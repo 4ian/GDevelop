@@ -206,7 +206,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
-  _renderResourceMenuTemplate = (resource: gdResource) => {
+  _renderResourceMenuTemplate = (resource: gdResource, _index: number) => {
     return [
       {
         label: 'Rename',

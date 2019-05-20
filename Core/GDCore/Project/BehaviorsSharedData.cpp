@@ -16,7 +16,7 @@ BehaviorsSharedData::~BehaviorsSharedData(){};
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> BehaviorsSharedData::GetProperties(
-    gd::Project& project) const {
+    const gd::SerializerElement& behaviorSharedDataContent, gd::Project& project) const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }

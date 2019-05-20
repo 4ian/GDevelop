@@ -45,8 +45,7 @@ class ProjectHelper {
   }
 
   /**
-   * \brief This check that the given gd::Behavior can be properly cloned
-   * and have the given property updated.
+   * \brief This check that the given gd::Behavior can have the given property updated.
    */
   static gd::String SanityCheckBehaviorProperty(gd::Behavior* behavior,
                                                 const gd::String& propertyName,
@@ -55,73 +54,48 @@ class ProjectHelper {
     gd::Project project;
     project.AddPlatform(JsPlatform::Get());
 
-    gd::String originalValue =
-        behavior->GetProperties(project)[propertyName].GetValue();
+    gd::SerializerElement behaviorContent;
+    behavior->InitializeContent(behaviorContent);
 
-    gd::Behavior* copiedBehavior = behavior->Clone();
-    if (copiedBehavior->GetProperties(project)[propertyName].GetValue() !=
-        originalValue) {
-      return "FAIL: Cloning the behavior does not copy properly the property";
-    }
+    // Call GetProperties as a sanity check
+    behavior->GetProperties(behaviorContent, project)[propertyName].GetValue();
 
-    behavior->UpdateProperty(propertyName, newValue, project);
+    behavior->UpdateProperty(behaviorContent, propertyName, newValue, project);
     gd::String updatedValue =
-        behavior->GetProperties(project)[propertyName].GetValue();
+        behavior->GetProperties(behaviorContent, project)[propertyName].GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the property, but "
              "received:" +
              updatedValue;
     }
 
-    gd::String copiedBehaviorValue =
-        copiedBehavior->GetProperties(project)[propertyName].GetValue();
-    if (copiedBehaviorValue != originalValue) {
-      return "FAIL: Updating the property of the behavior will change the "
-             "property of the cloned behavior. Clone behavior property is "
-             "now: " +
-             copiedBehaviorValue + ". Should have been:" + originalValue;
-    }
-
-    delete copiedBehavior;
     return "";
   }
 
   /**
-   * \brief This check that the given gd::BehaviorsSharedData can be properly cloned
-   * and have the given property updated.
+   * \brief This check that the given gd::BehaviorsSharedData can have the given property updated.
    */
   static gd::String SanityCheckBehaviorsSharedDataProperty(gd::BehaviorsSharedData* sharedData,
                                                 const gd::String& propertyName,
                                                 const gd::String& newValue) {
+
     if (!sharedData) return "FAIL: sharedData passed is null";
     gd::Project project;
     project.AddPlatform(JsPlatform::Get());
 
-    gd::String originalValue =
-        sharedData->GetProperties(project)[propertyName].GetValue();
+    gd::SerializerElement sharedDataContent;
+    sharedData->InitializeContent(sharedDataContent);
 
-    std::shared_ptr<gd::BehaviorsSharedData> copiedSharedData = sharedData->Clone();
-    if (copiedSharedData->GetProperties(project)[propertyName].GetValue() !=
-        originalValue) {
-      return "FAIL: Cloning the sharedData does not copy properly the property";
-    }
+    // Call GetProperties as a sanity check
+    sharedData->GetProperties(sharedDataContent, project)[propertyName].GetValue();
 
-    sharedData->UpdateProperty(propertyName, newValue, project);
+    sharedData->UpdateProperty(sharedDataContent, propertyName, newValue, project);
     gd::String updatedValue =
-        sharedData->GetProperties(project)[propertyName].GetValue();
+        sharedData->GetProperties(sharedDataContent, project)[propertyName].GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the property, but "
              "received:" +
              updatedValue;
-    }
-
-    gd::String copiedSharedDataValue =
-        copiedSharedData->GetProperties(project)[propertyName].GetValue();
-    if (copiedSharedDataValue != originalValue) {
-      return "FAIL: Updating the property of the sharedData will change the "
-             "property of the cloned sharedData. Clone sharedData property is "
-             "now: " +
-             copiedSharedDataValue + ". Should have been:" + originalValue;
     }
 
     return "";

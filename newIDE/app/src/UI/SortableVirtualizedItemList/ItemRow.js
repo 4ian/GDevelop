@@ -29,6 +29,7 @@ type Props = {
   onItemSelected: () => void,
   buildMenuTemplate: Item => any,
   errorStatus: '' | 'error' | 'warning',
+  buildMenuTemplate: () => any,
 };
 
 class ThemableItemRow extends React.Component<Props, *> {
@@ -41,7 +42,7 @@ class ThemableItemRow extends React.Component<Props, *> {
             <MoreVertIcon />
           </IconButton>
         }
-        buildMenuTemplate={() => this.props.buildMenuTemplate(item)}
+        buildMenuTemplate={this.props.buildMenuTemplate}
       />
     );
   }

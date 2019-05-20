@@ -1,6 +1,6 @@
 /**
  * The Cocos2D-JS renderer for the VideoRuntimeObject.
- * 
+ *
  * The implementation is empty as the object is not supported in Cocos2D-JS for now.
  *
  * @class VideoRuntimeObjectCocosRenderer
@@ -17,7 +17,7 @@ gdjs.VideoRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {}
 /**
  * To be called when the object is removed from the scene: will pause the video.
  */
-gdjs.VideoRuntimeObjectCocosRenderer.prototype.ownerRemovedFromScene = function() {};
+gdjs.VideoRuntimeObjectCocosRenderer.prototype.onOwnerRemovedFromScene = function() {};
 
 gdjs.VideoRuntimeObjectCocosRenderer.prototype.ensureUpToDate = function() {};
 

@@ -12,8 +12,8 @@ gdjs.DummyRuntimeBehavior = function(runtimeScene, behaviorData, owner)
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
     // Here you can access to the behavior data (JSON declared in JsExtension.js)
-    // using behaviorData.content:
-    this._textToSet = behaviorData.content.property1;
+    // using behaviorData:
+    this._textToSet = behaviorData.property1;
 
     // You can also run arbitrary code at the creation of the behavior:
     console.log("DummyRuntimeBehavior was created for object:", owner);

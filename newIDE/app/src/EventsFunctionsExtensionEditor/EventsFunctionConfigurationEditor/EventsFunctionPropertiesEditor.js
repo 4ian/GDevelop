@@ -11,11 +11,15 @@ import MenuItem from 'material-ui/MenuItem';
 import { mapVector } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import EmptyMessage from '../../UI/EmptyMessage';
+import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 
 const gd = global.gd;
 
 type Props = {|
   eventsFunction: gdEventsFunction,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
   helpPagePath?: string,
   onConfigurationUpdated?: () => void,
   renderConfigurationHeader?: () => React.Node,
@@ -34,6 +38,7 @@ const styles = {
 
 const getSentenceErrorText = (
   i18n: I18nType,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsFunction: gdEventsFunction
 ) => {
   const sentence = eventsFunction.getSentence();
@@ -42,6 +47,8 @@ const getSentenceErrorText = (
       t`Enter the sentence that will be displayed in the events sheet`
     );
 
+  const parametersIndexOffset = getParametersIndexOffset(!!eventsBasedBehavior);
+
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
     (parameter, index) => {
@@ -49,7 +56,7 @@ const getSentenceErrorText = (
         return null; // Behaviors are usually not shown in sentences.
       }
 
-      const expectedString = `_PARAM${index + 1}_`;
+      const expectedString = `_PARAM${index + parametersIndexOffset}_`;
       if (sentence.indexOf(expectedString) === -1) return expectedString;
 
       return null;
@@ -77,9 +84,21 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       onConfigurationUpdated,
       helpPagePath,
       renderConfigurationHeader,
+      eventsBasedBehavior,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
+    const isABehaviorLifecycleFunction =
+      !!eventsBasedBehavior &&
+      isBehaviorLifecycleFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleFunction) {
+      return (
+        <EmptyMessage>
+          This is a "lifecycle method". It will be called automatically by the
+          game engine.
+        </EmptyMessage>
+      );
+    }
 
     return (
       <I18n>
@@ -163,7 +182,11 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     this.forceUpdate();
                   }}
-                  errorText={getSentenceErrorText(i18n, eventsFunction)}
+                  errorText={getSentenceErrorText(
+                    i18n,
+                    eventsBasedBehavior,
+                    eventsFunction
+                  )}
                 />
               ) : null}
             </Line>

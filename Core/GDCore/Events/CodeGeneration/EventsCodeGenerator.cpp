@@ -537,6 +537,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
                             action.GetParameters().size() < 2
                                 ? ""
                                 : action.GetParameter(1).GetPlainString());
+
   if (MetadataProvider::HasBehaviorAction(
           platform, behaviorType, action.GetType()) &&
       instrInfos.parameters.size() >= 2) {

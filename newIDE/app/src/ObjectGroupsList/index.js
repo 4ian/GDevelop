@@ -9,7 +9,7 @@ import GroupRow from './GroupRow';
 import { ListItem } from 'material-ui/List';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { makeAddItem } from '../UI/ListAddItem';
+import { makeAddItem } from '../UI/ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import {
   filterGroupsList,

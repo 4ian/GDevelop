@@ -239,11 +239,6 @@ class GD_CORE_API EventsCodeGenerator {
     customCodeOutsideMain += code;
   };
 
-  /**
-   * \brief Add some code before events in the main function.
-   */
-  void AddCustomCodeInMain(gd::String code) { customCodeInMain += code; };
-
   /** \brief Get the set containing the include files.
    */
   const std::set<gd::String>& GetIncludeFiles() const { return includeFiles; }
@@ -253,10 +248,6 @@ class GD_CORE_API EventsCodeGenerator {
   const gd::String& GetCustomCodeOutsideMain() const {
     return customCodeOutsideMain;
   }
-
-  /** \brief Get the custom code to be inserted inside main function.
-   */
-  const gd::String& GetCustomCodeInMain() const { return customCodeInMain; }
 
   /** \brief Get the custom declaration to be inserted after includes.
    */
@@ -734,8 +725,6 @@ class GD_CORE_API EventsCodeGenerator {
                      ///< can share the same list.
   gd::String customCodeOutsideMain;  ///< Custom code inserted before events (
                                      ///< and not in events function )
-  gd::String customCodeInMain;  ///< Custom code inserted before events ( in
-                                ///< main function )
   std::set<gd::String>
       customGlobalDeclarations;     ///< Custom global C++ declarations inserted
                                     ///< after includes

@@ -14,6 +14,7 @@
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/Variable.h>
+#include <GDCore/Project/EventsBasedBehavior.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
@@ -70,6 +71,7 @@
 
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/EventsCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/IDE/Exporter.h>
 
 #include <emscripten.h>
@@ -390,6 +392,7 @@ typedef EventsFunction::FunctionType EventsFunction_FunctionType;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserDiagnostic*> VectorExpressionParserDiagnostic;
+typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehaviorsList;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -444,8 +447,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
             icon24x24,                                                      \
             std::shared_ptr<gd::Object>(instance))
 
-#define WRAPPED_Get() Get().get()
-#define WRAPPED_GetSharedDataInstance() GetSharedDataInstance().get()
 #define WRAPPED_at(a) at(a).get()
 
 #define MAP_get(a) find(a)->second
@@ -518,6 +519,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ObjectRemovedInLayout ObjectRemovedInLayout
 #define STATIC_GlobalObjectRenamed GlobalObjectRenamed
 #define STATIC_GlobalObjectRemoved GlobalObjectRemoved
+#define STATIC_GetAllObjectTypesUsingEventsBasedBehavior GetAllObjectTypesUsingEventsBasedBehavior
+#define STATIC_EnsureBehaviorEventsFunctionsProperParameters EnsureBehaviorEventsFunctionsProperParameters
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty
@@ -535,6 +538,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetNamespaceSeparator GetNamespaceSeparator
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_RenameEventsFunction RenameEventsFunction
+#define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
+#define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
 
 #define STATIC_UseOldExpressionParser UseOldExpressionParser
 #define STATIC_IsUsingOldExpressionParser IsUsingOldExpressionParser

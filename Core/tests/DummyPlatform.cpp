@@ -6,6 +6,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
@@ -24,6 +25,16 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   extension->SetExtensionInformation(
       "MyExtension", "My testing extension", "", "", "");
+  extension
+      ->AddAction("DoSomething",
+                  "Do something",
+                  "This does something",
+                  "Do something please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("expression", "Parameter 1 (a number)")
+      .SetFunctionName("doSomething");
   extension->AddExpression("GetNumber", "Get me a number", "", "", "")
       .SetFunctionName("getNumber");
   extension
@@ -31,9 +42,7 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
           "GetVariableAsNumber", "Get me a variable value", "", "", "")
       .AddParameter("scenevar", "Scene variable")
       .SetFunctionName("returnVariable");
-  extension
-      ->AddStrExpression(
-          "ToString", "ToString", "", "", "")
+  extension->AddStrExpression("ToString", "ToString", "", "", "")
       .AddParameter("expression", "Number to convert to string")
       .SetFunctionName("toString");
   extension
@@ -116,10 +125,36 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       .AddParameter("object", _("Object parameter"))
       .AddParameter("objectPtr", _("Object parameter"))
       .SetFunctionName("getObjectStringWith2ObjectParam");
-  // auto behavior = extension->AddBehavior("MyBehavior", "Dummy behavior",
-  // "MyBehavior", "", "", "","",
-  //   gd::make_unique<gd::Behavior>(),
-  //   gd::make_unique<gd::BehaviorsSharedData>());
+  auto behavior =
+      extension->AddBehavior("MyBehavior",
+                             "Dummy behavior",
+                             "MyBehavior",
+                             "A dummy behavior for tests",
+                             "",
+                             "",
+                             "",
+                             gd::make_unique<gd::Behavior>(),
+                             gd::make_unique<gd::BehaviorsSharedData>());
+  behavior
+      .AddAction("BehaviorDoSomething",
+                 "Do something on behavior",
+                 "This does something with the behavior",
+                 "Do something with the behavior please",
+                 "",
+                 "",
+                 "")
+      .AddParameter("expression", "Parameter 1 (a number)")
+      .SetFunctionName("behaviorDoSomething");
+  behavior
+      .AddStrExpression("GetBehaviorStringWith1Param",
+                        "Get string from behavior with 1 param",
+                        "",
+                        "",
+                        "")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
+      .AddParameter("expression", _("Number parameter"))
+      .SetFunctionName("getBehaviorStringWith1Param");
 
   platform.AddExtension(baseObjectExtension);
   platform.AddExtension(extension);

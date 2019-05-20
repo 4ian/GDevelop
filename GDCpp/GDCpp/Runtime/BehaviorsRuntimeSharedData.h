@@ -9,6 +9,7 @@
 
 namespace gd {
 class BehaviorsSharedData;
+class SerializerElement;
 }
 #include <memory>
 
@@ -16,17 +17,13 @@ class BehaviorsSharedData;
  * \brief Base class for defining behaviors shared datas used at runtime.
  *
  * Behaviors can use shared datas, as if they were extending the RuntimeScene
- * members. Inherit from this class, and define an appropriate constructor,
- * which will be called by the CreateRuntimeSharedDatas member function of
- * BehaviorsharedDatas.
- *
- * \see BehaviorsharedDatas::CreateRuntimeSharedDatas
+ * members.
  *
  * \ingroup GameEngine
  */
 class BehaviorsRuntimeSharedData {
  public:
-  BehaviorsRuntimeSharedData(){};
+  BehaviorsRuntimeSharedData(const gd::SerializerElement& behaviorSharedDataContent){};
   virtual ~BehaviorsRuntimeSharedData(){};
   virtual std::shared_ptr<BehaviorsRuntimeSharedData> Clone() const {
     return std::shared_ptr<BehaviorsRuntimeSharedData>(

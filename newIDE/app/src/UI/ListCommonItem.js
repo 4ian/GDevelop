@@ -1,6 +1,7 @@
 import React from 'react';
 import IconButton from 'material-ui/IconButton';
 import Add from 'material-ui/svg-icons/content/add';
+import Search from 'material-ui/svg-icons/action/search';
 import EmptyMessage from '../UI/EmptyMessage';
 // No i18n in this file
 
@@ -9,12 +10,7 @@ const styles = {
   message: { padding: 0 },
 };
 
-/**
- * An Higher-order component that create an item that must be put at the
- * end of a list to allow the user to add a new item.
- * @param Item The component to wrap. Should act as a material-ui ListItem.
- */
-export const makeAddItem = Item => ({
+export const makeCommonItem = (Item, Icon) => ({
   onClick,
   primaryText,
   style,
@@ -28,7 +24,7 @@ export const makeAddItem = Item => ({
       style={{ ...styles.item, ...style }}
       rightIconButton={
         <IconButton>
-          <Add
+          <Icon
             onClick={event => {
               event.stopPropagation();
               onClick();
@@ -41,3 +37,17 @@ export const makeAddItem = Item => ({
     />
   );
 };
+
+/**
+ * An Higher-order component that create an item that must be put at the
+ * end of a list to allow the user to add a new item.
+ * @param Item The component to wrap. Should act as a material-ui ListItem.
+ */
+export const makeAddItem = Item => makeCommonItem(Item, Add);
+
+/**
+ * An Higher-order component that create an item that must be put at the
+ * end of a list to allow the user to add a new item.
+ * @param Item The component to wrap. Should act as a material-ui ListItem.
+ */
+export const makeSearchItem = Item => makeCommonItem(Item, Search);

@@ -5,18 +5,19 @@ Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
+#include "DestroyOutsideBehavior.h"
+#include "DestroyOutsideRuntimeBehavior.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
 
-#include "DestroyOutsideBehavior.h"
-
 void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "DestroyOutsideBehavior",
-      _("Destroy Outside Screen Behavior"),
-      _("This Extension can be used to destroy objects when they go outside of "
-        "the borders of the game's window."),
-      "Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation("DestroyOutsideBehavior",
+                               _("Destroy Outside Screen Behavior"),
+                               _("This Extension can be used to destroy "
+                                 "objects when they go outside of "
+                                 "the borders of the game's window."),
+                               "Florian Rival",
+                               "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/destroyoutside");
 
   gd::BehaviorMetadata& aut =
@@ -32,8 +33,6 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                             std::shared_ptr<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
-  aut.SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideBehavior.h");
-
   aut.AddCondition("ExtraBorder",
                    _("Additional border"),
                    _("Compare the additional border that the object must cross "
@@ -49,7 +48,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetExtraBorder")
       .SetManipulatedType("number")
-      .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideBehavior.h");
+      .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
 
   aut.AddAction("ExtraBorder",
                 _("Additional border"),
@@ -67,7 +66,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetExtraBorder")
       .SetManipulatedType("number")
       .SetGetter("GetExtraBorder")
-      .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideBehavior.h");
+      .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
 #endif
 }
 
@@ -82,6 +81,12 @@ class DestroyOutsideBehaviorCppExtension : public ExtensionBase {
    */
   DestroyOutsideBehaviorCppExtension() {
     DeclareDestroyOutsideBehaviorExtension(*this);
+    AddRuntimeBehavior<DestroyOutsideRuntimeBehavior>(
+        GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside"),
+        "DestroyOutsideRuntimeBehavior");
+    GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside")
+        .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

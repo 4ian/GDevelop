@@ -27,98 +27,98 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === 'type') {
-        behaviorContent.type = newValue;
+      if (propertyName === 'bodyType') {
+        behaviorContent.getChild('bodyType').setStringValue(newValue);
         return true;
       }
       if (propertyName === 'bullet') {
-        behaviorContent.bullet = newValue === '1';
+        behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
         return true;
       }
       if (propertyName === 'fixedRotation') {
-        behaviorContent.fixedRotation = newValue === '1';
+        behaviorContent.getChild('fixedRotation').setBoolValue(newValue === '1');
         return true;
       }
       if (propertyName === 'canSleep') {
-        behaviorContent.canSleep = newValue === '1';
+        behaviorContent.getChild('canSleep').setBoolValue(newValue === '1');
         return true;
       }
       if (propertyName === 'shape') {
-        behaviorContent.shape = newValue;
+        behaviorContent.getChild('shape').setStringValue(newValue);
         return true;
       }
       if (propertyName === 'shapeDimensionA') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.shapeDimensionA = newValue;
+        behaviorContent.getChild('shapeDimensionA').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'shapeDimensionB') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.shapeDimensionB = newValue;
+        behaviorContent.getChild('shapeDimensionB').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'shapeOffsetX') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.shapeOffsetX = newValue;
+        behaviorContent.getChild('shapeOffsetX').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'shapeOffsetY') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.shapeOffsetY = newValue;
+        behaviorContent.getChild('shapeOffsetY').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'polygonOrigin') {
-        behaviorContent.polygonOrigin = newValue;
+        behaviorContent.getChild('polygonOrigin').setStringValue(newValue);
         return true;
       }
       if (propertyName === 'vertices') {
-        behaviorContent.vertices = JSON.parse(newValue);
+        behaviorContent.setChild('vertices', gd.Serializer.fromJSON(newValue));
         return true;
       }
       if (propertyName === 'density') {
-        behaviorContent.density = parseFloat(newValue);
+        behaviorContent.getChild('density').setDoubleValue(parseFloat(newValue));
         return true;
       }
       if (propertyName === 'friction') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.friction = newValue;
+        behaviorContent.getChild('friction').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'restitution') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.restitution = newValue;
+        behaviorContent.getChild('restitution').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'linearDamping') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.linearDamping = newValue;
+        behaviorContent.getChild('linearDamping').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'angularDamping') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.angularDamping = newValue;
+        behaviorContent.getChild('angularDamping').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'gravityScale') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.gravityScale = newValue;
+        behaviorContent.getChild('gravityScale').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'layers') {
-        behaviorContent.layers = parseInt(newValue);
+        behaviorContent.getChild('layers').setIntValue(parseInt(newValue, 10));
         return true;
       }
       if (propertyName === 'masks') {
-        behaviorContent.masks = parseInt(newValue);
+        behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
         return true;
       }
     };
@@ -126,8 +126,8 @@ module.exports = {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       behaviorProperties.set(
-        'type',
-        new gd.PropertyDescriptor(behaviorContent.type)
+        'bodyType',
+        new gd.PropertyDescriptor(behaviorContent.getChild('bodyType').getStringValue())
           .setType('Choice')
           .setLabel('Type')
           .addExtraInfo('Static')
@@ -136,27 +136,31 @@ module.exports = {
       );
       behaviorProperties.set(
         'bullet',
-        new gd.PropertyDescriptor(behaviorContent.bullet ? 'true' : 'false')
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('bullet').getBoolValue() ? 'true' : 'false'
+        )
           .setType('Boolean')
           .setLabel('Bullet')
       );
       behaviorProperties.set(
         'fixedRotation',
         new gd.PropertyDescriptor(
-          behaviorContent.fixedRotation ? 'true' : 'false'
+          behaviorContent.getChild('fixedRotation').getBoolValue() ? 'true' : 'false'
         )
           .setType('Boolean')
           .setLabel('Fixed Rotation')
       );
       behaviorProperties.set(
         'canSleep',
-        new gd.PropertyDescriptor(behaviorContent.canSleep ? 'true' : 'false')
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('canSleep').getBoolValue() ? 'true' : 'false'
+        )
           .setType('Boolean')
           .setLabel('Can Sleep')
       );
       behaviorProperties.set(
         'shape',
-        new gd.PropertyDescriptor(behaviorContent.shape)
+        new gd.PropertyDescriptor(behaviorContent.getChild('shape').getStringValue())
           .setType('Choice')
           .setLabel('Shape')
           .addExtraInfo('Box')
@@ -166,31 +170,41 @@ module.exports = {
       );
       behaviorProperties.set(
         'shapeDimensionA',
-        new gd.PropertyDescriptor(behaviorContent.shapeDimensionA.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('shapeDimensionA').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Shape Dimension A')
       );
       behaviorProperties.set(
         'shapeDimensionB',
-        new gd.PropertyDescriptor(behaviorContent.shapeDimensionB.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('shapeDimensionB').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Shape Dimension B')
       );
       behaviorProperties.set(
         'shapeOffsetX',
-        new gd.PropertyDescriptor(behaviorContent.shapeOffsetX.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('shapeOffsetX').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Shape Offset X')
       );
       behaviorProperties.set(
         'shapeOffsetY',
-        new gd.PropertyDescriptor(behaviorContent.shapeOffsetY.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('shapeOffsetY').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Shape Offset Y')
       );
       behaviorProperties.set(
         'polygonOrigin',
-        new gd.PropertyDescriptor(behaviorContent.polygonOrigin || 'Center')
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('polygonOrigin').getStringValue() || 'Center'
+        )
           .setType('Choice')
           .setLabel('Polygon Origin')
           .addExtraInfo('Center')
@@ -200,54 +214,70 @@ module.exports = {
       behaviorProperties.set(
         'vertices',
         new gd.PropertyDescriptor(
-          JSON.stringify(behaviorContent.vertices || [])
+          gd.Serializer.toJSON(behaviorContent.getChild('vertices')) || '[]'
         ).setLabel('Vertices')
       );
       behaviorProperties.set(
         'density',
-        new gd.PropertyDescriptor(behaviorContent.density.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('density').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Density')
       );
       behaviorProperties.set(
         'friction',
-        new gd.PropertyDescriptor(behaviorContent.friction.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('friction').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Friction')
       );
       behaviorProperties.set(
         'restitution',
-        new gd.PropertyDescriptor(behaviorContent.restitution.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('restitution').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Restitution')
       );
       behaviorProperties.set(
         'linearDamping',
-        new gd.PropertyDescriptor(behaviorContent.linearDamping.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('linearDamping').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Linear Damping')
       );
       behaviorProperties.set(
         'angularDamping',
-        new gd.PropertyDescriptor(behaviorContent.angularDamping.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('angularDamping').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Angular Damping')
       );
       behaviorProperties.set(
         'gravityScale',
-        new gd.PropertyDescriptor(behaviorContent.gravityScale.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('gravityScale').getDoubleValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Gravity Scale')
       );
       behaviorProperties.set(
         'layers',
-        new gd.PropertyDescriptor(behaviorContent.layers.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('layers').getIntValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Layers')
       );
       behaviorProperties.set(
         'masks',
-        new gd.PropertyDescriptor(behaviorContent.masks.toString(10))
+        new gd.PropertyDescriptor(
+          behaviorContent.getChild('masks').getIntValue().toString(10)
+        )
           .setType('Number')
           .setLabel('Masks')
       );
@@ -255,29 +285,27 @@ module.exports = {
       return behaviorProperties;
     };
 
-    physics2Behavior.setRawJSONContent(
-      JSON.stringify({
-        type: 'Dynamic',
-        bullet: false,
-        fixedRotation: false,
-        canSleep: true,
-        shape: 'Box',
-        shapeDimensionA: 0,
-        shapeDimensionB: 0,
-        shapeOffsetX: 0,
-        shapeOffsetY: 0,
-        polygonOrigin: 'Center',
-        vertices: [],
-        density: 1.0,
-        friction: 0.3,
-        restitution: 0.1,
-        linearDamping: 0.1,
-        angularDamping: 0.1,
-        gravityScale: 1,
-        layers: 1,
-        masks: 1,
-      })
-    );
+    physics2Behavior.initializeContent = function(behaviorContent) {
+      behaviorContent.addChild('bodyType').setStringValue('Dynamic');
+      behaviorContent.addChild('bullet').setBoolValue(false);
+      behaviorContent.addChild('fixedRotation').setBoolValue(false);
+      behaviorContent.addChild('canSleep').setBoolValue(true);
+      behaviorContent.addChild('shape').setStringValue('Box');
+      behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
+      behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
+      behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
+      behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
+      behaviorContent.addChild('polygonOrigin').setStringValue('Center');
+      behaviorContent.addChild('vertices').considerAsArray();
+      behaviorContent.addChild('density').setDoubleValue(1.0);
+      behaviorContent.addChild('friction').setDoubleValue(0.3);
+      behaviorContent.addChild('restitution').setDoubleValue(0.1);
+      behaviorContent.addChild('linearDamping').setDoubleValue(0.1);
+      behaviorContent.addChild('angularDamping').setDoubleValue(0.1);
+      behaviorContent.addChild('gravityScale').setDoubleValue(1);
+      behaviorContent.addChild('layers').setIntValue(1);
+      behaviorContent.addChild('masks').setIntValue(1);
+    };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
     sharedData.updateProperty = function(
@@ -288,25 +316,25 @@ module.exports = {
       if (propertyName === 'gravityX') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        sharedContent.gravityX = newValue;
+        sharedContent.getChild('gravityX').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'gravityY') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        sharedContent.gravityY = newValue;
+        sharedContent.getChild('gravityY').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'scaleX') {
         newValue = parseInt(newValue, 10);
         if (newValue !== newValue) return false;
-        sharedContent.scaleX = newValue;
+        sharedContent.getChild('scaleX').setDoubleValue(newValue);
         return true;
       }
       if (propertyName === 'scaleY') {
         newValue = parseInt(newValue, 10);
         if (newValue !== newValue) return false;
-        sharedContent.scaleY = newValue;
+        sharedContent.getChild('scaleY').setDoubleValue(newValue);
         return true;
       }
 
@@ -314,42 +342,41 @@ module.exports = {
     };
     sharedData.getProperties = function(sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
+      console.log(gd.Serializer.toJSON(sharedContent));
 
       sharedProperties.set(
         'gravityX',
-        new gd.PropertyDescriptor(sharedContent.gravityX.toString(10)).setType(
-          'Number'
-        )
+        new gd.PropertyDescriptor(
+          sharedContent.getChild('gravityX').getDoubleValue().toString(10)
+        ).setType('Number')
       );
       sharedProperties.set(
         'gravityY',
-        new gd.PropertyDescriptor(sharedContent.gravityY.toString(10)).setType(
-          'Number'
-        )
+        new gd.PropertyDescriptor(
+          sharedContent.getChild('gravityY').getDoubleValue().toString(10)
+        ).setType('Number')
       );
       sharedProperties.set(
         'scaleX',
-        new gd.PropertyDescriptor(sharedContent.scaleX.toString(10)).setType(
-          'Number'
-        )
+        new gd.PropertyDescriptor(
+          sharedContent.getChild('scaleX').getDoubleValue().toString(10)
+        ).setType('Number')
       );
       sharedProperties.set(
         'scaleY',
-        new gd.PropertyDescriptor(sharedContent.scaleY.toString(10)).setType(
-          'Number'
-        )
+        new gd.PropertyDescriptor(
+          sharedContent.getChild('scaleY').getDoubleValue().toString(10)
+        ).setType('Number')
       );
 
       return sharedProperties;
     };
-    sharedData.setRawJSONContent(
-      JSON.stringify({
-        gravityX: 0,
-        gravityY: 9.8,
-        scaleX: 100,
-        scaleY: 100,
-      })
-    );
+    sharedData.initializeContent = function(behaviorContent) {
+      behaviorContent.getChild("gravityX").setDoubleValue(0);
+      behaviorContent.getChild("gravityY").setDoubleValue(9.8);
+      behaviorContent.getChild("scaleX").setDoubleValue(100);
+      behaviorContent.getChild("scaleY").setDoubleValue(100);
+    }
 
     var aut = extension
       // extension
@@ -357,7 +384,9 @@ module.exports = {
         'Physics2Behavior',
         _('Physics Engine 2.0'),
         'Physics2',
-        _('Simulate realistic object physics, with gravity, forces, joints, etc.'),
+        _(
+          'Simulate realistic object physics, with gravity, forces, joints, etc.'
+        ),
         '',
         'res/physics32.png',
         'Physics2Behavior',
@@ -1031,7 +1060,7 @@ module.exports = {
       .setManipulatedType('number')
       .setGetter('getGravityScale');
 
-      aut
+    aut
       .addExpression(
         'GravityScale',
         _('Gravity scale of the object'),

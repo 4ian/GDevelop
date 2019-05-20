@@ -5,8 +5,9 @@
  */
 #include "BehaviorsRuntimeSharedDataHolder.h"
 #include <iostream>
+#include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/Runtime/BehaviorsRuntimeSharedData.h"
-#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
+#include "GDCpp/Runtime/Project/BehaviorContent.h"
 
 const std::shared_ptr<BehaviorsRuntimeSharedData>&
 BehaviorsRuntimeSharedDataHolder::GetBehaviorSharedData(
@@ -15,23 +16,22 @@ BehaviorsRuntimeSharedDataHolder::GetBehaviorSharedData(
 }
 
 void BehaviorsRuntimeSharedDataHolder::LoadFrom(
-    const std::map<gd::String, std::shared_ptr<gd::BehaviorsSharedData> >&
+    const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
         sharedData) {
   behaviorsSharedDatas.clear();
-  for (std::map<gd::String,
-                std::shared_ptr<gd::BehaviorsSharedData> >::const_iterator it =
-           sharedData.begin();
-       it != sharedData.end();
-       ++it) {
-    if (it->second == std::shared_ptr<gd::BehaviorsSharedData>()) continue;
-    std::shared_ptr<BehaviorsRuntimeSharedData> data =
-        it->second->CreateRuntimeSharedDatas();
+  for (auto& it : sharedData) {
+    const gd::String& type = it.second->GetTypeName();
+    const gd::String& name = it.second->GetName();
 
-    if (data)
-      behaviorsSharedDatas[it->first] = data;
+    std::unique_ptr<BehaviorsRuntimeSharedData> runtimeSharedData =
+        CppPlatform::Get().CreateBehaviorsRuntimeSharedData(
+            type, it.second->GetContent());
+
+    if (runtimeSharedData)
+      behaviorsSharedDatas[name] = std::move(runtimeSharedData);
     else
-      std::cout << "ERROR: Unable to create shared data for behavior \""
-                << it->second->GetName() << "\".";
+      std::cout << "ERROR: Unable to create shared data for behavior \"" << type
+                << "\".";
   }
 }
 
@@ -51,7 +51,7 @@ void BehaviorsRuntimeSharedDataHolder::Init(
     const BehaviorsRuntimeSharedDataHolder& other) {
   behaviorsSharedDatas.clear();
   for (std::map<gd::String,
-                std::shared_ptr<BehaviorsRuntimeSharedData> >::const_iterator
+                std::shared_ptr<BehaviorsRuntimeSharedData>>::const_iterator
            it = other.behaviorsSharedDatas.begin();
        it != other.behaviorsSharedDatas.end();
        ++it) {

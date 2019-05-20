@@ -12,43 +12,27 @@ This project is released under the MIT License.
 #include "RuntimeScenePhysicsDatas.h"
 
 /**
- * Datas shared by Physics Behavior
+ * \brief Handle the data shared by Physics Behavior
  */
 class ScenePhysicsDatas : public gd::BehaviorsSharedData {
  public:
-  ScenePhysicsDatas()
-      : BehaviorsSharedData(),
-        gravityX(0),
-        gravityY(9),
-        scaleX(100),
-        scaleY(100){};
+  ScenePhysicsDatas(){};
   virtual ~ScenePhysicsDatas(){};
-  virtual std::shared_ptr<gd::BehaviorsSharedData> Clone() const {
-    return std::shared_ptr<gd::BehaviorsSharedData>(
-        new ScenePhysicsDatas(*this));
-  }
-
-  float gravityX;
-  float gravityY;
-  float scaleX;
-  float scaleY;
-
-  virtual std::shared_ptr<BehaviorsRuntimeSharedData>
-  CreateRuntimeSharedDatas() {
-    return std::shared_ptr<BehaviorsRuntimeSharedData>(
-        new RuntimeScenePhysicsDatas(*this));
+  virtual ScenePhysicsDatas* Clone() const override {
+    return new ScenePhysicsDatas(*this);
   }
 
 #if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const;
-  virtual bool UpdateProperty(const gd::String& name,
+      const gd::SerializerElement& behaviorSharedDataContent,
+      gd::Project& project) const override;
+  virtual bool UpdateProperty(gd::SerializerElement& behaviorSharedDataContent,
+                              const gd::String& name,
                               const gd::String& value,
-                              gd::Project& project);
-  virtual void SerializeTo(gd::SerializerElement& element) const;
+                              gd::Project& project) override;
 #endif
-
-  virtual void UnserializeFrom(const gd::SerializerElement& element);
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorSharedDataContent) override;
 };
 
 #endif  // SCENEPHYSICSDATAS_H

@@ -5,6 +5,7 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { linkTo } from '@storybook/addon-links';
 
+import { I18n } from '@lingui/react';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
@@ -120,6 +121,13 @@ import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
+import EventsBasedBehaviorEditor from '../EventsBasedBehaviorEditor';
+import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
+import BehaviorTypeSelector from '../BehaviorTypeSelector';
+import ObjectTypeSelector from '../ObjectTypeSelector';
+import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
+import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
+import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 
 // No i18n in this file
 
@@ -141,6 +149,10 @@ const {
   testEventsFunctionsExtension,
   testSerializedEvents,
   testSerializedEventsWithLotsOfObjects,
+  testEventsBasedBehavior,
+  testEmptyEventsBasedBehavior,
+  testBehaviorEventsFunction,
+  testBehaviorLifecycleEventsFunction,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -1818,7 +1830,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
-  .add('default', () => (
+  .add('default, for a free function (i.e: no behavior)', () => (
     <FixedHeightFlexContainer height={500}>
       <EventsFunctionConfigurationEditor
         project={project}
@@ -1826,6 +1838,37 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         objectsContainer={testLayout}
         helpPagePath="/events/functions"
         eventsFunction={testEventsFunction}
+        eventsBasedBehavior={null}
+        onParametersOrGroupsUpdated={action(
+          'Parameters or groups were updated'
+        )}
+      />
+    </FixedHeightFlexContainer>
+  ))
+  .add('default, for an events based behavior function', () => (
+    <FixedHeightFlexContainer height={500}>
+      <EventsFunctionConfigurationEditor
+        project={project}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        helpPagePath="/events/functions"
+        eventsFunction={testBehaviorEventsFunction}
+        eventsBasedBehavior={testEventsBasedBehavior}
+        onParametersOrGroupsUpdated={action(
+          'Parameters or groups were updated'
+        )}
+      />
+    </FixedHeightFlexContainer>
+  ))
+  .add('default, for an events based behavior lifecycle function', () => (
+    <FixedHeightFlexContainer height={500}>
+      <EventsFunctionConfigurationEditor
+        project={project}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        helpPagePath="/events/functions"
+        eventsFunction={testBehaviorLifecycleEventsFunction}
+        eventsBasedBehavior={testEventsBasedBehavior}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}
@@ -1845,8 +1888,10 @@ storiesOf('EventsFunctionsList', module)
         )}
         onSelectEventsFunction={action('select')}
         onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
+        onAddEventsFunction={cb => cb(true, null)}
+        onEventsFunctionAdded={() => {}}
         onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
-        onEditOptions={action('edit options')}
+        canRename={() => true}
       />
     </FixedHeightFlexContainer>
   ));
@@ -1868,6 +1913,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           resourceExternalEditors={[]}
           openInstructionOrExpression={action('open instruction or expression')}
           initiallyFocusedFunctionName={null}
+          initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
         />
       </FixedHeightFlexContainer>
@@ -1878,10 +1924,60 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
   .add('default', () => (
-    <OptionsEditorDialog
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          eventsFunctionCodeWriter={null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <OptionsEditorDialog
+            eventsFunctionsExtension={testEventsFunctionsExtension}
+            open
+            onClose={action('close')}
+          />
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
+  ));
+
+storiesOf('EventsBasedBehaviorEditor', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <EventsBasedBehaviorEditor
+      project={project}
       eventsFunctionsExtension={testEventsFunctionsExtension}
-      open
-      onClose={action('close')}
+      eventsBasedBehavior={testEventsBasedBehavior}
+    />
+  ))
+  .add('events based behavior without functions', () => (
+    <EventsBasedBehaviorEditor
+      project={project}
+      eventsFunctionsExtension={testEventsFunctionsExtension}
+      eventsBasedBehavior={testEmptyEventsBasedBehavior}
+    />
+  ));
+
+storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <EventsBasedBehaviorEditorDialog
+      project={project}
+      eventsFunctionsExtension={testEventsFunctionsExtension}
+      eventsBasedBehavior={testEventsBasedBehavior}
+      onApply={action('apply')}
+    />
+  ))
+  .add('events based behavior without functions', () => (
+    <EventsBasedBehaviorEditorDialog
+      project={project}
+      eventsFunctionsExtension={testEventsFunctionsExtension}
+      eventsBasedBehavior={testEmptyEventsBasedBehavior}
+      onApply={action('apply')}
     />
   ));
 
@@ -1962,4 +2058,77 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
     />
+  ));
+
+storiesOf('BehaviorTypeSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <BehaviorTypeSelector
+      project={project}
+      value={''}
+      onChange={action('change')}
+    />
+  ))
+  .add('with a non existing behavior selected', () => (
+    <BehaviorTypeSelector
+      project={project}
+      value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
+      onChange={action('change')}
+    />
+  ));
+
+storiesOf('ObjectTypeSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default (Sprite selected)', () => (
+    <ObjectTypeSelector
+      project={project}
+      value={'Sprite'}
+      onChange={action('change')}
+    />
+  ))
+  .add('custom label (Sprite selected)', () => (
+    <ObjectTypeSelector
+      project={project}
+      value={'Sprite'}
+      floatingLabelText="Choose the object type to use"
+      onChange={action('change')}
+    />
+  ));
+
+storiesOf('NewBehaviorDialog', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default, for a Sprite object', () => (
+    <NewBehaviorDialog
+      open
+      project={project}
+      objectType={'Sprite'}
+      onClose={action('on close')}
+      onChoose={action('on choose')}
+    />
+  ));
+
+storiesOf('ExtensionsSearchDialog', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          eventsFunctionCodeWriter={null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <ExtensionsSearchDialog
+            project={project}
+            onClose={action('on close')}
+          />
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
   ));

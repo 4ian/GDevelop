@@ -23,6 +23,7 @@ BehaviorJsImplementation* BehaviorJsImplementation::Clone() const {
 
         clone['getProperties'] = self['getProperties'];
         clone['updateProperty'] = self['updateProperty'];
+        clone['initializeContent'] = self['initializeContent'];
       },
       (int)clone,
       (int)this);
@@ -30,7 +31,7 @@ BehaviorJsImplementation* BehaviorJsImplementation::Clone() const {
   return clone;
 }
 std::map<gd::String, gd::PropertyDescriptor>
-BehaviorJsImplementation::GetProperties(gd::Project&) const {
+BehaviorJsImplementation::GetProperties(const gd::SerializerElement& behaviorContent, gd::Project&) const {
   std::map<gd::String, gd::PropertyDescriptor>* jsCreatedProperties = nullptr;
   std::map<gd::String, gd::PropertyDescriptor> copiedProperties;
 
@@ -40,46 +41,51 @@ BehaviorJsImplementation::GetProperties(gd::Project&) const {
         if (!self.hasOwnProperty('getProperties'))
           throw 'getProperties is not defined on a BehaviorJsImplementation.';
 
-        var objectContent = JSON.parse(Pointer_stringify($1));
-        var newProperties = self['getProperties'](objectContent);
+        var newProperties = self['getProperties'](wrapPointer($1, Module['SerializerElement']));
         if (!newProperties)
           throw 'getProperties returned nothing in a gd::BehaviorJsImplementation.';
 
         return getPointer(newProperties);
       },
       (int)this,
-      jsonContent.c_str());
+      (int)&behaviorContent);
 
   copiedProperties = *jsCreatedProperties;
   delete jsCreatedProperties;
   return copiedProperties;
 }
-bool BehaviorJsImplementation::UpdateProperty(const gd::String& arg0,
-                                              const gd::String& arg1,
+bool BehaviorJsImplementation::UpdateProperty(gd::SerializerElement& behaviorContent,
+                                              const gd::String& name,
+                                              const gd::String& value,
                                               Project&) {
-  jsonContent = (const char*)EM_ASM_INT(
+  EM_ASM_INT(
       {
         var self = Module['getCache'](Module['BehaviorJsImplementation'])[$0];
         if (!self.hasOwnProperty('updateProperty'))
           throw 'updateProperty is not defined on a BehaviorJsImplementation.';
-        var objectContent = JSON.parse(Pointer_stringify($1));
+
         self['updateProperty'](
-            objectContent, Pointer_stringify($2), Pointer_stringify($3));
-        return ensureString(JSON.stringify(objectContent));
+            wrapPointer($1, Module['SerializerElement']), Pointer_stringify($2), Pointer_stringify($3));
       },
       (int)this,
-      jsonContent.c_str(),
-      arg0.c_str(),
-      arg1.c_str());
+      (int)&behaviorContent,
+      name.c_str(),
+      value.c_str());
 
   return true;
 }
+void BehaviorJsImplementation::InitializeContent(gd::SerializerElement& behaviorContent) {
+  EM_ASM_INT(
+      {
+        var self = Module['getCache'](Module['BehaviorJsImplementation'])[$0];
+        if (!self.hasOwnProperty('initializeContent'))
+          throw 'initializeContent is not defined on a BehaviorJsImplementation.';
 
-void BehaviorJsImplementation::SerializeTo(SerializerElement& arg0) const {
-  arg0.AddChild("content") = gd::Serializer::FromJSON(jsonContent);
-}
-void BehaviorJsImplementation::UnserializeFrom(const SerializerElement& arg1) {
-  jsonContent = gd::Serializer::ToJSON(arg1.GetChild("content"));
+        self['initializeContent'](
+            wrapPointer($1, Module['SerializerElement']));
+      },
+      (int)this,
+      (int)&behaviorContent);
 }
 
 void BehaviorJsImplementation::__destroy__() {  // Useless?

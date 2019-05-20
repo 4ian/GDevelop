@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/BehaviorContent.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
@@ -177,7 +177,7 @@ class GD_CORE_API Object {
                                              gd::Layout& layout) {
     return false;
   };
-  ///@}
+    ///@}
 #endif
 
   /** \name Behaviors management
@@ -194,12 +194,12 @@ class GD_CORE_API Object {
   /**
    * \brief Return a reference to the behavior called \a name.
    */
-  Behavior& GetBehavior(const gd::String& name);
+  BehaviorContent& GetBehavior(const gd::String& name);
 
   /**
    * \brief Return a reference to the behavior called \a name.
    */
-  const Behavior& GetBehavior(const gd::String& name) const;
+  const BehaviorContent& GetBehavior(const gd::String& name) const;
 
   /**
    * \brief Return true if object has a behavior called \a name.
@@ -217,33 +217,34 @@ class GD_CORE_API Object {
    */
   bool RenameBehavior(const gd::String& name, const gd::String& newName);
 
+  /**
+   * \brief Add the specified behavior content to the object
+   *
+   * \return A reference to the newly added behavior content.
+   */
+  gd::BehaviorContent& AddBehavior(const gd::BehaviorContent& behavior);
+
 #if defined(GD_IDE_ONLY)
   /**
    * \brief Add the behavior of the specified \a type with the specified \a
    * name.
    *
-   * The project's current platform is used to create the behavior.
+   * The project's current platform is used to initialize the content.
    *
-   * \return A pointer to the newly added behavior. NULL if the creation failed.
+   * \return A pointer to the newly added behavior content. NULL if the creation
+   * failed.
    */
-  gd::Behavior* AddNewBehavior(gd::Project& project,
-                               const gd::String& type,
-                               const gd::String& name);
+  gd::BehaviorContent* AddNewBehavior(gd::Project& project,
+                                      const gd::String& type,
+                                      const gd::String& name);
 #endif
 
   /**
-   * \brief Add the specified behavior to the object
-   * \note The object takes ownership of the behavior.
-   * \return true if the behavior was added, false otherwise (behavior with the
-   * same name already in the object)
+   * \brief Get a read-only access to the map containing the behaviors with
+   * their properties.
    */
-  bool AddBehavior(gd::Behavior* behavior);
-
-  /**
-   * \brief Get a read-only access to the map containing the behaviors.
-   */
-  const std::map<gd::String, std::unique_ptr<gd::Behavior>>& GetAllBehaviors()
-      const {
+  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
+  GetAllBehaviorContents() const {
     return behaviors;
   };
   ///@}
@@ -288,9 +289,10 @@ class GD_CORE_API Object {
   gd::String name;  ///< The full name of the object
   gd::String type;  ///< Which type is the object. ( To test if we can do
                     ///< something reserved to some objects with it )
-  std::map<gd::String, std::unique_ptr<gd::Behavior>>
-      behaviors;  ///< Contains all behaviors of the object. Behaviors are the
-                  ///< ownership of the object
+  std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>
+      behaviors;  ///< Contains all behaviors and their properties for the
+                  ///< object. Behavior contents are the ownership of the
+                  ///< object.
   gd::VariablesContainer
       objectVariables;  ///< List of the variables of the object
 

@@ -55,7 +55,7 @@ gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = funct
 gdjs.VideoRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
   gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
 
-  this._renderer.ownerRemovedFromScene();
+  this._renderer.onOwnerRemovedFromScene();
 };
 
 gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {

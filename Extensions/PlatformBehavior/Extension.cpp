@@ -8,7 +8,9 @@ This project is released under the MIT License.
 #include "GDCpp/Extensions/ExtensionBase.h"
 
 #include "PlatformBehavior.h"
+#include "PlatformRuntimeBehavior.h"
 #include "PlatformerObjectBehavior.h"
+#include "PlatformerObjectRuntimeBehavior.h"
 #include "ScenePlatformObjectsManager.h"
 
 void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
@@ -34,8 +36,6 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         std::make_shared<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
-    aut.SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
-
     aut.AddCondition("IsMoving",
                      _("Is moving"),
                      _("Check if the object is moving (whether it is on the "
@@ -48,7 +48,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
         .SetFunctionName("IsMoving")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition("IsOnFloor",
                      _("Is on floor"),
@@ -61,7 +61,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
         .SetFunctionName("IsOnFloor")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition("IsOnLadder",
                      _("Is on ladder"),
@@ -74,7 +74,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsAdvanced()
         .SetFunctionName("IsOnLadder")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition("IsJumping",
                      _("Is jumping"),
@@ -87,7 +87,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
         .SetFunctionName("IsJumping")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition(
            "IsFalling",
@@ -102,7 +102,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("IsFalling")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition("IsGrabbingPlatform",
                      _("Is grabbing platform ledge"),
@@ -114,7 +114,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("IsGrabbingPlatform")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition("Gravity",
                      _("Gravity"),
@@ -131,7 +131,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("GetGravity")
         .SetManipulatedType("number")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("Gravity",
                   _("Gravity"),
@@ -149,7 +149,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetGravity")
         .SetManipulatedType("number")
         .SetGetter("GetGravity")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition(
            "MaxFallingSpeed",
@@ -167,7 +167,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("GetMaxFallingSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
            "MaxFallingSpeed",
@@ -186,7 +186,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetMaxFallingSpeed")
         .SetManipulatedType("number")
         .SetGetter("GetMaxFallingSpeed")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition("Acceleration",
                      _("Acceleration"),
@@ -203,7 +203,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("GetAcceleration")
         .SetManipulatedType("number")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("Acceleration",
                   _("Acceleration"),
@@ -221,7 +221,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetAcceleration")
         .SetManipulatedType("number")
         .SetGetter("GetAcceleration")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition("Deceleration",
                      _("Deceleration"),
@@ -238,7 +238,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("GetDeceleration")
         .SetManipulatedType("number")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("Deceleration",
                   _("Deceleration"),
@@ -256,7 +256,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetDeceleration")
         .SetManipulatedType("number")
         .SetGetter("GetDeceleration")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition(
            "MaxSpeed",
@@ -272,7 +272,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value to test"))
         .SetFunctionName("GetMaxSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
            "MaxSpeed",
@@ -290,7 +290,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetMaxSpeed")
         .SetManipulatedType("number")
         .SetGetter("GetMaxSpeed")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition(
            "JumpSpeed",
@@ -307,7 +307,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("GetJumpSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
            "JumpSpeed",
@@ -324,7 +324,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetJumpSpeed")
         .SetManipulatedType("number")
         .SetGetter("GetJumpSpeed")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SetCanJump",
                   _("Allow again jumping"),
@@ -338,7 +338,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
         .SetFunctionName("SetCanJump")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateLeftKey",
                   _("Simulate left key press"),
@@ -351,7 +351,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsAdvanced()
         .SetFunctionName("SimulateLeftKey")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateRightKey",
                   _("Simulate right key press"),
@@ -364,7 +364,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsAdvanced()
         .SetFunctionName("SimulateRightKey")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateUpKey",
                   _("Simulate up key press"),
@@ -377,7 +377,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsAdvanced()
         .SetFunctionName("SimulateUpKey")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
            "SimulateDownKey",
@@ -391,7 +391,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsAdvanced()
         .SetFunctionName("SimulateDownKey")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
            "SimulateLadderKey",
@@ -405,7 +405,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsAdvanced()
         .SetFunctionName("SimulateLadderKey")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateJumpKey",
                   _("Simulate jump key press"),
@@ -417,7 +417,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("SimulateJumpKey")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateReleaseKey",
                   _("Simulate release key press"),
@@ -430,7 +430,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("SimulateReleaseKey")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateControl",
                   _("Simulate control"),
@@ -445,7 +445,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("string", _("Key"))
         .MarkAsAdvanced()
         .SetFunctionName("SimulateControl")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("IgnoreDefaultControls",
                   _("Ignore default controls"),
@@ -460,7 +460,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("yesorno", _("Ignore controls"))
         .MarkAsAdvanced()
         .SetFunctionName("IgnoreDefaultControls")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("Gravity",
                       _("Gravity"),
@@ -470,7 +470,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetGravity")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("MaxFallingSpeed",
                       _("Maximum falling speed"),
@@ -480,7 +480,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetMaxFallingSpeed")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("Acceleration",
                       _("Acceleration"),
@@ -490,7 +490,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetAcceleration")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("Deceleration",
                       _("Deceleration"),
@@ -500,7 +500,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetDeceleration")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("MaxSpeed",
                       _("Maximum speed"),
@@ -510,7 +510,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetMaxSpeed")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("JumpSpeed",
                       _("Jump speed"),
@@ -520,7 +520,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetJumpSpeed")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 #endif
   }
   {
@@ -536,7 +536,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         std::make_shared<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
-    aut.SetIncludeFile("PlatformBehavior/PlatformBehavior.h");
+    aut.SetIncludeFile("PlatformBehavior/PlatformRuntimeBehavior.h");
 
     aut.AddAction("ChangePlatformType",
                   _("Change platform type"),
@@ -553,7 +553,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
             _("Platform type (\"Platform\", \"Jumpthru\" or \"Ladder\")"))
         .MarkAsAdvanced()
         .SetFunctionName("ChangePlatformType")
-        .SetIncludeFile("PlatformBehavior/PlatformBehavior.h");
+        .SetIncludeFile("PlatformBehavior/PlatformRuntimeBehavior.h");
 #endif
   }
 }
@@ -569,6 +569,17 @@ class PlatformBehaviorCppExtension : public ExtensionBase {
    */
   PlatformBehaviorCppExtension() {
     DeclarePlatformBehaviorExtension(*this);
+    AddRuntimeBehavior<PlatformRuntimeBehavior>(
+        GetBehaviorMetadata("PlatformBehavior::PlatformBehavior"),
+        "PlatformRuntimeBehavior");
+    GetBehaviorMetadata("PlatformBehavior::PlatformBehavior")
+        .SetIncludeFile("PlatformBehavior/PlatformRuntimeBehavior.h");
+    AddRuntimeBehavior<PlatformerObjectRuntimeBehavior>(
+        GetBehaviorMetadata("PlatformBehavior::PlatformerObjectBehavior"),
+        "PlatformerObjectRuntimeBehavior");
+    GetBehaviorMetadata("PlatformBehavior::PlatformerObjectBehavior")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 

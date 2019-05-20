@@ -16,22 +16,15 @@ namespace gd {
 gd::Expression Instruction::badExpression("");
 
 Instruction::Instruction(gd::String type_)
-    : renderedHeightNeedUpdate(true),
-      renderedHeight(0),
-      selected(false),
-      type(type_),
+    : type(type_),
       inverted(false) {
-  // ctor
   parameters.reserve(8);
 }
 
 Instruction::Instruction(gd::String type_,
                          const std::vector<gd::Expression>& parameters_,
                          bool inverted_)
-    : renderedHeightNeedUpdate(true),
-      renderedHeight(0),
-      selected(false),
-      type(type_),
+    : type(type_),
       inverted(inverted_),
       parameters(parameters_) {
   parameters.reserve(8);

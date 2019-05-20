@@ -17,7 +17,7 @@ namespace gd {
  * action.
  *
  * An instruction has a type, which define what it does, and some parameters. It
- * can also be set as inverted ( when the instruction is a condition ) and it
+ * can also be set as inverted (when the instruction is a condition) and it
  * can have sub instructions. This class does nothing particular except storing
  * these data.
  *
@@ -130,20 +130,6 @@ class GD_CORE_API Instruction {
    * \brief Return a reference to the vector containing sub instructions
    */
   inline gd::InstructionsList& GetSubInstructions() { return subInstructions; };
-
-  /** \name Rendering
-   * Members related to the instruction rendering in an event editor.
-   */
-  ///@{
-
-  mutable bool
-      renderedHeightNeedUpdate;  ///< True if the instruction height may have
-                                 ///< changed and must be computed again.
-  mutable unsigned int renderedHeight;  ///< Height of the instruction rendered
-                                        ///< in an event editor.
-  mutable bool selected;  ///< True if selected in an event editor.
-
-  ///@}
 
  private:
   gd::String type;  ///< Instruction type

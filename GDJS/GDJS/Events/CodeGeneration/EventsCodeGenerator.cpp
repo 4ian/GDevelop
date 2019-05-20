@@ -29,22 +29,22 @@ using namespace std;
 
 namespace gdjs {
 
-gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
+gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
     gd::Project& project,
-    const gd::Layout& scene,
+    gdjs::EventsCodeGenerator& codeGenerator,
+    gd::String fullyQualifiedFunctionName,
+    gd::String functionArgumentsCode,
+    gd::String functionPreEventsCode,
     const gd::EventsList& events,
-    std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    gd::String functionReturnCode) {
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
   gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
-  EventsCodeGenerator codeGenerator(project, scene);
 
   // Generate whole events code
   // Preprocessing then code generation can make changes to the events, so we
   // need to do the work on a copy of the events.
   gd::EventsList generatedEvents = events;
-  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
   codeGenerator.PreprocessEventList(generatedEvents);
   gd::String wholeEventsCode =
       codeGenerator.GenerateEventsListCode(generatedEvents, context);
@@ -71,11 +71,29 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
       codeGenerator.GetCodeNamespace() + " = {};\n" + globalDeclarations +
       globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
       codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-      codeGenerator.GetCodeNamespaceAccessor() +
-      "func = function(runtimeScene) {\n" +
-      "runtimeScene.getOnceTriggers().startNewFrame();\n" +
-      globalObjectListsReset + "\n" + codeGenerator.GetCustomCodeInMain() +
-      wholeEventsCode + "\n" + "return;\n" + "}\n";
+      fullyQualifiedFunctionName + " = function(" + functionArgumentsCode +
+      ") {\n" + functionPreEventsCode + "\n" + globalObjectListsReset + "\n" +
+      wholeEventsCode + "\n" + functionReturnCode + "\n" + "}\n";
+
+  return output;
+}
+
+gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
+    gd::Project& project,
+    const gd::Layout& scene,
+    const gd::EventsList& events,
+    std::set<gd::String>& includeFiles,
+    bool compilationForRuntime) {
+  EventsCodeGenerator codeGenerator(project, scene);
+
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      project,
+      codeGenerator,
+      codeGenerator.GetCodeNamespaceAccessor() + "func",
+      "runtimeScene",
+      "runtimeScene.getOnceTriggers().startNewFrame();\n",
+      events,
+      "return;\n");
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
   output += "gdjs['" +
@@ -93,59 +111,62 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
-  gd::ObjectsContainer
-      emptyObjectsAndGroups;  // As opposed to layout events, we don't have
-                              // objects in the "outer" scope.
   gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
-      project, eventsFunction, objectsAndGroups);
+      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
-  // Prepare the global context
-  unsigned int maxDepthLevelReached = 0;
-  gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
-  EventsCodeGenerator codeGenerator(emptyObjectsAndGroups, objectsAndGroups);
-
-  // Generate whole events code
-  // Preprocessing then code generation can make changes to the events, so we
-  // need to do the work on a copy of the events.
-  gd::EventsList generatedEvents = eventsFunction.GetEvents();
-  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
   codeGenerator.SetCodeNamespace(codeNamespace);
-  codeGenerator.PreprocessEventList(generatedEvents);
-  gd::String wholeEventsCode =
-      codeGenerator.GenerateEventsListCode(generatedEvents, context);
+  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
-  // Extra declarations needed by events
-  gd::String globalDeclarations;
-  for (auto& declaration : codeGenerator.GetCustomGlobalDeclaration())
-    globalDeclarations += declaration + "\n";
-
-  // Global objects lists
-  auto allObjectsDeclarationsAndResets =
-      codeGenerator.GenerateAllObjectsDeclarationsAndResets(
-          maxDepthLevelReached);
-  gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
-  gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
-
-  codeGenerator.AddAllObjectsIncludeFiles();
-
-  // "Booleans" used by conditions
-  gd::String globalConditionsBooleans =
-      codeGenerator.GenerateAllConditionsBooleanDeclarations();
-
-  gd::String output =
-      codeGenerator.GetCodeNamespace() + " = {};\n" + globalDeclarations +
-      globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
-      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-      codeGenerator.GetCodeNamespaceAccessor() + "func = function(" +
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      project,
+      codeGenerator,
+      codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters()) +
-      ") {\n" +
+          eventsFunction.GetParameters(), false),
       codeGenerator.GenerateEventsFunctionContext(
-          eventsFunction.GetParameters()) +
-      "\n" + globalObjectListsReset + "\n" +
-      codeGenerator.GetCustomCodeInMain() + wholeEventsCode + "\n" +
-      codeGenerator.GenerateEventsFunctionReturn(eventsFunction) + "\n" + "}\n";
+          eventsFunction.GetParameters()),
+      eventsFunction.GetEvents(),
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+
+  includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
+                      codeGenerator.GetIncludeFiles().end());
+  return output;
+}
+
+gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
+    gd::Project& project,
+    const gd::EventsFunction& eventsFunction,
+    const gd::String& codeNamespace,
+    const gd::String& fullyQualifiedFunctionName,
+    std::set<gd::String>& includeFiles,
+    bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
+  gd::ObjectsContainer objectsAndGroups;
+  gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
+      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
+
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
+  codeGenerator.SetCodeNamespace(codeNamespace);
+  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      project,
+      codeGenerator,
+      fullyQualifiedFunctionName,
+      codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
+          eventsFunction.GetParameters(), true),
+      "var runtimeScene = this._runtimeScene;\nvar Object = "
+      "Hashtable.newFrom({Object: [this.owner]});\n" +
+          // TODO: Passing an extra argument to GenerateEventsFunctionContext
+          // could allow to generate optimized code, avoiding the use of
+          // Hashtable for Object?
+          codeGenerator.GenerateEventsFunctionContext(
+              eventsFunction.GetParameters()),
+      eventsFunction.GetEvents(),
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
                       codeGenerator.GetIncludeFiles().end());
@@ -153,13 +174,23 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
-    const vector<gd::ParameterMetadata>& parameters) {
-  gd::String declaration = "runtimeScene";
-  for (const auto& parameter : parameters) {
-    declaration +=
-        ", " + (parameter.GetName().empty() ? "_" : parameter.GetName());
+    const vector<gd::ParameterMetadata>& parameters,
+    bool isBehaviorEventsFunction) {
+  gd::String declaration = isBehaviorEventsFunction ? "" : "runtimeScene";
+  for (size_t i = 0; i < parameters.size(); ++i) {
+    const auto& parameter = parameters[i];
+    if (isBehaviorEventsFunction && (i == 0 || i == 1)) {
+      // By convention, the first two arguments of a behavior events function
+      // are the object and the behavior, which are not passed to the called
+      // function in the generated JS code.
+      continue;
+    }
+
+    declaration += (declaration.empty() ? "" : ", ") +
+                   (parameter.GetName().empty() ? "_" : parameter.GetName());
   }
-  declaration += ", parentEventsFunctionContext";
+  declaration += gd::String(declaration.empty() ? "" : ", ") +
+                 "parentEventsFunctionContext";
 
   return declaration;
 }

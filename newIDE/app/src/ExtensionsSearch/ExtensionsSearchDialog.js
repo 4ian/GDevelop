@@ -96,6 +96,9 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                   <ExtensionsSearch
                     project={project}
                     onNewExtensionInstalled={() => {}}
+                    onRegistryLoaded={() => {
+                      this.forceUpdate(); // Force update to ensure dialog is properly positioned.
+                    }}
                   />
                 </Dialog>
               );

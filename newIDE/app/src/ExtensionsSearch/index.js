@@ -59,6 +59,7 @@ export const addSerializedExtensionToProject = (
 type Props = {|
   project: gdProject,
   onNewExtensionInstalled: () => void,
+  onRegistryLoaded?: () => void,
 |};
 
 type State = {|
@@ -120,6 +121,10 @@ export default class ExtensionsSearch extends Component<Props, State> {
       extensionsRegistry => {
         this.setState({
           extensionsRegistry,
+        }, () => {
+          if (this.props.onRegistryLoaded) {
+            this.props.onRegistryLoaded();
+          }
         });
       },
       error => {

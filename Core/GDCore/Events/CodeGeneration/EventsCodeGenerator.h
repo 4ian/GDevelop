@@ -705,6 +705,11 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateArgumentsList(
       const std::vector<gd::String>& arguments, size_t startFrom = 0);
 
+  /**
+   * Generate the getter to get the name of the specified behavior.
+   */
+  virtual gd::String GenerateGetBehaviorNameCode(const gd::String& behaviorName);
+
   const gd::Platform& platform;  ///< The platform being used.
 
   gd::ObjectsContainer& globalObjectsAndGroups;

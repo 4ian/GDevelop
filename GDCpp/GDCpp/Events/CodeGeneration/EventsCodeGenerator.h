@@ -154,6 +154,8 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
                                     const gd::String& type,
                                     gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GenerateGetBehaviorNameCode(const gd::String& behaviorName);
+
   /**
    * \brief Construct a code generator for the specified project and layout.
    */

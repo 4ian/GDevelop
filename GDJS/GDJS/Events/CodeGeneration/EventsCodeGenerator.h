@@ -234,6 +234,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GenerateGetBehaviorNameCode(const gd::String& behaviorName);
+
   virtual gd::String GenerateGetVariable(
       const gd::String& variableName,
       const VariableScope& scope,
@@ -326,7 +328,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * the rest of the events.
    */
   gd::String GenerateEventsFunctionContext(
-      const std::vector<gd::ParameterMetadata>& parameters);
+      const std::vector<gd::ParameterMetadata>& parameters,
+      const gd::String& thisObjectName = "");
 
   gd::String GenerateEventsFunctionReturn(
       const gd::EventsFunction& eventFunction);

@@ -11,6 +11,8 @@ export type ExtensionShortHeader = {|
   url: string,
   headerUrl: string,
   tags: string,
+  eventsBasedBehaviorsCount: number,
+  eventsFunctionsCount: number,
 |};
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,

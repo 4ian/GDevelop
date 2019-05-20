@@ -221,48 +221,47 @@ function generateBehavior(
   );
 
   return Promise.resolve().then(() => {
-    // Generate behavior code
-    if (!options.skipCodeGeneration) {
-      const behaviorMethodMangledNames = new gd.MapStringString();
-      const includeFiles = new gd.SetString();
+    const behaviorMethodMangledNames = new gd.MapStringString();
 
-      // Declare all the behavior functions
-      mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
-        const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(i);
+    // Declare all the behavior functions
+    mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
+      const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(i);
 
-        const eventsFunctionMangledName = mangleName(eventsFunction.getName());
-        behaviorMethodMangledNames.set(
-          eventsFunction.getName(),
-          eventsFunctionMangledName
-        );
+      const eventsFunctionMangledName = mangleName(eventsFunction.getName());
+      behaviorMethodMangledNames.set(
+        eventsFunction.getName(),
+        eventsFunctionMangledName
+      );
 
-        const instructionOrExpression = declareBehaviorInstructionOrExpressionMetadata(
-          behaviorMetadata,
-          eventsBasedBehavior,
-          eventsFunction
-        );
-        declareEventsFunctionParameters(
-          eventsFunction,
-          instructionOrExpression
-        );
+      const instructionOrExpression = declareBehaviorInstructionOrExpressionMetadata(
+        behaviorMetadata,
+        eventsBasedBehavior,
+        eventsFunction
+      );
+      declareEventsFunctionParameters(
+        eventsFunction,
+        instructionOrExpression
+      );
 
-        // Hide "lifecycle" methods as they are called automatically by
-        // the game engine.
-        if (isBehaviorLifecycleFunction(eventsFunction.getName())) {
-          instructionOrExpression.setHidden();
-        }
+      // Hide "lifecycle" methods as they are called automatically by
+      // the game engine.
+      if (isBehaviorLifecycleFunction(eventsFunction.getName())) {
+        instructionOrExpression.setHidden();
+      }
 
-        const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
-        codeExtraInformation
-          .setIncludeFile(
-            options.eventsFunctionCodeWriter.getIncludeFileFor(
-              eventsFunctionMangledName
-            )
+      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
+      codeExtraInformation
+        .setIncludeFile(
+          options.eventsFunctionCodeWriter.getIncludeFileFor(
+            eventsFunctionMangledName
           )
-          .setFunctionName(eventsFunctionMangledName);
-      });
+        )
+        .setFunctionName(eventsFunctionMangledName);
+    });
 
-      // Generate code for the behavior and its methods
+    // Generate code for the behavior and its methods
+    if (!options.skipCodeGeneration) {
+      const includeFiles = new gd.SetString();
       const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
       const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
         eventsFunctionsExtension.getName(),
@@ -297,6 +296,7 @@ function generateBehavior(
       );
     } else {
       // Skip code generation
+      behaviorMethodMangledNames.delete();
       return Promise.resolve();
     }
   });

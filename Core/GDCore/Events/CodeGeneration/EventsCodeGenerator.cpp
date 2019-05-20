@@ -697,6 +697,11 @@ vector<gd::String> EventsCodeGenerator::GenerateParametersCodes(
   return arguments;
 }
 
+gd::String EventsCodeGenerator::GenerateGetBehaviorNameCode(
+    const gd::String& behaviorName) {
+  return ConvertToStringExplicit(behaviorName);
+}
+
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     EventsCodeGenerationContext& context) {
   auto declareObjectList = [this](gd::String object,

@@ -83,7 +83,8 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
              !context.GetCurrentObject().empty()) {
     if (!castNeeded)
       return "(" + ManObjListName(objectListName) +
-             "[i]->GetBehaviorRawPointer(\"" + behaviorName + "\")->" +
+             "[i]->GetBehaviorRawPointer(" +
+             GenerateGetBehaviorNameCode(behaviorName) + ")->" +
              codeInfo.functionCallName + "(" + parametersStr + "))";
     else
       return "(static_cast<" + autoInfo.className + "*>(" +
@@ -94,13 +95,15 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
     if (!castNeeded)
       return "(( " + ManObjListName(objectListName) + ".empty() ) ? " +
              defaultOutput + " :" + ManObjListName(objectListName) +
-             "[0]->GetBehaviorRawPointer(\"" + behaviorName + "\")->" +
+             "[0]->GetBehaviorRawPointer(" +
+             GenerateGetBehaviorNameCode(behaviorName) + ")->" +
              codeInfo.functionCallName + "(" + parametersStr + "))";
     else
       return "(( " + ManObjListName(objectListName) + ".empty() ) ? " +
              defaultOutput + " : " + "static_cast<" + autoInfo.className +
              "*>(" + ManObjListName(objectListName) +
-             "[0]->GetBehaviorRawPointer(\"" + behaviorName + "\"))->" +
+             "[0]->GetBehaviorRawPointer(" +
+             GenerateGetBehaviorNameCode(behaviorName) + "))->" +
              codeInfo.functionCallName + "(" + parametersStr + "))";
   }
 }
@@ -172,11 +175,11 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   gd::String objectFunctionCallNamePart =
       (!instrInfos.parameters[1].supplementaryInformation.empty())
           ? "static_cast<" + autoInfo.className + "*>(" +
-                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\"))->" +
+                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + "))->" +
                 instrInfos.codeExtraInformation.functionCallName
-          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\")->" +
+          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + ")->" +
                 instrInfos.codeExtraInformation.functionCallName;
 
   // Create call
@@ -289,10 +292,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   gd::String objectPart =
       (!instrInfos.parameters[1].supplementaryInformation.empty())
           ? "static_cast<" + autoInfo.className + "*>(" +
-                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\"))->"
-          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\")->";
+                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + "))->"
+          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + ")->";
 
   // Create call
   gd::String call;
@@ -366,6 +369,17 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   }
 
   return argOutput;
+}
+
+gd::String EventsCodeGenerator::GenerateGetBehaviorNameCode(
+    const gd::String& behaviorName) {
+  if (HasProjectAndLayout()) {
+    return ConvertToStringExplicit(behaviorName);
+  } else {
+    // No support for events function in C++ generated code.
+    // See GDJS for an example of proper implementation.
+    return ConvertToStringExplicit(behaviorName) + " /* unsupported */ ";
+  }
 }
 
 gd::String EventsCodeGenerator::GenerateObject(
@@ -531,8 +545,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
             gd::SceneNameMangler::GetMangledSceneName(scene.GetName()) +
             "(RuntimeContext * runtimeContext)\n"
             "{\n" +
-            "runtimeContext->StartNewFrame();\n" +
-            wholeEventsCode +
+            "runtimeContext->StartNewFrame();\n" + wholeEventsCode +
             "return 0;\n"
             "}\n";
 
@@ -620,7 +633,6 @@ void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
         PreprocessEventList(eventsList[i].GetSubEvents());
     }
   }
-
 }
 
 #endif

@@ -107,21 +107,25 @@ if (shell.test('-f', sourceFile)) {
     downloadLibGdJs('HEAD~1').then(onLibGdJsDownloaded, () =>
       downloadLibGdJs('HEAD~2').then(onLibGdJsDownloaded, () =>
         downloadLibGdJs('HEAD~3').then(onLibGdJsDownloaded, () =>
-          downloadLibGdJs('master').then(onLibGdJsDownloaded, () => {
-            if (alreadyHasLibGdJs) {
-              shell.echo(
-                `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
-              );
-              shell.exit(1);
-              return;
-            } else {
-              shell.echo(
-                `❌ Can't download any version of libGD.js, please check your internet connection.`
-              );
-              shell.exit(1);
-              return;
-            }
-          })
+          downloadLibGdJs('master').then(onLibGdJsDownloaded, () =>
+            downloadLibGdJs('master~1').then(onLibGdJsDownloaded, () =>
+              downloadLibGdJs('master~2').then(onLibGdJsDownloaded, () => {
+                if (alreadyHasLibGdJs) {
+                  shell.echo(
+                    `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
+                  );
+                  shell.exit(0);
+                  return;
+                } else {
+                  shell.echo(
+                    `❌ Can't download any version of libGD.js, please check your internet connection.`
+                  );
+                  shell.exit(1);
+                  return;
+                }
+              })
+            )
+          )
         )
       )
     )

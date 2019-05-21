@@ -10,6 +10,7 @@ import ExtensionsSearch, { addSerializedExtensionToProject } from '.';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import HelpButton from '../UI/HelpButton';
 
 type Props = {|
   project: gdProject,
@@ -73,6 +74,7 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                     />,
                   ]}
                   secondaryActions={[
+                    <HelpButton key="help" helpPagePath="/extensions/search" />,
                     eventsFunctionsExtensionOpener ? (
                       <FlatButton
                         icon={<CloudDownload />}

@@ -87,7 +87,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
           return (
             <Dialog
               secondaryActions={[
-                <HelpButton key="help" helpPagePath="/events/functions" />,
+                <HelpButton key="help" helpPagePath="/extensions/create" />,
                 eventsFunctionsExtensionWriter ? (
                   <FlatButton
                     icon={<CloudUpload />}
@@ -181,6 +181,9 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
               </Column>
               {exportDialogOpen && (
                 <Dialog
+                  secondaryActions={[
+                    <HelpButton key="help" helpPagePath="/extensions/share" />,
+                  ]}
                   actions={[
                     <FlatButton
                       label={<Trans>Close</Trans>}

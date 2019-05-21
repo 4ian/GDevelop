@@ -44,7 +44,7 @@ npm run electron-mac
 npm run electron-win
 
 #For Linux:
-npm run electron-lin
+npm run electron-linux
 ```
 
 ### Quick Install and Run

@@ -38,13 +38,13 @@ cd newIDE/electron-app
 npm install # or yarn
 
 #For macOS:
-npm run electron-mac
+./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app
 
 #For Windows:
-npm run electron-win
+node node_modules\electron\cli.js app
 
 #For Linux:
-npm run electron-lin
+./node_modules/electron/dist/electron app
 ```
 
 ### Quick Install and Run

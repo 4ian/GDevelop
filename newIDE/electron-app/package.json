@@ -13,7 +13,7 @@
     "app-build": "node scripts/app-build.js",
     "build": "node scripts/build.js",
     "electron-win": "node node_modules/electron/cli.js app",
-    "electron-lin": "./node_modules/electron/dist/electron app",
+    "electron-linux": "./node_modules/electron/dist/electron app",
     "electron-mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app"
   },
   "build": {

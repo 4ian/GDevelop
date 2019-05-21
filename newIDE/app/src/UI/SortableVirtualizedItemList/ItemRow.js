@@ -27,7 +27,6 @@ type Props = {
   getThumbnail?: () => string,
   selected: true,
   onItemSelected: () => void,
-  buildMenuTemplate: Item => any,
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => any,
 };

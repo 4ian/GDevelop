@@ -81,7 +81,9 @@ const theme = {
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',
     errorTextColor: '#ff2e16',
+    warningTextColor: '#ffb032',
     selectedErrorBackgroundColor: '#ff2e16',
+    selectedWarningBackgroundColor: '#ffb032',
   },
   emptyMessage: {
     shadowColor: '#FFFFFF',

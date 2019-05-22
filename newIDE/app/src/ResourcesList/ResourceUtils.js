@@ -81,10 +81,12 @@ export const getResourceFilePathStatus = (
     getLocalResourceFullPath(project, resourceName)
   );
 
-  // the resource path is outside of the project folder
-  if (!isPathInProjectFolder(project, resourcePath)) return 'warning';
-  // the resource path doesn't exist
+  // The resource path doesn't exist
   if (!fs.existsSync(resourcePath)) return 'error';
-  // the resource path seems ok
+
+  // The resource path is outside of the project folder
+  if (!isPathInProjectFolder(project, resourcePath)) return 'warning';
+
+  // The resource path seems ok
   return '';
 };

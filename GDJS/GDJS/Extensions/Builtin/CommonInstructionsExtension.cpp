@@ -656,12 +656,24 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::String functionName = codeGenerator.GetCodeNamespaceAccessor() +
                                   "userFunc" + gd::String::From(&event);
+        gd::String functionParameters = "runtimeScene";
         gd::String callArguments = "runtimeScene";
-        if (!event.GetParameterObjects().empty()) callArguments += ", objects";
+        if (!event.GetParameterObjects().empty()) {
+          functionParameters += ", objects";
+          callArguments += ", objects";
+        }
+        if (!codeGenerator.HasProjectAndLayout()) {
+          functionParameters += ", eventsFunctionContext";
+          callArguments +=
+              ", typeof eventsFunctionContext !== \'undefined\' ? "
+              "eventsFunctionContext : undefined";
+        }
 
         // Generate the function code
         gd::String functionCode;
-        functionCode += functionName + " = function(" + callArguments + ") {\n";
+        functionCode +=
+            functionName + " = function(" + functionParameters + ") {\n";
+        functionCode += event.IsUseStrict() ? "\"use strict\";\n" : "";
         functionCode += event.GetInlineCode();
         functionCode += "\n};\n";
         codeGenerator.AddCustomCodeOutsideMain(functionCode);

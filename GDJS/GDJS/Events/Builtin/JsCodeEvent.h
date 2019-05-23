@@ -11,7 +11,7 @@ class Instruction;
 class Project;
 class SerializerElement;
 class Layout;
-}
+}  // namespace gd
 
 namespace gdjs {
 
@@ -39,6 +39,7 @@ class JsCodeEvent : public gd::BaseEvent {
   virtual void SerializeTo(gd::SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
                                const gd::SerializerElement& element);
+  virtual bool IsUseStrict() const { return useStrict; }
 
  private:
   void Init(const JsCodeEvent& event);
@@ -46,6 +47,9 @@ class JsCodeEvent : public gd::BaseEvent {
   gd::String inlineCode;        ///< Contains the Javacript code of the event.
   gd::String parameterObjects;  ///< Name of the (group of) objects to pass as
                                 ///< parameter.
+  bool useStrict;  ///< Should the generated JS function have "use strict". true
+                   ///< by default. Should be removed once all the game engine
+                   ///< is using "use strict".
 };
 
 }  // namespace gdjs

@@ -299,7 +299,7 @@ class GD_CORE_API EventsCodeGenerator {
 
   /**
    * \brief Return true if the code generation is done for a given project and
-   * layout.
+   * layout. If not, this means that the code is generated for a function.
    */
   bool HasProjectAndLayout() const { return hasProjectAndLayout; }
 

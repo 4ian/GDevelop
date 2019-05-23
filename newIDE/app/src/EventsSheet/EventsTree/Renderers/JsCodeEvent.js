@@ -45,9 +45,16 @@ const styles = {
   },
 };
 
+type State = {|
+  width: number,
+  editing: boolean,
+  editingObject: boolean,
+  anchorEl: ?any,
+|};
+
 export default class JsCodeEvent extends React.Component<
   EventRendererProps,
-  *
+  State
 > {
   state = {
     width: 0,
@@ -65,7 +72,6 @@ export default class JsCodeEvent extends React.Component<
     this.setState(
       {
         editing: true,
-        height: this._container.offsetHeight,
       },
       () => {
         // $FlowFixMe
@@ -127,10 +133,17 @@ export default class JsCodeEvent extends React.Component<
           : ' /* Click here to choose objects to pass to JavaScript */'}
       </span>
     );
+    // "eventsFunctionContext" is passed when existing, which is the case
+    // when there is no layout, i.e: when we are in an event function.
+    const eventsFunctionContext = !this.props.layout ? (
+      <span>, eventsFunctionContext</span>
+    ) : null;
+
     const functionStart = (
       <p style={styles.wrappingText}>
         <span>{'(function(runtimeScene'}</span>
         {objects}
+        {eventsFunctionContext}
         <span>{') {'}</span>
       </p>
     );
@@ -138,6 +151,7 @@ export default class JsCodeEvent extends React.Component<
       <p style={styles.wrappingText}>
         <span>{'})(runtimeScene'}</span>
         {objects}
+        {eventsFunctionContext}
         <span>{');'}</span>
         <span style={styles.comment}>
           {' // '}

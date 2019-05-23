@@ -260,10 +260,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
 
   return gd::String("var eventsFunctionContext = {\n") +
          // The object name to parameter map:
-         "  objectsMap: {\n" + objectsGettersMap +
+         "  _objectsMap: {\n" + objectsGettersMap +
          "},\n"
          // The behavior name to parameter map:
-         "  behaviorNamesMap: {\n" +
+         "  _behaviorNamesMap: {\n" +
          behaviorsGetterMap +
          "},\n"
          // Function that will be used to query objects, when a new object list
@@ -271,7 +271,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  getObjects: function(objectName) {\n" +
          "    " + thisObjectGetterCode +
          "    var objectsList = "
-         "eventsFunctionContext.objectsMap[objectName];\n" +
+         "eventsFunctionContext._objectsMap[objectName];\n" +
          "    return objectsList ? gdjs.objectsListsToArray(objectsList) : "
          "[];\n"
          "  },\n" +
@@ -280,7 +280,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // name passed as argument).
          "  getBehaviorName: function(behaviorName) {\n" +
          // TODO: Use parentEventsFunctionContext?
-         "    return eventsFunctionContext.behaviorNamesMap[behaviorName];\n"
+         "    return eventsFunctionContext._behaviorNamesMap[behaviorName];\n"
          "  },\n" +
          // Creator function that will be used to create new objects. We
          // need to check if the function was given the context of the calling
@@ -289,7 +289,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // are not the same as the objects available in the scene.
          "  createObject: function(objectName) {\n"
          "    var objectsList = "
-         "eventsFunctionContext.objectsMap[objectName];\n" +
+         "eventsFunctionContext._objectsMap[objectName];\n" +
          "    if (objectsList) {\n" +
          "      return parentEventsFunctionContext ?\n" +
          "        "

@@ -26,6 +26,7 @@ namespace gdjs {
 void JsCodeEvent::SerializeTo(gd::SerializerElement& element) const {
   element.AddChild("inlineCode").SetValue(inlineCode);
   element.AddChild("parameterObjects").SetValue(parameterObjects);
+  element.AddChild("useStrict").SetValue(useStrict);
 }
 
 void JsCodeEvent::UnserializeFrom(gd::Project& project,
@@ -33,10 +34,19 @@ void JsCodeEvent::UnserializeFrom(gd::Project& project,
   inlineCode = element.GetChild("inlineCode").GetValue().GetString();
   parameterObjects =
       element.GetChild("parameterObjects").GetValue().GetString();
+
+  if (!element.HasChild("useStrict")) {
+    // Compatibility with GD <= 5.0.0-beta68
+    useStrict = false;
+    // end of compatibility code
+  } else {
+    useStrict = element.GetChild("useStrict").GetBoolValue();
+  }
 }
 
 JsCodeEvent::JsCodeEvent()
     : BaseEvent(),
-      inlineCode("runtimeScene.setBackgroundColor(100,100,240);\n") {}
+      inlineCode("runtimeScene.setBackgroundColor(100,100,240);\n"),
+      useStrict(true) {}
 
 }  // namespace gdjs

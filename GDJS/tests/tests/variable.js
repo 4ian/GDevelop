@@ -3,7 +3,7 @@
  * See README.md for more information.
  */
 
-describe('gdjs.variable', function() {
+describe('gdjs.Variable', function() {
   it('should parse initial values into strings and numbers', function() {
     var intVar = new gdjs.Variable({ value: '526' });
     var floatVar = new gdjs.Variable({ value: '10.568' });

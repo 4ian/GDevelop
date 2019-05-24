@@ -7,7 +7,7 @@ export default class RelationalOperatorField extends Component {
   focus() {}
 
   render() {
-    const { parameterMetadata } = this.props;
+    const { parameterMetadata, value } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -16,9 +16,10 @@ export default class RelationalOperatorField extends Component {
       <SelectField
         fullWidth
         floatingLabelText={description}
-        value={this.props.value}
+        value={value}
         ref={field => (this._field = field)}
         onChange={(e, i, value) => this.props.onChange(value)}
+        errorText={value ? undefined : <Trans>You must select a button</Trans>}
       >
         <MenuItem value="Left" primaryText={<Trans>Left (primary)</Trans>} />
         <MenuItem

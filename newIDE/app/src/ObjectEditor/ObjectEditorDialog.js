@@ -48,8 +48,11 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         primary
         keyboardFocused
         onClick={() => {
-          this.props.onRename(this.state.newObjectName);
           this.props.onApply();
+          // Do the renaming *after* applying changes, as "withSerializableObject"
+          // HOC will unserialize the object to apply modifications, which will
+          // override the name.
+          this.props.onRename(this.state.newObjectName);
         }}
       />,
     ];

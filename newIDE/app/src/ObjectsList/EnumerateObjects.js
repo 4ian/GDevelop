@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
+import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
 const gd = global.gd;
 
 export type EnumeratedObjectMetadata = {|
@@ -95,22 +96,34 @@ export const enumerateObjectTypes = (
   );
 };
 
+export type ObjectFilteringOptions = {|
+  searchText: string,
+  selectedTags: SelectedTags,
+|};
+
 export const filterObjectsList = (
   list: ObjectWithContextList,
-  searchText: string
+  { searchText, selectedTags }: ObjectFilteringOptions
 ): ObjectWithContextList => {
-  if (!searchText) return list;
+  if (!searchText && !selectedTags.length) return list;
 
   const lowercaseSearchText = searchText.toLowerCase();
 
-  return list.filter((objectWithContext: ObjectWithContext) => {
-    return (
-      objectWithContext.object
-        .getName()
-        .toLowerCase()
-        .indexOf(lowercaseSearchText) !== -1
-    );
-  });
+  return list
+    .filter((objectWithContext: ObjectWithContext) => {
+      if (!selectedTags.length) return true;
+
+      const objectTags = objectWithContext.object.getTags();
+      return hasStringAllTags(objectTags, selectedTags);
+    })
+    .filter((objectWithContext: ObjectWithContext) => {
+      return (
+        objectWithContext.object
+          .getName()
+          .toLowerCase()
+          .indexOf(lowercaseSearchText) !== -1
+      );
+    });
 };
 
 export const filterGroupsList = (

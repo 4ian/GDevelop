@@ -102,6 +102,10 @@ export const makeTestProject = gd => {
     'Draggable'
   );
 
+  // Add some tags
+  tiledSpriteObject.setTags('Tag1');
+  spriteObject.setTags('Tag1, Tag2');
+
   // Layout
   const testLayout = project.insertNewLayout('TestLayout', 0);
   testLayout.insertObject(shapePainterObject, 0);

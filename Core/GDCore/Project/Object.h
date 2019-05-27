@@ -87,6 +87,14 @@ class GD_CORE_API Object {
   /** \brief Return the type of the object.
    */
   const gd::String& GetType() const { return type; }
+
+  /** \brief Change the tags of the object.
+   */
+  void SetTags(const gd::String& tags_) { tags = tags_; }
+
+  /** \brief Return the tags of the object.
+   */
+  const gd::String& GetTags() const { return tags; }
   ///@}
 
 #if defined(GD_IDE_ONLY)
@@ -295,6 +303,7 @@ class GD_CORE_API Object {
                   ///< object.
   gd::VariablesContainer
       objectVariables;  ///< List of the variables of the object
+  gd::String tags; ///< Comma-separated list of tags
 
   /**
    * \brief Derived objects can redefine this method to load custom attributes.

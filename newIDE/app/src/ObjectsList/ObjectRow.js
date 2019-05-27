@@ -8,6 +8,7 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import Clipboard from '../Utils/Clipboard';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import muiThemeable from 'material-ui/styles/muiThemeable';
+import { buildTagsMenuTemplate, getTagsFromString } from '../Utils/TagsHelper';
 
 const LEFT_MOUSE_BUTTON = 0;
 
@@ -58,6 +59,19 @@ class ThemableObjectRow extends React.Component {
             click: () => this.props.onEditVariables(),
           },
           { type: 'separator' },
+          {
+            label: 'Tags',
+            submenu: buildTagsMenuTemplate({
+              noTagLabel: 'No tags',
+              getAllTags: this.props.getAllObjectTags,
+              selectedTags: getTagsFromString(object.getTags()),
+              onChange: objectTags => {
+                this.props.onChangeTags(objectTags);
+              },
+              editTagsLabel: 'Add/edit tags...',
+              onEditTags: this.props.onEditTags,
+            }),
+          },
           {
             label: 'Rename',
             enabled: !!this.props.onEdit,

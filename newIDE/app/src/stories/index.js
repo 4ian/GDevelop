@@ -357,6 +357,9 @@ storiesOf('UI Building Blocks/Tabs', module)
             objectsContainer={testLayout}
             onEditObject={action('On edit object')}
             selectedObjectNames={[]}
+            selectedObjectTags={[]}
+            onChangeSelectedObjectTags={() => {}}
+            getAllObjectTags={() => []}
           />
         </Tab>
         <Tab label="Tab 3" onClose={action('Close tab 3')}>
@@ -1391,6 +1394,30 @@ storiesOf('ObjectsList', module)
           objectsContainer={testLayout}
           onEditObject={action('On edit object')}
           selectedObjectNames={[]}
+          selectedObjectTags={[]}
+          onChangeSelectedObjectTags={selectedObjectTags => {}}
+          getAllObjectTags={() => []}
+        />
+      </div>
+    </SerializedObjectDisplay>
+  ))
+  .add('with tags', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <div style={{ height: 250 }}>
+        <ObjectsList
+          getThumbnail={() => 'res/unknown32.png'}
+          project={project}
+          objectsContainer={testLayout}
+          onEditObject={action('On edit object')}
+          selectedObjectNames={[]}
+          selectedObjectTags={['Tag1', 'Tag2']}
+          onChangeSelectedObjectTags={action('on change selected object tags')}
+          getAllObjectTags={() => [
+            'Tag1',
+            'Tag2',
+            'Looooooooooong Tag 3',
+            'Unselected Tag 4',
+          ]}
         />
       </div>
     </SerializedObjectDisplay>

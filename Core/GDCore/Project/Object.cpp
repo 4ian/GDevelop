@@ -23,6 +23,7 @@ void Object::Init(const gd::Object& object) {
   name = object.name;
   type = object.type;
   objectVariables = object.objectVariables;
+  tags = object.tags;
 
   behaviors.clear();
   for (auto& it : object.behaviors) {
@@ -110,6 +111,7 @@ void Object::UnserializeFrom(gd::Project& project,
                              const SerializerElement& element) {
   type = element.GetStringAttribute("type");
   name = element.GetStringAttribute("name", name, "nom");
+  tags = element.GetStringAttribute("tags");
 
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
@@ -177,6 +179,7 @@ void Object::UnserializeFrom(gd::Project& project,
 void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("type", GetType());
+  element.SetAttribute("tags", GetTags());
   objectVariables.SerializeTo(element.AddChild("variables"));
 
   SerializerElement& behaviorsElement = element.AddChild("behaviors");

@@ -56,6 +56,7 @@ describe('libGD.js object serialization', function() {
       obj.setType('TextObject::Text');
       obj.setName('testObject');
       obj.setString('Text of the object, with 官话 characters');
+      obj.setTags('inventory, player');
 
       var serializedObject = new gd.SerializerElement();
       obj.serializeTo(serializedObject);
@@ -64,7 +65,7 @@ describe('libGD.js object serialization', function() {
       obj.delete();
 
       expect(jsonObject).toBe(
-        '{"bold": false,"italic": false,"name": "testObject","smoothed": true,"type": "TextObject::Text","underlined": false,"variables": [],"behaviors": [],"string": "Text of the object, with 官话 characters","font": "","characterSize": 20,"color": {"b": 255,"g": 255,"r": 255}}'
+        '{"bold": false,"italic": false,"name": "testObject","smoothed": true,"tags": "inventory, player","type": "TextObject::Text","underlined": false,"variables": [],"behaviors": [],"string": "Text of the object, with 官话 characters","font": "","characterSize": 20,"color": {"b": 255,"g": 255,"r": 255}}'
       );
     });
   });

@@ -432,6 +432,8 @@ interface gdObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
@@ -1989,6 +1991,8 @@ interface SpriteObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
@@ -2056,6 +2060,8 @@ interface TextObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
@@ -2092,6 +2098,8 @@ interface TiledSpriteObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
@@ -2144,6 +2152,8 @@ interface PanelSpriteObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
@@ -2196,6 +2206,8 @@ interface ShapePainterObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
@@ -2225,6 +2237,8 @@ interface TextEntryObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
@@ -2349,6 +2363,8 @@ interface ParticleEmitterObject {
     [Const, Ref] DOMString GetName();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);

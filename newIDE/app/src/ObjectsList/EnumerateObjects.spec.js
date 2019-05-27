@@ -25,13 +25,22 @@ describe('EnumerateObjects', () => {
     } = enumerateObjects(project, testLayout);
 
     expect(
-      filterObjectsList(containerObjectsList, 'myshapepainterobject')
+      filterObjectsList(containerObjectsList, {
+        searchText: 'myshapepainterobject',
+        selectedTags: [],
+      })
     ).toHaveLength(1);
     expect(
-      filterObjectsList(projectObjectsList, 'myshapepainterobject')
+      filterObjectsList(projectObjectsList, {
+        searchText: 'myshapepainterobject',
+        selectedTags: [],
+      })
     ).toHaveLength(0);
     expect(
-      filterObjectsList(allObjectsList, 'myshapepainterobject')
+      filterObjectsList(allObjectsList, {
+        searchText: 'myshapepainterobject',
+        selectedTags: [],
+      })
     ).toHaveLength(1);
   });
 });

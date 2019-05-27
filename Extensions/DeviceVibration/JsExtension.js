@@ -44,7 +44,7 @@ module.exports = {
       .addAction(
         "StartVibrationPattern",
         _("Vibrate by pattern"),
-        _("Vibrate (Duration in ms). You can add multiple comma separated values where every second value determins the silense inbetween two vibrations. This is a string value so use quotes."),
+        _("Vibrate (Duration in ms). You can add multiple comma-separated values where every second value determines the silence period between two vibrations. This is a string value so use quotes."),
         _("Start vibration for _PARAM0_ ms"),
         _("Vibration"),
         "JsPlatform/Extensions/vibration_pattern_start24.png",

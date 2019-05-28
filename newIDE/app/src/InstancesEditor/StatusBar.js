@@ -11,13 +11,13 @@ export default class StatusBar {
   _width: number;
   _height: number;
   _getLastCursorPosition: () => [number, number];
-  _statusBarContainer: PIXI.DisplayObject;
+  _statusBarContainer: PIXI.Container;
   _statusBarBackground: PIXI.Graphics;
   _statusBarText: PIXI.Text;
 
   constructor({ getLastCursorPosition, width, height }: Props) {
     this._getLastCursorPosition = getLastCursorPosition;
-    this._statusBarContainer = new PIXI.DisplayObject();
+    this._statusBarContainer = new PIXI.Container();
     this._statusBarContainer.alpha = 0.8;
     this._statusBarContainer.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
     this._statusBarBackground = new PIXI.Graphics();
@@ -36,7 +36,7 @@ export default class StatusBar {
     this._height = height;
   }
 
-  getPixiObject(): PIXI.DisplayObject {
+  getPixiObject(): PIXI.Container {
     return this._statusBarContainer;
   }
 

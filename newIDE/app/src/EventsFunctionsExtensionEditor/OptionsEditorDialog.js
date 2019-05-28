@@ -136,6 +136,8 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                   }}
                   multiLine
                   fullWidth
+                  rows={2}
+                  rowsMax={2}
                 />
                 <TextField
                   floatingLabelText={
@@ -148,6 +150,8 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                   }}
                   multiLine
                   fullWidth
+                  rows={5}
+                  rowsMax={5}
                 />
                 <TextField
                   floatingLabelText={<Trans>Version</Trans>}

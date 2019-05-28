@@ -15,7 +15,6 @@ export default class InstancesSelection {
       fontSize: 15,
       fill: 0xffffff,
       align: 'center',
-
     });
     this.highlightRectangle.addChild(this.tooltipBackground);
     this.highlightRectangle.addChild(this.tooltipText);
@@ -75,9 +74,12 @@ export default class InstancesSelection {
 
     this.tooltipText.x = Math.round(
       highlightRectangle.x -
-      this.tooltipText.width / 2 +
-      highlightRectangle.width / 2);
-    this.tooltipText.y = Math.round(highlightRectangle.y - this.tooltipText.height);
+        this.tooltipText.width / 2 +
+        highlightRectangle.width / 2
+    );
+    this.tooltipText.y = Math.round(
+      highlightRectangle.y - this.tooltipText.height
+    );
 
     const padding = 5;
     this.tooltipBackground.clear();

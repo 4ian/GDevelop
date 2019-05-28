@@ -18,7 +18,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 
-const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behaviors';
+const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
 const styles = {
   listContainer: {
@@ -72,14 +72,19 @@ export default class EventsBasedBehaviorsList extends React.Component<
     searchText: '',
   };
 
-  _deleteEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+  _deleteEventsBasedBehavior = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    { askForConfirmation }: {| askForConfirmation: boolean |}
+  ) => {
     const { eventsBasedBehaviorsList } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      "Are you sure you want to remove this behavior? This can't be undone."
-    );
-    if (!answer) return;
+    if (askForConfirmation) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        "Are you sure you want to remove this behavior? This can't be undone."
+      );
+      if (!answer) return;
+    }
 
     this.props.onDeleteEventsBasedBehavior(eventsBasedBehavior, doRemove => {
       if (!doRemove) return;
@@ -155,13 +160,13 @@ export default class EventsBasedBehaviorsList extends React.Component<
       eventsBasedBehavior: copiedEventsBasedBehavior,
       name,
     } = Clipboard.get(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND);
-    const { project, eventsBasedBehaviorsContainer } = this.props;
+    const { project, eventsBasedBehaviorsList } = this.props;
 
     const newName = newNameGenerator(name, name =>
-      eventsBasedBehaviorsContainer.hasEventsBasedBehaviorNamed(name)
+      eventsBasedBehaviorsList.has(name)
     );
 
-    const newEventsBasedBehavior = eventsBasedBehaviorsContainer.insertNewEventsBasedBehavior(
+    const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
       newName,
       index
     );
@@ -173,7 +178,6 @@ export default class EventsBasedBehaviorsList extends React.Component<
       project
     );
     newEventsBasedBehavior.setName(newName);
-    this.props.onEventsBasedBehaviorAdded(newEventsBasedBehavior);
 
     this.forceUpdate();
   };
@@ -196,7 +200,10 @@ export default class EventsBasedBehaviorsList extends React.Component<
       },
       {
         label: 'Remove',
-        click: () => this._deleteEventsBasedBehavior(eventsBasedBehavior),
+        click: () =>
+          this._deleteEventsBasedBehavior(eventsBasedBehavior, {
+            askForConfirmation: true,
+          }),
       },
       {
         type: 'separator',

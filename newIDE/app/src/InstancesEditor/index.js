@@ -18,6 +18,7 @@ import BackgroundColor from './BackgroundColor';
 import * as PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
+import StatusBar from './StatusBar';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -204,6 +205,9 @@ export default class InstancesEditorContainer extends Component {
     if (this.windowMask) {
       this.pixiContainer.removeChild(this.windowMask.getPixiObject());
     }
+    if (this.statusBar) {
+      this.pixiContainer.removeChild(this.statusBar.getPixiObject());
+    }
 
     this.backgroundColor = new BackgroundColor({
       layout: props.layout,
@@ -258,6 +262,11 @@ export default class InstancesEditorContainer extends Component {
       viewPosition: this.viewPosition,
       options: this.props.options,
     });
+    this.statusBar = new StatusBar({
+      width: this.props.width,
+      height: this.props.height,
+      getLastCursorPosition: this.getLastCursorPosition,
+    });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
     this.viewPosition
@@ -267,6 +276,7 @@ export default class InstancesEditorContainer extends Component {
     this.pixiContainer.addChild(this.windowMask.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
+    this.pixiContainer.addChild(this.statusBar.getPixiObject());
   }
 
   componentWillUnmount() {
@@ -288,6 +298,7 @@ export default class InstancesEditorContainer extends Component {
     ) {
       this.pixiRenderer.resize(nextProps.width, nextProps.height);
       this.viewPosition.resize(nextProps.width, nextProps.height);
+      this.statusBar.resize(nextProps.width, nextProps.height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(
         0,
         0,
@@ -581,6 +592,7 @@ export default class InstancesEditorContainer extends Component {
       this.selectionRectangle.render();
       this.windowBorder.render();
       this.windowMask.render();
+      this.statusBar.render();
       this.pixiRenderer.render(this.pixiContainer);
     }
     this.nextFrame = requestAnimationFrame(this._renderScene);

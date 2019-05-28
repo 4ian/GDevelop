@@ -1,7 +1,17 @@
+// @flow
+import * as PIXI from 'pixi.js';
 import { rgbToHex } from '../Utils/ColorTransformer';
 
+type Props = {|
+  layout: gdLayout,
+  pixiRenderer: PIXI.Renderer,
+|};
+
 export default class BackgroundColor {
-  constructor({ layout, pixiRenderer }) {
+  layout: gdLayout;
+  pixiRenderer: PIXI.Renderer;
+
+  constructor({ layout, pixiRenderer }: Props) {
     this.layout = layout;
     this.pixiRenderer = pixiRenderer;
   }

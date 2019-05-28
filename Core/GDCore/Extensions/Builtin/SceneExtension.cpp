@@ -164,15 +164,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
 
   extension
       .AddCondition("Egal",
-                    _("Compare two expressions"),
-                    _("Test the two expressions"),
+                    _("Compare two numbers"),
+                    _("Compare the two numbers."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     _("Other"),
                     "res/conditions/egal24.png",
                     "res/conditions/egal.png")
-      .AddParameter("expression", _("Expression 1"))
+      .AddParameter("expression", _("First expression"))
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Expression 2"))
+      .AddParameter("expression", _("Second expression"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("StrEqual",
+                    _("Compare two strings"),
+                    _("Compare the two strings."),
+                    _("_PARAM0_ _PARAM1_ _PARAM2_"),
+                    _("Other"),
+                    "res/conditions/egal24.png",
+                    "res/conditions/egal.png")
+      .AddParameter("string", _("First string expression"))
+      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("string", _("Second string expression"))
       .MarkAsAdvanced();
 #endif
 }

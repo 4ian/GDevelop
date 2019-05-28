@@ -99,5 +99,33 @@ SceneExtension::SceneExtension() {
 
         return gd::String("");
       });
+
+  GetAllConditions()["StrEqual"].codeExtraInformation.SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String value1Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String value2Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[2].GetPlainString());
+
+        if (instruction.GetParameters()[1].GetPlainString() == "=")
+          return "conditionTrue = (" + value1Code + " == " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "!=")
+          return "conditionTrue = (" + value1Code + " != " + value2Code +
+                 ");\n";
+
+        return gd::String("");
+      });
 #endif
 }

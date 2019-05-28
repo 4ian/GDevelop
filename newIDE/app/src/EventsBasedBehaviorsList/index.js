@@ -12,6 +12,13 @@ import {
   enumerateEventsBasedBehaviors,
   filterEventsBasedBehaviorsList,
 } from './EnumerateEventsBasedBehaviors';
+import Clipboard from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+
+const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
 const styles = {
   listContainer: {
@@ -65,14 +72,19 @@ export default class EventsBasedBehaviorsList extends React.Component<
     searchText: '',
   };
 
-  _deleteEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+  _deleteEventsBasedBehavior = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    { askForConfirmation }: {| askForConfirmation: boolean |}
+  ) => {
     const { eventsBasedBehaviorsList } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      "Are you sure you want to remove this behavior? This can't be undone."
-    );
-    if (!answer) return;
+    if (askForConfirmation) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        "Are you sure you want to remove this behavior? This can't be undone."
+      );
+      if (!answer) return;
+    }
 
     this.props.onDeleteEventsBasedBehavior(eventsBasedBehavior, doRemove => {
       if (!doRemove) return;
@@ -127,9 +139,52 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
+  _copyEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+    Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
+      eventsBasedBehavior: serializeToJSObject(eventsBasedBehavior),
+      name: eventsBasedBehavior.getName(),
+    });
+  };
+
+  _cutEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+    this._copyEventsBasedBehavior(eventsBasedBehavior);
+    this._deleteEventsBasedBehavior(eventsBasedBehavior, {
+      askForConfirmation: false,
+    });
+  };
+
+  _pasteEventsBasedBehavior = (index: number) => {
+    if (!Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND)) return;
+
+    const {
+      eventsBasedBehavior: copiedEventsBasedBehavior,
+      name,
+    } = Clipboard.get(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND);
+    const { project, eventsBasedBehaviorsList } = this.props;
+
+    const newName = newNameGenerator(name, name =>
+      eventsBasedBehaviorsList.has(name)
+    );
+
+    const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
+      newName,
+      index
+    );
+
+    unserializeFromJSObject(
+      newEventsBasedBehavior,
+      copiedEventsBasedBehavior,
+      'unserializeFrom',
+      project
+    );
+    newEventsBasedBehavior.setName(newName);
+
+    this.forceUpdate();
+  };
+
   _renderEventsBasedBehaviorMenuTemplate = (
     eventsBasedBehavior: gdEventsBasedBehavior,
-    _index: number
+    index: number
   ) => {
     return [
       {
@@ -145,7 +200,26 @@ export default class EventsBasedBehaviorsList extends React.Component<
       },
       {
         label: 'Remove',
-        click: () => this._deleteEventsBasedBehavior(eventsBasedBehavior),
+        click: () =>
+          this._deleteEventsBasedBehavior(eventsBasedBehavior, {
+            askForConfirmation: true,
+          }),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Copy',
+        click: () => this._copyEventsBasedBehavior(eventsBasedBehavior),
+      },
+      {
+        label: 'Cut',
+        click: () => this._cutEventsBasedBehavior(eventsBasedBehavior),
+      },
+      {
+        label: 'Paste',
+        enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
+        click: () => this._pasteEventsBasedBehavior(index),
       },
     ];
   };

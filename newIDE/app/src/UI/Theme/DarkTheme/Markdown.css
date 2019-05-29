@@ -28,5 +28,5 @@
 }
 
 .gd-markdown-dark-theme img {
-  width: 100%;
+  max-width: 100%;
 }

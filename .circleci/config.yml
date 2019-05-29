@@ -1,36 +1,46 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
+# CircleCI 2.0 configuration file to build GDevelop app running
+# on the Electron runtime (newIDE/electron-app).
+
 version: 2
 jobs:
   build:
     docker:
       - image: circleci/node:lts
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
+    working_directory: ~/GDevelop
 
     steps:
       - checkout
 
-      # Download and cache dependencies
+      # Install dependencies
+      - run:
+          name: Install Wine for Electron builder
+          command: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt install wine32
+
+      - run:
+          name: Install system dependencies for Electron builder
+          command: sudo apt install icnsutils && sudo apt install graphicsmagick && sudo apt install rsync
+
+      # Download and cache npm dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - gd-ide-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - gd-ide-dependencies--
 
       - run: cd newIDE/app && npm install && cd ../electron-app && npm install
 
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: gd-ide-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}
 
       # Build
-      - run: npm run build --mac --win --linux tar.gz
+      - run: cd newIDE/electron-app && npm run build -- --mac --win --linux tar.gz --publish=never
+
+      # Upload artifacts
+      - run:
+          name: Clean dist folder to keep only installers/binaries.
+          command: rm -rf newIDE/electron-app/dist/linux-unpacked && rm -rf newIDE/electron-app/dist/win-unpacked && rm -rf newIDE/electron-app/dist/mac
+      - store_artifacts:
+          path: newIDE/electron-app/dist

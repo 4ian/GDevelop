@@ -26,3 +26,7 @@
 .gd-markdown-dark-theme a {
   color: rgb(221, 221, 221);
 }
+
+.gd-markdown-dark-theme img {
+  width: 100%;
+}

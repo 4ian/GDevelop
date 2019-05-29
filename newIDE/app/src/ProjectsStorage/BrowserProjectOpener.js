@@ -97,6 +97,7 @@ import textFadeInOut from '../fixtures/text-fade-in-out/text-fade-in-out.json';
 import textToSpeech from '../fixtures/text-to-speech/text-to-speech.json';
 import toggleMusicPlaySound from '../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
 import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effect.json';
+import videoPlayer from '../fixtures/video-player/video-player.json';
 import zDepth from '../fixtures/z-depth/z-depth.json';
 import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
 
@@ -300,6 +301,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(toggleMusicPlaySound);
     } else if (url === 'example://type-on-text-effect') {
       return Promise.resolve(typeOnTextEffect);
+    } else if (url === 'example://video-player') {
+      return Promise.resolve(videoPlayer);
     } else if (url === 'example://z-depth') {
       return Promise.resolve(zDepth);
     } else if (url === 'example://zombie-laser') {

@@ -50,7 +50,7 @@ gdjs.TextEntryRuntimeObjectPixiRenderer = function(runtimeObject)
 
 gdjs.TextEntryRuntimeObjectRenderer = gdjs.TextEntryRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
-gdjs.TextEntryRuntimeObjectPixiRenderer.prototype.ownerRemovedFromScene = function() {
+gdjs.TextEntryRuntimeObjectPixiRenderer.prototype.onOwnerRemovedFromScene = function() {
     document.removeEventListener('keypress', this._pressHandler);
     document.removeEventListener('keyup', this._upHandler);
     document.removeEventListener('keydown', this._downHandler);

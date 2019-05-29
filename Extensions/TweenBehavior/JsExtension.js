@@ -38,9 +38,7 @@ module.exports = {
       return behaviorProperties;
     };
 
-    tweenBehavior.setRawJSONContent(
-      JSON.stringify({})
-    );
+    tweenBehavior.initializeContent = function(behaviorContent) {};
 
     const behavior = extension
       .addBehavior(
@@ -401,7 +399,7 @@ module.exports = {
         _("Tween exists"),
         _("Check if the tween animation exists."),
         _("Tween _PARAM2_ on _PARAM0_ exists"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
@@ -417,7 +415,7 @@ module.exports = {
         _("Tween is playing"),
         _("Check if the tween animation is currently playing."),
         _("Tween _PARAM2_ on _PARAM0_ is playing"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
@@ -433,7 +431,7 @@ module.exports = {
         _("Tween finished playing"),
         _("Check if the tween animation has finished playing."),
         _("Tween _PARAM2_ on _PARAM0_ has finished playing"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
@@ -449,7 +447,7 @@ module.exports = {
         _("Pause a tween"),
         _("Pause the running tween animation."),
         _("Pause the tween _PARAM2_ on _PARAM0_"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
@@ -465,7 +463,7 @@ module.exports = {
         _("Stop a tween"),
         _("Stop the running tween animation."),
         _("Stop the tween _PARAM2_ on _PARAM0_"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
@@ -482,7 +480,7 @@ module.exports = {
         _("Resume a tween"),
         _("Resume the tween animation."),
         _("Resume the tween _PARAM2_ on _PARAM0_"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
@@ -498,7 +496,7 @@ module.exports = {
         _("Remove a tween"),
         _("Remove the tween animation from the object."),
         _("Remove the tween _PARAM2_ from _PARAM0_"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
@@ -513,7 +511,7 @@ module.exports = {
         "Progress",
         _("Progress of a tween"),
         _("Progress of a tween (between 0.0 and 1.0)"),
-        _(""),
+        "",
         "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )

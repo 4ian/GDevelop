@@ -12,11 +12,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/IDE/AndroidExporter.h"
-#include "GDCpp/IDE/ChangesNotifier.h"
-#include "GDCpp/IDE/CodeCompiler.h"
-#include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
-#include "GDCpp/IDE/Exporter.h"
 #include "GDCpp/Runtime/FontManager.h"
 #include "GDCpp/Runtime/Project/Behavior.h"
 #include "GDCpp/Runtime/Project/Project.h"
@@ -45,49 +40,12 @@
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/config.h>
-#include <wx/filename.h>
-#endif
+#include "GDCpp/Runtime/RuntimeBehavior.h"
+#include "GDCpp/Runtime/BehaviorsRuntimeSharedData.h"
 
 CppPlatform *CppPlatform::singleton = NULL;
 
-#if defined(GD_IDE_ONLY)
-ChangesNotifier CppPlatform::changesNotifier;
-#endif
-
-CppPlatform::CppPlatform() : gd::Platform() {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  // Events compiler setup
-  cout << "* Setting up events compiler..." << endl;
-  CodeCompiler::Get()->SetBaseDirectory(wxGetCwd());
-  wxString eventsCompilerTempDir;
-  if (wxConfigBase::Get()->Read("/Dossier/EventsCompilerTempDir",
-                                &eventsCompilerTempDir) &&
-      !eventsCompilerTempDir.empty())
-    CodeCompiler::Get()->SetOutputDirectory(eventsCompilerTempDir);
-  else
-    CodeCompiler::Get()->SetOutputDirectory(wxFileName::GetTempDir() +
-                                            "/GDTemporaries");
-  int eventsCompilerMaxThread = 0;
-  if (wxConfigBase::Get()->Read(
-          "/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) &&
-      eventsCompilerMaxThread >= 0)
-    CodeCompiler::Get()->AllowMultithread(eventsCompilerMaxThread > 1,
-                                          eventsCompilerMaxThread);
-  else
-    CodeCompiler::Get()->AllowMultithread(false);
-
-  cout << "* Loading events code compiler configuration" << endl;
-  bool deleteTemporaries;
-  if (wxConfigBase::Get()->Read(
-          _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true))
-    CodeCompiler::Get()->SetMustDeleteTemporaries(deleteTemporaries);
-#endif
-
-  ReloadBuiltinExtensions();
-}
+CppPlatform::CppPlatform() : gd::Platform() { ReloadBuiltinExtensions(); }
 
 void CppPlatform::ReloadBuiltinExtensions() {
   std::cout << "* Loading builtin extensions... ";
@@ -147,19 +105,17 @@ bool CppPlatform::AddExtension(
 
   // Then Load all runtime objects provided by the extension
   std::vector<gd::String> objectsTypes = extension->GetExtensionObjectsTypes();
-  for (std::size_t i = 0; i < objectsTypes.size(); ++i) {
-    runtimeObjCreationFunctionTable[objectsTypes[i]] =
-        extension->GetRuntimeObjectCreationFunctionPtr(objectsTypes[i]);
+  for (const auto &objectType : objectsTypes) {
+    runtimeObjCreationFunctionTable[objectType] =
+        extension->GetRuntimeObjectCreationFunctionPtr(objectType);
   }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  // And Add include directories
-  for (std::size_t i = 0;
-       i < extension->GetSupplementaryIncludeDirectories().size();
-       ++i)
-    CodeCompiler::Get()->AddHeaderDirectory(
-        extension->GetSupplementaryIncludeDirectories()[i]);
-#endif
+  std::vector<gd::String> behaviorsTypes = extension->GetBehaviorsTypes();
+  for (const auto &behaviorType : behaviorsTypes) {
+    runtimeBehaviorCreationFunctionTable[behaviorType] =
+        extension->GetRuntimeBehaviorCreationFunctionPtr(behaviorType);
+    behaviorsRuntimeSharedDataCreationFunctionTable[behaviorType] =
+        extension->GetBehaviorsRuntimeSharedDataFunctionPtr(behaviorType);
+  }
   return true;
 }
 
@@ -171,11 +127,57 @@ std::unique_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(
       runtimeObjCreationFunctionTable.end()) {
     std::cout << "Tried to create an object with an unknown type: " << type
               << std::endl;
+    std::cout << "Have you called AddRuntimeObject<...>(...) in your extension?" << std::endl;
     return std::unique_ptr<RuntimeObject>();
   }
 
   // Create a new object with the type we want.
   return runtimeObjCreationFunctionTable[type](scene, object);
+}
+
+std::unique_ptr<RuntimeBehavior> CppPlatform::CreateRuntimeBehavior(
+    const gd::String &type, gd::SerializerElement &behaviorContent) {
+  if (runtimeBehaviorCreationFunctionTable.find(type) ==
+      runtimeBehaviorCreationFunctionTable.end()) {
+    std::cout << "Tried to create a runtime behavior with an unknown type: "
+              << type << std::endl;
+    std::cout << "Have you called AddRuntimeBehavior<...>(...) in your extension?" << std::endl;
+    return std::unique_ptr<RuntimeBehavior>();
+  }
+  if (!runtimeBehaviorCreationFunctionTable[type]) {
+    std::cout << "Tried to create a runtime behavior, but no class was "
+                 "specified for type: "
+              << type << std::endl;
+    std::cout << "Have you called AddRuntimeBehavior<...>(...) in your extension?" << std::endl;
+    return std::unique_ptr<RuntimeBehavior>();
+  }
+
+  // Create a new behavior with the type we want.
+  return runtimeBehaviorCreationFunctionTable[type](behaviorContent);
+}
+
+std::unique_ptr<BehaviorsRuntimeSharedData>
+CppPlatform::CreateBehaviorsRuntimeSharedData(
+    const gd::String &type, const gd::SerializerElement &behaviorSharedDataContent) {
+  if (behaviorsRuntimeSharedDataCreationFunctionTable.find(type) ==
+      behaviorsRuntimeSharedDataCreationFunctionTable.end()) {
+    std::cout << "Tried to create a runtime behavior shared data with an "
+                 "unknown type: "
+              << type << std::endl;
+    std::cout << "Have you called AddBehaviorsRuntimeSharedData<...>(...) in your extension?" << std::endl;
+    return std::unique_ptr<BehaviorsRuntimeSharedData>();
+  }
+  if (!behaviorsRuntimeSharedDataCreationFunctionTable[type]) {
+    std::cout << "Tried to create a runtime behavior shared data, but no creation function was "
+                 "specified for type: "
+              << type << std::endl;
+    std::cout << "Have you called AddBehaviorsRuntimeSharedData<...>(...) in your extension?" << std::endl;
+    return std::unique_ptr<BehaviorsRuntimeSharedData>();
+  }
+
+  // Create a new behavior with the type we want.
+  return behaviorsRuntimeSharedDataCreationFunctionTable[type](
+      behaviorSharedDataContent);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -185,28 +187,7 @@ gd::String CppPlatform::GetDescription() const {
       "Windows or Linux.");
 }
 
-#if !defined(GD_NO_WX_GUI)
-std::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(
-    gd::LayoutEditorCanvas &editor) const {
-  return std::make_shared<CppLayoutPreviewer>(editor);
-}
-
-std::vector<std::shared_ptr<gd::ProjectExporter>>
-CppPlatform::GetProjectExporters() const {
-  return std::vector<std::shared_ptr<gd::ProjectExporter>>{
-      std::make_shared<Exporter>(),
-      std::make_shared<AndroidExporter>(gd::NativeFileSystem::Get())};
-}
-#endif
-
-void CppPlatform::OnIDEClosed() {
-#if !defined(GD_NO_WX_GUI)
-  if (CodeCompiler::Get()->MustDeleteTemporaries())
-    CodeCompiler::Get()->ClearOutputDirectory();
-#endif
-
-  FontManager::Get()->DestroySingleton();
-}
+void CppPlatform::OnIDEClosed() { FontManager::Get()->DestroySingleton(); }
 #endif
 
 CppPlatform &CppPlatform::Get() {

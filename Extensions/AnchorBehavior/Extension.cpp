@@ -6,6 +6,7 @@ This project is released under the MIT License.
 */
 
 #include "AnchorBehavior.h"
+#include "AnchorRuntimeBehavior.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 
@@ -28,12 +29,6 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
       "AnchorBehavior",
       std::make_shared<AnchorBehavior>(),
       std::make_shared<gd::BehaviorsSharedData>());
-
-#if defined(GD_IDE_ONLY)
-
-  aut.SetIncludeFile("AnchorBehavior/AnchorBehavior.h");
-
-#endif
 }
 
 /**
@@ -47,6 +42,12 @@ class AnchorBehaviorCppExtension : public ExtensionBase {
    */
   AnchorBehaviorCppExtension() {
     DeclareAnchorBehaviorExtension(*this);
+    AddRuntimeBehavior<AnchorRuntimeBehavior>(
+        GetBehaviorMetadata("AnchorBehavior::AnchorBehavior"),
+        "AnchorRuntimeBehavior");
+    GetBehaviorMetadata("AnchorBehavior::AnchorBehavior")
+        .SetIncludeFile("AnchorBehavior/AnchorRuntimeBehavior.h");
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

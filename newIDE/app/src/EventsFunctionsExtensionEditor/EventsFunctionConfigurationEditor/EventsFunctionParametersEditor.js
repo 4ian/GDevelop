@@ -3,7 +3,6 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import SelectField from 'material-ui/SelectField';
@@ -14,32 +13,24 @@ import IconButton from 'material-ui/IconButton';
 import EmptyMessage from '../../UI/EmptyMessage';
 import IconMenu from '../../UI/Menu/IconMenu';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import {
-  enumerateObjectTypes,
-  type EnumeratedObjectMetadata,
-} from '../../ObjectsList/EnumerateObjects';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
-import {
-  type EnumeratedBehaviorMetadata,
-  enumerateBehaviorsMetadata,
-} from '../../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import ObjectTypeSelector from '../../ObjectTypeSelector';
+import BehaviorTypeSelector from '../../BehaviorTypeSelector';
+import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 
 const gd = global.gd;
 
 type Props = {|
   project: gdProject,
   eventsFunction: gdEventsFunction,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
-|};
-
-type State = {|
-  objectMetadata: Array<EnumeratedObjectMetadata>,
-  behaviorMetadata: Array<EnumeratedBehaviorMetadata>,
 |};
 
 const styles = {
@@ -63,16 +54,8 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
 
 export default class EventsFunctionParametersEditor extends React.Component<
   Props,
-  State
+  {||}
 > {
-  state = {
-    objectMetadata: enumerateObjectTypes(this.props.project),
-    behaviorMetadata: enumerateBehaviorsMetadata(
-      this.props.project.getCurrentPlatform(),
-      this.props.project
-    ),
-  };
-
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
@@ -95,10 +78,39 @@ export default class EventsFunctionParametersEditor extends React.Component<
   };
 
   render() {
-    const { objectMetadata, behaviorMetadata } = this.state;
-    const { eventsFunction, freezeParameters, helpPagePath } = this.props;
+    const {
+      project,
+      eventsFunction,
+      eventsBasedBehavior,
+      freezeParameters,
+      helpPagePath,
+    } = this.props;
 
     const parameters = eventsFunction.getParameters();
+    const isABehaviorLifecycleFunction =
+      !!eventsBasedBehavior &&
+      isBehaviorLifecycleFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleFunction) {
+      return (
+        <EmptyMessage>
+          This is a "lifecycle method". It will be called automatically by the
+          game engine and has two parameters: "Object" (the object the behavior
+          is acting on) and "Behavior" (the behavior itself).
+        </EmptyMessage>
+      );
+    }
+
+    const isParameterDisabled = index => {
+      return !!freezeParameters || (!!eventsBasedBehavior && index < 2);
+    };
+    const isParameterDescriptionAndTypeShown = index => {
+      // The first two parameters of a behavior method should not be changed at all,
+      // so we even hide their description and type to avoid cluttering the interface.
+      return !eventsBasedBehavior || index >= 2;
+    };
+    const parametersIndexOffset = getParametersIndexOffset(
+      !!eventsBasedBehavior
+    );
 
     return (
       <I18n>
@@ -112,7 +124,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                     <React.Fragment key={i}>
                       <MiniToolbar>
                         <MiniToolbarText>
-                          <Trans>Parameter #{i + 1}:</Trans>
+                          <Trans>Parameter #{i + parametersIndexOffset}:</Trans>
                         </MiniToolbarText>
                         <Column expand noMargin>
                           <SemiControlledTextField
@@ -126,7 +138,15 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               this.forceUpdate();
                               this.props.onParametersUpdated();
                             }}
-                            disabled={!!freezeParameters}
+                            disabled={isParameterDisabled(i)}
+                            errorText={
+                              parameter.getName() ? null : (
+                                <Trans>
+                                  Name of the parameter is mandatory.
+                                </Trans>
+                              )
+                            }
+                            fullWidth
                           />
                         </Column>
                         <IconMenu
@@ -138,134 +158,106 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           buildMenuTemplate={() => [
                             {
                               label: i18n._(t`Delete`),
-                              enabled: !freezeParameters,
+                              enabled: !isParameterDisabled(i),
                               click: () => this._removeParameter(i),
                             },
                           ]}
                         />
                       </MiniToolbar>
                       <Line expand noMargin>
-                        <Column expand>
-                          <SelectField
-                            floatingLabelText={<Trans>Type</Trans>}
-                            value={parameter.getType()}
-                            onChange={(e, i, value) => {
-                              parameter.setType(value);
-                              this.forceUpdate();
-                              this.props.onParametersUpdated();
-                            }}
-                            disabled={!!freezeParameters}
-                            fullWidth
-                          >
-                            <MenuItem
-                              value="objectList"
-                              primaryText={<Trans>Objects</Trans>}
-                            />
-                            <MenuItem
-                              value="behavior"
-                              primaryText={
-                                <Trans>
-                                  Behavior (for the previous object)
-                                </Trans>
-                              }
-                            />
-                            <MenuItem
-                              value="expression"
-                              primaryText={<Trans>Number</Trans>}
-                            />
-                            <MenuItem
-                              value="string"
-                              primaryText={<Trans>String (text)</Trans>}
-                            />
-                            <MenuItem
-                              value="key"
-                              primaryText={<Trans>Keyboard Key (text)</Trans>}
-                            />
-                            <MenuItem
-                              value="mouse"
-                              primaryText={<Trans>Mouse button (text)</Trans>}
-                            />
-                          </SelectField>
-                        </Column>
-                        {parameter.getType() === 'objectList' && (
+                        {isParameterDescriptionAndTypeShown(i) && (
                           <Column expand>
                             <SelectField
-                              floatingLabelText={<Trans>Object type</Trans>}
-                              floatingLabelFixed
-                              value={parameter.getExtraInfo()}
+                              floatingLabelText={<Trans>Type</Trans>}
+                              value={parameter.getType()}
                               onChange={(e, i, value) => {
+                                parameter.setType(value);
+                                this.forceUpdate();
+                                this.props.onParametersUpdated();
+                              }}
+                              disabled={isParameterDisabled(i)}
+                              fullWidth
+                            >
+                              <MenuItem
+                                value="objectList"
+                                primaryText={<Trans>Objects</Trans>}
+                              />
+                              <MenuItem
+                                value="behavior"
+                                primaryText={
+                                  <Trans>
+                                    Behavior (for the previous object)
+                                  </Trans>
+                                }
+                              />
+                              <MenuItem
+                                value="expression"
+                                primaryText={<Trans>Number</Trans>}
+                              />
+                              <MenuItem
+                                value="string"
+                                primaryText={<Trans>String (text)</Trans>}
+                              />
+                              <MenuItem
+                                value="key"
+                                primaryText={<Trans>Keyboard Key (text)</Trans>}
+                              />
+                              <MenuItem
+                                value="mouse"
+                                primaryText={<Trans>Mouse button (text)</Trans>}
+                              />
+                            </SelectField>
+                          </Column>
+                        )}
+                        {gd.ParameterMetadata.isObject(parameter.getType()) && (
+                          <Column expand>
+                            <ObjectTypeSelector
+                              project={project}
+                              value={parameter.getExtraInfo()}
+                              onChange={(value: string) => {
                                 parameter.setExtraInfo(value);
                                 this.forceUpdate();
                                 this.props.onParametersUpdated();
                               }}
-                              disabled={!!freezeParameters}
-                              fullWidth
-                            >
-                              <MenuItem
-                                value=""
-                                primaryText={<Trans>Any object</Trans>}
-                              />
-                              {objectMetadata.map(
-                                (metadata: EnumeratedObjectMetadata) => {
-                                  if (metadata.name === '') {
-                                    // Base object is an "abstract" object
-                                    return null;
-                                  }
-
-                                  return (
-                                    <MenuItem
-                                      key={metadata.name}
-                                      value={metadata.name}
-                                      primaryText={metadata.fullName}
-                                    />
-                                  );
-                                }
-                              )}
-                            </SelectField>
+                              disabled={isParameterDisabled(i)}
+                            />
                           </Column>
                         )}
                         {parameter.getType() === 'behavior' && (
                           <Column expand>
-                            <SelectField
-                              floatingLabelText={<Trans>Behavior type</Trans>}
-                              floatingLabelFixed
+                            <BehaviorTypeSelector
+                              project={project}
                               value={parameter.getExtraInfo()}
-                              onChange={(e, i, value) => {
+                              onChange={(value: string) => {
                                 parameter.setExtraInfo(value);
                                 this.forceUpdate();
                                 this.props.onParametersUpdated();
                               }}
-                              disabled={!!freezeParameters}
-                              fullWidth
-                            >
-                              {behaviorMetadata.map(
-                                (metadata: EnumeratedBehaviorMetadata) => (
-                                  <MenuItem
-                                    key={metadata.type}
-                                    value={metadata.type}
-                                    primaryText={metadata.fullName}
-                                  />
-                                )
-                              )}
-                            </SelectField>
+                              disabled={isParameterDisabled(i)}
+                            />
                           </Column>
                         )}
                       </Line>
-                      <Line expand noMargin>
-                        <Column expand>
-                          <SemiControlledTextField
-                            commitOnBlur
-                            floatingLabelText={<Trans>Description</Trans>}
-                            floatingLabelFixed
-                            value={parameter.getDescription()}
-                            onChange={text => {
-                              parameter.setDescription(text);
-                              this.forceUpdate();
-                            }}
-                            fullWidth
-                          />
-                        </Column>
-                      </Line>
+                      {isParameterDescriptionAndTypeShown(i) && (
+                        <Line expand noMargin>
+                          <Column expand>
+                            <SemiControlledTextField
+                              commitOnBlur
+                              floatingLabelText={<Trans>Description</Trans>}
+                              floatingLabelFixed
+                              value={parameter.getDescription()}
+                              onChange={text => {
+                                parameter.setDescription(text);
+                                this.forceUpdate();
+                              }}
+                              fullWidth
+                              disabled={
+                                false /* Description, if shown, can always be changed */
+                              }
+                            />
+                          </Column>
+                        </Line>
+                      )}
                     </React.Fragment>
                   )
                 )}

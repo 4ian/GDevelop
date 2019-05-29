@@ -63,12 +63,7 @@ import {
 import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
-import {
-  type EventsFunctionWriter,
-  loadProjectEventsFunctionsExtensions,
-  unloadProjectEventsFunctionsExtensions,
-  getFunctionNameFromType,
-} from '../EventsFunctionsExtensionsLoader';
+import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   getUpdateNotificationTitle,
   getUpdateNotificationBody,
@@ -82,6 +77,7 @@ import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
+import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 
 const gd = global.gd;
 
@@ -142,7 +138,7 @@ type Props = {
   authentification: Authentification,
   extensionsLoader?: JsExtensionsLoader,
   initialPathsOrURLsToOpen: ?Array<string>,
-  eventsFunctionWriter?: EventsFunctionWriter,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
 };
 
@@ -262,6 +258,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   loadFromProject = (project: gdProject, cb: Function) => {
+    const { eventsFunctionsExtensionsState } = this.props;
     this.closeProject(() => {
       // Make sure that the ResourcesLoader cache is emptied, so that
       // the URL to a resource with a name in the old project is not re-used
@@ -276,37 +273,13 @@ class MainFrame extends React.Component<Props, State> {
         () => {
           // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
           // their editor will take care of reloading them.
-          this._loadProjectEventsFunctionsExtensions();
+          eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+            this.state.currentProject
+          );
           cb();
         }
       );
     });
-  };
-
-  _loadProjectEventsFunctionsExtensions = () => {
-    const { i18n } = this.props;
-    if (this.props.eventsFunctionWriter && this.state.currentProject) {
-      loadProjectEventsFunctionsExtensions(
-        this.state.currentProject,
-        this.props.eventsFunctionWriter
-      )
-        .then(() =>
-          this.setState({
-            eventsFunctionsExtensionsError: null,
-          })
-        )
-        .catch((eventsFunctionsExtensionsError: Error) => {
-          this.setState({
-            eventsFunctionsExtensionsError,
-          });
-          showErrorBox(
-            i18n._(
-              t`An error has occured during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
-            ),
-            eventsFunctionsExtensionsError
-          );
-        });
-    }
   };
 
   openFromPathOrURL = (url: string, cb: Function) => {
@@ -378,6 +351,7 @@ class MainFrame extends React.Component<Props, State> {
 
   closeProject = (cb: Function) => {
     const { currentProject } = this.state;
+    const { eventsFunctionsExtensionsState } = this.props;
     if (!currentProject) return cb();
 
     this.openProjectManager(false);
@@ -386,7 +360,9 @@ class MainFrame extends React.Component<Props, State> {
         editorTabs: closeProjectTabs(this.state.editorTabs, currentProject),
       },
       () => {
-        unloadProjectEventsFunctionsExtensions(currentProject);
+        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+          currentProject
+        );
         currentProject.delete();
         this.setState(
           {
@@ -477,7 +453,7 @@ class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    const name = newNameGenerator('NewEventsFunctionsExtension', name =>
+    const name = newNameGenerator('NewExtension', name =>
       currentProject.hasEventsFunctionsExtensionNamed(name)
     );
     currentProject.insertNewEventsFunctionsExtension(
@@ -569,7 +545,7 @@ class MainFrame extends React.Component<Props, State> {
     externalLayout: gdEventsFunctionsExtension
   ) => {
     const { currentProject } = this.state;
-    const { i18n } = this.props;
+    const { i18n, eventsFunctionsExtensionsState } = this.props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
@@ -591,6 +567,12 @@ class MainFrame extends React.Component<Props, State> {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
         this.forceUpdate();
       }
+    );
+
+    // Reload extensions to make sure the deleted extension is removed
+    // from the platform
+    eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+      currentProject
     );
   };
 
@@ -681,7 +663,7 @@ class MainFrame extends React.Component<Props, State> {
   renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
     const { i18n } = this.props;
-    const { eventsFunctionWriter } = this.props;
+    const { eventsFunctionsExtensionsState } = this.props;
     if (!currentProject) return;
 
     if (
@@ -726,10 +708,9 @@ class MainFrame extends React.Component<Props, State> {
           newName
         );
         eventsFunctionsExtension.setName(newName);
-        if (eventsFunctionWriter) {
-          unloadProjectEventsFunctionsExtensions(currentProject);
-          this._loadProjectEventsFunctionsExtensions();
-        }
+        eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+          currentProject
+        );
 
         this.forceUpdate();
       }
@@ -963,10 +944,10 @@ class MainFrame extends React.Component<Props, State> {
 
   openEventsFunctionsExtension = (
     name: string,
-    initiallyFocusedFunctionName?: string
+    initiallyFocusedFunctionName?: string,
+    initiallyFocusedBehaviorName?: ?string
   ) => {
-    if (!this.props.eventsFunctionWriter) return;
-
+    const { eventsFunctionsExtensionsState } = this.props;
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
@@ -980,13 +961,16 @@ class MainFrame extends React.Component<Props, State> {
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
-              onReloadEventsFunctionsExtensions={
-                this._loadProjectEventsFunctionsExtensions
-              }
               initiallyFocusedFunctionName={initiallyFocusedFunctionName}
+              initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
               openInstructionOrExpression={this._openInstructionOrExpression}
               onCreateEventsFunction={this._onCreateEventsFunction}
               ref={editorRef}
+              onLoadEventsFunctionsExtensions={() => {
+                eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+                  this.state.currentProject
+                );
+              }}
             />
           ),
           key: 'events functions extension ' + name,
@@ -1105,13 +1089,20 @@ class MainFrame extends React.Component<Props, State> {
       );
       if (foundTab) {
         // Open the given function and focus the tab
-        foundTab.editor.selectEventsFunctionByName(functionName);
+        foundTab.editor.selectEventsFunctionByName(
+          functionName.name,
+          functionName.behaviorName
+        );
         this.setState(state => ({
           editorTabs: changeCurrentTab(state.editorTabs, foundTab.tabIndex),
         }));
       } else {
         // Open a new editor for the extension and the given function
-        this.openEventsFunctionsExtension(extensionName, functionName);
+        this.openEventsFunctionsExtension(
+          extensionName,
+          functionName.name,
+          functionName.behaviorName
+        );
       }
     } else {
       // It's not an events functions extension, we should not be here.
@@ -1127,6 +1118,7 @@ class MainFrame extends React.Component<Props, State> {
   ) => {
     const { currentProject } = this.state;
     if (!currentProject) return;
+    const { eventsFunctionsExtensionsState } = this.props;
 
     // Names are assumed to be already validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
@@ -1144,7 +1136,9 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     extension.insertEventsFunction(eventsFunction, 0);
-    this._loadProjectEventsFunctionsExtensions();
+    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+      currentProject
+    );
   };
 
   openCreateDialog = (open: boolean = true) => {
@@ -1397,6 +1391,7 @@ class MainFrame extends React.Component<Props, State> {
       authentification,
       previewLauncher,
       resourceExternalEditors,
+      eventsFunctionsExtensionsState,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1456,9 +1451,12 @@ class MainFrame extends React.Component<Props, State> {
               }
               onChangeSubscription={() => this.openSubscription(true)}
               eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
-              onReloadEventsFunctionsExtensions={
-                this._loadProjectEventsFunctionsExtensions
-              }
+              onReloadEventsFunctionsExtensions={() => {
+                // Check if load is sufficient
+                eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+                  currentProject
+                );
+              }}
               freezeUpdate={!projectManagerOpen}
             />
           )}

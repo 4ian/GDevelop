@@ -6,10 +6,6 @@ Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>  //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
-#include <wx/panel.h>
-#endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
@@ -25,9 +21,7 @@ This project is released under the MIT License.
 #include "TiledSpriteObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "TiledSpriteObjectEditor.h"
 #endif
 
 using namespace std;
@@ -47,11 +41,6 @@ void TiledSpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("texture", textureName);
   element.SetAttribute("width", width);
   element.SetAttribute("height", height);
-}
-
-void TiledSpriteObject::LoadResources(gd::Project& project,
-                                      gd::Layout& layout) {
-  texture = project.GetImageManager()->GetSFMLTexture(textureName);
 }
 #endif
 
@@ -190,80 +179,8 @@ bool RuntimeTiledSpriteObject::Draw(sf::RenderTarget& window) {
 }
 
 #if defined(GD_IDE_ONLY)
-sf::Vector2f TiledSpriteObject::GetInitialInstanceDefaultSize(
-    gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& layout) const {
-  return sf::Vector2f(width, height);
-}
-
-/**
- * Render object at edittime
- */
-void TiledSpriteObject::DrawInitialInstance(gd::InitialInstance& instance,
-                                            sf::RenderTarget& renderTarget,
-                                            gd::Project& project,
-                                            gd::Layout& layout) {
-  if (!texture) return;
-
-  float width =
-      instance.HasCustomSize()
-          ? instance.GetCustomWidth()
-          : GetInitialInstanceDefaultSize(instance, project, layout).x;
-  float height =
-      instance.HasCustomSize()
-          ? instance.GetCustomHeight()
-          : GetInitialInstanceDefaultSize(instance, project, layout).y;
-  float xOffset = 0;
-  float yOffset = 0;
-
-  sf::Vector2f centerPosition =
-      sf::Vector2f(instance.GetX() + width / 2, instance.GetY() + height / 2);
-  float angleInRad = instance.GetAngle() * 3.14159 / 180.0;
-  texture->texture.setRepeated(true);
-  sf::Vertex vertices[] = {
-      sf::Vertex(
-          centerPosition +
-              RotatePoint(sf::Vector2f(-width / 2, -height / 2), angleInRad),
-          sf::Vector2f(0 + xOffset, 0 + yOffset)),
-      sf::Vertex(
-          centerPosition +
-              RotatePoint(sf::Vector2f(+width / 2, -height / 2), angleInRad),
-          sf::Vector2f(width + xOffset, 0 + yOffset)),
-      sf::Vertex(
-          centerPosition +
-              RotatePoint(sf::Vector2f(-width / 2, +height / 2), angleInRad),
-          sf::Vector2f(0 + xOffset, height + yOffset)),
-      sf::Vertex(
-          centerPosition +
-              RotatePoint(sf::Vector2f(+width / 2, +height / 2), angleInRad),
-          sf::Vector2f(width + xOffset, height + yOffset))};
-
-  renderTarget.draw(vertices, 4, sf::TrianglesStrip, &texture->texture);
-  texture->texture.setRepeated(false);
-}
-
 void TiledSpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   worker.ExposeImage(textureName);
-}
-
-bool TiledSpriteObject::GenerateThumbnail(const gd::Project& project,
-                                          wxBitmap& thumbnail) const {
-#if !defined(GD_NO_WX_GUI)
-  thumbnail = wxBitmap("CppPlatform/Extensions/TiledSpriteIcon24.png",
-                       wxBITMAP_TYPE_ANY);
-#endif
-
-  return true;
-}
-
-void TiledSpriteObject::EditObject(wxWindow* parent,
-                                   gd::Project& game,
-                                   gd::MainFrameWrapper& mainFrameWrapper) {
-#if !defined(GD_NO_WX_GUI)
-  TiledSpriteObjectEditor dialog(parent, game, *this, mainFrameWrapper);
-  dialog.ShowModal();
-#endif
 }
 
 void RuntimeTiledSpriteObject::GetPropertyForDebugger(std::size_t propertyNb,

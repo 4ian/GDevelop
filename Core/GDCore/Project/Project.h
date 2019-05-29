@@ -8,17 +8,13 @@
 #define GDCORE_PROJECT_H
 #include <memory>
 #include <vector>
-#include "GDCore/String.h"
-class wxPropertyGrid;
-class wxPropertyGridEvent;
-class TiXmlElement;
-#include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/String.h"
 namespace gd {
 class Platform;
 class Layout;
@@ -41,7 +37,8 @@ class SerializerElement;
 
 namespace gd {
 /**
- * \brief Base class used to represent a project of a platform
+ * \brief Base class representing a project (game), including all resources,
+ * scenes, objects, extensions...
  *
  * \ingroup PlatformDefinition
  */
@@ -350,35 +347,34 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            const gd::String& platformName = "");
 
   /**
-   * Create a behavior of the given type.
+   * Get the behavior of the given type.
    *
    * \note A project can use more than one platform. In this case, the first
    * platform supporting the behavior is used, unless \a platformName argument
-   * is not empty.<br> It is assumed that each platform provides an equivalent
+   * is not empty.
+   * It is assumed that each platform provides an equivalent
    * behavior.
    *
-   * \param project The project for which the object must be created.
    * \param type The type of the behavior
    * \param platformName The name of the platform to be used. If empty, the
    * first platform supporting the object is used.
    */
-  std::unique_ptr<gd::Behavior> CreateBehavior(
-      const gd::String& type, const gd::String& platformName = "");
+  gd::Behavior* GetBehavior(const gd::String& type,
+                            const gd::String& platformName = "");
 
   /**
-   * Create behavior shared data of the given type.
+   * Get the behavior shared data of the given type.
    *
    * \note A project can use more than one platform. In this case, the first
    * platform supporting the behavior shared data is used, unless \a
-   * platformName argument is not empty.<br> It is assumed that each platform
-   * provides equivalent behavior shared data.
+   * platformName argument is not empty.
+   * It is assumed that each platform provides equivalent behavior shared data.
    *
-   * \param project The project for which the behavior shared data must be
-   * created. \param type The type of behavior shared data \param platformName
-   * The name of the platform to be used. If empty, the first platform
-   * supporting the object is used.
+   * \param type The type of behavior
+   * \param platformName The name of the platform to be used. If empty, the
+   * first platform supporting the object is used.
    */
-  std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(
+  gd::BehaviorsSharedData* GetBehaviorSharedDatas(
       const gd::String& type, const gd::String& platformName = "");
 
 #if defined(GD_IDE_ONLY)
@@ -399,42 +395,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   ///@}
 #endif
 
-#if !defined(GD_NO_WX_GUI)
-  /** \name GUI property grid management
-   * Members functions related to managing the wxWidgets property grid used to
-   * display the properties of the project.
-   */
-  ///@{
-  /**
-   * IDE calls this function so as to let the project populate a wxPropertyGrid
-   * with its properties.
-   */
-  void PopulatePropertyGrid(wxPropertyGrid* grid);
-
-  /**
-   * IDE calls this function so that the project update its properties from the
-   * values stored in the wxPropertyGrid.
-   */
-  void UpdateFromPropertyGrid(wxPropertyGrid* grid);
-
-  /**
-   * IDE calls this function when a property is selected in the property grid.
-   */
-  void OnSelectionInPropertyGrid(wxPropertyGrid* grid,
-                                 wxPropertyGridEvent& event);
-
-  /**
-   * IDE calls this function when a property was changed in the property grid.
-   */
-  void OnChangeInPropertyGrid(wxPropertyGrid* grid, wxPropertyGridEvent& event);
-  ///@}
-#endif
-
   /** \name Layouts management
    * Members functions related to layout management.
    */
   ///@{
-
   /**
    * \brief Return true if layout called "name" exists.
    */
@@ -510,7 +474,7 @@ class GD_CORE_API Project : public ObjectsContainer {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Called to serialize the project to a TiXmlElement.
+   * \brief Serialize the project.
    *
    * "Dirty" flag is set to false when serialization is done.
    */
@@ -538,7 +502,7 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Get the minor version of GDevelop used to save the project.
    */
   unsigned int GetLastSaveGDMinorVersion() { return gdMinorVersion; };
-  
+
   /**
    * Get the minor version of GDevelop used to save the project.
    */
@@ -770,14 +734,15 @@ class GD_CORE_API Project : public ObjectsContainer {
       const gd::String& name, std::size_t position);
 
   /**
-   * \brief Adds a new events functions extension constructed from the layout
-   * passed as parameter.
+   * \brief Adds an events functions extension to the list.
    *
-   * \note No pointer or reference must be kept on the extension passed as
-   * parameter.
+   * \note A copy of it is stored in the project (and returned).
+   * \return The newly stored events functions extension (a copy of the one
+   * passed as parameter).
    */
   gd::EventsFunctionsExtension& InsertEventsFunctionsExtension(
-      const EventsFunctionsExtension& externalLayout, std::size_t position);
+      const EventsFunctionsExtension& eventsFunctionExtension,
+      std::size_t position);
 
   /**
    * Must delete the events functions extension named "name".
@@ -949,11 +914,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Don't forget to update me if members were changed!
    */
   void Init(const gd::Project& project);
-
-  /**
-   * Helper method for LoadFromXml method.
-   */
-  void LoadProjectInformationFromXml(const TiXmlElement* elem);
 
   gd::String name;            ///< Game name
   gd::String version;         ///< Game version number (used for some exports)

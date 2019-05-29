@@ -10,7 +10,7 @@ import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import WarningIcon from 'material-ui/svg-icons/alert/warning';
 import IconButton from 'material-ui/IconButton';
 import ListIcon from '../UI/ListIcon';
-import { makeAddItem } from '../UI/ListAddItem';
+import { makeAddItem, makeSearchItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
 import IconMenu from '../UI/Menu/IconMenu';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -29,6 +29,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -233,6 +234,7 @@ class Item extends React.Component<ItemProps, {||}> {
 }
 
 const AddItem = makeAddItem(ListItem);
+const SearchItem = makeSearchItem(ListItem);
 
 type Props = {|
   project: gdProject,
@@ -270,6 +272,7 @@ type State = {|
   searchText: string,
   projectPropertiesDialogOpen: boolean,
   variablesEditorOpen: boolean,
+  extensionsSearchDialogOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -281,6 +284,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     searchText: '',
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
+    extensionsSearchDialogOpen: false,
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -323,7 +327,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const { layout: copiedLayout, name } = Clipboard.get(LAYOUT_CLIPBOARD_KIND);
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasLayoutNamed(name)
     );
 
@@ -377,7 +381,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasExternalEventsNamed(name)
     );
 
@@ -430,7 +434,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasExternalLayoutNamed(name)
     );
 
@@ -459,31 +463,31 @@ export default class ProjectManager extends React.Component<Props, State> {
   };
 
   _copyEventsFunctionsExtension = (
-    externalLayout: gdEventsFunctionsExtension
+    eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
     Clipboard.set(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND, {
-      externalLayout: serializeToJSObject(externalLayout),
-      name: externalLayout.getName(),
+      eventsFunctionsExtension: serializeToJSObject(eventsFunctionsExtension),
+      name: eventsFunctionsExtension.getName(),
     });
   };
 
   _cutEventsFunctionsExtension = (
-    externalLayout: gdEventsFunctionsExtension
+    eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
-    this._copyEventsFunctionsExtension(externalLayout);
-    this.props.onDeleteEventsFunctionsExtension(externalLayout);
+    this._copyEventsFunctionsExtension(eventsFunctionsExtension);
+    this.props.onDeleteEventsFunctionsExtension(eventsFunctionsExtension);
   };
 
   _pasteEventsFunctionsExtension = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
 
     const {
-      externalLayout: copiedEventsFunctionsExtension,
+      eventsFunctionsExtension: copiedEventsFunctionsExtension,
       name,
     } = Clipboard.get(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND);
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasEventsFunctionsExtensionNamed(name)
     );
 
@@ -494,11 +498,14 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     unserializeFromJSObject(
       newEventsFunctionsExtension,
-      copiedEventsFunctionsExtension
+      copiedEventsFunctionsExtension,
+      'unserializeFrom',
+      project
     );
     newEventsFunctionsExtension.setName(newName);
 
     this.forceUpdate();
+    this.props.onReloadEventsFunctionsExtensions();
   };
 
   _moveUpEventsFunctionsExtension = (index: number) => {
@@ -837,7 +844,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               )}
           />
           <ProjectStructureItem
-            primaryText={<Trans>Functions/Extensions</Trans>}
+            primaryText={<Trans>Functions/Behaviors</Trans>}
             error={eventsFunctionsExtensionsError}
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
@@ -897,7 +904,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     }
                     onPaste={() => this._pasteEventsFunctionsExtension(i)}
                     canPaste={() =>
-                      Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
+                      Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)
                     }
                     canMoveUp={i !== 0}
                     onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
@@ -911,8 +918,19 @@ export default class ProjectManager extends React.Component<Props, State> {
               .concat(
                 <AddItem
                   key={'add-events-functions-extension'}
-                  primaryText={<Trans>Click to add functions</Trans>}
+                  primaryText={
+                    <Trans>Click to add functions and behaviors</Trans>
+                  }
                   onClick={this.props.onAddEventsFunctionsExtension}
+                />
+              )
+              .concat(
+                <SearchItem
+                  key={'extensions-search'}
+                  primaryText={<Trans>Search for new extensions</Trans>}
+                  onClick={() =>
+                    this.setState({ extensionsSearchDialogOpen: true })
+                  }
                 />
               )}
           />
@@ -948,6 +966,12 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false })
             }
             onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {this.state.extensionsSearchDialogOpen && (
+          <ExtensionsSearchDialog
+            project={project}
+            onClose={() => this.setState({ extensionsSearchDialogOpen: false })}
           />
         )}
       </div>

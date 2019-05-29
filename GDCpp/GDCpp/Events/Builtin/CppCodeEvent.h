@@ -9,29 +9,12 @@
 #ifndef CPPCODEEVENT_H
 #define CPPCODEEVENT_H
 #include "GDCore/Events/Event.h"
-class RuntimeScene;
 namespace gd {
 class Instruction;
-}
-namespace gd {
-class MainFrameWrapper;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class SerializerElement;
-}
-namespace gd {
-class EventsEditorItemsAreas;
-}
-namespace gd {
-class EventsEditorSelection;
-}
-namespace gd {
 class Layout;
 }
-class wxWindow;
 
 /**
  * \brief Builtin internal event that pick an object of a list each time it is
@@ -75,7 +58,6 @@ class CppCodeEvent : public gd::BaseEvent {
 
   const gd::String& GetAssociatedGDManagedSourceFile(
       gd::Project& parentGame) const {
-    EnsureAssociatedSourceFileIsUpToDate(parentGame);
     return associatedGDManagedSourceFile;
   };
 
@@ -112,7 +94,6 @@ class CppCodeEvent : public gd::BaseEvent {
   bool IsCodeDisplayedInEditor() const { return codeDisplayedInEditor; };
   void EnableCodeDisplayedInEditor(bool enable) {
     codeDisplayedInEditor = enable;
-    eventHeightNeedUpdate = true;
   };
 
   const gd::String& GetDisplayedName() const { return displayedName; };
@@ -124,35 +105,8 @@ class CppCodeEvent : public gd::BaseEvent {
   virtual void UnserializeFrom(gd::Project& project,
                                const gd::SerializerElement& element);
 
-  /**
-   * Called by event editor to draw the event.
-   */
-  virtual void Render(wxDC& dc,
-                      int x,
-                      int y,
-                      unsigned int width,
-                      gd::EventsEditorItemsAreas& areas,
-                      gd::EventsEditorSelection& selection,
-                      const gd::Platform& platform);
-
-  /**
-   * Must return the height of the event when rendered
-   */
-  virtual unsigned int GetRenderedHeight(unsigned int width,
-                                         const gd::Platform& platform) const;
-
-  /**
-   * Called when the user want to edit the event
-   */
-  virtual EditEventReturnType EditEvent(
-      wxWindow* parent_,
-      gd::Project& game_,
-      gd::Layout& scene_,
-      gd::MainFrameWrapper& mainFrameWrapper_);
-
  private:
   void Init(const CppCodeEvent& event);
-  gd::String GenerateAssociatedFileCode() const;
   void AutogenerateFunctionName() const;
 
   std::vector<gd::String> includeFiles;

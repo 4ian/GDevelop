@@ -3850,7 +3850,8 @@
               "supplementaryInformation": "",
               "type": "objectList"
             }
-          ]
+          ],
+          "objectGroups": []
         }
       ]
     }

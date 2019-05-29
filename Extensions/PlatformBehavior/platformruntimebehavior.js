@@ -104,7 +104,7 @@ gdjs.PlatformRuntimeBehavior.LADDER = 2;
 gdjs.PlatformRuntimeBehavior.JUMPTHRU = 1;
 gdjs.PlatformRuntimeBehavior.NORMALPLAFTORM = 0;
 
-gdjs.PlatformRuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+gdjs.PlatformRuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
 	if ( this._manager && this._registeredInManager ) this._manager.removePlatform(this);
 };
 

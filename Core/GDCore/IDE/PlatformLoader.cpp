@@ -11,11 +11,6 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/DynamicLibrariesTools.h"
-#include "GDCore/Tools/Locale/LocaleManager.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/filename.h>
-#include <wx/msgdlg.h>
-#endif
 // Compiler specific include, for listing files of directory (see below)
 #if defined(__GNUC__)
 #include <dirent.h>
@@ -49,9 +44,6 @@ void PlatformLoader::LoadAllPlatformsInManager(gd::String dir) {
     if (platform)
       gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/",
                                               *platform);
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    gd::LocaleManager::Get()->AddPath("./CppPlatform/Extensions/locale");
-#endif
   }
 
   {
@@ -74,9 +66,6 @@ void PlatformLoader::LoadAllPlatformsInManager(gd::String dir) {
     if (platform)
       gd::ExtensionsLoader::LoadAllExtensions(
           "./CppPlatform/Extensions/", *platform, true);
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    gd::LocaleManager::Get()->AddPath("./JsPlatform/Extensions/locale");
-#endif
   }
 
   gd::ExtensionsLoader::ExtensionsLoadingDone("./CppPlatform/Extensions/");
@@ -92,14 +81,6 @@ std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(
 
     cout << "Loading of " << fullpath << " failed." << endl;
     cout << "Error returned : \"" << error << "\"" << endl;
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    wxString userMsg = _("Platform ") + fullpath +
-                       _(" could not be loaded.\nContact the developer for "
-                         "more information.\n\nDetailed log:\n") +
-                       error;
-    wxMessageBox(
-        userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
-#endif
   } else {
     CreatePlatformFunPtr createFunPtr =
         (CreatePlatformFunPtr)GetSymbol(platformHdl, "CreateGDPlatform");
@@ -111,23 +92,7 @@ std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(
            << " failed (no valid create/destroy functions)." << endl;
 
       CloseLibrary(platformHdl);
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-      wxString userMsg = _("Platform ") + fullpath +
-                         _(" could not be loaded.\nContact the developer for "
-                           "more information.\n\nDetailed log:\nNo valid "
-                           "create/destroy functions.");
-      wxMessageBox(
-          userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
-#endif
     } else {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-      gd::LocaleManager::Get()->AddCatalog(
-          wxFileName(fullpath)
-              .GetName());  // In editor, load catalog
-                            // associated with extension, if any.
-#endif
-
       std::shared_ptr<gd::Platform> platform(createFunPtr(), destroyFunPtr);
       std::cout << "Loading of " << fullpath << " done." << std::endl;
 

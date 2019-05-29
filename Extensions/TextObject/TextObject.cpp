@@ -5,10 +5,6 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/log.h>
-#include "Dialogs/TextObjectEditor.h"  //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
-#endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
@@ -42,10 +38,6 @@ TextObject::TextObject(gd::String name_)
       colorR(255),
       colorG(255),
       colorB(255)
-#if defined(GD_IDE_ONLY)
-      ,
-      font(NULL)
-#endif
 {
 }
 
@@ -69,54 +61,6 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
 }
 
 #if defined(GD_IDE_ONLY)
-void TextObject::DrawInitialInstance(gd::InitialInstance& instance,
-                                     sf::RenderTarget& renderTarget,
-                                     gd::Project& project,
-                                     gd::Layout& layout) {
-  sf::Text sfText;
-  sfText.setString(text);
-  sfText.setCharacterSize(characterSize);
-  sfText.setStyle((bold ? sf::Text::Bold : 0) |
-                  (IsItalic() ? sf::Text::Italic : 0) |
-                  (IsUnderlined() ? sf::Text::Underlined : 0));
-  if (font)
-    sfText.setFont(*font);
-  else
-    sfText.setFont(*FontManager::Get()->GetFont(""));
-  sfText.setOrigin(sfText.getLocalBounds().width / 2,
-                   sfText.getLocalBounds().height / 2);
-  sfText.setPosition(instance.GetX() + sfText.getOrigin().x,
-                     instance.GetY() + sfText.getOrigin().y);
-  sfText.setRotation(instance.GetAngle());
-  sfText.setFillColor(sf::Color(colorR, colorG, colorB));
-
-  renderTarget.draw(sfText);
-}
-
-sf::Vector2f TextObject::GetInitialInstanceDefaultSize(
-    gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& layout) const {
-  sf::Text sfText;
-  sfText.setString(text);
-  sfText.setCharacterSize(characterSize);
-  sfText.setStyle((bold ? sf::Text::Bold : 0) |
-                  (IsItalic() ? sf::Text::Italic : 0) |
-                  (IsUnderlined() ? sf::Text::Underlined : 0));
-  if (font)
-    sfText.setFont(*font);
-  else
-    sfText.setFont(*FontManager::Get()->GetFont(""));
-
-  return sf::Vector2f(
-      sfText.getLocalBounds().width,
-      sfText.getLocalBounds().height + sfText.getLocalBounds().top);
-}
-
-void TextObject::LoadResources(gd::Project& project, gd::Layout& layout) {
-  font = FontManager::Get()->GetFont(fontName);
-}
-
 void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.AddChild("string").SetValue(GetString());
   element.AddChild("font").SetValue(GetFontName());
@@ -134,26 +78,6 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
 
 void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   worker.ExposeFont(fontName);
-}
-
-bool TextObject::GenerateThumbnail(const gd::Project& project,
-                                   wxBitmap& thumbnail) const {
-#if !defined(GD_NO_WX_GUI)
-  thumbnail =
-      wxBitmap("CppPlatform/Extensions/texticon24.png", wxBITMAP_TYPE_ANY);
-#endif
-
-  return true;
-}
-
-void TextObject::EditObject(wxWindow* parent,
-                            gd::Project& game,
-                            gd::MainFrameWrapper& mainFrameWrapper) {
-#if !defined(GD_NO_WX_GUI)
-  wxLogNull logNo;
-  TextObjectEditor dialog(parent, game, *this, mainFrameWrapper);
-  dialog.ShowModal();
-#endif
 }
 #endif
 

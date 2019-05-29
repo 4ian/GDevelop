@@ -9,10 +9,14 @@ const styles = {
     height: '100%',
     flexDirection: 'column',
   },
+  maxWidth: {
+    maxWidth: '100%',
+  },
 };
 
 type Props = {|
   children: ?React.Node,
+  maxWidth?: boolean,
 |};
 
 /**
@@ -23,7 +27,14 @@ type Props = {|
  * removed in favor of using this component.
  */
 const Background = (props: Props) => (
-  <Paper style={styles.container}>{props.children}</Paper>
+  <Paper
+    style={{
+      ...styles.container,
+      ...(props.maxWidth ? styles.maxWidth : undefined),
+    }}
+  >
+    {props.children}
+  </Paper>
 );
 
 export default Background;

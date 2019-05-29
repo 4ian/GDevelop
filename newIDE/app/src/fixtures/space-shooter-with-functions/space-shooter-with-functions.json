@@ -3481,7 +3481,8 @@
               "supplementaryInformation": "",
               "type": "expression"
             }
-          ]
+          ],
+          "objectGroups": []
         },
         {
           "description": "Run logic on particles. To be called once every frame",
@@ -3555,7 +3556,8 @@
               "supplementaryInformation": "Sprite",
               "type": "objectList"
             }
-          ]
+          ],
+          "objectGroups": []
         }
       ]
     }

@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
@@ -159,6 +160,9 @@ export default class KeyField extends Component<ParameterFieldProps, State> {
         }))}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}
+        errorText={
+          this.props.value ? undefined : <Trans>You must select a key</Trans>
+        }
       />
     );
   }

@@ -102,6 +102,10 @@ export const makeTestProject = gd => {
     'Draggable'
   );
 
+  // Add some tags
+  tiledSpriteObject.setTags('Tag1');
+  spriteObject.setTags('Tag1, Tag2');
+
   // Layout
   const testLayout = project.insertNewLayout('TestLayout', 0);
   testLayout.insertObject(shapePainterObject, 0);
@@ -333,12 +337,67 @@ export const makeTestProject = gd => {
 
   testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
 
+  // Create more dummy objects to test events with a lot of objects
+  for (var i = 0; i < 6; ++i) {
+    testLayout.insertNewObject(
+      project,
+      'Sprite',
+      'VirtualControls' + (i !== 0 ? i : ''),
+      testLayout.getObjectsCount()
+    );
+  }
+
   const testSerializedEvents = JSON.parse(
-    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}]`
+    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["MySpriteObject","MySpriteObjectWithBehaviors",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MySpriteObjectWithBehaviors"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MySpriteObjectWithBehaviors","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["MyTextObject","MySpriteObjectWithBehaviors",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MySpriteObjectWithBehaviors"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MySpriteObjectWithBehaviors","150","0","1"],"subInstructions":[]}],"events":[]}]`
   );
 
   const testSerializedEventsWithLotsOfObjects = JSON.parse(
-    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}, {"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":true,"value":"SystemInfo::IsMobile"},"parameters":[],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls2"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls3"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["HiddenStuff"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["Markers"],"subInstructions":[]}],"events":[]}]`
+    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["MySpriteObject","MySpriteObjectWithBehaviors",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MySpriteObjectWithBehaviors"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MySpriteObjectWithBehaviors","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["MyTextObject","MySpriteObjectWithBehaviors",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MySpriteObjectWithBehaviors"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MySpriteObjectWithBehaviors","150","0","1"],"subInstructions":[]}],"events":[]}, {"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":true,"value":"SystemInfo::IsMobile"},"parameters":[],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls2"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls3"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls4"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls5"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls5"],"subInstructions":[]}],"events":[]}]`
+  );
+
+  // Events based behavior
+  const testEventsBasedBehavior = new gd.EventsBasedBehavior();
+  testEventsBasedBehavior.setName('MyTestBehavior');
+  testEventsBasedBehavior.setFullName('My Test Behavior');
+  testEventsBasedBehavior.setDescription(
+    'This is a test events based behavior.\n\nIt does a lot of cool things. It applies to SpriteObject only.'
+  );
+  testEventsBasedBehavior.setObjectType('Sprite');
+
+  // Add a function
+  const testBehaviorEventsFunction = testEventsBasedBehavior
+    .getEventsFunctions()
+    .insertNewEventsFunction('MyTestFunction', 0);
+  testBehaviorEventsFunction
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+  // Add a lifecycle function
+  const testBehaviorLifecycleEventsFunction = testEventsBasedBehavior
+    .getEventsFunctions()
+    .insertNewEventsFunction('doStepPreEvents', 1);
+
+  {
+    const parameter1 = new gd.ParameterMetadata();
+    parameter1.setType('object');
+    parameter1.setName('Object');
+    parameter1.setDescription('Object');
+    const parameter2 = new gd.ParameterMetadata();
+    parameter2.setType('behavior');
+    parameter2.setName('Behavior');
+    parameter2.setDescription('Behavior');
+    testBehaviorEventsFunction.getParameters().push_back(parameter1);
+    testBehaviorEventsFunction.getParameters().push_back(parameter2);
+    testBehaviorLifecycleEventsFunction.getParameters().push_back(parameter1);
+    testBehaviorLifecycleEventsFunction.getParameters().push_back(parameter2);
+  }
+
+  // Add an empty events based behavior
+  const testEmptyEventsBasedBehavior = new gd.EventsBasedBehavior();
+  testEventsBasedBehavior.setName('MyTestEmptyBehavior');
+  testEventsBasedBehavior.setFullName('My Test empty Behavior');
+  testEventsBasedBehavior.setDescription(
+    'This is a test events based behavior, without any functions.'
   );
 
   return {
@@ -361,5 +420,9 @@ export const makeTestProject = gd => {
     testEventsFunctionsExtension,
     testSerializedEvents,
     testSerializedEventsWithLotsOfObjects,
+    testEventsBasedBehavior,
+    testEmptyEventsBasedBehavior,
+    testBehaviorEventsFunction,
+    testBehaviorLifecycleEventsFunction,
   };
 };

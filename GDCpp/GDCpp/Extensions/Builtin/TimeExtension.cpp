@@ -73,7 +73,7 @@ TimeExtension::TimeExtension() {
 #endif
 }
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY) && !defined(EMSCRIPTEN)
 void TimeExtension::GetPropertyForDebugger(RuntimeScene& scene,
                                            std::size_t propertyNb,
                                            gd::String& name,

@@ -1,10 +1,10 @@
 gdjs.Physics2SharedData = function(runtimeScene, sharedData) {
-  this.gravityX = sharedData.content.gravityX;
-  this.gravityY = sharedData.content.gravityY;
+  this.gravityX = sharedData.gravityX;
+  this.gravityY = sharedData.gravityY;
   this.scaleX =
-    sharedData.content.scaleX === 0 ? 100 : sharedData.content.scaleX;
+    sharedData.scaleX === 0 ? 100 : sharedData.scaleX;
   this.scaleY =
-    sharedData.content.scaleY === 0 ? 100 : sharedData.content.scaleY;
+    sharedData.scaleY === 0 ? 100 : sharedData.scaleY;
 
   this.invScaleX = 1 / this.scaleX;
   this.invScaleY = 1 / this.scaleY;
@@ -194,28 +194,28 @@ gdjs.Physics2SharedData.prototype.removeJoint = function(jointId) {
 gdjs.Physics2RuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
-  this.type = behaviorData.content.type;
-  this.bullet = behaviorData.content.bullet;
-  this.fixedRotation = behaviorData.content.fixedRotation;
-  this.canSleep = behaviorData.content.canSleep;
-  this.shape = behaviorData.content.shape;
-  this.shapeDimensionA = behaviorData.content.shapeDimensionA;
-  this.shapeDimensionB = behaviorData.content.shapeDimensionB;
-  this.shapeOffsetX = behaviorData.content.shapeOffsetX;
-  this.shapeOffsetY = behaviorData.content.shapeOffsetY;
-  this.polygonOrigin = behaviorData.content.polygonOrigin;
+  this.bodyType = behaviorData.bodyType;
+  this.bullet = behaviorData.bullet;
+  this.fixedRotation = behaviorData.fixedRotation;
+  this.canSleep = behaviorData.canSleep;
+  this.shape = behaviorData.shape;
+  this.shapeDimensionA = behaviorData.shapeDimensionA;
+  this.shapeDimensionB = behaviorData.shapeDimensionB;
+  this.shapeOffsetX = behaviorData.shapeOffsetX;
+  this.shapeOffsetY = behaviorData.shapeOffsetY;
+  this.polygonOrigin = behaviorData.polygonOrigin;
   this.polygon =
     this.shape === 'Polygon'
-      ? gdjs.Physics2RuntimeBehavior.getPolygon(behaviorData.content.vertices)
+      ? gdjs.Physics2RuntimeBehavior.getPolygon(behaviorData.vertices)
       : null;
-  this.density = behaviorData.content.density;
-  this.friction = behaviorData.content.friction;
-  this.restitution = behaviorData.content.restitution;
-  this.linearDamping = behaviorData.content.linearDamping;
-  this.angularDamping = behaviorData.content.angularDamping;
-  this.gravityScale = behaviorData.content.gravityScale;
-  this.layers = behaviorData.content.layers;
-  this.masks = behaviorData.content.masks;
+  this.density = behaviorData.density;
+  this.friction = behaviorData.friction;
+  this.restitution = behaviorData.restitution;
+  this.linearDamping = behaviorData.linearDamping;
+  this.angularDamping = behaviorData.angularDamping;
+  this.gravityScale = behaviorData.gravityScale;
+  this.layers = behaviorData.layers;
+  this.masks = behaviorData.masks;
   this.shapeScale = 1;
   this.currentContacts = this.currentContacts || [];
   this.currentContacts.length = 0;
@@ -268,7 +268,7 @@ gdjs.Physics2RuntimeBehavior.prototype.onDeActivate = function() {
   }
 };
 
-gdjs.Physics2RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+gdjs.Physics2RuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
   this.onDeActivate();
 };
 
@@ -512,9 +512,9 @@ gdjs.Physics2RuntimeBehavior.prototype.createBody = function() {
 
   // Set body settings
   bodyDef.set_type(
-    this.type === 'Static'
+    this.bodyType === 'Static'
       ? Box2D.b2_staticBody
-      : this.type === 'Kinematic'
+      : this.bodyType === 'Kinematic'
       ? Box2D.b2_kinematicBody
       : Box2D.b2_dynamicBody
   );
@@ -656,14 +656,14 @@ gdjs.Physics2RuntimeBehavior.setTimeScaleFromObject = function(
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.isDynamic = function() {
-  return this.type === 'Dynamic';
+  return this.bodyType === 'Dynamic';
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.setDynamic = function() {
   // Check if there is no modification
-  if (this.type === 'Dynamic') return;
+  if (this.bodyType === 'Dynamic') return;
   // Change body type
-  this.type = 'Dynamic';
+  this.bodyType = 'Dynamic';
   // If there is no body, set a new one
   if (this._body === null) {
     this.createBody();
@@ -675,14 +675,14 @@ gdjs.Physics2RuntimeBehavior.prototype.setDynamic = function() {
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.isStatic = function() {
-  return this.type === 'Static';
+  return this.bodyType === 'Static';
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.setStatic = function() {
   // Check if there is no modification
-  if (this.type === 'Static') return;
+  if (this.bodyType === 'Static') return;
   // Change body type
-  this.type = 'Static';
+  this.bodyType = 'Static';
   // If there is no body, set a new one
   if (this._body === null) {
     this.createBody();
@@ -694,14 +694,14 @@ gdjs.Physics2RuntimeBehavior.prototype.setStatic = function() {
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.isKinematic = function() {
-  return this.type === 'Kinematic';
+  return this.bodyType === 'Kinematic';
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.setKinematic = function() {
   // Check if there is no modification
-  if (this.type === 'Kinematic') return;
+  if (this.bodyType === 'Kinematic') return;
   // Change body type
-  this.type = 'Kinematic';
+  this.bodyType = 'Kinematic';
   // If there is no body, set a new one
   if (this._body === null) {
     this.createBody();

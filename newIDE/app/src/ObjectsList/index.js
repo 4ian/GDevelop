@@ -16,7 +16,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { makeAddItem } from '../UI/ListAddItem';
+import { makeAddItem } from '../UI/ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
 import type {
@@ -24,6 +24,9 @@ import type {
   ObjectWithContext,
 } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
+import TagChips from '../UI/TagChips';
+import EditTagsDialog from '../UI/EditTagsDialog';
+import { type Tags, getStringFromTags } from '../Utils/TagsHelper';
 
 const listItemHeight = 48;
 const styles = {
@@ -79,10 +82,10 @@ class ObjectsList extends Component<*, *> {
           }
 
           const nameBeingEdited =
-            this.props.renamedObjectWithScope &&
-            this.props.renamedObjectWithScope.object ===
+            this.props.renamedObjectWithContext &&
+            this.props.renamedObjectWithContext.object ===
               objectWithContext.object &&
-            this.props.renamedObjectWithScope.global ===
+            this.props.renamedObjectWithContext.global ===
               objectWithContext.global;
 
           return (
@@ -120,7 +123,12 @@ class ObjectsList extends Component<*, *> {
               onAddNewObject={this.props.onAddNewObject}
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
+              getAllObjectTags={this.props.getAllObjectTags}
               onObjectSelected={this.props.onObjectSelected}
+              onEditTags={() => this.props.onEditTags(objectWithContext.object)}
+              onChangeTags={objectTags =>
+                this.props.onChangeTags(objectWithContext.object, objectTags)
+              }
               selected={
                 selectedObjectNames.indexOf(
                   objectWithContext.object.getName()
@@ -139,9 +147,10 @@ const SortableObjectsList = SortableContainer(ObjectsList, { withRef: true });
 
 type StateType = {|
   newObjectDialogOpen: boolean,
-  renamedObjectWithScope: ?ObjectWithContext,
-  variablesEditedObject: any,
+  renamedObjectWithContext: ?ObjectWithContext,
+  variablesEditedObject: ?gdObject,
   searchText: string,
+  tagEditedObject: ?gdObject,
 |};
 
 export default class ObjectsListContainer extends React.Component<
@@ -163,9 +172,10 @@ export default class ObjectsListContainer extends React.Component<
   projectObjectsList: ObjectWithContextList = [];
   state: StateType = {
     newObjectDialogOpen: false,
-    renamedObjectWithScope: null,
+    renamedObjectWithContext: null,
     variablesEditedObject: null,
     searchText: '',
+    tagEditedObject: null,
   };
 
   shouldComponentUpdate(nextProps: *, nextState: StateType) {
@@ -178,13 +188,18 @@ export default class ObjectsListContainer extends React.Component<
 
     if (
       this.state.newObjectDialogOpen !== nextState.newObjectDialogOpen ||
-      this.state.renamedObjectWithScope !== nextState.renamedObjectWithScope ||
+      this.state.renamedObjectWithContext !==
+        nextState.renamedObjectWithContext ||
       this.state.variablesEditedObject !== nextState.variablesEditedObject ||
-      this.state.searchText !== nextState.searchText
+      this.state.searchText !== nextState.searchText ||
+      this.state.tagEditedObject !== nextState.tagEditedObject
     )
       return true;
 
-    if (this.props.selectedObjectNames !== nextProps.selectedObjectNames)
+    if (
+      this.props.selectedObjectNames !== nextProps.selectedObjectNames ||
+      this.props.selectedObjectTags !== nextProps.selectedObjectTags
+    )
       return true;
 
     if (
@@ -197,7 +212,13 @@ export default class ObjectsListContainer extends React.Component<
   }
 
   addObject = (objectType: string) => {
-    const { project, objectsContainer } = this.props;
+    const {
+      project,
+      objectsContainer,
+      onEditObject,
+      onObjectCreated,
+      onObjectSelected,
+    } = this.props;
 
     const name = newNameGenerator(
       'NewObject',
@@ -211,17 +232,24 @@ export default class ObjectsListContainer extends React.Component<
       name,
       objectsContainer.getObjectsCount()
     );
+    object.setTags(getStringFromTags(this.props.selectedObjectTags));
 
     this.setState(
       {
         newObjectDialogOpen: false,
       },
       () => {
-        if (this.props.onEditObject) {
-          this.props.onEditObject(object);
+        if (onEditObject) {
+          onEditObject(object);
+          onObjectCreated(name);
+          onObjectSelected(name);
         }
       }
     );
+  };
+
+  onAddNewObject = () => {
+    this.setState({ newObjectDialogOpen: true });
   };
 
   _deleteObject = (objectWithContext: ObjectWithContext) => {
@@ -314,13 +342,13 @@ export default class ObjectsListContainer extends React.Component<
   _editName = (objectWithContext: ?ObjectWithContext) => {
     this.setState(
       {
-        renamedObjectWithScope: objectWithContext,
+        renamedObjectWithContext: objectWithContext,
       },
       () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
   };
 
-  _editVariables = (object: any) => {
+  _editVariables = (object: ?gdObject) => {
     this.setState({
       variablesEditedObject: object,
     });
@@ -330,7 +358,7 @@ export default class ObjectsListContainer extends React.Component<
     const { object } = objectWithContext;
 
     this.setState({
-      renamedObjectWithScope: null,
+      renamedObjectWithContext: null,
     });
 
     if (this.props.canRenameObject(objectWithContext, newName)) {
@@ -415,20 +443,37 @@ export default class ObjectsListContainer extends React.Component<
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
+  _openEditTagDialog = (tagEditedObject: ?gdObject) => {
+    this.setState({
+      tagEditedObject,
+    });
+  };
+
+  _changeObjectTags = (object: gdObject, tags: Tags) => {
+    object.setTags(getStringFromTags(tags));
+
+    // Force update the list as it's possible that user removed a tag
+    // from an object, that should then not be shown anymore in the list.
+    this.forceUpdateList();
+  };
+
   render() {
-    const { project, objectsContainer } = this.props;
-    const { searchText } = this.state;
+    const { project, objectsContainer, selectedObjectTags } = this.props;
+    const { searchText, tagEditedObject } = this.state;
 
     const lists = enumerateObjects(project, objectsContainer);
-    this.containerObjectsList = filterObjectsList(
-      lists.containerObjectsList,
-      searchText
-    );
-    this.projectObjectsList = filterObjectsList(
-      lists.projectObjectsList,
-      searchText
-    );
-    const allObjectsList = filterObjectsList(lists.allObjectsList, searchText);
+    this.containerObjectsList = filterObjectsList(lists.containerObjectsList, {
+      searchText,
+      selectedTags: selectedObjectTags,
+    });
+    this.projectObjectsList = filterObjectsList(lists.projectObjectsList, {
+      searchText,
+      selectedTags: selectedObjectTags,
+    });
+    const allObjectsList = filterObjectsList(lists.allObjectsList, {
+      searchText,
+      selectedTags: selectedObjectTags,
+    });
     const fullList = allObjectsList.concat({
       key: 'add-objects-row',
       object: null,
@@ -440,7 +485,11 @@ export default class ObjectsListContainer extends React.Component<
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
     return (
-      <Background>
+      <Background maxWidth>
+        <TagChips
+          tags={this.props.selectedObjectTags}
+          onChange={this.props.onChangeSelectedObjectTags}
+        />
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -451,8 +500,11 @@ export default class ObjectsListContainer extends React.Component<
                 project={project}
                 width={width}
                 height={height}
-                renamedObjectWithScope={this.state.renamedObjectWithScope}
+                renamedObjectWithContext={this.state.renamedObjectWithContext}
                 getThumbnail={this.props.getThumbnail}
+                getAllObjectTags={this.props.getAllObjectTags}
+                onEditTags={this._openEditTagDialog}
+                onChangeTags={this._changeObjectTags}
                 selectedObjectNames={this.props.selectedObjectNames}
                 onObjectSelected={this.props.onObjectSelected}
                 onEditObject={this.props.onEditObject}
@@ -461,9 +513,7 @@ export default class ObjectsListContainer extends React.Component<
                 onDuplicateObject={this._duplicateObject}
                 onSetAsGlobalObject={this._setAsGlobalObject}
                 onPasteObject={this._pasteAndRename}
-                onAddNewObject={() =>
-                  this.setState({ newObjectDialogOpen: true })
-                }
+                onAddNewObject={this.onAddNewObject}
                 onEditName={this._editName}
                 onEditVariables={this._editVariables}
                 onDelete={this._deleteObject}
@@ -491,14 +541,18 @@ export default class ObjectsListContainer extends React.Component<
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog
             open={this.state.newObjectDialogOpen}
-            onClose={() => this.setState({ newObjectDialogOpen: false })}
+            onClose={() =>
+              this.setState({
+                newObjectDialogOpen: false,
+              })
+            }
             onChoose={this.addObject}
             project={project}
           />
         )}
         {this.state.variablesEditedObject && (
           <VariablesEditorDialog
-            open={!!this.state.variablesEditedObject}
+            open
             variablesContainer={
               this.state.variablesEditedObject &&
               this.state.variablesEditedObject.getVariables()
@@ -508,6 +562,16 @@ export default class ObjectsListContainer extends React.Component<
             title="Object Variables"
             emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
             emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
+          />
+        )}
+        {tagEditedObject && (
+          <EditTagsDialog
+            tagsString={tagEditedObject.getTags()}
+            onEdit={tags => {
+              this._changeObjectTags(tagEditedObject, tags);
+              this._openEditTagDialog(null);
+            }}
+            onCancel={() => this._openEditTagDialog(null)}
           />
         )}
       </Background>

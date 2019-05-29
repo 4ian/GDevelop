@@ -9,25 +9,18 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/BehaviorContent.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
-
 namespace gd {
 class PropertyDescriptor;
 class Project;
 class Layout;
-class MainFrameWrapper;
 class ArbitraryResourceWorker;
 class InitialInstance;
 class SerializerElement;
 }  // namespace gd
-namespace sf {
-class RenderTarget;
-}
-class wxWindow;
-class wxBitmap;
 
 namespace gd {
 
@@ -94,6 +87,14 @@ class GD_CORE_API Object {
   /** \brief Return the type of the object.
    */
   const gd::String& GetType() const { return type; }
+
+  /** \brief Change the tags of the object.
+   */
+  void SetTags(const gd::String& tags_) { tags = tags_; }
+
+  /** \brief Return the tags of the object.
+   */
+  const gd::String& GetTags() const { return tags; }
   ///@}
 
 #if defined(GD_IDE_ONLY)
@@ -184,70 +185,7 @@ class GD_CORE_API Object {
                                              gd::Layout& layout) {
     return false;
   };
-
-  /**
-   * \brief Called when the IDE wants to draw an initial instance of the object
-   * on the layout editor.
-   *
-   * LoadResources method was called before so as to let the object load
-   * resources if necessary. \see gd::InitialInstance
-   */
-  virtual void DrawInitialInstance(gd::InitialInstance& instance,
-                                   sf::RenderTarget& renderTarget,
-                                   gd::Project& project,
-                                   gd::Layout& layout);
-
-  /**
-   * \brief Called by the IDE when a layout is going to be rendered.
-   * \see gd::InitialInstance
-   */
-  virtual void LoadResources(gd::Project& project, gd::Layout& layout){};
-
-  /**
-   * \brief Called when the IDE wants to know the default size an initial
-   * instance. \see gd::InitialInstance
-   */
-  virtual sf::Vector2f GetInitialInstanceDefaultSize(
-      gd::InitialInstance& instance,
-      gd::Project& project,
-      gd::Layout& layout) const;
-
-  /**
-   * \brief Called when the IDE wants to know the origin of an initial instance.
-   * ( Relative to the object )
-   *
-   * The default implementation returns point (0;0) and it should be ok for most
-   * objects except for objects whose origin can be modified ( sprites for
-   * example )
-   *
-   * \see gd::InitialInstance
-   */
-  virtual sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance& instance,
-                                                gd::Project& project,
-                                                gd::Layout& layout) const;
-  ///@}
-
-  /** \name  Others IDE related functions
-   * Members functions related to generating thumbnails and other wxWidgets
-   * related tasks
-   */
-  ///@{
-  /**
-   * \brief Called when user wants to edit the object.
-   */
-  virtual void EditObject(wxWindow* parent,
-                          gd::Project& project,
-                          gd::MainFrameWrapper& mainFrameWrapper_){};
-
-  /**
-   * \brief Must update \a thumbnail bitmap with a 24*24 bitmap.
-   * \return true if thumbnail was successfully updated.
-   */
-  virtual bool GenerateThumbnail(const gd::Project& project,
-                                 wxBitmap& thumbnail) const {
-    return false;
-  };
-///@}
+    ///@}
 #endif
 
   /** \name Behaviors management
@@ -264,12 +202,12 @@ class GD_CORE_API Object {
   /**
    * \brief Return a reference to the behavior called \a name.
    */
-  Behavior& GetBehavior(const gd::String& name);
+  BehaviorContent& GetBehavior(const gd::String& name);
 
   /**
    * \brief Return a reference to the behavior called \a name.
    */
-  const Behavior& GetBehavior(const gd::String& name) const;
+  const BehaviorContent& GetBehavior(const gd::String& name) const;
 
   /**
    * \brief Return true if object has a behavior called \a name.
@@ -287,33 +225,34 @@ class GD_CORE_API Object {
    */
   bool RenameBehavior(const gd::String& name, const gd::String& newName);
 
+  /**
+   * \brief Add the specified behavior content to the object
+   *
+   * \return A reference to the newly added behavior content.
+   */
+  gd::BehaviorContent& AddBehavior(const gd::BehaviorContent& behavior);
+
 #if defined(GD_IDE_ONLY)
   /**
    * \brief Add the behavior of the specified \a type with the specified \a
    * name.
    *
-   * The project's current platform is used to create the behavior.
+   * The project's current platform is used to initialize the content.
    *
-   * \return A pointer to the newly added behavior. NULL if the creation failed.
+   * \return A pointer to the newly added behavior content. NULL if the creation
+   * failed.
    */
-  gd::Behavior* AddNewBehavior(gd::Project& project,
-                               const gd::String& type,
-                               const gd::String& name);
+  gd::BehaviorContent* AddNewBehavior(gd::Project& project,
+                                      const gd::String& type,
+                                      const gd::String& name);
 #endif
 
   /**
-   * \brief Add the specified behavior to the object
-   * \note The object takes ownership of the behavior.
-   * \return true if the behavior was added, false otherwise (behavior with the
-   * same name already in the object)
+   * \brief Get a read-only access to the map containing the behaviors with
+   * their properties.
    */
-  bool AddBehavior(gd::Behavior* behavior);
-
-  /**
-   * \brief Get a read-only access to the map containing the behaviors.
-   */
-  const std::map<gd::String, std::unique_ptr<gd::Behavior>>& GetAllBehaviors()
-      const {
+  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
+  GetAllBehaviorContents() const {
     return behaviors;
   };
   ///@}
@@ -358,11 +297,13 @@ class GD_CORE_API Object {
   gd::String name;  ///< The full name of the object
   gd::String type;  ///< Which type is the object. ( To test if we can do
                     ///< something reserved to some objects with it )
-  std::map<gd::String, std::unique_ptr<gd::Behavior>>
-      behaviors;  ///< Contains all behaviors of the object. Behaviors are the
-                  ///< ownership of the object
+  std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>
+      behaviors;  ///< Contains all behaviors and their properties for the
+                  ///< object. Behavior contents are the ownership of the
+                  ///< object.
   gd::VariablesContainer
       objectVariables;  ///< List of the variables of the object
+  gd::String tags; ///< Comma-separated list of tags
 
   /**
    * \brief Derived objects can redefine this method to load custom attributes.

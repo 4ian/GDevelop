@@ -24,6 +24,10 @@ void EventsCodeGenerationContext::InheritsFrom(
             parent_.objectsListsToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
+  std::copy(parent_.objectsListsWithoutPickingToBeDeclared.begin(),
+            parent_.objectsListsWithoutPickingToBeDeclared.end(),
+            std::inserter(alreadyDeclaredObjectsLists,
+                          alreadyDeclaredObjectsLists.begin()));
   std::copy(parent_.emptyObjectsListsToBeDeclared.begin(),
             parent_.emptyObjectsListsToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
@@ -47,16 +51,23 @@ void EventsCodeGenerationContext::Reuse(
 
 void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
-  if (emptyObjectsListsToBeDeclared.find(objectName) ==
-      emptyObjectsListsToBeDeclared.end())
+  if (!IsToBeDeclared(objectName))
     objectsListsToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
+
+void EventsCodeGenerationContext::ObjectsListWithoutPickingNeeded(
+    const gd::String& objectName) {
+  if (!IsToBeDeclared(objectName))
+    objectsListsWithoutPickingToBeDeclared.insert(objectName);
+
+  depthOfLastUse[objectName] = GetContextDepth();
+}
+
 void EventsCodeGenerationContext::EmptyObjectsListNeeded(
     const gd::String& objectName) {
-  if (objectsListsToBeDeclared.find(objectName) ==
-      objectsListsToBeDeclared.end())
+  if (!IsToBeDeclared(objectName))
     emptyObjectsListsToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
@@ -66,6 +77,8 @@ std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
     const {
   std::set<gd::String> allObjectListsToBeDeclared(
       objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
+  allObjectListsToBeDeclared.insert(objectsListsWithoutPickingToBeDeclared.begin(),
+                                    objectsListsWithoutPickingToBeDeclared.end());
   allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(),
                                     emptyObjectsListsToBeDeclared.end());
 

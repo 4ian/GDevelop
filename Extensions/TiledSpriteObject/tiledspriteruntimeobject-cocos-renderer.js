@@ -23,7 +23,7 @@ gdjs.TiledSpriteRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScen
 
 gdjs.TiledSpriteRuntimeObjectRenderer = gdjs.TiledSpriteRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.ownerRemovedFromScene = function() {
+gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.onOwnerRemovedFromScene = function() {
     if (this._shader) this._shader.release();
 }
 

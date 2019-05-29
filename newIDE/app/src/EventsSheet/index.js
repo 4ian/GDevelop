@@ -151,12 +151,12 @@ export default class EventsSheet extends React.Component<Props, State> {
 
       this.deleteSelection();
     },
-    onCopy: this.copySelection,
-    onCut: this.cutSelection,
-    onPaste: this.pasteEventsOrInstructions,
-    onSearch: this._toggleSearchPanel,
-    onUndo: this.undo,
-    onRedo: this.redo,
+    onCopy: () => this.copySelection(),
+    onCut: () => this.cutSelection(),
+    onPaste: () => this.pasteEventsOrInstructions(),
+    onSearch: () => this._toggleSearchPanel(),
+    onUndo: () => this.undo(),
+    onRedo: () => this.redo(),
   });
 
   eventContextMenu: ContextMenu;

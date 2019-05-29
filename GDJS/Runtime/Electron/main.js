@@ -14,6 +14,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800 /*GDJS_WINDOW_WIDTH*/,
     height: 600 /*GDJS_WINDOW_HEIGHT*/,
+    useContentSize: true,
     title: "GDJS_GAME_NAME",
     backgroundColor: '#000000'
   });

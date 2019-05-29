@@ -66,7 +66,7 @@ bool SerializerElement::GetBoolAttribute(const gd::String& name,
   return defaultValue;
 }
 
-gd::String SerializerElement::GetStringAttribute(
+gd::String SerializerElement::GetStringAttribute(  // TODO: Use const ref?
     const gd::String& name,
     gd::String defaultValue,
     gd::String deprecatedName) const {
@@ -239,6 +239,33 @@ bool SerializerElement::HasChild(const gd::String& name,
   }
 
   return false;
+}
+
+void SerializerElement::RemoveChild(const gd::String &name) {
+  for (size_t i = 0; i < children.size();) {
+    if (children[i].first == name)
+      children.erase(children.begin() + i);
+    else
+      ++i;
+  }
+}
+
+void SerializerElement::Init(const gd::SerializerElement& other) {
+  valueUndefined = other.valueUndefined;
+  elementValue = other.elementValue;
+  attributes = other.attributes;
+
+  children.clear();
+  for (const auto& child : other.children) {
+    children.push_back(
+        std::make_pair(child.first,
+                       std::shared_ptr<SerializerElement>(
+                           new SerializerElement(*child.second))));
+  }
+
+  isArray = other.isArray;
+  arrayOf = other.arrayOf;
+  deprecatedArrayOf = other.deprecatedArrayOf;
 }
 
 }  // namespace gd

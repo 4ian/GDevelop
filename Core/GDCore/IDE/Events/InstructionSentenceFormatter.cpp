@@ -14,14 +14,9 @@
 #include <vector>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
-#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/config.h>
-#endif
 
 using namespace std;
 
@@ -174,92 +169,7 @@ void InstructionSentenceFormatter::LoadTypesFormattingFromConfig() {
   typesFormatting["objectvar"].SetColor(131, 55, 162).SetBold();
   typesFormatting["scenevar"].SetColor(131, 55, 162).SetBold();
   typesFormatting["globalvar"].SetColor(131, 55, 162).SetBold();
-
-// Load any existing custom configuration
-#if !defined(GD_NO_WX_GUI)
-  wxConfigBase *config = wxConfigBase::Get();
-
-  for (std::map<gd::String, gd::TextFormatting>::iterator it =
-           typesFormatting.begin();
-       it != typesFormatting.end();
-       ++it) {
-    it->second.SetColor(config->ReadObject(
-        "EventsEditor/" + it->first + "Color", it->second.GetWxColor()));
-    it->second.bold = config->ReadBool("EventsEditor/" + it->first + "Bold",
-                                       it->second.IsBold());
-    it->second.italic = config->ReadBool("EventsEditor/" + it->first + "Italic",
-                                         it->second.IsItalic());
-  }
-#endif
 }
-
-#if !defined(GD_NO_WX_GUI)
-void InstructionSentenceFormatter::SaveTypesFormattingToConfig() {
-  wxConfigBase *config = wxConfigBase::Get();
-
-  for (std::map<gd::String, TextFormatting>::iterator it =
-           typesFormatting.begin();
-       it != typesFormatting.end();
-       ++it) {
-    config->Write("EventsEditor/" + it->first + "Color",
-                  it->second.GetWxColor());
-    config->Write("EventsEditor/" + it->first + "Bold", it->second.bold);
-    config->Write("EventsEditor/" + it->first + "Italic", it->second.italic);
-  }
-}
-
-wxBitmap InstructionSentenceFormatter::BitmapFromType(const gd::String &type) {
-  gd::CommonBitmapProvider *CommonBitmapProvider =
-      gd::CommonBitmapProvider::Get();
-
-  if (type == "")
-    return CommonBitmapProvider->unknownBt;
-  else if (type == "expression")
-    return CommonBitmapProvider->expressionBt;
-  else if (gd::ParameterMetadata::IsObject(type))
-    return CommonBitmapProvider->objectBt;
-  else if (type == "behavior")
-    return CommonBitmapProvider->behaviorBt;
-  else if (type == "operator")
-    return CommonBitmapProvider->signeBt;
-  else if (type == "relationalOperator")
-    return CommonBitmapProvider->signeBt;
-  else if (type == "file")
-    return CommonBitmapProvider->fileBt;
-  else if (type == "key")
-    return CommonBitmapProvider->keyBt;
-  else if (type == "mouse")
-    return CommonBitmapProvider->mouseBt;
-  else if (type == "yesorno")
-    return CommonBitmapProvider->yesnoBt;
-  else if (type == "police")
-    return CommonBitmapProvider->policeBt;
-  else if (type == "color")
-    return CommonBitmapProvider->colorBt;
-  else if (type == "trueorfalse")
-    return CommonBitmapProvider->trueOrFalseBt;
-  else if (type == "string")
-    return CommonBitmapProvider->texteBt;
-  else if (type == "musicfile")
-    return CommonBitmapProvider->musicBt;
-  else if (type == "soundfile")
-    return CommonBitmapProvider->soundBt;
-  else if (type == "password")
-    return CommonBitmapProvider->passwordBt;
-  else if (type == "layer")
-    return CommonBitmapProvider->layerBt;
-  else if (type == "joyaxis")
-    return CommonBitmapProvider->joyaxisBt;
-  else if (type == "objectvar")
-    return CommonBitmapProvider->varBt;
-  else if (type == "scenevar")
-    return CommonBitmapProvider->varBt;
-  else if (type == "globalvar")
-    return CommonBitmapProvider->varBt;
-
-  return CommonBitmapProvider->unknownBt;
-}
-#endif
 
 }  // namespace gd
 

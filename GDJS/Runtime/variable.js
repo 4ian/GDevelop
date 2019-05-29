@@ -18,7 +18,7 @@ gdjs.Variable = function(varData)
     this._numberDirty = false;
     this._stringDirty = true;
 	this._isStructure = false;
-    this._children = {}; //TODO: Use a hashtable and avoid de/allocations.
+    this._children = {};
     this._undefinedInContainer = false;
 
 	if ( varData !== undefined ) {

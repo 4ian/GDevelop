@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import uniq from 'lodash/uniq';
@@ -56,7 +59,11 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
   type ObjectWithContext,
   type GroupWithContext,
+  enumerateObjects,
 } from '../ObjectsList/EnumerateObjects';
+import TagsButton from '../UI/EditorMosaic/TagsButton';
+import CloseButton from '../UI/EditorMosaic/CloseButton';
+import { buildTagsMenuTemplate, getTagsFromString } from '../Utils/TagsHelper';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -106,6 +113,7 @@ type State = {|
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
+  newObjectInstancePosition: ?[number, number],
 
   editedGroup: ?gdObjectGroup,
 
@@ -119,6 +127,9 @@ type State = {|
   showObjectsListInfoBar: boolean,
   layoutVariablesDialogOpen: boolean,
   showPropertiesInfoBar: boolean,
+
+  // State for tags of objects:
+  selectedObjectTags: Array<string>,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
@@ -136,6 +147,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsList;
   _propertiesEditor: ?InstancePropertiesEditor;
+  _objectsListToolbar: Array<React.Node>;
 
   constructor(props: Props) {
     super(props);
@@ -154,7 +166,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       variablesEditedObject: null,
       selectedObjectNames: [],
-
+      newObjectInstancePosition: null,
       editedGroup: null,
 
       // State for "drag'n'dropping" from the objects list to the instances editor:
@@ -169,6 +181,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       showObjectsListInfoBar: false,
       layoutVariablesDialogOpen: false,
       showPropertiesInfoBar: false,
+
+      selectedObjectTags: [],
     };
   }
 
@@ -459,6 +473,20 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _createNewObjectAndInstanceUnderCursor = () => {
+    if (!this.editor) {
+      return;
+    }
+
+    // Remember where to create the instance, when the object will be created
+    this.setState({
+      newObjectInstancePosition: this.editor.getLastCursorPosition(),
+    });
+
+    if (this._objectsList)
+      this._objectsList.setState({ newObjectDialogOpen: true });
+  };
+
   _onAddInstanceUnderCursor = () => {
     if (!this.state.selectedObjectNames.length || !this.editor) {
       return;
@@ -557,6 +585,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
+  };
+
+  /**
+   * Create an instance of the given object, at the position
+   * previously chosen (see `newObjectInstancePosition`).
+   */
+  _addNewObjectInstance = (newObjectName: string) => {
+    const { newObjectInstancePosition } = this.state;
+    if (!newObjectInstancePosition) {
+      return;
+    }
+
+    this._addInstance(
+      newObjectInstancePosition[0],
+      newObjectInstancePosition[1],
+      newObjectName
+    );
+    this.setState({ newObjectInstancePosition: null });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -830,6 +876,30 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  _getAllObjectTags = (): Array<string> => {
+    const { project, layout } = this.props;
+
+    const tagsSet: Set<string> = new Set();
+    enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
+      getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
+    });
+
+    return Array.from(tagsSet);
+  };
+
+  _buildObjectTagsMenuTemplate = (i18n: I18nType): Array<any> => {
+    const { selectedObjectTags } = this.state;
+
+    return buildTagsMenuTemplate({
+      noTagLabel: i18n._(t`No tags - add a tag to an object first`),
+      getAllTags: this._getAllObjectTags,
+      selectedTags: selectedObjectTags,
+      onChange: selectedObjectTags => {
+        this.setState({ selectedObjectTags });
+      },
+    });
+  };
+
   render() {
     const {
       project,
@@ -841,6 +911,21 @@ export default class SceneEditor extends React.Component<Props, State> {
       isActive,
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
+
+    // Create and store the toolbar for the ObjectsList only once:
+    // It's important to always use the same object (in the sense of ===) for toolbarControls,
+    // to avoid confusing MosaicWindow.shouldComponentUpdate: It makes a nasty infinite loop
+    // while it tries to compare React elements.
+    this._objectsListToolbar = this._objectsListToolbar || [
+      <I18n key="tags">
+        {({ i18n }) => (
+          <TagsButton
+            buildMenuTemplate={() => this._buildObjectTagsMenuTemplate(i18n)}
+          />
+        )}
+      </I18n>,
+      <CloseButton key="close" />,
+    ];
 
     const editors = {
       properties: (
@@ -891,6 +976,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'objects-list': (
         <MosaicWindow
           title={<Trans>Objects</Trans>}
+          toolbarControls={this._objectsListToolbar}
           selectedObjectNames={
             this.state
               .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
@@ -898,6 +984,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           canDropDraggedObject={
             this.state
               .canDropDraggedObject /*Ensure MosaicWindow content is updated when canDropDraggedObject changes*/
+          }
+          selectedObjectTags={
+            this.state
+              .selectedObjectTags /*Ensure MosaicWindow content is updated when selectedObjectTags changes*/
           }
         >
           <ObjectsList
@@ -915,12 +1005,20 @@ export default class SceneEditor extends React.Component<Props, State> {
             ) => {
               return this._canObjectUseNewName(objectWithContext, newName);
             }}
+            onObjectCreated={this._addNewObjectInstance}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
             onStartDraggingObject={this._onStartDraggingObjectFromList}
             onEndDraggingObject={this._onEndDraggingObjectFromList}
             canMoveObjects={!this.state.canDropDraggedObject}
+            selectedObjectTags={this.state.selectedObjectTags}
+            onChangeSelectedObjectTags={selectedObjectTags =>
+              this.setState({
+                selectedObjectTags,
+              })
+            }
+            getAllObjectTags={this._getAllObjectTags}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
@@ -1118,15 +1216,17 @@ export default class SceneEditor extends React.Component<Props, State> {
           layerRemoved={this.state.layerRemoved}
           onClose={this.state.onCloseLayerRemoveDialog}
         />
-        <ScenePropertiesDialog
-          open={!!this.state.scenePropertiesDialogOpen}
-          project={project}
-          layout={layout}
-          onClose={() => this.openSceneProperties(false)}
-          onApply={() => this.openSceneProperties(false)}
-          onEditVariables={() => this.editLayoutVariables(true)}
-          onOpenMoreSettings={this.props.onOpenMoreSettings}
-        />
+        {this.state.scenePropertiesDialogOpen && (
+          <ScenePropertiesDialog
+            open
+            project={project}
+            layout={layout}
+            onClose={() => this.openSceneProperties(false)}
+            onApply={() => this.openSceneProperties(false)}
+            onEditVariables={() => this.editLayoutVariables(true)}
+            onOpenMoreSettings={this.props.onOpenMoreSettings}
+          />
+        )}
         <VariablesEditorDialog
           open={!!this.state.layoutVariablesDialogOpen}
           variablesContainer={layout.getVariables()}
@@ -1146,6 +1246,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                 : '',
               click: () => this._onAddInstanceUnderCursor(),
               visible: this.state.selectedObjectNames.length > 0,
+            },
+            {
+              label: 'Insert a New Object',
+              click: () => this._createNewObjectAndInstanceUnderCursor(),
+              visible: this.state.selectedObjectNames.length === 0,
             },
             {
               label: this.state.selectedObjectNames.length

@@ -120,7 +120,7 @@ module.exports = {
         _(
           'Save a scene variable (including, for structure, all the children) into a file in JSON format. Only use this on small files to avoid any lag or freeze during the the game execution.'
         ),
-        _('Save scene variable _PARAM0_ into file PARAM1 as JSON'),
+        _('Save scene variable _PARAM0_ into file _PARAM1_ as JSON'),
         _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
@@ -146,7 +146,7 @@ module.exports = {
         _(
           "Save the scene variable (including, for structures, all the children) into a file in JSON format, asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finished."
         ),
-        _('Save scene variable _PARAM0_ into file PARAM1 as JSON'),
+        _('Save scene variable _PARAM0_ into file _PARAM1_ as JSON'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'

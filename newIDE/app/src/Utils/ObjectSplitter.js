@@ -25,6 +25,7 @@ type SplitConfiguration = {|
 type UnsplitConfiguration = {|
   isReferenceMagicPropertyName: string,
   getReferencePartialObject: (referencePath: string) => Promise<Object>,
+  maxUnsplitDepth?: number,
 |};
 
 /**
@@ -127,6 +128,7 @@ export const unsplit = (
   {
     isReferenceMagicPropertyName,
     getReferencePartialObject,
+    maxUnsplitDepth,
   }: UnsplitConfiguration
 ): Promise<void> => {
   const isReference = (object: Object): ?Reference => {
@@ -137,7 +139,14 @@ export const unsplit = (
     return null;
   };
 
-  const unsplitObject = (currentObject: Object): Promise<void> => {
+  const unsplitObject = (
+    currentObject: Object,
+    depth: number
+  ): Promise<void> => {
+    if (maxUnsplitDepth !== undefined && depth >= maxUnsplitDepth) {
+      return Promise.resolve();
+    }
+
     if (currentObject !== null && typeof currentObject === 'object') {
       const keys = Object.keys(currentObject);
       if (keys) {
@@ -149,12 +158,15 @@ export const unsplit = (
                 partialObject => {
                   currentObject[indexOrPropertyName] = partialObject;
 
-                  return unsplitObject(currentObject[indexOrPropertyName]);
+                  return unsplitObject(
+                    currentObject[indexOrPropertyName],
+                    depth + 1
+                  );
                 }
               );
             }
 
-            return unsplitObject(currentObject[indexOrPropertyName]);
+            return unsplitObject(currentObject[indexOrPropertyName], depth + 1);
           })
         ).then(() => {});
       }
@@ -163,7 +175,7 @@ export const unsplit = (
     return Promise.resolve();
   };
 
-  return unsplitObject(object);
+  return unsplitObject(object, 0);
 };
 
 /**

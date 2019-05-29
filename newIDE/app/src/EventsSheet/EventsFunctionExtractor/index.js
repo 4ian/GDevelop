@@ -1,7 +1,7 @@
 // @flow
 import { unserializeFromJSObject } from '../../Utils/Serializer';
 import { mapVector } from '../../Utils/MapFor';
-import { getEventsFunctionType } from '../../EventsFunctionsExtensionsLoader';
+import { getFreeEventsFunctionType } from '../../EventsFunctionsExtensionsLoader';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 const gd = global.gd;
 
@@ -139,7 +139,7 @@ export const createNewInstructionForEventsFunction = (
   const runtimeSceneParameterCount = 1; // By convention, first parameter is always the Runtime Scene.
   const contextParameterCount = 1; // By convention, latest parameter is always the eventsFunctionContext of the calling function (if any).
 
-  action.setType(getEventsFunctionType(extensionName, eventsFunction));
+  action.setType(getFreeEventsFunctionType(extensionName, eventsFunction));
   action.setParametersCount(
     eventsFunction.getParameters().size() +
       runtimeSceneParameterCount +

@@ -29,22 +29,22 @@ using namespace std;
 
 namespace gdjs {
 
-gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
+gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
     gd::Project& project,
-    const gd::Layout& scene,
+    gdjs::EventsCodeGenerator& codeGenerator,
+    gd::String fullyQualifiedFunctionName,
+    gd::String functionArgumentsCode,
+    gd::String functionPreEventsCode,
     const gd::EventsList& events,
-    std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    gd::String functionReturnCode) {
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
   gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
-  EventsCodeGenerator codeGenerator(project, scene);
 
   // Generate whole events code
   // Preprocessing then code generation can make changes to the events, so we
   // need to do the work on a copy of the events.
   gd::EventsList generatedEvents = events;
-  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
   codeGenerator.PreprocessEventList(generatedEvents);
   gd::String wholeEventsCode =
       codeGenerator.GenerateEventsListCode(generatedEvents, context);
@@ -71,11 +71,29 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
       codeGenerator.GetCodeNamespace() + " = {};\n" + globalDeclarations +
       globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
       codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-      codeGenerator.GetCodeNamespaceAccessor() +
-      "func = function(runtimeScene) {\n" +
-      "runtimeScene.getOnceTriggers().startNewFrame();\n" +
-      globalObjectListsReset + "\n" + codeGenerator.GetCustomCodeInMain() +
-      wholeEventsCode + "\n" + "return;\n" + "}\n";
+      fullyQualifiedFunctionName + " = function(" + functionArgumentsCode +
+      ") {\n" + functionPreEventsCode + "\n" + globalObjectListsReset + "\n" +
+      wholeEventsCode + "\n" + functionReturnCode + "\n" + "}\n";
+
+  return output;
+}
+
+gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
+    gd::Project& project,
+    const gd::Layout& scene,
+    const gd::EventsList& events,
+    std::set<gd::String>& includeFiles,
+    bool compilationForRuntime) {
+  EventsCodeGenerator codeGenerator(project, scene);
+
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      project,
+      codeGenerator,
+      codeGenerator.GetCodeNamespaceAccessor() + "func",
+      "runtimeScene",
+      "runtimeScene.getOnceTriggers().startNewFrame();\n",
+      events,
+      "return;\n");
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
   output += "gdjs['" +
@@ -93,59 +111,72 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
-  gd::ObjectsContainer
-      emptyObjectsAndGroups;  // As opposed to layout events, we don't have
-                              // objects in the "outer" scope.
   gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
-      project, eventsFunction, objectsAndGroups);
+      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
-  // Prepare the global context
-  unsigned int maxDepthLevelReached = 0;
-  gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
-  EventsCodeGenerator codeGenerator(emptyObjectsAndGroups, objectsAndGroups);
-
-  // Generate whole events code
-  // Preprocessing then code generation can make changes to the events, so we
-  // need to do the work on a copy of the events.
-  gd::EventsList generatedEvents = eventsFunction.GetEvents();
-  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
   codeGenerator.SetCodeNamespace(codeNamespace);
-  codeGenerator.PreprocessEventList(generatedEvents);
-  gd::String wholeEventsCode =
-      codeGenerator.GenerateEventsListCode(generatedEvents, context);
+  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
-  // Extra declarations needed by events
-  gd::String globalDeclarations;
-  for (auto& declaration : codeGenerator.GetCustomGlobalDeclaration())
-    globalDeclarations += declaration + "\n";
-
-  // Global objects lists
-  auto allObjectsDeclarationsAndResets =
-      codeGenerator.GenerateAllObjectsDeclarationsAndResets(
-          maxDepthLevelReached);
-  gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
-  gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
-
-  codeGenerator.AddAllObjectsIncludeFiles();
-
-  // "Booleans" used by conditions
-  gd::String globalConditionsBooleans =
-      codeGenerator.GenerateAllConditionsBooleanDeclarations();
-
-  gd::String output =
-      codeGenerator.GetCodeNamespace() + " = {};\n" + globalDeclarations +
-      globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
-      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-      codeGenerator.GetCodeNamespaceAccessor() + "func = function(" +
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      project,
+      codeGenerator,
+      codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters()) +
-      ") {\n" +
+          eventsFunction.GetParameters(), false),
       codeGenerator.GenerateEventsFunctionContext(
-          eventsFunction.GetParameters()) +
-      "\n" + globalObjectListsReset + "\n" +
-      codeGenerator.GetCustomCodeInMain() + wholeEventsCode + "\n" +
-      codeGenerator.GenerateEventsFunctionReturn(eventsFunction) + "\n" + "}\n";
+          eventsFunction.GetParameters()),
+      eventsFunction.GetEvents(),
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+
+  includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
+                      codeGenerator.GetIncludeFiles().end());
+  return output;
+}
+
+gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
+    gd::Project& project,
+    const gd::EventsFunction& eventsFunction,
+    const gd::String& codeNamespace,
+    const gd::String& fullyQualifiedFunctionName,
+    std::set<gd::String>& includeFiles,
+    bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
+  gd::ObjectsContainer objectsAndGroups;
+  gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
+      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
+
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
+  codeGenerator.SetCodeNamespace(codeNamespace);
+  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+
+  // Generate the code setting up the context of the function.
+  gd::String prelude =
+      // runtimeScene is supposed to be always accessible, read
+      // it from the behavior
+      gd::String("var runtimeScene = this._runtimeScene;\n") +
+      // By convention of Behavior Events Function, the object is accessible
+      // as a parameter called "Object", and thisObjectList is an array containing it
+      // (for faster access, without having to go through the hashmap).
+      "var thisObjectList = [this.owner];\n" +
+      "var Object = Hashtable.newFrom({Object: thisObjectList});\n" +
+      // By convention of Behavior Events Function, the behavior is accessible
+      // as a parameter called "Behavior".
+      "var Behavior = this.name;\n" +
+      codeGenerator.GenerateEventsFunctionContext(
+          eventsFunction.GetParameters(), "Object");
+
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      project,
+      codeGenerator,
+      fullyQualifiedFunctionName,
+      codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
+          eventsFunction.GetParameters(), true),
+      prelude,
+      eventsFunction.GetEvents(),
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
                       codeGenerator.GetIncludeFiles().end());
@@ -153,27 +184,45 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
-    const vector<gd::ParameterMetadata>& parameters) {
-  gd::String declaration = "runtimeScene";
-  for (const auto& parameter : parameters) {
-    declaration +=
-        ", " + (parameter.GetName().empty() ? "_" : parameter.GetName());
+    const vector<gd::ParameterMetadata>& parameters,
+    bool isBehaviorEventsFunction) {
+  gd::String declaration = isBehaviorEventsFunction ? "" : "runtimeScene";
+  for (size_t i = 0; i < parameters.size(); ++i) {
+    const auto& parameter = parameters[i];
+    if (isBehaviorEventsFunction && (i == 0 || i == 1)) {
+      // By convention, the first two arguments of a behavior events function
+      // are the object and the behavior, which are not passed to the called
+      // function in the generated JS code.
+      continue;
+    }
+
+    declaration += (declaration.empty() ? "" : ", ") +
+                   (parameter.GetName().empty() ? "_" : parameter.GetName());
   }
-  declaration += ", parentEventsFunctionContext";
+  declaration += gd::String(declaration.empty() ? "" : ", ") +
+                 "parentEventsFunctionContext";
 
   return declaration;
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
-    const vector<gd::ParameterMetadata>& parameters) {
-  // TODO: Renamed "behavior" parameters (i.e: "behavior" arguments that are
-  // passed with a different name than the parameter) are not working in events
-  // function. This is because the behavior parameters are passed as strings
-  // (see GenerateParameterCodes). Would need a "getBehavior"/"getBehaviorName"
-  // indirection in the generated code :/ Or a code generation that can use the
-  // parameter passed to the function for behaviors.
+    const vector<gd::ParameterMetadata>& parameters,
+    const gd::String& thisObjectName) {
+  // When running in the context of a function generated from events, we
+  // need some indirection to deal with objects, behaviors and parameters in
+  // general:
+  //
+  // * Each map of objects passed as parameter needs to be queryable as an array
+  // of objects.
+  // * Behaviors are passed as string, representing the name of the behavior.
+  // This can differ from the name used to refer to the behavior in the events
+  // of the function (for example, a behavior can simply called "Behavior" in
+  // the parameter name).
+  // * For other parameters, allow to access to them without transformation.
+  // Conditions/expressions are available to deal with them in events.
 
   gd::String objectsGettersMap;
+  gd::String behaviorsGetterMap;
   gd::String objectsCreators;
   gd::String argumentsGetters;
   for (const auto& parameter : parameters) {
@@ -186,6 +235,13 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
       objectsGettersMap += comma +
                            ConvertToStringExplicit(parameter.GetName()) + ": " +
                            parameter.GetName() + "\n";
+    } else if (gd::ParameterMetadata::IsBehavior(parameter.GetType())) {
+      // Generate map that will be used to transform from behavior name used in
+      // function to the "real" behavior name from the caller.
+      gd::String comma = behaviorsGetterMap.empty() ? "" : ", ";
+      behaviorsGetterMap += comma +
+                            ConvertToStringExplicit(parameter.GetName()) +
+                            ": " + parameter.GetName() + "\n";
     } else {
       argumentsGetters +=
           "if (argName === " + ConvertToStringExplicit(parameter.GetName()) +
@@ -193,17 +249,38 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     }
   }
 
+  // If we have an object considered as the current object ("this") (usually called
+  // Object in behavior events function), generate a slightly more optimized getter
+  // for it (bypassing "Object" hashmap, and directly return the array containing it).
+  gd::String thisObjectGetterCode =
+      thisObjectName.empty()
+          ? ""
+          : "if (objectName === " + ConvertToStringExplicit(thisObjectName) +
+                ") { return thisObjectList; }";
+
   return gd::String("var eventsFunctionContext = {\n") +
          // The object name to parameter map:
-         "  objectsMap: {\n" + objectsGettersMap +
+         "  _objectsMap: {\n" + objectsGettersMap +
+         "},\n"
+         // The behavior name to parameter map:
+         "  _behaviorNamesMap: {\n" +
+         behaviorsGetterMap +
          "},\n"
          // Function that will be used to query objects, when a new object list
          // is needed by events.
          "  getObjects: function(objectName) {\n" +
+         "    " + thisObjectGetterCode +
          "    var objectsList = "
-         "eventsFunctionContext.objectsMap[objectName];\n" +
+         "eventsFunctionContext._objectsMap[objectName];\n" +
          "    return objectsList ? gdjs.objectsListsToArray(objectsList) : "
          "[];\n"
+         "  },\n" +
+         // Function that will be used to query behavior name (as behavior name
+         // can be different between the parameter name vs the actual behavior
+         // name passed as argument).
+         "  getBehaviorName: function(behaviorName) {\n" +
+         // TODO: Use parentEventsFunctionContext?
+         "    return eventsFunctionContext._behaviorNamesMap[behaviorName];\n"
          "  },\n" +
          // Creator function that will be used to create new objects. We
          // need to check if the function was given the context of the calling
@@ -212,7 +289,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // are not the same as the objects available in the scene.
          "  createObject: function(objectName) {\n"
          "    var objectsList = "
-         "eventsFunctionContext.objectsMap[objectName];\n" +
+         "eventsFunctionContext._objectsMap[objectName];\n" +
          "    if (objectsList) {\n" +
          "      return parentEventsFunctionContext ?\n" +
          "        "
@@ -349,14 +426,14 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
   if (context.GetCurrentObject() == objectListName &&
       !context.GetCurrentObject().empty())
     return "(" + GetObjectListName(objectListName, context) +
-           "[i].getBehavior(\"" + behaviorName + "\")." +
-           codeInfo.functionCallName + "(" + parametersStr + "))";
+           "[i].getBehavior(" + GenerateGetBehaviorNameCode(behaviorName) +
+           ")." + codeInfo.functionCallName + "(" + parametersStr + "))";
   else
     return "(( " + GetObjectListName(objectListName, context) +
            ".length === 0 ) ? " + defaultOutput + " :" +
-           GetObjectListName(objectListName, context) + "[0].getBehavior(\"" +
-           behaviorName + "\")." + codeInfo.functionCallName + "(" +
-           parametersStr + "))";
+           GetObjectListName(objectListName, context) + "[0].getBehavior(" +
+           GenerateGetBehaviorNameCode(behaviorName) + ")." +
+           codeInfo.functionCallName + "(" + parametersStr + "))";
 }
 
 gd::String EventsCodeGenerator::GenerateFreeCondition(
@@ -452,8 +529,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
 
   // Prepare call
   gd::String objectFunctionCallNamePart =
-      GetObjectListName(objectName, context) + "[i].getBehavior(\"" +
-      behaviorName + "\")." + instrInfos.codeExtraInformation.functionCallName;
+      GetObjectListName(objectName, context) + "[i].getBehavior(" +
+      GenerateGetBehaviorNameCode(behaviorName) + ")." +
+      instrInfos.codeExtraInformation.functionCallName;
 
   // Create call
   gd::String predicat;
@@ -556,9 +634,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   gd::String actionCode;
 
   // Prepare call
-  // Add a static_cast if necessary
   gd::String objectPart = GetObjectListName(objectName, context) +
-                          "[i].getBehavior(\"" + behaviorName + "\").";
+                          "[i].getBehavior(" +
+                          GenerateGetBehaviorNameCode(behaviorName) + ").";
 
   // Create call
   gd::String call;
@@ -616,6 +694,16 @@ gd::String EventsCodeGenerator::GetObjectListName(
          gd::String::From(context.GetLastDepthObjectListWasNeeded(name));
 }
 
+gd::String EventsCodeGenerator::GenerateGetBehaviorNameCode(
+    const gd::String& behaviorName) {
+  if (HasProjectAndLayout()) {
+    return ConvertToStringExplicit(behaviorName);
+  } else {
+    return "eventsFunctionContext.getBehaviorName(" +
+           ConvertToStringExplicit(behaviorName) + ")";
+  }
+}
+
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::EventsCodeGenerationContext& context) {
   auto declareObjectList = [this](gd::String object,
@@ -644,7 +732,18 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration += GetObjectListName(object, context) +
                                ".createFrom(" +
-                               GenerateAllInstancesGetter(object) + ");";
+                               GenerateAllInstancesGetterCode(object) + ");";
+      context.SetObjectDeclared(object);
+    } else
+      objectListDeclaration = declareObjectList(object, context);
+
+    declarationsCode += objectListDeclaration + "\n";
+  }
+  for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
+    gd::String objectListDeclaration = "";
+    if (!context.ObjectAlreadyDeclared(object)) {
+      objectListDeclaration =
+          GetObjectListName(object, context) + ".length = 0;\n";
       context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
@@ -658,7 +757,8 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
           GetObjectListName(object, context) + ".length = 0;\n";
       context.SetObjectDeclared(object);
     } else
-      objectListDeclaration = declareObjectList(object, context);
+      objectListDeclaration =
+          GetObjectListName(object, context) + ".length = 0;\n";
 
     declarationsCode += objectListDeclaration + "\n";
   }
@@ -666,7 +766,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   return declarationsCode;
 }
 
-gd::String EventsCodeGenerator::GenerateAllInstancesGetter(
+gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
     gd::String& objectName) {
   if (HasProjectAndLayout()) {
     return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) +
@@ -826,7 +926,7 @@ gd::String EventsCodeGenerator::GenerateObject(
     std::vector<gd::String> realObjects =
         ExpandObjectsName(objectName, context);
     for (auto& objectName : realObjects)
-      context.EmptyObjectsListNeeded(objectName);
+      context.ObjectsListWithoutPickingNeeded(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
     output = objectsMapName;

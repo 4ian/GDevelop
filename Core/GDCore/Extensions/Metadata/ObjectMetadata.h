@@ -12,14 +12,10 @@
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/String.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
 namespace gd {
 class InstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
-class wxBitmap;
 
 typedef std::function<std::unique_ptr<gd::Object>(gd::String name)> CreateFunPtr;
 
@@ -112,12 +108,6 @@ class GD_CORE_API ObjectMetadata {
   ObjectMetadata& SetDescription(const gd::String& description_);
 
   /**
-   * Set the bitmap icon shown to the user.
-   * \note This method does nothing when used for GD C++ runtime.
-   */
-  ObjectMetadata& SetBitmapIcon(const wxBitmap& bitmap_);
-
-  /**
    * Get the help path of the object, relative to the documentation root.
    */
   const gd::String &GetHelpPath() const { return helpPath; }
@@ -139,9 +129,6 @@ class GD_CORE_API ObjectMetadata {
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetIconFilename() const { return iconFilename; }
-#if !defined(GD_NO_WX_GUI)
-  const wxBitmap& GetBitmapIcon() const { return icon; }
-#endif
 #endif
 
   /**
@@ -183,9 +170,6 @@ class GD_CORE_API ObjectMetadata {
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap icon;
-#endif
 #endif
   std::shared_ptr<gd::Object>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

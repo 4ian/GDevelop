@@ -4,7 +4,6 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceRoot}",
-                "${workspaceRoot}/IDE",
                 "${workspaceRoot}/GDCpp",
                 "${workspaceRoot}/GDJS",
                 "${workspaceRoot}/Extensions",
@@ -12,29 +11,21 @@
                 "${workspaceRoot}/ExtLibs/SFML/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                 "/usr/local/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/usr/include",
-                "/usr/local/lib/wx/include/osx_cocoa-unicode-3.0",
-                "/usr/local/include/wx-3.0",
                 "${workspaceRoot}"
             ],
             "defines": [
                 "GD_IDE_ONLY",
-                "__WXMAC__",
-                "__WXOSX__",
-                "__WXOSX_COCOA__",
                 "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
                 "GD_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */",
-                "WXUSINGDLL"
+                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                     "/usr/local/include",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include",
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                     "/usr/include",
                     "${workspaceRoot}"
@@ -66,13 +57,9 @@
             ],
             "defines": [
                 "GD_IDE_ONLY",
-                "__WXMAC__",
-                "__WXOSX__",
-                "__WXOSX_COCOA__",
                 "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
                 "GD_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */",
-                "WXUSINGDLL"
+                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {
@@ -102,13 +89,9 @@
                 "_DEBUG",
                 "UNICODE",
                 "GD_IDE_ONLY",
-                "__WXMAC__",
-                "__WXOSX__",
-                "__WXOSX_COCOA__",
                 "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
                 "GD_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */",
-                "WXUSINGDLL"
+                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
             ],
             "intelliSenseMode": "msvc-x64",
             "browse": {

@@ -19,10 +19,12 @@ import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronMainMenu from './MainFrame/ElectronMainMenu';
 import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
-import { makeLocalEventsFunctionWriter } from './EventsFunctionsExtensionsLoader/LocalEventsFunctionWriter';
+import { makeLocalEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/LocalEventsFunctionCodeWriter';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
 import Providers from './MainFrame/Providers';
+import LocalEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
+import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
@@ -36,8 +38,11 @@ export const create = (authentification: Authentification) => {
       <Providers
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
+        eventsFunctionCodeWriter={null}
+        eventsFunctionsExtensionWriter={null}
+        eventsFunctionsExtensionOpener={null}
       >
-        {({ i18n }) => (
+        {({ i18n, eventsFunctionsExtensionsState }) => (
           <ExternalEditor
             serverPort={appArguments['server-port']}
             isIntegrated={appArguments['mode'] === 'integrated'}
@@ -46,6 +51,7 @@ export const create = (authentification: Authentification) => {
           >
             <MainFrame
               i18n={i18n}
+              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               resourceSources={localResourceSources}
               authentification={authentification}
               onReadFromPathOrURL={() =>
@@ -63,11 +69,15 @@ export const create = (authentification: Authentification) => {
       <Providers
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
+        eventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter()}
+        eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
+        eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
       >
-        {({ i18n }) => (
+        {({ i18n, eventsFunctionsExtensionsState }) => (
           <ElectronMainMenu i18n={i18n}>
             <MainFrame
               i18n={i18n}
+              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               previewLauncher={<LocalPreviewLauncher />}
               exportDialog={<ExportDialog exporters={getLocalExporters()} />}
               createDialog={
@@ -91,7 +101,6 @@ export const create = (authentification: Authentification) => {
                 filterExamples: !Window.isDev(),
               })}
               initialPathsOrURLsToOpen={appArguments['_']}
-              eventsFunctionWriter={makeLocalEventsFunctionWriter()}
             />
           </ElectronMainMenu>
         )}

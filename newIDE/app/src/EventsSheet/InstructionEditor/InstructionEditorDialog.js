@@ -13,7 +13,7 @@ import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExterna
 
 const styles = {
   dialogContent: {
-    width: '100%',
+    width: 'calc(100% - 16px)',
     maxWidth: 'none',
   },
   dialogBody: {

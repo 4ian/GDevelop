@@ -5,9 +5,6 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/wx.h>  //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
-#endif
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDCore/Tools/Localization.h"
@@ -25,10 +22,8 @@ This project is released under the MIT License.
 #include "ParticleSystemWrapper.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCpp/Runtime/CommonTools.h"
-#include "ParticleEmitterObjectEditor.h"
 #endif
 
 // clang-format off
@@ -621,75 +616,11 @@ void RuntimeParticleEmitterObject::OnPositionChanged() {
 }
 
 #if defined(GD_IDE_ONLY)
-/**
- * Render object at edittime
- */
-void ParticleEmitterObject::DrawInitialInstance(gd::InitialInstance& instance,
-                                                sf::RenderTarget& renderTarget,
-                                                gd::Project& project,
-                                                gd::Layout& layout) {
-  sf::CircleShape circle(3);
-  circle.setPosition(sf::Vector2f(instance.GetX() - 2, instance.GetY() - 2));
-  circle.setFillColor(
-      sf::Color(GetParticleRed1(), GetParticleGreen1(), GetParticleBlue1()));
-
-  float emitterAngle = instance.GetAngle() / 180.0 * 3.14159;
-  float line1Angle =
-      emitterAngle - (GetEmitterAngleB() / 2.0) / 180.0 * 3.14159;
-  float line2Angle =
-      emitterAngle + (GetEmitterAngleB() / 2.0) / 180.0 * 3.14159;
-
-  sf::Vertex line1[] = {
-      sf::Vertex(
-          sf::Vector2f(instance.GetX(), instance.GetY()),
-          sf::Color(
-              GetParticleRed1(), GetParticleGreen1(), GetParticleBlue1())),
-      sf::Vertex(
-          sf::Vector2f(cos(line1Angle) * 32 + instance.GetX(),
-                       sin(line1Angle) * 32 + instance.GetY()),
-          sf::Color(
-              GetParticleRed2(), GetParticleGreen2(), GetParticleBlue2()))};
-
-  sf::Vertex line2[] = {
-      sf::Vertex(
-          sf::Vector2f(instance.GetX(), instance.GetY()),
-          sf::Color(
-              GetParticleRed1(), GetParticleGreen1(), GetParticleBlue1())),
-      sf::Vertex(
-          sf::Vector2f(cos(line2Angle) * 32 + instance.GetX(),
-                       sin(line2Angle) * 32 + instance.GetY()),
-          sf::Color(
-              GetParticleRed2(), GetParticleGreen2(), GetParticleBlue2()))};
-
-  renderTarget.draw(circle);
-  renderTarget.draw(line1, 2, sf::Lines);
-  renderTarget.draw(line2, 2, sf::Lines);
-}
-
 void ParticleEmitterObject::ExposeResources(
     gd::ArbitraryResourceWorker& worker) {
   gd::String texture = GetParticleTexture();
   worker.ExposeImage(texture);
   SetParticleTexture(texture);
-}
-
-bool ParticleEmitterObject::GenerateThumbnail(const gd::Project& project,
-                                              wxBitmap& thumbnail) const {
-#if !defined(GD_NO_WX_GUI)
-  thumbnail = wxBitmap("CppPlatform/Extensions/particleSystemicon24.png",
-                       wxBITMAP_TYPE_ANY);
-#endif
-
-  return true;
-}
-
-void ParticleEmitterObject::EditObject(wxWindow* parent,
-                                       gd::Project& game,
-                                       gd::MainFrameWrapper& mainFrameWrapper) {
-#if !defined(GD_NO_WX_GUI)
-  ParticleEmitterObjectEditor dialog(parent, game, *this, mainFrameWrapper);
-  dialog.ShowModal();
-#endif
 }
 
 void RuntimeParticleEmitterObject::GetPropertyForDebugger(

@@ -11,7 +11,9 @@ This project is released under the MIT License.
 
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "PhysicsBehavior.h"
+#include "PhysicsRuntimeBehavior.h"
 #include "ScenePhysicsDatas.h"
+#include "RuntimeScenePhysicsDatas.h"
 
 void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -38,8 +40,6 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         std::make_shared<ScenePhysicsDatas>());
 
 #if defined(GD_IDE_ONLY)
-    aut.SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
-
     aut.AddAction("SetStatic",
                   _("Make the object static"),
                   _("Make the object immovable."),
@@ -51,7 +51,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetStatic")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetDynamic",
                   _("Make the object dynamic"),
@@ -65,7 +65,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetDynamic")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("IsDynamic",
                      _("The object is dynamic"),
@@ -79,7 +79,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .SetFunctionName("IsDynamic")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetFixedRotation",
                   _("Fix rotation"),
@@ -92,7 +92,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetFixedRotation")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction(
            "AddRevoluteJoint",
@@ -109,7 +109,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Hinge Y position"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("AddRevoluteJoint")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("AddRevoluteJointBetweenObjects",
                   _("Add a hinge between two objects"),
@@ -135,7 +135,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
             true)
         .SetDefaultValue("0")
         .SetFunctionName("AddRevoluteJointBetweenObjects")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("ActAddGearJointBetweenObjects",
                   _("Add a gear between two objects"),
@@ -151,7 +151,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .SetDefaultValue("1")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("AddGearJointBetweenObjects")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetFreeRotation",
                   _("Make object's rotation free"),
@@ -164,7 +164,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetFreeRotation")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("IsFixedRotation",
                      _("Fixed rotation"),
@@ -177,7 +177,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("IsFixedRotation")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetAsBullet",
                   _("Treat object like a bullet."),
@@ -191,7 +191,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetAsBullet")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("DontSetAsBullet",
                   _("Do not treat object like a bullet"),
@@ -205,7 +205,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("DontSetAsBullet")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("IsBullet",
                      _("Object is treated like a bullet"),
@@ -218,7 +218,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("IsBullet")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("ApplyImpulse",
                   _("Apply an impulse"),
@@ -233,7 +233,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Y component ( Newtons/Seconds )"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("ApplyImpulse")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("ApplyImpulseUsingPolarCoordinates",
                   _("Apply an impulse (angle)"),
@@ -250,7 +250,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Impulse value ( Newton/seconds )"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("ApplyImpulseUsingPolarCoordinates")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction(
            "ApplyImpulseTowardPosition",
@@ -268,7 +268,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Impulse value ( Newton/seconds )"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("ApplyImpulseTowardPosition")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("ApplyForce",
                   _("Add a force"),
@@ -283,7 +283,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Y component ( Newtons )"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("ApplyForce")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("ApplyForceUsingPolarCoordinates",
                   _("Apply a force ( angle )"),
@@ -299,7 +299,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Length of the force ( Newtons )"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("ApplyForceUsingPolarCoordinates")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction(
            "ApplyForceTowardPosition",
@@ -317,7 +317,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Length of the force ( Newtons )"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("ApplyForceTowardPosition")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("ApplyTorque",
                   _("Add a torque (a rotation)"),
@@ -331,7 +331,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Torque value"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("ApplyTorque")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetLinearVelocity",
                   _("Linear velocity"),
@@ -346,7 +346,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Y Coordinate"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetLinearVelocity")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition(
            "LinearVelocityX",
@@ -363,7 +363,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityX")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition(
            "LinearVelocityY",
@@ -380,7 +380,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityY")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("LinearVelocity",
                      _("Linear speed"),
@@ -396,7 +396,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocity")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetAngularVelocity",
                   _("Angular speed"),
@@ -410,7 +410,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("New value"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetAngularVelocity")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("AngularVelocity",
                      _("Angular speed"),
@@ -426,7 +426,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularVelocity")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("LinearDamping",
                      _("Linear damping"),
@@ -442,7 +442,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearDamping")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("CollisionWith",
                      _("Collision"),
@@ -459,7 +459,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("objectList", _("Object"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("CollisionWith")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetLinearDamping",
                   _("Linear damping"),
@@ -473,7 +473,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetLinearDamping")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("AngularDamping",
                      _("Angular damping"),
@@ -489,7 +489,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularDamping")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetAngularDamping",
                   _("Angular damping"),
@@ -503,7 +503,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetAngularDamping")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetGravity",
                   _("Gravity"),
@@ -518,7 +518,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Y Coordinate"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetGravity")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetPolygonScaleX",
                   _("Change the X scale of a collision polygon"),
@@ -534,7 +534,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Scale"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetPolygonScaleX")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetPolygonScaleY",
                   _("Change the Y scale of a collision polygon"),
@@ -550,7 +550,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Scale"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("SetPolygonScaleY")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition(
            "GetPolygonScaleX",
@@ -568,7 +568,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleX")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition(
            "GetPolygonScaleY",
@@ -586,7 +586,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleY")
         .SetManipulatedType("number")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("PolygonScaleX",
                       _("Collision polygon X scale"),
@@ -597,7 +597,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleX")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("PolygonScaleY",
                       _("Collision polygon Y scale"),
@@ -608,7 +608,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleY")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("LinearVelocity",
                       _("Linear speed"),
@@ -619,7 +619,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocity")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("LinearVelocityX",
                       _("X component"),
@@ -630,7 +630,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityX")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("LinearVelocityY",
                       _("Y component"),
@@ -641,7 +641,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityY")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("AngularVelocity",
                       _("Angular speed"),
@@ -652,7 +652,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularVelocity")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("LinearDamping",
                       _("Linear damping"),
@@ -663,7 +663,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearDamping")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("AngularDamping",
                       _("Angular damping"),
@@ -674,7 +674,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularDamping")
-        .SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
 #endif
   }
@@ -691,6 +691,15 @@ class PhysicsBehaviorCppExtension : public ExtensionBase {
    */
   PhysicsBehaviorCppExtension() {
     DeclarePhysicsBehaviorExtension(*this);
+    AddRuntimeBehavior<PhysicsRuntimeBehavior>(
+        GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior"),
+        "PhysicsRuntimeBehavior");
+    GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior")
+        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
+
+    AddBehaviorsRuntimeSharedData<RuntimeScenePhysicsDatas>(
+        GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior"));
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

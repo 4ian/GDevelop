@@ -191,7 +191,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               //"OR" condition must declare objects list, but without getting
               // the objects from the scene. Lists are either empty or come from
               // a parent event.
-              parentContext.EmptyObjectsListNeeded(*it);
+              parentContext.ObjectsListWithoutPickingNeeded(*it);
               // We need to duplicate the object lists : The "final" ones will
               // be filled with objects by conditions, but they will have no
               // incidence on further conditions, as conditions use "normal"
@@ -341,8 +341,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String outputCode;
         gd::WhileEvent& event = dynamic_cast<gd::WhileEvent&>(event_);
 
-        // Context is "reset" each time the event is repeated ( i.e. objects are
-        // picked again )
+        // Context is "reset" each time the event is repeated (i.e. objects are
+        // picked again)
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext);
         context.ForbidReuse();
@@ -414,8 +414,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator, parentContext, "number", repeatNumberExpression);
 
-        // Context is "reset" each time the event is repeated ( i.e. objects are
-        // picked again )
+        // Context is "reset" each time the event is repeated (i.e. objects are
+        // picked again)
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext);
         context.ForbidReuse();
@@ -484,14 +484,14 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         for (unsigned int i = 0; i < realObjects.size(); ++i)
           parentContext.ObjectsListNeeded(realObjects[i]);
 
-        // Context is "reset" each time the event is repeated ( i.e. objects are
-        // picked again )
+        // Context is "reset" each time the event is repeated (i.e. objects are
+        // picked again)
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext);
         context.ForbidReuse();
 
         for (unsigned int i = 0; i < realObjects.size(); ++i)
-          context.ObjectsListNeeded(realObjects[i]);
+          context.EmptyObjectsListNeeded(realObjects[i]);
 
         // Prepare conditions/actions codes
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
@@ -569,10 +569,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                         " < " + forEachTotalCountVar + ";++" + forEachIndexVar +
                         ") {\n";
 
+        // Empty object lists declaration
         outputCode += objectDeclaration;
 
-        // Clear all concerned objects lists and keep only one object
+        // Pick one object
         if (realObjects.size() == 1) {
+          // We write a slighty more simple ( and optimized ) output code
+          // when only one object list is used.
           gd::String temporary = codeGenerator.GetCodeNamespaceAccessor() +
                                  "forEachTemporary" +
                                  gd::String::From(context.GetContextDepth());
@@ -581,22 +584,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               temporary + " = " +
               codeGenerator.GetObjectListName(realObjects[0], parentContext) +
               "[" + forEachIndexVar + "];\n";
-          outputCode +=
-              codeGenerator.GetObjectListName(realObjects[0], context) +
-              ".length = 0;\n";
+
           outputCode +=
               codeGenerator.GetObjectListName(realObjects[0], context) +
               ".push(" + temporary + ");\n";
         } else {
-          // Declare all lists of concerned objects empty
-          for (unsigned int j = 0; j < realObjects.size(); ++j)
-            outputCode +=
-                codeGenerator.GetObjectListName(realObjects[j], context) +
-                ".length = 0;\n";
-
-          for (unsigned int i = 0; i < realObjects.size();
-               ++i)  // Pick then only one object
-          {
+          // Generate the code to pick only one object in the lists
+          for (unsigned int i = 0; i < realObjects.size(); ++i) {
             gd::String count;
             for (unsigned int j = 0; j <= i; ++j) {
               gd::String forEachCountVar =
@@ -662,12 +656,24 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::String functionName = codeGenerator.GetCodeNamespaceAccessor() +
                                   "userFunc" + gd::String::From(&event);
+        gd::String functionParameters = "runtimeScene";
         gd::String callArguments = "runtimeScene";
-        if (!event.GetParameterObjects().empty()) callArguments += ", objects";
+        if (!event.GetParameterObjects().empty()) {
+          functionParameters += ", objects";
+          callArguments += ", objects";
+        }
+        if (!codeGenerator.HasProjectAndLayout()) {
+          functionParameters += ", eventsFunctionContext";
+          callArguments +=
+              ", typeof eventsFunctionContext !== \'undefined\' ? "
+              "eventsFunctionContext : undefined";
+        }
 
         // Generate the function code
         gd::String functionCode;
-        functionCode += functionName + " = function(" + callArguments + ") {\n";
+        functionCode +=
+            functionName + " = function(" + functionParameters + ") {\n";
+        functionCode += event.IsUseStrict() ? "\"use strict\";\n" : "";
         functionCode += event.GetInlineCode();
         functionCode += "\n};\n";
         codeGenerator.AddCustomCodeOutsideMain(functionCode);

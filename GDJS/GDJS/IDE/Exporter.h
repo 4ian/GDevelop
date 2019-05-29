@@ -9,7 +9,6 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "GDCore/IDE/ProjectExporter.h"
 namespace gd {
 class Project;
 class Layout;
@@ -23,22 +22,11 @@ namespace gdjs {
  * \brief Export a project or a layout to a playable HTML5/Javascript based
  * game.
  */
-class Exporter : public gd::ProjectExporter {
+class Exporter {
  public:
   Exporter(gd::AbstractFileSystem& fileSystem,
            gd::String gdjsRoot_ = "./JsPlatform");
   virtual ~Exporter();
-
-  /**
-   * \brief Show a dialog that will enable the user to export the project.
-   */
-  virtual void ShowProjectExportDialog(gd::Project& project);
-
-  /**
-   * \brief Return the label that will be displayed on the button or menu item
-   * allowing the user to export the project for the JS Platform.
-   */
-  virtual gd::String GetProjectExportButtonLabel();
 
   /**
    * \brief Create a preview for the specified layout.

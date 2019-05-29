@@ -27,10 +27,9 @@ External libraries used by GDevelop C++ Platform
 ---------------------------------------------------
 
    * SFML is distributed under the zlib/png license
-   * wxWidgets is distributed under wxWindows License (similar to GNU LGPL)
 
-GDCpp also uses the Liberation font which is licensed under the SIL OPEN FONT LICENCE 1.1. The license is just below :
-----------------------------------------------------------------------------------------------------------------------
+GDCpp also uses the Liberation font which is licensed under the SIL OPEN FONT LICENCE 1.1. The license is below:
+----------------------------------------------------------------------------------------------------------------
 
    Digitized data copyright (c) 2010 Google Corporation
    	with Reserved Font Arimo, Tinos and Cousine.

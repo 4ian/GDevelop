@@ -9,18 +9,21 @@ This project is released under the MIT License.
 #include <iostream>
 #include "Box2D/Box2D.h"
 #include "ContactListener.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
 #include "ScenePhysicsDatas.h"
 
 RuntimeScenePhysicsDatas::RuntimeScenePhysicsDatas(
-    const ScenePhysicsDatas& behaviorSharedDatas)
-    : world(new b2World(
-          b2Vec2(behaviorSharedDatas.gravityX, -behaviorSharedDatas.gravityY),
+    const gd::SerializerElement& behaviorSharedDataContent)
+    : BehaviorsRuntimeSharedData(behaviorSharedDataContent),
+      world(new b2World(
+          b2Vec2(behaviorSharedDataContent.GetDoubleAttribute("gravityX"),
+                 -behaviorSharedDataContent.GetDoubleAttribute("gravityY")),
           true)),
       contactListener(new ContactListener),
       staticBody(NULL),
       stepped(false),
-      scaleX(behaviorSharedDatas.scaleX),
-      scaleY(behaviorSharedDatas.scaleY),
+      scaleX(behaviorSharedDataContent.GetDoubleAttribute("scaleX")),
+      scaleY(behaviorSharedDataContent.GetDoubleAttribute("scaleY")),
       invScaleX(1 / scaleX),
       invScaleY(1 / scaleY),
       fixedTimeStep(1.f / 60.f),
@@ -47,10 +50,6 @@ void RuntimeScenePhysicsDatas::StepWorld(float dt, int v, int p) {
       world->ClearForces();
     }
   }
-
-  // Old method
-  /*world->Step(dt, v, p);
-  world->ClearForces();*/
 }
 
 RuntimeScenePhysicsDatas::~RuntimeScenePhysicsDatas() {

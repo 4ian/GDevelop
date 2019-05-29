@@ -9,8 +9,6 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include "GDCore/Project/ChangesNotifier.h"
-#include "GDCore/Project/LayoutEditorPreviewer.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -139,15 +137,16 @@ class GD_CORE_API Platform {
                                            const gd::String& name) const;
 
   /**
-   * \brief Create a behavior
+   * \brief Get the class handling the behavior with the given type, or
+   * `nullptr` if no behavior with the given type is found.
    */
-  std::unique_ptr<gd::Behavior> CreateBehavior(const gd::String& type) const;
+  gd::Behavior* GetBehavior(const gd::String& type) const;
 
   /**
-   * \brief Create a behavior shared data object.
+   * \brief Get the class handling the behavior shared data with the given type,
+   * or `nullptr` if no behavior with the given type is found.
    */
-  std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(
-      const gd::String& type) const;
+  gd::BehaviorsSharedData* GetBehaviorSharedDatas(const gd::String& type) const;
 
 #if defined(GD_IDE_ONLY)
   /**
@@ -155,54 +154,6 @@ class GD_CORE_API Platform {
    */
   std::shared_ptr<gd::BaseEvent> CreateEvent(const gd::String& type) const;
 
-  ///@}
-
-  /** \name Notification of changes
-   * The platform can do extra work when a change occurs by providing a special
-   * gd::ChangesNotifier
-   */
-  ///@{
-
-  /**
-   * \brief Must provide a ChangesNotifier object that will be called by the IDE
-   * if needed. The IDE is not supposed to store the returned object.
-   *
-   * The default implementation simply return a ChangesNotifier object doing
-   * nothing.
-   */
-  virtual ChangesNotifier& GetChangesNotifier() const {
-    return defaultEmptyChangesNotifier;
-  };
-    ///@}
-
-    /** \name Preview and compilation
-     * The platform should provides specialized classes used for previewing
-     * layouts or exporting the project.
-     */
-    ///@{
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Must provide a gd::LayoutEditorPreviewer object that will be stored
-   * and used by LayoutEditorCanvas to display/run a preview of the layout of a
-   * project.
-   *
-   * The default implementation simply return a gd::LayoutEditorPreviewer object
-   * doing nothing.
-   */
-  virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(
-      gd::LayoutEditorCanvas& editor) const;
-
-  /**
-   * \brief Must provide at least one gd::ProjectExporter object that will be
-   * used by the IDE to export the project so as to be used without the IDE.
-   *
-   * The default implementation simply return a vector containing a
-   * gd::ProjectExporter object doing nothing.
-   */
-  virtual std::vector<std::shared_ptr<gd::ProjectExporter>>
-  GetProjectExporters() const;
-#endif
   ///@}
 
   /**
@@ -223,10 +174,6 @@ class GD_CORE_API Platform {
       extensionsLoaded;  ///< Extensions of the platform
   std::map<gd::String, CreateFunPtr>
       creationFunctionTable;  ///< Creation functions for objects
-
-#if defined(GD_IDE_ONLY)
-  static ChangesNotifier defaultEmptyChangesNotifier;
-#endif
 };
 
 }  // namespace gd

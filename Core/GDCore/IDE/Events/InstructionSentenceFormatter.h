@@ -11,7 +11,6 @@
 #include <utility>
 #include <vector>
 #include "GDCore/String.h"
-class wxBitmap;
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/IDE/Events/TextFormatting.h"
 namespace gd {
@@ -53,22 +52,9 @@ class GD_CORE_API InstructionSentenceFormatter {
   gd::String LabelFromType(const gd::String &type);
 
   /**
-   * \brief Load the configuration from the default configuration,
-   * or saved configuration if one was saved with wxWidgets.
+   * \brief Load the configuration from the default configuration.
    */
   void LoadTypesFormattingFromConfig();
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Return the bitmap of a button from parameter type
-   */
-  wxBitmap BitmapFromType(const gd::String &type);
-
-  /**
-   * Save the configuration to wxConfigBase
-   */
-  void SaveTypesFormattingToConfig();
-#endif
 
   std::map<gd::String, gd::TextFormatting> typesFormatting;
 

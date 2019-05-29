@@ -58,7 +58,7 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype._createTilingShaderAndUnifo
     }
 };
 
-gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.ownerRemovedFromScene = function() {
+gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.onOwnerRemovedFromScene = function() {
     if (this._centerSpriteShader && this._centerSpriteShader.shader)
         this._centerSpriteShader.shader.release();
     if (this._rightSpriteShader && this._rightSpriteShader.shader)

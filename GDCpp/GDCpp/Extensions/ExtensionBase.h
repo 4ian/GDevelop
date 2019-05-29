@@ -7,7 +7,6 @@
 
 #ifndef EXTENSIONBASE_H
 #define EXTENSIONBASE_H
-
 #include <iostream>
 #include <map>
 #include <memory>
@@ -23,27 +22,18 @@
 
 namespace gd {
 class Instruction;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class BehaviorsSharedData;
-}
-namespace gd {
 class ArbitraryResourceWorker;
-}
-class RuntimeScene;
-namespace gd {
 class Project;
-}
+class SerializerElement;
+}  // namespace gd
+class RuntimeScene;
 class RuntimeObject;
+class RuntimeBehavior;
+class BehaviorsRuntimeSharedData;
 class ExtensionBase;
 class EventsCodeGenerationContext;
 class EventsCodeGenerator;
@@ -52,6 +42,11 @@ class EventsCodeGenerator;
 // Declare typedefs for objects creations/destructions functions
 typedef std::unique_ptr<RuntimeObject> (*CreateRuntimeObjectFunPtr)(
     RuntimeScene& scene, const gd::Object& object);
+typedef std::unique_ptr<RuntimeBehavior> (*CreateRuntimeBehaviorFunPtr)(
+    const gd::SerializerElement& behaviorContent);
+typedef std::unique_ptr<BehaviorsRuntimeSharedData> (
+    *CreateBehaviorsRuntimeSharedDataFunPtr)(
+    const gd::SerializerElement& behaviorSharedDataContent);
 
 /**
  * \brief Base class for C++ extensions.
@@ -71,14 +66,46 @@ class GD_API ExtensionBase : public gd::PlatformExtension {
 
   /**
    * \brief To be called so as to declare the creation and destruction function
-   * of a RuntimeObject associated to a gd::Object. \tparam T the object class
-   * (inheriting *gd::Object*) declared with *AddObject* \tparam U the runtime
-   * object class (inheriting *RuntimeObject*) \param object The object
-   * associated to the RuntimeObject being declared. \param className The C++
-   * class name associated to the RuntimeObject.
+   * of a RuntimeObject associated to a gd::Object.
+   *
+   * \tparam T the object class (inheriting *gd::Object*) declared with
+   * *AddObject*.
+   *
+   * \tparam U the runtime object class (inheriting *RuntimeObject*).
+   *
+   * \param object The object associated to the RuntimeObject being declared.
+   * \param className The C++ class name associated to the RuntimeObject.
    */
   template <class T, class U>
   void AddRuntimeObject(gd::ObjectMetadata& object, gd::String className);
+
+  /**
+   * \brief To be called so as to declare the creation and destruction function
+   * of a RuntimeBehavior associated to a gd::Behavior.
+   *
+   * \tparam T the runtime behavior class (inheriting *RuntimeBehavior*).
+   * \tparam U the runtime behavior shared data class (inheriting
+   * *BehaviorsRuntimeSharedData*).
+   *
+   * \param object The object associated to the RuntimeBehavior being declared.
+   * \param className The C++ class name associated to the RuntimeBehavior.
+   */
+  template <class T>
+  void AddRuntimeBehavior(gd::BehaviorMetadata& behavior, gd::String className);
+
+  /**
+   * \brief To be called so as to declare the creation and destruction function
+   * of a BehaviorsRuntimeSharedData associated to a gd::BehaviorsSharedData.
+   *
+   * \tparam T the behavior shared data class (inheriting
+   * *BehaviorsSharedData*). \tparam U the runtime behavior shared data class
+   * (inheriting *BehaviorsRuntimeSharedData*).
+   *
+   * \param object The object associated to the RuntimeBehavior being declared.
+   * \param className The C++ class name associated to the RuntimeBehavior.
+   */
+  template <class T>
+  void AddBehaviorsRuntimeSharedData(gd::BehaviorMetadata& behavior);
 
   /**
    * \brief Return a function to create the runtime object if the type is
@@ -86,6 +113,20 @@ class GD_API ExtensionBase : public gd::PlatformExtension {
    */
   CreateRuntimeObjectFunPtr GetRuntimeObjectCreationFunctionPtr(
       gd::String objectType) const;
+
+  /**
+   * \brief Return a function to create the runtime behavior if the type is
+   * handled by the extension
+   */
+  CreateRuntimeBehaviorFunPtr GetRuntimeBehaviorCreationFunctionPtr(
+      gd::String behaviorType) const;
+
+  /**
+   * \brief Return a function to create the runtime behavior shared data if the type is
+   * handled by the extension.
+   */
+  CreateBehaviorsRuntimeSharedDataFunPtr GetBehaviorsRuntimeSharedDataFunctionPtr(
+      gd::String behaviorType) const;
 
   /**
    * \brief Called when a scene is loaded: Useful to initialize some extensions
@@ -182,6 +223,10 @@ class GD_API ExtensionBase : public gd::PlatformExtension {
  private:
   std::map<gd::String, CreateRuntimeObjectFunPtr>
       runtimeObjectCreationFunctionTable;
+  std::map<gd::String, CreateRuntimeBehaviorFunPtr>
+      runtimeBehaviorCreationFunctionTable;
+  std::map<gd::String, CreateBehaviorsRuntimeSharedDataFunPtr>
+      behaviorsRuntimeSharedDataCreationFunctionTable;
 };
 
 #include "GDCpp/Extensions/ExtensionBase.inl"

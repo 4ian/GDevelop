@@ -28,6 +28,27 @@ CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(
   return NULL;
 }
 
+CreateRuntimeBehaviorFunPtr
+ExtensionBase::GetRuntimeBehaviorCreationFunctionPtr(
+    gd::String behaviorType) const {
+  if (runtimeBehaviorCreationFunctionTable.find(behaviorType) !=
+      runtimeBehaviorCreationFunctionTable.end())
+    return runtimeBehaviorCreationFunctionTable.find(behaviorType)->second;
+
+  return NULL;
+}
+
+CreateBehaviorsRuntimeSharedDataFunPtr
+ExtensionBase::GetBehaviorsRuntimeSharedDataFunctionPtr(
+    gd::String behaviorType) const {
+  if (behaviorsRuntimeSharedDataCreationFunctionTable.find(behaviorType) !=
+      behaviorsRuntimeSharedDataCreationFunctionTable.end())
+    return behaviorsRuntimeSharedDataCreationFunctionTable.find(behaviorType)
+        ->second;
+
+  return NULL;
+}
+
 #if !defined(GD_IDE_ONLY)
 // Implementations of some dependencies of ExtensionBase are compiled in this
 // compilation unit when compiling for runtime:

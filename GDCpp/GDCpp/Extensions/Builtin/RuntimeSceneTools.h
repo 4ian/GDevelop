@@ -249,19 +249,4 @@ unsigned int GD_API GetScreenHeight();
  */
 unsigned int GD_API GetScreenColorDepth();
 
-#if defined(GD_IDE_ONLY)
-/**
- * \brief Called so as to warn the developer about a while event doing a large
- * number of iterations.
- *
- * Displays a warning and offer a chance to stop the preview.
- * Only used internally by GD events generated code and only available for the
- * IDE.
- *
- * \return true if scene must be stopped ( scene.running was set to false )
- */
-bool GD_API WarnAboutInfiniteLoop(RuntimeScene &scene);
-
-#endif
-
 #endif  // RUNTIMESCENETOOLS_H

@@ -22,29 +22,51 @@ namespace gd {
  * \brief Replace in expressions, in parameters of actions or conditions, calls
  * to a function by another function.
  *
- * \note The replacement is done by making a raw search/replace in parameters
- * that are expecting expressions or string expressions. Consequently, to avoid
- * unwanted renaming, be sure to only use ExpressionsRenamer for expression
- * calls that have an obvious name (in particular, make sure they have a
- * namespace: Extension::Expression).
- *
  * \ingroup IDE
  */
-class GD_CORE_API ExpressionsRenamer : public ArbitraryEventsWorker {
+class GD_CORE_API ExpressionsRenamer : public ArbitraryEventsWorkerWithContext {
  public:
-  ExpressionsRenamer(const gd::Platform& platform_,
-                     const gd::String& oldType_,
-                     const gd::String& newType_)
-      : platform(platform_), oldType(oldType_), newType(newType_){};
+  ExpressionsRenamer(const gd::Platform &platform_) : platform(platform_){};
   virtual ~ExpressionsRenamer();
 
+  ExpressionsRenamer &SetReplacedFreeExpression(
+      const gd::String &oldFunctionName_, const gd::String &newFunctionName_) {
+    objectType = "";
+    behaviorType = "";
+    oldFunctionName = oldFunctionName_;
+    newFunctionName = newFunctionName_;
+    return *this;
+  }
+  ExpressionsRenamer &SetReplacedObjectExpression(
+      const gd::String &objectType_,
+      const gd::String &oldFunctionName_,
+      const gd::String &newFunctionName_) {
+    objectType = objectType_;
+    behaviorType = "";
+    oldFunctionName = oldFunctionName_;
+    newFunctionName = newFunctionName_;
+    return *this;
+  };
+  ExpressionsRenamer &SetReplacedBehaviorExpression(
+      const gd::String &behaviorType_,
+      const gd::String &oldFunctionName_,
+      const gd::String &newFunctionName_) {
+    objectType = "";
+    behaviorType = behaviorType_;
+    oldFunctionName = oldFunctionName_;
+    newFunctionName = newFunctionName_;
+    return *this;
+  };
+
  private:
-  bool DoVisitInstruction(gd::Instruction& instruction,
+  bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override;
 
-  const gd::Platform& platform;
-  gd::String oldType;
-  gd::String newType;
+  const gd::Platform &platform;
+  gd::String oldFunctionName;
+  gd::String newFunctionName;
+  gd::String behaviorType;
+  gd::String objectType;
 };
 
 }  // namespace gd

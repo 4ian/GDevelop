@@ -5,8 +5,7 @@
  * This is the help file for the GDevelop C++ Platform, which contains a
  * reference of all the features provided by the C++ Platform and explains how
  * to create extensions for this platform.<br> To create new extensions, you
- * should have some basic knowledge of C++. GDevelop mainly uses SFML and
- * wxWidgets libraries.
+ * should have some basic knowledge of C++.
  *
  * ### GDevelop Core documentation
  * Some classes and features are provided by the *GDevelop Core library*: When

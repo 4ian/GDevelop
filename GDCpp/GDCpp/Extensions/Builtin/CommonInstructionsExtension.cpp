@@ -116,7 +116,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               //"OR" condition must declare objects list, but without getting
               // the objects from the scene. Lists are either empty or come from
               // a parent event.
-              parentContext.EmptyObjectsListNeeded(*it);
+              parentContext.ObjectsListWithoutPickingNeeded(*it);
               // We need to duplicate the object lists : The "final" ones will
               // be filled with objects by conditions, but they will have no
               // incidence on further conditions, as conditions use "normal"
@@ -356,22 +356,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Write final code
         outputCode += "bool stopDoWhile = false;";
-        if (event.HasInfiniteLoopWarning() &&
-            !codeGenerator.GenerateCodeForRuntime())
-          outputCode += "std::size_t loopCount = 0;";
         outputCode += "do";
         outputCode += "{\n";
         outputCode += codeGenerator.GenerateObjectsDeclarationCode(context);
         outputCode += whileConditionsStr;
         outputCode += "if (" + whileIfPredicat + ")\n";
         outputCode += "{\n";
-        if (event.HasInfiniteLoopWarning() &&
-            !codeGenerator.GenerateCodeForRuntime()) {
-          outputCode +=
-              "if (loopCount == 100000) { if ( "
-              "WarnAboutInfiniteLoop(*runtimeContext->scene) ) break; }\n";
-          outputCode += "loopCount++;\n\n";
-        }
         outputCode += conditionsCode;
         outputCode += "if (" + ifPredicat + ")\n";
         outputCode += "{\n";

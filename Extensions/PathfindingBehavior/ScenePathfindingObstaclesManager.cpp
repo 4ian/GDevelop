@@ -6,13 +6,13 @@ This project is released under the MIT License.
 */
 #include "ScenePathfindingObstaclesManager.h"
 #include <iostream>
-#include "PathfindingObstacleBehavior.h"
+#include "PathfindingObstacleRuntimeBehavior.h"
 
 std::map<RuntimeScene*, ScenePathfindingObstaclesManager>
     ScenePathfindingObstaclesManager::managers;
 
 ScenePathfindingObstaclesManager::~ScenePathfindingObstaclesManager() {
-  for (std::set<PathfindingObstacleBehavior*>::iterator it =
+  for (std::set<PathfindingObstacleRuntimeBehavior*>::iterator it =
            allObstacles.begin();
        it != allObstacles.end();
        ++it) {
@@ -21,10 +21,10 @@ ScenePathfindingObstaclesManager::~ScenePathfindingObstaclesManager() {
 }
 
 void ScenePathfindingObstaclesManager::AddObstacle(
-    PathfindingObstacleBehavior* obstacle) {
+    PathfindingObstacleRuntimeBehavior* obstacle) {
   allObstacles.insert(obstacle);
 }
 void ScenePathfindingObstaclesManager::RemoveObstacle(
-    PathfindingObstacleBehavior* obstacle) {
+    PathfindingObstacleRuntimeBehavior* obstacle) {
   allObstacles.erase(obstacle);
 }

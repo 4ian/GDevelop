@@ -567,7 +567,7 @@ gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
     //Notify the object it was removed from the scene
     obj.onDeletedFromScene(this);
     for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
-        obj._behaviors[j].ownerRemovedFromScene();
+        obj._behaviors[j].onOwnerRemovedFromScene();
     }
 
     //Call global callback
@@ -617,6 +617,7 @@ gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
         return this._initialBehaviorSharedData.get(name);
     }
 
+    console.error("Can't find shared data for behavior with name:", name);
     return null;
 };
 
@@ -737,7 +738,7 @@ gdjs.RuntimeScene.prototype.getOnceTriggers = function() {
  * You should not, normally, need this method at all. It's only to be used
  * in exceptional use cases where you need to loop through all objects,
  * and it won't be performant.
- * 
+ *
  * @returns {gdjs.RuntimeObject[]} The list of all runtime objects on the scnee
  */
 gdjs.RuntimeScene.prototype.getAdhocListOfAllInstances = function() {

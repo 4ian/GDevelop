@@ -16,13 +16,8 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
-#include "GDCore/IDE/Dialogs/ProjectUpdateDialog.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCore/IDE/wxTools/SafeYield.h"
-#include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -34,7 +29,6 @@
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/Serialization/Splitter.h"
 #include "GDCore/String.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
@@ -42,15 +36,6 @@
 #include "GDCore/Tools/PolymorphicClone.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Utf8/utf8.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/filename.h>
-// clang-format off
-#include <wx/propgrid/propgrid.h>
-#include <wx/propgrid/advprops.h>
-// clang-format on
-#include <wx/settings.h>
-#include <wx/utils.h>
-#endif
 
 using namespace std;
 
@@ -71,7 +56,7 @@ Project::Project()
       windowWidth(800),
       windowHeight(600),
       maxFPS(60),
-      minFPS(10),
+      minFPS(20),
       verticalSync(false),
       scaleMode("linear"),
       sizeOnStartupMode("adaptWidth"),
@@ -136,31 +121,31 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   return nullptr;
 }
 
-std::unique_ptr<gd::Behavior> Project::CreateBehavior(
-    const gd::String& type, const gd::String& platformName) {
+gd::Behavior* Project::GetBehavior(const gd::String& type,
+                                   const gd::String& platformName) {
   for (std::size_t i = 0; i < platforms.size(); ++i) {
     if (!platformName.empty() && platforms[i]->GetName() != platformName)
       continue;
 
-    std::unique_ptr<gd::Behavior> behavior = platforms[i]->CreateBehavior(type);
+    gd::Behavior* behavior = platforms[i]->GetBehavior(type);
     if (behavior) return behavior;
   }
 
   return nullptr;
 }
 
-std::shared_ptr<gd::BehaviorsSharedData> Project::CreateBehaviorSharedDatas(
+gd::BehaviorsSharedData* Project::GetBehaviorSharedDatas(
     const gd::String& type, const gd::String& platformName) {
   for (std::size_t i = 0; i < platforms.size(); ++i) {
     if (!platformName.empty() && platforms[i]->GetName() != platformName)
       continue;
 
-    std::shared_ptr<gd::BehaviorsSharedData> behavior =
-        platforms[i]->CreateBehaviorSharedDatas(type);
-    if (behavior) return behavior;
+    gd::BehaviorsSharedData* behaviorSharedData =
+        platforms[i]->GetBehaviorSharedDatas(type);
+    if (behaviorSharedData) return behaviorSharedData;
   }
 
-  return std::shared_ptr<gd::BehaviorsSharedData>();
+  return nullptr;
 }
 
 #if defined(GD_IDE_ONLY)
@@ -536,45 +521,6 @@ void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
 }
 #endif
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-// Compatibility with GD2.x
-class SpriteObjectsPositionUpdater : public gd::InitialInstanceFunctor {
- public:
-  SpriteObjectsPositionUpdater(gd::Project& project_, gd::Layout& layout_)
-      : project(project_), layout(layout_){};
-  virtual ~SpriteObjectsPositionUpdater(){};
-
-  virtual void operator()(gd::InitialInstance& instance) {
-    gd::Object* object = NULL;
-    if (layout.HasObjectNamed(instance.GetObjectName()))
-      object = &layout.GetObject(instance.GetObjectName());
-    else if (project.HasObjectNamed(instance.GetObjectName()))
-      object = &project.GetObject(instance.GetObjectName());
-    else
-      return;
-
-    if (object->GetType() != "Sprite") return;
-    if (!instance.HasCustomSize()) return;
-
-    wxSetWorkingDirectory(
-        wxFileName::FileName(project.GetProjectFile()).GetPath());
-    object->LoadResources(project, layout);
-
-    sf::Vector2f size =
-        object->GetInitialInstanceDefaultSize(instance, project, layout);
-
-    instance.SetX(instance.GetX() + size.x / 2 - instance.GetCustomWidth() / 2);
-    instance.SetY(instance.GetY() + size.y / 2 -
-                  instance.GetCustomHeight() / 2);
-  }
-
- private:
-  gd::Project& project;
-  gd::Layout& layout;
-};
-// End of compatibility code
-#endif
-
 void Project::UnserializeFrom(const SerializerElement& element) {
 // Checking version
 #if defined(GD_IDE_ONLY)
@@ -828,16 +774,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::Layout& layout = InsertNewLayout(
         layoutElement.GetStringAttribute("name", "", "nom"), -1);
     layout.UnserializeFrom(*this, layoutElement);
-
-// Compatibility code with GD 2.x
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    if (gdMajorVersion <= 2) {
-      SpriteObjectsPositionUpdater updater(*this, layout);
-      gd::InitialInstancesContainer& instances = layout.GetInitialInstances();
-      instances.IterateOverInstances(updater);
-    }
-#endif
-    // End of compatibility code
   }
 
 #if defined(GD_IDE_ONLY)
@@ -900,17 +836,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::SourceFile& newSourceFile = InsertNewSourceFile("", "");
     newSourceFile.UnserializeFrom(sourceFileElement);
   }
-
-#if !defined(GD_NO_WX_GUI)
-  if (!updateText.empty())  // TODO
-  {
-    ProjectUpdateDialog updateDialog(NULL, updateText);
-    updateDialog.ShowModal();
-  }
-
-  dirty = false;
-#endif
-
 #endif
 }
 
@@ -1035,9 +960,6 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add project resources
   worker.ExposeResources(&GetResourcesManager());
   platformSpecificAssets.ExposeResources(worker);
-#if !defined(GD_NO_WX_GUI)
-  gd::SafeYield::Do();
-#endif
 
   // Add layouts resources
   for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
@@ -1055,23 +977,15 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add events functions extensions resources
   for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
     auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction :
-         eventsFunctionsExtension.GetEventsFunctions()) {
+    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
       LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
     }
   }
-#if !defined(GD_NO_WX_GUI)
-  gd::SafeYield::Do();
-#endif
 
   // Add global objects resources
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
     GetObject(j).ExposeResources(worker);
   }
-
-#if !defined(GD_NO_WX_GUI)
-  gd::SafeYield::Do();
-#endif
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {
@@ -1122,136 +1036,6 @@ gd::SourceFile& Project::InsertNewSourceFile(const gd::String& name,
 
   return newlyInsertedSourceFile;
 }
-
-#if !defined(GD_NO_WX_GUI)
-void Project::PopulatePropertyGrid(wxPropertyGrid* grid) {
-  grid->Append(new wxPropertyCategory(_("Properties")));
-  grid->Append(
-      new wxStringProperty(_("Name of the project"), wxPG_LABEL, GetName()));
-  grid->Append(
-      new wxStringProperty(_("Package name"), wxPG_LABEL, GetPackageName()));
-  grid->Append(new wxStringProperty(_("Author"), wxPG_LABEL, GetAuthor()));
-  grid->Append(new wxStringProperty(
-      _("Globals variables"), wxPG_LABEL, _("Click to edit...")));
-  grid->Append(
-      new wxStringProperty(_("Extensions"), wxPG_LABEL, _("Click to edit...")));
-  grid->Append(new wxPropertyCategory(_("Window")));
-  grid->Append(
-      new wxUIntProperty(_("Width"), wxPG_LABEL, GetMainWindowDefaultWidth()));
-  grid->Append(new wxUIntProperty(
-      _("Height"), wxPG_LABEL, GetMainWindowDefaultHeight()));
-  grid->Append(new wxBoolProperty(_("Vertical Synchronization"),
-                                  wxPG_LABEL,
-                                  IsVerticalSynchronizationEnabledByDefault()));
-  grid->Append(new wxBoolProperty(
-      _("Limit the framerate"), wxPG_LABEL, GetMaximumFPS() != -1));
-  grid->Append(
-      new wxIntProperty(_("Maximum FPS"), wxPG_LABEL, GetMaximumFPS()));
-  grid->Append(
-      new wxUIntProperty(_("Minimum FPS"), wxPG_LABEL, GetMinimumFPS()));
-
-  grid->SetPropertyCell(wxString(_("Globals variables")),
-                        1,
-                        _("Click to edit..."),
-                        wxNullBitmap,
-                        wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-  grid->SetPropertyReadOnly(wxString(_("Globals variables")));
-  grid->SetPropertyCell(wxString(_("Extensions")),
-                        1,
-                        _("Click to edit..."),
-                        wxNullBitmap,
-                        wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-  grid->SetPropertyReadOnly(wxString(_("Extensions")));
-
-  if (GetMaximumFPS() == -1) {
-    grid->GetProperty(_("Maximum FPS"))->Enable(false);
-    grid->GetProperty(_("Maximum FPS"))->SetValue("");
-  } else
-    grid->GetProperty(_("Maximum FPS"))->Enable(true);
-
-  grid->Append(new wxPropertyCategory(_("Generation")));
-  grid->Append(new wxStringProperty(
-      _("Windows executable name"), wxPG_LABEL, winExecutableFilename));
-  grid->Append(new wxImageFileProperty(
-      _("Windows executable icon"), wxPG_LABEL, winExecutableIconFile));
-  grid->Append(new wxStringProperty(
-      _("Linux executable name"), wxPG_LABEL, linuxExecutableFilename));
-  grid->Append(new wxStringProperty(
-      _("Mac OS executable name"), wxPG_LABEL, macExecutableFilename));
-
-  grid->Append(new wxPropertyCategory(_("C++ features")));
-  grid->Append(new wxBoolProperty(_("Activate the use of C++/JS source files"),
-                                  wxPG_LABEL,
-                                  useExternalSourceFiles));
-}
-
-void Project::UpdateFromPropertyGrid(wxPropertyGrid* grid) {
-  if (grid->GetProperty(_("Name of the project")) != NULL)
-    SetName(grid->GetProperty(_("Name of the project"))->GetValueAsString());
-  if (grid->GetProperty(_("Author")) != NULL)
-    SetAuthor(grid->GetProperty(_("Author"))->GetValueAsString());
-  if (grid->GetProperty(_("Package name")) != NULL)
-    SetPackageName(grid->GetProperty(_("Package name"))->GetValueAsString());
-  if (grid->GetProperty(_("Width")) != NULL)
-    SetDefaultWidth(grid->GetProperty(_("Width"))->GetValue().GetInteger());
-  if (grid->GetProperty(_("Height")) != NULL)
-    SetDefaultHeight(grid->GetProperty(_("Height"))->GetValue().GetInteger());
-  if (grid->GetProperty(_("Vertical Synchronization")) != NULL)
-    SetVerticalSyncActivatedByDefault(
-        grid->GetProperty(_("Vertical Synchronization"))->GetValue().GetBool());
-  if (grid->GetProperty(_("Limit the framerate")) != NULL &&
-      !grid->GetProperty(_("Limit the framerate"))->GetValue().GetBool())
-    SetMaximumFPS(-1);
-  else if (grid->GetProperty(_("Maximum FPS")) != NULL)
-    SetMaximumFPS(grid->GetProperty(_("Maximum FPS"))->GetValue().GetInteger());
-  if (grid->GetProperty(_("Minimum FPS")) != NULL)
-    SetMinimumFPS(grid->GetProperty(_("Minimum FPS"))->GetValue().GetInteger());
-
-  if (grid->GetProperty(_("Windows executable name")) != NULL)
-    winExecutableFilename =
-        grid->GetProperty(_("Windows executable name"))->GetValueAsString();
-  if (grid->GetProperty(_("Windows executable icon")) != NULL)
-    winExecutableIconFile =
-        grid->GetProperty(_("Windows executable icon"))->GetValueAsString();
-  if (grid->GetProperty(_("Linux executable name")) != NULL)
-    linuxExecutableFilename =
-        grid->GetProperty(_("Linux executable name"))->GetValueAsString();
-  if (grid->GetProperty(_("Mac OS executable name")) != NULL)
-    macExecutableFilename =
-        grid->GetProperty(_("Mac OS executable name"))->GetValueAsString();
-  if (grid->GetProperty(_("Activate the use of C++/JS source files")) != NULL)
-    useExternalSourceFiles =
-        grid->GetProperty(_("Activate the use of C++/JS source files"))
-            ->GetValue()
-            .GetBool();
-}
-
-void Project::OnChangeInPropertyGrid(wxPropertyGrid* grid,
-                                     wxPropertyGridEvent& event) {
-  if (event.GetPropertyName() == _("Limit the framerate"))
-    grid->EnableProperty(
-        wxString(_("Maximum FPS")),
-        grid->GetProperty(_("Limit the framerate"))->GetValue().GetBool());
-
-  UpdateFromPropertyGrid(grid);
-}
-
-void Project::OnSelectionInPropertyGrid(wxPropertyGrid* grid,
-                                        wxPropertyGridEvent& event) {
-  if (event.GetColumn() == 1)  // Manage button-like properties
-  {
-    if (event.GetPropertyName() == _("Extensions")) {
-      gd::ProjectExtensionsDialog dialog(NULL, *this);
-      dialog.ShowModal();
-    } else if (event.GetPropertyName() == _("Globals variables")) {
-      gd::ChooseVariableDialog dialog(
-          NULL, GetVariables(), /*editingOnly=*/true);
-      dialog.SetAssociatedProject(this);
-      dialog.ShowModal();
-    }
-  }
-}
-#endif
 #endif
 
 Project::Project(const Project& other) { Init(other); }

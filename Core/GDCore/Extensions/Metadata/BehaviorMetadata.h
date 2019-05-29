@@ -9,25 +9,17 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
 namespace gd {
 class Behavior;
 class BehaviorsSharedData;
 class InstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
-class wxBitmap;
 
 namespace gd {
 
 /**
- * \brief Contains user-friendly information about a behavior type
- *
- * Implementations may derive from this class so as to provide more complete
- * metadata if needed. ( For example, GDevelop C++ Platform is shared pointers
- * to objects that will be cloned so as to create the behaviors... )
+ * \brief Contains user-friendly information about a behavior type.
  *
  * \ingroup Events
  */
@@ -48,7 +40,8 @@ class GD_CORE_API BehaviorMetadata {
   virtual ~BehaviorMetadata(){};
 
   /**
-   * Declare a new condition as being part of the extension.
+   * Declare a new condition as being part of the behavior.
+   * \deprecated Prefer using `AddScopedCondition`.
    */
   gd::InstructionMetadata& AddCondition(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -59,9 +52,32 @@ class GD_CORE_API BehaviorMetadata {
                                         const gd::String& smallicon_);
 
   /**
-   * Declare a new action as being part of the extension.
+   * Declare a new action as being part of the behavior.
+   * \deprecated Prefer using `AddScopedAction`.
    */
   gd::InstructionMetadata& AddAction(const gd::String& name_,
+                                     const gd::String& fullname_,
+                                     const gd::String& description_,
+                                     const gd::String& sentence_,
+                                     const gd::String& group_,
+                                     const gd::String& icon_,
+                                     const gd::String& smallicon_);
+
+  /**
+   * Declare a new condition as being part of the behavior.
+   */
+  gd::InstructionMetadata& AddScopedCondition(const gd::String& name_,
+                                        const gd::String& fullname_,
+                                        const gd::String& description_,
+                                        const gd::String& sentence_,
+                                        const gd::String& group_,
+                                        const gd::String& icon_,
+                                        const gd::String& smallicon_);
+
+  /**
+   * Declare a new action as being part of the behavior.
+   */
+  gd::InstructionMetadata& AddScopedAction(const gd::String& name_,
                                      const gd::String& fullname_,
                                      const gd::String& description_,
                                      const gd::String& sentence_,
@@ -90,7 +106,6 @@ class GD_CORE_API BehaviorMetadata {
   BehaviorMetadata& SetDefaultName(const gd::String& defaultName_);
   BehaviorMetadata& SetDescription(const gd::String& description_);
   BehaviorMetadata& SetGroup(const gd::String& group_);
-  BehaviorMetadata& SetBitmapIcon(const wxBitmap& bitmap_);
 
   /**
    * \brief Erase any existing include file and add the specified include.
@@ -107,32 +122,54 @@ class GD_CORE_API BehaviorMetadata {
   /**
    * Get the help path of the behavior, relative to the documentation root.
    */
-  const gd::String &GetHelpPath() const { return helpPath; }
+  const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
    * Set the help path of the behavior, relative to the documentation root.
-   * 
+   *
    * The behavior instructions will have this help path set by
    * default, unless you call SetHelpPath on them.
    */
-  BehaviorMetadata &SetHelpPath(const gd::String &path) {
+  BehaviorMetadata& SetHelpPath(const gd::String& path) {
     helpPath = path;
     return *this;
   }
 
+  const gd::String& GetName() const;
 #if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDefaultName() const { return defaultName; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
   const gd::String& GetIconFilename() const { return iconFilename; }
-#if !defined(GD_NO_WX_GUI)
-  const wxBitmap& GetBitmapIcon() const { return icon; }
+
+  /**
+   * \brief Set the type of the object that this behavior can be used on.
+   */
+  BehaviorMetadata& SetObjectType(const gd::String& objectType_) {
+    objectType = objectType_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the type of the object that this behavior can be used on.
+   *
+   * \note An empty string means the base object, so any object.
+   */
+  const gd::String& GetObjectType() const { return objectType; }
 #endif
-#endif
-  std::shared_ptr<gd::Behavior> Get() const { return instance; }
-  std::shared_ptr<gd::BehaviorsSharedData> GetSharedDataInstance() const {
-    return sharedDatasInstance;
+
+  /**
+   * \brief Return the associated gd::Behavior, handling behavior contents.
+   */
+  gd::Behavior& Get() const { return *instance; }
+
+  /**
+   * \brief Return the associated gd::BehaviorsSharedData, handling behavior
+   * shared data, if any (nullptr if none).
+   */
+  gd::BehaviorsSharedData* GetSharedDataInstance() const {
+    return sharedDatasInstance.get();
   }
 
 #if defined(GD_IDE_ONLY)
@@ -153,11 +190,10 @@ class GD_CORE_API BehaviorMetadata {
   gd::String description;
   gd::String group;
   gd::String iconFilename;
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap icon;
-#endif
+  gd::String objectType;
 #endif
 
+  // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;
   std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance;
 };

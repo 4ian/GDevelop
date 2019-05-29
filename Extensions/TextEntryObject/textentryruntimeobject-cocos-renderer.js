@@ -12,7 +12,7 @@ gdjs.TextEntryRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScene)
 
 gdjs.TextEntryRuntimeObjectRenderer = gdjs.TextEntryRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.TextEntryRuntimeObjectCocosRenderer.prototype.ownerRemovedFromScene = function() {
+gdjs.TextEntryRuntimeObjectCocosRenderer.prototype.onOwnerRemovedFromScene = function() {
     this.activate(false);
 };
 

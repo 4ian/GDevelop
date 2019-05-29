@@ -8,26 +8,10 @@
 #include "GDCore/Events/Event.h"
 namespace gd {
 class Instruction;
-}
-namespace gd {
-class MainFrameWrapper;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class SerializerElement;
-}
-namespace gd {
-class EventsEditorItemsAreas;
-}
-namespace gd {
-class EventsEditorSelection;
-}
-namespace gd {
 class Layout;
-}
-class wxWindow;
+}  // namespace gd
 
 namespace gdjs {
 
@@ -55,32 +39,7 @@ class JsCodeEvent : public gd::BaseEvent {
   virtual void SerializeTo(gd::SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
                                const gd::SerializerElement& element);
-
-  /**
-   * Called by event editor to draw the event.
-   */
-  virtual void Render(wxDC& dc,
-                      int x,
-                      int y,
-                      unsigned int width,
-                      gd::EventsEditorItemsAreas& areas,
-                      gd::EventsEditorSelection& selection,
-                      const gd::Platform& platform);
-
-  /**
-   * Must return the height of the event when rendered
-   */
-  virtual unsigned int GetRenderedHeight(unsigned int width,
-                                         const gd::Platform& platform) const;
-
-  /**
-   * Called when the user want to edit the event
-   */
-  virtual EditEventReturnType EditEvent(
-      wxWindow* parent_,
-      gd::Project& game_,
-      gd::Layout& scene_,
-      gd::MainFrameWrapper& mainFrameWrapper_);
+  virtual bool IsUseStrict() const { return useStrict; }
 
  private:
   void Init(const JsCodeEvent& event);
@@ -88,6 +47,9 @@ class JsCodeEvent : public gd::BaseEvent {
   gd::String inlineCode;        ///< Contains the Javacript code of the event.
   gd::String parameterObjects;  ///< Name of the (group of) objects to pass as
                                 ///< parameter.
+  bool useStrict;  ///< Should the generated JS function have "use strict". true
+                   ///< by default. Should be removed once all the game engine
+                   ///< is using "use strict".
 };
 
 }  // namespace gdjs

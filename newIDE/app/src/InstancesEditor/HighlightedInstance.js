@@ -12,7 +12,7 @@ export default class InstancesSelection {
 
     this.tooltipBackground = new PIXI.Graphics();
     this.tooltipText = new PIXI.Text('', {
-      fontSize: 17,
+      fontSize: 15,
       fill: 0xffffff,
       align: 'center',
     });
@@ -72,11 +72,14 @@ export default class InstancesSelection {
       '\n';
     this.tooltipText.text = tooltipInfo;
 
-    this.tooltipText.x =
+    this.tooltipText.x = Math.round(
       highlightRectangle.x -
-      this.tooltipText.width / 2 +
-      highlightRectangle.width / 2;
-    this.tooltipText.y = highlightRectangle.y - this.tooltipText.height;
+        this.tooltipText.width / 2 +
+        highlightRectangle.width / 2
+    );
+    this.tooltipText.y = Math.round(
+      highlightRectangle.y - this.tooltipText.height
+    );
 
     const padding = 5;
     this.tooltipBackground.clear();

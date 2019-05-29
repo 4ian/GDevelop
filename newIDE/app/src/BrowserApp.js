@@ -20,7 +20,7 @@ import { getBrowserExporters } from './Export/BrowserExporters';
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
-import { makeBrowserS3EventsFunctionWriter } from './EventsFunctionsExtensionsLoader/BrowserS3EventsFunctionWriter';
+import { makeBrowserS3EventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/BrowserS3EventsFunctionCodeWriter';
 import Providers from './MainFrame/Providers';
 
 export const create = (authentification: Authentification) => {
@@ -33,10 +33,14 @@ export const create = (authentification: Authentification) => {
     <Providers
       authentification={authentification}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
+      eventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter()}
+      eventsFunctionsExtensionWriter={null}
+      eventsFunctionsExtensionOpener={null}
     >
-      {({ i18n }) => (
+      {({ i18n, eventsFunctionsExtensionsState }) => (
         <MainFrame
           i18n={i18n}
+          eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
           previewLauncher={<BrowserS3PreviewLauncher />}
           exportDialog={<ExportDialog exporters={getBrowserExporters()} />}
           createDialog={
@@ -57,7 +61,6 @@ export const create = (authentification: Authentification) => {
             filterExamples: !Window.isDev(),
           })}
           initialPathsOrURLsToOpen={appArguments['_']}
-          eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
         />
       )}
     </Providers>

@@ -9,23 +9,27 @@ cache:
   directories:
     - $HOME/.npm
 
-git:
-  depth: 999999
-
 env:
   global:
     - GCC_VERSION="4.8"
 
 addons:
+  artifacts:
+    s3_region: "us-east-1"
+    target_paths:
+    - /$(git rev-parse HEAD)
+    paths:
+    - Binaries/Output/libGD.js/Release
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    #Build dependencies:
-    - cmake
+    # Build dependencies:
+    # (Cmake 3+ is required by Emscripten)
+    - cmake3
     - p7zip-full
     - g++-4.8
-    #SFML dependencies:
+    # SFML dependencies:
     - libopenal-dev
     - libjpeg-dev
     - libglew-dev
@@ -35,43 +39,63 @@ addons:
     - libglu1-mesa-dev
     - libfreetype6-dev
 
-#Activate X Virtual Framebuffer to allow tests to
-#use SFML.
 before_install:
+  #Activate X Virtual Framebuffer to allow tests to
+  #use SFML.
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
+  # This workaround is required to avoid libstdc++ errors (Emscripten requires a recent version of libstdc++)
+  - wget -q -O libstdc++6 http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.10_amd64.deb
+  - sudo dpkg --force-all -i libstdc++6
 
 install:
+#Get the correct version of gcc/g++
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
+#Compile the tests only for GDCore and GDCpp
+  - mkdir .build-tests
+  - cd .build-tests
+  - cmake -DBUILD_GDJS=FALSE -DBUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
+  - make -j 4
+  - cd ..
+# Install Emscripten (for GDevelop.js)
+  - git clone https://github.com/juj/emsdk.git
+  - cd emsdk
+  - ./emsdk install sdk-1.37.37-64bit
+  - ./emsdk activate sdk-1.37.37-64bit
+  - source ./emsdk_env.sh
+  - cd ..
+# Install GDevelop.js dependencies and compile it
+  - cd GDevelop.js
+  - npm install -g grunt-cli
+  - npm install
+  - npm run build
+  - cd ..
 #Install newIDE tests dependencies
   - cd newIDE/app && npm install
   - cd ../..
 #Install GDJS tests dependencies
   - cd GDJS/tests && npm install
   - cd ../..
-#Get the correct version of gcc/g++
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
-#Compile the tests only
-  - mkdir .build-tests
-  - cd .build-tests
-  - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
-  - make -j 4
-  - cd ..
 
 script:
-#GDCore and GDCpp game engine tests:
+# GDCore and GDCpp game engine tests:
   - cd .build-tests
   - Core/GDCore_tests
   - GDCpp/GDCpp_tests
   - Extensions/PathfindingBehavior/PathfindingBehavior_Runtime_tests
   - Extensions/LinkedObjects/LinkedObjects_Runtime_tests
   - cd ..
-#newIDE tests:
+# GDevelop.js tests
+  - cd GDevelop.js
+  - npm test
+  - cd ..
+# newIDE tests:
   - cd newIDE/app
   - npm test
   - npm run flow
   - npm run check-format
   - cd ../..
-#GDJS game engine tests, disabled on Travis CI because ChromeHeadless can't be started.
-#See them running on Semaphore-CI instead: https://semaphoreci.com/4ian/gd
+# GDJS game engine tests, disabled on Travis CI because ChromeHeadless can't be started.
+# See them running on Semaphore-CI instead: https://semaphoreci.com/4ian/gd
 #  - cd GDJS/tests && npm test
 #  - cd ../..

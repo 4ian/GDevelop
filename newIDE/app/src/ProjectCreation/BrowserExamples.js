@@ -109,6 +109,7 @@ const exampleNames = [
   'text-to-speech',
   'toggle-music-play-sound',
   'type-on-text-effect',
+  'video-player',
   'z-depth',
   'zombie-laser',
 ];

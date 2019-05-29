@@ -83,7 +83,8 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
              !context.GetCurrentObject().empty()) {
     if (!castNeeded)
       return "(" + ManObjListName(objectListName) +
-             "[i]->GetBehaviorRawPointer(\"" + behaviorName + "\")->" +
+             "[i]->GetBehaviorRawPointer(" +
+             GenerateGetBehaviorNameCode(behaviorName) + ")->" +
              codeInfo.functionCallName + "(" + parametersStr + "))";
     else
       return "(static_cast<" + autoInfo.className + "*>(" +
@@ -94,13 +95,15 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
     if (!castNeeded)
       return "(( " + ManObjListName(objectListName) + ".empty() ) ? " +
              defaultOutput + " :" + ManObjListName(objectListName) +
-             "[0]->GetBehaviorRawPointer(\"" + behaviorName + "\")->" +
+             "[0]->GetBehaviorRawPointer(" +
+             GenerateGetBehaviorNameCode(behaviorName) + ")->" +
              codeInfo.functionCallName + "(" + parametersStr + "))";
     else
       return "(( " + ManObjListName(objectListName) + ".empty() ) ? " +
              defaultOutput + " : " + "static_cast<" + autoInfo.className +
              "*>(" + ManObjListName(objectListName) +
-             "[0]->GetBehaviorRawPointer(\"" + behaviorName + "\"))->" +
+             "[0]->GetBehaviorRawPointer(" +
+             GenerateGetBehaviorNameCode(behaviorName) + "))->" +
              codeInfo.functionCallName + "(" + parametersStr + "))";
   }
 }
@@ -172,11 +175,11 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   gd::String objectFunctionCallNamePart =
       (!instrInfos.parameters[1].supplementaryInformation.empty())
           ? "static_cast<" + autoInfo.className + "*>(" +
-                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\"))->" +
+                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + "))->" +
                 instrInfos.codeExtraInformation.functionCallName
-          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\")->" +
+          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + ")->" +
                 instrInfos.codeExtraInformation.functionCallName;
 
   // Create call
@@ -289,10 +292,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   gd::String objectPart =
       (!instrInfos.parameters[1].supplementaryInformation.empty())
           ? "static_cast<" + autoInfo.className + "*>(" +
-                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\"))->"
-          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(\"" +
-                behaviorName + "\")->";
+                ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + "))->"
+          : ManObjListName(objectName) + "[i]->GetBehaviorRawPointer(" +
+                GenerateGetBehaviorNameCode(behaviorName) + ")->";
 
   // Create call
   gd::String call;
@@ -368,6 +371,17 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   return argOutput;
 }
 
+gd::String EventsCodeGenerator::GenerateGetBehaviorNameCode(
+    const gd::String& behaviorName) {
+  if (HasProjectAndLayout()) {
+    return ConvertToStringExplicit(behaviorName);
+  } else {
+    // No support for events function in C++ generated code.
+    // See GDJS for an example of proper implementation.
+    return ConvertToStringExplicit(behaviorName) + " /* unsupported */ ";
+  }
+}
+
 gd::String EventsCodeGenerator::GenerateObject(
     const gd::String& objectName,
     const gd::String& type,
@@ -390,7 +404,7 @@ gd::String EventsCodeGenerator::GenerateObject(
 
     output += "runtimeContext->ClearObjectListsMap()";
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
-      context.EmptyObjectsListNeeded(realObjects[i]);
+      context.ObjectsListWithoutPickingNeeded(realObjects[i]);
       output += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
                 "\", " + ManObjListName(realObjects[i]) + ")";
     }
@@ -531,8 +545,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
             gd::SceneNameMangler::GetMangledSceneName(scene.GetName()) +
             "(RuntimeContext * runtimeContext)\n"
             "{\n" +
-            "runtimeContext->StartNewFrame();\n" +
-            codeGenerator.GetCustomCodeInMain() + wholeEventsCode +
+            "runtimeContext->StartNewFrame();\n" + wholeEventsCode +
             "return 0;\n"
             "}\n";
 
@@ -596,7 +609,7 @@ gd::String EventsCodeGenerator::GenerateExternalEventsCompleteCode(
                 events.GetName()) +
             "(RuntimeContext * runtimeContext)\n"
             "{\n" +
-            codeGenerator.GetCustomCodeInMain() + wholeEventsCode +
+            wholeEventsCode +
             "return;\n"
             "}\n";
 
@@ -612,52 +625,14 @@ EventsCodeGenerator::~EventsCodeGenerator() {}
 void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
   if (!HasProjectAndLayout()) return;
 
-#if !defined( \
-    GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-  std::shared_ptr<ProfileEvent> previousProfileEvent;
-#endif
-
   for (std::size_t i = 0; i < eventsList.size(); ++i) {
     eventsList[i].Preprocess(*this, eventsList, i);
     if (i < eventsList.size()) {  // Be sure that that there is still an event!
                                   // ( Preprocess can remove it. )
       if (eventsList[i].CanHaveSubEvents())
         PreprocessEventList(eventsList[i].GetSubEvents());
-
-#if !defined( \
-    GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-      if (GetLayout().GetProfiler() &&
-          GetLayout().GetProfiler()->profilingActivated &&
-          eventsList[i].IsExecutable()) {
-        // Define a new profile event
-        std::shared_ptr<ProfileEvent> profileEvent =
-            std::make_shared<ProfileEvent>();
-        profileEvent->originalEvent = eventsList[i].originalEvent;
-        profileEvent->SetPreviousProfileEvent(previousProfileEvent);
-
-        // Add it before the event to profile
-        eventsList.InsertEvent(profileEvent, i);
-
-        previousProfileEvent = profileEvent;
-        ++i;  // Don't preprocess the newly added profile event
-      }
-#endif
     }
   }
-
-#if !defined( \
-    GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-  if (!eventsList.IsEmpty() && GetLayout().GetProfiler() &&
-      GetLayout().GetProfiler()->profilingActivated) {
-    // Define a new profile events
-    std::shared_ptr<ProfileEvent> profileEvent =
-        std::make_shared<ProfileEvent>();
-    profileEvent->SetPreviousProfileEvent(previousProfileEvent);
-
-    // Add it at the end of the events list
-    eventsList.InsertEvent(profileEvent, eventsList.GetEventsCount());
-  }
-#endif
 }
 
 #endif

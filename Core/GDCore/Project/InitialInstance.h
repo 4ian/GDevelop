@@ -11,15 +11,9 @@
 #include "GDCore/String.h"
 namespace gd {
 class PropertyDescriptor;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
 }
-class wxPropertyGrid;
-class wxPropertyGridEvent;
 
 namespace gd {
 

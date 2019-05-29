@@ -10,65 +10,74 @@
 gdjs.WebsocketDebuggerClient = function(runtimegame) {
   this._runtimegame = runtimegame;
 
-  if (typeof WebSocket !== 'undefined') {
-    var that = this;
-    var ws = (this._ws = new WebSocket('ws://127.0.0.1:3030/'));
-
-    ws.onopen = function open() {
-      console.info('Debugger connection open');
-    };
-
-    ws.onclose = function close() {
-      console.info('Debugger connection closed');
-    };
-
-    ws.onerror = function errored(error) {
-      console.warn('Debugger client error:', error);
-    };
-
-    ws.onmessage = function incoming(message) {
-      var data = null;
-      try {
-        data = JSON.parse(message.data);
-      } catch (e) {
-        console.info('Debugger received a badly formatted message');
-      }
-
-      if (data && data.command) {
-        if (data.command === 'play') {
-          runtimegame.pause(false);
-        } else if (data.command === 'pause') {
-          runtimegame.pause(true);
-          that.sendRuntimeGameDump();
-        } else if (data.command === 'refresh') {
-          that.sendRuntimeGameDump();
-        } else if (data.command === 'set') {
-          that.set(data.path, data.newValue);
-        } else if (data.command === 'call') {
-          that.call(data.path, data.args);
-        } else if (data.command === 'profiler.start') {
-          runtimegame.startCurrentSceneProfiler(function (stoppedProfiler) {
-            that.sendProfilerOutput(
-              stoppedProfiler.getFramesAverageMeasures(),
-              stoppedProfiler.getStats()
-            );
-            that.sendProfilerStopped();
-          });
-          that.sendProfilerStarted();
-        } else if (data.command === 'profiler.stop') {
-          runtimegame.stopCurrentSceneProfiler();
-        } else {
-          console.info(
-            'Unknown command "' + data.command + '" received by the debugger.'
-          );
-        }
-      } else {
-        console.info('Debugger received a message with badly formatted data.');
-      }
-    };
-  } else {
+  if (typeof WebSocket === 'undefined') {
     console.log("WebSocket is not defined, debugger won't work");
+    return;
   }
+
+  var that = this;
+  var ws = null;
+  try {
+    ws = this._ws = new WebSocket('ws://127.0.0.1:3030/');
+  } catch (e) {
+    console.log(
+      "WebSocket could not initialize, debugger won't work (might be because of preview inside web browser)."
+    );
+    return;
+  }
+
+  ws.onopen = function open() {
+    console.info('Debugger connection open');
+  };
+
+  ws.onclose = function close() {
+    console.info('Debugger connection closed');
+  };
+
+  ws.onerror = function errored(error) {
+    console.warn('Debugger client error:', error);
+  };
+
+  ws.onmessage = function incoming(message) {
+    var data = null;
+    try {
+      data = JSON.parse(message.data);
+    } catch (e) {
+      console.info('Debugger received a badly formatted message');
+    }
+
+    if (data && data.command) {
+      if (data.command === 'play') {
+        runtimegame.pause(false);
+      } else if (data.command === 'pause') {
+        runtimegame.pause(true);
+        that.sendRuntimeGameDump();
+      } else if (data.command === 'refresh') {
+        that.sendRuntimeGameDump();
+      } else if (data.command === 'set') {
+        that.set(data.path, data.newValue);
+      } else if (data.command === 'call') {
+        that.call(data.path, data.args);
+      } else if (data.command === 'profiler.start') {
+        runtimegame.startCurrentSceneProfiler(function(stoppedProfiler) {
+          that.sendProfilerOutput(
+            stoppedProfiler.getFramesAverageMeasures(),
+            stoppedProfiler.getStats()
+          );
+          that.sendProfilerStopped();
+        });
+        that.sendProfilerStarted();
+      } else if (data.command === 'profiler.stop') {
+        runtimegame.stopCurrentSceneProfiler();
+      } else {
+        console.info(
+          'Unknown command "' + data.command + '" received by the debugger.'
+        );
+      }
+    } else {
+      console.info('Debugger received a message with badly formatted data.');
+    }
+  };
 };
 
 gdjs.DebuggerClient = gdjs.WebsocketDebuggerClient; //Register the class to let the engine use it.
@@ -189,18 +198,19 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
     '_baseTexture',
     '_invalidTexture',
   ];
-  var stringifiedMessage = this._circularSafeStringify(message, function(
-    key,
-    value
-  ) {
-    if (
-      excludedValues.indexOf(value) !== -1 ||
-      excludedKeys.indexOf(key) !== -1
-    )
-      return '[Removed from the debugger]';
+  var stringifiedMessage = this._circularSafeStringify(
+    message,
+    function(key, value) {
+      if (
+        excludedValues.indexOf(value) !== -1 ||
+        excludedKeys.indexOf(key) !== -1
+      )
+        return '[Removed from the debugger]';
 
-    return value;
-  }, 18 /* Limit maximum depth to prevent any crashes */);
+      return value;
+    },
+    18 /* Limit maximum depth to prevent any crashes */
+  );
 
   var serializationDuration = Date.now() - serializationStartTime;
   console.log('RuntimeGame serialization took ' + serializationDuration + 'ms');

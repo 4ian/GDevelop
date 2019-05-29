@@ -10,35 +10,16 @@
 #include "GDCpp/Runtime/RuntimeObject.h"
 namespace gd {
 class InitialInstance;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class Layout;
+class Sprite;
+class SpriteObject;
+class Animation;
+class PropertyDescriptor;
 }
 namespace sf {
 class Sprite;
 }
-namespace gd {
-class Sprite;
-}
-namespace gd {
-class SpriteObject;
-}
-namespace gd {
-class Animation;
-}
-namespace gd {
-class MainFrameWrapper;
-}
-namespace gd {
-class PropertyDescriptor;
-}
-#if defined(GD_IDE_ONLY)
-class wxBitmap;
-class wxWindow;
-#endif
 
 /**
  * \brief Wrapper around a pointer to Animation, used to reduce compile time.

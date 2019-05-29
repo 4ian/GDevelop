@@ -8,8 +8,10 @@
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
 #include <vector>
-#include "GDCore/Project/EventsFunction.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/SerializableWithNameList.h"
 namespace gd {
 class SerializerElement;
 class Project;
@@ -18,16 +20,18 @@ class Project;
 namespace gd {
 
 /**
- * \brief Hold a list of Events Functions (gd::EventsFunction).
+ * \brief Hold a list of Events Functions (gd::EventsFunction) and Events Based
+ * Behaviors.
  *
  * Events functions can be generated as stand-alone functions, and
  * converted to actions/conditions/expressions.
- * Similarly, a gd::EventsFunctionsExtension can be converted to
- * an extension.
+ * Events behaviors can be generated to a runtime behavior, with functions
+ * converted to behavior actions/conditions/expressions. Similarly, a
+ * gd::EventsFunctionsExtension can be converted to an extension.
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API EventsFunctionsExtension {
+class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
  public:
   EventsFunctionsExtension();
   EventsFunctionsExtension(const EventsFunctionsExtension&);
@@ -54,6 +58,12 @@ class GD_CORE_API EventsFunctionsExtension {
     return *this;
   }
 
+  const gd::String& GetShortDescription() const { return shortDescription; };
+  EventsFunctionsExtension& SetShortDescription(const gd::String& shortDescription_) {
+    shortDescription = shortDescription_;
+    return *this;
+  }
+
   const gd::String& GetDescription() const { return description; };
   EventsFunctionsExtension& SetDescription(const gd::String& description_) {
     description = description_;
@@ -72,69 +82,32 @@ class GD_CORE_API EventsFunctionsExtension {
     return *this;
   }
 
-  /**
-   * \brief Check if the function with the specified name exists.
-   */
-  bool HasEventsFunctionNamed(const gd::String& name) const;
+  const gd::String& GetTags() const { return tags; };
+  EventsFunctionsExtension& SetTags(const gd::String& tags_) {
+    tags = tags_;
+    return *this;
+  }
+
+  const gd::String& GetAuthor() const { return author; };
+  EventsFunctionsExtension& SetAuthor(const gd::String& author_) {
+    author = author_;
+    return *this;
+  }
 
   /**
-   * \brief Get the function with the specified name.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
+   * \brief Return a reference to the list of the events based behaviors.
    */
-  gd::EventsFunction& GetEventsFunction(const gd::String& name);
+  SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors() {
+    return eventsBasedBehaviors;
+  }
 
   /**
-   * \brief Get the function with the specified name.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
+   * \brief Return a const reference to the list of the events based behaviors.
    */
-  const gd::EventsFunction& GetEventsFunction(const gd::String& name) const;
-
-  /**
-   * \brief Get the function at the specified index in the list.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
-   */
-  gd::EventsFunction& GetEventsFunction(std::size_t index);
-
-  /**
-   * \brief Get the function at the specified index in the list.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
-   */
-  const gd::EventsFunction& GetEventsFunction(std::size_t index) const;
-
-  /**
-   * \brief Return the number of functions.
-   */
-  std::size_t GetEventsFunctionsCount() const;
-
-  gd::EventsFunction& InsertNewEventsFunction(const gd::String& name,
-                                              std::size_t position);
-  gd::EventsFunction& InsertEventsFunction(const gd::EventsFunction& object,
-                                           std::size_t position);
-  void RemoveEventsFunction(const gd::String& name);
-  void MoveEventsFunction(std::size_t oldIndex, std::size_t newIndex);
-
-  /**
-   * \brief Provide a raw access to the vector containing the functions.
-   */
-  const std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions()
+  const SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors()
       const {
-    return eventsFunctions;
-  };
-
-  /**
-   * \brief Provide a raw access to the vector containing the functions.
-   */
-  std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions() {
-    return eventsFunctions;
-  };
+    return eventsBasedBehaviors;
+  }
 
   /** \name Serialization
    */
@@ -160,10 +133,13 @@ class GD_CORE_API EventsFunctionsExtension {
 
   gd::String version;
   gd::String extensionNamespace;
+  gd::String shortDescription;
   gd::String description;
   gd::String name;
   gd::String fullName;
-  std::vector<std::unique_ptr<gd::EventsFunction>> eventsFunctions;
+  gd::String tags;
+  gd::String author;
+  SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 
 }  // namespace gd

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<wxsmith>
-	<object class="wxPanel" name="LayoutEditorCanvas">
-		<id_arg>0</id_arg>
-		<style>wxTAB_TRAVERSAL|wxWANTS_CHARS</style>
-	</object>
-</wxsmith>

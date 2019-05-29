@@ -12,9 +12,9 @@ describe('EnumerateObjects', () => {
       allObjectsList,
     } = enumerateObjects(project, testLayout);
 
-    expect(containerObjectsList).toHaveLength(6);
+    expect(containerObjectsList).toHaveLength(12);
     expect(projectObjectsList).toHaveLength(2);
-    expect(allObjectsList).toHaveLength(8);
+    expect(allObjectsList).toHaveLength(14);
   });
 
   it('can do a case-insensitive search in the lists of objects', () => {
@@ -25,13 +25,22 @@ describe('EnumerateObjects', () => {
     } = enumerateObjects(project, testLayout);
 
     expect(
-      filterObjectsList(containerObjectsList, 'myshapepainterobject')
+      filterObjectsList(containerObjectsList, {
+        searchText: 'myshapepainterobject',
+        selectedTags: [],
+      })
     ).toHaveLength(1);
     expect(
-      filterObjectsList(projectObjectsList, 'myshapepainterobject')
+      filterObjectsList(projectObjectsList, {
+        searchText: 'myshapepainterobject',
+        selectedTags: [],
+      })
     ).toHaveLength(0);
     expect(
-      filterObjectsList(allObjectsList, 'myshapepainterobject')
+      filterObjectsList(allObjectsList, {
+        searchText: 'myshapepainterobject',
+        selectedTags: [],
+      })
     ).toHaveLength(1);
   });
 });

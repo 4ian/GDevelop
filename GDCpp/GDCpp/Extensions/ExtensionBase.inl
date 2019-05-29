@@ -32,4 +32,26 @@ void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata& object,
   };
 }
 
+template <class T>
+void ExtensionBase::AddRuntimeBehavior(gd::BehaviorMetadata& behavior,
+                                       gd::String className) {
+#if defined(GD_IDE_ONLY)
+  behavior.className = className;
+#endif
+  runtimeBehaviorCreationFunctionTable[behavior.GetName()] =
+      [](const gd::SerializerElement& behaviorContent)
+      -> std::unique_ptr<RuntimeBehavior> {
+    return gd::make_unique<T>(behaviorContent);
+  };
+}
+
+template <class T>
+void ExtensionBase::AddBehaviorsRuntimeSharedData(gd::BehaviorMetadata& behavior) {
+  behaviorsRuntimeSharedDataCreationFunctionTable[behavior.GetName()] =
+      [](const gd::SerializerElement& behaviorSharedDataContent)
+      -> std::unique_ptr<BehaviorsRuntimeSharedData> {
+    return gd::make_unique<T>(behaviorSharedDataContent);
+  };
+}
+
 #endif

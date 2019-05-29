@@ -9,17 +9,24 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/IDE/ChangesNotifier.h"
 #include "GDCpp/Runtime/CommonTools.h"
 namespace gd {
 class Behavior;
 class Object;
+class SerializerElement;
 }  // namespace gd
+class RuntimeBehavior;
+class BehaviorsRuntimeSharedData;
 class RuntimeObject;
 class RuntimeScene;
 
 typedef std::unique_ptr<RuntimeObject> (*CreateRuntimeObjectFunPtr)(
     RuntimeScene& scene, const gd::Object& object);
+typedef std::unique_ptr<RuntimeBehavior> (*CreateRuntimeBehaviorFunPtr)(
+    const gd::SerializerElement& behaviorContent);
+typedef std::unique_ptr<BehaviorsRuntimeSharedData> (
+    *CreateBehaviorsRuntimeSharedDataFunPtr)(
+    const gd::SerializerElement& behaviorSharedDataContent);
 
 /**
  * \brief GDevelop C++ Platform
@@ -45,10 +52,29 @@ class GD_API CppPlatform : public gd::Platform {
    * \brief Create a RuntimeObject from a gd::Object for a scene.
    *
    * \param scene The scene the object is going to be used on.
-   * \param scene The gd::Object the RuntimeObject must be based on.
+   * \param object The gd::Object the RuntimeObject must be based on.
    */
   std::unique_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene& scene,
                                                      gd::Object& object);
+
+  /**
+   * \brief Create a RuntimeBehavior for an object.
+   *
+   * \param type The type of the behavior to create.
+   * \param behaviorContent The content used to initialize the behavior.
+   */
+  std::unique_ptr<RuntimeBehavior> CreateRuntimeBehavior(
+      const gd::String& type, gd::SerializerElement& behaviorContent);
+
+  /**
+   * \brief Create a BehaviorsRuntimeSharedData
+   *
+   * \param type The type of the behavior shared data to create.
+   * \param behaviorSharedData The initial shared data used to initialize the
+   * shared data.
+   */
+  std::unique_ptr<BehaviorsRuntimeSharedData> CreateBehaviorsRuntimeSharedData(
+      const gd::String& type, const gd::SerializerElement &behaviorSharedDataContent);
 
   /**
    * \brief Our platform need to do a bit of extra work when adding an extension
@@ -65,29 +91,6 @@ class GD_API CppPlatform : public gd::Platform {
 
 #if defined(GD_IDE_ONLY)
   virtual gd::String GetIcon() const { return "CppPlatform/icon32.png"; }
-
-  /**
-   * \brief We provide a specific ChangesNotifier to ensure that compilation
-   * jobs are done properly.
-   */
-  virtual ChangesNotifier& GetChangesNotifier() const {
-    return changesNotifier;
-  };
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Preview can be done directly inside the editor thanks to
-   * CppLayoutPreviewer
-   */
-  virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(
-      gd::LayoutEditorCanvas& editor) const;
-
-  /**
-   * \brief Expose to the IDE how to export games.
-   */
-  virtual std::vector<std::shared_ptr<gd::ProjectExporter>>
-  GetProjectExporters() const;
-#endif
 
   /**
    * \brief When destroyed, our platform need to do ensure the destruction of
@@ -124,12 +127,16 @@ class GD_API CppPlatform : public gd::Platform {
       runtimeObjCreationFunctionTable;  ///< The C++ Platform also need to store
                                         ///< functions to create runtime
                                         ///< objects.
-#if defined(GD_IDE_ONLY)
-  static ChangesNotifier changesNotifier;
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap icon32;
-#endif
-#endif
+  std::map<gd::String, CreateRuntimeBehaviorFunPtr>
+      runtimeBehaviorCreationFunctionTable;  ///< The C++ Platform also need to
+                                             ///< store functions to create
+                                             ///< runtime behaviors.
+  std::map<gd::String, CreateBehaviorsRuntimeSharedDataFunPtr>
+      behaviorsRuntimeSharedDataCreationFunctionTable;  ///< The C++ Platform
+                                                        ///< also need to store
+                                                        ///< functions to create
+                                                        ///< runtime behaviors
+                                                        ///< shared data.
 
   static CppPlatform* singleton;
 };

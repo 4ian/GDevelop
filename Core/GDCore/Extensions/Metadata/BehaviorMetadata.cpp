@@ -4,17 +4,12 @@
  * reserved. This project is released under the MIT License.
  */
 #include "BehaviorMetadata.h"
-#include <algorithm>
 #include <iostream>
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/file.h>
-#include "GDCore/IDE/wxTools/SkinHelper.h"
-#endif
 
 namespace gd {
 
@@ -39,18 +34,6 @@ BehaviorMetadata::BehaviorMetadata(
   SetGroup(group_);
   className = className_;
   iconFilename = icon24x24;
-#if !defined(GD_NO_WX_GUI)
-  if (gd::SkinHelper::IconExists(iconFilename, 24))
-    SetBitmapIcon(gd::SkinHelper::GetIcon(iconFilename, 24));
-  else if (wxFile::Exists(iconFilename))
-    SetBitmapIcon(wxBitmap(iconFilename, wxBITMAP_TYPE_ANY));
-  else {
-    std::cout << "Warning: The icon file for behavior \"" << name_
-              << " was not found in the current skin icons"
-              << " and the specified name is not an existing filename.";
-    SetBitmapIcon(wxBitmap(24, 24));
-  }
-#endif
 #endif
 
   if (instance) instance->SetTypeName(name_);
@@ -92,6 +75,52 @@ gd::InstructionMetadata& BehaviorMetadata::AddAction(
 #if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       extensionNamespace.empty() ? name : extensionNamespace + name;
+  actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
+                                                        nameWithNamespace,
+                                                        fullname,
+                                                        description,
+                                                        sentence,
+                                                        group,
+                                                        icon,
+                                                        smallicon)
+                                        .SetHelpPath(GetHelpPath());
+  return actionsInfos[nameWithNamespace];
+#endif
+}
+
+gd::InstructionMetadata& BehaviorMetadata::AddScopedCondition(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentence,
+    const gd::String& group,
+    const gd::String& icon,
+    const gd::String& smallicon) {
+#if defined(GD_IDE_ONLY)
+  gd::String nameWithNamespace = GetName() +gd::PlatformExtension::GetNamespaceSeparator() +  name;
+  conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
+                                                           nameWithNamespace,
+                                                           fullname,
+                                                           description,
+                                                           sentence,
+                                                           group,
+                                                           icon,
+                                                           smallicon)
+                                           .SetHelpPath(GetHelpPath());
+  return conditionsInfos[nameWithNamespace];
+#endif
+}
+
+gd::InstructionMetadata& BehaviorMetadata::AddScopedAction(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentence,
+    const gd::String& group,
+    const gd::String& icon,
+    const gd::String& smallicon) {
+#if defined(GD_IDE_ONLY)
+  gd::String nameWithNamespace = GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
                                                         nameWithNamespace,
                                                         fullname,
@@ -161,12 +190,6 @@ BehaviorMetadata& BehaviorMetadata::SetGroup(const gd::String& group_) {
 #endif
   return *this;
 }
-BehaviorMetadata& BehaviorMetadata::SetBitmapIcon(const wxBitmap& bitmap_) {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  icon = bitmap_;
-#endif
-  return *this;
-}
 BehaviorMetadata& BehaviorMetadata::SetIncludeFile(
     const gd::String& includeFile) {
 #if defined(GD_IDE_ONLY)
@@ -183,6 +206,10 @@ BehaviorMetadata& BehaviorMetadata::AddIncludeFile(
     includeFiles.push_back(includeFile);
 #endif
   return *this;
+}
+
+const gd::String& BehaviorMetadata::GetName() const {
+  return instance->GetTypeName();
 }
 
 }  // namespace gd

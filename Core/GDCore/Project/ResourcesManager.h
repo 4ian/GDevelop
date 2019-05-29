@@ -14,8 +14,6 @@ class ResourceFolder;
 class SerializerElement;
 class PropertyDescriptor;
 }
-class wxPaintDC;
-class wxPanel;
 
 namespace gd {
 
@@ -80,12 +78,6 @@ class GD_CORE_API Resource {
   virtual void SetFile(const gd::String& newFile){};
 
   /**
-   * \brief Return, if applicable, a String containing the absolute filename of
-   * the resource.
-   */
-  gd::String GetAbsoluteFile(const gd::Project& game) const;
-
-  /**
    * \brief Set the metadata (any string) associated to the resource.
    * \note Can be used by external editors to store extra information, for
    * example the configuration used to produce a sound.
@@ -96,15 +88,6 @@ class GD_CORE_API Resource {
    * \brief Return the (optional) metadata associated to the resource
    */
   virtual const gd::String& GetMetadata() const { return metadata; }
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Called when the resource must be rendered in a preview panel.
-   */
-  virtual void RenderPreview(wxPaintDC& dc,
-                             wxPanel& previewPanel,
-                             gd::Project& game){};
-#endif
 
 #if defined(GD_IDE_ONLY)
   /** \name Resources properties
@@ -191,15 +174,6 @@ class GD_CORE_API ImageResource : public Resource {
 
 #if defined(GD_IDE_ONLY)
   virtual bool UseFile() override { return true; }
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * Called when the resource must be rendered in a preview panel.
-   */
-  virtual void RenderPreview(wxPaintDC& dc,
-                             wxPanel& previewPanel,
-                             gd::Project& game) override;
-#endif
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       gd::Project& project) const override;

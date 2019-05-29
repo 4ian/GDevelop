@@ -56,7 +56,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Functions"),
           "res/function24.png",
           "res/function16.png")
-      .AddParameter("expression", "The text to be returned")
+      .AddParameter("string", "The text to be returned")
       .MarkAsAdvanced();
 
   extension

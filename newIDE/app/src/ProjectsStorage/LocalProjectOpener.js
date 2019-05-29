@@ -55,6 +55,10 @@ export default class LocalProjectOpener {
           return readJSONFile(path.join(projectPath, referencePath) + '.json');
         },
         isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
+        // Limit unsplitting to depth 3 (which would allow properties of layouts/external layouts/external events
+        // to be un-splitted, but not the content of these properties), to avoid very slow processing
+        // of large game files.
+        maxUnsplitDepth: 3,
       }).then(() => {
         return object;
       });

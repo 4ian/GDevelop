@@ -52,6 +52,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`This action will create a new texture and re-render the text each time it is called, which is expensive and can reduce performances. Prefer to avoid changing a lot the character size of a text.`,
     };
   }
+  if (type === 'PlayMusicCanal' || type === 'PlayMusic') {
+    return {
+      kind: 'warning',
+      message: t`Musics will only be played if the user has interacted with the game before (by clicking/touching it or pressing a key on the keyboard). This is due to browser limitations. Make sure to have the user interact with the game before using this action.`,
+    };
+  }
 
   return null;
 };

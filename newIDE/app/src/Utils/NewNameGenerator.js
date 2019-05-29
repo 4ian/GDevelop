@@ -1,4 +1,10 @@
-export default (name, exists, prefix = '') => {
+// @flow
+
+export default (
+  name /*:string */,
+  exists /*:(string) => boolean */,
+  prefix /*: string */ = ''
+) => {
   if (!exists(name)) return name;
 
   let potentialName = prefix + name;

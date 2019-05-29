@@ -19,7 +19,7 @@ class TimeExtension : public ExtensionBase {
   TimeExtension();
   virtual ~TimeExtension(){};
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY) && !defined(EMSCRIPTEN)
   bool HasDebuggingProperties() const { return true; };
   void GetPropertyForDebugger(RuntimeScene& scene,
                               std::size_t propertyNb,

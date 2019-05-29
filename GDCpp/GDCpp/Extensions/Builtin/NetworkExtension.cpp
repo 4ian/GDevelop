@@ -14,9 +14,6 @@ NetworkExtension::NetworkExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsNetworkExtension(*this);
 
 #if defined(GD_IDE_ONLY)
-  GetAllActions()["EnvoiDataNet"]
-      .SetFunctionName("SendDataToPhpWebPage")
-      .SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
   GetAllActions()["SendRequest"]
       .SetFunctionName("SendHttpRequest")
       .SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");

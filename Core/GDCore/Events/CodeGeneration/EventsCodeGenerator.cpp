@@ -537,6 +537,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
                             action.GetParameters().size() < 2
                                 ? ""
                                 : action.GetParameter(1).GetPlainString());
+
   if (MetadataProvider::HasBehaviorAction(
           platform, behaviorType, action.GetType()) &&
       instrInfos.parameters.size() >= 2) {
@@ -696,6 +697,11 @@ vector<gd::String> EventsCodeGenerator::GenerateParametersCodes(
   return arguments;
 }
 
+gd::String EventsCodeGenerator::GenerateGetBehaviorNameCode(
+    const gd::String& behaviorName) {
+  return ConvertToStringExplicit(behaviorName);
+}
+
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     EventsCodeGenerationContext& context) {
   auto declareObjectList = [this](gd::String object,
@@ -740,7 +746,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     declarationsCode += objectListDeclaration + "\n";
   }
-  for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
+  for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
@@ -748,6 +754,18 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
       context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
+
+    declarationsCode += objectListDeclaration + "\n";
+  }
+  for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
+    gd::String objectListDeclaration = "";
+    if (!context.ObjectAlreadyDeclared(object)) {
+      objectListDeclaration = "std::vector<RuntimeObject*> " +
+                              GetObjectListName(object, context) + ";\n";
+      context.SetObjectDeclared(object);
+    } else
+      objectListDeclaration = "std::vector<RuntimeObject*> " +
+                              GetObjectListName(object, context) + ";\n";
 
     declarationsCode += objectListDeclaration + "\n";
   }

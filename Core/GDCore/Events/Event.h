@@ -21,13 +21,9 @@ class Layout;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 class Platform;
-class EventsEditorItemsAreas;
-class EventsEditorSelection;
 class SerializerElement;
 class Instruction;
 }
-class wxWindow;
-class wxDC;
 
 namespace gd {
 
@@ -259,76 +255,6 @@ class GD_CORE_API BaseEvent {
 
   ///@}
 
-  /** \name Event rendering
-   * Method and members used to render the event
-   */
-  ///@{
-
-  /**
-   * Redefine this method to draw the event.
-   *
-   * \param dc The wxWidgets drawing context to be used.
-   * \param x The x position where the events must be drawn.
-   * \param y The y position where the events must be drawn.
-   * \param width The width available for drawing.
-   * \param areas Use this object to indicate the areas where items have been
-   * drawn \param selection Give access to the current selection(s), to draw for
-   * example hovering or selecting effects.
-   *
-   * \note The height of the drawing must be the same as the height returned by
-   * BaseEvent::GetRenderedHeight
-   *
-   * \see gd::EventsRenderingHelper
-   * \see EventsEditorSelection
-   * \see EventsEditorItemsAreas
-   */
-  virtual void Render(wxDC& dc,
-                      int x,
-                      int y,
-                      unsigned int width,
-                      gd::EventsEditorItemsAreas& areas,
-                      gd::EventsEditorSelection& selection,
-                      const gd::Platform& platform) {
-    return;
-  }
-
-  /**
-   * Must return the height of the event when rendered.
-   *
-   * \note The height of the drawing must be the same as the height of the
-   * drawing made by BaseEvent::Render
-   */
-  virtual unsigned int GetRenderedHeight(unsigned int width,
-                                         const gd::Platform& platform) const {
-    return 0;
-  };
-
-  /**
-   * Used by EditEvent to describe what sort of changes have been made to the
-   * event. \see BaseEvent::EditEvent
-   */
-  enum EditEventReturnType {
-    ChangesMade,
-    Cancelled,
-    ChangesMadeButNoNeedForEventsRecompilation
-  };
-
-  /**
-   * Called when the user want to edit the event.
-   */
-  virtual EditEventReturnType EditEvent(
-      wxWindow* parent_,
-      gd::Project& game_,
-      gd::Layout& scene_,
-      gd::MainFrameWrapper& mainFrameWrapper_) {
-    return ChangesMade;
-  };
-
-  ///@}
-
-  mutable bool eventHeightNeedUpdate;  ///< Automatically set to true/false by
-                                       ///< the events editor
-
   std::weak_ptr<gd::BaseEvent>
       originalEvent;  ///< Pointer only used for profiling events, so as to
                       ///< remember the original event from which it has been
@@ -339,9 +265,6 @@ class GD_CORE_API BaseEvent {
                                    ///< profiling.
   float percentDuringLastSession;  ///< Total time used by the event during the
                                    ///< last run. Used for profiling.
-
- protected:
-  mutable unsigned int renderedHeight;
 
  private:
   bool folded;  ///< True if the subevents should be hidden in the events editor

@@ -2,6 +2,7 @@
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
+const path = optionalRequire('path');
 
 export const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',
@@ -48,10 +49,44 @@ export const getLocalResourceFullPath = (
   return resourcePath;
 };
 
-export const resourceHasValidPath = (
+export const isPathInProjectFolder = (
+  project: gdProject,
+  resourcePath: string
+) => {
+  const projectPath = path.dirname(project.getProjectFile());
+  return resourcePath.includes(projectPath);
+};
+
+export const confirmResourcePath = (
+  project: gdProject,
+  resourcePath: string
+) => {
+  if (!isPathInProjectFolder(project, resourcePath)) {
+    // eslint-disable-next-line
+    const answer = confirm(
+      resourcePath +
+        ' is located outside of the project folder. If the project is moved, the path to the resource can be broken.\nAre you sure you want to proceed?'
+    );
+    return answer;
+  }
+  return true;
+};
+
+export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
 ) => {
-  const resourcePath = getLocalResourceFullPath(project, resourceName);
-  return fs.existsSync(resourcePath);
+  if (!fs) return 0;
+  const resourcePath = path.normalize(
+    getLocalResourceFullPath(project, resourceName)
+  );
+
+  // The resource path doesn't exist
+  if (!fs.existsSync(resourcePath)) return 'error';
+
+  // The resource path is outside of the project folder
+  if (!isPathInProjectFolder(project, resourcePath)) return 'warning';
+
+  // The resource path seems ok
+  return '';
 };

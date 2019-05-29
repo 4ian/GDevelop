@@ -1,5 +1,5 @@
-// flow-typed signature: 957d92b80c0e58047ab324d07668abf2
-// flow-typed version: 63cba5e9af/firebase_v4.x.x/flow_>=v0.34.x
+// flow-typed signature: 0a7c5018a7783bafd1ecdfe3a87e17c7
+// flow-typed version: 0dcf7d868b/firebase_v5.x.x/flow_>=v0.34.x
 
 /* @flow */
 /** ** firebase ****/
@@ -70,6 +70,7 @@ declare class $npm$firebase$App {
   auth(): $npm$firebase$auth$Auth;
   database(): $npm$firebase$database$Database;
   storage(): $npm$firebase$storage$Storage;
+  firestore(): $npm$firebase$firestore$Firestore;
   delete(): Promise<void>;
 }
 
@@ -87,14 +88,14 @@ declare type $npm$firebase$auth$Auth$Persistence = {
   +LOCAL: 'local',
   +SESSION: 'session',
   +NONE: 'none',
-}
+};
 
-declare type $npm$firebase$auth$Auth$Persistence$Enum = $Values<$npm$firebase$auth$Auth$Persistence>
+declare type $npm$firebase$auth$Auth$Persistence$Enum = $Values<$npm$firebase$auth$Auth$Persistence>;
 
 declare class $npm$firebase$auth$Auth {
   static Persistence: $npm$firebase$auth$Auth$Persistence;
   app: $npm$firebase$App;
-  currentUser: $npm$firebase$auth$User;
+  currentUser: $npm$firebase$auth$User | null;
   applyActionCode(code: string): Promise<void>;
   checkActionCode(code: string): Promise<$npm$firebase$auth$ActionCodeInfo>;
   confirmPasswordReset(code: string, newPassword: string): Promise<void>;
@@ -102,7 +103,7 @@ declare class $npm$firebase$auth$Auth {
   createUserWithEmailAndPassword(
     email: string,
     password: string
-  ): Promise<$npm$firebase$auth$User>;
+  ): Promise<$npm$firebase$auth$UserCredential>;
   fetchProvidersForEmail(email: string): Promise<Array<string>>;
   onAuthStateChanged(
     nextOrObserver: (?$npm$firebase$auth$User) => void | Promise<void>,
@@ -127,7 +128,7 @@ declare class $npm$firebase$auth$Auth {
   signInWithEmailAndPassword(
     email: string,
     password: string
-  ): Promise<$npm$firebase$auth$User>;
+  ): Promise<$npm$firebase$auth$UserCredential>;
   signInWithPhoneNumber(
     phoneNumber: string,
     applicationVerifier: $npm$firebase$auth$ApplicationVerifier
@@ -240,35 +241,46 @@ declare class $npm$firebase$auth$User extends $npm$firebase$auth$UserInfo {
 }
 
 declare class $npm$firebase$auth$EmailAuthProvider extends $npm$firebase$auth$AuthProvider {
-  PROVIDER_ID: string;
-  providerId: string;
-  credential(
+  static EMAIL_LINK_SIGN_IN_METHOD: string;
+  static EMAIL_PASSWORD_SIGN_IN_METHOD: string;
+  static PROVIDER_ID: string;
+  static credential(
     email: string,
     password: string
   ): $npm$firebase$auth$AuthCredential;
+  static credentialWithLink(
+    email: string,
+    emailLink: string
+  ): $npm$firebase$auth$AuthCredential;
+  providerId: string;
 }
 
 declare class $npm$firebase$auth$FacebookAuthProvider extends $npm$firebase$auth$AuthProvider {
-  PROVIDER_ID: string;
-  credential(token: string): $npm$firebase$auth$AuthCredential;
+  static FACEBOOK_SIGN_IN_METHOD: string;
+  static PROVIDER_ID: string;
+  static credential(token: string): $npm$firebase$auth$AuthCredential;
   addScope(scope: string): $npm$firebase$auth$FacebookAuthProvider;
   setCustomParameters(
     customOAuthParameters: Object
   ): $npm$firebase$auth$FacebookAuthProvider;
+  providerId: string
 }
 
 declare class $npm$firebase$auth$GithubAuthProvider extends $npm$firebase$auth$AuthProvider {
-  PROVIDER_ID: string;
-  credential(token: string): $npm$firebase$auth$AuthCredential;
+  static GITHUB_SIGN_IN_METHOD: string;
+  static PROVIDER_ID: string;
+  static credential(token: string): $npm$firebase$auth$AuthCredential;
   addScope(scope: string): $npm$firebase$auth$GithubAuthProvider;
   setCustomParameters(
     customOAuthParameters: Object
   ): $npm$firebase$auth$GithubAuthProvider;
+  providerId: string;
 }
 
 declare class $npm$firebase$auth$GoogleAuthProvider extends $npm$firebase$auth$AuthProvider {
-  PROVIDER_ID: string;
-  credential(
+  static GOOGLE_SIGN_IN_METHOD: string;
+  static PROVIDER_ID: string;
+  static credential(
     idToken?: string,
     accessToken?: string
   ): $npm$firebase$auth$AuthCredential;
@@ -279,22 +291,24 @@ declare class $npm$firebase$auth$GoogleAuthProvider extends $npm$firebase$auth$A
 }
 
 declare class $npm$firebase$auth$PhoneAuthProvider extends $npm$firebase$auth$AuthProvider {
-  PROVIDER_ID: string;
-  constructor(
-    auth?: $npm$firebase$auth$Auth
-  ): $npm$firebase$auth$PhoneAuthProvider;
-  credential(
+  static PHONE_SIGN_IN_METHOD: string;
+  static PROVIDER_ID: string;
+  static credential(
     verificationId: string,
     verificationCode: string
   ): $npm$firebase$auth$AuthCredential;
+  constructor(
+    auth?: $npm$firebase$auth$Auth
+  ): $npm$firebase$auth$PhoneAuthProvider;
   verifyPhoneNumber(
     phoneNumber: string,
     applicationVerifier: $npm$firebase$auth$ApplicationVerifier
   ): Promise<string>;
+  providerId: string;
 }
 
 declare class $npm$firebase$auth$TwitterAuthProvider extends $npm$firebase$auth$AuthProvider {
-  PROVIDER_ID: string;
+  static PROVIDER_ID: string;
   credential(token: string, secret: string): $npm$firebase$auth$AuthCredential;
   setCustomParameters(customOAuthParameters: Object): this;
 }
@@ -332,7 +346,7 @@ declare class $npm$firebase$database$DataSnapshot {
   child(path?: string): $npm$firebase$database$DataSnapshot;
   exists(): boolean;
   exportVal(): $npm$firebase$database$Value;
-  forEach(action: ($npm$firebase$database$DataSnapshot) => boolean): boolean;
+  forEach(action: ($npm$firebase$database$DataSnapshot) => ?boolean): boolean;
   getPriority(): $npm$firebase$database$Priority;
   hasChild(path: string): boolean;
   hasChildren(): boolean;
@@ -362,7 +376,7 @@ declare class $npm$firebase$database$OnDisconnect {
 declare type $npm$firebase$database$Callback = (
   $npm$firebase$database$DataSnapshot,
   ?string
-) => void;
+) => void | Promise<void>;
 
 declare class $npm$firebase$database$Query {
   ref: $npm$firebase$database$Reference;
@@ -462,10 +476,15 @@ declare class $npm$firebase$firestore$Firestore {
   batch(): $npm$firebase$firestore$WriteBatch;
   collection(collectionPath: string): $npm$firebase$firestore$CollectionReference;
   doc(documentPath: string): $npm$firebase$firestore$DocumentReference;
-  enablePersistence(): Promise<void>;
-  runTransaction(updateFunction: (transaction: $npm$firebase$firestore$Transaction) => Promise<any>): Promise<mixed>;
+  enableNetwork(): Promise<void>;
+  disableNetwork(): Promise<void>;
+  enablePersistence(settings?: $npm$firebase$firestore$PersistenceSettings): Promise<void>;
+  runTransaction(updateFunction: (transaction: $npm$firebase$firestore$Transaction) => Promise<any>): Promise<any>;
   setLogLevel(logLevel: 'debug' | 'error' | 'silent'): void;
   settings(settings: $npm$firebase$firestore$Settings): void;
+  getAll(
+    ...docs: Array<$npm$firebase$firestore$DocumentReference>
+  ): Promise<Array<$npm$firebase$firestore$DocumentSnapshot>>;
 }
 
 declare interface $npm$firebase$firestore$Blob {
@@ -479,64 +498,77 @@ declare interface $npm$firebase$firestore$QueryListenOptions {
   includeMetadataChanges: boolean;
   includeQueryMetadataChanges: boolean;
 }
-declare type $npm$firebase$firestore$observer = (snapshot: $npm$firebase$firestore$DocumentSnapshot) => void | Promise<void>;
+
+declare type $npm$firebase$firestore$documentObserver = (snapshot: $npm$firebase$firestore$DocumentSnapshot) => void | Promise<void>;
+declare type $npm$firebase$firestore$queryObserver = (snapshot: $npm$firebase$firestore$QuerySnapshot) => void | Promise<void>;
 declare type $npm$firebase$firestore$observerError = (error: $npm$firebase$Error) => void | Promise<void>;
+declare type $npm$firebase$firestore$GetOptions = {
+  source?: 'default' | 'cache' | 'server'
+}
 
 declare class $npm$firebase$firestore$Query {
   firestore: $npm$firebase$firestore$Firestore;
   endAt(snapshotOrVarArgs: $npm$firebase$firestore$DocumentSnapshot | {}): $npm$firebase$firestore$Query;
   endBefore(snapshotOrVarArgs: $npm$firebase$firestore$DocumentSnapshot | {}): $npm$firebase$firestore$Query;
-  get(): Promise<$npm$firebase$firestore$QuerySnapshot>;
+  get(getOptions?: $npm$firebase$firestore$GetOptions): Promise<$npm$firebase$firestore$QuerySnapshot>;
+  isEqual(other: $npm$firebase$firestore$Query): boolean;
   limit(limit: number): $npm$firebase$firestore$Query;
   onSnapshot(
-    optionsOrObserverOrOnNext: $npm$firebase$firestore$QueryListenOptions | $npm$firebase$firestore$observer,
+    optionsOrObserverOrOnNext: $npm$firebase$firestore$QueryListenOptions | $npm$firebase$firestore$queryObserver,
     observerOrOnNextOrOnError?: | $npm$firebase$firestore$QueryListenOptions
-    | $npm$firebase$firestore$observer
+    | $npm$firebase$firestore$queryObserver
     | $npm$firebase$firestore$observerError,
     onError?: $npm$firebase$firestore$observerError
-  ): void;
+  ): () => void;
   orderBy(
     fieldPath: $npm$firebase$firestore$FieldPath | string,
     directionStr: 'asc' | 'desc'
   ): $npm$firebase$firestore$Query;
   startAfter(snapshotOrVarArgs: $npm$firebase$firestore$DocumentSnapshot | {}): $npm$firebase$firestore$Query;
   startAt(snapshotOrVarArgs: $npm$firebase$firestore$DocumentSnapshot | {}): $npm$firebase$firestore$Query;
-  where(fieldPath: string, opStr: '<' | '<=' | '==' | '>' | '>=', value: any): $npm$firebase$firestore$Query;
+  where(fieldPath: string, opStr: '<' | '<=' | '==' | 'array-contains' | '>' | '>=', value: any): $npm$firebase$firestore$Query;
 }
 
 declare class $npm$firebase$firestore$CollectionReference extends $npm$firebase$firestore$Query {
   constructor(): $npm$firebase$firestore$CollectionReference;
   id: string;
   parent: $npm$firebase$firestore$DocumentReference | null;
-  add(data: {}): Promise<mixed>;
+  add(data: { +[string]: mixed }): Promise<$npm$firebase$firestore$DocumentReference>;
   doc(documentPath?: string): $npm$firebase$firestore$DocumentReference;
 }
 
 declare interface $npm$firebase$firestore$DocumentChange {
   type: 'added' | 'removed' | 'modified';
+  doc: $npm$firebase$firestore$DocumentSnapshot;
+  oldIndex: number;
+  newIndex: number;
 }
 
 declare class $npm$firebase$firestore$DocumentReference {
   firestore: $npm$firebase$firestore$Firestore;
   id: string;
+  path: string;
   parent: typeof $npm$firebase$firestore$CollectionReference;
-  collection(collectionPath: string): typeof $npm$firebase$firestore$CollectionReference;
+  collection(collectionPath: string): $npm$firebase$firestore$CollectionReference;
   delete(): Promise<void>;
   get(): Promise<$npm$firebase$firestore$DocumentSnapshot>;
+  isEqual(other: $npm$firebase$firestore$DocumentReference): boolean;
   onSnapshot(
-    optionsOrObserverOrOnNext: $npm$firebase$firestore$QueryListenOptions | $npm$firebase$firestore$observer,
+    optionsOrObserverOrOnNext: $npm$firebase$firestore$QueryListenOptions
+    | $npm$firebase$firestore$documentObserver,
     observerOrOnNextOrOnError?: | $npm$firebase$firestore$QueryListenOptions
-    | $npm$firebase$firestore$observer
+    | $npm$firebase$firestore$documentObserver
     | $npm$firebase$firestore$observerError,
     onError?: $npm$firebase$firestore$observerError
-  ): void;
-  set(data: {}, options?: { merge: boolean } | null): Promise<void>;
+  ): () => void;
+  set(data: { +[string]: mixed }, options?: {| merge?: boolean, mergeFields?: string[] |} | null): Promise<void>;
   update(...args: Array<any>): Promise<void>;
 }
 
 declare class $npm$firebase$firestore$DocumentSnapshot {
-  data(): {};
+  data(): {| +[string]: any |};
   get(fieldpath: typeof $npm$firebase$firestore$FieldPath): any;
+  isEqual(other: $npm$firebase$firestore$DocumentSnapshot): boolean;
   exists: boolean;
   id: string;
   metadata: $npm$firebase$firestore$SnapshotMetadata;
@@ -545,12 +577,16 @@ declare class $npm$firebase$firestore$DocumentSnapshot {
 
 declare class $npm$firebase$firestore$FieldPath {
   constructor(...args: Array<any>): $npm$firebase$firestore$FieldPath;
-  documentId(): typeof $npm$firebase$firestore$FieldPath;
+  static documentId(): typeof $npm$firebase$firestore$FieldPath;
+  isEqual(other: $npm$firebase$firestore$FieldPath): boolean;
 }
 
-declare interface $npm$firebase$firestore$FieldValue {
-  delete(): $npm$firebase$firestore$FieldValue;
-  serverTimestamp(): $npm$firebase$firestore$FieldValue;
+declare class $npm$firebase$firestore$FieldValue {
+  static delete(): $npm$firebase$firestore$FieldValue;
+  static serverTimestamp(): $npm$firebase$firestore$FieldValue;
+  static arrayUnion(...elements: any[]): $npm$firebase$firestore$FieldValue;
+  static arrayRemove(...elements: any[]): $npm$firebase$firestore$FieldValue;
+  isEqual(other: $npm$firebase$firestore$FieldPath): boolean;
 }
 
 declare type $npm$firebase$firestore$FirestoreError =
@@ -575,6 +611,7 @@ declare class $npm$firebase$firestore$GeoPoint {
   constructor(latitude: number, longitude: number): $npm$firebase$firestore$GeoPoint;
   latitude: number;
   longitude: number;
+  isEqual(other: $npm$firebase$firestore$GeoPoint): boolean;
 }
 
 declare class $npm$firebase$firestore$QuerySnapshot {
@@ -585,9 +622,19 @@ declare class $npm$firebase$firestore$QuerySnapshot {
   query: $npm$firebase$firestore$Query;
   size: number;
   forEach((snapshot: $npm$firebase$firestore$DocumentSnapshot, thisArg?: any) => void): void;
+  isEqual(other: $npm$firebase$firestore$QuerySnapshot): boolean;
 }
 
-declare interface $npm$firebase$firestore$Settings {}
+declare type $npm$firebase$firestore$Settings = {|
+  +host?: string;
+  +ssl?: boolean;
+  +timestampsInSnapshots?: boolean;
+  +cacheSizeBytes?: number;
+|};
+
+declare type $npm$firebase$firestore$PersistenceSettings = {|
+  +experimentalTabSynchronization?: boolean;
+|};
 
 declare interface $npm$firebase$firestore$SnapshotMetadata {
   fromCache: boolean;
@@ -599,7 +646,7 @@ declare interface $npm$firebase$firestore$Transaction {
   get(documentRef: $npm$firebase$firestore$DocumentReference): Promise<$npm$firebase$firestore$DocumentSnapshot>;
   set(
     documentRef: $npm$firebase$firestore$DocumentReference,
-    data: {},
+    data: { +[string]: mixed },
     options?: { merge: boolean }
   ): $npm$firebase$firestore$Transaction;
   update(documentRef: $npm$firebase$firestore$DocumentReference, ...args: Array<any>): $npm$firebase$firestore$Transaction;
@@ -610,7 +657,7 @@ declare interface $npm$firebase$firestore$WriteBatch {
   delete(documentRef: $npm$firebase$firestore$DocumentReference): $npm$firebase$firestore$WriteBatch;
   set(
     documentRef: $npm$firebase$firestore$DocumentReference,
-    data: {},
+    data: { +[string]: mixed },
     options?: { merge: boolean }
   ): $npm$firebase$firestore$WriteBatch;
   update(documentRef: $npm$firebase$firestore$DocumentReference, ...args: Array<any>): $npm$firebase$firestore$WriteBatch;
@@ -619,7 +666,7 @@ declare interface $npm$firebase$firestore$WriteBatch {
 /** **** messaging ******/
 declare class $npm$firebase$messaging$Messaging {
   deleteToken(token: string): Promise<any>;
-  getToken(): Promise<string>;
+  getToken(): Promise<?string>;
   onMessage(nextOrObserver: ({}) => void | {}): () => void;
   onTokenRefresh(nextOrObserver: ({}) => void | {}): () => void;
   requestPermission(): Promise<any>;
@@ -747,30 +794,32 @@ declare class $npm$firebase$storage$UploadTaskSnapshot {
   totalBytes: number;
 }
 
+declare type $npm$firebase$app$exports = {
+  +apps: Array<$npm$firebase$App>,
+  initializeApp(
+    options: $npm$firebase$Config,
+    name?: string
+  ): $npm$firebase$App,
+  SDK_VERSION: string,
+  FirebaseError: $npm$firebase$Error,
+  FirebaseConfig: $npm$firebase$Config,
+  FirebaseUser: typeof $npm$firebase$auth$User,
+  FirebaseUserInfo: typeof $npm$firebase$auth$UserInfo,
+  app: $Exports<'@firebase/app'>,
+  auth: $Exports<'@firebase/auth'>,
+  database: $Exports<'@firebase/database'>,
+  firestore: $Exports<'@firebase/firestore'>,
+  messaging: $Exports<'@firebase/messaging'>,
+  storage: $Exports<'@firebase/storage'>
+};
+
 // Exporting the types
 declare module 'firebase' {
-  declare module.exports: {
-    +apps: Array<$npm$firebase$App>,
-    initializeApp(
-      options: $npm$firebase$Config,
-      name?: string
-    ): $npm$firebase$App,
-    SDK_VERSION: string,
-    FirebaseError: $npm$firebase$Error,
-    FirebaseConfig: $npm$firebase$Config,
-    FirebaseUser: typeof $npm$firebase$auth$User,
-    FirebaseUserInfo: typeof $npm$firebase$auth$UserInfo,
-    app: $Exports<'@firebase/app'>,
-    auth: $Exports<'@firebase/auth'>,
-    database: $Exports<'@firebase/database'>,
-    firestore: $Exports<'@firebase/firestore'>,
-    messaging: $Exports<'@firebase/messaging'>,
-    storage: $Exports<'@firebase/storage'>
-  };
+  declare module.exports: $npm$firebase$app$exports;
 }
 
 declare module 'firebase/app' {
-  declare module.exports: $Exports<'@firebase/app'>;
+  declare module.exports: $npm$firebase$app$exports;
 }
 
 declare module 'firebase/auth' {
@@ -847,7 +896,7 @@ declare module '@firebase/firestore' {
     DocumentReference: typeof $npm$firebase$firestore$DocumentReference,
     DocumentSnapshot: typeof $npm$firebase$firestore$DocumentSnapshot,
     FieldPath: typeof $npm$firebase$firestore$FieldPath,
-    FieldValue: $npm$firebase$firestore$FieldValue,
+    FieldValue: typeof $npm$firebase$firestore$FieldValue,
     Firestore: typeof $npm$firebase$firestore$Firestore,
     FirestoreError: $npm$firebase$firestore$FirestoreError,
     GeoPoint: typeof $npm$firebase$firestore$GeoPoint,

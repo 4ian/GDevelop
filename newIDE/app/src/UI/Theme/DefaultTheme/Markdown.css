@@ -26,3 +26,7 @@
 .gd-markdown-default-theme a {
   color: rgb(74, 176, 228);
 }
+
+.gd-markdown-default-theme img {
+  max-width: 100%;
+}

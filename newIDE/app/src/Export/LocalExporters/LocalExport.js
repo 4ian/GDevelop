@@ -13,6 +13,7 @@ import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
+import AlertMessage from '../../UI/AlertMessage';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -148,6 +149,14 @@ export default class LocalExport extends Component {
               You can now upload the game to a web hosting to play to the game.
             </Trans>
           </p>
+          <AlertMessage kind="warning">
+            <Trans>
+              Your game won't work if you open index.html on your computer. You
+              must upload it to a web hosting (Kongregate, Itch.io, etc...) or a
+              web server to run it.
+            </Trans>
+          </AlertMessage>
+          <Spacer />
           <RaisedButton
             fullWidth
             primary

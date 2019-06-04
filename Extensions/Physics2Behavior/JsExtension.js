@@ -342,7 +342,6 @@ module.exports = {
     };
     sharedData.getProperties = function(sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
-      console.log(gd.Serializer.toJSON(sharedContent));
 
       sharedProperties.set(
         'gravityX',
@@ -372,10 +371,10 @@ module.exports = {
       return sharedProperties;
     };
     sharedData.initializeContent = function(behaviorContent) {
-      behaviorContent.getChild("gravityX").setDoubleValue(0);
-      behaviorContent.getChild("gravityY").setDoubleValue(9.8);
-      behaviorContent.getChild("scaleX").setDoubleValue(100);
-      behaviorContent.getChild("scaleY").setDoubleValue(100);
+      behaviorContent.addChild("gravityX").setDoubleValue(0);
+      behaviorContent.addChild("gravityY").setDoubleValue(9.8);
+      behaviorContent.addChild("scaleX").setDoubleValue(100);
+      behaviorContent.addChild("scaleY").setDoubleValue(100);
     }
 
     var aut = extension

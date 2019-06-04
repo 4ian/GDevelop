@@ -309,7 +309,7 @@ export default class ObjectsListContainer extends React.Component<
       name,
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name),
-      'CopyOf'
+      ''
     );
 
     const newObject = global
@@ -332,6 +332,7 @@ export default class ObjectsListContainer extends React.Component<
       'unserializeFrom',
       project
     );
+    newObject.setName(newName); // Unserialization has overwritten the name.
 
     this.forceUpdate();
     if (onObjectPasted) onObjectPasted(newObject);

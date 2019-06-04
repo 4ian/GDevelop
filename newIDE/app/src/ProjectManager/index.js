@@ -339,7 +339,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       'unserializeFrom',
       project
     );
-    newLayout.setName(newName);
+    newLayout.setName(newName); // Unserialization has overwritten the name.
     newLayout.updateBehaviorsSharedData(project);
 
     this.forceUpdate();
@@ -393,7 +393,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       'unserializeFrom',
       project
     );
-    newExternalEvents.setName(newName);
+    newExternalEvents.setName(newName); // Unserialization has overwritten the name.
 
     this.forceUpdate();
   };
@@ -441,7 +441,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const newExternalLayout = project.insertNewExternalLayout(newName, index);
 
     unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
-    newExternalLayout.setName(newName);
+    newExternalLayout.setName(newName); // Unserialization has overwritten the name.
 
     this.forceUpdate();
   };
@@ -502,7 +502,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       'unserializeFrom',
       project
     );
-    newEventsFunctionsExtension.setName(newName);
+    newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
 
     this.forceUpdate();
     this.props.onReloadEventsFunctionsExtensions();

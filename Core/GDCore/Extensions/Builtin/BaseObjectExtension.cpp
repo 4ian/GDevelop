@@ -1165,6 +1165,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Objects"),
                        "res/conditions/text.png")
       .AddParameter("object", _("Object"));
+
+  obj.AddStrExpression("Layer",
+                       _("Object layer"),
+                       _("Return the name of the layer the object is on"),
+                       _("Objects"),
+                       "res/actions/layer.png")
+      .AddParameter("object", _("Object"));
 #endif
 }
 

@@ -53,7 +53,7 @@ export const declareBehaviorMetadata = (
   return extension
     .addBehavior(
       eventsBasedBehavior.getName(),
-      eventsBasedBehavior.getFullName(),
+      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
       eventsBasedBehavior.getName(), // Default name is the name
       eventsBasedBehavior.getDescription(),
       '',

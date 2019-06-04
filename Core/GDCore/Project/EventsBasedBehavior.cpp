@@ -12,7 +12,7 @@
 namespace gd {
 
 EventsBasedBehavior::EventsBasedBehavior()
-    : name("MyBehavior"), fullName("My Behavior") {}
+    : name("MyBehavior"), fullName("") {}
 
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);

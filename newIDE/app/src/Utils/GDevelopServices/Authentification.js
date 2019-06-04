@@ -1,5 +1,6 @@
 // @flow
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
 import { GDevelopFirebaseConfig } from './ApiConfigs';
 
 export type Profile = {
@@ -26,7 +27,7 @@ export type LoginError = {
 };
 
 export default class Authentification {
-  user = null;
+  user: ?$npm$firebase$auth$User = null;
   _onUserChangeCb: ?() => void = null;
 
   constructor() {
@@ -47,38 +48,29 @@ export default class Authentification {
   };
 
   createAccount = (form: LoginForm): Promise<void> => {
-    return (
-      firebase
-        .auth()
-        // $FlowFixMe - Outdated definitions?
-        .createUserAndRetrieveDataWithEmailAndPassword(
-          form.email,
-          form.password
-        )
-        .then(userCredentials => {
-          this.user = userCredentials.user;
-        })
-        .catch(error => {
-          console.error('Error while creating account:', error);
-          throw error;
-        })
-    );
+    return firebase
+      .auth()
+      .createUserWithEmailAndPassword(form.email, form.password)
+      .then(userCredentials => {
+        this.user = userCredentials.user;
+      })
+      .catch(error => {
+        console.error('Error while creating account:', error);
+        throw error;
+      });
   };
 
   login = (form: LoginForm): Promise<void> => {
-    return (
-      firebase
-        .auth()
-        // $FlowFixMe - Outdated definitions?
-        .signInAndRetrieveDataWithEmailAndPassword(form.email, form.password)
-        .then(userCredentials => {
-          this.user = userCredentials.user;
-        })
-        .catch(error => {
-          console.error('Error while login:', error);
-          throw error;
-        })
-    );
+    return firebase
+      .auth()
+      .signInWithEmailAndPassword(form.email, form.password)
+      .then(userCredentials => {
+        this.user = userCredentials.user;
+      })
+      .catch(error => {
+        console.error('Error while login:', error);
+        throw error;
+      });
   };
 
   forgotPassword = (form: LoginForm): Promise<void> => {

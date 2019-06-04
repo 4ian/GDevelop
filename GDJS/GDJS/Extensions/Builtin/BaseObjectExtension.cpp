@@ -192,6 +192,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
       "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
+  objectStrExpressions["Layer"].SetFunctionName("getLayer");
 
   GetAllActions()["Create"].SetFunctionName(
       "gdjs.evtTools.object.createObjectOnScene");

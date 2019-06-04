@@ -137,6 +137,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectExpressions["VariableChildCount"].SetFunctionName(
       "GetVariableChildCount");
   objectStrExpressions["ObjectName"].SetFunctionName("GetName");
+  objectStrExpressions["Layer"].SetFunctionName("GetLayer");
 
   GetAllActions()["Create"]
       .SetFunctionName("CreateObjectOnScene")

@@ -138,7 +138,8 @@ module.exports = {
         "OrientationAbsolute",
         _("Is Absolute"),
         _("Get if the devices orientation is absolute and not relative"),
-        _("Sensors/Orientation")
+        _("Sensors/Orientation"),
+	"JsPlatform/Extensions/orientation_absolute16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -151,7 +152,8 @@ module.exports = {
         "OrientationAlpha",
         _("Alpha value"),
         _("Get the devices orientation Alpha (compass)"),
-        _("Sensors/Orientation")
+        _("Sensors/Orientation"),
+	"JsPlatform/Extensions/orientation_alpha16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -164,7 +166,8 @@ module.exports = {
         "OrientationBeta",
         _("Beta value"),
         _("Get the devices orientation Beta"),
-        _("Sensors/Orientation")
+        _("Sensors/Orientation"),
+	"JsPlatform/Extensions/orientation_beta16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -177,7 +180,8 @@ module.exports = {
         "OrientationGamma",
         _("Gamma value"),
         _("Get the devices orientation Gamma value"),
-        _("Sensors/Orientation")
+        _("Sensors/Orientation"),
+	"JsPlatform/Extensions/orientation_gamma16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -360,7 +364,8 @@ module.exports = {
         "RotationAlpha",
         _("Alpha value"),
         _("Get the devices rotation Alpha"),
-        _("Sensors/Motion")
+        _("Sensors/Motion"),
+	"JsPlatform/Extensions/motion_rotation_alpha16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -373,7 +378,8 @@ module.exports = {
         "RotationBeta",
         _("Beta value"),
         _("Get the devices rotation Beta"),
-        _("Sensors/Motion")
+        _("Sensors/Motion"),
+	"JsPlatform/Extensions/motion_rotation_beta16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -386,7 +392,8 @@ module.exports = {
         "RotationGamma",
         _("Gamma value"),
         _("Get the devices rotation Gamma"),
-        _("Sensors/Motion")
+        _("Sensors/Motion"),
+	"JsPlatform/Extensions/motion_rotation_gamma16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -399,7 +406,8 @@ module.exports = {
         "AccelerationX",
         _("Acceleration X value"),
         _("Get the devices acceleration on the X-axis (m/s²)"),
-        _("Sensors/Motion")
+        _("Sensors/Motion"),
+	"JsPlatform/Extensions/motion_acceleration_x16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -412,7 +420,8 @@ module.exports = {
         "AccelerationY",
         _("Acceleration Y value"),
         _("Get the devices acceleration on the Y-axis (m/s²)"),
-        _("Sensors/Motion")
+        _("Sensors/Motion"),
+	"JsPlatform/Extensions/motion_acceleration_y16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -425,7 +434,8 @@ module.exports = {
         "AccelerationZ",
         _("Acceleration Z value"),
         _("Get the devices acceleration on the Z-axis (m/s²)"),
-        _("Sensors/Motion")
+        _("Sensors/Motion"),
+	"JsPlatform/Extensions/motion_acceleration_z16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(

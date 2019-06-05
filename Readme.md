@@ -60,7 +60,7 @@ License
 -------
 
 * The Core library, the native and HTML5 game engines, the IDE, and all extensions (respectively `Core`, `GDCpp`, `GDJS`, `newIDE` and `Extensions` folders) are under the **MIT license**.
-* The name, GDevelop, and its logo are the exclusive property of Florian Rival.
+* The name, GDevelop, and its logo are the exclusive properties of Florian Rival.
 
 Games exported with GDevelop are based on the native and/or HTML5 game engines (see `Core`, `GDCpp` and `GDJS` folders): these engines are distributed under the MIT license so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open source.
 

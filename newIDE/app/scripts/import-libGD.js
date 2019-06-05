@@ -36,15 +36,12 @@ if (shell.test('-f', sourceFile)) {
     new Promise((resolve, reject) => {
       shell.echo(`ℹ️ Trying to download libGD.js for ${gitRef}.`);
 
-      var hashShellString = shell.exec(`git rev-parse ${gitRef}`, {
+      var hashShellString = shell.exec(`git rev-parse "${gitRef}"`, {
         silent: true,
       });
       if (hashShellString.stderr || hashShellString.code) {
-        shell.echo(
-          `❌ Can't find the hash of the associated commit. Are you using git to work on GDevelop?`
-        );
-        shell.echo(`ℹ️ Full error is: ${hashShellString.stderr}`);
-        shell.exit(1);
+        shell.echo(`⚠️ Can't find the hash of the associated commit.`);
+        reject();
         return;
       }
       var hash = (hashShellString.stdout || 'unknown-hash').trim();
@@ -102,28 +99,41 @@ if (shell.test('-f', sourceFile)) {
   };
 
   // Try to download the latest libGD.js, fallback to previous or master ones
-  // if not found.
+  // if not found (including different parents, for handling of merge commits).
   downloadLibGdJs('HEAD').then(onLibGdJsDownloaded, () =>
     downloadLibGdJs('HEAD~1').then(onLibGdJsDownloaded, () =>
       downloadLibGdJs('HEAD~2').then(onLibGdJsDownloaded, () =>
         downloadLibGdJs('HEAD~3').then(onLibGdJsDownloaded, () =>
           downloadLibGdJs('master').then(onLibGdJsDownloaded, () =>
-            downloadLibGdJs('master~1').then(onLibGdJsDownloaded, () =>
-              downloadLibGdJs('master~2').then(onLibGdJsDownloaded, () => {
-                if (alreadyHasLibGdJs) {
-                  shell.echo(
-                    `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
-                  );
-                  shell.exit(0);
-                  return;
-                } else {
-                  shell.echo(
-                    `❌ Can't download any version of libGD.js, please check your internet connection.`
-                  );
-                  shell.exit(1);
-                  return;
-                }
-              })
+            downloadLibGdJs('master^1').then(onLibGdJsDownloaded, () =>
+              downloadLibGdJs('master^2').then(onLibGdJsDownloaded, () =>
+                downloadLibGdJs('master^1^1').then(onLibGdJsDownloaded, () =>
+                  downloadLibGdJs('master^1^2').then(onLibGdJsDownloaded, () =>
+                    downloadLibGdJs('master^2^1').then(
+                      onLibGdJsDownloaded,
+                      () =>
+                        downloadLibGdJs('master^2^2').then(
+                          onLibGdJsDownloaded,
+                          () => {
+                            if (alreadyHasLibGdJs) {
+                              shell.echo(
+                                `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
+                              );
+                              shell.exit(0);
+                              return;
+                            } else {
+                              shell.echo(
+                                `❌ Can't download any version of libGD.js, please check your internet connection.`
+                              );
+                              shell.exit(1);
+                              return;
+                            }
+                          }
+                        )
+                    )
+                  )
+                )
+              )
             )
           )
         )

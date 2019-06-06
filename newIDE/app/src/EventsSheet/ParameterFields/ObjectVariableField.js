@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
@@ -79,7 +80,9 @@ export default class ObjectVariableField extends React.Component<
   }
 }
 
-export const renderObjectVariable = (value: string) => {
+export const renderInlineObjectVariable = ({
+  value,
+}: ParameterInlineRendererProps) => {
   return renderVariableWithIcon(
     value,
     'res/types/objectvar.png',

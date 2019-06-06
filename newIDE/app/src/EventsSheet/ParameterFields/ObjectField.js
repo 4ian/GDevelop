@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
@@ -76,10 +77,11 @@ export default class ObjectField extends React.Component<
     );
   }
 }
-export const renderObjectWithThumbnail = (
-  value: string,
-  renderObjectThumbnail: string => React.Node
-) => {
+
+export const renderInlineObjectWithThumbnail = ({
+  value,
+  renderObjectThumbnail,
+}: ParameterInlineRendererProps) => {
   return (
     <span title={value}>
       {renderObjectThumbnail(value)}

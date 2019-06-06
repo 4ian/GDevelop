@@ -1,4 +1,5 @@
 import { Trans } from '@lingui/macro';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -45,3 +46,16 @@ export default class RelationalOperatorField extends Component {
     );
   }
 }
+
+export const renderInlineMouse = ({
+  value,
+  InvalidParameterValue,
+}: ParameterInlineRendererProps) => {
+  return value ? (
+    value
+  ) : (
+    <InvalidParameterValue isEmpty>
+      <Trans>Choose a mouse button</Trans>
+    </InvalidParameterValue>
+  );
+};

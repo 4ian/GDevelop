@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
@@ -93,7 +93,9 @@ export default class ForceMultiplierField extends Component<
   }
 }
 
-export const renderForceMultiplierString = (value: string) => {
+export const renderInlineForceMultiplier = ({
+  value,
+}: ParameterInlineRendererProps) => {
   if (value === '1') return 'a permanent';
   else if (value === '0' || value === '') return 'an instant';
 

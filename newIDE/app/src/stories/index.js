@@ -128,6 +128,7 @@ import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
 import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
+import InvalidParameterValue from '../EventsSheet/EventsTree/InvalidParameterValue';
 
 // No i18n in this file
 
@@ -1056,35 +1057,37 @@ storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <DragDropContextProvider>
-      <FixedHeightFlexContainer height={500}>
-        <EventsTree
-          events={testLayout.getEvents()}
-          project={project}
-          layout={testLayout}
-          globalObjectsContainer={project}
-          objectsContainer={testLayout}
-          selection={getInitialSelection()}
-          onAddNewInstruction={action('add new instruction')}
-          onMoveToInstruction={action('move to instruction')}
-          onMoveToInstructionsList={action('move instruction to list')}
-          onInstructionClick={action('instruction click')}
-          onInstructionDoubleClick={action('instruction double click')}
-          onInstructionContextMenu={action('instruction context menu')}
-          onInstructionsListContextMenu={action(
-            'instruction list context menu'
-          )}
-          onParameterClick={action('parameter click')}
-          onEventClick={action('event click')}
-          onEventContextMenu={action('event context menu')}
-          onAddNewEvent={action('add new event')}
-          onOpenExternalEvents={action('open external events')}
-          onOpenLayout={action('open layout')}
-          searchResults={null}
-          searchFocusOffset={null}
-          onEventMoved={() => {}}
-          showObjectThumbnails={true}
-        />
-      </FixedHeightFlexContainer>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testLayout.getEvents()}
+            project={project}
+            layout={testLayout}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onInstructionsListContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+          />
+        </FixedHeightFlexContainer>
+      </div>
     </DragDropContextProvider>
   ));
 

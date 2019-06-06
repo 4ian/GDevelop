@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
@@ -54,7 +55,9 @@ export default class GlobalVariableField extends React.Component<
   }
 }
 
-export const renderGlobalVariable = (value: string) => {
+export const renderInlineGlobalVariable = ({
+  value,
+}: ParameterInlineRendererProps) => {
   return renderVariableWithIcon(
     value,
     'res/types/globalvar.png',

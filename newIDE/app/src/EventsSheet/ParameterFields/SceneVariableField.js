@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
@@ -55,7 +56,9 @@ export default class SceneVariableField extends React.Component<
   }
 }
 
-export const renderSceneVariable = (value: string) => {
+export const renderInlineSceneVariable = ({
+  value,
+}: ParameterInlineRendererProps) => {
   return renderVariableWithIcon(
     value,
     'res/types/scenevar.png',

@@ -11,6 +11,7 @@ export const actionsContainer = 'actions-container';
 export const conditionsContainer = 'conditions-container';
 export const subInstructionsContainer = 'sub-instructions-container';
 export const instructionParameter = 'instruction-parameter';
+export const instructionInvalidParameter = 'instruction-invalid-parameter';
 export const disabledText = 'disabled-text';
 
 export const background = 'background';

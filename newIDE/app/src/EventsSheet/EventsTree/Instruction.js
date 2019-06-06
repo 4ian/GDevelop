@@ -29,6 +29,7 @@ import {
 } from 'react-dnd';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
+import InvalidParameterValue from './InvalidParameterValue';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -96,7 +97,7 @@ class Instruction extends React.Component<Props, *> {
    * has not particular styling.
    */
   _renderInstructionText = (metadata: gdInstructionMetadata) => {
-    const { instruction, disabled } = this.props;
+    const { instruction, disabled, renderObjectThumbnail } = this.props;
     const formattedTexts = instrFormatter.getAsFormattedText(
       instruction,
       metadata
@@ -131,11 +132,12 @@ class Instruction extends React.Component<Props, *> {
                 this.props.onParameterClick(domEvent, parameterIndex)
               }
             >
-              {ParameterRenderingService.renderParameterString(
-                parameterType,
-                formattedTexts.getString(i),
-                this.props.renderObjectThumbnail
-              )}
+              {ParameterRenderingService.renderInlineParameter({
+                type: parameterType,
+                value: formattedTexts.getString(i),
+                renderObjectThumbnail,
+                InvalidParameterValue,
+              })}
             </span>
           );
         })}

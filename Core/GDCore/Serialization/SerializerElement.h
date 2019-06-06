@@ -27,6 +27,10 @@ namespace gd {
  * It also has specialized methods in GDevelop.js (see postjs.js) to be
  * converted to a JavaScript object.
  *
+ * \note Children are stored with their order preserved, but this also
+ * means that their access/removal is O(number of children). This class
+ * is not appropriated for a use in game where fast access is required.
+ *
  * \see gd::Serializer
  */
 class GD_CORE_API SerializerElement {
@@ -177,6 +181,8 @@ class GD_CORE_API SerializerElement {
 
   /** \name Attributes
    * Methods related to the attributes of the element.
+   *
+   * \deprecated Prefer using AddChild/GetChild methods.
    *
    * Attributes are stored differently than children elements, but
    * are serialized to the same in JSON. Hence, the attribute getters
@@ -376,7 +382,7 @@ class GD_CORE_API SerializerElement {
    * \brief Get a child of the element using its name.
    *
    * \param name The name of the child.
-   * \param name The index of the child
+   * \param name The index of the child, in case of an array.
    */
   SerializerElement &GetChild(gd::String name,
                               std::size_t index = 0,
@@ -406,12 +412,14 @@ class GD_CORE_API SerializerElement {
 
   /**
    * \brief Return true if the specified child exists.
+   * \note Complexity is O(number of children).
    * \param name The name of the child to find.
    */
   bool HasChild(const gd::String &name, gd::String deprecatedName = "") const;
 
   /**
    * \brief Remove the child with the specified name
+   * \note Complexity is O(number of children).
    * \param name The name of the child to remove.
    */
   void RemoveChild(const gd::String &name);

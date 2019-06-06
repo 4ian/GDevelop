@@ -1,49 +1,50 @@
 {
-  "name": "gdevelop",
-  "productName": "GDevelop 5",
-  "description": "GDevelop 5 IDE running on the Electron runtime",
-  "version": "1.0.0",
-  "author": "Florian Rival",
-  "license": "MIT",
-  "homepage": "http://gdevelop-app.com",
-  "repository": "github:4ian/GDevelop",
-  "private": true,
-  "scripts": {
-    "postinstall": "cd app && npm install",
-    "app-build": "node scripts/app-build.js",
-    "build": "node scripts/build.js",
-    "electron-win": "node node_modules/electron/cli.js app",
-    "electron-linux": "./node_modules/electron/dist/electron app",
-    "electron-mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app"
-  },
-  "build": {
-    "appId": "com.gdevelop-app.ide",
-    "extraResources": [
-      {
-        "from": "../app/resources/examples",
-        "to": "examples"
-      },
-      {
-        "from": "../app/resources/GDJS",
-        "to": "GDJS"
-      }
-    ],
-    "mac": {
-      "category": "public.app-category.developer-tools"
-    },
-    "publish": [
-      {
-        "provider": "github"
-      }
-    ]
-  },
-  "devDependencies": {
-    "electron": "3.0.9",
-    "electron-builder": "19.53.4",
-    "minimist": "^1.2.0",
-    "shelljs": "^0.7.7"
-  },
-  "dependencies": {
-    "electron-is": "^2.4.0"
-  }
+	"name": "gdevelop",
+	"productName": "GDevelop 5",
+	"description": "GDevelop 5 IDE running on the Electron runtime",
+	"version": "1.0.0",
+	"author": "Florian Rival",
+	"license": "MIT",
+	"homepage": "http://gdevelop-app.com",
+	"repository": "github:4ian/GDevelop",
+	"private": true,
+	"scripts": {
+		"postinstall": "cd app && npm install",
+		"app-build": "node scripts/app-build.js",
+		"build": "node scripts/build.js",
+		"electron-win": "node node_modules/electron/cli.js app",
+		"electron-linux": "./node_modules/electron/dist/electron app",
+		"electron-mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app",
+		"reload-extensions": "cd ../app/scripts && node import-GDJS-Runtime.js"
+	},
+	"build": {
+		"appId": "com.gdevelop-app.ide",
+		"extraResources": [
+			{
+				"from": "../app/resources/examples",
+				"to": "examples"
+			},
+			{
+				"from": "../app/resources/GDJS",
+				"to": "GDJS"
+			}
+		],
+		"mac": {
+			"category": "public.app-category.developer-tools"
+		},
+		"publish": [
+			{
+				"provider": "github"
+			}
+		]
+	},
+	"devDependencies": {
+		"electron": "3.0.9",
+		"electron-builder": "19.53.4",
+		"minimist": "^1.2.0",
+		"shelljs": "^0.7.7"
+	},
+	"dependencies": {
+		"electron-is": "^2.4.0"
+	}
 }

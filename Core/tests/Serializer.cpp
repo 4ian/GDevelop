@@ -57,12 +57,24 @@ TEST_CASE("SerializerElement", "[common]") {
     REQUIRE(element.GetChild("child2").GetDoubleValue() == 45.6);
   }
 
-  SECTION("Adding multiple children, in arrays") {
+  SECTION("Adding multiple named children, in arrays") {
     SerializerElement element;
     element.ConsiderAsArrayOf("namedElement");
     element.AddChild("namedElement").SetStringValue("value123");
     element.AddChild("namedElement").SetStringValue("value456");
     element.AddChild("namedElement").SetDoubleValue(45.6);
+
+    REQUIRE(element.GetChild(0).GetStringValue() == "value123");
+    REQUIRE(element.GetChild(1).GetStringValue() == "value456");
+    REQUIRE(element.GetChild(2).GetDoubleValue() == 45.6);
+  }
+
+  SECTION("Adding multiple unnamed children, in arrays") {
+    SerializerElement element;
+    element.ConsiderAsArray();
+    element.AddChild("").SetStringValue("value123");
+    element.AddChild("").SetStringValue("value456");
+    element.AddChild("").SetDoubleValue(45.6);
 
     REQUIRE(element.GetChild(0).GetStringValue() == "value123");
     REQUIRE(element.GetChild(1).GetStringValue() == "value456");

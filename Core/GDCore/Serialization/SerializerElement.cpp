@@ -142,7 +142,7 @@ bool SerializerElement::HasAttribute(const gd::String& name) const {
 }
 
 SerializerElement& SerializerElement::AddChild(gd::String name) {
-  if (!arrayOf.empty()) {
+  if (isArray) {
     if (name != arrayOf) {
       std::cout << "WARNING: Adding a child, to a SerializerElement which is "
                    "considered as an array, with a name ("
@@ -155,7 +155,7 @@ SerializerElement& SerializerElement::AddChild(gd::String name) {
   // In case of children of objects, there can be only one child with
   // a given name.
   // Note: searching for the existing children is O(number of children). This
-  // could be improved, but in practice has no visible impact of saving
+  // could be improved, but in practice has no visible impact on saving
   // large projects.
   if (!isArray && HasChild(name)) {
     return GetChild(name);
@@ -168,7 +168,7 @@ SerializerElement& SerializerElement::AddChild(gd::String name) {
 }
 
 SerializerElement& SerializerElement::GetChild(std::size_t index) const {
-  if (arrayOf.empty()) {
+  if (!isArray) {
     std::cout << "ERROR: Getting a child from its index whereas the parent is "
                  "not considered as an array."
               << std::endl;
@@ -196,7 +196,7 @@ SerializerElement& SerializerElement::GetChild(std::size_t index) const {
 
 SerializerElement& SerializerElement::GetChild(
     gd::String name, std::size_t index, gd::String deprecatedName) const {
-  if (!arrayOf.empty()) {
+  if (isArray) {
     if (name != arrayOf) {
       std::cout << "WARNING: Getting a child, from a SerializerElement which "
                    "is considered as an array, with a name ("
@@ -211,7 +211,7 @@ SerializerElement& SerializerElement::GetChild(
     if (children[i].second == std::shared_ptr<SerializerElement>()) continue;
 
     if (children[i].first == name ||
-        (!arrayOf.empty() && children[i].first.empty()) ||
+        (isArray && children[i].first.empty()) ||
         (!deprecatedName.empty() && children[i].first == deprecatedName)) {
       if (index == currentIndex)
         return *children[i].second;
@@ -228,7 +228,7 @@ SerializerElement& SerializerElement::GetChild(
 std::size_t SerializerElement::GetChildrenCount(
     gd::String name, gd::String deprecatedName) const {
   if (name.empty()) {
-    if (arrayOf.empty()) {
+    if (!isArray) {
       std::cout
           << "ERROR: Getting children count without specifying name, from a "
              "SerializerElement which is NOT considered as an array."
@@ -245,7 +245,7 @@ std::size_t SerializerElement::GetChildrenCount(
     if (children[i].second == std::shared_ptr<SerializerElement>()) continue;
 
     if (children[i].first == name ||
-        (!arrayOf.empty() && children[i].first.empty()) ||
+        (isArray && children[i].first.empty()) ||
         (!deprecatedName.empty() && children[i].first == deprecatedName))
       currentIndex++;
   }

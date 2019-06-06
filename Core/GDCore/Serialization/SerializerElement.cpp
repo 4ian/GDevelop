@@ -22,24 +22,40 @@ const SerializerValue& SerializerElement::GetValue() const {
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
                                                    bool value) {
+  RemoveChild(name);  // Ideally, only children would be used, but we still
+                      // support code using attributes. Make sure that any
+                      // existing child with this name is removed (otherwise it
+                      // would erase the attribute at serialization).
   attributes[name].SetBool(value);
   return *this;
 }
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
                                                    const gd::String& value) {
+  RemoveChild(name);  // Ideally, only children would be used, but we still
+                      // support code using attributes. Make sure that any
+                      // existing child with this name is removed (otherwise it
+                      // would erase the attribute at serialization).
   attributes[name].SetString(value);
   return *this;
 }
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
                                                    int value) {
+  RemoveChild(name);  // Ideally, only children would be used, but we still
+                      // support code using attributes. Make sure that any
+                      // existing child with this name is removed (otherwise it
+                      // would erase the attribute at serialization).
   attributes[name].SetInt(value);
   return *this;
 }
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
                                                    double value) {
+  RemoveChild(name);  // Ideally, only children would be used, but we still
+                      // support code using attributes. Make sure that any
+                      // existing child with this name is removed (otherwise it
+                      // would erase the attribute at serialization).
   attributes[name].SetDouble(value);
   return *this;
 }
@@ -136,6 +152,15 @@ SerializerElement& SerializerElement::AddChild(gd::String name) {
     }
   }
 
+  // In case of children of objects, there can be only one child with
+  // a given name.
+  // Note: searching for the existing children is O(number of children). This
+  // could be improved, but in practice has no visible impact of saving
+  // large projects.
+  if (!isArray && HasChild(name)) {
+    return GetChild(name);
+  }
+
   std::shared_ptr<SerializerElement> newElement(new SerializerElement);
   children.push_back(std::make_pair(name, newElement));
 
@@ -164,7 +189,7 @@ SerializerElement& SerializerElement::GetChild(std::size_t index) const {
     }
   }
 
-  std::cout << "ERROR: Request out of bound child at index " << index
+  std::cout << "ERROR: Requested out of bound child at index " << index
             << std::endl;
   return nullElement;
 }
@@ -241,7 +266,7 @@ bool SerializerElement::HasChild(const gd::String& name,
   return false;
 }
 
-void SerializerElement::RemoveChild(const gd::String &name) {
+void SerializerElement::RemoveChild(const gd::String& name) {
   for (size_t i = 0; i < children.size();) {
     if (children[i].first == name)
       children.erase(children.begin() + i);

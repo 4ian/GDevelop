@@ -199,13 +199,12 @@ gd::String Serializer::ToJSON(const SerializerElement& element) {
       bool firstChild = true;
 
       if (element.GetAllAttributes().size() > 0) {
-        std::cout
-            << "WARNING: A SerializerElement is considered as an array of "
-            << (element.ConsideredAsArrayOf().empty()
-                    ? "[unnamed elements]"
-                    : element.ConsideredAsArrayOf())
-            << " but has attributes. These attributes won't be saved!"
-            << std::endl;
+        std::cout << "ERROR: A SerializerElement is considered as an array of "
+                  << (element.ConsideredAsArrayOf().empty()
+                          ? "[unnamed elements]"
+                          : element.ConsideredAsArrayOf())
+                  << " but has attributes. These attributes won't be saved!"
+                  << std::endl;
       }
 
       const std::vector<
@@ -216,7 +215,7 @@ gd::String Serializer::ToJSON(const SerializerElement& element) {
           continue;
         if (children[i].first != element.ConsideredAsArrayOf()) {
           std::cout
-              << "WARNING: A SerializerElement is considered as an array of "
+              << "ERROR: A SerializerElement is considered as an array of "
               << (element.ConsideredAsArrayOf().empty()
                       ? "[unnamed elements]"
                       : element.ConsideredAsArrayOf())
@@ -256,6 +255,15 @@ gd::String Serializer::ToJSON(const SerializerElement& element) {
       for (size_t i = 0; i < children.size(); ++i) {
         if (children[i].second == std::shared_ptr<SerializerElement>())
           continue;
+
+        if (attributes.find(children[i].first) != attributes.end()) {
+          std::cout << "ERROR: An attribute and a children called \""
+                    << children[i].first
+                    << "\" both exist. The children will erase the attribute - "
+                       "fix the usage of the attribute or (better) use "
+                       "children methods only."
+                    << std::endl;
+        }
 
         if (!firstChild) str += ",";
         str += StringToQuotedJSONString(children[i].first.c_str()) + ": " +

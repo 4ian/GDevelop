@@ -46,6 +46,47 @@ TEST_CASE("SerializerElement", "[common]") {
     REQUIRE(copiedElement.GetChild("child2").GetDoubleValue() == 45.678);
     REQUIRE(copiedElement.GetStringAttribute("attr1") == "attr123 modified");
   }
+
+  SECTION("Accessing already existing children, in objects") {
+    SerializerElement element;
+    element.AddChild("child1").SetStringValue("value123");
+    element.AddChild("child1").SetStringValue("value456");
+    element.AddChild("child2").SetDoubleValue(45.6);
+
+    REQUIRE(element.GetChild("child1").GetStringValue() == "value456");
+    REQUIRE(element.GetChild("child2").GetDoubleValue() == 45.6);
+  }
+
+  SECTION("Adding multiple children, in arrays") {
+    SerializerElement element;
+    element.ConsiderAsArrayOf("namedElement");
+    element.AddChild("namedElement").SetStringValue("value123");
+    element.AddChild("namedElement").SetStringValue("value456");
+    element.AddChild("namedElement").SetDoubleValue(45.6);
+
+    REQUIRE(element.GetChild(0).GetStringValue() == "value123");
+    REQUIRE(element.GetChild(1).GetStringValue() == "value456");
+    REQUIRE(element.GetChild(2).GetDoubleValue() == 45.6);
+  }
+
+  SECTION("(Deprecated) attributes") {
+    SerializerElement element;
+    element.AddChild("child1").SetStringValue("value123");
+    element.AddChild("child2").SetDoubleValue(45.6);
+    element.SetStringAttribute("attr1", "attr123");
+
+    // Setting a string attribute with the same name as a child
+    // will remove this child. This is because, even though in the future
+    // only child should be used (and only children are loaded from JSON),
+    // we still support attributes, so that
+    // setting one should take precedence over any children that was loaded.
+    element.SetStringAttribute("child1", "value456");
+
+    REQUIRE(element.HasChild("child1") == false);
+    REQUIRE(element.HasChild("child2") == true);
+    REQUIRE(element.GetStringAttribute("attr1") == "attr123");
+    REQUIRE(element.GetStringAttribute("child1") == "value456");
+  }
 }
 
 TEST_CASE("Serializer", "[common]") {
@@ -127,5 +168,27 @@ TEST_CASE("Serializer", "[common]") {
           "{\"-3\": [-4]}]}}";
       REQUIRE(unserializeAndSerializeToJSON(test2) == test2);
     }
+  }
+
+  SECTION("(Deprecated) attributes") {
+    gd::String originalJSON = "{\"ok\": true,\"hello\": \"world\"}";
+    SerializerElement element = Serializer::FromJSON(originalJSON);
+    REQUIRE(element.GetChild("ok").GetBoolValue() == true);
+    REQUIRE(element.GetChild("hello").GetStringValue() == "world");
+
+    // Attributes are deprecated, but can still be used to access
+    // children:
+    REQUIRE(element.GetBoolAttribute("ok") == true);
+    REQUIRE(element.GetStringAttribute("hello") == "world");
+    REQUIRE(element.GetStringAttribute("idontexists") == "");
+
+    // Add a new children and changes an attribute. Even though "hello"
+    // was loaded as a child, attributes are still supported so the child
+    // with this name should be removed.
+    element.AddChild("hello2").SetStringValue("world2");
+    element.SetStringAttribute("hello", "world1");
+
+    gd::String json = Serializer::ToJSON(element);
+    REQUIRE(json == "{\"hello\": \"world1\",\"ok\": true,\"hello2\": \"world2\"}");
   }
 }

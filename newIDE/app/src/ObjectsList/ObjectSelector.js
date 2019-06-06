@@ -65,11 +65,8 @@ export default class ObjectSelector extends React.Component<Props, State> {
     this.fullList = [...objects, { text: '', value: <Divider /> }, ...groups];
   }
 
-  componentWillUnmount() {
-    if (this.state.focused) {
-      this.props.onChange(this.state.text || '');
-    }
-  }
+  // Don't add a componentWillUnmount that would call onChange. This can lead to
+  // calling callbacks that would then update a deleted instruction parameters.
 
   focus() {
     if (this._field) this._field.focus();

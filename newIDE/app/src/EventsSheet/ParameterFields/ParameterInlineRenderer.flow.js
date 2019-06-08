@@ -9,7 +9,7 @@ export type InvalidParameterValueProps = {|
  * The props expected by a function that renders a parameter in the events sheet
  */
 export type ParameterInlineRendererProps = {|
-  type: string,
+  parameterMetadata: gdParameterMetadata,
   value: string,
   renderObjectThumbnail: string => React.Node,
   InvalidParameterValue: InvalidParameterValueProps => React.Node,

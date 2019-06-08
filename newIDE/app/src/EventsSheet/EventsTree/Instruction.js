@@ -119,7 +119,8 @@ class Instruction extends React.Component<Props, *> {
           if (!isParameter)
             return <span key={i}>{formattedTexts.getString(i)}</span>;
 
-          const parameterType = metadata.getParameter(parameterIndex).getType();
+          const parameterMetadata = metadata.getParameter(parameterIndex);
+          const parameterType = parameterMetadata.getType();
           return (
             <span
               key={i}
@@ -133,8 +134,8 @@ class Instruction extends React.Component<Props, *> {
               }
             >
               {ParameterRenderingService.renderInlineParameter({
-                type: parameterType,
                 value: formattedTexts.getString(i),
+                parameterMetadata,
                 renderObjectThumbnail,
                 InvalidParameterValue,
               })}

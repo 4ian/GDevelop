@@ -3,7 +3,7 @@ import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 
 type State = {|
   editorOpen: boolean,
@@ -45,7 +45,6 @@ export default class GlobalVariableField extends React.Component<
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
-              if (this._field) this._field.forceUpdateVariables();
             }}
             emptyExplanationMessage="Global variables are variables that are persisted across the scenes during the game."
           />

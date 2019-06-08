@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import EventsTree from './EventsTree';
-import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
+import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
@@ -1083,7 +1083,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                   ]}
                 />
                 {this.state.editedInstruction.instruction && (
-                  <InstructionEditorDialog
+                  <NewInstructionEditorDialog
                     project={project}
                     scope={scope}
                     globalObjectsContainer={globalObjectsContainer}

@@ -5,7 +5,9 @@ import {
   type ParameterInlineRendererProps,
 } from './ParameterFields/ParameterInlineRenderer.flow';
 import DefaultField from './ParameterFields/DefaultField';
-import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
+import RelationalOperatorField, {
+  renderInlineRelationalOperator,
+} from './ParameterFields/RelationalOperatorField';
 import OperatorField from './ParameterFields/OperatorField';
 import MouseField, { renderInlineMouse } from './ParameterFields/MouseField';
 import KeyField, { renderInlineKey } from './ParameterFields/KeyField';
@@ -76,6 +78,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   object: renderInlineObjectWithThumbnail,
   yesorno: renderInlineYesNo,
   trueorfalse: renderInlineTrueFalse,
+  relationalOperator: renderInlineRelationalOperator,
 };
 
 export default {

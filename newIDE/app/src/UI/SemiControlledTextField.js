@@ -2,10 +2,10 @@
 import * as React from 'react';
 import TextField from 'material-ui/TextField';
 
-type State = {
+type State = {|
   focused: boolean,
   text: ?string,
-};
+|};
 
 type Props = {|
   onChange: string => void,

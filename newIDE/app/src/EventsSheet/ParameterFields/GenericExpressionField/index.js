@@ -12,7 +12,7 @@ import ExpressionParametersEditorDialog, {
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
 import { type InstructionOrExpressionInformation } from '../../InstructionEditor/InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
-import { type ParameterFieldProps } from '../ParameterFieldProps.flow';
+import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
 } from './BackgroundHighlighting';
@@ -194,6 +194,9 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionType,
     } = this.props;
     if (!project) return null;
+
+    // Validation can be time consuming (~1ms for simple expression,
+    // a few milliseconds for complex ones).
 
     const parser = new gd.ExpressionParser2(
       gd.JsPlatform.get(),

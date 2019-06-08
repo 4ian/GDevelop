@@ -12,8 +12,10 @@ import KeyField, { renderInlineKey } from './ParameterFields/KeyField';
 import ObjectField, {
   renderInlineObjectWithThumbnail,
 } from './ParameterFields/ObjectField';
-import YesNoField from './ParameterFields/YesNoField';
-import TrueFalseField from './ParameterFields/TrueFalseField';
+import YesNoField, { renderInlineYesNo } from './ParameterFields/YesNoField';
+import TrueFalseField, {
+  renderInlineTrueFalse,
+} from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
@@ -34,6 +36,7 @@ import ColorExpressionField from './ParameterFields/ColorExpressionField';
 import ForceMultiplierField, {
   renderInlineForceMultiplier,
 } from './ParameterFields/ForceMultiplierField';
+import SceneNameField from './ParameterFields/SceneNameField';
 const gd = global.gd;
 
 const components = {
@@ -61,6 +64,7 @@ const components = {
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
+  sceneName: SceneNameField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   forceMultiplier: renderInlineForceMultiplier,
@@ -70,6 +74,8 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   key: renderInlineKey,
   mouse: renderInlineMouse,
   object: renderInlineObjectWithThumbnail,
+  yesorno: renderInlineYesNo,
+  trueorfalse: renderInlineTrueFalse,
 };
 
 export default {
@@ -81,9 +87,10 @@ export default {
     else return components.default;
   },
   renderInlineParameter: (props: ParameterInlineRendererProps): React.Node => {
-    const fieldType = gd.ParameterMetadata.isObject(props.type)
+    const rawType = props.parameterMetadata.getType();
+    const fieldType = gd.ParameterMetadata.isObject(rawType)
       ? 'object'
-      : props.type;
+      : rawType;
 
     return inlineRenderers[fieldType]
       ? inlineRenderers[fieldType](props)

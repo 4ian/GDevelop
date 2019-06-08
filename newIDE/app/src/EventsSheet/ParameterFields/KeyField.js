@@ -2,14 +2,8 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
-import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
-
-type State = {|
-  focused: boolean,
-  text: ?string,
-|};
+import { type ParameterFieldProps } from './ParameterFieldCommons';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const keyNames = [
   'Num0',
@@ -103,72 +97,34 @@ const keyNames = [
 
 const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;
 
-export default class KeyField extends Component<ParameterFieldProps, State> {
-  state = { focused: false, text: null };
-
-  _description: ?string;
+export default class KeyField extends Component<ParameterFieldProps, {||}> {
   _field: ?any;
-
-  constructor(props: ParameterFieldProps) {
-    super(props);
-
-    const { parameterMetadata } = this.props;
-    this._description = parameterMetadata
-      ? parameterMetadata.getDescription()
-      : undefined;
-  }
 
   focus() {
     if (this._field) this._field.focus();
   }
 
   render() {
+    const { value, onChange, isInline, parameterMetadata } = this.props;
+
     return (
-      <AutoComplete
-        {...defaultAutocompleteProps}
-        floatingLabelText={this._description}
-        searchText={this.state.focused ? this.state.text : this.props.value}
-        onFocus={() => {
-          this.setState({
-            focused: true,
-            text: this.props.value,
-          });
-        }}
-        onUpdateInput={value => {
-          this.setState({
-            focused: true,
-            text: value,
-          });
-        }}
-        onBlur={event => {
-          this.props.onChange(event.target.value);
-          this.setState({
-            focused: false,
-            text: null,
-          });
-        }}
-        onNewRequest={data => {
-          // Note that data may be a string or a {text, value} object.
-          if (typeof data === 'string') {
-            this.props.onChange(data);
-          } else if (typeof data.value === 'string') {
-            this.props.onChange(data.value);
-          }
-          this.focus(); // Keep the focus after choosing an item
-        }}
+      <SemiControlledAutoComplete
+        floatingLabelText={
+          parameterMetadata ? parameterMetadata.getDescription() : undefined
+        }
+        value={value}
+        onChange={onChange}
         dataSource={keyNames.map(keyName => ({
           text: keyName,
           value: keyName,
         }))}
-        openOnFocus={!this.props.isInline}
+        openOnFocus={!isInline}
         ref={field => (this._field = field)}
         errorText={
-          !this.props.value ? (
-            <Trans>You must select a key</Trans>
-          ) : !isKeyValid(this.props.value) ? (
-            <Trans>
-              You must select a valid key. "{this.props.value}" is not valid.
-            </Trans>
+          !value ? (
+            <Trans>You must select a key.</Trans>
+          ) : !isKeyValid(value) ? (
+            <Trans>You must select a valid key. "{value}" is not valid.</Trans>
           ) : (
             undefined
           )

@@ -2,15 +2,12 @@
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ObjectSelector from '../../ObjectsList/ObjectSelector';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
-
-type State = {|
-  errorText: ?string,
-|};
+import { type ParameterFieldProps } from './ParameterFieldCommons';
+import { Trans } from '@lingui/macro';
 
 export default class ObjectField extends React.Component<
   ParameterFieldProps,
-  State
+  {||}
 > {
   _description: ?string;
   _allowedObjectType: ?string;
@@ -18,7 +15,6 @@ export default class ObjectField extends React.Component<
 
   constructor(props: ParameterFieldProps) {
     super(props);
-    this.state = { errorText: null };
 
     const { parameterMetadata } = this.props;
 
@@ -35,39 +31,23 @@ export default class ObjectField extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  componentDidMount() {
-    if (this.props.value) this._doValidation();
-  }
-
-  _getError = () => {
-    if (this._field && !this._field.hasAValidObject())
-      return "The object does not exist or can't be used here";
-
-    return null;
-  };
-
-  _doValidation = () => {
-    this.setState({ errorText: this._getError() });
-  };
-
-  _onChange = (value: string) => {
-    this.setState({ errorText: null });
-    this.props.onChange(value);
-  };
-
   render() {
     return (
       <ObjectSelector
         value={this.props.value}
-        onChange={this._onChange}
-        onChoose={this._onChange}
+        onChange={this.props.onChange}
         allowedObjectType={this._allowedObjectType}
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}
         fullWidth
-        errorText={this.state.errorText}
-        onBlur={this._doValidation}
+        errorTextIfInvalid={
+          this._allowedObjectType ? (
+            <Trans>The object does not exist or can't be used here.</Trans>
+          ) : (
+            <Trans>Enter the name of an object.</Trans>
+          )
+        }
         openOnFocus={
           !this.props
             .value /* Only force showing the list if no object is entered, see https://github.com/4ian/GDevelop/issues/859 */

@@ -128,7 +128,9 @@ import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
 import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
-import InvalidParameterValue from '../EventsSheet/EventsTree/InvalidParameterValue';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 
 // No i18n in this file
 
@@ -161,6 +163,89 @@ const Placeholder = () => <div>Placeholder component</div>;
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
 ));
+
+storiesOf('UI Building Blocks/SemiControlledTextField', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ValueStateHolder
+      initialValue={'Hello World'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledTextField value={value} onChange={onChange} />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('default (commitOnBlur)', () => (
+    <ValueStateHolder
+      initialValue={'Hello World'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledTextField
+            value={value}
+            onChange={onChange}
+            commitOnBlur
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('example that is storing a float in the state', () => (
+    <ValueStateHolder
+      initialValue={12.35}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledTextField
+            value={value.toString()}
+            onChange={newValue => onChange(parseFloat(newValue))}
+          />
+          <p>
+            State value is {value} ({typeof value})
+          </p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('example that is storing a float in the state (commitOnBlur)', () => (
+    <ValueStateHolder
+      initialValue={12.35}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledTextField
+            value={value.toString()}
+            onChange={newValue => onChange(parseFloat(newValue))}
+            commitOnBlur
+          />
+          <p>
+            State value is {value} ({typeof value})
+          </p>
+        </React.Fragment>
+      )}
+    />
+  ));
+
+storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ));
 
 storiesOf('UI Building Blocks/Background', module)
   .addDecorator(muiDecorator)
@@ -481,7 +566,7 @@ storiesOf('ParameterFields', module)
   ))
   .add('LayerField', () => (
     <ValueStateHolder
-      initialValue={'Test'}
+      initialValue={'"GUI"'}
       render={(value, onChange) => (
         <LayerField
           project={project}
@@ -496,9 +581,37 @@ storiesOf('ParameterFields', module)
   ))
   .add('LayerField (without project and layout)', () => (
     <ValueStateHolder
-      initialValue={'Test'}
+      initialValue={'"GUI"'}
       render={(value, onChange) => (
         <LayerField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('SceneNameField', () => (
+    <ValueStateHolder
+      initialValue={'"TestLayout"'}
+      render={(value, onChange) => (
+        <SceneNameField
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('SceneNameField (without project and layout)', () => (
+    <ValueStateHolder
+      initialValue={'"TestLayout"'}
+      render={(value, onChange) => (
+        <SceneNameField
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}

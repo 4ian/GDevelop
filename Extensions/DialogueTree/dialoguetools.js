@@ -7,36 +7,75 @@
 
 gdjs.dialoguetree = {};
 
+gdjs.dialoguetree.runner = new bondage.Runner();
 /**
  * Save a screenshot of the game.
  * @param {string} savepath The path where to save the screenshot
  */
-gdjs.dialoguetree.load = function(runtimeScene, jsonString) {
-	const electron = runtimeScene
-		.getGame()
-		.getRenderer()
-		.getElectron();
+gdjs.dialoguetree.load = function(runtimeScene, sceneVar, startDialogueNode) {
+	this.runner = gdjs.dialoguetree.runner; //TODO needs to be initiated globally once, outside of any methods
+	this.yarnData = JSON.parse(sceneVar.getAsString());
+	this.runner.load(this.yarnData);
 
-	console.log(bondage, jsonString);
-
-	if (electron) {
-		const fileSystem = electron.remote.require('fs');
-		const canvas = runtimeScene
-			.getGame()
-			.getRenderer()
-			.getCanvas();
-
-		if (canvas) {
-			const content = canvas.toDataURL('image/png').replace('data:image/png;base64,', '');
-			if (jsonString.toLowerCase().indexOf('.png') == -1) jsonString += '.png';
-
-			fileSystem.writeFile(jsonString, content, 'base64', err => {
-				if (err) {
-					console.error('Unable to save the screenshot at path: ' + jsonString);
-				}
-			});
-		} else {
-			console.error('Screenshot are not supported on rendering engines without canvas.');
-		}
+	if (startDialogueNode) {
+		this.dialogueIsRunning = true;
+		this.dialogue = this.runner.run(startDialogueNode);
+		gdjs.dialoguetree.advanceDialogue();
 	}
 };
+
+gdjs.dialoguetree.isDialogueRunning = function() {
+	return this.dialogueIsRunning;
+};
+
+gdjs.dialoguetree.getDialogueLineText = function() {
+	return this.dialogueData.text
+		? this.dialogueData.text
+		: this.dialogueData.options
+		? this.dialogueData.options.join(' - ')
+		: '';
+};
+
+gdjs.dialoguetree.dialogueLineOptions = function() {
+	return this.dialogueData.options;
+};
+
+gdjs.dialoguetree.dialogueLineOptionsCount = function() {
+	return this.dialogueData.options.length;
+};
+
+gdjs.dialoguetree.dialogueLineTypeIsText = function() {
+	return this.dialogueData instanceof bondage.TextResult;
+};
+gdjs.dialoguetree.dialogueLineTypeIsOptions = function() {
+	return this.dialogueData instanceof bondage.OptionsResult;
+};
+gdjs.dialoguetree.dialogueLineTypeIsCommand = function() {
+	return this.dialogueData instanceof bondage.CommandResult;
+};
+
+gdjs.dialoguetree.advanceDialogue = function() {
+	this.dialogueData = this.dialogue.next().value;
+	console.log(this.dialogueData);
+	if (gdjs.dialoguetree.dialogueLineTypeIsText()) {
+		this.dialogueDataType = 'text';
+	} else if (gdjs.dialoguetree.dialogueLineTypeIsOptions()) {
+		this.dialogueDataType = 'options';
+	} else if (gdjs.dialoguetree.dialogueLineTypeIsCommand()) {
+		this.dialogueDataType = 'command';
+	} else {
+		this.dialogueDataType = 'unknown';
+	}
+	if (!this.dialogueData) this.dialogueIsRunning = false;
+};
+
+gdjs.dialoguetree.getDialogueLineType = function() {
+	return this.dialogueDataType;
+};
+
+//check if it has a tag
+// get tags (tags.tag)
+
+//get title(expr)
+
+// check if it was visited before (how many times?)

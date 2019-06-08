@@ -76,3 +76,49 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.getWidth = function() {
 gdjs.TextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
     return this._text.height;
 };
+
+/**
+ * Get scale of the text.
+ */
+gdjs.TextRuntimeObjectPixiRenderer.prototype.getScale = function() {
+    return this._text.scale;
+};
+
+/**
+ * Get y-scale of the text.
+ */
+gdjs.TextRuntimeObjectPixiRenderer.prototype.getScaleX = function() {
+    return this._text.scale.x;
+};
+
+/**
+ * Get x-scale of the text.
+ */
+gdjs.TextRuntimeObjectPixiRenderer.prototype.getScaleY = function() {
+    return this._text.scale.y;
+};
+
+/**
+ * Set the text object scale.
+ * @param {number} newScale The new scale for the text object.
+ */
+gdjs.TextRuntimeObjectPixiRenderer.prototype.setScale = function(newScale) {
+    this._text.scale.x = newScale.x;
+    this._text.scale.y = newScale.y;
+};
+
+/**
+ * Set the text object x-scale.
+ * @param {number} newScale The new x-scale for the text object.
+ */
+gdjs.TextRuntimeObjectPixiRenderer.prototype.setScaleX = function(newScale) {
+    this._text.scale.x = newScale;
+};
+
+/**
+ * Set the text object y-scale.
+ * @param {number} newScale The new y-scale for the text object.
+ */
+gdjs.TextRuntimeObjectPixiRenderer.prototype.setScaleY = function(newScale) {
+    this._text.scale.y = newScale;
+};

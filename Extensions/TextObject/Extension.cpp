@@ -127,7 +127,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "ScaleX",
          _("Scale on X axis"),
          _("Modify the scale of the text on the X axis (default scale is 1)"),
-         _("Modify the scale of _PARAM0_ on the X axis to _PARAM1__PARAM2_"),
+         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_ on the X axis"),
          _("Scale"),
          "res/actions/scaleWidth24.png",
          "res/actions/scaleWidth.png")
@@ -158,7 +158,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "ScaleY",
          _("Scale on Y axis"),
          _("Modify the scale of the text on the Y axis (default scale is 1)"),
-         _("Modify the scale of _PARAM0_ on the Y axis to _PARAM1__PARAM2_"),
+         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_ on the Y axis"),
          _("Scale"),
          "res/actions/scaleHeight24.png",
          "res/actions/scaleHeight.png")
@@ -174,7 +174,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "Scale",
          _("Scale"),
          _("Modify the scale of the specified object (default scale is 1)"),
-         _("Modify the scale of _PARAM0_ to _PARAM1__PARAM2_"),
+         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
          _("Scale"),
          "res/actions/scale24.png",
          "res/actions/scale.png")

@@ -341,7 +341,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>
                 To obtain the best pixel-perfect effect possible, go in the
                 resources editor and disable the Smoothing for all images of
-                your game.
+                your game. It will be done automatically for new images added
+                from now.
               </Trans>
             </DismissableAlertMessage>
           )}

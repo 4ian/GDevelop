@@ -337,7 +337,8 @@ class GD_CORE_API ResourcesManager {
   std::shared_ptr<gd::Resource> GetResourceSPtr(const gd::String& name);
 
   /**
-   * \brief Add an already constructed resource
+   * \brief Add an already constructed resource.
+   * \note A copy of the resource is made and stored inside the ResourcesManager.
    */
   bool AddResource(const gd::Resource& resource);
 

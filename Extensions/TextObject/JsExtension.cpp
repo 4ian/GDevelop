@@ -105,6 +105,10 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setColor")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::ChangeOutline"]
+        .SetFunctionName("setOutline")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+
     // Unimplemented actions and conditions:
     GetAllActionsForObject("TextObject::Text")["TextObject::Font"]
         .SetFunctionName("");

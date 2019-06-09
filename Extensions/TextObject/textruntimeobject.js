@@ -23,6 +23,8 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this.opacity = 255;
     this._wrapping = false;
     this._wrappingWidth = 1;
+    this._outlineThickness = 0;
+    this._outlineColor = [255,255,255];
 
     this._str = objectData.string;
 
@@ -240,5 +242,21 @@ gdjs.TextRuntimeObject.prototype.getWrappingWidth = function() {
 gdjs.TextRuntimeObject.prototype.setWrappingWidth = function(width) {
     if (width <= 1) width = 1;
     this._wrappingWidth = width;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Set the outline for the text object.
+ * @param {String} str color as a "R;G;B" string, for example: "255;0;0"
+ * @param {number} thickness thickness of the outline (0 = disabled)
+ */
+gdjs.TextRuntimeObject.prototype.setOutline = function(str, thickness) {
+    var color = str.split(";");
+    if ( color.length < 3 ) return;
+
+    this._outlineColor[0] = parseInt(color[0], 10);
+    this._outlineColor[1] = parseInt(color[1], 10);
+    this._outlineColor[2] = parseInt(color[2], 10);
+    this._outlineThickness = thickness;
     this._renderer.updateStyle();
 };

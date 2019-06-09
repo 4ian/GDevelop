@@ -44,6 +44,12 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     style.wordWrap = this._object._wrapping;
     style.wordWrapWidth = this._object._wrappingWidth;
     style.breakWords = true;
+    style.stroke = gdjs.rgbToHexNumber(
+        this._object._outlineColor[0],
+        this._object._outlineColor[1],
+        this._object._outlineColor[2]
+    );
+    style.strokeThickness = this._object._outlineThickness;
     this.updatePosition();
 
     // Manually ask the PIXI object to re-render as we changed a style property

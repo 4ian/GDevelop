@@ -122,6 +122,21 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetColor")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  obj.AddAction(
+         "ChangeOutline",
+         _("Outline"),
+         _("Change the outline of the text. A thickness of 0 disables the outline."),
+         _("Change outline of _PARAM0_ to color _PARAM1_ with thickness _PARAM2_"),
+         _("Effects"),
+         "res/actions/color24.png",
+         "res/actions/color.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("color", _("Color"))
+      .AddParameter("expression", _("Thickness"))
+      .SetFunctionName("SetOutline")
+      .SetIncludeFile("TextObject/TextObject.h");
+
   obj.AddAction("Opacity",
                 _("Change Text Opacity"),
                 _("Change the opacity of a Text. 0 is fully transparent, 255 "

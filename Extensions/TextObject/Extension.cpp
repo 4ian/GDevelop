@@ -126,8 +126,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction(
          "ScaleX",
          _("Scale on X axis"),
-         _("Change the scale of the text on the X axis (default scale is 1)"),
-         _("Change scale of _PARAM0_ on the X axis to _PARAM1__PARAM2_"),
+         _("Modify the scale of the text on the X axis (default scale is 1)"),
+         _("Modify the scale of _PARAM0_ on the X axis to _PARAM1__PARAM2_"),
          _("Scale"),
          "res/actions/scaleWidth24.png",
          "res/actions/scaleWidth.png")
@@ -157,8 +157,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction(
          "ScaleY",
          _("Scale on Y axis"),
-         _("Change the scale of the text on the Y axis (default scale is 1)"),
-         _("Change scale of _PARAM0_ on the Y axis to _PARAM1__PARAM2_"),
+         _("Modify the scale of the text on the Y axis (default scale is 1)"),
+         _("Modify the scale of _PARAM0_ on the Y axis to _PARAM1__PARAM2_"),
          _("Scale"),
          "res/actions/scaleHeight24.png",
          "res/actions/scaleHeight.png")
@@ -167,6 +167,22 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value"))
       .SetFunctionName("SetScaleY")
+      .SetManipulatedType("number")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
+         "Scale",
+         _("Scale"),
+         _("Modify the scale of the specified object (default scale is 1)"),
+         _("Modify the scale of _PARAM0_ to _PARAM1__PARAM2_"),
+         _("Scale"),
+         "res/actions/scale24.png",
+         "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .SetFunctionName("SetScale")
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 

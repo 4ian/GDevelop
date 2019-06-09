@@ -194,7 +194,7 @@ gdjs.TextRuntimeObject.prototype.getHeight = function() {
  * Get scale of the text.
  */
 gdjs.TextRuntimeObject.prototype.getScale = function() {
-    return this._renderer.getScale();
+    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0; 
 };
 
 /**
@@ -216,8 +216,8 @@ gdjs.TextRuntimeObject.prototype.getScaleY = function() {
  * @param {number} newScale The new scale for the text object.
  */
 gdjs.TextRuntimeObject.prototype.setScale = function(newScale) {
-    this._scaleX = newScale.x;
-    this._scaleY = newScale.y;
+    this._scaleX = newScale;
+    this._scaleY = newScale;
     this._renderer.setScale(newScale);
 };
 

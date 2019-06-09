@@ -103,8 +103,8 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.getScaleY = function() {
  * @param {number} newScale The new scale for the text object.
  */
 gdjs.TextRuntimeObjectPixiRenderer.prototype.setScale = function(newScale) {
-    this._text.scale.x = newScale.x;
-    this._text.scale.y = newScale.y;
+    this._text.scale.x = newScale;
+    this._text.scale.y = newScale;
 };
 
 /**

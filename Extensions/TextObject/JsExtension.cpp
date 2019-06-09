@@ -33,6 +33,10 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::Scale"]
+        .SetFunctionName("setScale")
+        .SetGetter("getScale")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::ScaleX"]
         .SetFunctionName("setScaleX")
         .SetGetter("getScaleX")

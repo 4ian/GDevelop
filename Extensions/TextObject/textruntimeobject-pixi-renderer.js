@@ -78,13 +78,6 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
 };
 
 /**
- * Get scale of the text.
- */
-gdjs.TextRuntimeObjectPixiRenderer.prototype.getScale = function() {
-    return this._text.scale;
-};
-
-/**
  * Get y-scale of the text.
  */
 gdjs.TextRuntimeObjectPixiRenderer.prototype.getScaleX = function() {

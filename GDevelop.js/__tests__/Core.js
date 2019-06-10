@@ -680,6 +680,24 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.VideoResource', function() {
+    it('should have name and file', function() {
+      const resource = new gd.VideoResource();
+      resource.setName('MyVideoResource');
+      resource.setFile('MyVideoFile');
+      expect(resource.getName()).toBe('MyVideoResource');
+      expect(resource.getFile()).toBe('MyVideoFile');
+      resource.delete();
+    });
+    it('can have metadata', function() {
+      const resource = new gd.VideoResource();
+      expect(resource.getMetadata()).toBe('');
+      resource.setMetadata(JSON.stringify({ hello: 'world' }));
+      expect(resource.getMetadata()).toBe('{"hello":"world"}');
+      resource.delete();
+    });
+  });
+
   describe('gd.ResourcesManager', function() {
     it('should support adding resources', function() {
       var project = gd.ProjectHelper.createNewGDJSProject();

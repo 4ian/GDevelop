@@ -653,99 +653,23 @@ interface ImageResource {
 
     boolean IsSmooth();
     void SetSmooth(boolean enable);
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+ImageResource implements Resource;
 
 interface AudioResource {
     void AudioResource();
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+AudioResource implements Resource;
 
 interface FontResource {
     void FontResource();
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+FontResource implements Resource;
 
 interface VideoResource {
     void VideoResource();
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+VideoResource implements Resource;
 
 interface InitialInstance {
     void InitialInstance();

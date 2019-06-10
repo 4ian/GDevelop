@@ -128,13 +128,44 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          _("Change the outline of the text. A thickness of 0 disables the outline."),
          _("Change outline of _PARAM0_ to color _PARAM1_ with thickness _PARAM2_"),
          _("Effects"),
-         "res/actions/color24.png",
-         "res/actions/color.png")
+         "res/actions/textOutline24.png",
+         "res/actions/textOutline.png")
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("color", _("Color"))
       .AddParameter("expression", _("Thickness"))
       .SetFunctionName("SetOutline")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
+         "ChangeShadow",
+         _("Change Shadow"),
+         _("Change the shadow of the text."),
+         _("Change the shadow of _PARAM0_ to color _PARAM1_ distance _PARAM2_ blur _PARAM3_ angle _PARAM4_"),
+         _("Effects/Shadow"),
+         "res/actions/textShadow24.png",
+         "res/actions/textShadow.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("color", _("Color"))
+      .AddParameter("expression", _("Distance"))
+      .AddParameter("expression", _("Blur"))
+      .AddParameter("expression", _("Angle"))
+      .SetFunctionName("SetShadow")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
+         "ShowShadow",
+         _("Show Shadow"),
+         _("Show the shadow of the text."),
+         _("Show the shadow of _PARAM0_: _PARAM1_"),
+         _("Effects/Shadow"),
+         "res/actions/textShadow24.png",
+         "res/actions/textShadow.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("yesorno", _("Show the shadow"))  
+      .SetFunctionName("ShowShadow")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction("Opacity",
@@ -301,6 +332,36 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  obj.AddCondition("Padding",
+                   _("Padding"),
+                   _("Compare the number of pixels around a text object. If you text gets cropped due to shadow effects or an outline raise this value."),
+                   _("The padding of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Style"),
+                   "res/conditions/textPadding24.png",
+                   "res/conditions/textPadding.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("expression", _("Value to test"))
+      .SetFunctionName("GetPadding")
+      .SetManipulatedType("number")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction("Padding",
+                _("Padding"),
+                _("Set the number of pixels around a text object. If you text gets cropped due to shadow effects or an outline raise this value."),
+                _("Do _PARAM1__PARAM2_ to the padding of _PARAM0_"),
+                _("Style"),
+                "res/actions/textPadding24.png",
+                "res/actions/textPadding.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .SetManipulatedType("number")
+      .SetFunctionName("SetPadding")
+      .SetIncludeFile("TextObject/TextObject.h");
+
   obj.AddAction(
          "SetWrapping",
          _("Wrapping"),
@@ -349,6 +410,15 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
       .SetManipulatedType("number");
+
+  obj.AddExpression("Padding",
+                    _("Padding"),
+                    _("Padding"),
+                    _("Style"),
+                    "res/actions/textPadding.png")
+      .AddParameter("object", _("Object"), "Text")
+      .SetFunctionName("GetPadding")
+      .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddExpression("Opacity",
                     _("Opacity of a Text object"),

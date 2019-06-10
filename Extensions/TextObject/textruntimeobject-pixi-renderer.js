@@ -50,6 +50,16 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
         this._object._outlineColor[2]
     );
     style.strokeThickness = this._object._outlineThickness;
+    style.dropShadow = this._object._shadow;
+    style.dropShadowColor = gdjs.rgbToHexNumber(
+        this._object._shadowColor[0],
+        this._object._shadowColor[1],
+        this._object._shadowColor[2]
+    );
+    style.dropShadowBlur = this._object._shadowBlur;
+    style.dropShadowAngle = this._object._shadowAngle;
+    style.dropShadowDistance = this._object._shadowDistance;
+    style.padding = this._object._padding;
     this.updatePosition();
 
     // Manually ask the PIXI object to re-render as we changed a style property

@@ -25,6 +25,12 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._wrappingWidth = 1;
     this._outlineThickness = 0;
     this._outlineColor = [255,255,255];
+    this._shadow = false;
+    this._shadowColor = [0,0,0];
+    this._shadowDistance = 1;
+    this._shadowBlur = 1;
+    this._shadowAngle = 0;
+    this._padding = 5;
 
     this._str = objectData.string;
 
@@ -258,5 +264,52 @@ gdjs.TextRuntimeObject.prototype.setOutline = function(str, thickness) {
     this._outlineColor[1] = parseInt(color[1], 10);
     this._outlineColor[2] = parseInt(color[2], 10);
     this._outlineThickness = thickness;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Set the shadow for the text object.
+ * @param {String} str color as a "R;G;B" string, for example: "255;0;0"
+ * @param {number} distance distance between the shadow and the text
+ * @param {number} blur amout of shadow blur
+ * @param {number} angle shadow offset direction
+ */
+gdjs.TextRuntimeObject.prototype.setShadow = function(str, distance, blur, angle) {
+    var color = str.split(";");
+    if ( color.length < 3 ) return;
+
+    this._shadowColor[0] = parseInt(color[0], 10);
+    this._shadowColor[1] = parseInt(color[1], 10);
+    this._shadowColor[2] = parseInt(color[2], 10);
+    this._shadowDistance = distance;
+    this._shadowBlur = blur;
+    this._shadowAngle = angle;
+    this._shadow = true;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Show the shadow of the text object.
+ * @param {number} value boolean show the shadow (1 = enabled / 0 = disabled)
+ */
+gdjs.TextRuntimeObject.prototype.showShadow = function(value) {
+    this._shadow = (value == 1) ? true : false;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Get padding of the text object.
+ * @return {number} number of pixels around the text before it gets cropped
+ */
+gdjs.TextRuntimeObject.prototype.getPadding = function() {
+    return this._padding;
+};
+
+/**
+ * Set padding of the text object.
+ * @param {number} value number of pixels around the text before it gets cropped
+ */
+gdjs.TextRuntimeObject.prototype.setPadding = function(value) {
+    this._padding = value;
     this._renderer.updateStyle();
 };

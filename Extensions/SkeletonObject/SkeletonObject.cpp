@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "SkeletonObject.h"
 #include <SFML/Graphics.hpp>
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"

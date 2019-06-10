@@ -588,7 +588,18 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetLabel();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Value] VectorString GetExtraInfo();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+
+interface NamedPropertyDescriptor {
+    void NamedPropertyDescriptor();
+
+    [Ref] PropertyDescriptor SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+};
+NamedPropertyDescriptor implements PropertyDescriptor;
 
 interface MapStringPropertyDescriptor {
     void MapStringPropertyDescriptor();

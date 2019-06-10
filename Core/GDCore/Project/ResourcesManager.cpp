@@ -7,7 +7,7 @@
 #include <iostream>
 #include <map>
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Serialization/Serializer.h"

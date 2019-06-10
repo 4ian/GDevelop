@@ -7,7 +7,7 @@
 #include "GDCore/Project/BehaviorsSharedData.h"
 #if defined(GD_IDE_ONLY)
 #include <map>
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #endif
 
 namespace gd {

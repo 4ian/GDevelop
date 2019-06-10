@@ -958,6 +958,58 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.NamedPropertyDescriptor', function() {
+    const makeNewProperty = () => {
+      const property = new gd.NamedPropertyDescriptor();
+      property.setName("Property1")
+      .setLabel("The first property")
+      .setValue("Hello world")
+      .setType("string")
+      .addExtraInfo('Info1')
+      .addExtraInfo('Info2');
+
+      return property;
+    }
+
+    it('can be created and manipulated', function (){
+      const property = makeNewProperty();
+      expect(property.getName()).toBe('Property1');
+      expect(property.getLabel()).toBe('The first property');
+      expect(property.getValue()).toBe('Hello world');
+      expect(property.getType()).toBe('string');
+      expect(property
+        .getExtraInfo()
+        .toJSArray()).toContain("Info1");
+      expect(property
+        .getExtraInfo()
+        .toJSArray()).toContain("Info2");
+
+      property.delete();
+    });
+    it('can be serialized', function (){
+      const property = makeNewProperty();
+
+      var serializerElement = new gd.SerializerElement();
+      property.serializeTo(serializerElement);
+      property.delete();
+
+      const property2 = new gd.NamedPropertyDescriptor();
+      property2.unserializeFrom(serializerElement);
+      serializerElement.delete();
+
+      expect(property2.getName()).toBe('Property1');
+      expect(property2.getLabel()).toBe('The first property');
+      expect(property2.getValue()).toBe('Hello world');
+      expect(property2.getType()).toBe('string');
+      expect(property2
+        .getExtraInfo()
+        .toJSArray()).toContain("Info1");
+      expect(property2
+        .getExtraInfo()
+        .toJSArray()).toContain("Info2");
+    });
+  });
+
   describe('gd.MapStringPropertyDescriptor', function() {
     it('can be used to manipulate properties', function() {
       var properties = new gd.MapStringPropertyDescriptor();

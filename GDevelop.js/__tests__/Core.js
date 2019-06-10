@@ -1028,6 +1028,24 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.NamedPropertyDescriptorsList', function() {
+    it('can be used to store named properties', function() {
+      const list = new gd.NamedPropertyDescriptorsList();
+
+      const property1 = list.insertNew("Property1", 0);
+      expect(list.has("Property1")).toBe(true);
+      expect(list.getCount()).toBe(1);
+
+      expect(property1.getName()).toBe("Property1");
+      expect(list.getAt(0).getName()).toBe("Property1");
+
+      property1.setLabel("Property 1");
+      property1.setValue("123");
+      expect(list.getAt(0).getLabel()).toBe("Property 1");
+      expect(list.getAt(0).getValue()).toBe("123");
+    });
+  });
+
   describe('gd.MapStringPropertyDescriptor', function() {
     it('can be used to manipulate properties', function() {
       var properties = new gd.MapStringPropertyDescriptor();

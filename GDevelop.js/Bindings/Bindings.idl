@@ -1641,6 +1641,7 @@ interface EventsBasedBehavior {
     [Const, Ref] DOMString GetObjectType();
 
     [Ref] EventsFunctionsContainer GetEventsFunctions();
+    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -1648,7 +1649,7 @@ interface EventsBasedBehavior {
 
 interface EventsBasedBehaviorsList {
     [Ref] EventsBasedBehavior InsertNew([Const] DOMString name, unsigned long pos);
-    [Ref] EventsBasedBehavior Insert([Const, Ref] EventsBasedBehavior eventsFunction, unsigned long pos);
+    [Ref] EventsBasedBehavior Insert([Const, Ref] EventsBasedBehavior item, unsigned long pos);
     boolean Has([Const] DOMString name);
     [Ref] EventsBasedBehavior Get([Const] DOMString name);
     [Ref] EventsBasedBehavior GetAt(unsigned long pos);
@@ -1658,6 +1659,22 @@ interface EventsBasedBehaviorsList {
 
     unsigned long size();
     [Ref] EventsBasedBehavior at(unsigned long index);
+};
+
+interface NamedPropertyDescriptorsList {
+    void NamedPropertyDescriptorsList();
+
+    [Ref] NamedPropertyDescriptor InsertNew([Const] DOMString name, unsigned long pos);
+    [Ref] NamedPropertyDescriptor Insert([Const, Ref] NamedPropertyDescriptor item, unsigned long pos);
+    boolean Has([Const] DOMString name);
+    [Ref] NamedPropertyDescriptor Get([Const] DOMString name);
+    [Ref] NamedPropertyDescriptor GetAt(unsigned long pos);
+    void Remove([Const] DOMString name);
+    void Move(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetCount();
+
+    unsigned long size();
+    [Ref] NamedPropertyDescriptor at(unsigned long index);
 };
 
 interface EventsFunctionsExtension {

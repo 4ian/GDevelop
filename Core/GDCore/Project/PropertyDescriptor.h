@@ -1,15 +1,20 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
+ */
 #ifndef GDCORE_PROPERTYDESCRIPTOR
 #define GDCORE_PROPERTYDESCRIPTOR
-
 #include <vector>
 #include "GDCore/String.h"
+namespace gd {
+class SerializerElement;
+}
 
 namespace gd {
 
 /**
  * \brief Used to describe a property shown in a property grid.
- * \see gd::InitialInstancesPropgridHelper
- * \see gd::ObjectsPropgridHelper
  * \see gd::Object
  */
 class GD_CORE_API PropertyDescriptor {
@@ -77,6 +82,20 @@ class GD_CORE_API PropertyDescriptor {
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
   }
+
+  /** \name Serialization
+   */
+  ///@{
+  /**
+   * \brief Serialize the PropertyDescriptor.
+   */
+  virtual void SerializeTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserialize the PropertyDescriptor.
+   */
+  virtual void UnserializeFrom(const SerializerElement& element);
+  ///@}
 
  private:
   gd::String currentValue;  ///< The current value to be shown.

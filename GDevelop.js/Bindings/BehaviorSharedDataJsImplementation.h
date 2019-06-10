@@ -1,4 +1,4 @@
-#include <GDCore/IDE/Dialogs/PropertyDescriptor.h>
+#include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/BehaviorsSharedData.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Serialization/Serializer.h>

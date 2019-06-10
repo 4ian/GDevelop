@@ -6,7 +6,7 @@
 #include "GDCore/Project/Behavior.h"
 #include <iostream>
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #endif
 
 namespace gd {

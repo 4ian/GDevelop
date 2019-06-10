@@ -21,7 +21,7 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Serialization/SerializerElement.h"
 #if defined(GD_IDE_ONLY)
 #include <map>
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #endif
 
 void TopDownMovementBehavior::InitializeContent(

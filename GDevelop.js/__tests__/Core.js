@@ -1867,6 +1867,16 @@ describe('libGD.js', function() {
   });
 
   describe('gd.SpriteObject', function() {
+    it('is a gd.Object and can have tags', function() {
+      var object = new gd.SpriteObject('MySpriteObject');
+
+      expect(object instanceof gd.Object).toBe(true);
+      object.setTags('tag1, tag2, tag3');
+      expect(object.getTags()).toBe('tag1, tag2, tag3');
+      expect(object.getVariables()).toBeTruthy();
+      object.delete();
+    });
+
     it('can have animations', function() {
       var obj = new gd.SpriteObject('MySpriteObject');
       obj.addAnimation(new gd.Animation());

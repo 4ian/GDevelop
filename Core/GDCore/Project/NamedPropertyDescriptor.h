@@ -25,10 +25,11 @@ class GD_CORE_API NamedPropertyDescriptor : public PropertyDescriptor {
    */
   NamedPropertyDescriptor(){};
 
-  /**
-   * \brief Destructor
-   */
   virtual ~NamedPropertyDescriptor();
+
+  virtual NamedPropertyDescriptor* Clone() const {
+    return new NamedPropertyDescriptor(*this);
+  }
 
   /**
    * \brief Change the name of the property.
@@ -60,7 +61,7 @@ class GD_CORE_API NamedPropertyDescriptor : public PropertyDescriptor {
   ///@}
 
  private:
-  gd::String name;  ///< The current value to be shown.
+  gd::String name;  ///< The name of the property.
 };
 
 }  // namespace gd

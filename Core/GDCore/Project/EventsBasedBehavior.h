@@ -8,6 +8,8 @@
 #define GDCORE_EVENTSBASEDBEHAVIOR_H
 
 #include <vector>
+#include "GDCore/Project/NamedPropertyDescriptor.h"
+#include "GDCore/Tools/SerializableWithNameList.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -105,6 +107,21 @@ class GD_CORE_API EventsBasedBehavior {
     return eventsFunctionsContainer;
   }
 
+  /**
+   * \brief Return a reference to the list of the properties.
+   */
+  SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors() {
+    return propertyDescriptors;
+  }
+
+  /**
+   * \brief Return a const reference to the list of the properties.
+   */
+  const SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors()
+      const {
+    return propertyDescriptors;
+  }
+
   /** \name Serialization
    */
   ///@{
@@ -126,6 +143,7 @@ class GD_CORE_API EventsBasedBehavior {
   gd::String description;
   gd::String objectType;
   gd::EventsFunctionsContainer eventsFunctionsContainer;
+  SerializableWithNameList<NamedPropertyDescriptor> propertyDescriptors;
 };
 
 }  // namespace gd

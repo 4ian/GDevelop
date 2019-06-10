@@ -394,6 +394,7 @@ typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserDiagnostic*> VectorExpressionParserDiagnostic;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehaviorsList;
+typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor> NamedPropertyDescriptorsList;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;

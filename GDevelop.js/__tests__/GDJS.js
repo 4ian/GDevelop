@@ -133,8 +133,8 @@ describe('libGD.js - GDJS related tests', function() {
       );
 
       // ...and objects should be able to get queried...
-      expect(code).toMatch('\"MyObject\": MyObject');
-      expect(code).toMatch('\"MySprite\": MySprite');
+      expect(code).toMatch('"MyObject": MyObject');
+      expect(code).toMatch('"MySprite": MySprite');
 
       // ...and arguments should be able to get queried too:
       expect(code).toMatch('if (argName === "MyNumber") return MyNumber;');
@@ -185,9 +185,9 @@ describe('libGD.js - GDJS related tests', function() {
       parameters.push_back(parameter2);
 
       // And with a group:
-      const group = eventsFunction.getObjectGroups().insertNew("MyGroup", 0);
-      group.addObject("MyObject");
-      group.addObject("MySprite");
+      const group = eventsFunction.getObjectGroups().insertNew('MyGroup', 0);
+      group.addObject('MyObject');
+      group.addObject('MySprite');
 
       // Create a repeat event with...
       const eventsList = eventsFunction.getEvents();
@@ -210,7 +210,6 @@ describe('libGD.js - GDJS related tests', function() {
       gd.asRepeatEvent(evt)
         .getActions()
         .insert(action, 0);
-
 
       const namespace = 'gdjs.eventsFunction.myTest';
       const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
@@ -235,19 +234,32 @@ describe('libGD.js - GDJS related tests', function() {
       );
 
       // ...and objects should be able to get queried...
-      expect(code).toMatch('\"MyObject\": MyObject');
-      expect(code).toMatch('\"MySprite\": MySprite');
+      expect(code).toMatch('"MyObject": MyObject');
+      expect(code).toMatch('"MySprite": MySprite');
 
       // Variables of both MyObject and MySprite should have 42 added:
-      expect(code).toMatch('GDMyObjectObjects2[i].getVariables().get("ObjectVariable")).add(42)');
-      expect(code).toMatch('GDMySpriteObjects2[i].getVariables().get("ObjectVariable")).add(42)');
+      expect(code).toMatch(
+        'GDMyObjectObjects2[i].getVariables().get("ObjectVariable")).add(42)'
+      );
+      expect(code).toMatch(
+        'GDMySpriteObjects2[i].getVariables().get("ObjectVariable")).add(42)'
+      );
 
       action.delete();
     });
   });
+
+  const testObjectFeatures = object => {
+    expect(object instanceof gd.Object).toBe(true);
+    object.setTags('tag1, tag2, tag3');
+    expect(object.getTags()).toBe('tag1, tag2, tag3');
+    expect(object.getVariables()).toBeTruthy();
+  };
+
   describe('TextObject', function() {
     it('should expose TextObject specific methods', function() {
       var object = new gd.TextObject('MyTextObject');
+      testObjectFeatures(object);
       object.setString('Hello');
       object.setFontName('Hello.ttf');
       object.setCharacterSize(10);
@@ -266,6 +278,15 @@ describe('libGD.js - GDJS related tests', function() {
   describe('TiledSpriteObject', function() {
     it('should expose TiledSpriteObject specific methods', function() {
       var object = new gd.TiledSpriteObject('MyTiledSpriteObject');
+      testObjectFeatures(object);
+      object.setTexture('MyImageName');
+      expect(object.getTexture()).toBe('MyImageName');
+    });
+  });
+  describe('PanelSpriteObject', function() {
+    it('should expose PanelSpriteObject specific methods', function() {
+      var object = new gd.PanelSpriteObject('MyPanelSpriteObject');
+      testObjectFeatures(object);
       object.setTexture('MyImageName');
       expect(object.getTexture()).toBe('MyImageName');
     });
@@ -273,6 +294,7 @@ describe('libGD.js - GDJS related tests', function() {
   describe('ShapePainterObject', function() {
     it('should expose ShapePainterObject specific methods', function() {
       var object = new gd.ShapePainterObject('MyShapePainterObject');
+      testObjectFeatures(object);
       object.setCoordinatesAbsolute();
       expect(object.areCoordinatesAbsolute()).toBe(true);
       object.setCoordinatesRelative();
@@ -282,6 +304,13 @@ describe('libGD.js - GDJS related tests', function() {
   describe('TextEntryObject', function() {
     it('should expose TextEntryObject', function() {
       var object = new gd.TextEntryObject('MyTextEntryObject');
+      testObjectFeatures(object);
+    });
+  });
+  describe('ParticleEmitterObject', function() {
+    it('should expose ParticleEmitterObject', function() {
+      var object = new gd.ParticleEmitterObject('MyParticleEmitterObject');
+      testObjectFeatures(object);
     });
   });
   describe('JsCodeEvent', function() {

@@ -35,8 +35,28 @@ class BehaviorCodeGenerator {
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 
+  /**
+   * \brief Generate the name of the method to get the value of the property
+   * of a behavior.
+   */
+  static gd::String GetBehaviorPropertyGetterName(
+      const gd::String& propertyName) {
+    return "_get" + propertyName;
+  }
+
+  /**
+   * \brief Generate the name of the method to set the value of the property
+   * of a behavior.
+   */
+  static gd::String GetBehaviorPropertySetterName(
+      const gd::String& propertyName) {
+    return "_set" + propertyName;
+  }
+
  private:
   gd::String GetRuntimeBehaviorTemplateCode();
+  gd::String GetRuntimeBehaviorPropertyTemplateCode();
+  gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
 
   gd::Project& project;
 };

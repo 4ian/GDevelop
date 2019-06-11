@@ -60,7 +60,8 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
 
     return loadProjectEventsFunctionsExtensions(
       project,
-      eventsFunctionCodeWriter
+      eventsFunctionCodeWriter,
+      i18n
     )
       .then(() =>
         this.setState({

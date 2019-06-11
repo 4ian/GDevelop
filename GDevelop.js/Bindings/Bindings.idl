@@ -598,6 +598,8 @@ interface NamedPropertyDescriptor {
 
     [Ref] PropertyDescriptor SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+
+    [Value] PropertyDescriptor ToPropertyDescriptor();
 };
 NamedPropertyDescriptor implements PropertyDescriptor;
 
@@ -2169,6 +2171,9 @@ interface EventsCodeGenerator {
 interface BehaviorCodeGenerator {
     void BehaviorCodeGenerator([Ref] Project project);
     [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
+
 };
 
 [Prefix="gdjs::"]

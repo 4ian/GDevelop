@@ -301,13 +301,14 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
       propertyName
     );
+    const propertyLabel = property.getLabel() || propertyName;
 
     if (propertyType === 'String' || propertyType === 'Choice') {
       addObjectAndBehaviorParameters(
         behaviorMetadata.addStrExpression(
           propertyName,
-          property.getLabel(),
-          property.getLabel(),
+          propertyLabel,
+          propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
         )
@@ -318,8 +319,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedCondition(
           propertyName,
-          property.getLabel(),
-          i18n._(t`Compare the content of ${property.getLabel()}`),
+          propertyLabel,
+          i18n._(t`Compare the content of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
@@ -339,8 +340,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
           propertyName,
-          property.getLabel(),
-          i18n._(t`Update the content of ${property.getLabel()}`),
+          propertyLabel,
+          i18n._(t`Update the content of ${propertyLabel}`),
           i18n._(
             t`Do _PARAM2__PARAM3_ to property ${propertyName} of _PARAM0_`
           ),
@@ -358,8 +359,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       addObjectAndBehaviorParameters(
         behaviorMetadata.addExpression(
           propertyName,
-          property.getLabel(),
-          property.getLabel(),
+          propertyLabel,
+          propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
         )
@@ -370,8 +371,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedCondition(
           propertyName,
-          property.getLabel(),
-          i18n._(t`Compare the value of ${property.getLabel()}`),
+          propertyLabel,
+          i18n._(t`Compare the value of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
@@ -396,8 +397,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
           propertyName,
-          property.getLabel(),
-          i18n._(t`Update the value of ${property.getLabel()}`),
+          propertyLabel,
+          i18n._(t`Update the value of ${propertyLabel}`),
           i18n._(
             t`Do _PARAM2__PARAM3_ to property ${propertyName} of _PARAM0_`
           ),
@@ -415,8 +416,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedCondition(
           propertyName,
-          property.getLabel(),
-          i18n._(t`Check the value of ${property.getLabel()}`),
+          propertyLabel,
+          i18n._(t`Check the value of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png',
@@ -429,8 +430,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
           propertyName,
-          property.getLabel(),
-          i18n._(t`Update the value of ${property.getLabel()}`),
+          propertyLabel,
+          i18n._(t`Update the value of ${propertyLabel}`),
           i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'

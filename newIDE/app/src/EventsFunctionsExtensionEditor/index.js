@@ -42,6 +42,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
+  onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
 |};
@@ -349,24 +350,30 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  _editBehaviorProperties = (
-    editedEventsBasedBehavior: ?gdEventsBasedBehavior
-  ) => {
-    this.setState(state => {
-      // If we're closing the properties of a behavior, ensure parameters
-      // are up-to-date in all event functions of the behavior (the object
-      // type might have changed).
-      if (state.editedEventsBasedBehavior && !editedEventsBasedBehavior) {
-        gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
-          this.props.eventsFunctionsExtension,
-          state.editedEventsBasedBehavior
-        );
-      }
+  _editBehavior = (editedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
+    this.setState(
+      state => {
+        // If we're closing the properties of a behavior, ensure parameters
+        // are up-to-date in all event functions of the behavior (the object
+        // type might have changed).
+        if (state.editedEventsBasedBehavior && !editedEventsBasedBehavior) {
+          gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+            this.props.eventsFunctionsExtension,
+            state.editedEventsBasedBehavior
+          );
+        }
 
-      return {
-        editedEventsBasedBehavior,
-      };
-    });
+        return {
+          editedEventsBasedBehavior,
+        };
+      },
+      () => {
+        // If we're closing the properties of a behavior, notify parent
+        // that a behavior was edited (to trigger reload of extensions)
+        if (!editedEventsBasedBehavior && this.props.onBehaviorEdited)
+          this.props.onBehaviorEdited();
+      }
+    );
   };
 
   render() {
@@ -556,9 +563,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                               label={<Trans>Edit behavior properties</Trans>}
                               primary
                               onClick={() =>
-                                this._editBehaviorProperties(
-                                  selectedEventsBasedBehavior
-                                )
+                                this._editBehavior(selectedEventsBasedBehavior)
                               }
                             />
                           </Line>
@@ -597,7 +602,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
                         i18n
                       )}
-                      onEditProperties={this._editBehaviorProperties}
+                      onEditProperties={this._editBehavior}
                     />
                   </MosaicWindow>
                 ),
@@ -643,7 +648,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedBehavior={editedEventsBasedBehavior}
-                onApply={() => this._editBehaviorProperties(null)}
+                onApply={() => this._editBehavior(null)}
               />
             )}
           </React.Fragment>

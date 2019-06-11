@@ -24,6 +24,23 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
                           eventsBasedBehavior.GetName())
           .FindAndReplace("CODE_NAMESPACE", codeNamespace);
 
+  gd::String runtimeBehaviorPropertyMethodsCode;
+  for (auto& property :
+       eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
+    runtimeBehaviorPropertyMethodsCode +=
+        GetRuntimeBehaviorPropertyTemplateCode()
+            .FindAndReplace("PROPERTY_NAME", property->GetName())
+            .FindAndReplace("GETTER_NAME",
+                            GetBehaviorPropertyGetterName(property->GetName()))
+            .FindAndReplace("SETTER_NAME",
+                            GetBehaviorPropertySetterName(property->GetName()))
+            .FindAndReplace("DEFAULT_VALUE",
+                            GeneratePropertyValueCode(*property))
+            .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
+                            eventsBasedBehavior.GetName())
+            .FindAndReplace("CODE_NAMESPACE", codeNamespace);
+  }
+
   gd::String runtimeBehaviorMethodsCode;
   for (auto& eventsFunction :
        eventsBasedBehavior.GetEventsFunctions().GetInternalVector()) {
@@ -48,7 +65,8 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
             compilationForRuntime);
   }
 
-  return runtimeBehaviorCode + runtimeBehaviorMethodsCode;
+  return runtimeBehaviorCode + runtimeBehaviorPropertyMethodsCode +
+         runtimeBehaviorMethodsCode;
 }
 
 gd::String BehaviorCodeGenerator::GetRuntimeBehaviorTemplateCode() {
@@ -65,6 +83,7 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = function(runtimeScene, behaviorData,
 {
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
     this._runtimeScene = runtimeScene;
+    this._behaviorData = behaviorData;
 
     if (this.onCreated) { this.onCreated(); }
 };
@@ -73,6 +92,31 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype = Object.create( gdjs.Runtim
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.thisIsARuntimeBehaviorConstructor = "EXTENSION_NAME::BEHAVIOR_NAME";
 
 )jscode_template";
+}
+
+gd::String BehaviorCodeGenerator::GetRuntimeBehaviorPropertyTemplateCode() {
+  return R"jscode_template(
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.GETTER_NAME = function() {
+    return this._behaviorData.PROPERTY_NAME !== undefined ? this._behaviorData.PROPERTY_NAME : DEFAULT_VALUE;
+};
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.SETTER_NAME = function(newValue) {
+    this._behaviorData.PROPERTY_NAME = newValue;
+};
+
+)jscode_template";
+}
+
+gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
+    const gd::PropertyDescriptor& property) {
+  if (property.GetType() == "String" || property.GetType() == "Choice") {
+    return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
+  } else if (property.GetType() == "Number") {
+    return property.GetValue();
+  } else if (property.GetType() == "Boolean") {  // TODO: Check if working
+    return property.GetValue() == "true" ? "true" : "false";
+  }
+
+  return "0 /* Error: property was of an unrecognized type */";
 }
 
 }  // namespace gdjs

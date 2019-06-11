@@ -546,6 +546,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_UseOldExpressionParser UseOldExpressionParser
 #define STATIC_IsUsingOldExpressionParser IsUsingOldExpressionParser
 
+#define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
+#define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName
+
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout
 #define GetExternalEventsAt GetExternalEvents

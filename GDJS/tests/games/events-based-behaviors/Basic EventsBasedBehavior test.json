@@ -187,13 +187,15 @@
           "italic": false,
           "name": "NewObject",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
           "behaviors": [
             {
               "name": "MyBehavior",
-              "type": "NewEventsFunctionsExtension::MyBehavior"
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "BooleanTestProperty": true
             }
           ],
           "string": "Text",
@@ -210,6 +212,7 @@
           "italic": false,
           "name": "NewObject2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -233,6 +236,7 @@
           "italic": false,
           "name": "NewObject3",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -377,7 +381,32 @@
                   "disabled": false,
                   "folded": false,
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::MyBehavior::AddedNumber"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "-42"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::MyBehavior::BooleanTestProperty"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
@@ -387,7 +416,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsString(\"Text\")+\"!\""
+                        "GetArgumentAsString(\"Text\")+Object.Behavior::SuffixText()"
                       ],
                       "subInstructions": []
                     }
@@ -546,7 +575,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "GetArgumentAsNumber(\"Value\") + 1"
+                        "GetArgumentAsNumber(\"Value\") + Object.Behavior::AddedNumber()"
                       ],
                       "subInstructions": []
                     }
@@ -584,6 +613,29 @@
                 }
               ],
               "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "!",
+              "type": "String",
+              "label": "Suffix text to be appended",
+              "extraInformation": [],
+              "name": "SuffixText"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "label": "Number to be added",
+              "extraInformation": [],
+              "name": "AddedNumber"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Boolean test property",
+              "extraInformation": [],
+              "name": "BooleanTestProperty"
             }
           ]
         },
@@ -651,7 +703,8 @@
               ],
               "objectGroups": []
             }
-          ]
+          ],
+          "propertyDescriptors": []
         }
       ]
     }

@@ -232,7 +232,7 @@ function generateBehavior(
     declareBehaviorPropertiesInstructionAndExpressions(
       options.i18n,
       behaviorMetadata,
-      eventsBasedBehavior,
+      eventsBasedBehavior
     );
 
     // Declare all the behavior functions

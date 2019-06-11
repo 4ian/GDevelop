@@ -33,6 +33,13 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
     }
   }
 
+  _onBehaviorEdited = () => {
+    // Immediately trigger the reload/regeneration of extensions
+    // as a change in the properties of a behavior can create changes
+    // in actions/conditions/expressions to manipulate these properties.
+    this.props.onLoadEventsFunctionsExtensions();
+  };
+
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, eventsFunctionsExtensionName } = this.props;
     if (
@@ -76,6 +83,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={this.props.initiallyFocusedFunctionName}
           initiallyFocusedBehaviorName={this.props.initiallyFocusedBehaviorName}
+          onBehaviorEdited={this._onBehaviorEdited}
           ref={editor => (this.editor = editor)}
         />
       </div>

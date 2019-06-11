@@ -2086,6 +2086,7 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   ));
 
 storiesOf('EventsBasedBehaviorEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
   .add('default', () => (

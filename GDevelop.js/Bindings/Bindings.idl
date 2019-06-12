@@ -1456,6 +1456,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameBehaviorProperty(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_RenameEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -1647,6 +1653,10 @@ interface EventsBasedBehavior {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
 };
 
 interface EventsBasedBehaviorsList {

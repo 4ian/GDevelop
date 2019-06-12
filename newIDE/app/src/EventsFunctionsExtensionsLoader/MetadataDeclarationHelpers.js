@@ -306,7 +306,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     if (propertyType === 'String' || propertyType === 'Choice') {
       addObjectAndBehaviorParameters(
         behaviorMetadata.addStrExpression(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
           propertyLabel,
           propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
@@ -318,7 +318,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedCondition(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
           i18n._(t`Compare the content of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
@@ -339,7 +339,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
           propertyLabel,
           i18n._(t`Update the content of ${propertyLabel}`),
           i18n._(
@@ -358,7 +358,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     } else if (propertyType === 'Number') {
       addObjectAndBehaviorParameters(
         behaviorMetadata.addExpression(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
           propertyLabel,
           propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
@@ -370,7 +370,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedCondition(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
           i18n._(t`Compare the value of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
@@ -396,7 +396,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
           propertyLabel,
           i18n._(t`Update the value of ${propertyLabel}`),
           i18n._(
@@ -415,7 +415,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     } else if (propertyType === 'Boolean') {
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedCondition(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
           i18n._(t`Check the value of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
@@ -429,7 +429,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
-          propertyName,
+          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
           propertyLabel,
           i18n._(t`Update the value of ${propertyLabel}`),
           i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),

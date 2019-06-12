@@ -2094,6 +2094,9 @@ storiesOf('EventsBasedBehaviorEditor', module)
       project={project}
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEventsBasedBehavior}
+      onPropertiesUpdated={action('properties updated')}
+      onTabChanged={action('tab changed')}
+      onRenameProperty={action('property rename')}
     />
   ))
   .add('events based behavior without functions', () => (
@@ -2101,6 +2104,9 @@ storiesOf('EventsBasedBehaviorEditor', module)
       project={project}
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEmptyEventsBasedBehavior}
+      onPropertiesUpdated={action('properties updated')}
+      onTabChanged={action('tab changed')}
+      onRenameProperty={action('property rename')}
     />
   ));
 
@@ -2114,6 +2120,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEventsBasedBehavior}
       onApply={action('apply')}
+      onRenameProperty={action('property rename')}
     />
   ))
   .add('events based behavior without functions', () => (
@@ -2122,6 +2129,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEmptyEventsBasedBehavior}
       onApply={action('apply')}
+      onRenameProperty={action('property rename')}
     />
   ));
 

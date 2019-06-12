@@ -541,6 +541,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_RenameEventsFunction RenameEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
+#define STATIC_RenameBehaviorProperty RenameBehaviorProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
 
 #define STATIC_UseOldExpressionParser UseOldExpressionParser
@@ -548,6 +549,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
 #define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName
+#define STATIC_GetPropertyActionName GetPropertyActionName
+#define STATIC_GetPropertyConditionName GetPropertyConditionName
+#define STATIC_GetPropertyExpressionName GetPropertyExpressionName
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

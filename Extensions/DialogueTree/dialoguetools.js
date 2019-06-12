@@ -48,6 +48,25 @@ gdjs.dialoguetree.getLineText = function() {
 		: '';
 };
 
+gdjs.dialoguetree.getClippedLineText = function() {
+	// use this to render the text
+	return this.dialogueData.text ? this.dialogueData.text.substring(0, this.clipTextEnd) : '';
+};
+
+gdjs.dialoguetree.scrollCippedText = function() {
+	// call action every x miliseconds- hold button makes it faster
+	if (this.dialogueIsRunning && this.dialogueData.text) {
+		this.clipTextEnd += 1;
+	}
+};
+
+gdjs.dialoguetree.cippedTextScrollingHasCompleted = function() {
+	//use this to force the game to wait for the text to complete before next line
+	if (this.dialogueData && this.dialogueData.text) {
+		return this.clipTextEnd >= this.dialogueData.text.length;
+	}
+};
+
 gdjs.dialoguetree._normalizedOptionIndex = function(optionIndex) {
 	if (optionIndex >= this.options.length) optionIndex = this.options.length - 1;
 	if (optionIndex < 0) optionIndex = 0;
@@ -124,6 +143,7 @@ gdjs.dialoguetree.advanceDialogue = function() {
 	this.dialogueData = this.dialogue.next().value;
 	this.optionsCount = 0;
 	this.selectedOptionUpdated = false;
+	this.clipTextEnd = 0;
 	console.log(this.dialogueData);
 	if (gdjs.dialoguetree.lineTypeIsText()) {
 		this.dialogueDataType = 'text';
@@ -155,3 +175,8 @@ gdjs.dialoguetree.getLineType = function() {
 // check if it was visited before (how many times?)
 
 //Load/save visited, all variables -state
+
+// todo load from node without reloading your yarn data - one yarn file can handle multiple NPC
+
+//// controll incremention and speed in gd, expose below to makeit easier to manage text clipping
+/// getclippedtext(returns the text in a clipped state- ) gettextlength get incrementcippedtext clippedTextHasCompleted(condition)

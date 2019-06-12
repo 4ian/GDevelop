@@ -115,6 +115,22 @@ module.exports = {
 			.setFunctionName('gdjs.dialoguetree.selectPreviousOption');
 
 		extension
+			.addAction(
+				'ScrollClippedText',
+				_('Scroll Clipped text'),
+				_('Scroll Clipped text'),
+				_('Scroll Clipped text'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			// .addCodeOnlyParameter('currentScene', '')
+			// .addParameter('expression', _('Option index number'))
+			// .setDefaultValue('0')
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.scrollCippedText');
+
+		extension
 			.addStrExpression(
 				'GetLineText',
 				_('Get the current dialogue line text'),
@@ -174,6 +190,18 @@ module.exports = {
 			)
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.getSelectOption');
+
+		extension
+			.addStrExpression(
+				'GetClippedLineText',
+				_('Get dialogue line text clipped'),
+				_('Get dialogue line text clipped'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getClippedLineText');
 
 		extension
 			.addCondition(
@@ -239,6 +267,20 @@ module.exports = {
 			)
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.selectedOptionHasUpdated');
+
+		extension
+			.addCondition(
+				'Text Scrolling has Completed',
+				_('Text Scrolling has Completed'),
+				_('Text Scrolling has Completed'),
+				_('Text Scrolling has Completed'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.cippedTextScrollingHasCompleted');
+
 		//finally return it
 		return extension;
 	},

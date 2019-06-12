@@ -44,6 +44,23 @@ module.exports = {
 
 		extension
 			.addAction(
+				'StarDialogueFromNode',
+				_('Start Dialogue from Node'),
+				_('Start Dialogue from Node in Yarn. You can use this to store multiple Npcs in one Yarn file'),
+				_('Start Dialogue from Node: _PARAM1_'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			// .addCodeOnlyParameter('currentScene', '')
+			// .addParameter('scenevar', _('Scene variable that holds the Yarn Json data'))
+			.addParameter('string', _('Dialogue node'))
+			.setDefaultValue('Start')
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.startFrom');
+
+		extension
+			.addAction(
 				'AdvanceToNextLine',
 				_('Advance to the Next Dialogue Line'),
 				_('Advance to the Next dialogue line'),

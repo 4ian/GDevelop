@@ -16,15 +16,18 @@ gdjs.dialoguetree.loadFromSceneVar = function(runtimeScene, sceneVar, startDialo
 	this.runner = gdjs.dialoguetree.runner; //TODO needs to be initiated globally once, outside of any methods
 	this.yarnData = JSON.parse(sceneVar.getAsString());
 	this.runner.load(this.yarnData);
-	this.optionsCount = 0;
-	this.options = [];
-	this.selectOption = -1;
 
 	if (startDialogueNode) {
-		this.dialogueIsRunning = true;
-		this.dialogue = this.runner.run(startDialogueNode);
-		gdjs.dialoguetree.advanceDialogue();
+		gdjs.dialoguetree.startFrom(startDialogueNode);
 	}
+};
+
+gdjs.dialoguetree.startFrom = function(startDialogueNode) {
+	this.optionsCount = 0;
+	this.options = [];
+	this.dialogueIsRunning = true;
+	this.dialogue = this.runner.run(startDialogueNode);
+	gdjs.dialoguetree.advanceDialogue();
 };
 
 gdjs.dialoguetree.isRunning = function() {
@@ -33,11 +36,11 @@ gdjs.dialoguetree.isRunning = function() {
 
 gdjs.dialoguetree.selectedOptionHasUpdated = function() {
 	if (this.selectedOptionUpdated) {
-		console.log('UPDATED!');
 		this.selectedOptionUpdated = false;
+		if (this.selectOption === -1) this.selectOption = 0;
 		return true;
 	}
-	return this.selectedOptionUpdated;
+	return false;
 };
 
 gdjs.dialoguetree.getLineText = function() {
@@ -87,13 +90,12 @@ gdjs.dialoguetree.getLineOption = function(optionIndex) {
 
 gdjs.dialoguetree.lineOptionsCount = function() {
 	if (this.options.length) {
-		// console.log(this.optionsCount);
 		return this.optionsCount;
 	}
 };
 
 gdjs.dialoguetree.confirmSelectOption = function() {
-	if (this.dialogueData.select) {
+	if (this.dialogueData.select && !this.selectedOptionUpdated && this.selectOption !== -1) {
 		this.dialogueData.select(this.selectOption);
 		gdjs.dialoguetree.advanceDialogue();
 	}
@@ -142,16 +144,16 @@ gdjs.dialoguetree.lineTypeIsCommand = function() {
 gdjs.dialoguetree.advanceDialogue = function() {
 	this.dialogueData = this.dialogue.next().value;
 	this.optionsCount = 0;
+	this.selectOption = -1;
 	this.selectedOptionUpdated = false;
 	this.clipTextEnd = 0;
-	console.log(this.dialogueData);
+
 	if (gdjs.dialoguetree.lineTypeIsText()) {
 		this.dialogueDataType = 'text';
 	} else if (gdjs.dialoguetree.lineTypeIsOptions()) {
 		this.dialogueDataType = 'options';
 		this.optionsCount = this.dialogueData.options.length;
 		this.options = this.dialogueData.options;
-		this.selectOption = 0;
 		this.selectedOptionUpdated = true;
 	} else if (gdjs.dialoguetree.lineTypeIsCommand()) {
 		this.dialogueDataType = 'command';
@@ -177,6 +179,3 @@ gdjs.dialoguetree.getLineType = function() {
 //Load/save visited, all variables -state
 
 // todo load from node without reloading your yarn data - one yarn file can handle multiple NPC
-
-//// controll incremention and speed in gd, expose below to makeit easier to manage text clipping
-/// getclippedtext(returns the text in a clipped state- ) gettextlength get incrementcippedtext clippedTextHasCompleted(condition)

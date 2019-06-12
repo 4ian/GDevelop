@@ -400,20 +400,20 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "NewEventsFunctionsExtension::MyBehavior::AddedNumber"
+                        "value": "NewEventsFunctionsExtension::MyBehavior::PropertyAddedNumber"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
                         "!=",
-                        "-42"
+                        "42"
                       ],
                       "subInstructions": []
                     },
                     {
                       "type": {
                         "inverted": false,
-                        "value": "NewEventsFunctionsExtension::MyBehavior::BooleanTestProperty"
+                        "value": "NewEventsFunctionsExtension::MyBehavior::PropertyBooleanTestProperty"
                       },
                       "parameters": [
                         "Object",
@@ -431,7 +431,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsString(\"Text\")+Object.Behavior::SuffixText()"
+                        "GetArgumentAsString(\"Text\")+Object.Behavior::PropertySuffixText()"
                       ],
                       "subInstructions": []
                     }
@@ -443,16 +443,16 @@
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Object",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "TextObject::Text",
-                  "type": "objectList"
+                  "type": "object"
                 },
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Behavior",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -503,16 +503,16 @@
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Object",
                   "name": "Object",
                   "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "objectList"
+                  "supplementaryInformation": "TextObject::Text",
+                  "type": "object"
                 },
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Behavior",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -556,7 +556,7 @@
                   "description": "Object",
                   "name": "Object",
                   "optional": false,
-                  "supplementaryInformation": "",
+                  "supplementaryInformation": "TextObject::Text",
                   "type": "object"
                 },
                 {
@@ -590,7 +590,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "GetArgumentAsNumber(\"Value\") + Object.Behavior::AddedNumber()"
+                        "GetArgumentAsNumber(\"Value\") + Object.Behavior::PropertyAddedNumber()"
                       ],
                       "subInstructions": []
                     }

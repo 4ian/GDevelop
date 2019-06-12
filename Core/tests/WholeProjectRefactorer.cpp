@@ -75,12 +75,18 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     eventsBasedBehavior.SetFullName("My events based behavior");
     eventsBasedBehavior.SetDescription("An events based behavior for test");
 
+    // Add functions
     auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
     behaviorEventsFunctions.InsertNewEventsFunction("MyBehaviorEventsFunction",
                                                     0);
     behaviorEventsFunctions
         .InsertNewEventsFunction("MyBehaviorEventsFunctionExpression", 1)
         .SetFunctionType(gd::EventsFunction::Expression);
+
+    // Add property
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("MyProperty", 0)
+        .SetType("Number");
   }
 
   // Add some usage in events
@@ -107,6 +113,18 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       gd::Instruction instruction;
       instruction.SetType(
           "MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction");
+      event.GetActions().Insert(instruction);
+      layout.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in the layout referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedBehavior::" +
+          gd::EventsBasedBehavior::GetPropertyActionName("MyProperty"));
       event.GetActions().Insert(instruction);
       layout.GetEvents().InsertEvent(event);
     }
@@ -405,6 +423,18 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyRenamedExtension::MyEventsBasedBehavior::"
             "MyBehaviorEventsFunction");
 
+    // Check if events based behaviors properties have been renamed in
+    // instructions
+    REQUIRE(static_cast<gd::StandardEvent &>(
+                project.GetLayout("LayoutWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(1))
+                .GetActions()
+                .Get(0)
+                .GetType() ==
+            "MyRenamedExtension::MyEventsBasedBehavior::"
+            "SetPropertyMyProperty");
+
     // Check events based behaviors functions have *not* been renamed in
     // expressions
     REQUIRE(static_cast<gd::StandardEvent &>(
@@ -493,6 +523,18 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyEventsExtension::MyRenamedEventsBasedBehavior::"
             "MyBehaviorEventsFunction");
 
+    // Check if events based behaviors properties have been renamed in
+    // instructions
+    REQUIRE(static_cast<gd::StandardEvent &>(
+                project.GetLayout("LayoutWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(1))
+                .GetActions()
+                .Get(0)
+                .GetType() ==
+            "MyEventsExtension::MyRenamedEventsBasedBehavior::"
+            "SetPropertyMyProperty");
+
     // Check events based behaviors functions have *not* been renamed in
     // expressions
     REQUIRE(static_cast<gd::StandardEvent &>(
@@ -553,5 +595,32 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "1 + "
             "ObjectWithMyBehavior::MyBehavior."
             "MyRenamedBehaviorEventsFunctionExpression(123)");
+  }
+  SECTION("(Events based Behavior) property renamed") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    gd::WholeProjectRefactorer::RenameBehaviorProperty(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyProperty",
+        "MyRenamedProperty");
+
+    // Check if events based behaviors property has been renamed in
+    // instructions
+    REQUIRE(static_cast<gd::StandardEvent &>(
+                project.GetLayout("LayoutWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(1))
+                .GetActions()
+                .Get(0)
+                .GetType() ==
+            "MyEventsExtension::MyEventsBasedBehavior::"
+            "SetPropertyMyRenamedProperty");
   }
 }

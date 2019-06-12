@@ -229,6 +229,43 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
         }
       };
 
+  auto renameBehaviorPropertyFunctions =
+      [&project, &eventsFunctionsExtension, &oldName, &newName](
+          const gd::EventsBasedBehavior& eventsBasedBehavior,
+          const gd::NamedPropertyDescriptor& property) {
+        gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+            project,
+            GetBehaviorEventsFunctionFullType(
+                oldName,
+                eventsBasedBehavior.GetName(),
+                gd::EventsBasedBehavior::GetPropertyActionName(
+                    property.GetName())),
+            GetBehaviorEventsFunctionFullType(
+                newName,
+                eventsBasedBehavior.GetName(),
+                gd::EventsBasedBehavior::GetPropertyActionName(
+                    property.GetName())));
+        ExposeProjectEvents(project, actionRenamer);
+
+        gd::InstructionsTypeRenamer conditionRenamer =
+            gd::InstructionsTypeRenamer(
+                project,
+                GetBehaviorEventsFunctionFullType(
+                    oldName,
+                    eventsBasedBehavior.GetName(),
+                    gd::EventsBasedBehavior::GetPropertyConditionName(
+                        property.GetName())),
+                GetBehaviorEventsFunctionFullType(
+                    newName,
+                    eventsBasedBehavior.GetName(),
+                    gd::EventsBasedBehavior::GetPropertyConditionName(
+                        property.GetName())));
+        ExposeProjectEvents(project, conditionRenamer);
+
+        // Nothing to do for expressions, expressions are not including the
+        // extension name
+      };
+
   // Order is important: we first rename the expressions then the instructions,
   // to avoid being unable to fetch the metadata (the types of parameters) of
   // instructions after they are renamed.
@@ -271,6 +308,16 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
           eventsFunction->GetFunctionType() == gd::EventsFunction::Condition) {
         renameBehaviorEventsFunction(*eventsBasedBehavior, *eventsFunction);
       }
+    }
+  }
+
+  // Behavior properties
+  for (auto&& eventsBasedBehavior :
+       eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
+    auto& behaviorProperties = eventsBasedBehavior->GetPropertyDescriptors();
+    for (auto&& propertyDescriptor : behaviorProperties.GetInternalVector()) {
+      renameBehaviorPropertyFunctions(*eventsBasedBehavior,
+                                      *propertyDescriptor);
     }
   }
 
@@ -344,6 +391,51 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
   }
 }
 
+void WholeProjectRefactorer::RenameBehaviorProperty(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::String& oldPropertyName,
+    const gd::String& newPropertyName) {
+  auto& properties = eventsBasedBehavior.GetPropertyDescriptors();
+  if (!properties.Has(oldPropertyName)) return;
+
+  const auto& property = properties.Get(oldPropertyName);
+
+  gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+      project,
+      GetBehaviorEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          eventsBasedBehavior.GetName(),
+          EventsBasedBehavior::GetPropertyActionName(oldPropertyName)),
+      GetBehaviorEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          eventsBasedBehavior.GetName(),
+          EventsBasedBehavior::GetPropertyActionName(newPropertyName)));
+  ExposeProjectEvents(project, actionRenamer);
+
+  gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
+      project,
+      GetBehaviorEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          eventsBasedBehavior.GetName(),
+          EventsBasedBehavior::GetPropertyConditionName(oldPropertyName)),
+      GetBehaviorEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          eventsBasedBehavior.GetName(),
+          EventsBasedBehavior::GetPropertyConditionName(newPropertyName)));
+  ExposeProjectEvents(project, conditionRenamer);
+
+  gd::ExpressionsRenamer expressionRenamer =
+      gd::ExpressionsRenamer(project.GetCurrentPlatform());
+  expressionRenamer.SetReplacedBehaviorExpression(
+      GetBehaviorFullType(eventsFunctionsExtension.GetName(),
+                          eventsBasedBehavior.GetName()),
+      EventsBasedBehavior::GetPropertyExpressionName(oldPropertyName),
+      EventsBasedBehavior::GetPropertyExpressionName(newPropertyName));
+  ExposeProjectEvents(project, expressionRenamer);
+}
+
 void WholeProjectRefactorer::RenameEventsBasedBehavior(
     gd::Project& project,
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,
@@ -386,6 +478,41 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
         }
       };
 
+  auto renameBehaviorProperty = [&project,
+                                 &eventsFunctionsExtension,
+                                 &eventsBasedBehavior,
+                                 &oldBehaviorName,
+                                 &newBehaviorName](
+                                    const gd::NamedPropertyDescriptor&
+                                        property) {
+    gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            oldBehaviorName,
+            EventsBasedBehavior::GetPropertyActionName(property.GetName())),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            newBehaviorName,
+            EventsBasedBehavior::GetPropertyActionName(property.GetName())));
+    ExposeProjectEvents(project, actionRenamer);
+
+    gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            oldBehaviorName,
+            EventsBasedBehavior::GetPropertyConditionName(property.GetName())),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            newBehaviorName,
+            EventsBasedBehavior::GetPropertyConditionName(property.GetName())));
+    ExposeProjectEvents(project, conditionRenamer);
+
+    // Nothing to do for expression, expressions are not including the name of
+    // the behavior
+  };
+
   // Order is important: we first rename the expressions then the instructions,
   // to avoid being unable to fetch the metadata (the types of parameters) of
   // instructions after they are renamed.
@@ -406,6 +533,12 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
         eventsFunction->GetFunctionType() == gd::EventsFunction::Condition) {
       renameBehaviorEventsFunction(*eventsFunction);
     }
+  }
+
+  // Behavior properties
+  auto& properties = eventsBasedBehavior.GetPropertyDescriptors();
+  for (auto&& property : properties.GetInternalVector()) {
+    renameBehaviorProperty(*property);
   }
 
   DoRenameBehavior(

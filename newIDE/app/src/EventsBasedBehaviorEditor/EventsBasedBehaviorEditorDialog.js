@@ -11,6 +11,7 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
+  onRenameProperty: (oldName: string, newName: string) => void,
 |};
 
 export default class EventsBasedBehaviorEditorDialog extends React.Component<
@@ -61,6 +62,7 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
           }
+          onRenameProperty={this.props.onRenameProperty}
         />
       </Dialog>
     );

@@ -19,6 +19,7 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
   onPropertiesUpdated: () => void,
+  onRenameProperty: (oldName: string, newName: string) => void,
   onTabChanged: () => void,
 |};
 
@@ -158,6 +159,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
             project={project}
             eventsBasedBehavior={eventsBasedBehavior}
             onPropertiesUpdated={this.props.onPropertiesUpdated}
+            onRenameProperty={this.props.onRenameProperty}
           />
         </Tab>
       </Tabs>

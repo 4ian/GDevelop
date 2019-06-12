@@ -122,6 +122,21 @@ class GD_CORE_API EventsBasedBehavior {
     return propertyDescriptors;
   }
 
+  /**
+   * \brief Get the name of the action to change a property.
+   */
+  static gd::String GetPropertyActionName(const gd::String& propertyName) { return "SetProperty" + propertyName; };
+
+  /**
+   * \brief Get the name of the condition to compare a property.
+   */
+  static gd::String GetPropertyConditionName(const gd::String& propertyName) { return "Property" + propertyName; };
+
+  /**
+   * \brief Get the name of the expression to get a property.
+   */
+  static gd::String GetPropertyExpressionName(const gd::String& propertyName) { return "Property" + propertyName; };
+
   /** \name Serialization
    */
   ///@{

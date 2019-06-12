@@ -293,6 +293,23 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
+  _onEventsBasedBehaviorRenamed = () => {
+    // Name of a behavior changed, so notify parent
+    // that a behavior was edited (to trigger reload of extensions)
+    if (this.props.onBehaviorEdited) this.props.onBehaviorEdited();
+
+    // Reload the selected events function, if any, as the behavior was
+    // changed so objects containers need to be re-created (otherwise,
+    // objects from objects containers will still refer to the old behavior name,
+    // done before the call to gd.WholeProjectRefactorer.renameEventsBasedBehavior).
+    if (this.state.selectedEventsFunction) {
+      this._loadEventsFunctionFrom(
+        this.props.project,
+        this.state.selectedEventsFunction
+      );
+    }
+  };
+
   _onDeleteEventsBasedBehavior = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     cb: boolean => void
@@ -341,6 +358,21 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
       this.props.eventsFunctionsExtension,
       eventsBasedBehavior
+    );
+  };
+
+  _onBehaviorPropertyRenamed = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    oldName: string,
+    newName: string
+  ) => {
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.renameBehaviorProperty(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      oldName,
+      newName
     );
   };
 
@@ -602,6 +634,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
                         i18n
                       )}
+                      onEventsBasedBehaviorRenamed={
+                        this._onEventsBasedBehaviorRenamed
+                      }
                       onEditProperties={this._editBehavior}
                     />
                   </MosaicWindow>
@@ -649,6 +684,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedBehavior={editedEventsBasedBehavior}
                 onApply={() => this._editBehavior(null)}
+                onRenameProperty={(oldName, newName) =>
+                  this._onBehaviorPropertyRenamed(
+                    editedEventsBasedBehavior,
+                    oldName,
+                    newName
+                  )
+                }
               />
             )}
           </React.Fragment>

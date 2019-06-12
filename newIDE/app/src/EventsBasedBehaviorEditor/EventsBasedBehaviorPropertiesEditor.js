@@ -24,6 +24,7 @@ type Props = {|
   project: gdProject,
   eventsBasedBehavior: gdEventsBasedBehavior,
   onPropertiesUpdated: () => void,
+  onRenameProperty: (oldName: string, newName: string) => void,
 |};
 
 const styles = {
@@ -130,7 +131,11 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               )
                                 return;
 
-                              // TODO: refactor with WholeProjectRefactorer?
+                              this.props.onRenameProperty(
+                                property.getName(),
+                                newName
+                              );
+
                               property.setName(newName);
                               this.forceUpdate();
                               this.props.onPropertiesUpdated();

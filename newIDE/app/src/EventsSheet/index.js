@@ -344,6 +344,9 @@ export default class EventsSheet extends React.Component<Props, State> {
   openInstructionEditor = (instructionContext: InstructionContext) => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
+      console.warn(
+        'state.editedInstruction.instruction was containing an instruction - deleting it. Verify the logic handling the state in EventsSheet because that should not happen.'
+      );
     }
 
     this.setState({
@@ -359,10 +362,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   closeInstructionEditor(saveChanges: boolean = false) {
-    if (this.state.editedInstruction.instruction) {
-      this.state.editedInstruction.instruction.delete();
-    }
-
+    const { instruction } = this.state.editedInstruction;
     this.setState(
       {
         editedInstruction: {
@@ -373,6 +373,12 @@ export default class EventsSheet extends React.Component<Props, State> {
         },
       },
       () => {
+        // Delete from memory the instruction being edited, *after* resetting
+        // editedInstruction and after the re-rendering, in an effort to be
+        // sure that instruction is not used after deletion.
+        if (instruction) {
+          instruction.delete();
+        }
         if (saveChanges) {
           this._saveChangesToHistory();
         }

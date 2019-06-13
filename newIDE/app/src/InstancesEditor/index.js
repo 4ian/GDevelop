@@ -54,6 +54,11 @@ export default class InstancesEditorContainer extends Component {
   }
 
   _initializeCanvasAndRenderer() {
+    // project can be used here for initializing stuff, but don't keep references to it.
+    // Instead, create editors in _mountEditorComponents (as they will be destroyed/recreated
+    // if the project changes).
+    const { project } = this.props;
+
     this.pixiRenderer = PIXI.autoDetectRenderer(
       this.props.width,
       this.props.height,
@@ -138,6 +143,8 @@ export default class InstancesEditorContainer extends Component {
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
+      initialViewX: project ? project.getMainWindowDefaultWidth() / 2 : 0,
+      initialViewY: project ? project.getMainWindowDefaultHeight() / 2 : 0,
       width: this.props.width,
       height: this.props.height,
       options: this.props.options,

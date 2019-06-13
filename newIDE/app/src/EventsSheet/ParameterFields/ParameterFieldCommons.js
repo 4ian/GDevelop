@@ -48,3 +48,14 @@ export type ParameterFieldProps = {|
   // The index of the parameter in the instruction or expression.
   parameterIndex?: number,
 |};
+
+export const getParameterValueOrDefault = (
+  value: string,
+  parameterMetadata: ?gdParameterMetadata
+) => {
+  const defaultValue =
+    parameterMetadata && parameterMetadata.isOptional()
+      ? parameterMetadata.getDefaultValue()
+      : '';
+  return value ? value : defaultValue;
+};

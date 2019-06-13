@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 
 type State = {|
@@ -70,7 +71,6 @@ export default class ObjectVariableField extends React.Component<
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
-              if (this._field) this._field.forceUpdateVariables();
             }}
           />
         )}
@@ -79,7 +79,9 @@ export default class ObjectVariableField extends React.Component<
   }
 }
 
-export const renderObjectVariable = (value: string) => {
+export const renderInlineObjectVariable = ({
+  value,
+}: ParameterInlineRendererProps) => {
   return renderVariableWithIcon(
     value,
     'res/types/objectvar.png',

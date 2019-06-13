@@ -125,6 +125,11 @@
   color: rgb(131, 55, 162);
 }
 
+.gd-events-sheet-default-theme .instruction-parameter .instruction-invalid-parameter {
+  color: #bb0000;
+  text-decoration: #bb0000 underline wavy;
+}
+
 /**
  * Search results highlight
  */

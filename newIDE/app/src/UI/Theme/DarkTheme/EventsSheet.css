@@ -132,6 +132,11 @@
   color: #18dcf2;
 }
 
+.gd-events-sheet-dark-theme .instruction-parameter .instruction-invalid-parameter {
+  color: #ff0000;
+  text-decoration: #ff0000 underline wavy;
+}
+
 /**
  * Search results highlight
  */

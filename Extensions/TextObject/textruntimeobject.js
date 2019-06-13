@@ -33,6 +33,8 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._shadowBlur = 1;
     this._shadowAngle = 0;
     this._padding = 5;
+    this._scaleX = 1;
+    this._scaleY = 1;
 
     this._str = objectData.string;
 
@@ -196,6 +198,55 @@ gdjs.TextRuntimeObject.prototype.getWidth = function() {
  */
 gdjs.TextRuntimeObject.prototype.getHeight = function() {
     return this._renderer.getHeight();
+};
+
+/**
+ * Get scale of the text.
+ */
+gdjs.TextRuntimeObject.prototype.getScale = function() {
+    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0; 
+};
+
+/**
+ * Get y-scale of the text.
+ */
+gdjs.TextRuntimeObject.prototype.getScaleX = function() {
+    return this._renderer.getScaleX();
+};
+
+/**
+ * Get x-scale of the text.
+ */
+gdjs.TextRuntimeObject.prototype.getScaleY = function() {
+    return this._renderer.getScaleY();
+};
+
+/**
+ * Set the text object scale.
+ * @param {number} newScale The new scale for the text object.
+ */
+gdjs.TextRuntimeObject.prototype.setScale = function(newScale) {
+    this._scaleX = newScale;
+    this._scaleY = newScale;
+    this._renderer.setScale(newScale);
+};
+
+/**
+ * Set the text object x-scale.
+ * @param {number} newScale The new x-scale for the text object.
+ */
+gdjs.TextRuntimeObject.prototype.setScaleX = function(newScale) {
+    this._scaleX = newScale;
+    this._renderer.setScaleX(newScale);
+};
+
+/**
+ * Set the text object y-scale.
+ * @param {number} newScale The new y-scale for the text object.
+ */
+gdjs.TextRuntimeObject.prototype.setScaleY = function(newScale) {
+    this._scaleY = newScale;
+    this._renderer.setScaleY(newScale);
 };
 
 /**

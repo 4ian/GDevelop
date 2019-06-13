@@ -1,10 +1,13 @@
 // @flow
 import React, { Component } from 'react';
-import { mapFor } from '../../Utils/MapFor';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import { enumerateLayouts } from '../../ProjectManager/EnumerateProjectItems';
 
-export default class LayerField extends Component<ParameterFieldProps, {||}> {
+export default class SceneNameField extends Component<
+  ParameterFieldProps,
+  {||}
+> {
   _field: ?SemiControlledAutoComplete;
 
   focus() {
@@ -12,12 +15,15 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
   }
 
   render() {
-    const { value, onChange, isInline, layout, parameterMetadata } = this.props;
-    const layerNames = layout
-      ? mapFor(0, layout.getLayersCount(), i => {
-          const layer = layout.getLayerAt(i);
-          return layer.getName();
-        })
+    const {
+      value,
+      onChange,
+      isInline,
+      project,
+      parameterMetadata,
+    } = this.props;
+    const layoutNames = project
+      ? enumerateLayouts(project).map(layout => layout.getName())
       : [];
 
     return (
@@ -28,9 +34,9 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
         value={value}
         onChange={onChange}
         openOnFocus={isInline}
-        dataSource={layerNames.map(layerName => ({
-          text: layerName || '(Base layer)',
-          value: `"${layerName}"`,
+        dataSource={layoutNames.map(layoutName => ({
+          text: layoutName,
+          value: `"${layoutName}"`,
         }))}
         hintText={'""'}
         ref={field => (this._field = field)}

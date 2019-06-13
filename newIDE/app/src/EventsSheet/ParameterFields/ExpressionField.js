@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import GenericExpressionField from './GenericExpressionField';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 
 export default class ExpressionField extends Component<
   ParameterFieldProps,

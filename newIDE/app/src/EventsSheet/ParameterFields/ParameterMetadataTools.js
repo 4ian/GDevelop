@@ -1,5 +1,5 @@
 // @flow
-import { type ExpressionParameters } from './ParameterFieldProps.flow';
+import { type ExpressionParameters } from './ParameterFieldCommons';
 const gd = global.gd;
 
 /**

@@ -1,10 +1,13 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import {
+  type ParameterFieldProps,
+  getParameterValueOrDefault,
+} from './ParameterFieldCommons';
 
 const styles = {
   button: {
@@ -23,10 +26,11 @@ export default class TrueFalseField extends Component<
   focus() {}
 
   render() {
-    const { parameterMetadata } = this.props;
+    const { parameterMetadata, value } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
+    const effectiveValue = getParameterValueOrDefault(value, parameterMetadata);
 
     return (
       <Line>
@@ -35,7 +39,7 @@ export default class TrueFalseField extends Component<
           <RaisedButton
             style={styles.button}
             label={<Trans>True</Trans>}
-            primary={this.props.value === 'True'}
+            primary={effectiveValue === 'True'}
             onClick={() => this.props.onChange('True')}
           />
         </Column>
@@ -43,7 +47,7 @@ export default class TrueFalseField extends Component<
           <RaisedButton
             style={styles.button}
             label={<Trans>False</Trans>}
-            primary={this.props.value !== 'True'}
+            primary={effectiveValue !== 'True'}
             onClick={() => this.props.onChange('False')}
           />
         </Column>
@@ -51,3 +55,14 @@ export default class TrueFalseField extends Component<
     );
   }
 }
+
+export const renderInlineTrueFalse = ({
+  value,
+  parameterMetadata,
+}: ParameterInlineRendererProps) => {
+  if (getParameterValueOrDefault(value, parameterMetadata) === 'True') {
+    return <Trans>true</Trans>;
+  } else {
+    return <Trans>false</Trans>;
+  }
+};

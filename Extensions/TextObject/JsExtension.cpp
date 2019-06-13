@@ -33,6 +33,24 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::Scale"]
+        .SetFunctionName("setScale")
+        .SetGetter("getScale")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllActionsForObject("TextObject::Text")["TextObject::ScaleX"]
+        .SetFunctionName("setScaleX")
+        .SetGetter("getScaleX")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::ScaleX"]
+        .SetFunctionName("getScaleX")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllActionsForObject("TextObject::Text")["TextObject::ScaleY"]
+        .SetFunctionName("setScaleY")
+        .SetGetter("getScaleY")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::ScaleY"]
+        .SetFunctionName("getScaleY")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::String"]
         .SetFunctionName("setString")
         .SetGetter("getString")
@@ -102,6 +120,12 @@ class TextObjectJsExtension : public gd::PlatformExtension {
 
     GetAllExpressionsForObject("TextObject::Text")["Padding"]
         .SetFunctionName("getPadding")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllExpressionsForObject("TextObject::Text")["ScaleX"]
+        .SetFunctionName("getScaleX")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllExpressionsForObject("TextObject::Text")["ScaleY"]
+        .SetFunctionName("getScaleY")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllExpressionsForObject("TextObject::Text")["Opacity"]
         .SetFunctionName("getOpacity")

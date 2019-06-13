@@ -123,6 +123,24 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
+         "ChangeGradient",
+         _("Gradient"),
+         _("Change the gradient of the text."),
+         _("Change gradient of _PARAM0_ to colors _PARAM1_ _PARAM2_ _PARAM3_ _PARAM4_ type _PARAM5_"),
+         _("Effects"),
+         "res/actions/textGradient24.png",
+         "res/actions/textGradient.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("color", _("First Color"))
+      .AddParameter("color", _("Second Color"))
+      .AddParameter("color", _("Third Color"))
+      .AddParameter("color", _("Fourth Color"))
+      .AddParameter("stringWithSelector", _("Gradient type"), "[\"LINEAR_VERTICAL\", \"LINEAR_HORIZONTAL\"]", false)
+      .SetFunctionName("SetGradient")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
          "ChangeOutline",
          _("Outline"),
          _("Change the outline of the text. A thickness of 0 disables the outline."),

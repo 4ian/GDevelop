@@ -20,6 +20,8 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._italic = objectData.italic;
     this._underlined = objectData.underlined;
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+    this._gradient = [];
+    this._gradientType = '';
     this.opacity = 255;
     this._wrapping = false;
     this._wrappingWidth = 1;
@@ -285,6 +287,63 @@ gdjs.TextRuntimeObject.prototype.setShadow = function(str, distance, blur, angle
     this._shadowBlur = blur;
     this._shadowAngle = angle;
     this._shadow = true;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Set the gradient for the text object.
+ * @param {String} strFirstColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {String} strSecondColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {String} strThirdColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {String} strFourthColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {number} strGradientType gradient type
+ */
+gdjs.TextRuntimeObject.prototype.setGradient = function(strFirstColor, strSecondColor, strThirdColor, strFourthColor, strGradientType) {
+    var colorFirst = strFirstColor.split(";");
+    var colorSecond = strSecondColor.split(";");
+    var colorThird = strThirdColor.split(";");
+    var colorFourth = strFourthColor.split(";");
+
+    this._gradient = [];
+
+    if (colorFirst.length == 3){
+        this._gradient.push([
+            parseInt(colorFirst[0], 10),
+            parseInt(colorFirst[1], 10),
+            parseInt(colorFirst[2], 10)
+        ]);
+    }
+
+    if (colorSecond.length == 3){
+        this._gradient.push([
+            parseInt(colorSecond[0], 10),
+            parseInt(colorSecond[1], 10),
+            parseInt(colorSecond[2], 10)
+        ]);
+    }
+
+    if (colorThird.length == 3){
+        this._gradient.push([
+            parseInt(colorThird[0], 10),
+            parseInt(colorThird[1], 10),
+            parseInt(colorThird[2], 10)
+        ]);
+    }
+
+    if (colorFourth.length == 3){
+        this._gradient.push([
+            parseInt(colorFourth[0], 10),
+            parseInt(colorFourth[1], 10),
+            parseInt(colorFourth[2], 10)
+        ]);
+    }
+
+    this._gradientType = strGradientType;
+
+    if (this._gradient.length < 1){
+        this._gradient = this._color.slice();
+    }
+
     this._renderer.updateStyle();
 };
 

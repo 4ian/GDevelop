@@ -117,6 +117,10 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setColor")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::ChangeGradient"]
+        .SetFunctionName("setGradient")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::ChangeOutline"]
         .SetFunctionName("setOutline")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");

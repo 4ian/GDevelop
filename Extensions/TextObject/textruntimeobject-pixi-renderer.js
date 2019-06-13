@@ -36,11 +36,19 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     style.fontWeight = this._object._bold ? 'bold' : 'normal';
     style.fontSize = this._object._characterSize;
     style.fontFamily = fontName;
-    style.fill = gdjs.rgbToHexNumber(
-        this._object._color[0],
-        this._object._color[1],
-        this._object._color[2]
-    );
+
+    if (this._object._gradient.length > 1){
+        style.fill = gdjs.TextRuntimeObjectPixiRenderer.prototype._getGradientHex.call(this);
+    } else {
+        style.fill = gdjs.TextRuntimeObjectPixiRenderer.prototype._getColorHex.call(this);
+    }
+
+    if (this._object._gradientType == 'LINEAR_VERTICAL'){
+        style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_VERTICAL;
+    } else {
+        style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_HORIZONTAL;
+    }
+
     style.wordWrap = this._object._wrapping;
     style.wordWrapWidth = this._object._wrappingWidth;
     style.breakWords = true;
@@ -92,3 +100,26 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.getWidth = function() {
 gdjs.TextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
     return this._text.height;
 };
+
+gdjs.TextRuntimeObjectPixiRenderer.prototype._getColorHex = function() {
+    return gdjs.rgbToHexNumber(
+        this._object._color[0],
+        this._object._color[1],
+        this._object._color[2]
+    );
+}
+
+gdjs.TextRuntimeObjectPixiRenderer.prototype._getGradientHex = function() {
+    var gradient = [];
+    var color;
+    for (color = 0; color < this._object._gradient.length; color++){
+        gradient.push(
+            '#' + gdjs.rgbToHex(
+                this._object._gradient[color][0],
+                this._object._gradient[color][1],
+                this._object._gradient[color][2]
+            )
+        );
+    } 
+    return gradient;
+}

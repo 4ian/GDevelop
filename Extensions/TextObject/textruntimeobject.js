@@ -20,6 +20,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._italic = objectData.italic;
     this._underlined = objectData.underlined;
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+    this._useGradient = false;
     this._gradient = [];
     this._gradientType = '';
     this.opacity = 255;
@@ -260,6 +261,9 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
     this._color[0] = parseInt(color[0], 10);
     this._color[1] = parseInt(color[1], 10);
     this._color[2] = parseInt(color[2], 10);
+
+    this._useGradient = false;
+
     this._renderer.updateStyle();
 };
 
@@ -390,6 +394,8 @@ gdjs.TextRuntimeObject.prototype.setGradient = function(strFirstColor, strSecond
     }
 
     this._gradientType = strGradientType;
+
+    this._useGradient = (this._gradient.length > 1) ? true : false; 
 
     this._renderer.updateStyle();
 };

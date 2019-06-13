@@ -37,7 +37,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     style.fontSize = this._object._characterSize;
     style.fontFamily = fontName;
 
-    if (this._object._gradient.length > 1){
+    if (this._object._useGradient){
         style.fill = gdjs.TextRuntimeObjectPixiRenderer.prototype._getGradientHex.call(this);
     } else {
         style.fill = gdjs.TextRuntimeObjectPixiRenderer.prototype._getColorHex.call(this);

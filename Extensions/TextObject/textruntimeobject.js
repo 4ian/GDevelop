@@ -340,10 +340,6 @@ gdjs.TextRuntimeObject.prototype.setGradient = function(strFirstColor, strSecond
 
     this._gradientType = strGradientType;
 
-    if (this._gradient.length < 1){
-        this._gradient = this._color.slice();
-    }
-
     this._renderer.updateStyle();
 };
 

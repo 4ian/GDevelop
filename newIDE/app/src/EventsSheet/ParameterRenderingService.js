@@ -1,37 +1,44 @@
 // @flow
 import * as React from 'react';
+import {
+  type ParameterInlineRenderer,
+  type ParameterInlineRendererProps,
+} from './ParameterFields/ParameterInlineRenderer.flow';
 import DefaultField from './ParameterFields/DefaultField';
-import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
+import RelationalOperatorField, {
+  renderInlineRelationalOperator,
+} from './ParameterFields/RelationalOperatorField';
 import OperatorField from './ParameterFields/OperatorField';
-import MouseField from './ParameterFields/MouseField';
-import KeyField from './ParameterFields/KeyField';
+import MouseField, { renderInlineMouse } from './ParameterFields/MouseField';
+import KeyField, { renderInlineKey } from './ParameterFields/KeyField';
 import ObjectField, {
-  renderObjectWithThumbnail,
+  renderInlineObjectWithThumbnail,
 } from './ParameterFields/ObjectField';
-import YesNoField from './ParameterFields/YesNoField';
-import TrueFalseField from './ParameterFields/TrueFalseField';
+import YesNoField, { renderInlineYesNo } from './ParameterFields/YesNoField';
+import TrueFalseField, {
+  renderInlineTrueFalse,
+} from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
 import BehaviorField from './ParameterFields/BehaviorField';
-
 import SceneVariableField, {
-  renderSceneVariable,
+  renderInlineSceneVariable,
 } from './ParameterFields/SceneVariableField';
 import GlobalVariableField, {
-  renderGlobalVariable,
+  renderInlineGlobalVariable,
 } from './ParameterFields/GlobalVariableField';
 import ObjectVariableField, {
-  renderObjectVariable,
+  renderInlineObjectVariable,
 } from './ParameterFields/ObjectVariableField';
-
 import LayerField from './ParameterFields/LayerField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
 import ForceMultiplierField, {
-  renderForceMultiplierString,
+  renderInlineForceMultiplier,
 } from './ParameterFields/ForceMultiplierField';
+import SceneNameField from './ParameterFields/SceneNameField';
 const gd = global.gd;
 
 const components = {
@@ -59,14 +66,19 @@ const components = {
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
+  sceneName: SceneNameField,
 };
-
-const stringRenderers = {
-  forceMultiplier: renderForceMultiplierString,
-  globalvar: renderGlobalVariable,
-  scenevar: renderSceneVariable,
-  objectvar: renderObjectVariable,
-  object: renderObjectWithThumbnail,
+const inlineRenderers: { [string]: ParameterInlineRenderer } = {
+  forceMultiplier: renderInlineForceMultiplier,
+  globalvar: renderInlineGlobalVariable,
+  scenevar: renderInlineSceneVariable,
+  objectvar: renderInlineObjectVariable,
+  key: renderInlineKey,
+  mouse: renderInlineMouse,
+  object: renderInlineObjectWithThumbnail,
+  yesorno: renderInlineYesNo,
+  trueorfalse: renderInlineTrueFalse,
+  relationalOperator: renderInlineRelationalOperator,
 };
 
 export default {
@@ -77,13 +89,14 @@ export default {
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
   },
-  renderParameterString: (
-    type: string,
-    value: string,
-    renderObjectThumnail: string => React.Node
-  ) => {
-    return stringRenderers[type]
-      ? stringRenderers[type](value, renderObjectThumnail)
-      : value;
+  renderInlineParameter: (props: ParameterInlineRendererProps): React.Node => {
+    const rawType = props.parameterMetadata.getType();
+    const fieldType = gd.ParameterMetadata.isObject(rawType)
+      ? 'object'
+      : rawType;
+
+    return inlineRenderers[fieldType]
+      ? inlineRenderers[fieldType](props)
+      : props.value;
   },
 };

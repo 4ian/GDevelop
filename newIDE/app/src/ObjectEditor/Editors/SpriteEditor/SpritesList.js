@@ -21,6 +21,7 @@ import {
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 const gd = global.gd;
 const path = require('path');
 
@@ -185,6 +186,7 @@ export default class SpritesList extends Component<Props, void> {
 
     onChooseResource(sources[0].name).then(resources => {
       resources.forEach(resource => {
+        applyResourceDefaults(project, resource);
         project.getResourcesManager().addResource(resource);
 
         const sprite = new gd.Sprite();
@@ -197,6 +199,10 @@ export default class SpritesList extends Component<Props, void> {
         }
         direction.addSprite(sprite);
       });
+
+      // Important, we are responsible for deleting the resources that were given to us.
+      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+      resources.forEach(resource => resource.delete());
 
       this.forceUpdate();
     });

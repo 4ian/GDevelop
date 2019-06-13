@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 
 type State = {|
   editorOpen: boolean,
@@ -44,7 +45,6 @@ export default class SceneVariableField extends React.Component<
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
-              if (this._field) this._field.forceUpdateVariables();
             }}
             emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
             emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
@@ -55,7 +55,9 @@ export default class SceneVariableField extends React.Component<
   }
 }
 
-export const renderSceneVariable = (value: string) => {
+export const renderInlineSceneVariable = ({
+  value,
+}: ParameterInlineRendererProps) => {
   return renderVariableWithIcon(
     value,
     'res/types/scenevar.png',

@@ -173,7 +173,8 @@ class GD_CORE_API ParameterMetadata {
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
              parameterType == "joyaxis" ||
-             parameterType == "stringWithSelector";
+             parameterType == "stringWithSelector" ||
+             parameterType == "sceneName";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";

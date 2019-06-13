@@ -1,19 +1,34 @@
+// @flow
 import * as PIXI from 'pixi.js';
 
+type Props = {|
+  initialViewX: number,
+  initialViewY: number,
+  width: number,
+  height: number,
+  options: any,
+|};
+
 export default class ViewPosition {
-  constructor({ width, height, options }) {
-    this.viewX = width / 2;
-    this.viewY = height / 2;
+  viewX: number = 0;
+  viewY: number = 0;
+  _width: number;
+  _height: number;
+  options: any;
+  _pixiContainer = new PIXI.Container();
+
+  constructor({ initialViewX, initialViewY, width, height, options }: Props) {
+    this.viewX = initialViewX;
+    this.viewY = initialViewY;
     this.options = options;
-    this._pixiContainer = new PIXI.Container();
     this.resize(width, height);
   }
 
-  setOptions(options) {
+  setOptions(options: any) {
     this.options = options;
   }
 
-  resize(width, height) {
+  resize(width: number, height: number) {
     this._width = width;
     this._height = height;
   }
@@ -30,7 +45,7 @@ export default class ViewPosition {
    * Convert a point from the canvas coordinates (for example, the mouse position) to the
    * "world" coordinates.
    */
-  toSceneCoordinates = (x, y) => {
+  toSceneCoordinates = (x: number, y: number): [number, number] => {
     x -= this._width / 2;
     y -= this._height / 2;
     x /= Math.abs(this._pixiContainer.scale.x);
@@ -52,7 +67,7 @@ export default class ViewPosition {
    * Convert a point from the "world" coordinates (for example, an object position) to the
    * canvas coordinates.
    */
-  toCanvasCoordinates = (x, y) => {
+  toCanvasCoordinates = (x: number, y: number): [number, number] => {
     x -= this.viewX;
     y -= this.viewY;
 
@@ -71,17 +86,17 @@ export default class ViewPosition {
     return [x + this._width / 2, y + this._height / 2];
   };
 
-  scrollBy(x, y) {
+  scrollBy(x: number, y: number) {
     this.viewX += x;
     this.viewY += y;
   }
 
-  scrollTo(x, y) {
+  scrollTo(x: number, y: number) {
     this.viewX = x;
     this.viewY = y;
   }
 
-  scrollToInstance(instance) {
+  scrollToInstance(instance: gdInitialInstance) {
     this.viewX = instance.getX();
     this.viewY = instance.getY();
   }

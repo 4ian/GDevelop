@@ -29,6 +29,7 @@ import {
 } from 'react-dnd';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
+import InvalidParameterValue from './InvalidParameterValue';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -96,7 +97,7 @@ class Instruction extends React.Component<Props, *> {
    * has not particular styling.
    */
   _renderInstructionText = (metadata: gdInstructionMetadata) => {
-    const { instruction, disabled } = this.props;
+    const { instruction, disabled, renderObjectThumbnail } = this.props;
     const formattedTexts = instrFormatter.getAsFormattedText(
       instruction,
       metadata
@@ -118,7 +119,8 @@ class Instruction extends React.Component<Props, *> {
           if (!isParameter)
             return <span key={i}>{formattedTexts.getString(i)}</span>;
 
-          const parameterType = metadata.getParameter(parameterIndex).getType();
+          const parameterMetadata = metadata.getParameter(parameterIndex);
+          const parameterType = parameterMetadata.getType();
           return (
             <span
               key={i}
@@ -131,11 +133,12 @@ class Instruction extends React.Component<Props, *> {
                 this.props.onParameterClick(domEvent, parameterIndex)
               }
             >
-              {ParameterRenderingService.renderParameterString(
-                parameterType,
-                formattedTexts.getString(i),
-                this.props.renderObjectThumbnail
-              )}
+              {ParameterRenderingService.renderInlineParameter({
+                value: formattedTexts.getString(i),
+                parameterMetadata,
+                renderObjectThumbnail,
+                InvalidParameterValue,
+              })}
             </span>
           );
         })}

@@ -15,6 +15,7 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import IconMenu from '../UI/Menu/IconMenu';
 import ResourcesLoader from '../ResourcesLoader';
 import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
+import { applyResourceDefaults } from './ResourceUtils';
 
 type Props = {|
   project: gdProject,
@@ -121,6 +122,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       .then(resources => {
         if (!resources.length) return;
         const resource = resources[0];
+        applyResourceDefaults(project, resource);
 
         // addResource will check if a resource with the same name exists, and if it is
         // the case, no new resource will be added.
@@ -128,6 +130,10 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
         this._loadFrom(project.getResourcesManager());
         this._onUpdate(resource.getName());
+
+        // Important, we are responsible for deleting the resources that were given to us.
+        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+        resources.forEach(resource => resource.delete());
       })
       .catch(err => {
         // TODO: Display an error message

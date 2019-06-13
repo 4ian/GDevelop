@@ -108,6 +108,84 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  obj.AddCondition("ScaleX",
+                   _("Scale on X axis"),
+                   _("Compare the scale of the text on the X axis"),
+                   _("The X scale of the text _PARAM0_ is _PARAM1__PARAM2_"),
+                   "Scale",
+                   "res/conditions/scaleWidth24.png",
+                   "res/conditions/scaleWidth.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("expression", _("x-scale to test"))
+      .SetFunctionName("GetScaleX")
+      .SetManipulatedType("number")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
+         "ScaleX",
+         _("Scale on X axis"),
+         _("Modify the scale of the text on the X axis (default scale is 1)"),
+         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_ on the X axis"),
+         _("Scale"),
+         "res/actions/scaleWidth24.png",
+         "res/actions/scaleWidth.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .SetFunctionName("SetScaleX")
+      .SetManipulatedType("number")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddCondition("ScaleY",
+                   _("Scale on Y axis"),
+                   _("Compare the scale of the text on the Y axis"),
+                   _("The Y scale of the text _PARAM0_ is _PARAM1__PARAM2_"),
+                   "Scale",
+                   "res/conditions/scaleHeight24.png",
+                   "res/conditions/scaleHeight.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("expression", _("y-scale to test"))
+      .SetFunctionName("GetScaleY")
+      .SetManipulatedType("number")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
+         "ScaleY",
+         _("Scale on Y axis"),
+         _("Modify the scale of the text on the Y axis (default scale is 1)"),
+         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_ on the Y axis"),
+         _("Scale"),
+         "res/actions/scaleHeight24.png",
+         "res/actions/scaleHeight.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .SetFunctionName("SetScaleY")
+      .SetManipulatedType("number")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
+         "Scale",
+         _("Scale"),
+         _("Modify the scale of the specified object (default scale is 1)"),
+         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
+         _("Scale"),
+         "res/actions/scale24.png",
+         "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .SetFunctionName("SetScale")
+      .SetManipulatedType("number")
+      .SetIncludeFile("TextObject/TextObject.h");
+
   obj.AddAction(
          "ChangeColor",
          _("Color"),
@@ -334,6 +412,24 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
       .SetManipulatedType("number");
+
+  obj.AddExpression("ScaleX",
+                    _("X Scale of a Text object"),
+                    _("X Scale of a Text object"),
+                    _("Scale"),
+                    "res/actions/scaleWidth.png")
+      .AddParameter("object", _("Object"), "Text")
+      .SetFunctionName("GetScaleX")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddExpression("ScaleY",
+                    _("Y Scale of a Text object"),
+                    _("Y Scale of a Text object"),
+                    _("Scale"),
+                    "res/actions/scaleHeight.png")
+      .AddParameter("object", _("Object"), "Text")
+      .SetFunctionName("GetScaleY")
+      .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddExpression("Opacity",
                     _("Opacity of a Text object"),

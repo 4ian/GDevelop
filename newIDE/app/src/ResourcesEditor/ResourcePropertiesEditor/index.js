@@ -84,7 +84,10 @@ export default class ResourcePropertiesEditor extends React.Component<
     onChooseResource(sources[0].name).then(resources => {
       if (!resources.length) return; // No path was chosen by the user.
       resource.setFile(resources[0].getFile());
-      resources.forEach(resource => resource.delete()); // Important, we are responsible for deleting the resources that were given to us. Otherwise we have a memory leak.
+
+      // Important, we are responsible for deleting the resources that were given to us.
+      // Otherwise we have a memory leak.
+      resources.forEach(resource => resource.delete());
 
       onResourcePathUpdated();
       this.forceUpdate();

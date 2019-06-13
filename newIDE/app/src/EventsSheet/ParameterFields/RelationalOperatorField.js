@@ -27,14 +27,24 @@ export default class RelationalOperatorField extends Component {
         <MenuItem value=">" primaryText={<Trans>&gt; (greater than)</Trans>} />
         <MenuItem
           value="<="
-          primaryText={<Trans>&lt;= (less or equal to)</Trans>}
+          primaryText={<Trans>&le; (less or equal to)</Trans>}
         />
         <MenuItem
           value=">="
-          primaryText={<Trans>&gt;= (greater or equal to)</Trans>}
+          primaryText={<Trans>&ge; (greater or equal to)</Trans>}
         />
-        <MenuItem value="!=" primaryText={<Trans>!= (different than)</Trans>} />
+        <MenuItem value="!=" primaryText={<Trans>&ne; (not equal to)</Trans>} />
       </SelectField>
     );
   }
 }
+
+export const renderInlineRelationalOperator = ({
+  value,
+}: ParameterInlineRendererProps) => {
+  if (value === '<=') return '\u2264';
+  if (value === '>=') return '\u2265';
+  else if (value === '!=') return '\u2260';
+
+  return value;
+};

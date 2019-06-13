@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 
 export default class VideoResourceField extends Component<
   ParameterFieldProps,

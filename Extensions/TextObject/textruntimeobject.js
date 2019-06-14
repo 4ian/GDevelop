@@ -402,10 +402,10 @@ gdjs.TextRuntimeObject.prototype.setGradient = function(strFirstColor, strSecond
 
 /**
  * Show the shadow of the text object.
- * @param {number} value boolean show the shadow (1 = enabled / 0 = disabled)
+ * @param {Boolean} enable true to show the shadow, false to hide it
  */
-gdjs.TextRuntimeObject.prototype.showShadow = function(value) {
-    this._shadow = (value == 1) ? true : false;
+gdjs.TextRuntimeObject.prototype.showShadow = function(enable) {
+    this._shadow = enable;
     this._renderer.updateStyle();
 };
 

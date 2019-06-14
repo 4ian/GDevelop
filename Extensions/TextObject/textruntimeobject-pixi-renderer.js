@@ -38,12 +38,12 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     style.fontFamily = fontName;
 
     if (this._object._useGradient){
-        style.fill = gdjs.TextRuntimeObjectPixiRenderer.prototype._getGradientHex.call(this);
+        style.fill = this._getGradientHex();
     } else {
-        style.fill = gdjs.TextRuntimeObjectPixiRenderer.prototype._getColorHex.call(this);
+        style.fill = this._getColorHex();
     }
 
-    if (this._object._gradientType == 'LINEAR_VERTICAL'){
+    if (this._object._gradientType === 'LINEAR_VERTICAL'){
         style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_VERTICAL;
     } else {
         style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_HORIZONTAL;
@@ -111,13 +111,12 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype._getColorHex = function() {
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype._getGradientHex = function() {
     var gradient = [];
-    var color;
-    for (color = 0; color < this._object._gradient.length; color++){
+    for (var colorIndex = 0; colorIndex < this._object._gradient.length; colorIndex++){
         gradient.push(
             '#' + gdjs.rgbToHex(
-                this._object._gradient[color][0],
-                this._object._gradient[color][1],
-                this._object._gradient[color][2]
+                this._object._gradient[colorIndex][0],
+                this._object._gradient[colorIndex][1],
+                this._object._gradient[colorIndex][2]
             )
         );
     } 

@@ -38,7 +38,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-      .AddParameter("object", _("Tiled Sprite Object"), "TiledSprite")
+      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
       .SetManipulatedType("number")
@@ -54,7 +54,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/opacity24.png",
                 "res/actions/opacity.png")
 
-      .AddParameter("object", _("Tiled Sprite Object"), "TiledSprite")
+      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value (between 0 and 255)"))
       .SetManipulatedType("number")
@@ -66,8 +66,22 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                     _("Opacity"),
                     _("Visibility"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Tiled Sprite Object"), "TiledSprite")
+      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
       .SetFunctionName("getOpacity")
+      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+  obj.AddAction(
+         "SetColor",
+         _("Global color"),
+         _("Change the global color of a Tiled Sprite. The default color is white."),
+         _("Change color of _PARAM0_ to _PARAM1_"),
+         _("Effects"),
+         "res/actions/color24.png",
+         "res/actions/color.png")
+
+      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
+      .AddParameter("color", _("Color"))
+      .SetFunctionName("setColor")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
   obj.AddAction("Width",

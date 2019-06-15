@@ -70,3 +70,15 @@ gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.updateXOffset = function() {
 gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.updateYOffset = function() {
     this._tiledSprite.tilePosition.y = -this._object._yOffset;
 };
+
+gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.setColor = function(rgbColor) {
+    var colors = rgbColor.split(";");
+    if ( colors.length < 3 ) return;
+ 
+    this._tiledSprite.tint = "0x" + gdjs.rgbToHex(parseInt(colors[0], 10), parseInt(colors[1], 10), parseInt(colors[2], 10));
+ };
+ 
+ gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.getColor = function() {
+     var rgb = PIXI.utils.hex2rgb(this._tiledSprite.tint)
+     return Math.floor(rgb[0]*255) + ';' + Math.floor(rgb[1]*255) + ';' + Math.floor(rgb[2]*255);
+ }

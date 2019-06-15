@@ -172,3 +172,21 @@ gdjs.TiledSpriteRuntimeObject.prototype.setOpacity = function(opacity) {
 gdjs.TiledSpriteRuntimeObject.prototype.getOpacity = function() {
     return this.opacity;
 };
+
+/**
+ * Change the tint of the tiled sprite object.
+ *
+ * @param {string} rgbColor The color, in RGB format ("128;200;255").
+ */
+gdjs.TiledSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
+    this._renderer.setColor(rgbColor);
+};
+
+/**
+ * Get the tint of the tiled sprite object.
+ *
+ * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ */
+gdjs.SpriTiledSpriteRuntimeObjectteRuntimeObject.prototype.getColor = function() {
+    return this._renderer.getColor();
+};

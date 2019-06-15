@@ -210,11 +210,11 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/textGradient.png")
 
       .AddParameter("object", _("Object"), "Text")
+      .AddParameter("stringWithSelector", _("Gradient type"), "[\"LINEAR_VERTICAL\", \"LINEAR_HORIZONTAL\"]", false)
       .AddParameter("color", _("First Color"))
       .AddParameter("color", _("Second Color"))
       .AddParameter("color", _("Third Color"))
       .AddParameter("color", _("Fourth Color"))
-      .AddParameter("stringWithSelector", _("Gradient type"), "[\"LINEAR_VERTICAL\", \"LINEAR_HORIZONTAL\"]", false)
       .SetFunctionName("SetGradient")
       .SetIncludeFile("TextObject/TextObject.h");
 
@@ -234,7 +234,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
-         "ChangeShadow",
+         "SetShadow",
          _("Change Shadow"),
          _("Change the shadow of the text."),
          _("Change the shadow of _PARAM0_ to color _PARAM1_ distance _PARAM2_ blur _PARAM3_ angle _PARAM4_"),
@@ -428,7 +428,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
-  obj.AddCondition("Padding",
+  obj.AddCondition("GetPadding",
                    _("Padding"),
                    _("Compare the number of pixels around a text object. If you text gets cropped due to shadow effects or an outline raise this value."),
                    _("The padding of _PARAM0_ is _PARAM1__PARAM2_"),
@@ -443,7 +443,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
-  obj.AddAction("Padding",
+  obj.AddAction("SetPadding",
                 _("Padding"),
                 _("Set the number of pixels around a text object. If you text gets cropped due to shadow effects or an outline raise this value."),
                 _("Do _PARAM1__PARAM2_ to the padding of _PARAM0_"),
@@ -456,6 +456,35 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Value"))
       .SetManipulatedType("number")
       .SetFunctionName("SetPadding")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddAction(
+         "SetTextAlignment",
+         _("Alignment"),
+         _("Set the text alignment of a multiline text object. (Does not work with single line texts)"),
+         _("Align _PARAM0_: _PARAM1_"),
+         _("Style"),
+         "res/actions/textAlign24.png",
+         "res/actions/textAlign.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("stringWithSelector", _("Alignment"), "[\"left\", \"center\", \"right\"]", false)
+      .SetFunctionName("SetTextAlignment")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddCondition("GetTextAlignment",
+                   _("Alignment"),
+                   _("Compare the text alignment of a multiline text object."),
+                   _("The alignment of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Style"),
+                   "res/conditions/textAlign24.png",
+                   "res/conditions/textAlign.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("string", _("Text to test"))
+      .SetManipulatedType("string")
+      .SetFunctionName("GetTextAlignment")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(

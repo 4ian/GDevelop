@@ -24,6 +24,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._gradient = [];
     this._gradientType = '';
     this.opacity = 255;
+    this._textAlign = 'left';
     this._wrapping = false;
     this._wrappingWidth = 1;
     this._outlineThickness = 0;
@@ -276,6 +277,23 @@ gdjs.TextRuntimeObject.prototype.getColor = function(str) {
 };
 
 /**
+ * Set the text alignment for multiline text objects.
+ * @param {String} alignment The text alignment.
+ */
+gdjs.TextRuntimeObject.prototype.setTextAlignment = function(alignment) {
+    this._textAlign = alignment;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Get the text alignment of text object.
+ * @return {String} The text alignment.
+ */
+gdjs.TextRuntimeObject.prototype.getTextAlignment = function() {
+    return this._textAlign;
+};
+
+/**
  * Return true if word wrapping is enabled for the text.
  */
 gdjs.TextRuntimeObject.prototype.isWrapping = function() {
@@ -353,7 +371,7 @@ gdjs.TextRuntimeObject.prototype.setShadow = function(str, distance, blur, angle
  * @param {String} strFourthColor color as a "R;G;B" string, for example: "255;0;0"
  * @param {number} strGradientType gradient type
  */
-gdjs.TextRuntimeObject.prototype.setGradient = function(strFirstColor, strSecondColor, strThirdColor, strFourthColor, strGradientType) {
+gdjs.TextRuntimeObject.prototype.setGradient = function(strGradientType, strFirstColor, strSecondColor, strThirdColor, strFourthColor) {
     var colorFirst = strFirstColor.split(";");
     var colorSecond = strSecondColor.split(";");
     var colorThird = strThirdColor.split(";");

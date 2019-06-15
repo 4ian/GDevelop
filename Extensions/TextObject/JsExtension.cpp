@@ -102,14 +102,21 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("isWrapping")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
-    GetAllActionsForObject("TextObject::Text")["TextObject::Padding"]
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetPadding"]
         .SetFunctionName("setPadding")
         .SetGetter("getPadding")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
-    GetAllConditionsForObject("TextObject::Text")["TextObject::Padding"]
+    GetAllConditionsForObject("TextObject::Text")["TextObject::GetPadding"]
         .SetFunctionName("getPadding")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetTextAlignment"]
+        .SetFunctionName("setTextAlignment")
+        .SetGetter("getTextAlignment")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::GetTextAlignment"]
+        .SetFunctionName("getTextAlignment")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::WrappingWidth"]
         .SetFunctionName("setWrappingWidth")
         .SetGetter("getWrappingWidth")
@@ -148,7 +155,7 @@ class TextObjectJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject("TextObject::Text")["TextObject::ChangeOutline"]
         .SetFunctionName("setOutline")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
-    GetAllActionsForObject("TextObject::Text")["TextObject::ChangeShadow"]
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetShadow"]
         .SetFunctionName("setShadow")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::ShowShadow"]

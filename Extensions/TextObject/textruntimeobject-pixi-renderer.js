@@ -49,6 +49,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
         style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_HORIZONTAL;
     }
 
+    style.align = this._object._textAlign;
     style.wordWrap = this._object._wrapping;
     style.wordWrapWidth = this._object._wrappingWidth;
     style.breakWords = true;

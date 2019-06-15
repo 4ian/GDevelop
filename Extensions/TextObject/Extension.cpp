@@ -59,7 +59,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to test"))
+      .AddParameter("string", _("Text to compare"))
       .SetFunctionName("GetString")
       .SetManipulatedType("string")
       .SetIncludeFile("TextObject/TextObject.h");
@@ -201,7 +201,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
-         "ChangeGradient",
+         "SetGradient",
          _("Gradient"),
          _("Change the gradient of the text."),
          _("Change gradient of _PARAM0_ to colors _PARAM1_ _PARAM2_ _PARAM3_ _PARAM4_ type _PARAM5_"),
@@ -219,7 +219,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
-         "ChangeOutline",
+         "SetOutline",
          _("Outline"),
          _("Change the outline of the text. A thickness of 0 disables the outline."),
          _("Change outline of _PARAM0_ to color _PARAM1_ with thickness _PARAM2_"),
@@ -445,7 +445,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("SetPadding",
                 _("Padding"),
-                _("Set the number of pixels around a text object. If you text gets cropped due to shadow effects or an outline raise this value."),
+                _("Set the number of pixels around a text object. If the shadow or the outline around the text are getting cropped, raise this value."),
                 _("Do _PARAM1__PARAM2_ to the padding of _PARAM0_"),
                 _("Style"),
                 "res/actions/textPadding24.png",
@@ -461,7 +461,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction(
          "SetTextAlignment",
          _("Alignment"),
-         _("Set the text alignment of a multiline text object. (Does not work with single line texts)"),
+         _("Set the text alignment of a multiline text object (does not work with single line texts)."),
          _("Align _PARAM0_: _PARAM1_"),
          _("Style"),
          "res/actions/textAlign24.png",
@@ -482,7 +482,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to test"))
+      .AddParameter("string", _("Text to compare"))
       .SetManipulatedType("string")
       .SetFunctionName("GetTextAlignment")
       .SetIncludeFile("TextObject/TextObject.h");

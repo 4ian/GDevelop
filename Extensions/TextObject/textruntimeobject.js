@@ -278,7 +278,7 @@ gdjs.TextRuntimeObject.prototype.getColor = function(str) {
 
 /**
  * Set the text alignment for multiline text objects.
- * @param {String} alignment The text alignment.
+ * @param {string} alignment The text alignment.
  */
 gdjs.TextRuntimeObject.prototype.setTextAlignment = function(alignment) {
     this._textAlign = alignment;
@@ -287,7 +287,7 @@ gdjs.TextRuntimeObject.prototype.setTextAlignment = function(alignment) {
 
 /**
  * Get the text alignment of text object.
- * @return {String} The text alignment.
+ * @return {string} The text alignment.
  */
 gdjs.TextRuntimeObject.prototype.getTextAlignment = function() {
     return this._textAlign;
@@ -328,7 +328,7 @@ gdjs.TextRuntimeObject.prototype.setWrappingWidth = function(width) {
 
 /**
  * Set the outline for the text object.
- * @param {String} str color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} str color as a "R;G;B" string, for example: "255;0;0"
  * @param {number} thickness thickness of the outline (0 = disabled)
  */
 gdjs.TextRuntimeObject.prototype.setOutline = function(str, thickness) {
@@ -344,7 +344,7 @@ gdjs.TextRuntimeObject.prototype.setOutline = function(str, thickness) {
 
 /**
  * Set the shadow for the text object.
- * @param {String} str color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} str color as a "R;G;B" string, for example: "255;0;0"
  * @param {number} distance distance between the shadow and the text
  * @param {number} blur amout of shadow blur
  * @param {number} angle shadow offset direction
@@ -365,11 +365,11 @@ gdjs.TextRuntimeObject.prototype.setShadow = function(str, distance, blur, angle
 
 /**
  * Set the gradient for the text object.
- * @param {String} strFirstColor color as a "R;G;B" string, for example: "255;0;0"
- * @param {String} strSecondColor color as a "R;G;B" string, for example: "255;0;0"
- * @param {String} strThirdColor color as a "R;G;B" string, for example: "255;0;0"
- * @param {String} strFourthColor color as a "R;G;B" string, for example: "255;0;0"
- * @param {number} strGradientType gradient type
+ * @param {string} strFirstColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strSecondColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strThirdColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strFourthColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strGradientType gradient type
  */
 gdjs.TextRuntimeObject.prototype.setGradient = function(strGradientType, strFirstColor, strSecondColor, strThirdColor, strFourthColor) {
     var colorFirst = strFirstColor.split(";");
@@ -420,7 +420,7 @@ gdjs.TextRuntimeObject.prototype.setGradient = function(strGradientType, strFirs
 
 /**
  * Show the shadow of the text object.
- * @param {Boolean} enable true to show the shadow, false to hide it
+ * @param {boolean} enable true to show the shadow, false to hide it
  */
 gdjs.TextRuntimeObject.prototype.showShadow = function(enable) {
     this._shadow = enable;

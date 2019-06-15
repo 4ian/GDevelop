@@ -206,6 +206,18 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 value="mouse"
                                 primaryText={<Trans>Mouse button (text)</Trans>}
                               />
+                              <MenuItem
+                                value="color"
+                                primaryText={<Trans>Color (text)</Trans>}
+                              />
+                              <MenuItem
+                                value="layer"
+                                primaryText={<Trans>Layer (text)</Trans>}
+                              />
+                              <MenuItem
+                                value="sceneName"
+                                primaryText={<Trans>Scene name (text)</Trans>}
+                              />
                             </SelectField>
                           </Column>
                         )}

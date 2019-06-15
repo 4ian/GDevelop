@@ -345,9 +345,9 @@ gdjs.TextRuntimeObject.prototype.setOutline = function(str, thickness) {
 /**
  * Set the shadow for the text object.
  * @param {string} str color as a "R;G;B" string, for example: "255;0;0"
- * @param {number} distance distance between the shadow and the text
- * @param {number} blur amout of shadow blur
- * @param {number} angle shadow offset direction
+ * @param {number} distance distance between the shadow and the text, in pixel
+ * @param {number} blur amout of shadow blur, in pixel
+ * @param {number} angle shadow offset direction in degrees
  */
 gdjs.TextRuntimeObject.prototype.setShadow = function(str, distance, blur, angle) {
     var color = str.split(";");

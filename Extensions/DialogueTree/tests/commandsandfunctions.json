@@ -1,0 +1,52 @@
+[
+	{
+		"title": "BasicCommands",
+		"tags": "Tag",
+		"body": "<<command>>text in between commands<<command with space>> <<callFunction()>> <<callFunctionWithParam(\"test\",true,1,12.5,[2,3])>>",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "StopCommand",
+		"tags": "Tag",
+		"body": "First line\n<<stop>>\nThis shouldn't show",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "FunctionConditional",
+		"tags": "Tag",
+		"body": "First line\n<<if testfunc(\"firstarg\")>>This shouldn't show<<elseif testfunc(\"firstarg\", \"secondarg\")>>This should show<<endif>>After both",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "VisitedFunction",
+		"tags": "Tag",
+		"body": "<<if visited(\"VisitedFunctionStart\")>>you have visited VisitedFunctionStart!<<endif>><<if visited(\"SomeOtherNode\")>>You have not visited SomeOtherNode!<<endif>>",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "VisitedFunctionStart",
+		"tags": "Tag",
+		"body": "Hello[[VisitedFunction]]",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	}
+]

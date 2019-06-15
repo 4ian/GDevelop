@@ -148,6 +148,49 @@ module.exports = {
 			.setFunctionName('gdjs.dialoguetree.scrollCippedText');
 
 		extension
+			.addAction(
+				'SetVariable',
+				_('Set a Dialogue tree variable'),
+				_('Set a Dialogue tree variable'),
+				_('Set a Dialogue tree variable _PARAM0_ to _PARAM1_'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('Variable Name'))
+			.addParameter('expression', _('Variable Value'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.setVariable');
+
+		extension
+			.addAction(
+				'SaveState',
+				_('Save Dialogue state'),
+				_('Save Dialogue state'),
+				_('Save Dialogue state to _PARAM0_'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('globalvar', _('Global Variable'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.saveState');
+
+		extension
+			.addAction(
+				'LoadState',
+				_('Load Dialogue state'),
+				_('Load Dialogue state'),
+				_('Load Dialogue state from _PARAM0_'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('globalvar', _('Global Variable'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.loadState');
+
+		extension
 			.addStrExpression(
 				'GetLineText',
 				_('Get the current dialogue line text'),
@@ -280,6 +323,19 @@ module.exports = {
 			)
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.getBranchText');
+
+		extension
+			.addExpression(
+				'GetVariable',
+				_('Get the value of a variable used by the Dialogue tree'),
+				_('Get the value of a variable used by the Dialogue tree'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('Variable Name'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getVariable');
 
 		extension
 			.addCondition(

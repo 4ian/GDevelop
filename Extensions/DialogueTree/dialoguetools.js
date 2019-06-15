@@ -16,7 +16,6 @@ gdjs.dialoguetree.loadFromSceneVar = function(runtimeScene, sceneVar, startDialo
 	this.runner = gdjs.dialoguetree.runner; //TODO needs to be initiated globally once, outside of any methods
 	this.yarnData = JSON.parse(sceneVar.getAsString());
 	this.runner.load(this.yarnData);
-	this.visitedBranchTitles = [];
 
 	if (startDialogueNode && startDialogueNode.length > 0) {
 		gdjs.dialoguetree.startFrom(startDialogueNode);
@@ -130,7 +129,6 @@ gdjs.dialoguetree.selectOption = function(optionIndex) {
 
 gdjs.dialoguetree.getSelectOption = function() {
 	if (this.dialogueData.select) {
-		console.log(this.selectOption);
 		return this.selectOption;
 	}
 };
@@ -152,15 +150,13 @@ gdjs.dialoguetree.advanceDialogue = function() {
 	this.selectedOptionUpdated = false;
 	this.clipTextEnd = 0;
 
-	console.log(this.dialogueData);
+	console.log(this.runner);
 	console.log(this.dialogue);
 	if (gdjs.dialoguetree.lineTypeIsText()) {
 		this.dialogueDataType = 'text';
 		this.dialogueBranchTags = this.dialogueData.data.tags;
 		this.dialogueBranchTitle = this.dialogueData.data.title;
 		this.dialogueBranchBody = this.dialogueData.data.body;
-		if (!this.visitedBranchTitles.includes(this.dialogueBranchTitle))
-			this.visitedBranchTitles.push(this.dialogueBranchTitle);
 	} else if (gdjs.dialoguetree.lineTypeIsOptions()) {
 		this.dialogueDataType = 'options';
 		this.optionsCount = this.dialogueData.options.length;
@@ -215,11 +211,11 @@ gdjs.dialoguetree.branchContainsTag = function(tag) {
 };
 
 gdjs.dialoguetree.getVisitedBranchTitles = function() {
-	return this.visitedBranchTitles.join(',');
+	return Object.keys(this.runner.visited).join(',');
 };
 
 gdjs.dialoguetree.branchTitleHasBeenVisited = function(title) {
-	return this.visitedBranchTitles.includes(title);
+	return Object.keys(this.runner.visited).includes(title);
 };
 
 gdjs.dialoguetree.getBranchText = function() {
@@ -229,6 +225,37 @@ gdjs.dialoguetree.getBranchText = function() {
 	return '';
 };
 
-//Load/save visited, all variables -state
+gdjs.dialoguetree.getBranchText = function() {
+	if (this.dialogueIsRunning) {
+		return this.dialogueBranchBody;
+	}
+	return '';
+};
 
-// todo load from node without reloading your yarn data - one yarn file can handle multiple NPC
+gdjs.dialoguetree.getVariable = function(key) {
+	if (key in this.runner.variables.data) {
+		return this.runner.variables.data[key];
+	}
+	return '';
+};
+
+gdjs.dialoguetree.saveState = function(storeVar) {
+	const dialogueState = {
+		variables: gdjs.dialoguetree.runner.variables.data,
+		visited: gdjs.dialoguetree.runner.visited,
+	};
+	gdjs.evtTools.network._objectToVariable(dialogueState, storeVar);
+};
+
+gdjs.dialoguetree.loadState = function(storeVar) {
+	const jsonData = gdjs.evtTools.network.variableStructureToJSON(storeVar);
+	const loadedState = JSON.parse(gdjs.evtTools.network.variableStructureToJSON(storeVar));
+	gdjs.dialoguetree.runner.visited = loadedState.visited;
+	gdjs.dialoguetree.runner.variables.data = loadedState.variables;
+};
+
+gdjs.dialoguetree.setVariable = function(key, value) {
+	if (this.runner.variables.data) {
+		this.runner.variables.data[key] = value;
+	}
+};

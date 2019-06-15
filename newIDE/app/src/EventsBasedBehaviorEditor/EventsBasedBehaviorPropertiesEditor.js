@@ -17,6 +17,9 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import InlineCheckbox from '../UI/InlineCheckbox';
+import Visibility from 'material-ui/svg-icons/action/visibility';
+import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 
 const gd = global.gd;
 
@@ -143,6 +146,23 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             fullWidth
                           />
                         </Column>
+                        <InlineCheckbox
+                          label={
+                            property.isHidden() ? (
+                              <Trans>Hidden</Trans>
+                            ) : (
+                              <Trans>Visible in editor</Trans>
+                            )
+                          }
+                          checked={!property.isHidden()}
+                          onCheck={(e, checked) => {
+                            property.setHidden(!checked);
+                            this.forceUpdate();
+                            this.props.onPropertiesUpdated();
+                          }}
+                          checkedIcon={<Visibility />}
+                          uncheckedIcon={<VisibilityOff />}
+                        />
                         <IconMenu
                           iconButtonElement={
                             <IconButton>

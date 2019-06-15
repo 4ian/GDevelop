@@ -24,12 +24,12 @@ class GD_CORE_API PropertyDescriptor {
    * value. \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), label("") {}
+      : currentValue(propertyValue), type("string"), label(""), hidden(false) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
-  PropertyDescriptor(){};
+  PropertyDescriptor() : hidden(false){};
 
   /**
    * \brief Destructor
@@ -83,6 +83,19 @@ class GD_CORE_API PropertyDescriptor {
     return extraInformation;
   }
 
+  /**
+   * \brief Set if the property should be shown or hidden in the editor.
+   */
+  PropertyDescriptor& SetHidden(bool enable = true) {
+    hidden = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the property should be shown or hidden in the editor.
+   */
+  bool IsHidden() const { return hidden; }
+
   /** \name Serialization
    */
   ///@{
@@ -107,6 +120,7 @@ class GD_CORE_API PropertyDescriptor {
       extraInformation;  ///< Can be used to store for example the available
                          ///< choices, if a property is a displayed as a combo
                          ///< box.
+  bool hidden;
 };
 
 }  // namespace gd

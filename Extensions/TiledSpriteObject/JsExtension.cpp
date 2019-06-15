@@ -38,6 +38,27 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension {
             "tiledspriteruntimeobject-cocos-renderer.js");
 
     GetAllActionsForObject(
+        "TiledSpriteObject::TiledSprite")["TiledSpriteObject::SetOpacity"]
+        .SetFunctionName("setOpacity")
+        .SetGetter("getOpacity")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllConditionsForObject(
+        "TiledSpriteObject::TiledSprite")["TiledSpriteObject::Opacity"]
+        .SetFunctionName("getOpacity")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllExpressionsForObject(
+        "TiledSpriteObject::TiledSprite")["Opacity"]
+        .SetFunctionName("getOpacity")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllActionsForObject(
+        "TiledSpriteObject::TiledSprite")["TiledSpriteObject::SetColor"]
+        .SetFunctionName("setColor")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllActionsForObject(
         "TiledSpriteObject::TiledSprite")["TiledSpriteObject::Width"]
         .SetFunctionName("setWidth")
         .SetGetter("getWidth")

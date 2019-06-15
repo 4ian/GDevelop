@@ -22,6 +22,7 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   for (const gd::String& information : extraInformation) {
     extraInformationElement.AddChild("").SetStringValue(information);
   }
+  element.AddChild("hidden").SetBoolValue(hidden);
 }
 
 void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
@@ -36,6 +37,10 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   for (std::size_t i = 0; i < extraInformationElement.GetChildrenCount(); ++i)
     extraInformation.push_back(
         extraInformationElement.GetChild(i).GetStringValue());
+
+  hidden = element.HasChild("hidden")
+               ? element.GetChild("hidden").GetBoolValue()
+               : false;
 }
 
 }  // namespace gd

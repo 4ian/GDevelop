@@ -10,6 +10,9 @@
 #include <string>
 #include <vector>
 #include "GDCore/Project/EventsBasedBehavior.h"
+namespace gd {
+class NamedPropertyDescriptor;
+}
 
 namespace gdjs {
 
@@ -54,8 +57,21 @@ class BehaviorCodeGenerator {
   }
 
  private:
-  gd::String GetRuntimeBehaviorTemplateCode();
-  gd::String GetRuntimeBehaviorPropertyTemplateCode();
+  gd::String GenerateRuntimeBehaviorTemplateCode(
+      const gd::String& extensionName,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace,
+      std::function<gd::String()> generateInitializePropertiesCode,
+      std::function<gd::String()> generateMethodsCode,
+      std::function<gd::String()> generatePropertiesCode);
+  gd::String GenerateRuntimeBehaviorPropertyTemplateCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace,
+      const gd::NamedPropertyDescriptor& property);
+  gd::String GenerateInitializePropertyFromDataCode(
+      const gd::NamedPropertyDescriptor& property);
+  gd::String GenerateInitializePropertyFromDefaultValueCode(
+      const gd::NamedPropertyDescriptor& property);
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
 
   gd::Project& project;

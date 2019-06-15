@@ -51,7 +51,6 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "TiledSpriteObject::TiledSprite")["TiledSpriteObject::SetColor"]
         .SetFunctionName("setColor")
-        .SetGetter("getColor")
         .SetIncludeFile(
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
     GetAllActionsForObject(

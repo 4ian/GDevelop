@@ -42,7 +42,6 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
       .SetManipulatedType("number")
-      .SetFunctionName("getOpacity")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
   obj.AddAction("SetOpacity",
@@ -58,7 +57,6 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value (between 0 and 255)"))
       .SetManipulatedType("number")
-      .SetFunctionName("setOpacity")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
   obj.AddExpression("Opacity",
@@ -67,7 +65,6 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                     _("Visibility"),
                     "res/actions/opacity.png")
       .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
-      .SetFunctionName("getOpacity")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
   obj.AddAction(
@@ -81,7 +78,6 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
       .AddParameter("color", _("Color"))
-      .SetFunctionName("setColor")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
   obj.AddAction("Width",

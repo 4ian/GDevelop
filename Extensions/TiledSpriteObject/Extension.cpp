@@ -29,6 +29,47 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
+  obj.AddCondition("GetOpacity",
+                   _("Opacity"),
+                   _("Compare the opacity of a Tiled Sprite, between 0 (fully "
+                     "transparent) to 255 (opaque)."),
+                   _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Visibility"),
+                   "res/conditions/opacity24.png",
+                   "res/conditions/opacity.png")
+
+      .AddParameter("object", _("Tiled Sprite Object"), "TiledSprite")
+      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("expression", _("Value to test"))
+      .SetManipulatedType("number")
+      .SetFunctionName("getOpacity")
+      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+  obj.AddAction("SetOpacity",
+                _("Change Tiled Sprite opacity"),
+                _("Change the opacity of a Tiled Sprite. 0 is fully transparent, 255 "
+                  "is opaque (default)."),
+                _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
+                _("Visibility"),
+                "res/actions/opacity24.png",
+                "res/actions/opacity.png")
+
+      .AddParameter("object", _("Tiled Sprite Object"), "TiledSprite")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value (between 0 and 255)"))
+      .SetManipulatedType("number")
+      .SetFunctionName("setOpacity")
+      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+  obj.AddExpression("Opacity",
+                    _("Opacity"),
+                    _("Opacity"),
+                    _("Visibility"),
+                    "res/actions/opacity.png")
+      .AddParameter("object", _("Tiled Sprite Object"), "TiledSprite")
+      .SetFunctionName("getOpacity")
+      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
   obj.AddAction("Width",
                 _("Width"),
                 _("Modify the width of a Tiled Sprite."),

@@ -15,6 +15,7 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
     this._xOffset = 0;
     this._yOffset = 0;
+    this.opacity = 255;
 
     if (this._renderer)
         gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, objectData.texture);
@@ -150,4 +151,24 @@ gdjs.TiledSpriteRuntimeObject.prototype.getXOffset = function() {
  */
 gdjs.TiledSpriteRuntimeObject.prototype.getYOffset = function() {
     return this._yOffset;
+};
+
+/**
+ * Change the transparency of the object.
+ * @param {number} opacity The new opacity, between 0 (transparent) and 255 (opaque).
+ */
+gdjs.TiledSpriteRuntimeObject.prototype.setOpacity = function(opacity) {
+    if ( opacity < 0 ) opacity = 0;
+    if ( opacity > 255 ) opacity = 255;
+
+    this.opacity = opacity;
+    this._renderer.updateOpacity();
+};
+
+/**
+ * Get the transparency of the object.
+ * @return {number} The opacity, between 0 (transparent) and 255 (opaque).
+ */
+gdjs.TiledSpriteRuntimeObject.prototype.getOpacity = function() {
+    return this.opacity;
 };

@@ -41,8 +41,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
-      .SetManipulatedType("number")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetManipulatedType("number");
 
   obj.AddAction("SetOpacity",
                 _("Change Tiled Sprite opacity"),
@@ -56,16 +55,14 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value (between 0 and 255)"))
-      .SetManipulatedType("number")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetManipulatedType("number");
 
   obj.AddExpression("Opacity",
                     _("Opacity"),
                     _("Opacity"),
                     _("Visibility"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .AddParameter("object", _("Tiled Sprite"), "TiledSprite");
 
   obj.AddAction(
          "SetColor",
@@ -77,8 +74,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/color.png")
 
       .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
-      .AddParameter("color", _("Color"))
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .AddParameter("color", _("Color"));
 
   obj.AddAction("Width",
                 _("Width"),

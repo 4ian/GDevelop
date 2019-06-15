@@ -29,7 +29,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
-  obj.AddCondition("GetOpacity",
+  obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Tiled Sprite, between 0 (fully "
                      "transparent) to 255 (opaque)."),

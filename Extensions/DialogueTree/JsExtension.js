@@ -445,7 +445,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.addParameter('string', _('State variable'))
-			.addParameter('expression', _('Equal to'))
+			.addParameter('string', _('Equal to'))
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.compareVariable');
 

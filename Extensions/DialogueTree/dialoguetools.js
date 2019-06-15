@@ -241,7 +241,7 @@ gdjs.dialoguetree.getVariable = function(key) {
 
 gdjs.dialoguetree.compareVariable = function(key, value) {
 	if (key in this.runner.variables.data) {
-		return this.runner.variables.data[key] === value;
+		return this.runner.variables.data[key].toString() === value;
 	}
 	return false;
 };

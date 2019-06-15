@@ -221,6 +221,67 @@ module.exports = {
 			.setFunctionName('gdjs.dialoguetree.getClippedLineText');
 
 		extension
+			.addStrExpression(
+				'GetBranchTitle',
+				_('Get the title of the current branch of running dialogue'),
+				_('Get the title of the current branch of running dialogue'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getBranchTitle');
+
+		extension
+			.addStrExpression(
+				'GetBranchTags',
+				_('Get the tags of the current branch of running dialogue'),
+				_('Get the tags of the current branch of running dialogue'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getBranchTags');
+
+		extension
+			.addStrExpression(
+				'GetBranchTag',
+				_('Get a tag of the current branch of running dialogue via index'),
+				_('Get a tag of the current branch of running dialogue via index'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('expression', _('Tag Index Number'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getBranchTag');
+
+		extension
+			.addStrExpression(
+				'GetVisitedBranchTitles',
+				_('Get a list of all visited branches'),
+				_('Get a list of all visited branches'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getVisitedBranchTitles');
+
+		extension
+			.addStrExpression(
+				'GetBranchText',
+				_('Get the raw text of the current branch'),
+				_('Get the full raw text of the current branch'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getBranchText');
+
+		extension
 			.addCondition(
 				'The Dialogue line is Text',
 				_('The Dialogue line is Text'),
@@ -284,6 +345,48 @@ module.exports = {
 			)
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.selectedOptionHasUpdated');
+
+		extension
+			.addCondition(
+				'Current branch title is',
+				_('Current Dialogue branch title is'),
+				_('The current Dialogue branch title is'),
+				_('The current Dialogue branch title is _PARAM0_'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('title name'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.branchTitleIs');
+
+		extension
+			.addCondition(
+				'Current branch contains Tag',
+				_('Current Dialogue branch contains a tag'),
+				_('The current Dialogue branch contains a tag'),
+				_('The current Dialogue branch contains a _PARAM0_ tag'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('tag name'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.branchContainsTag');
+
+		extension
+			.addCondition(
+				'Branch has been visited before',
+				_('Branch title has been visited before'),
+				_('Branch title has been visited before'),
+				_('Branch title _PARAM0_ has been visited before'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('branch title'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.branchTitleHasBeenVisited');
 
 		extension
 			.addCondition(

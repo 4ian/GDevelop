@@ -9,15 +9,16 @@ gdjs.dialoguetree = {};
 
 gdjs.dialoguetree.runner = new bondage.Runner();
 /**
- * Save a screenshot of the game.
- * @param {string} savepath The path where to save the screenshot
+ * Load the Dialogue Tree data of the game.
+ * @param {string} sceneVar The path where to save the screenshot
  */
 gdjs.dialoguetree.loadFromSceneVar = function(runtimeScene, sceneVar, startDialogueNode) {
 	this.runner = gdjs.dialoguetree.runner; //TODO needs to be initiated globally once, outside of any methods
 	this.yarnData = JSON.parse(sceneVar.getAsString());
 	this.runner.load(this.yarnData);
+	this.visitedBranchTitles = [];
 
-	if (startDialogueNode) {
+	if (startDialogueNode && startDialogueNode.length > 0) {
 		gdjs.dialoguetree.startFrom(startDialogueNode);
 	}
 };
@@ -26,6 +27,9 @@ gdjs.dialoguetree.startFrom = function(startDialogueNode) {
 	this.optionsCount = 0;
 	this.options = [];
 	this.dialogueIsRunning = true;
+	this.dialogueBranchTitle = '';
+	this.dialogueBranchBody = '';
+	this.dialogueBranchTags = [];
 	this.dialogue = this.runner.run(startDialogueNode);
 	gdjs.dialoguetree.advanceDialogue();
 };
@@ -148,8 +152,15 @@ gdjs.dialoguetree.advanceDialogue = function() {
 	this.selectedOptionUpdated = false;
 	this.clipTextEnd = 0;
 
+	console.log(this.dialogueData);
+	console.log(this.dialogue);
 	if (gdjs.dialoguetree.lineTypeIsText()) {
 		this.dialogueDataType = 'text';
+		this.dialogueBranchTags = this.dialogueData.data.tags;
+		this.dialogueBranchTitle = this.dialogueData.data.title;
+		this.dialogueBranchBody = this.dialogueData.data.body;
+		if (!this.visitedBranchTitles.includes(this.dialogueBranchTitle))
+			this.visitedBranchTitles.push(this.dialogueBranchTitle);
 	} else if (gdjs.dialoguetree.lineTypeIsOptions()) {
 		this.dialogueDataType = 'options';
 		this.optionsCount = this.dialogueData.options.length;
@@ -167,14 +178,56 @@ gdjs.dialoguetree.getLineType = function() {
 	return this.dialogueDataType;
 };
 
-//check if it has a tag
-// get tags (tags.tag)
+gdjs.dialoguetree.getBranchTitle = function() {
+	if (this.dialogueIsRunning) {
+		return this.dialogueBranchTitle;
+	}
+	return '';
+};
 
-//get title(expr)
+gdjs.dialoguetree.branchTitleIs = function(title) {
+	if (this.dialogueIsRunning) {
+		return this.dialogueBranchTitle === title;
+	}
+	return false;
+};
 
-// has title been visited before, how many times has title been visited
+gdjs.dialoguetree.getBranchTags = function() {
+	if (this.dialogueIsRunning) {
+		return this.dialogueBranchTags.join(',');
+	}
+	return '';
+};
 
-// check if it was visited before (how many times?)
+gdjs.dialoguetree.getBranchTag = function(index) {
+	if (this.dialogueIsRunning) {
+		if (index > this.dialogueBranchTags.length - 1) index = this.dialogueBranchTags.length - 1;
+		return this.dialogueBranchTags[index];
+	}
+	return '';
+};
+
+gdjs.dialoguetree.branchContainsTag = function(tag) {
+	if (this.dialogueIsRunning) {
+		return this.dialogueBranchTags.includes(tag);
+	}
+	return false;
+};
+
+gdjs.dialoguetree.getVisitedBranchTitles = function() {
+	return this.visitedBranchTitles.join(',');
+};
+
+gdjs.dialoguetree.branchTitleHasBeenVisited = function(title) {
+	return this.visitedBranchTitles.includes(title);
+};
+
+gdjs.dialoguetree.getBranchText = function() {
+	if (this.dialogueIsRunning) {
+		return this.dialogueBranchBody;
+	}
+	return '';
+};
 
 //Load/save visited, all variables -state
 

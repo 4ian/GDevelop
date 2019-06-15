@@ -6,8 +6,8 @@
  */
 
 gdjs.dialoguetree = {};
-
 gdjs.dialoguetree.runner = new bondage.Runner();
+
 /**
  * Load the Dialogue Tree data of the game.
  * @param {string} sceneVar The path where to save the screenshot
@@ -237,6 +237,13 @@ gdjs.dialoguetree.getVariable = function(key) {
 		return this.runner.variables.data[key];
 	}
 	return '';
+};
+
+gdjs.dialoguetree.compareVariable = function(key, value) {
+	if (key in this.runner.variables.data) {
+		return this.runner.variables.data[key].toString() === value;
+	}
+	return false;
 };
 
 gdjs.dialoguetree.saveState = function(storeVar) {

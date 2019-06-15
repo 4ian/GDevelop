@@ -52,8 +52,6 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			// .addCodeOnlyParameter('currentScene', '')
-			// .addParameter('scenevar', _('Scene variable that holds the Yarn Json data'))
 			.addParameter('string', _('Dialogue node'))
 			.setDefaultValue('Start')
 			.getCodeExtraInformation()
@@ -69,7 +67,6 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			// .addCodeOnlyParameter('currentScene', '')
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.advanceDialogue');
 
@@ -83,7 +80,6 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			// .addCodeOnlyParameter('currentScene', '')
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.confirmSelectOption');
 
@@ -97,7 +93,6 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			// .addCodeOnlyParameter('currentScene', '')
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.selectNextOption');
 
@@ -111,7 +106,6 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			// .addCodeOnlyParameter('currentScene', '')
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.selectPreviousOption');
 
@@ -125,7 +119,6 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			// .addCodeOnlyParameter('currentScene', '')
 			.addParameter('expression', _('Option index number'))
 			.setDefaultValue('0')
 			.getCodeExtraInformation()
@@ -141,23 +134,20 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			// .addCodeOnlyParameter('currentScene', '')
-			// .addParameter('expression', _('Option index number'))
-			// .setDefaultValue('0')
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.scrollCippedText');
 
 		extension
 			.addAction(
 				'SetVariable',
-				_('Set a Dialogue tree variable'),
-				_('Set a Dialogue tree variable'),
-				_('Set a Dialogue tree variable _PARAM0_ to _PARAM1_'),
+				_('Set dialogue state variable'),
+				_('Set dialogue state variable'),
+				_('Set dialogue state variable _PARAM0_ to _PARAM1_'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			.addParameter('string', _('Variable Name'))
+			.addParameter('string', _('State Variable Name'))
 			.addParameter('expression', _('Variable Value'))
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.setVariable');
@@ -327,8 +317,8 @@ module.exports = {
 		extension
 			.addExpression(
 				'GetVariable',
-				_('Get the value of a variable used by the Dialogue tree'),
-				_('Get the value of a variable used by the Dialogue tree'),
+				_('Get Dialogue state value'),
+				_('Get Dialogue state value'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
@@ -446,6 +436,21 @@ module.exports = {
 
 		extension
 			.addCondition(
+				'Compare Dialogue State variable',
+				_('Compare Dialogue State variable'),
+				_('Compare Dialogue State variable'),
+				_('Branch title _PARAM0_ is equal to _PARAM1_'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('State variable'))
+			.addParameter('expression', _('Equal to'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.compareVariable');
+
+		extension
+			.addCondition(
 				'Text Scrolling has Completed',
 				_('Text Scrolling has Completed'),
 				_('Text Scrolling has Completed'),
@@ -457,7 +462,6 @@ module.exports = {
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialoguetree.cippedTextScrollingHasCompleted');
 
-		//finally return it
 		return extension;
 	},
 	runExtensionSanityTests: function(gd, extension) {

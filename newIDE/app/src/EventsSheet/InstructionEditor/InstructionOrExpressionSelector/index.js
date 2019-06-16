@@ -1,11 +1,12 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import ListIcon from '../../../UI/ListIcon';
 import SearchBar from 'material-ui-search-bar';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
 import { type InstructionOrExpressionTreeNode } from './CreateTree';
+import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+import { Subheader } from 'material-ui';
 
 const SelectableList = makeSelectable(List);
 
@@ -20,7 +21,6 @@ const styles = {
 };
 
 type Props = {|
-  muiTheme: any,
   focusOnMount?: boolean,
   instructionsInfo: Array<InstructionOrExpressionInformation>,
   instructionsInfoTree: InstructionOrExpressionTreeNode,
@@ -28,13 +28,17 @@ type Props = {|
   onChoose: (type: string, InstructionOrExpressionInformation) => void,
   iconSize: number,
   style?: Object,
+  useSubheaders?: boolean,
 |};
 type State = {|
   search: string,
   searchResults: Array<InstructionOrExpressionInformation>,
 |};
 
-class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
+export default class InstructionOrExpressionSelector extends React.Component<
+  Props,
+  State
+> {
   state = {
     search: '',
     searchResults: [],
@@ -62,7 +66,9 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
     );
   }
 
-  _computeSearchResults = (search: string) => {
+  _computeSearchResults = (
+    search: string
+  ): Array<InstructionOrExpressionInformation> => {
     const lowercaseSearch = this.state.search.toLowerCase();
     return this.props.instructionsInfo.filter(instructionInfo =>
       this._matchCritera(instructionInfo, lowercaseSearch)
@@ -76,9 +82,11 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
     this.props.onChoose(searchResults[0].type, searchResults[0]);
   };
 
-  _renderTree(instructionInfoTree: InstructionOrExpressionTreeNode) {
-    const { muiTheme } = this.props;
-
+  _renderTree(
+    muiTheme: any,
+    instructionInfoTree: InstructionOrExpressionTreeNode,
+    depth: number = 0
+  ): Array<React.Node> {
     return Object.keys(instructionInfoTree).map(key => {
       // $FlowFixMe - in theory, we should have a way to distinguish
       // between instruction (leaf nodes) and group (nodes). We use
@@ -113,34 +121,51 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
         // $FlowFixMe - see above
         const groupOfInstructionInformation = (instructionOrGroup: InstructionOrExpressionTreeNode);
         const isDeprecated = key.indexOf('(deprecated)') !== -1;
-        return (
-          <ListItem
-            key={key}
-            style={{
-              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-            }}
-            nestedListStyle={styles.groupListItemNestedList}
-            primaryText={
-              <div
-                style={{
-                  color: isDeprecated
-                    ? muiTheme.listItem.deprecatedGroupTextColor
-                    : muiTheme.listItem.groupTextColor,
-                }}
-              >
-                {key}
-              </div>
-            }
-            primaryTogglesNestedList={true}
-            autoGenerateNestedIndicator={true}
-            nestedItems={this._renderTree(groupOfInstructionInformation)}
-          />
-        );
+        if (this.props.useSubheaders && depth === 0) {
+          return (
+            <React.Fragment key={key}>
+              <Subheader>{key}</Subheader>
+              {this._renderTree(
+                muiTheme,
+                groupOfInstructionInformation,
+                depth + 1
+              )}
+            </React.Fragment>
+          );
+        } else {
+          return (
+            <ListItem
+              key={key}
+              style={{
+                borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+              }}
+              nestedListStyle={styles.groupListItemNestedList}
+              primaryText={
+                <div
+                  style={{
+                    color: isDeprecated
+                      ? muiTheme.listItem.deprecatedGroupTextColor
+                      : muiTheme.listItem.groupTextColor,
+                  }}
+                >
+                  {key}
+                </div>
+              }
+              primaryTogglesNestedList={true}
+              autoGenerateNestedIndicator={true}
+              nestedItems={this._renderTree(
+                muiTheme,
+                groupOfInstructionInformation,
+                depth + 1
+              )}
+            />
+          );
+        }
       }
     });
   }
 
-  _renderSearchResults = () => {
+  _renderSearchResults = (): Array<React.Node> => {
     return this.state.searchResults.map(instructionInfo => {
       return (
         <ListItem
@@ -157,37 +182,36 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
   };
 
   render() {
-    const { muiTheme, selectedType, instructionsInfoTree, style } = this.props;
+    const { selectedType, instructionsInfoTree, style } = this.props;
 
     return (
-      <div
-        style={{
-          backgroundColor: muiTheme.list.itemsBackgroundColor,
-          ...style,
-        }}
-      >
-        <SearchBar
-          onChange={text =>
-            this.setState({
-              search: text,
-              searchResults: this._computeSearchResults(text),
-            })
-          }
-          onRequestSearch={this._onSubmitSearch}
-          style={styles.searchBar}
-          ref={searchBar => (this._searchBar = searchBar)}
-        />
-        <SelectableList value={selectedType}>
-          {this.state.search
-            ? this._renderSearchResults()
-            : this._renderTree(instructionsInfoTree)}
-        </SelectableList>
-      </div>
+      <ThemeConsumer>
+        {muiTheme => (
+          <div
+            style={{
+              backgroundColor: muiTheme.list.itemsBackgroundColor,
+              ...style,
+            }}
+          >
+            <SearchBar
+              onChange={text =>
+                this.setState({
+                  search: text,
+                  searchResults: this._computeSearchResults(text),
+                })
+              }
+              onRequestSearch={this._onSubmitSearch}
+              style={styles.searchBar}
+              ref={searchBar => (this._searchBar = searchBar)}
+            />
+            <SelectableList value={selectedType}>
+              {this.state.search
+                ? this._renderSearchResults()
+                : this._renderTree(muiTheme, instructionsInfoTree)}
+            </SelectableList>
+          </div>
+        )}
+      </ThemeConsumer>
     );
   }
 }
-
-const InstructionOrExpressionSelector = muiThemeable()(
-  ThemableInstructionOrExpressionSelector
-);
-export default InstructionOrExpressionSelector;

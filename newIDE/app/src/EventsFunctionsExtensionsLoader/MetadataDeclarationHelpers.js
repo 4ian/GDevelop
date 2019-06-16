@@ -36,7 +36,9 @@ export const declareBehaviorMetadata = (
 ): gdBehaviorMetadata => {
   const generatedBehavior = new gd.BehaviorJsImplementation();
 
-  // TODO: Check if we can keep a reference to eventsBasedBehavior
+  // The functions below are keeping a reference to eventsBasedBehavior.
+  // This should be safe as if eventsBasedBehavior is deleted (i.e: the behavior
+  // is removed from its extension), then extension will be re-generated.
 
   // Declare the properties of the behavior
   generatedBehavior.updateProperty = function(

@@ -8,6 +8,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type EventsScope } from '../EventsScope.flow';
 
 const styles = {
   container: {
@@ -29,7 +30,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   instruction: gdInstruction,
@@ -63,9 +64,9 @@ export default class InstructionEditor extends React.Component<Props, State> {
       instruction,
       isCondition,
       project,
-      layout,
       globalObjectsContainer,
       objectsContainer,
+      scope,
     } = this.props;
 
     return (
@@ -76,11 +77,12 @@ export default class InstructionEditor extends React.Component<Props, State> {
           selectedType={instruction.getType()}
           onChoose={this.chooseType}
           focusOnMount={!instruction.getType()}
+          scope={scope}
         />
         <Paper style={styles.parametersEditor} rounded={false} zDepth={2}>
           <InstructionParametersEditor
             project={project}
-            layout={layout}
+            scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             isCondition={isCondition}

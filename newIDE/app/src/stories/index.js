@@ -478,7 +478,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExpressionField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -496,7 +496,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExpressionField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -512,7 +512,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <StringField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -528,7 +528,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ObjectField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -543,6 +543,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExternalEventsField
           project={project}
+          scope={{}}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -556,6 +557,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Test'}
       render={(value, onChange) => (
         <ExternalEventsField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -570,7 +572,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <LayerField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -584,6 +586,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"GUI"'}
       render={(value, onChange) => (
         <LayerField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -598,7 +601,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <SceneNameField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -612,6 +615,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"TestLayout"'}
       render={(value, onChange) => (
         <SceneNameField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -626,6 +630,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <KeyField
           project={project}
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -654,7 +659,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <SceneVariableField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -668,6 +673,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <SceneVariableField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -681,6 +687,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <ObjectVariableField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -694,6 +701,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -707,6 +715,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -721,6 +730,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <TrueFalseField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -735,6 +745,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <YesNoField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -749,6 +760,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <ForceMultiplierField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -762,6 +774,7 @@ storiesOf('ParameterFields', module)
       initialValue={'0.8'}
       render={(value, onChange) => (
         <ForceMultiplierField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -1168,14 +1181,14 @@ storiesOf('LayoutChooserDialog', module)
 
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default (no scope)', () => (
     <DragDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
           <EventsTree
             events={testLayout.getEvents()}
             project={project}
-            layout={testLayout}
+            scope={{ layout: testLayout }}
             globalObjectsContainer={project}
             objectsContainer={testLayout}
             selection={getInitialSelection()}
@@ -1206,12 +1219,12 @@ storiesOf('EventsTree', module)
 
 storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default (no scope)', () => (
     <DragDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           events={testLayout.getEvents()}
@@ -1234,12 +1247,12 @@ storiesOf('EventsSheet', module)
       </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ))
-  .add('empty (no events)', () => (
+  .add('empty (no events) (no scope)', () => (
     <DragDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
-          layout={emptyLayout}
+          scope={{ layout: emptyLayout }}
           globalObjectsContainer={project}
           objectsContainer={emptyLayout}
           events={emptyLayout.getEvents()}
@@ -1322,47 +1335,51 @@ storiesOf('SearchPanel', module)
 
 storiesOf('ExpressionSelector', module)
   .addDecorator(muiDecorator)
-  .add('number (with focusOnMount)', () => (
+  .add('number (with focusOnMount) (no scope)', () => (
     <ExpressionSelector
       selectedType=""
       expressionType="number"
       onChoose={action('Expression chosen')}
       focusOnMount
+      scope={{}}
     />
   ))
-  .add('string (with focusOnMount)', () => (
+  .add('string (with focusOnMount) (no scope)', () => (
     <ExpressionSelector
       selectedType=""
       expressionType="string"
       onChoose={action('(String) Expression chosen')}
       focusOnMount
+      scope={{}}
     />
   ));
 
 storiesOf('InstructionSelector', module)
   .addDecorator(muiDecorator)
-  .add('conditions', () => (
+  .add('conditions (no scope)', () => (
     <InstructionSelector
       selectedType=""
       onChoose={action('Instruction chosen')}
       isCondition
+      scope={{}}
     />
   ))
-  .add('actions', () => (
+  .add('actions (no scope)', () => (
     <InstructionSelector
       selectedType=""
       onChoose={action('Instruction chosen')}
       isCondition={false}
+      scope={{}}
     />
   ));
 
 storiesOf('InstructionEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default (no scope)', () => (
     <InstructionEditor
       project={project}
-      layout={testLayout}
+      scope={{ layout: testLayout }}
       globalObjectsContainer={project}
       objectsContainer={testLayout}
       isCondition
@@ -1376,10 +1393,10 @@ storiesOf('InstructionEditor', module)
       openInstructionOrExpression={action('open instruction or expression')}
     />
   ))
-  .add('without layout', () => (
+  .add('without layout (no scope)', () => (
     <InstructionEditor
       project={project}
-      layout={null}
+      scope={{ layout: null }}
       globalObjectsContainer={project}
       objectsContainer={testLayout}
       isCondition

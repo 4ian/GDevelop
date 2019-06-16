@@ -26,7 +26,7 @@ export default class ObjectVariableField extends React.Component<
   render() {
     const {
       project,
-      layout,
+      scope,
       instructionMetadata,
       instruction,
       expressionMetadata,
@@ -44,6 +44,7 @@ export default class ObjectVariableField extends React.Component<
 
     let variablesContainer = null;
     if (objectName) {
+      const { layout } = scope;
       if (layout && layout.hasObjectNamed(objectName)) {
         variablesContainer = layout.getObject(objectName).getVariables();
       } else if (project && project.hasObjectNamed(objectName)) {
@@ -63,6 +64,7 @@ export default class ObjectVariableField extends React.Component<
           onOpenDialog={() => this.setState({ editorOpen: true })}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
+          scope={scope}
         />
         {this.state.editorOpen && variablesContainer && (
           <VariablesEditorDialog

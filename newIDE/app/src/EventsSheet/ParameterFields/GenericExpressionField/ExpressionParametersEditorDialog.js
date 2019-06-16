@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type EventsScope } from '../../EventsScope.flow';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
@@ -10,7 +10,7 @@ export type ParameterValues = Array<string>;
 
 type Props = {
   project?: gdProject,
-  layout?: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   expressionMetadata: Object,
@@ -46,7 +46,7 @@ export default class ExpressionParametersEditorDialog extends Component<
   render() {
     const {
       project,
-      layout,
+      scope,
       globalObjectsContainer,
       objectsContainer,
       expressionMetadata,
@@ -70,7 +70,7 @@ export default class ExpressionParametersEditorDialog extends Component<
       >
         <ExpressionParametersEditor
           project={project}
-          layout={layout}
+          scope={scope}
           globalObjectsContainer={globalObjectsContainer}
           objectsContainer={objectsContainer}
           expressionMetadata={expressionMetadata}

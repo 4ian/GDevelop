@@ -125,9 +125,9 @@ export default class RepeatEvent extends React.Component<
         >
           <DefaultField
             project={this.props.project}
+            scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
-            layout={this.props.layout}
             value={expression}
             onChange={text => {
               repeatEvent.setRepeatExpression(text);

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import ListIcon from '../../../UI/ListIcon';
 import SearchBar from 'material-ui-search-bar';
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
 import { type InstructionOrExpressionTreeNode } from './CreateTree';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { Subheader } from 'material-ui';
@@ -22,17 +22,17 @@ const styles = {
 
 type Props = {|
   focusOnMount?: boolean,
-  instructionsInfo: Array<InstructionOrExpressionInformation>,
+  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata>,
   instructionsInfoTree: InstructionOrExpressionTreeNode,
   selectedType: string,
-  onChoose: (type: string, InstructionOrExpressionInformation) => void,
+  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
   iconSize: number,
   style?: Object,
   useSubheaders?: boolean,
 |};
 type State = {|
   search: string,
-  searchResults: Array<InstructionOrExpressionInformation>,
+  searchResults: Array<EnumeratedInstructionOrExpressionMetadata>,
 |};
 
 export default class InstructionOrExpressionSelector extends React.Component<
@@ -56,7 +56,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
   };
 
   _matchCritera(
-    instructionInfo: InstructionOrExpressionInformation,
+    instructionInfo: EnumeratedInstructionOrExpressionMetadata,
     lowercaseSearch: string
   ) {
     const { displayedName, fullGroupName } = instructionInfo;
@@ -68,7 +68,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
 
   _computeSearchResults = (
     search: string
-  ): Array<InstructionOrExpressionInformation> => {
+  ): Array<EnumeratedInstructionOrExpressionMetadata> => {
     const lowercaseSearch = this.state.search.toLowerCase();
     return this.props.instructionsInfo.filter(instructionInfo =>
       this._matchCritera(instructionInfo, lowercaseSearch)
@@ -97,7 +97,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
 
       if (typeof instructionOrGroup.type === 'string') {
         // $FlowFixMe - see above
-        const instructionInformation: InstructionOrExpressionInformation = instructionOrGroup;
+        const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
         return (
           <ListItem
             key={key}

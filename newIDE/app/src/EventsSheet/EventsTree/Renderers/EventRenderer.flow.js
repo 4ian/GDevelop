@@ -6,10 +6,11 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../../SelectionHandler';
+import { type EventsScope } from '../../EventsScope.flow';
 
 export type EventRendererProps = {
   project: gdProject,
-  layout?: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   event: gdBaseEvent,

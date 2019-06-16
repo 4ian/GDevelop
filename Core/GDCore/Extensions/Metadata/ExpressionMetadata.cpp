@@ -20,7 +20,8 @@ ExpressionMetadata::ExpressionMetadata(const gd::String& extensionNamespace_,
       group(group_),
       shown(true),
       smallIconFilename(smallicon_),
-      extensionNamespace(extensionNamespace_) {
+      extensionNamespace(extensionNamespace_),
+      isPrivate(false) {
 }
 
 ExpressionMetadata& ExpressionMetadata::SetHidden() {

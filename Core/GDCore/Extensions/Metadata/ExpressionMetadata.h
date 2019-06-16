@@ -112,19 +112,29 @@ class ExpressionCodeGenerationInformation {
 };
 
 /**
- * \brief Contains user-friendly infos about expressions and members needed to
- * setup an expression
+ * \brief Describe user-friendly information about an expression, its parameters
+ * and the function name as well as other information for code generation.
  *
  * \ingroup Events
  */
 class GD_CORE_API ExpressionMetadata {
  public:
+  /**
+   * Construct a new expression metadata.
+   */
   ExpressionMetadata(const gd::String& extensionNamespace,
                      const gd::String& name,
                      const gd::String& fullname,
                      const gd::String& description,
                      const gd::String& group,
                      const gd::String& smallicon);
+
+  /**
+   * Construct an empty ExpressionMetadata.
+   * \warning Don't use this - only here to fullfil std::map requirements.
+   */
+  ExpressionMetadata() : shown(false), isPrivate(false){};
+
   virtual ~ExpressionMetadata(){};
 
   /**
@@ -137,6 +147,21 @@ class GD_CORE_API ExpressionMetadata {
    */
   ExpressionMetadata& SetGroup(const gd::String& str) {
     group = str;
+    return *this;
+  }
+
+  /**
+   * Check if the instruction is private - it can't be used outside of the
+   * object/ behavior that it is attached too.
+   */
+  bool IsPrivate() const { return isPrivate; }
+
+  /**
+   * Set that the instruction is private - it can't be used outside of the
+   * object/ behavior that it is attached too.
+   */
+  ExpressionMetadata& SetPrivate() {
+    isPrivate = true;
     return *this;
   }
 
@@ -187,10 +212,6 @@ class GD_CORE_API ExpressionMetadata {
 
   ExpressionCodeGenerationInformation codeExtraInformation;
 
-  /** Don't use this constructor. Only here to fullfil std::map requirements
-   */
-  ExpressionMetadata() : shown(false){};
-
   bool IsShown() const { return shown; }
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDescription() const { return description; }
@@ -203,7 +224,9 @@ class GD_CORE_API ExpressionMetadata {
     return parameters[id];
   };
   std::size_t GetParametersCount() const { return parameters.size(); };
-  const std::vector<gd::ParameterMetadata> & GetParameters() const { return parameters; };
+  const std::vector<gd::ParameterMetadata>& GetParameters() const {
+    return parameters;
+  };
 
   std::vector<gd::ParameterMetadata> parameters;
 
@@ -215,6 +238,7 @@ class GD_CORE_API ExpressionMetadata {
 
   gd::String smallIconFilename;
   gd::String extensionNamespace;
+  bool isPrivate;
 };
 
 }  // namespace gd

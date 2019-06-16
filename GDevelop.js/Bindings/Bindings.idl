@@ -894,11 +894,12 @@ interface InstructionMetadata {
     [Const, Ref] VectorParameterMetadata GetParameters();
     long GetUsageComplexity();
     boolean IsHidden();
+    boolean IsPrivate();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
-    [Ref] InstructionMetadata SetGroup([Const] DOMString group); //TODO: check if useful
+    [Ref] InstructionMetadata SetPrivate();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,
@@ -919,12 +920,13 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetGroup();
     [Const, Ref] DOMString GetSmallIconFilename();
     boolean IsShown();
+    boolean IsPrivate();
     [Ref] ParameterMetadata GetParameter(unsigned long id);
     unsigned long GetParametersCount();
     [Const, Ref] VectorParameterMetadata GetParameters();
 
     [Ref] ExpressionMetadata SetHidden();
-    [Ref] ExpressionMetadata SetGroup([Const] DOMString str); //TODO: check if useful
+    [Ref] ExpressionMetadata SetPrivate();
     [Ref] ExpressionMetadata AddParameter(
         [Const] DOMString type,
         [Const] DOMString description,

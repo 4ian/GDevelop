@@ -268,7 +268,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .SetFunctionName("SetOpacity")
+      .SetManipulatedType("number")	
+      .SetGetter("GetOpacity")	
+      .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("Opacity",
                    _("Opacity"),
@@ -282,7 +285,9 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .SetFunctionName("GetOpacity")
+      .SetManipulatedType("number")	
+      .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction("SetSmooth",
                 _("Smoothing"),

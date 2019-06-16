@@ -562,7 +562,9 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Opacity of a Text object"),
                     _("Opacity"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Object"), "Text");
+      .AddParameter("object", _("Object"), "Text")
+      .SetFunctionName("GetOpacity")
+      .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddExpression("Angle",
                     _("Angle"),

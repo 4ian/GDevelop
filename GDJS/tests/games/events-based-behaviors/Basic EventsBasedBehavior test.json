@@ -636,6 +636,7 @@
               "type": "String",
               "label": "Suffix text to be appended",
               "extraInformation": [],
+              "hidden": false,
               "name": "SuffixText"
             },
             {
@@ -643,6 +644,7 @@
               "type": "Number",
               "label": "Number to be added",
               "extraInformation": [],
+              "hidden": false,
               "name": "AddedNumber"
             },
             {
@@ -650,6 +652,7 @@
               "type": "Boolean",
               "label": "Boolean test property",
               "extraInformation": [],
+              "hidden": true,
               "name": "BooleanTestProperty"
             }
           ]

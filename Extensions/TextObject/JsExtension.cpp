@@ -106,7 +106,7 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setPadding")
         .SetGetter("getPadding")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
-    GetAllConditionsForObject("TextObject::Text")["TextObject::GetPadding"]
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Padding"]
         .SetFunctionName("getPadding")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
@@ -114,7 +114,7 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setTextAlignment")
         .SetGetter("getTextAlignment")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
-    GetAllConditionsForObject("TextObject::Text")["TextObject::GetTextAlignment"]
+    GetAllConditionsForObject("TextObject::Text")["TextObject::TextAlignment"]
         .SetFunctionName("getTextAlignment")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::WrappingWidth"]

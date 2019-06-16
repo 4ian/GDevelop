@@ -55,6 +55,7 @@ type Props = {|
   layout: ?gdLayout,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  objectName?: ?string,
   instruction: gdInstruction,
   isCondition: boolean,
   focusOnMount?: boolean,
@@ -66,10 +67,47 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  noHelpButton?: boolean,
 |};
 type State = {|
   isDirty: boolean,
 |};
+
+const setupInstruction = (
+  instruction: gdInstruction,
+  instructionMetadata: gdInstructionMetadata,
+  objectName: ?string
+) => {
+  instruction.setParametersCount(instructionMetadata.getParametersCount());
+
+  if (objectName) {
+    if (
+      instructionMetadata.getParametersCount() === 0 ||
+      instructionMetadata.getParameter(0).getType() !== 'object'
+    ) {
+      console.error(
+        `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
+      );
+      return;
+    }
+
+    instruction.setParameter(0, objectName);
+  }
+};
+
+const isParameterVisible = (
+  parameterMetadata: gdParameterMetadata,
+  parameterIndex: number,
+  objectName: ?string
+) => {
+  // Hide parameters that are used only for code generation
+  if (parameterMetadata.isCodeOnly()) return false;
+
+  // For objects, hide the first parameter, which is by convention the object name.
+  if (objectName && parameterIndex === 0) return false;
+
+  return true;
+};
 
 export default class InstructionParametersEditor extends React.Component<
   Props,
@@ -91,7 +129,10 @@ export default class InstructionParametersEditor extends React.Component<
   focus() {
     // Verify that there is a field to focus.
     if (
-      this._getNonCodeOnlyParametersCount(this._getInstructionMetadata()) !== 0
+      this._getVisibleParametersCount(
+        this._getInstructionMetadata(),
+        this.props.objectName
+      ) !== 0
     ) {
       if (this._firstVisibleField && this._firstVisibleField.focus) {
         this._firstVisibleField.focus();
@@ -99,14 +140,17 @@ export default class InstructionParametersEditor extends React.Component<
     }
   }
 
-  _getNonCodeOnlyParametersCount(instructionMetadata: ?gdInstructionMetadata) {
+  _getVisibleParametersCount(
+    instructionMetadata: ?gdInstructionMetadata,
+    objectName: ?string
+  ) {
     if (!instructionMetadata) return 0;
 
     return mapFor(0, instructionMetadata.getParametersCount(), i => {
       if (!instructionMetadata) return false;
-
       const parameterMetadata = instructionMetadata.getParameter(i);
-      return !parameterMetadata.isCodeOnly();
+
+      return isParameterVisible(parameterMetadata, i, objectName);
     }).filter(isVisible => isVisible).length;
   }
 
@@ -173,6 +217,8 @@ export default class InstructionParametersEditor extends React.Component<
       layout,
       globalObjectsContainer,
       objectsContainer,
+      noHelpButton,
+      objectName,
     } = this.props;
 
     const type = instruction.getType();
@@ -180,11 +226,9 @@ export default class InstructionParametersEditor extends React.Component<
     if (!instructionMetadata) return this._renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
-
     const instructionExtraInformation = getExtraInstructionInformation(type);
 
-    //TODO?
-    instruction.setParametersCount(instructionMetadata.getParametersCount());
+    setupInstruction(instruction, instructionMetadata, objectName);
 
     let parameterFieldIndex = 0;
     return (
@@ -215,19 +259,13 @@ export default class InstructionParametersEditor extends React.Component<
             <div key={type} style={styles.parametersContainer}>
               {mapFor(0, instructionMetadata.getParametersCount(), i => {
                 const parameterMetadata = instructionMetadata.getParameter(i);
+                if (!isParameterVisible(parameterMetadata, i, objectName))
+                  return null;
+
                 const parameterMetadataType = parameterMetadata.getType();
                 const ParameterComponent = ParameterRenderingService.getParameterComponent(
                   parameterMetadataType
                 );
-
-                if (parameterMetadata.isCodeOnly()) return null;
-                if (!ParameterComponent) {
-                  console.warn(
-                    'Missing parameter component for',
-                    parameterMetadataType
-                  );
-                  return null;
-                }
 
                 // Track the field count on screen, to affect the ref to the
                 // first visible field.
@@ -266,8 +304,10 @@ export default class InstructionParametersEditor extends React.Component<
                   />
                 );
               })}
-              {this._getNonCodeOnlyParametersCount(instructionMetadata) ===
-                0 && (
+              {this._getVisibleParametersCount(
+                instructionMetadata,
+                objectName
+              ) === 0 && (
                 <EmptyMessage>
                   <Trans>There is nothing to configure.</Trans>
                 </EmptyMessage>
@@ -286,7 +326,7 @@ export default class InstructionParametersEditor extends React.Component<
               )}
             </div>
             <Line>
-              {helpPage && (
+              {!noHelpButton && helpPage && (
                 <HelpButton
                   helpPagePath={instructionMetadata.getHelpPath()}
                   label={

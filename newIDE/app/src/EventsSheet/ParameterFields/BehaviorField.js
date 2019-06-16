@@ -92,7 +92,7 @@ export default class BehaviorField extends React.Component<
     this.setState({ errorText: this._getError(value) });
   };
 
-  componentDidUpdate() {
+  _forceChooseBehavior = () => {
     // This is a bit hacky:
     // force the behavior selection if there is only one selectable behavior
     if (this._behaviorNames.length === 1) {
@@ -100,6 +100,14 @@ export default class BehaviorField extends React.Component<
         this.props.onChange(this._behaviorNames[0]);
       }
     }
+  };
+
+  componentDidUpdate() {
+    this._forceChooseBehavior();
+  }
+
+  componentDidMount() {
+    this._forceChooseBehavior();
   }
 
   render() {

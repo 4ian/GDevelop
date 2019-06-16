@@ -5,27 +5,30 @@ import InstructionOrExpressionSelector from './index';
 import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
 import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
 
-export default class ExpressionSelector extends Component<*, {||}> {
-  instructionsInfo: Array<InstructionOrExpressionInformation> = [];
-  instructionsInfoTree: ?InstructionOrExpressionTreeNode = null;
+type Props = {|
+  expressionType: string,
+  focusOnMount?: boolean,
+  selectedType: string,
+  onChoose: (type: string, InstructionOrExpressionInformation) => void,
+  style?: Object,
+|};
 
-  static defaultProps = {
-    expressionType: 'number',
-  };
-
-  componentWillMount() {
-    const { allExpressions } = enumerateExpressions(this.props.expressionType);
-    this.instructionsInfo = allExpressions;
-    this.instructionsInfoTree = createTree(allExpressions);
-  }
+export default class ExpressionSelector extends Component<Props, {||}> {
+  instructionsInfo: Array<InstructionOrExpressionInformation> = enumerateExpressions(
+    this.props.expressionType
+  ).allExpressions;
+  instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
+    this.instructionsInfo
+  );
 
   render() {
+    const { expressionType, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
         iconSize={16}
-        {...this.props}
+        {...otherProps}
       />
     );
   }

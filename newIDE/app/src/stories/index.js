@@ -1341,11 +1341,18 @@ storiesOf('ExpressionSelector', module)
 
 storiesOf('InstructionSelector', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('conditions', () => (
     <InstructionSelector
       selectedType=""
       onChoose={action('Instruction chosen')}
       isCondition
+    />
+  ))
+  .add('actions', () => (
+    <InstructionSelector
+      selectedType=""
+      onChoose={action('Instruction chosen')}
+      isCondition={false}
     />
   ));
 

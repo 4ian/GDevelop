@@ -41,7 +41,9 @@ export default class EventsEditor extends BaseEditor {
         {...this.props}
         ref={editor => (this.editor = editor)}
         project={project}
-        layout={layout}
+        scope={{
+          layout,
+        }}
         globalObjectsContainer={project}
         objectsContainer={layout}
         events={layout.getEvents()}

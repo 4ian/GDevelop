@@ -12,7 +12,8 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
   }
 
   render() {
-    const { value, onChange, isInline, layout, parameterMetadata } = this.props;
+    const { value, onChange, isInline, scope, parameterMetadata } = this.props;
+    const { layout } = scope;
     const layerNames = layout
       ? mapFor(0, layout.getLayersCount(), i => {
           const layer = layout.getLayerAt(i);

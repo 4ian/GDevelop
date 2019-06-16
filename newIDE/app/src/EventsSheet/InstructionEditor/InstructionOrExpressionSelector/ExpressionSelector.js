@@ -3,26 +3,32 @@ import React, { Component } from 'react';
 import { enumerateExpressions } from './EnumerateExpressions';
 import InstructionOrExpressionSelector from './index';
 import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import {
+  type EnumeratedInstructionOrExpressionMetadata,
+  filterEnumeratedInstructionOrExpressionMetadataByScope,
+} from './EnumeratedInstructionOrExpressionMetadata.js';
+import { type EventsScope } from '../../EventsScope.flow';
 
 type Props = {|
   expressionType: string,
   focusOnMount?: boolean,
   selectedType: string,
-  onChoose: (type: string, InstructionOrExpressionInformation) => void,
+  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  scope: EventsScope,
   style?: Object,
 |};
 
 export default class ExpressionSelector extends Component<Props, {||}> {
-  instructionsInfo: Array<InstructionOrExpressionInformation> = enumerateExpressions(
-    this.props.expressionType
-  ).allExpressions;
+  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
+    enumerateExpressions(this.props.expressionType).allExpressions,
+    this.props.scope
+  );
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
     this.instructionsInfo
   );
 
   render() {
-    const { expressionType, ...otherProps } = this.props;
+    const { expressionType, scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector
         instructionsInfo={this.instructionsInfo}

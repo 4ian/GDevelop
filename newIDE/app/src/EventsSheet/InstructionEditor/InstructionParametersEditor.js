@@ -22,6 +22,7 @@ import { getExtraInstructionInformation } from '../../Hints';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import IconButton from 'material-ui/IconButton';
+import { type EventsScope } from '../EventsScope.flow';
 const gd = global.gd;
 
 const styles = {
@@ -52,7 +53,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName?: ?string,
@@ -214,11 +215,11 @@ export default class InstructionParametersEditor extends React.Component<
     const {
       instruction,
       project,
-      layout,
       globalObjectsContainer,
       objectsContainer,
       noHelpButton,
       objectName,
+      scope,
     } = this.props;
 
     const type = instruction.getType();
@@ -288,7 +289,7 @@ export default class InstructionParametersEditor extends React.Component<
                       }
                     }}
                     project={project}
-                    layout={layout}
+                    scope={scope}
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     key={i}

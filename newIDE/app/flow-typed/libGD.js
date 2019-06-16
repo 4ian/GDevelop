@@ -32,10 +32,12 @@ declare type gdEventsFunction = gdEmscriptenObject;
 
 declare type gdInstruction = gdEmscriptenObject;
 declare type gdInstructionMetadata = gdEmscriptenObject;
+declare type gdMapStringInstructionMetadata = gdEmscriptenObject;
 declare type gdInstructionsList = gdEmscriptenObject;
 declare type gdParameterMetadata = gdEmscriptenObject;
 declare type gdExpression = gdEmscriptenObject;
 declare type gdExpressionMetadata = gdEmscriptenObject;
+declare type gdMapStringExpressionMetadata = gdEmscriptenObject;
 declare type gdObjectMetadata = gdEmscriptenObject;
 declare type gdBehaviorMetadata = gdEmscriptenObject;
 
@@ -62,6 +64,7 @@ declare type gdMapStringPropertyDescriptor = gdEmscriptenObject;
 declare type gdPropertyDescriptor = gdEmscriptenObject;
 declare type gdNamedPropertyDescriptor = gdEmscriptenObject;
 declare type gdNamedPropertyDescriptorsList = gdEmscriptenObject;
+
 
 declare type gdEventsContext = gdEmscriptenObject;
 

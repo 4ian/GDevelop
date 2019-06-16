@@ -125,7 +125,7 @@ export default class ForEachEvent extends React.Component<
         >
           <ObjectField
             project={this.props.project}
-            layout={this.props.layout}
+            scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={objectName}

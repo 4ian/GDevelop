@@ -480,7 +480,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       key={selectedEventsFunction.ptr}
                       ref={editor => (this.editor = editor)}
                       project={project}
-                      layout={null}
+                      scope={{
+                        layout: null,
+                        eventsFunctionsExtension,
+                        eventsBasedBehavior: selectedEventsBasedBehavior,
+                        eventsFunction: selectedEventsFunction,
+                      }}
                       globalObjectsContainer={this._globalObjectsContainer}
                       objectsContainer={this._objectsContainer}
                       events={selectedEventsFunction.getEvents()}

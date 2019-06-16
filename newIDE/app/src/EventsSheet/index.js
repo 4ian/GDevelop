@@ -67,13 +67,14 @@ import {
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
+import { type EventsScope } from './EventsScope.flow';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
@@ -838,7 +839,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   render() {
     const {
       project,
-      layout,
+      scope,
       events,
       onOpenExternalEvents,
       onOpenLayout,
@@ -878,7 +879,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                   key={events.ptr}
                   events={events}
                   project={project}
-                  layout={layout}
+                  scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   selection={this.state.selection}
@@ -940,7 +941,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                   anchorEl={this.state.inlineEditingAnchorEl}
                   onRequestClose={this.closeParameterEditor}
                   project={project}
-                  layout={layout}
+                  scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   isCondition={this.state.editedParameter.isCondition}
@@ -1114,7 +1115,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                 {this.state.editedInstruction.instruction && (
                   <InstructionEditorDialog
                     project={project}
-                    layout={layout}
+                    scope={scope}
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     instruction={this.state.editedInstruction.instruction}

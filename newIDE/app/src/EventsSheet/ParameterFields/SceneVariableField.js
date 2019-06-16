@@ -23,7 +23,8 @@ export default class SceneVariableField extends React.Component<
   }
 
   render() {
-    const { layout } = this.props;
+    const { scope } = this.props;
+    const { layout } = scope;
 
     return (
       <React.Fragment>
@@ -37,6 +38,7 @@ export default class SceneVariableField extends React.Component<
           onOpenDialog={() => this.setState({ editorOpen: true })}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
+          scope={scope}
         />
         {this.state.editorOpen && layout && (
           <VariablesEditorDialog

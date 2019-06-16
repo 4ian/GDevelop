@@ -1,22 +1,22 @@
 // @flow
 import update from 'lodash/update';
 import compact from 'lodash/compact';
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
 
 const GROUP_DELIMITER = '/';
 
 export type InstructionOrExpressionTreeNode =
-  | InstructionOrExpressionInformation
+  | EnumeratedInstructionOrExpressionMetadata
   | {
       [string]: InstructionOrExpressionTreeNode,
     };
 
 export const createTree = (
-  allExpressions: Array<InstructionOrExpressionInformation>
+  allExpressions: Array<EnumeratedInstructionOrExpressionMetadata>
 ): InstructionOrExpressionTreeNode => {
   const tree = {};
   allExpressions.forEach(
-    (expressionInfo: InstructionOrExpressionInformation) => {
+    (expressionInfo: EnumeratedInstructionOrExpressionMetadata) => {
       update(
         tree,
         compact(expressionInfo.fullGroupName.split(GROUP_DELIMITER)),

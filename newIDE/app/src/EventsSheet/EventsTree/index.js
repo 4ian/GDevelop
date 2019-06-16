@@ -20,6 +20,7 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../SelectionHandler';
+import { type EventsScope } from '../EventsScope.flow';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
@@ -40,7 +41,7 @@ type EventsContainerProps = {|
   leftIndentWidth: number,
   disabled: boolean,
   project: gdProject,
-  layout?: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
@@ -93,7 +94,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
   };
 
   render() {
-    const { event, project, layout, disabled } = this.props;
+    const { event, project, scope, disabled } = this.props;
     const EventComponent = EventsRenderingService.getEventComponent(event);
 
     return (
@@ -105,7 +106,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
         {EventComponent && (
           <EventComponent
             project={project}
-            layout={layout}
+            scope={scope}
             event={event}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
@@ -153,7 +154,7 @@ const noop = () => {};
 type EventsTreeProps = {|
   events: gdEventsList,
   project: gdProject,
-  layout?: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
@@ -367,10 +368,10 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
   };
 
   _renderObjectThumbnail = (objectName: string) => {
-    const { project, layout, showObjectThumbnails } = this.props;
+    const { project, scope, showObjectThumbnails } = this.props;
     if (!showObjectThumbnails) return null;
 
-    const object = getObjectByName(project, layout, objectName);
+    const object = getObjectByName(project, scope.layout, objectName);
     if (!object) return null;
 
     return (
@@ -390,7 +391,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     return (
       <EventContainer
         project={this.props.project}
-        layout={this.props.layout}
+        scope={this.props.scope}
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         event={event}

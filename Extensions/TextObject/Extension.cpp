@@ -214,9 +214,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("color", _("First Color"))
       .AddParameter("color", _("Second Color"))
       .AddParameter("color", _("Third Color"))
-      .AddParameter("color", _("Fourth Color"))
-      .SetFunctionName("SetGradient")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .AddParameter("color", _("Fourth Color"));
 
   obj.AddAction(
          "SetOutline",
@@ -229,9 +227,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("color", _("Color"))
-      .AddParameter("expression", _("Thickness"))
-      .SetFunctionName("SetOutline")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .AddParameter("expression", _("Thickness"));
 
   obj.AddAction(
          "SetShadow",
@@ -246,9 +242,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("color", _("Color"))
       .AddParameter("expression", _("Distance"))
       .AddParameter("expression", _("Blur"))
-      .AddParameter("expression", _("Angle"))
-      .SetFunctionName("SetShadow")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .AddParameter("expression", _("Angle"));
 
   obj.AddAction(
          "ShowShadow",
@@ -260,9 +254,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/textShadow.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("yesorno", _("Show the shadow"))  
-      .SetFunctionName("ShowShadow")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .AddParameter("yesorno", _("Show the shadow"));
 
   obj.AddAction("Opacity",
                 _("Change Text Opacity"),
@@ -276,10 +268,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value"))
-      .SetFunctionName("SetOpacity")
-      .SetManipulatedType("number")
-      .SetGetter("GetOpacity")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetManipulatedType("number");
 
   obj.AddCondition("Opacity",
                    _("Opacity"),
@@ -292,10 +281,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
-      .SetFunctionName("GetOpacity")
-      .SetManipulatedType("number")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .AddParameter("expression", _("Value to compare"))
+      .SetManipulatedType("number");
 
   obj.AddAction("SetSmooth",
                 _("Smoothing"),
@@ -428,7 +415,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
-  obj.AddCondition("GetPadding",
+  obj.AddCondition("Padding",
                    _("Padding"),
                    _("Compare the number of pixels around a text object. If you text gets cropped due to shadow effects or an outline raise this value."),
                    _("The padding of _PARAM0_ is _PARAM1__PARAM2_"),
@@ -439,9 +426,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
-      .SetFunctionName("GetPadding")
-      .SetManipulatedType("number")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetManipulatedType("number");
 
   obj.AddAction("SetPadding",
                 _("Padding"),
@@ -454,9 +439,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number")
-      .SetFunctionName("SetPadding")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetManipulatedType("number");
 
   obj.AddAction(
          "SetTextAlignment",
@@ -472,7 +455,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetTextAlignment")
       .SetIncludeFile("TextObject/TextObject.h");
 
-  obj.AddCondition("GetTextAlignment",
+  obj.AddCondition("TextAlignment",
                    _("Alignment"),
                    _("Compare the text alignment of a multiline text object."),
                    _("The alignment of _PARAM0_ is _PARAM1__PARAM2_"),
@@ -483,9 +466,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("string", _("Text to compare"))
-      .SetManipulatedType("string")
-      .SetFunctionName("GetTextAlignment")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetManipulatedType("string");
 
   obj.AddAction(
          "SetWrapping",
@@ -541,9 +522,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Padding"),
                     _("Style"),
                     "res/actions/textPadding.png")
-      .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetPadding")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .AddParameter("object", _("Object"), "Text");
 
   obj.AddExpression("ScaleX",
                     _("X Scale of a Text object"),
@@ -568,9 +547,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Opacity of a Text object"),
                     _("Opacity"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetOpacity")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .AddParameter("object", _("Object"), "Text");
 
   obj.AddExpression("Angle",
                     _("Angle"),

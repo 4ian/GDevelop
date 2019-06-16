@@ -34,7 +34,7 @@ const getObjectsAndGroupsDataSource = ({
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
-  allowedObjectType?: ?string,
+  allowedObjectType: ?string,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
     globalObjectsContainer,
@@ -86,6 +86,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       globalObjectsContainer,
       objectsContainer,
       noGroups,
+      allowedObjectType,
     });
     const hasValidObject =
       objectAndGroups.filter(choice => value === choice.text).length !== 0;

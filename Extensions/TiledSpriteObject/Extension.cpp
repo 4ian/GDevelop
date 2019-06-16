@@ -38,7 +38,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
+      .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
       .SetManipulatedType("number");
@@ -52,7 +52,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/opacity24.png",
                 "res/actions/opacity.png")
 
-      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
+      .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value (between 0 and 255)"))
       .SetManipulatedType("number");
@@ -62,7 +62,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                     _("Opacity"),
                     _("Visibility"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Tiled Sprite"), "TiledSprite");
+      .AddParameter("object", _("Object"), "TiledSprite");
 
   obj.AddAction(
          "SetColor",
@@ -73,7 +73,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/color24.png",
          "res/actions/color.png")
 
-      .AddParameter("object", _("Tiled Sprite"), "TiledSprite")
+      .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("color", _("Color"));
 
   obj.AddAction("Width",

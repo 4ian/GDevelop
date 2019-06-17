@@ -1425,6 +1425,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1435,6 +1436,8 @@
           ],
           "behaviors": [
             {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "acceleration": 1600,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -1442,9 +1445,7 @@
               "deceleration": 8000,
               "ignoreDefaultControls": false,
               "maxSpeed": 450,
-              "name": "TopDownMovement",
-              "rotateObject": false,
-              "type": "TopDownMovementBehavior::TopDownMovementBehavior"
+              "rotateObject": false
             }
           ],
           "animations": [
@@ -1481,6 +1482,7 @@
         },
         {
           "name": "Rock",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1524,14 +1526,15 @@
         },
         {
           "name": "PlayerBullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -1568,6 +1571,7 @@
         },
         {
           "name": "BlackEnemy",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1611,6 +1615,7 @@
         },
         {
           "name": "BlueEnemy",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1655,6 +1660,7 @@
         {
           "height": 256,
           "name": "SpaceBackground",
+          "tags": "",
           "texture": "purpleSpaceBackground.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 256,
@@ -1663,6 +1669,7 @@
         },
         {
           "name": "PlayerParticle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1759,6 +1766,7 @@
         },
         {
           "name": "GreenEnemy",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1802,6 +1810,7 @@
         },
         {
           "name": "EnemyBullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1840,6 +1849,7 @@
         },
         {
           "name": "EnemyParticle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1939,6 +1949,7 @@
           "italic": false,
           "name": "GameOver",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3357,10 +3368,13 @@
   "externalEvents": [],
   "eventsFunctionsExtensions": [
     {
+      "author": "",
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
       "name": "ParticlesFunctions",
+      "shortDescription": "",
+      "tags": "",
       "version": "",
       "eventsFunctions": [
         {
@@ -3559,7 +3573,8 @@
           ],
           "objectGroups": []
         }
-      ]
+      ],
+      "eventsBasedBehaviors": []
     }
   ],
   "externalLayouts": [],

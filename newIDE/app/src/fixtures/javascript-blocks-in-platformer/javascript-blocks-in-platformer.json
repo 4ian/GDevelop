@@ -1858,6 +1858,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2155,15 +2156,16 @@
         },
         {
           "name": "Platform",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ],
@@ -2268,15 +2270,16 @@
         },
         {
           "name": "Jumpthru",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -2334,16 +2337,17 @@
         {
           "height": 70,
           "name": "TiledGrassPlatform",
+          "tags": "",
           "texture": "grassHalfMid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -2351,31 +2355,33 @@
         {
           "height": 70,
           "name": "TiledCastlePlatform",
+          "tags": "",
           "texture": "castleCenter.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
         },
         {
           "name": "MovingPlatform",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -2432,6 +2438,7 @@
         },
         {
           "name": "GoLeft",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2489,6 +2496,7 @@
         },
         {
           "name": "GoRight",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2547,27 +2555,31 @@
         {
           "height": 70,
           "name": "Ladder",
+          "tags": "",
           "texture": "ladder_mid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Ladder",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Ladder",
               "yGrabOffset": 0
             }
           ]
         },
         {
           "name": "PlayerHitBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -2576,10 +2588,7 @@
               "jumpSpeed": 1000,
               "maxFallingSpeed": 1000,
               "maxSpeed": 250,
-              "name": "PlatformerObject",
-              "roundCoordinates": false,
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -2637,6 +2646,7 @@
         },
         {
           "name": "SlimeWalk",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [
@@ -2647,6 +2657,8 @@
           ],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 5000,
               "canGrabPlatforms": false,
               "deceleration": 5000,
@@ -2655,10 +2667,7 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 75,
-              "name": "PlatformerObject",
-              "roundCoordinates": false,
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -2800,11 +2809,14 @@
         },
         {
           "name": "Fly",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 500,
               "canGrabPlatforms": false,
               "deceleration": 500,
@@ -2813,10 +2825,7 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 400,
-              "name": "PlatformerObject",
-              "roundCoordinates": false,
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -2958,6 +2967,7 @@
         },
         {
           "name": "Cloud",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3111,6 +3121,7 @@
         },
         {
           "name": "BackgroundObjects",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3267,6 +3278,7 @@
           "italic": false,
           "name": "Score",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3282,6 +3294,7 @@
         },
         {
           "name": "Coin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3339,6 +3352,7 @@
         },
         {
           "name": "CoinIcon",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3396,6 +3410,7 @@
         },
         {
           "name": "LeftButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3453,6 +3468,7 @@
         },
         {
           "name": "RightButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3510,18 +3526,19 @@
         },
         {
           "name": "JumpButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
               "bottomEdgeAnchor": 0,
               "leftEdgeAnchor": 2,
-              "name": "Anchor",
               "relativeToOriginalWindowSize": true,
               "rightEdgeAnchor": 0,
-              "topEdgeAnchor": 2,
-              "type": "AnchorBehavior::AnchorBehavior"
+              "topEdgeAnchor": 2
             }
           ],
           "animations": [
@@ -3577,6 +3594,7 @@
         },
         {
           "name": "ArrowButtonsBg",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3654,7 +3672,8 @@
           "folded": false,
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "const players = runtimeScene.getObjects(\"Player\");\nconst playerHitBoxes = runtimeScene.getObjects(\"PlayerHitBox\");\nif (playerHitBoxes.length === 0 || players.length === 0) return;\n\nif (runtimeScene.getTimeManager().isFirstFrame()) {\n  playerHitBoxes[0].hide();\n}\n\nplayers[0].setX(playerHitBoxes[0].getX() - 12);\nplayers[0].setY(playerHitBoxes[0].getY());",
-          "parameterObjects": ""
+          "parameterObjects": "",
+          "useStrict": false
         },
         {
           "disabled": true,
@@ -3797,7 +3816,8 @@
           "folded": false,
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "const players = runtimeScene.getObjects(\"Player\");\nconst playerHitBoxes = runtimeScene.getObjects(\"PlayerHitBox\");\nif (playerHitBoxes.length === 0 || players.length === 0) return;\n\n/** @type {gdjs.SpriteRuntimeObject} */\nconst player = players[0];\n\n/** @type {gdjs.PlatformerObjectRuntimeBehavior} */\nconst platformerBehavior = playerHitBoxes[0].getBehavior(\"PlatformerObject\");\n\nif (platformerBehavior.isJumping() || platformerBehavior.isFalling()) {\n  player.setAnimation(1);\n} else if (platformerBehavior.isOnFloor()) {\n  if (!platformerBehavior.isMoving()) {\n    player.setAnimation(0);\n  } else {\n    player.setAnimation(2);\n  }\n}\n\nvar LEFTKEY = 37;\nvar RIGHTKEY = 39;\nif (runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY)) {\n  player.flipX(true);\n} else if (runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY)) {\n  player.flipX(false);\n}",
-          "parameterObjects": ""
+          "parameterObjects": "",
+          "useStrict": false
         },
         {
           "disabled": true,
@@ -4036,7 +4056,8 @@
           "folded": false,
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "if (!objects.length) return; \n\n// Here, \"objects\" refer to a list of \"Player\", as it is what we've selected\n// in the configuration of the function.\n\nruntimeScene.getLayer(\"\").setCameraX(objects[0].getX());",
-          "parameterObjects": "Player"
+          "parameterObjects": "Player",
+          "useStrict": false
         },
         {
           "disabled": true,
@@ -4963,7 +4984,8 @@
           "folded": false,
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "\nobjects.forEach(object => {\n  /** @type {gdjs.SpriteRuntimeObject} */\n  const enemy = object;\n\n  /** @type {gdjs.PlatformerObjectRuntimeBehavior} */\n  const platformerBehavior = object.getBehavior(\"PlatformerObject\");\n\n  if (enemy.getAnimation() === 1 && platformerBehavior.isOnFloor() && !platformerBehavior.isMoving()) {\n      object.activateBehavior(\"PlatformerObject\", false);\n      enemy.setOpacity(enemy.getOpacity() - 50 * object.getElapsedTime(runtimeScene) / 1000);\n\n      if (enemy.getOpacity() === 0) {\n          object.deleteFromScene(runtimeScene);\n      }\n  }\n})",
-          "parameterObjects": "Enemy"
+          "parameterObjects": "Enemy",
+          "useStrict": false
         },
         {
           "disabled": true,

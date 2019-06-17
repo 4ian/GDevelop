@@ -133,6 +133,7 @@
   "objects": [
     {
       "name": "Box",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -140,25 +141,23 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "type": "Dynamic",
-            "bullet": false,
-            "fixedRotation": false,
-            "shape": "Box",
-            "shapeDimensionA": 0,
-            "shapeDimensionB": 0,
-            "shapeOffsetX": 0,
-            "shapeOffsetY": 0,
-            "density": 1,
-            "friction": 0.3,
-            "restitution": 0.1,
-            "linearDamping": 0.1,
-            "angularDamping": 0.1,
-            "gravityScale": 1,
-            "layers": 1,
-            "masks": 1,
-            "canSleep": true
-          }
+          "bullet": false,
+          "fixedRotation": false,
+          "shape": "Box",
+          "shapeDimensionA": 0,
+          "shapeDimensionB": 0,
+          "shapeOffsetX": 0,
+          "shapeOffsetY": 0,
+          "density": 1,
+          "friction": 0.3,
+          "restitution": 0.1,
+          "linearDamping": 0.1,
+          "angularDamping": 0.1,
+          "gravityScale": 1,
+          "layers": 1,
+          "masks": 1,
+          "canSleep": true,
+          "bodyType": "Dynamic"
         }
       ],
       "animations": [
@@ -201,6 +200,7 @@
     },
     {
       "name": "Circle",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -208,25 +208,23 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "type": "Dynamic",
-            "bullet": false,
-            "fixedRotation": false,
-            "shape": "Circle",
-            "shapeDimensionA": 0,
-            "shapeDimensionB": 0,
-            "shapeOffsetX": 0,
-            "shapeOffsetY": 0,
-            "density": 1,
-            "friction": 0.9,
-            "restitution": 0.1,
-            "linearDamping": 0.1,
-            "angularDamping": 0.1,
-            "gravityScale": 1,
-            "layers": 1,
-            "masks": 1,
-            "canSleep": true
-          }
+          "bullet": false,
+          "fixedRotation": false,
+          "shape": "Circle",
+          "shapeDimensionA": 0,
+          "shapeDimensionB": 0,
+          "shapeOffsetX": 0,
+          "shapeOffsetY": 0,
+          "density": 1,
+          "friction": 0.9,
+          "restitution": 0.1,
+          "linearDamping": 0.1,
+          "angularDamping": 0.1,
+          "gravityScale": 1,
+          "layers": 1,
+          "masks": 1,
+          "canSleep": true,
+          "bodyType": "Dynamic"
         }
       ],
       "animations": [
@@ -269,6 +267,7 @@
     },
     {
       "name": "Wall",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -276,24 +275,22 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "type": "Static",
-            "bullet": false,
-            "fixedRotation": false,
-            "shape": "Box",
-            "shapeDimensionA": 0,
-            "shapeDimensionB": 0,
-            "shapeOffsetX": 0,
-            "shapeOffsetY": 0,
-            "density": 1,
-            "friction": 0.3,
-            "restitution": 0.1,
-            "linearDamping": 0.1,
-            "angularDamping": 0.1,
-            "gravityScale": 1,
-            "layers": 1,
-            "masks": 1
-          }
+          "bullet": false,
+          "fixedRotation": false,
+          "shape": "Box",
+          "shapeDimensionA": 0,
+          "shapeDimensionB": 0,
+          "shapeOffsetX": 0,
+          "shapeOffsetY": 0,
+          "density": 1,
+          "friction": 0.3,
+          "restitution": 0.1,
+          "linearDamping": 0.1,
+          "angularDamping": 0.1,
+          "gravityScale": 1,
+          "layers": 1,
+          "masks": 1,
+          "bodyType": "Static"
         }
       ],
       "animations": [
@@ -330,6 +327,7 @@
     },
     {
       "name": "Drawer",
+      "tags": "",
       "type": "PrimitiveDrawing::Drawer",
       "variables": [],
       "behaviors": [],
@@ -350,6 +348,7 @@
     },
     {
       "name": "Button",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [
@@ -396,6 +395,7 @@
       "italic": false,
       "name": "ValueText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [
@@ -419,6 +419,7 @@
       "italic": false,
       "name": "TitleText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [
@@ -442,6 +443,7 @@
       "italic": false,
       "name": "ButtonText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [],
@@ -457,6 +459,7 @@
     },
     {
       "name": "SceneButton",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -498,6 +501,7 @@
       "italic": false,
       "name": "SceneButtonText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [],
@@ -1641,12 +1645,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -3907,12 +3909,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -6258,12 +6258,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -7135,12 +7133,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -8007,12 +8003,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -9061,12 +9055,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -11130,12 +11122,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -12028,12 +12018,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -12577,12 +12565,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -13375,12 +13361,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -15060,12 +15044,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     }

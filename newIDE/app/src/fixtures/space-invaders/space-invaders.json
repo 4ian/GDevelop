@@ -3750,6 +3750,7 @@
       "objects": [
         {
           "name": "Invader1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3788,6 +3789,7 @@
         },
         {
           "name": "Invader2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3826,6 +3828,7 @@
         },
         {
           "name": "Invader3",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3864,6 +3867,7 @@
         },
         {
           "name": "Ship",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3921,6 +3925,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3959,14 +3964,15 @@
         },
         {
           "name": "Bullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -4003,6 +4009,7 @@
         },
         {
           "name": "Left",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4041,6 +4048,7 @@
         },
         {
           "name": "Right",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4079,6 +4087,7 @@
         },
         {
           "name": "Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4120,6 +4129,7 @@
           "italic": false,
           "name": "ScoreTEXT",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4138,6 +4148,7 @@
           "italic": false,
           "name": "ScoreNUM",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4153,14 +4164,15 @@
         },
         {
           "name": "UFO",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -4197,6 +4209,7 @@
         },
         {
           "name": "Bomb",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4238,6 +4251,7 @@
           "italic": false,
           "name": "Count",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4256,6 +4270,7 @@
           "italic": false,
           "name": "BombTextNUM",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4271,6 +4286,7 @@
         },
         {
           "name": "Base",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -6879,6 +6895,7 @@
       "objects": [
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -6920,6 +6937,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6938,6 +6956,7 @@
           "italic": false,
           "name": "Instruction1",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6956,6 +6975,7 @@
           "italic": false,
           "name": "Instruction2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6971,6 +6991,7 @@
         },
         {
           "name": "NewObject3",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],

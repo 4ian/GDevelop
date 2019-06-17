@@ -889,6 +889,7 @@
       "objects": [
         {
           "name": "Voiture",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -957,6 +958,7 @@
         },
         {
           "name": "Batiment",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1082,6 +1084,7 @@
         },
         {
           "name": "Fond",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1139,6 +1142,7 @@
         },
         {
           "name": "Route",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1280,6 +1284,7 @@
         },
         {
           "name": "etincelle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1337,6 +1342,7 @@
         },
         {
           "name": "smoke",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1490,6 +1496,7 @@
         },
         {
           "name": "frein",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1550,6 +1557,7 @@
           "italic": false,
           "name": "Speed",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1568,6 +1576,7 @@
           "italic": false,
           "name": "Explanation",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1583,6 +1592,7 @@
         },
         {
           "name": "btnTurnLeft",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1621,6 +1631,7 @@
         },
         {
           "name": "btnTurnRight",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1659,6 +1670,7 @@
         },
         {
           "name": "btnAccelerate",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1697,6 +1709,7 @@
         },
         {
           "name": "btnBreak",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],

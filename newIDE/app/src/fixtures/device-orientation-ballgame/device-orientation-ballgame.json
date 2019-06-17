@@ -326,6 +326,7 @@
       "objects": [
         {
           "name": "board",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -364,6 +365,7 @@
         },
         {
           "name": "boundary",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -402,6 +404,7 @@
         },
         {
           "name": "ball",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -440,6 +443,7 @@
         },
         {
           "name": "pit",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -481,6 +485,7 @@
           "italic": false,
           "name": "you_win",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

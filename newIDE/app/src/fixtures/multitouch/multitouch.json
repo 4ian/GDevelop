@@ -167,6 +167,7 @@
       "objects": [
         {
           "name": "Marker",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [
@@ -232,6 +233,7 @@
           "italic": false,
           "name": "Explanation",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

@@ -188,6 +188,7 @@
       "objects": [
         {
           "name": "compass",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -226,6 +227,7 @@
         },
         {
           "name": "needle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],

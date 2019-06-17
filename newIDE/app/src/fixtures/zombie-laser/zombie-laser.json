@@ -337,6 +337,7 @@
       "objects": [
         {
           "name": "Hero",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -782,15 +783,16 @@
         },
         {
           "name": "Wall",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "cost": 2,
-              "impassable": true,
               "name": "PathfindingObstacle",
-              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior",
+              "cost": 2,
+              "impassable": true
             }
           ],
           "animations": [
@@ -1824,11 +1826,14 @@
         },
         {
           "name": "Zombie",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "Pathfinding",
+              "type": "PathfindingBehavior::PathfindingBehavior",
               "acceleration": 400,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -1837,9 +1842,7 @@
               "cellWidth": 20,
               "extraBorder": 0,
               "maxSpeed": 200,
-              "name": "Pathfinding",
-              "rotateObject": true,
-              "type": "PathfindingBehavior::PathfindingBehavior"
+              "rotateObject": true
             }
           ],
           "animations": [
@@ -2189,6 +2192,7 @@
         },
         {
           "name": "LaserDrawer",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2209,6 +2213,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2470,6 +2475,7 @@
           "italic": false,
           "name": "GameOver",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2488,6 +2494,7 @@
           "italic": false,
           "name": "NewObject",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

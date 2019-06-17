@@ -760,67 +760,6 @@ module.exports = {
       }
     ]
   },
-  "controller-input": {
-    "description": "Use JavaScript to read the state of a gamepad and use it in your game.",
-    "usedExtensions": [
-      {
-        "fullName": "Sprite",
-        "name": "Sprite"
-      },
-      {
-        "fullName": "Tiled Sprite Object",
-        "name": "TiledSpriteObject"
-      },
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Platform Behavior",
-        "name": "PlatformBehavior"
-      },
-      {
-        "fullName": "Anchor",
-        "name": "AnchorBehavior"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "System information",
-        "name": "SystemInfo"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Audio",
-        "name": "BuiltinAudio"
-      },
-      {
-        "fullName": "Cameras and layers features",
-        "name": "BuiltinCamera"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
-      }
-    ]
-  },
   "create-object-with-mouseclick": {
     "description": "Show how to create an object at the position of the click.",
     "usedExtensions": [
@@ -1909,6 +1848,71 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "multiplayer-platformer-with-gamepads": {
+    "description": "Example showing how to use the Gamepads extension to read the state of gamepads (or controllers), for 2 players.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Anchor",
+        "name": "AnchorBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },

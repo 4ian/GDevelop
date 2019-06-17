@@ -17,7 +17,6 @@ import changeScaleOfSprites from '../fixtures/change-scale-of-sprites/change-sca
 import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sprite-animation.json';
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import characterSelection from '../fixtures/character-selection/character-selection.json';
-import controllerInput from '../fixtures/controller-input/controller-input.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
@@ -49,6 +48,7 @@ import moveObjectInCircle from '../fixtures/move-object-in-circle/move-object-in
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
 import moveObjectWithMouseJoint from '../fixtures/move-object-with-mouse-joint/move-object-with-mouse-joint.json';
 import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-object-with-physics.json';
+import multiplayerPlatformerWithGamepads from '../fixtures/multiplayer-platformer-with-gamepads/multiplayer-platformer-with-gamepads.json';
 import multitouch from '../fixtures/multitouch/multitouch.json';
 import objectGravity from '../fixtures/object-gravity/object-gravity.json';
 import objectSelection from '../fixtures/object-selection/object-selection.json';
@@ -149,8 +149,6 @@ export default class BrowserProjectOpener {
       return Promise.resolve(changeSpriteColor);
     } else if (url === 'example://character-selection') {
       return Promise.resolve(characterSelection);
-    } else if (url === 'example://controller-input') {
-      return Promise.resolve(controllerInput);
     } else if (url === 'example://device-orientation-ballgame') {
       return Promise.resolve(deviceOrientationBallgame);
     } else if (url === 'example://device-orientation-compass') {
@@ -213,6 +211,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(moveObjectWithMouseJoint);
     } else if (url === 'example://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
+    } else if (url === 'example://multiplayer-platformer-with-gamepads') {
+      return Promise.resolve(multiplayerPlatformerWithGamepads);
     } else if (url === 'example://multitouch') {
       return Promise.resolve(multitouch);
     } else if (url === 'example://object-gravity') {

@@ -179,6 +179,7 @@
       "objects": [
         {
           "name": "background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],

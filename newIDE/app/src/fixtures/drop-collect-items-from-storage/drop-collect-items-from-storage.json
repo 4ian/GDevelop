@@ -646,6 +646,7 @@
       "objects": [
         {
           "name": "Box",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -759,6 +760,7 @@
         },
         {
           "name": "Jug",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -872,6 +874,7 @@
         },
         {
           "name": "Barrel",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -985,6 +988,7 @@
         },
         {
           "name": "DropItem",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1142,6 +1146,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1160,6 +1165,7 @@
           "italic": false,
           "name": "ExampleDescription",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

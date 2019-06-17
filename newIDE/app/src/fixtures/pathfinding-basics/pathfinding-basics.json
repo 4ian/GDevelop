@@ -383,11 +383,14 @@
       "objects": [
         {
           "name": "player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
+              "name": "Pathfinding",
+              "type": "PathfindingBehavior::PathfindingBehavior",
               "acceleration": 400,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -396,9 +399,7 @@
               "cellWidth": 20,
               "extraBorder": 0,
               "maxSpeed": 200,
-              "name": "Pathfinding",
-              "rotateObject": true,
-              "type": "PathfindingBehavior::PathfindingBehavior"
+              "rotateObject": true
             }
           ],
           "animations": [
@@ -435,6 +436,7 @@
         },
         {
           "name": "obstacle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -444,10 +446,10 @@
               "type": "DraggableBehavior::Draggable"
             },
             {
-              "cost": 2,
-              "impassable": true,
               "name": "PathfindingObstacle",
-              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior",
+              "cost": 2,
+              "impassable": true
             }
           ],
           "animations": [
@@ -487,6 +489,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -505,6 +508,7 @@
           "italic": false,
           "name": "message2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

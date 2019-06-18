@@ -48,7 +48,13 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() 
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
     //TODO: Workaround a not working property in PIXI.js:
-    this._spritesContainer.alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
+    this._centerSprite.alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
+
+    for (var borderCounter = 0; borderCounter < this._borderSprites.length; borderCounter++){
+        this._borderSprites[borderCounter].alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
+    }
+    
+    this._spritesContainer.cacheAsBitmap = false;
 }
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
@@ -188,6 +194,8 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setColor = function(rgbColor
     for (var borderCounter = 0; borderCounter < this._borderSprites.length; borderCounter++){
         this._borderSprites[borderCounter].tint = "0x" + gdjs.rgbToHex(parseInt(colors[0], 10), parseInt(colors[1], 10), parseInt(colors[2], 10));
     }
+
+    this._spritesContainer.cacheAsBitmap = false;
  };
  
  gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getColor = function() {

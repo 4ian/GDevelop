@@ -418,7 +418,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetFunctionName("GetAngle")
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
@@ -435,7 +435,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction("SetPadding",
@@ -529,7 +529,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddExpression("Padding",

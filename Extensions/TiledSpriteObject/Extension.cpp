@@ -40,7 +40,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction("SetOpacity",
@@ -101,7 +101,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleWidth.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetFunctionName("GetWidth")
       .SetManipulatedType("number")
@@ -132,7 +132,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleHeight.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetFunctionName("GetHeight")
       .SetManipulatedType("number")
@@ -165,7 +165,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetHidden()  // Now available for all objects
       .SetFunctionName("GetAngle")
       .SetManipulatedType("number")
@@ -198,7 +198,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/conditions/scaleWidth.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetFunctionName("GetXOffset")
       .SetManipulatedType("number")
@@ -231,7 +231,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/conditions/scaleWidth.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetFunctionName("GetYOffset")
       .SetManipulatedType("number")

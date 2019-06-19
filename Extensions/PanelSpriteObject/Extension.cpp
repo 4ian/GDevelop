@@ -59,7 +59,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "PanelSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetFunctionName("GetWidth")
       .SetManipulatedType("number")
       .SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
@@ -90,7 +90,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "PanelSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetFunctionName("SetHeight")
       .SetManipulatedType("number")
       .SetGetter("GetHeight")
@@ -124,7 +124,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetHidden()  // Deprecated
       .AddParameter("object", _("Object"), "PanelSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetFunctionName("SetAngle")
       .SetManipulatedType("number")
       .SetGetter("GetAngle")

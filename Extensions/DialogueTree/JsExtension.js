@@ -355,6 +355,20 @@ module.exports = {
 
 		extension
 			.addCondition(
+				'Command is Called',
+				_('Command is Called'),
+				_('Command is Called'),
+				_('Command <<_PARAM0_>> is Called'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('Command String'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.commandIsCalled');
+
+		extension
+			.addCondition(
 				'The Dialogue line is Options',
 				_('The Dialogue line is Options'),
 				_('The Dialogue line is Options'),

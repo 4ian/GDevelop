@@ -30,6 +30,9 @@ gdjs.dialoguetree.startFrom = function(startDialogueNode) {
 	this.dialogueBranchBody = '';
 	this.dialogueBranchTags = [];
 	this.dialogue = this.runner.run(startDialogueNode);
+	this.NextDialogueData = null;
+	this.dialogueData = null;
+	this.lastCommand = null;
 	gdjs.dialoguetree.advanceDialogue();
 };
 
@@ -48,28 +51,46 @@ gdjs.dialoguetree.selectedOptionHasUpdated = function() {
 
 gdjs.dialoguetree.getLineText = function() {
 	return this.dialogueData.text
-		? this.dialogueData.text
+		? this.dialogueText
 		: this.dialogueData.options
 		? this.dialogueData.options.join(' - ')
 		: '';
 };
 
 gdjs.dialoguetree.getClippedLineText = function() {
-	// use this to render the text
-	return this.dialogueData.text ? this.dialogueData.text.substring(0, this.clipTextEnd) : '';
+	return this.dialogueText.length ? this.dialogueText.substring(0, this.clipTextEnd) : '';
 };
 
 gdjs.dialoguetree.scrollCippedText = function() {
-	// call action every x miliseconds- hold button makes it faster
-	if (this.dialogueIsRunning && this.dialogueData.text) {
+	if (this.dialogueIsRunning && this.dialogueText) {
 		this.clipTextEnd += 1;
 	}
+	if (gdjs.dialoguetree.cippedTextScrollingHasCompleted() && this.NextDialogueData instanceof bondage.CommandResult) {
+		this.lastCommand = this.NextDialogueData.text;
+		this.lastDataType = 'command';
+		this.NextDialogueData = this.dialogue.next().value;
+
+		gdjs.dialoguetree.advanceDialogue();
+	}
+};
+
+gdjs.dialoguetree.commandIsCalled = function(command) {
+	if (this.lastCommand) {
+		console.info('Dialogue tree cmd passed:', this.lastCommand);
+		if (this.lastCommand === command) {
+			console.info('Dialogue tree cmd picked by GD:', this.lastCommand);
+			this.lastCommand = null;
+			return true;
+		}
+		this.lastCommand = null;
+	}
+	return false;
 };
 
 gdjs.dialoguetree.cippedTextScrollingHasCompleted = function() {
 	//use this to force the game to wait for the text to complete before next line
-	if (this.dialogueData && this.dialogueData.text) {
-		return this.clipTextEnd >= this.dialogueData.text.length;
+	if (this.dialogueData && this.dialogueText.length) {
+		return this.clipTextEnd >= this.dialogueText.length;
 	}
 };
 
@@ -143,35 +164,47 @@ gdjs.dialoguetree.lineTypeIsCommand = function() {
 	return this.dialogueData instanceof bondage.CommandResult;
 };
 
+//we need to process current, but also have the next one
 gdjs.dialoguetree.advanceDialogue = function() {
-	this.dialogueData = this.dialogue.next().value;
+	this.dialogueData = this.NextDialogueData ? this.NextDialogueData : this.dialogue.next().value;
 	this.optionsCount = 0;
 	this.selectOption = -1;
 	this.selectedOptionUpdated = false;
-	this.clipTextEnd = 0;
 
-	console.log(this.runner);
-	console.log(this.dialogue);
+	// console.log(this.runner);
+	// console.log(this.dialogue);
 	if (gdjs.dialoguetree.lineTypeIsText()) {
-		this.dialogueDataType = 'text';
+		// console.log('last type was:', this.lastDataType);
 		this.dialogueBranchTags = this.dialogueData.data.tags;
 		this.dialogueBranchTitle = this.dialogueData.data.title;
 		this.dialogueBranchBody = this.dialogueData.data.body;
+		if (this.lastDataType === 'command') {
+			this.dialogueText += this.dialogueData.text;
+		} else {
+			this.dialogueText = this.dialogueData.text;
+			this.clipTextEnd = 0;
+		}
+		this.lastDataType = 'text';
+		this.NextDialogueData = this.dialogue.next().value;
 	} else if (gdjs.dialoguetree.lineTypeIsOptions()) {
-		this.dialogueDataType = 'options';
 		this.optionsCount = this.dialogueData.options.length;
 		this.options = this.dialogueData.options;
 		this.selectedOptionUpdated = true;
+		this.NextDialogueData = null;
+		this.lastDataType = 'options';
 	} else if (gdjs.dialoguetree.lineTypeIsCommand()) {
-		this.dialogueDataType = 'command';
+		this.lastDataType = 'command';
+		this.lastCommand = this.dialogueData.text;
+		this.NextDialogueData = this.dialogue.next().value;
+		gdjs.dialoguetree.advanceDialogue();
 	} else {
-		this.dialogueDataType = 'unknown';
+		this.lastDataType = 'unknown';
 	}
 	if (!this.dialogueData) this.dialogueIsRunning = false;
 };
 
 gdjs.dialoguetree.getLineType = function() {
-	return this.dialogueDataType;
+	return this.lastDataType;
 };
 
 gdjs.dialoguetree.getBranchTitle = function() {

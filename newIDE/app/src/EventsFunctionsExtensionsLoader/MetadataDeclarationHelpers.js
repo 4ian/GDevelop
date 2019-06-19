@@ -307,7 +307,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
       propertyName
     );
-    const propertyLabel = property.getLabel() || propertyName;
+    const propertyLabel =
+      property.getLabel() || i18n._(t`${propertyName} property`);
 
     if (propertyType === 'String' || propertyType === 'Choice') {
       addObjectAndBehaviorParameters(
@@ -413,7 +414,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         )
       )
         .addParameter('operator', i18n._(t`Modification's sign`), '', false)
-        .addParameter('string', i18n._(t`New value`), '', false)
+        .addParameter('expression', i18n._(t`New value`), '', false)
         .getCodeExtraInformation()
         .setFunctionName(setterName)
         .setManipulatedType('number')

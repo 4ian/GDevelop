@@ -42,7 +42,7 @@
     "material-ui": "0.20",
     "material-ui-search-bar": "0.4.1",
     "node-require-function": "^1.2.0",
-    "pixi-simple-gesture": "git://github.com/4ian/pixi-simple-gesture#v3.0.0",
+    "pixi-simple-gesture": "git://github.com/4ian/pixi-simple-gesture#v0.3.2",
     "pixi.js": "4.8.6",
     "prop-types": "^15.5.10",
     "randomcolor": "^0.5.3",

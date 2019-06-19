@@ -8787,9 +8787,9 @@ pixi-gl-core@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/pixi-gl-core/-/pixi-gl-core-1.1.4.tgz#8b4b5c433b31e419bc379dc565ce1b835a91b372"
 
-"pixi-simple-gesture@git://github.com/4ian/pixi-simple-gesture#v3.0.0":
-  version "0.3.0"
-  resolved "git://github.com/4ian/pixi-simple-gesture#58574461b7ad8a06a207d91546ebd711a689c0a6"
+"pixi-simple-gesture@git://github.com/4ian/pixi-simple-gesture#v0.3.2":
+  version "0.3.2"
+  resolved "git://github.com/4ian/pixi-simple-gesture#0e42e78b55c63ebd157f52f42da65b0cc36f6360"
 
 pixi.js@4.8.6:
   version "4.8.6"

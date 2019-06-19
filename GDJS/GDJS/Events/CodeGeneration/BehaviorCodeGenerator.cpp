@@ -164,7 +164,9 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
   if (property.GetType() == "String" || property.GetType() == "Choice") {
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (property.GetType() == "Number") {
-    return property.GetValue();
+    return "Number(" +
+           EventsCodeGenerator::ConvertToStringExplicit(property.GetValue()) +
+           ") || 0";
   } else if (property.GetType() == "Boolean") {  // TODO: Check if working
     return property.GetValue() == "true" ? "true" : "false";
   }

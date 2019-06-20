@@ -17,7 +17,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                                _("Built-in camera extension"),
                                "Florian Rival",
                                "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
 
 #if defined(GD_IDE_ONLY)
   extension

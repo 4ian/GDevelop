@@ -12,7 +12,6 @@ import EventsRenderingService from './EventsRenderingService';
 import EventHeightsCache from './EventHeightsCache';
 import classNames from 'classnames';
 import { eventsTree, eventsTreeWithSearchResults, icon } from './ClassNames';
-import './style.css';
 import {
   type SelectionState,
   type EventContext,
@@ -23,6 +22,11 @@ import {
 import { type EventsScope } from '../EventsScope.flow';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+
+// Import default style of react-sortable-tree and the override made for EventsSheet.
+import 'react-sortable-tree/style.css';
+import './style.css';
+
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
 );
@@ -228,14 +232,9 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
    */
   onHeightsChanged(cb: ?() => void) {
     this.forceUpdate(() => {
-      // Help the developer updating react-sortable-tree
-      if (this._list && !this._list.wrappedInstance.recomputeRowHeights) {
-        console.error(
-          'recomputeRowHeights not on wrappedInstance, this must be fixed after updating react-virtualized/react-sortable-tree'
-        );
+      if (this._list && this._list.wrappedInstance.current) {
+        this._list.wrappedInstance.current.recomputeRowHeights();
       }
-
-      if (this._list) this._list.wrappedInstance.recomputeRowHeights();
       if (cb) cb();
     });
   }
@@ -246,21 +245,20 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
    */
   forceEventsUpdate(cb: ?() => void) {
     this.setState(this._eventsToTreeData(this.props.events), () => {
-      // Help the developer updating react-sortable-tree
-      if (this._list && !this._list.wrappedInstance.recomputeRowHeights) {
-        console.error(
-          'recomputeRowHeights not on wrappedInstance, this must be fixed after updating react-virtualized/react-sortable-tree'
-        );
+      if (this._list && this._list.wrappedInstance.current) {
+        this._list.wrappedInstance.current.recomputeRowHeights();
       }
-
-      if (this._list) this._list.wrappedInstance.recomputeRowHeights();
       if (cb) cb();
     });
   }
 
   scrollToEvent(event: gdBaseEvent) {
     const row = this._getEventRow(event);
-    if (row !== -1 && this._list) this._list.wrappedInstance.scrollToRow(row);
+    if (row !== -1) {
+      if (this._list && this._list.wrappedInstance.current) {
+        this._list.wrappedInstance.current.scrollToRow(row);
+      }
+    }
   }
 
   /**
@@ -272,6 +270,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
   }
 
   _getEventRow(searchedEvent: gdBaseEvent) {
+    // TODO: flatData could be replaced by a hashmap of events to row index
     return findIndex(
       this.state.flatData,
       event => event.ptr === searchedEvent.ptr
@@ -449,6 +448,18 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     );
   };
 
+  componentDidUpdate(prevProps: EventsTreeProps) {
+    if (prevProps.selection !== this.props.selection) {
+      // react-sortable-tree does the rendering by transforming treeData
+      // into a flat array, the result being memoized. This hack forces
+      // a re-rendering of events, by discarding the memoized flat array
+      // (otherwise, no re-rendering would be done).
+      this.setState(state => ({
+        treeData: state.treeData ? [...state.treeData] : null,
+      }));
+    }
+  }
+
   render() {
     return (
       <div style={styles.container}>
@@ -459,11 +470,10 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
           onVisibilityToggle={this._onVisibilityToggle}
           onMoveNode={this._onMoveNode}
           canDrop={this._canDrop}
-          rowHeight={({ index }) => {
-            const event = this.state.flatData[index];
-            if (!event) return 0;
+          rowHeight={({ node }: { node: SortableTreeNode }) => {
+            if (!node.event) return 0;
 
-            return this.eventsHeightsCache.getEventHeight(event);
+            return this.eventsHeightsCache.getEventHeight(node.event);
           }}
           searchMethod={this._treeSearchMethod}
           searchQuery={this.props.searchResults}

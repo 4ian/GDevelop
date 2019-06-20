@@ -29,7 +29,9 @@ type State = {|
 export default class LocalStarters extends Component<Props, State> {
   state = {
     outputPath: findEmptyPath(
-      path && app ? path.join(app.getPath('home'), 'GDevelop projects') : ''
+      path && app
+        ? path.join(app.getPath('documents'), 'GDevelop projects')
+        : ''
     ),
   };
 

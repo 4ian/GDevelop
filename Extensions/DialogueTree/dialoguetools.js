@@ -68,7 +68,7 @@ gdjs.dialoguetree.scrollCippedText = function() {
 	if (gdjs.dialoguetree.cippedTextScrollingHasCompleted() && this.NextDialogueData instanceof bondage.CommandResult) {
 		this.lastCommand = this.NextDialogueData.text;
 		this.lastDataType = 'command';
-		this.NextDialogueData = this.dialogue.next().value;
+		this.NextDialogueData = null;
 
 		gdjs.dialoguetree.advanceDialogue();
 	}
@@ -90,6 +90,7 @@ gdjs.dialoguetree.commandIsCalled = function(command) {
 gdjs.dialoguetree.cippedTextScrollingHasCompleted = function() {
 	//use this to force the game to wait for the text to complete before next line
 	if (this.dialogueData && this.dialogueText.length) {
+		// console.log('completed:', this.clipTextEnd, this.dialogueText.length);
 		return this.clipTextEnd >= this.dialogueText.length;
 	}
 };
@@ -161,11 +162,14 @@ gdjs.dialoguetree.lineTypeIsOptions = function() {
 	return this.dialogueData instanceof bondage.OptionsResult;
 };
 gdjs.dialoguetree.lineTypeIsCommand = function() {
-	return this.dialogueData instanceof bondage.CommandResult;
+	// commands get passed to the engine and skipped automatically from any mandatory input, so we need to pick them from next state instead
+	return this.NextDialogueData instanceof bondage.CommandResult;
 };
 
-//we need to process current, but also have the next one
 gdjs.dialoguetree.advanceDialogue = function() {
+	// We need both this.dialogueData and this.NextDialogueData in order to handle command calls differently from text/options
+	// That way we know what dialoguedata we are on, but also what is the one comming up next or was  last.
+	// setting NextDialogueData to null forces dialogueData to use next().value in the next cycle instead of NextDialogueData
 	this.dialogueData = this.NextDialogueData ? this.NextDialogueData : this.dialogue.next().value;
 	this.optionsCount = 0;
 	this.selectOption = -1;
@@ -195,7 +199,7 @@ gdjs.dialoguetree.advanceDialogue = function() {
 	} else if (gdjs.dialoguetree.lineTypeIsCommand()) {
 		this.lastDataType = 'command';
 		this.lastCommand = this.dialogueData.text;
-		this.NextDialogueData = this.dialogue.next().value;
+		this.NextDialogueData = null;
 		gdjs.dialoguetree.advanceDialogue();
 	} else {
 		this.lastDataType = 'unknown';

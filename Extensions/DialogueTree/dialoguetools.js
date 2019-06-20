@@ -33,6 +33,7 @@ gdjs.dialoguetree.startFrom = function(startDialogueNode) {
 	this.NextDialogueData = null;
 	this.dialogueData = null;
 	this.lastCommand = null;
+	this.pauseScrolling = false;
 	gdjs.dialoguetree.advanceDialogue();
 };
 
@@ -62,14 +63,26 @@ gdjs.dialoguetree.getClippedLineText = function() {
 };
 
 gdjs.dialoguetree.scrollCippedText = function() {
+	if (this.pauseScrolling) return;
 	if (this.dialogueIsRunning && this.dialogueText) {
 		this.clipTextEnd += 1;
 	}
 	if (gdjs.dialoguetree.cippedTextScrollingHasCompleted() && this.NextDialogueData instanceof bondage.CommandResult) {
 		this.lastCommand = this.NextDialogueData.text;
 		this.lastDataType = 'command';
-		this.NextDialogueData = null;
 
+		// if the command was to wait, wait x miliseconds before proceeding with scrolling
+		if (/^(wait\s?[0-9]{1,5})$/.test(this.lastCommand.toLowerCase())) {
+			var captured = this.lastCommand.toLowerCase().match(/([0-9]{1,5})$/gi)[0];
+			setTimeout(() => {
+				this.pauseScrolling = false;
+				// this.NextDialogueData = null;
+				gdjs.dialoguetree.advanceDialogue();
+			}, parseInt(captured));
+			this.pauseScrolling = true;
+			return;
+		}
+		// this.NextDialogueData = null;
 		gdjs.dialoguetree.advanceDialogue();
 	}
 };
@@ -79,10 +92,8 @@ gdjs.dialoguetree.commandIsCalled = function(command) {
 		console.info('Dialogue tree cmd passed:', this.lastCommand);
 		if (this.lastCommand === command) {
 			console.info('Dialogue tree cmd picked by GD:', this.lastCommand);
-			this.lastCommand = null;
 			return true;
 		}
-		this.lastCommand = null;
 	}
 	return false;
 };
@@ -174,6 +185,7 @@ gdjs.dialoguetree.lineTypeIsCommand = function() {
 };
 
 gdjs.dialoguetree.advanceDialogue = function() {
+	if (this.pauseScrolling) return;
 	// We need both this.dialogueData and this.NextDialogueData in order to handle command calls differently from text/options
 	// That way we know what dialoguedata we are on, but also what is the one comming up next or was  last.
 	// setting NextDialogueData to null forces dialogueData to use next().value in the next cycle instead of NextDialogueData
@@ -183,7 +195,7 @@ gdjs.dialoguetree.advanceDialogue = function() {
 	this.selectedOptionUpdated = false;
 
 	// console.log(this.runner);
-	// console.log(this.dialogue);
+	console.log(this.dialogue);
 	if (gdjs.dialoguetree.lineTypeIsText()) {
 		// console.log('last type was:', this.lastDataType);
 		this.dialogueBranchTags = this.dialogueData.data.tags;
@@ -259,7 +271,7 @@ gdjs.dialoguetree.getVisitedBranchTitles = function() {
 };
 
 gdjs.dialoguetree.branchTitleHasBeenVisited = function(title) {
-	return Object.keys(this.runner.visited).includes(title);
+	return Object.keys(this.runner.visited).includes(title) && this.runner.visited[title];
 };
 
 gdjs.dialoguetree.getBranchText = function() {

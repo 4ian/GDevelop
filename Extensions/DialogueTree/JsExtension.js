@@ -329,32 +329,6 @@ module.exports = {
 
 		extension
 			.addCondition(
-				'The Dialogue line is Text',
-				_('The Dialogue line is Text'),
-				_('The Dialogue line is Text'),
-				_('The Dialogue line is TEXT'),
-				_('Dialogue Tree'),
-				'JsPlatform/Extensions/yarn24.png',
-				'JsPlatform/Extensions/yarn32.png'
-			)
-			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.lineTypeIsText');
-
-		extension
-			.addCondition(
-				'The Dialogue line is a Command',
-				_('The Dialogue line is a Command'),
-				_('The Dialogue line is a Command'),
-				_('The Dialogue line is a << COMMAND >>'),
-				_('Dialogue Tree'),
-				'JsPlatform/Extensions/yarn24.png',
-				'JsPlatform/Extensions/yarn32.png'
-			)
-			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.lineTypeIsCommand');
-
-		extension
-			.addCondition(
 				'Command is Called',
 				_('Command is Called'),
 				_('Command is Called'),
@@ -369,16 +343,17 @@ module.exports = {
 
 		extension
 			.addCondition(
-				'The Dialogue line is Options',
-				_('The Dialogue line is Options'),
-				_('The Dialogue line is Options'),
-				_('The Dialogue line is [[ OPTIONS ]]'),
+				'The Dialogue line is of type',
+				_('The Dialogue line is of type'),
+				_('The Dialogue line is of type'),
+				_('The Dialogue line is of type _PARAM0_'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
+			.addParameter('stringWithSelector', _('type'), '["text", "options", "command"]', false)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.lineTypeIsOptions');
+			.setFunctionName('gdjs.dialoguetree.compareDialogueLineType');
 
 		extension
 			.addCondition(

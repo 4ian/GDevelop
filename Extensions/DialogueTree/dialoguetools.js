@@ -155,6 +155,13 @@ gdjs.dialoguetree.getSelectOption = function() {
 	}
 };
 
+gdjs.dialoguetree.compareDialogueLineType = function(type) {
+	if (gdjs.dialoguetree.lineTypeIsText() && type === 'text') return true;
+	if (gdjs.dialoguetree.lineTypeIsOptions() && type === 'options') return true;
+	if (gdjs.dialoguetree.lineTypeIsCommand() && type === 'command') return true;
+	return false;
+};
+
 gdjs.dialoguetree.lineTypeIsText = function() {
 	return this.dialogueData instanceof bondage.TextResult;
 };

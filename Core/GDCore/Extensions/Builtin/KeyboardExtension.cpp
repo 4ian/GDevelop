@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
           _("Built-in extension that enables the use of a keyboard"),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/all-features/keyboard");
 
 #if defined(GD_IDE_ONLY)
   extension

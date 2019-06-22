@@ -1,3 +1,0 @@
-GDevelop JS platform
-Enhanced tutorial
-An improved version of tutorial available on www.wiki.compilgames.net

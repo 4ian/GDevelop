@@ -1,3 +1,0 @@
-GDevelop JS platform
-Web Shoot 'em up
-A side-scrolling shoot-'em-up game

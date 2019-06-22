@@ -1,3 +1,0 @@
-GDevelop C++ platform
-Castle-Doodle (Platformer)
-A game where you have to reach the end of the level by jumping on platforms.

@@ -19,7 +19,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           _("Built-in extension providing standard conversions expressions."),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/all-features/common-conversions");
 
 #if defined(GD_IDE_ONLY)
 

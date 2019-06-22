@@ -111,10 +111,7 @@ export default class BrowserStarters extends Component {
               />
               <ListItem
                 leftAvatar={
-                  <ListIcon
-                    iconSize={32}
-                    src="res/starters_icons/pairs.png"
-                  />
+                  <ListIcon iconSize={32} src="res/starters_icons/pairs.png" />
                 }
                 primaryText="Pairs"
                 secondaryText={

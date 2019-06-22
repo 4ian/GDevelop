@@ -158,10 +158,7 @@ export default class LocalStarters extends Component<Props, State> {
               />
               <ListItem
                 leftAvatar={
-                  <ListIcon
-                    iconSize={32}
-                    src="res/starters_icons/pairs.png"
-                  />
+                  <ListIcon iconSize={32} src="res/starters_icons/pairs.png" />
                 }
                 primaryText="Pairs"
                 secondaryText={

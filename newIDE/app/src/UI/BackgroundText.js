@@ -4,7 +4,7 @@ import ThemeConsumer from './Theme/ThemeConsumer';
 
 const styles = {
   messageStyle: {
-    opacity: 0.4,
+    //opacity: 0.4,
     textAlign: 'center',
     fontSize: '13px',
   },

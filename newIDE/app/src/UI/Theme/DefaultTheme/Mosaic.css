@@ -19,3 +19,8 @@
 .mosaic-gd-default-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
   background: #9100ce !important;
 }
+
+/* Separator draggable background */
+.mosaic-gd-default-theme .mosaic-split.-column {
+  background-color: #e0e0e0;
+}

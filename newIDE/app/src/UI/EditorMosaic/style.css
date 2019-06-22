@@ -41,3 +41,8 @@
 .mosaic-gd-theme .draggable .mosaic-window-title {
   cursor: move;
 }
+
+.mosaic-split.-column {
+  margin-left: 2px;
+  margin-right: 2px;
+}

@@ -4,6 +4,7 @@ import { List, ListItem } from 'material-ui/List';
 import RaisedButton from 'material-ui/RaisedButton';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
+import ListIcon from '../UI/ListIcon';
 
 export default class BrowserStarters extends Component {
   render() {
@@ -20,6 +21,12 @@ export default class BrowserStarters extends Component {
           <Column expand noMargin>
             <List>
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/platformer.png"
+                  />
+                }
                 primaryText={<Trans>Platformer</Trans>}
                 secondaryText={
                   <p>
@@ -36,12 +43,19 @@ export default class BrowserStarters extends Component {
                 }}
               />
               <ListItem
-                primaryText={<Trans>Space Shooter</Trans>}
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/space-shooter.png"
+                  />
+                }
+                primaryText={<Trans>8-bit Space Shooter</Trans>}
                 secondaryText={
                   <p>
                     <Trans>
-                      A side-scrolling shooter where you must defeat incoming
-                      enemies with your spaceship.
+                      A beautiful, retro side-scrolling shooter where you must
+                      defeat incoming enemies with your mecha transforming
+                      spaceship. Huge boss included!
                     </Trans>
                   </p>
                 }
@@ -52,6 +66,12 @@ export default class BrowserStarters extends Component {
                 }}
               />
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/isometric-game.png"
+                  />
+                }
                 primaryText={<Trans>Isometric game</Trans>}
                 secondaryText={
                   <p>
@@ -68,6 +88,12 @@ export default class BrowserStarters extends Component {
                 }}
               />
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/downhill-bike-physics-demo.png"
+                  />
+                }
                 primaryText="Downhill Bike Racing"
                 secondaryText={
                   <p>
@@ -84,6 +110,12 @@ export default class BrowserStarters extends Component {
                 }}
               />
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/pairs.png"
+                  />
+                }
                 primaryText="Pairs"
                 secondaryText={
                   <p>

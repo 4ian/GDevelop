@@ -10,6 +10,7 @@ import { List, ListItem } from 'material-ui/List';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { findEmptyPath } from './LocalPathFinder';
+import ListIcon from '../UI/ListIcon';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
@@ -77,6 +78,12 @@ export default class LocalStarters extends Component<Props, State> {
           <Column expand noMargin>
             <List>
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/platformer.png"
+                  />
+                }
                 primaryText={<Trans>Platformer</Trans>}
                 secondaryText={
                   <p>
@@ -90,12 +97,19 @@ export default class LocalStarters extends Component<Props, State> {
                 onClick={() => this.createFromExample('platformer')}
               />
               <ListItem
-                primaryText={<Trans>Space Shooter</Trans>}
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/space-shooter.png"
+                  />
+                }
+                primaryText={<Trans>8-bit Space Shooter</Trans>}
                 secondaryText={
                   <p>
                     <Trans>
-                      A side-scrolling shooter where you must defeat incoming
-                      enemies with your spaceship.
+                      A beautiful, retro side-scrolling shooter where you must
+                      defeat incoming enemies with your mecha transforming
+                      spaceship. Huge boss included!
                     </Trans>
                   </p>
                 }
@@ -103,6 +117,12 @@ export default class LocalStarters extends Component<Props, State> {
                 onClick={() => this.createFromExample('space-shooter')}
               />
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/isometric-game.png"
+                  />
+                }
                 primaryText={<Trans>Isometric game</Trans>}
                 secondaryText={
                   <p>
@@ -116,6 +136,12 @@ export default class LocalStarters extends Component<Props, State> {
                 onClick={() => this.createFromExample('isometric-game')}
               />
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/downhill-bike-physics-demo.png"
+                  />
+                }
                 primaryText="Downhill Bike Racing"
                 secondaryText={
                   <p>
@@ -131,6 +157,12 @@ export default class LocalStarters extends Component<Props, State> {
                 }
               />
               <ListItem
+                leftAvatar={
+                  <ListIcon
+                    iconSize={32}
+                    src="res/starters_icons/pairs.png"
+                  />
+                }
                 primaryText="Pairs"
                 secondaryText={
                   <p>

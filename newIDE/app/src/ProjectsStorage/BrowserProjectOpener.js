@@ -86,10 +86,10 @@ import screenShake from '../fixtures/screen-shake/screen-shake.json';
 import shootBulletInParabola from '../fixtures/shoot-bullet-in-parabola/shoot-bullet-in-parabola.json';
 import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
+import simpleSpaceShooter from '../fixtures/simple-space-shooter/simple-space-shooter.json';
 import snapObjectToGrid from '../fixtures/snap-object-to-grid/snap-object-to-grid.json';
 import spaceInvaders from '../fixtures/space-invaders/space-invaders.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
-import spaceShooterWithFunctions from '../fixtures/space-shooter-with-functions/space-shooter-with-functions.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
 import spriteFadeInOut from '../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
 import textEntryObject from '../fixtures/text-entry-object/text-entry-object.json';
@@ -278,6 +278,8 @@ export default class BrowserProjectOpener {
     } else if (url === 'example://shoot-bullets') {
       return Promise.resolve(shootBullets);
     } else if (url === 'example://shooting-bullets-explanation') {
+      return Promise.resolve(simpleSpaceShooter);
+    } else if (url === 'example://simple-space-shooter') {
       return Promise.resolve(shootingBulletsExplanation);
     } else if (url === 'example://snap-object-to-grid') {
       return Promise.resolve(snapObjectToGrid);
@@ -285,8 +287,6 @@ export default class BrowserProjectOpener {
       return Promise.resolve(spaceInvaders);
     } else if (url === 'example://space-shooter') {
       return Promise.resolve(spaceShooter);
-    } else if (url === 'example://space-shooter-with-functions') {
-      return Promise.resolve(spaceShooterWithFunctions);
     } else if (url === 'example://splash-screen') {
       return Promise.resolve(splashScreen);
     } else if (url === 'example://sprite-fade-in-out') {

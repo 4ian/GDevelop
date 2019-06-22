@@ -29,6 +29,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
         this._spritesContainer.addChild(this._borderSprites[i]);
     }
 
+    this._opacity = this._spritesContainer.alpha;
     runtimeScene.getLayer("").getRenderer().addRendererObject(this._spritesContainer, runtimeObject.getZOrder());
 };
 
@@ -40,7 +41,8 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
     if (this._spritesContainer.visible && this._wasRendered) {
-        this._spritesContainer.cacheAsBitmap = true;
+        this._spritesContainer.alpha = this._opacity;
+        this._spritesContainer.cacheAsBitmap = true;        
     }
 
     this._wasRendered = true;
@@ -48,13 +50,8 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() 
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
     //TODO: Workaround a not working property in PIXI.js:
-    this._centerSprite.alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
-
-    for (var borderCounter = 0; borderCounter < this._borderSprites.length; borderCounter++){
-        this._borderSprites[borderCounter].alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
-    }
-    
-    this._spritesContainer.cacheAsBitmap = false;
+    this._spritesContainer.alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
+    this._opacity = this._spritesContainer.alpha;
 }
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateAngle = function() {

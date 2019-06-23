@@ -30,7 +30,7 @@
 :not(input):not(textarea):not(canvas)::before {
     -webkit-user-select: none;
     user-select: none;
-    //cursor: default;
+    cursor: default;
 }
 a:not([draggable=true]), img:not([draggable=true]) {
     -webkit-user-drag: none;

@@ -29,7 +29,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
         this._spritesContainer.addChild(this._borderSprites[i]);
     }
 
-    this._opacity = this._spritesContainer.alpha;
+    this._alpha = this._spritesContainer.alpha;
     runtimeScene.getLayer("").getRenderer().addRendererObject(this._spritesContainer, runtimeObject.getZOrder());
 };
 
@@ -41,7 +41,11 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
     if (this._spritesContainer.visible && this._wasRendered) {
-        this._spritesContainer.alpha = this._opacity;
+        /* 
+        Update the alpha of the container to make sure that it's applied. 
+        If not done, the alpha will return to be full opaque when changing the colour.
+        */
+        this._spritesContainer.alpha = this._alpha;
         this._spritesContainer.cacheAsBitmap = true;        
     }
 
@@ -51,7 +55,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
     //TODO: Workaround a not working property in PIXI.js:
     this._spritesContainer.alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
-    this._opacity = this._spritesContainer.alpha;
+    this._alpha = this._spritesContainer.alpha;
 }
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateAngle = function() {

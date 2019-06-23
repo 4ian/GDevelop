@@ -19,6 +19,7 @@ import * as PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
+import CanvasCursor from './CanvasCursor';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -172,6 +173,11 @@ export default class InstancesEditorContainer extends Component {
     this.dropHandler = new DropHandler({
       canvas: this.canvasArea,
       onDrop: this._onDrop,
+    });
+
+    this.canvasCursor = new CanvasCursor({
+      canvas: this.canvasArea,
+      shouldMoveView: () => this.keyboardShortcuts.shouldMoveView(),
     });
 
     this._mountEditorComponents(this.props);
@@ -608,6 +614,7 @@ export default class InstancesEditorContainer extends Component {
     if (this.fpsLimiter.shouldUpdate()) {
       this.backgroundColor.render();
       this.viewPosition.render();
+      this.canvasCursor.render();
       this.grid.render();
       this.instancesRenderer.render();
       this.highlightedInstance.render();

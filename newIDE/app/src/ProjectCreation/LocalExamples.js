@@ -28,7 +28,11 @@ type State = {|
   exampleNames: ?Array<string>,
 |};
 
-export const showGameFileCreationError = (i18n: I18nType, outputPath: string, error: Error) => {
+export const showGameFileCreationError = (
+  i18n: I18nType,
+  outputPath: string,
+  error: Error
+) => {
   showWarningBox(
     i18n._(
       t`Unable to create the game in the specified folder. Check that you have permissions to write in this folder: ${outputPath} or choose another folder.`

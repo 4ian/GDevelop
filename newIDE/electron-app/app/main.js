@@ -43,7 +43,7 @@ let mainWindow = null;
 // so have to ignore one more).
 const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
   // "Officially" supported arguments and their types:
-  boolean: ['dev-tools', 'disable-updates-check'],
+  boolean: ['dev-tools', 'disable-update-check'],
   string: '_', // Files are always strings
 });
 

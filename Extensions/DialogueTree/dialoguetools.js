@@ -13,28 +13,13 @@ gdjs.dialoguetree.runner = new bondage.Runner();
  * @param {string} sceneVar The path where to save the screenshot
  */
 gdjs.dialoguetree.loadFromSceneVar = function(runtimeScene, sceneVar, startDialogueNode) {
-	this.runner = gdjs.dialoguetree.runner; //TODO needs to be initiated globally once, outside of any methods
+	this.runner = gdjs.dialoguetree.runner;
 	this.yarnData = JSON.parse(sceneVar.getAsString());
 	this.runner.load(this.yarnData);
 
 	if (startDialogueNode && startDialogueNode.length > 0) {
 		gdjs.dialoguetree.startFrom(startDialogueNode);
 	}
-};
-
-gdjs.dialoguetree.startFrom = function(startDialogueNode) {
-	this.optionsCount = 0;
-	this.options = [];
-	this.dialogueIsRunning = true;
-	this.dialogueBranchTitle = '';
-	this.dialogueBranchBody = '';
-	this.dialogueBranchTags = [];
-	this.dialogue = this.runner.run(startDialogueNode);
-	this.NextDialogueData = null;
-	this.dialogueData = null;
-	this.lastCommand = null;
-	this.pauseScrolling = false;
-	gdjs.dialoguetree.advanceDialogue();
 };
 
 gdjs.dialoguetree.isRunning = function() {
@@ -64,46 +49,31 @@ gdjs.dialoguetree.getClippedLineText = function() {
 
 gdjs.dialoguetree.scrollCippedText = function() {
 	if (this.pauseScrolling) return;
-	if (this.dialogueIsRunning && this.dialogueText) {
-		this.clipTextEnd += 1;
-	}
-	if (gdjs.dialoguetree.cippedTextScrollingHasCompleted() && this.NextDialogueData instanceof bondage.CommandResult) {
-		this.lastCommand = this.NextDialogueData.text;
-		this.lastDataType = 'command';
 
-		// if the command was to wait, wait x miliseconds before proceeding with scrolling
-		if (/^(wait\s?[0-9]{1,5})$/.test(this.lastCommand.toLowerCase())) {
-			var captured = this.lastCommand.toLowerCase().match(/([0-9]{1,5})$/gi)[0];
-			setTimeout(() => {
-				this.pauseScrolling = false;
-				// this.NextDialogueData = null;
-				gdjs.dialoguetree.advanceDialogue();
-			}, parseInt(captured));
-			this.pauseScrolling = true;
-			return;
-		}
-		// this.NextDialogueData = null;
-		gdjs.dialoguetree.advanceDialogue();
+	if (this.dialogueText) {
+		this.clipTextEnd += 1;
 	}
 };
 
 gdjs.dialoguetree.commandIsCalled = function(command) {
-	if (this.lastCommand) {
-		console.info('Dialogue tree cmd passed:', this.lastCommand);
-		if (this.lastCommand === command) {
-			console.info('Dialogue tree cmd picked by GD:', this.lastCommand);
+	var commandCalls = gdjs.dialoguetree.commandCalls;
+	var clipTextEnd = gdjs.dialoguetree.clipTextEnd;
+
+	return this.commandCalls.some(function(call, index) {
+		if (clipTextEnd >= call.time && call.cmd === command) {
+			commandCalls.splice(index, 1);
 			return true;
 		}
-	}
+		if (clipTextEnd >= call.time && call.cmd === 'wait') {
+			commandCalls.splice(index, 1);
+			setTimeout(function() {
+				gdjs.dialoguetree.pauseScrolling = false;
+			}, parseInt(call.param));
+			gdjs.dialoguetree.pauseScrolling = true;
+			return false;
+		}
+	});
 	return false;
-};
-
-gdjs.dialoguetree.cippedTextScrollingHasCompleted = function() {
-	//use this to force the game to wait for the text to complete before next line
-	if (this.dialogueData && this.dialogueText.length) {
-		// console.log('completed:', this.clipTextEnd, this.dialogueText.length);
-		return this.clipTextEnd >= this.dialogueText.length;
-	}
 };
 
 gdjs.dialoguetree._normalizedOptionIndex = function(optionIndex) {
@@ -133,6 +103,7 @@ gdjs.dialoguetree.lineOptionsCount = function() {
 gdjs.dialoguetree.confirmSelectOption = function() {
 	if (this.dialogueData.select && !this.selectedOptionUpdated && this.selectOption !== -1) {
 		this.dialogueData.select(this.selectOption);
+		this.dialogueData = this.dialogue.next().value;
 		gdjs.dialoguetree.advanceDialogue();
 	}
 };
@@ -167,10 +138,24 @@ gdjs.dialoguetree.getSelectOption = function() {
 };
 
 gdjs.dialoguetree.compareDialogueLineType = function(type) {
-	if (gdjs.dialoguetree.lineTypeIsText() && type === 'text') return true;
-	if (gdjs.dialoguetree.lineTypeIsOptions() && type === 'options') return true;
-	if (gdjs.dialoguetree.lineTypeIsCommand() && type === 'command') return true;
-	return false;
+	return this.dialogueDataType === type;
+};
+
+gdjs.dialoguetree.startFrom = function(startDialogueNode) {
+	this.optionsCount = 0;
+
+	this.options = [];
+	this.dialogueIsRunning = true;
+	this.dialogueBranchTitle = '';
+	this.dialogueBranchBody = '';
+	this.dialogueBranchTags = [];
+	this.dialogue = this.runner.run(startDialogueNode);
+	this.dialogueData = null;
+	this.commandCalls = [];
+	this.runCommands = false;
+	this.pauseScrolling = false;
+	this.dialogueData = this.dialogue.next().value;
+	gdjs.dialoguetree.advanceDialogue();
 };
 
 gdjs.dialoguetree.lineTypeIsText = function() {
@@ -180,49 +165,61 @@ gdjs.dialoguetree.lineTypeIsOptions = function() {
 	return this.dialogueData instanceof bondage.OptionsResult;
 };
 gdjs.dialoguetree.lineTypeIsCommand = function() {
-	// commands get passed to the engine and skipped automatically from any mandatory input, so we need to pick them from next state instead
-	return this.NextDialogueData instanceof bondage.CommandResult;
+	//TODO: needs REFACTOR
+	return this.dialogueData instanceof bondage.CommandResult || !isNaN(this.commandCalls[this.clipTextEnd]);
 };
 
+gdjs.dialoguetree.cippedTextScrollingHasCompleted = function() {
+	if (this.dialogueData && this.dialogueText.length) {
+		return this.clipTextEnd >= this.dialogueText.length;
+	}
+	return false;
+};
+
+/// Can be called only when scrolling is completed
 gdjs.dialoguetree.advanceDialogue = function() {
-	if (this.pauseScrolling) return;
-	// We need both this.dialogueData and this.NextDialogueData in order to handle command calls differently from text/options
-	// That way we know what dialoguedata we are on, but also what is the one comming up next or was  last.
-	// setting NextDialogueData to null forces dialogueData to use next().value in the next cycle instead of NextDialogueData
-	this.dialogueData = this.NextDialogueData ? this.NextDialogueData : this.dialogue.next().value;
 	this.optionsCount = 0;
 	this.selectOption = -1;
 	this.selectedOptionUpdated = false;
 
-	// console.log(this.runner);
-	console.log(this.dialogue);
 	if (gdjs.dialoguetree.lineTypeIsText()) {
-		// console.log('last type was:', this.lastDataType);
+		if (this.dialogueDataType === 'options' || this.dialogueDataType === 'text' || !this.dialogueDataType) {
+			this.clipTextEnd = 0;
+			this.dialogueText = this.dialogueData.text;
+		} else {
+			this.dialogueText += this.dialogueData.text;
+		}
+
+		this.dialogueDataType = 'text';
 		this.dialogueBranchTags = this.dialogueData.data.tags;
 		this.dialogueBranchTitle = this.dialogueData.data.title;
 		this.dialogueBranchBody = this.dialogueData.data.body;
-		if (this.lastDataType === 'command') {
-			this.dialogueText += this.dialogueData.text;
-		} else {
-			this.dialogueText = this.dialogueData.text;
-			this.clipTextEnd = 0;
-		}
-		this.lastDataType = 'text';
-		this.NextDialogueData = this.dialogue.next().value;
+		this.dialogueData = this.dialogue.next().value;
 	} else if (gdjs.dialoguetree.lineTypeIsOptions()) {
+		this.dialogueDataType = 'options';
 		this.optionsCount = this.dialogueData.options.length;
 		this.options = this.dialogueData.options;
 		this.selectedOptionUpdated = true;
-		this.NextDialogueData = null;
-		this.lastDataType = 'options';
 	} else if (gdjs.dialoguetree.lineTypeIsCommand()) {
-		this.lastDataType = 'command';
-		this.lastCommand = this.dialogueData.text;
-		this.NextDialogueData = null;
+		this.dialogueDataType = 'command';
+		var command = this.dialogueData.text.split(' ');
+		this.commandCalls.push({
+			cmd: command[0],
+			param: command[1],
+			time: this.dialogueText.length,
+		});
+		this.dialogueData = this.dialogue.next().value;
 		gdjs.dialoguetree.advanceDialogue();
 	} else {
-		this.lastDataType = 'unknown';
+		this.dialogueDataType = 'unknown';
 	}
+
+	/// Skip asking for input if command
+	if (gdjs.dialoguetree.lineTypeIsCommand()) {
+		this.dialogueDataType = 'command';
+		gdjs.dialoguetree.advanceDialogue();
+	}
+
 	if (!this.dialogueData) this.dialogueIsRunning = false;
 };
 

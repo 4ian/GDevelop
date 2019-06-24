@@ -207,6 +207,9 @@ class Instruction extends React.Component<Props, *> {
           {this._renderInstructionText(metadata)}
           {metadata.canHaveSubInstructions() && (
             <InstructionsList
+              style={
+                {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+              }
               extraClassName={subInstructionsContainer}
               instrsList={instruction.getSubInstructions()}
               areConditions={this.props.isCondition}

@@ -448,23 +448,17 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     );
   };
 
-  componentDidUpdate(prevProps: EventsTreeProps) {
-    if (prevProps.selection !== this.props.selection) {
-      // react-sortable-tree does the rendering by transforming treeData
-      // into a flat array, the result being memoized. This hack forces
-      // a re-rendering of events, by discarding the memoized flat array
-      // (otherwise, no re-rendering would be done).
-      this.setState(state => ({
-        treeData: state.treeData ? [...state.treeData] : null,
-      }));
-    }
-  }
-
   render() {
+    // react-sortable-tree does the rendering by transforming treeData
+    // into a flat array, the result being memoized. This hack forces
+    // a re-rendering of events, by discarding the memoized flat array
+    // (otherwise, no re-rendering would be done).
+    const treeData = this.state.treeData ? [...this.state.treeData] : null;
+
     return (
       <div style={styles.container}>
         <SortableTree
-          treeData={this.state.treeData}
+          treeData={treeData}
           scaffoldBlockPxWidth={indentWidth}
           onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}

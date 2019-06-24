@@ -40,11 +40,10 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function
 };
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
-    if (this._spritesContainer.visible && this._wasRendered) {
-        /* 
-        Update the alpha of the container to make sure that it's applied. 
-        If not done, the alpha will return to be full opaque when changing the colour.
-        */
+    if (this._spritesContainer.visible && this._wasRendered) { 
+        // Update the alpha of the container to make sure that it's applied.
+        // If not done, the alpha will be back to full opaque when changing the color
+        // of the object.
         this._spritesContainer.alpha = this._alpha;
         this._spritesContainer.cacheAsBitmap = true;        
     }

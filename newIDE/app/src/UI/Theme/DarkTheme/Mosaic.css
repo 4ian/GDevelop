@@ -26,12 +26,11 @@
 
 /* Separator draggable background */
 .mosaic-gd-dark-theme .mosaic-split.-column .mosaic-split-line {
-  height: 2px;
+  height: 1px;
   border-bottom: 1px solid #888888 !important;
   border-top: 1px solid #888888 !important;
   width: 100px;
   margin: auto;
-  background-color: #444444;
   bottom: auto !important;
 }
 

@@ -60,17 +60,17 @@ gdjs.dialoguetree.commandIsCalled = function(command) {
 	var clipTextEnd = gdjs.dialoguetree.clipTextEnd;
 
 	return this.commandCalls.some(function(call, index) {
-		if (clipTextEnd >= call.time && call.cmd === command) {
-			commandCalls.splice(index, 1);
-			return true;
-		}
 		if (clipTextEnd >= call.time && call.cmd === 'wait') {
 			commandCalls.splice(index, 1);
 			setTimeout(function() {
 				gdjs.dialoguetree.pauseScrolling = false;
 			}, parseInt(call.param));
 			gdjs.dialoguetree.pauseScrolling = true;
-			return false;
+			return true;
+		}
+		if (clipTextEnd >= call.time && call.cmd === command) {
+			commandCalls.splice(index, 1);
+			return true;
 		}
 	});
 	return false;
@@ -202,11 +202,14 @@ gdjs.dialoguetree.advanceDialogue = function() {
 		this.selectedOptionUpdated = true;
 	} else if (gdjs.dialoguetree.lineTypeIsCommand()) {
 		this.dialogueDataType = 'command';
+
 		var command = this.dialogueData.text.split(' ');
+		//if last command was to wait, increase time by one
+		var offsetTime = this.commandCalls.length && this.commandCalls[this.commandCalls.length - 1].cmd === 'wait' ? 1 : 0;
 		this.commandCalls.push({
 			cmd: command[0],
 			param: command[1],
-			time: this.dialogueText.length,
+			time: this.dialogueText.length + offsetTime,
 		});
 		this.dialogueData = this.dialogue.next().value;
 		gdjs.dialoguetree.advanceDialogue();

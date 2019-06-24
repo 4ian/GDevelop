@@ -44,7 +44,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Panel Sprite"), "PanelSprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction("SetOpacity",

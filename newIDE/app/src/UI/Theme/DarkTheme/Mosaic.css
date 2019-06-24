@@ -25,6 +25,18 @@
 }
 
 /* Separator draggable background */
-.mosaic-gd-dark-theme .mosaic-split.-column {
-  background-color: #444444 !important;
+.mosaic-gd-dark-theme .mosaic-split.-column .mosaic-split-line {
+  height: 2px;
+  border-bottom: 1px solid #888888 !important;
+  border-top: 1px solid #888888 !important;
+  width: 8%;
+  margin: auto;
+  background-color: #444444;
+  bottom: auto !important;
+}
+
+.mosaic-gd-dark-theme .mosaic-split:hover .mosaic-split-line {
+  border-color: #2b95d6 !important;
+  box-shadow: none !important;
+  cursor: ns-resize;
 }

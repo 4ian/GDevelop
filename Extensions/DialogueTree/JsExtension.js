@@ -292,6 +292,31 @@ module.exports = {
 
 		extension
 			.addStrExpression(
+				'GetCommandParameter',
+				_('Get the parameters of a command call'),
+				_('Get the parameters of a command call'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('expression', _('parameter Index Number'), '', true)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.getCommandParameter');
+
+		extension
+			.addExpression(
+				'GetCommandParametersCount',
+				_('Get the number of parameters in the currently passed command'),
+				_('Get the number of parameters in the currently passed command'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialoguetree.commandParametersCount');
+
+		extension
+			.addStrExpression(
 				'GetVisitedBranchTitles',
 				_('Get a list of all visited branches'),
 				_('Get a list of all visited branches'),

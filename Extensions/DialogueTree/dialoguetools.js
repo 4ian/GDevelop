@@ -55,20 +55,36 @@ gdjs.dialoguetree.scrollCippedText = function() {
 	}
 };
 
+gdjs.dialoguetree.commandParametersCount = function() {
+	if (this.cmdParams && this.cmdParams.length > 1) {
+		return this.cmdParams.length - 1;
+	}
+	return 0;
+};
+
+gdjs.dialoguetree.getCommandParameter = function(paramIndex) {
+	if (this.cmdParams && this.cmdParams.length >= paramIndex + 1) {
+		var returnedParam = this.cmdParams[paramIndex + 1];
+		return returnedParam ? returnedParam : '';
+	}
+	return '';
+};
+
 gdjs.dialoguetree.commandIsCalled = function(command) {
-	var commandCalls = gdjs.dialoguetree.commandCalls;
-	var clipTextEnd = gdjs.dialoguetree.clipTextEnd;
+	if (this.pauseScrolling) return;
+	var { commandCalls, clipTextEnd } = gdjs.dialoguetree;
 
 	return this.commandCalls.some(function(call, index) {
-		if (clipTextEnd >= call.time && call.cmd === 'wait') {
-			commandCalls.splice(index, 1);
+		if (clipTextEnd < call.time) return false;
+		if (call.cmd === 'wait') {
+			gdjs.dialoguetree.pauseScrolling = true;
 			setTimeout(function() {
 				gdjs.dialoguetree.pauseScrolling = false;
-			}, parseInt(call.param));
-			gdjs.dialoguetree.pauseScrolling = true;
-			return true;
+				commandCalls.splice(index, 1);
+			}, parseInt(call.params[1]));
 		}
-		if (clipTextEnd >= call.time && call.cmd === command) {
+		if (call.cmd === command) {
+			gdjs.dialoguetree.cmdParams = [...call.params];
 			commandCalls.splice(index, 1);
 			return true;
 		}
@@ -102,6 +118,7 @@ gdjs.dialoguetree.lineOptionsCount = function() {
 
 gdjs.dialoguetree.confirmSelectOption = function() {
 	if (this.dialogueData.select && !this.selectedOptionUpdated && this.selectOption !== -1) {
+		this.commandCalls = [];
 		this.dialogueData.select(this.selectOption);
 		this.dialogueData = this.dialogue.next().value;
 		gdjs.dialoguetree.advanceDialogue();
@@ -138,12 +155,11 @@ gdjs.dialoguetree.getSelectOption = function() {
 };
 
 gdjs.dialoguetree.compareDialogueLineType = function(type) {
-	return this.dialogueDataType === type;
+	return this.dialogueIsRunning ? this.dialogueDataType === type : false;
 };
 
 gdjs.dialoguetree.startFrom = function(startDialogueNode) {
 	this.optionsCount = 0;
-
 	this.options = [];
 	this.dialogueIsRunning = true;
 	this.dialogueBranchTitle = '';
@@ -151,7 +167,9 @@ gdjs.dialoguetree.startFrom = function(startDialogueNode) {
 	this.dialogueBranchTags = [];
 	this.dialogue = this.runner.run(startDialogueNode);
 	this.dialogueData = null;
+	this.dialogueDataType = '';
 	this.commandCalls = [];
+	this.cmdParams = [];
 	this.runCommands = false;
 	this.pauseScrolling = false;
 	this.dialogueData = this.dialogue.next().value;
@@ -186,6 +204,7 @@ gdjs.dialoguetree.advanceDialogue = function() {
 		if (this.dialogueDataType === 'options' || this.dialogueDataType === 'text' || !this.dialogueDataType) {
 			this.clipTextEnd = 0;
 			this.dialogueText = this.dialogueData.text;
+			this.commandCalls = [];
 		} else {
 			this.dialogueText += this.dialogueData.text;
 		}
@@ -208,7 +227,7 @@ gdjs.dialoguetree.advanceDialogue = function() {
 		var offsetTime = this.commandCalls.length && this.commandCalls[this.commandCalls.length - 1].cmd === 'wait' ? 1 : 0;
 		this.commandCalls.push({
 			cmd: command[0],
-			param: command[1],
+			params: command,
 			time: this.dialogueText.length + offsetTime,
 		});
 		this.dialogueData = this.dialogue.next().value;
@@ -217,13 +236,15 @@ gdjs.dialoguetree.advanceDialogue = function() {
 		this.dialogueDataType = 'unknown';
 	}
 
-	/// Skip asking for input if command
 	if (gdjs.dialoguetree.lineTypeIsCommand()) {
 		this.dialogueDataType = 'command';
 		gdjs.dialoguetree.advanceDialogue();
 	}
 
-	if (!this.dialogueData) this.dialogueIsRunning = false;
+	// dialogue has finished
+	if (!this.dialogueData) {
+		this.dialogueIsRunning = false;
+	}
 };
 
 gdjs.dialoguetree.getLineType = function() {

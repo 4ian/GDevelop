@@ -1,32 +1,32 @@
 /**
  * @memberof gdjs
- * @class dialoguetree
+ * @class dialogueTree
  * @static
  * @private
  */
 
-gdjs.dialoguetree = {};
-gdjs.dialoguetree.runner = new bondage.Runner();
+gdjs.dialogueTree = {};
+gdjs.dialogueTree.runner = new bondage.Runner();
 
 /**
  * Load the Dialogue Tree data of the game.
  * @param {string} sceneVar The path where to save the screenshot
  */
-gdjs.dialoguetree.loadFromSceneVar = function(runtimeScene, sceneVar, startDialogueNode) {
-	this.runner = gdjs.dialoguetree.runner;
+gdjs.dialogueTree.loadFromSceneVar = function(runtimeScene, sceneVar, startDialogueNode) {
+	this.runner = gdjs.dialogueTree.runner;
 	this.yarnData = JSON.parse(sceneVar.getAsString());
 	this.runner.load(this.yarnData);
 
 	if (startDialogueNode && startDialogueNode.length > 0) {
-		gdjs.dialoguetree.startFrom(startDialogueNode);
+		gdjs.dialogueTree.startFrom(startDialogueNode);
 	}
 };
 
-gdjs.dialoguetree.isRunning = function() {
+gdjs.dialogueTree.isRunning = function() {
 	return this.dialogueIsRunning;
 };
 
-gdjs.dialoguetree.selectedOptionHasUpdated = function() {
+gdjs.dialogueTree.selectedOptionHasUpdated = function() {
 	if (this.selectedOptionUpdated) {
 		this.selectedOptionUpdated = false;
 		if (this.selectOption === -1) this.selectOption = 0;
@@ -35,7 +35,7 @@ gdjs.dialoguetree.selectedOptionHasUpdated = function() {
 	return false;
 };
 
-gdjs.dialoguetree.getLineText = function() {
+gdjs.dialogueTree.getLineText = function() {
 	return this.dialogueData.text
 		? this.dialogueText
 		: this.dialogueData.options
@@ -43,11 +43,11 @@ gdjs.dialoguetree.getLineText = function() {
 		: '';
 };
 
-gdjs.dialoguetree.getClippedLineText = function() {
+gdjs.dialogueTree.getClippedLineText = function() {
 	return this.dialogueText.length ? this.dialogueText.substring(0, this.clipTextEnd) : '';
 };
 
-gdjs.dialoguetree.scrollCippedText = function() {
+gdjs.dialogueTree.scrollCippedText = function() {
 	if (this.pauseScrolling) return;
 
 	if (this.dialogueText) {
@@ -55,14 +55,14 @@ gdjs.dialoguetree.scrollCippedText = function() {
 	}
 };
 
-gdjs.dialoguetree.commandParametersCount = function() {
+gdjs.dialogueTree.commandParametersCount = function() {
 	if (this.cmdParams && this.cmdParams.length > 1) {
 		return this.cmdParams.length - 1;
 	}
 	return 0;
 };
 
-gdjs.dialoguetree.getCommandParameter = function(paramIndex) {
+gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
 	if (this.cmdParams && this.cmdParams.length >= paramIndex + 1) {
 		var returnedParam = this.cmdParams[paramIndex + 1];
 		return returnedParam ? returnedParam : '';
@@ -70,21 +70,21 @@ gdjs.dialoguetree.getCommandParameter = function(paramIndex) {
 	return '';
 };
 
-gdjs.dialoguetree.commandIsCalled = function(command) {
+gdjs.dialogueTree.commandIsCalled = function(command) {
 	if (this.pauseScrolling) return;
-	var { commandCalls, clipTextEnd } = gdjs.dialoguetree;
+	var { commandCalls, clipTextEnd } = gdjs.dialogueTree;
 
 	return this.commandCalls.some(function(call, index) {
 		if (clipTextEnd < call.time) return false;
 		if (call.cmd === 'wait') {
-			gdjs.dialoguetree.pauseScrolling = true;
+			gdjs.dialogueTree.pauseScrolling = true;
 			setTimeout(function() {
-				gdjs.dialoguetree.pauseScrolling = false;
+				gdjs.dialogueTree.pauseScrolling = false;
 				commandCalls.splice(index, 1);
 			}, parseInt(call.params[1]));
 		}
 		if (call.cmd === command) {
-			gdjs.dialoguetree.cmdParams = [...call.params];
+			gdjs.dialogueTree.cmdParams = [...call.params];
 			commandCalls.splice(index, 1);
 			return true;
 		}
@@ -92,73 +92,73 @@ gdjs.dialoguetree.commandIsCalled = function(command) {
 	return false;
 };
 
-gdjs.dialoguetree._normalizedOptionIndex = function(optionIndex) {
+gdjs.dialogueTree._normalizedOptionIndex = function(optionIndex) {
 	if (optionIndex >= this.options.length) optionIndex = this.options.length - 1;
 	if (optionIndex < 0) optionIndex = 0;
 	return optionIndex;
 };
 
-gdjs.dialoguetree._cycledOptionIndex = function(optionIndex) {
+gdjs.dialogueTree._cycledOptionIndex = function(optionIndex) {
 	if (optionIndex >= this.options.length) optionIndex = 0;
 	if (optionIndex < 0) optionIndex = this.options.length - 1;
 	return optionIndex;
 };
 
-gdjs.dialoguetree.getLineOption = function(optionIndex) {
+gdjs.dialogueTree.getLineOption = function(optionIndex) {
 	if (!this.options.length) return [];
-	optionIndex = gdjs.dialoguetree._normalizedOptionIndex(optionIndex);
+	optionIndex = gdjs.dialogueTree._normalizedOptionIndex(optionIndex);
 	return this.options[optionIndex];
 };
 
-gdjs.dialoguetree.lineOptionsCount = function() {
+gdjs.dialogueTree.lineOptionsCount = function() {
 	if (this.options.length) {
 		return this.optionsCount;
 	}
 };
 
-gdjs.dialoguetree.confirmSelectOption = function() {
+gdjs.dialogueTree.confirmSelectOption = function() {
 	if (this.dialogueData.select && !this.selectedOptionUpdated && this.selectOption !== -1) {
 		this.commandCalls = [];
 		this.dialogueData.select(this.selectOption);
 		this.dialogueData = this.dialogue.next().value;
-		gdjs.dialoguetree.advanceDialogue();
+		gdjs.dialogueTree.advanceDialogue();
 	}
 };
 
-gdjs.dialoguetree.selectNextOption = function() {
+gdjs.dialogueTree.selectNextOption = function() {
 	if (this.dialogueData.select) {
 		this.selectOption += 1;
-		this.selectOption = gdjs.dialoguetree._cycledOptionIndex(this.selectOption);
+		this.selectOption = gdjs.dialogueTree._cycledOptionIndex(this.selectOption);
 		this.selectedOptionUpdated = true;
 	}
 };
 
-gdjs.dialoguetree.selectPreviousOption = function() {
+gdjs.dialogueTree.selectPreviousOption = function() {
 	if (this.dialogueData.select) {
 		this.selectOption -= 1;
-		this.selectOption = gdjs.dialoguetree._cycledOptionIndex(this.selectOption);
+		this.selectOption = gdjs.dialogueTree._cycledOptionIndex(this.selectOption);
 		this.selectedOptionUpdated = true;
 	}
 };
 
-gdjs.dialoguetree.selectOption = function(optionIndex) {
+gdjs.dialogueTree.selectOption = function(optionIndex) {
 	if (this.dialogueData.select) {
-		this.selectOption = gdjs.dialoguetree._normalizedOptionIndex(this.selectOption);
+		this.selectOption = gdjs.dialogueTree._normalizedOptionIndex(this.selectOption);
 		this.selectedOptionUpdated = true;
 	}
 };
 
-gdjs.dialoguetree.getSelectOption = function() {
+gdjs.dialogueTree.getSelectOption = function() {
 	if (this.dialogueData.select) {
 		return this.selectOption;
 	}
 };
 
-gdjs.dialoguetree.compareDialogueLineType = function(type) {
+gdjs.dialogueTree.compareDialogueLineType = function(type) {
 	return this.dialogueIsRunning ? this.dialogueDataType === type : false;
 };
 
-gdjs.dialoguetree.startFrom = function(startDialogueNode) {
+gdjs.dialogueTree.startFrom = function(startDialogueNode) {
 	this.optionsCount = 0;
 	this.options = [];
 	this.dialogueIsRunning = true;
@@ -173,21 +173,21 @@ gdjs.dialoguetree.startFrom = function(startDialogueNode) {
 	this.runCommands = false;
 	this.pauseScrolling = false;
 	this.dialogueData = this.dialogue.next().value;
-	gdjs.dialoguetree.advanceDialogue();
+	gdjs.dialogueTree.advanceDialogue();
 };
 
-gdjs.dialoguetree.lineTypeIsText = function() {
+gdjs.dialogueTree.lineTypeIsText = function() {
 	return this.dialogueData instanceof bondage.TextResult;
 };
-gdjs.dialoguetree.lineTypeIsOptions = function() {
+gdjs.dialogueTree.lineTypeIsOptions = function() {
 	return this.dialogueData instanceof bondage.OptionsResult;
 };
-gdjs.dialoguetree.lineTypeIsCommand = function() {
+gdjs.dialogueTree.lineTypeIsCommand = function() {
 	//TODO: needs REFACTOR
 	return this.dialogueData instanceof bondage.CommandResult || !isNaN(this.commandCalls[this.clipTextEnd]);
 };
 
-gdjs.dialoguetree.cippedTextScrollingHasCompleted = function() {
+gdjs.dialogueTree.cippedTextScrollingHasCompleted = function() {
 	if (this.dialogueData && this.dialogueText.length) {
 		return this.clipTextEnd >= this.dialogueText.length;
 	}
@@ -195,12 +195,12 @@ gdjs.dialoguetree.cippedTextScrollingHasCompleted = function() {
 };
 
 /// Can be called only when scrolling is completed
-gdjs.dialoguetree.advanceDialogue = function() {
+gdjs.dialogueTree.advanceDialogue = function() {
 	this.optionsCount = 0;
 	this.selectOption = -1;
 	this.selectedOptionUpdated = false;
 
-	if (gdjs.dialoguetree.lineTypeIsText()) {
+	if (gdjs.dialogueTree.lineTypeIsText()) {
 		if (this.dialogueDataType === 'options' || this.dialogueDataType === 'text' || !this.dialogueDataType) {
 			this.clipTextEnd = 0;
 			this.dialogueText = this.dialogueData.text;
@@ -214,12 +214,12 @@ gdjs.dialoguetree.advanceDialogue = function() {
 		this.dialogueBranchTitle = this.dialogueData.data.title;
 		this.dialogueBranchBody = this.dialogueData.data.body;
 		this.dialogueData = this.dialogue.next().value;
-	} else if (gdjs.dialoguetree.lineTypeIsOptions()) {
+	} else if (gdjs.dialogueTree.lineTypeIsOptions()) {
 		this.dialogueDataType = 'options';
 		this.optionsCount = this.dialogueData.options.length;
 		this.options = this.dialogueData.options;
 		this.selectedOptionUpdated = true;
-	} else if (gdjs.dialoguetree.lineTypeIsCommand()) {
+	} else if (gdjs.dialogueTree.lineTypeIsCommand()) {
 		this.dialogueDataType = 'command';
 
 		var command = this.dialogueData.text.split(' ');
@@ -231,14 +231,14 @@ gdjs.dialoguetree.advanceDialogue = function() {
 			time: this.dialogueText.length + offsetTime,
 		});
 		this.dialogueData = this.dialogue.next().value;
-		gdjs.dialoguetree.advanceDialogue();
+		gdjs.dialogueTree.advanceDialogue();
 	} else {
 		this.dialogueDataType = 'unknown';
 	}
 
-	if (gdjs.dialoguetree.lineTypeIsCommand()) {
+	if (gdjs.dialogueTree.lineTypeIsCommand()) {
 		this.dialogueDataType = 'command';
-		gdjs.dialoguetree.advanceDialogue();
+		gdjs.dialogueTree.advanceDialogue();
 	}
 
 	// dialogue has finished
@@ -247,32 +247,32 @@ gdjs.dialoguetree.advanceDialogue = function() {
 	}
 };
 
-gdjs.dialoguetree.getLineType = function() {
+gdjs.dialogueTree.getLineType = function() {
 	return this.lastDataType;
 };
 
-gdjs.dialoguetree.getBranchTitle = function() {
+gdjs.dialogueTree.getBranchTitle = function() {
 	if (this.dialogueIsRunning) {
 		return this.dialogueBranchTitle;
 	}
 	return '';
 };
 
-gdjs.dialoguetree.branchTitleIs = function(title) {
+gdjs.dialogueTree.branchTitleIs = function(title) {
 	if (this.dialogueIsRunning) {
 		return this.dialogueBranchTitle === title;
 	}
 	return false;
 };
 
-gdjs.dialoguetree.getBranchTags = function() {
+gdjs.dialogueTree.getBranchTags = function() {
 	if (this.dialogueIsRunning) {
 		return this.dialogueBranchTags.join(',');
 	}
 	return '';
 };
 
-gdjs.dialoguetree.getBranchTag = function(index) {
+gdjs.dialogueTree.getBranchTag = function(index) {
 	if (this.dialogueIsRunning) {
 		if (index > this.dialogueBranchTags.length - 1) index = this.dialogueBranchTags.length - 1;
 		return this.dialogueBranchTags[index];
@@ -280,65 +280,65 @@ gdjs.dialoguetree.getBranchTag = function(index) {
 	return '';
 };
 
-gdjs.dialoguetree.branchContainsTag = function(tag) {
+gdjs.dialogueTree.branchContainsTag = function(tag) {
 	if (this.dialogueIsRunning) {
 		return this.dialogueBranchTags.includes(tag);
 	}
 	return false;
 };
 
-gdjs.dialoguetree.getVisitedBranchTitles = function() {
+gdjs.dialogueTree.getVisitedBranchTitles = function() {
 	return Object.keys(this.runner.visited).join(',');
 };
 
-gdjs.dialoguetree.branchTitleHasBeenVisited = function(title) {
+gdjs.dialogueTree.branchTitleHasBeenVisited = function(title) {
 	return Object.keys(this.runner.visited).includes(title) && this.runner.visited[title];
 };
 
-gdjs.dialoguetree.getBranchText = function() {
+gdjs.dialogueTree.getBranchText = function() {
 	if (this.dialogueIsRunning) {
 		return this.dialogueBranchBody;
 	}
 	return '';
 };
 
-gdjs.dialoguetree.getBranchText = function() {
+gdjs.dialogueTree.getBranchText = function() {
 	if (this.dialogueIsRunning) {
 		return this.dialogueBranchBody;
 	}
 	return '';
 };
 
-gdjs.dialoguetree.getVariable = function(key) {
+gdjs.dialogueTree.getVariable = function(key) {
 	if (key in this.runner.variables.data) {
 		return this.runner.variables.data[key];
 	}
 	return '';
 };
 
-gdjs.dialoguetree.compareVariable = function(key, value) {
+gdjs.dialogueTree.compareVariable = function(key, value) {
 	if (key in this.runner.variables.data) {
 		return this.runner.variables.data[key].toString() === value;
 	}
 	return false;
 };
 
-gdjs.dialoguetree.saveState = function(storeVar) {
+gdjs.dialogueTree.saveState = function(storeVar) {
 	const dialogueState = {
-		variables: gdjs.dialoguetree.runner.variables.data,
-		visited: gdjs.dialoguetree.runner.visited,
+		variables: gdjs.dialogueTree.runner.variables.data,
+		visited: gdjs.dialogueTree.runner.visited,
 	};
 	gdjs.evtTools.network._objectToVariable(dialogueState, storeVar);
 };
 
-gdjs.dialoguetree.loadState = function(storeVar) {
+gdjs.dialogueTree.loadState = function(storeVar) {
 	const jsonData = gdjs.evtTools.network.variableStructureToJSON(storeVar);
 	const loadedState = JSON.parse(gdjs.evtTools.network.variableStructureToJSON(storeVar));
-	gdjs.dialoguetree.runner.visited = loadedState.visited;
-	gdjs.dialoguetree.runner.variables.data = loadedState.variables;
+	gdjs.dialogueTree.runner.visited = loadedState.visited;
+	gdjs.dialogueTree.runner.variables.data = loadedState.variables;
 };
 
-gdjs.dialoguetree.setVariable = function(key, value) {
+gdjs.dialogueTree.setVariable = function(key, value) {
 	if (this.runner.variables.data) {
 		this.runner.variables.data[key] = value;
 	}

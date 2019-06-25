@@ -40,7 +40,7 @@ module.exports = {
 			.getCodeExtraInformation()
 			.setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
 			.addIncludeFile('Extensions/DialogueTree/bondage.min.js')
-			.setFunctionName('gdjs.dialoguetree.loadFromSceneVar');
+			.setFunctionName('gdjs.dialogueTree.loadFromSceneVar');
 
 		extension
 			.addAction(
@@ -55,7 +55,7 @@ module.exports = {
 			.addParameter('string', _('Dialogue node'))
 			.setDefaultValue('Start')
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.startFrom');
+			.setFunctionName('gdjs.dialogueTree.startFrom');
 
 		extension
 			.addAction(
@@ -68,7 +68,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.advanceDialogue');
+			.setFunctionName('gdjs.dialogueTree.advanceDialogue');
 
 		extension
 			.addAction(
@@ -81,7 +81,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.confirmSelectOption');
+			.setFunctionName('gdjs.dialogueTree.confirmSelectOption');
 
 		extension
 			.addAction(
@@ -94,7 +94,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.selectNextOption');
+			.setFunctionName('gdjs.dialogueTree.selectNextOption');
 
 		extension
 			.addAction(
@@ -107,7 +107,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.selectPreviousOption');
+			.setFunctionName('gdjs.dialogueTree.selectPreviousOption');
 
 		extension
 			.addAction(
@@ -122,7 +122,7 @@ module.exports = {
 			.addParameter('expression', _('Option index number'))
 			.setDefaultValue('0')
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.selectPreviousOption');
+			.setFunctionName('gdjs.dialogueTree.selectPreviousOption');
 
 		extension
 			.addAction(
@@ -135,7 +135,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.scrollCippedText');
+			.setFunctionName('gdjs.dialogueTree.scrollCippedText');
 
 		extension
 			.addAction(
@@ -150,7 +150,7 @@ module.exports = {
 			.addParameter('string', _('State Variable Name'))
 			.addParameter('expression', _('Variable Value'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.setVariable');
+			.setFunctionName('gdjs.dialogueTree.setVariable');
 
 		extension
 			.addAction(
@@ -164,7 +164,7 @@ module.exports = {
 			)
 			.addParameter('globalvar', _('Global Variable'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.saveState');
+			.setFunctionName('gdjs.dialogueTree.saveState');
 
 		extension
 			.addAction(
@@ -178,7 +178,7 @@ module.exports = {
 			)
 			.addParameter('globalvar', _('Global Variable'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.loadState');
+			.setFunctionName('gdjs.dialogueTree.loadState');
 
 		extension
 			.addStrExpression(
@@ -190,7 +190,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getLineText');
+			.setFunctionName('gdjs.dialogueTree.getLineText');
 
 		extension
 			.addStrExpression(
@@ -202,7 +202,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getLineType');
+			.setFunctionName('gdjs.dialogueTree.getLineType');
 
 		extension
 			.addExpression(
@@ -214,7 +214,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.lineOptionsCount');
+			.setFunctionName('gdjs.dialogueTree.lineOptionsCount');
 
 		extension
 			.addStrExpression(
@@ -227,7 +227,7 @@ module.exports = {
 			)
 			.addParameter('expression', _('Option Index Number'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getLineOption');
+			.setFunctionName('gdjs.dialogueTree.getLineOption');
 
 		extension
 			.addExpression(
@@ -239,7 +239,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getSelectOption');
+			.setFunctionName('gdjs.dialogueTree.getSelectOption');
 
 		extension
 			.addStrExpression(
@@ -251,7 +251,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getClippedLineText');
+			.setFunctionName('gdjs.dialogueTree.getClippedLineText');
 
 		extension
 			.addStrExpression(
@@ -263,7 +263,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getBranchTitle');
+			.setFunctionName('gdjs.dialogueTree.getBranchTitle');
 
 		extension
 			.addStrExpression(
@@ -275,7 +275,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getBranchTags');
+			.setFunctionName('gdjs.dialogueTree.getBranchTags');
 
 		extension
 			.addStrExpression(
@@ -288,7 +288,7 @@ module.exports = {
 			)
 			.addParameter('expression', _('Tag Index Number'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getBranchTag');
+			.setFunctionName('gdjs.dialogueTree.getBranchTag');
 
 		extension
 			.addStrExpression(
@@ -301,7 +301,7 @@ module.exports = {
 			)
 			.addParameter('expression', _('parameter Index Number'), '', true)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getCommandParameter');
+			.setFunctionName('gdjs.dialogueTree.getCommandParameter');
 
 		extension
 			.addExpression(
@@ -313,7 +313,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.commandParametersCount');
+			.setFunctionName('gdjs.dialogueTree.commandParametersCount');
 
 		extension
 			.addStrExpression(
@@ -325,7 +325,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getVisitedBranchTitles');
+			.setFunctionName('gdjs.dialogueTree.getVisitedBranchTitles');
 
 		extension
 			.addStrExpression(
@@ -337,7 +337,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getBranchText');
+			.setFunctionName('gdjs.dialogueTree.getBranchText');
 
 		extension
 			.addExpression(
@@ -350,7 +350,7 @@ module.exports = {
 			)
 			.addParameter('string', _('Variable Name'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.getVariable');
+			.setFunctionName('gdjs.dialogueTree.getVariable');
 
 		extension
 			.addCondition(
@@ -364,7 +364,7 @@ module.exports = {
 			)
 			.addParameter('string', _('Command String'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.commandIsCalled');
+			.setFunctionName('gdjs.dialogueTree.commandIsCalled');
 
 		extension
 			.addCondition(
@@ -378,7 +378,7 @@ module.exports = {
 			)
 			.addParameter('stringWithSelector', _('type'), '["text", "options", "command"]', false)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.compareDialogueLineType');
+			.setFunctionName('gdjs.dialogueTree.compareDialogueLineType');
 
 		extension
 			.addCondition(
@@ -391,7 +391,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.isRunning');
+			.setFunctionName('gdjs.dialogueTree.isRunning');
 
 		extension
 			.addCondition(
@@ -404,7 +404,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.selectedOptionHasUpdated');
+			.setFunctionName('gdjs.dialogueTree.selectedOptionHasUpdated');
 
 		extension
 			.addCondition(
@@ -418,7 +418,7 @@ module.exports = {
 			)
 			.addParameter('string', _('title name'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.branchTitleIs');
+			.setFunctionName('gdjs.dialogueTree.branchTitleIs');
 
 		extension
 			.addCondition(
@@ -432,7 +432,7 @@ module.exports = {
 			)
 			.addParameter('string', _('tag name'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.branchContainsTag');
+			.setFunctionName('gdjs.dialogueTree.branchContainsTag');
 
 		extension
 			.addCondition(
@@ -446,7 +446,7 @@ module.exports = {
 			)
 			.addParameter('string', _('branch title'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.branchTitleHasBeenVisited');
+			.setFunctionName('gdjs.dialogueTree.branchTitleHasBeenVisited');
 
 		extension
 			.addCondition(
@@ -461,7 +461,7 @@ module.exports = {
 			.addParameter('string', _('State variable'))
 			.addParameter('string', _('Equal to'))
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.compareVariable');
+			.setFunctionName('gdjs.dialogueTree.compareVariable');
 
 		extension
 			.addCondition(
@@ -474,7 +474,7 @@ module.exports = {
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialoguetree.cippedTextScrollingHasCompleted');
+			.setFunctionName('gdjs.dialogueTree.cippedTextScrollingHasCompleted');
 
 		return extension;
 	},

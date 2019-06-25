@@ -36,11 +36,8 @@ gdjs.dialogueTree.selectedOptionHasUpdated = function() {
 };
 
 gdjs.dialogueTree.getLineText = function() {
-	return this.dialogueData.text
-		? this.dialogueText
-		: this.dialogueData.options
-		? this.dialogueData.options.join(' - ')
-		: '';
+	this.clipTextEnd = this.dialogueText.length;
+	return this.dialogueText.length ? this.dialogueText : '';
 };
 
 gdjs.dialogueTree.getClippedLineText = function() {
@@ -72,11 +69,11 @@ gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
 
 gdjs.dialogueTree.commandIsCalled = function(command) {
 	if (this.pauseScrolling) return;
-	var { commandCalls, clipTextEnd } = gdjs.dialogueTree;
+	var { commandCalls, clipTextEnd, dialogueText } = gdjs.dialogueTree;
 
 	return this.commandCalls.some(function(call, index) {
 		if (clipTextEnd < call.time) return false;
-		if (call.cmd === 'wait') {
+		if (call.cmd === 'wait' && clipTextEnd !== dialogueText.length) {
 			gdjs.dialogueTree.pauseScrolling = true;
 			setTimeout(function() {
 				gdjs.dialogueTree.pauseScrolling = false;
@@ -84,7 +81,7 @@ gdjs.dialogueTree.commandIsCalled = function(command) {
 			}, parseInt(call.params[1]));
 		}
 		if (call.cmd === command) {
-			gdjs.dialogueTree.cmdParams = [...call.params];
+			gdjs.dialogueTree.cmdParams = call.params;
 			commandCalls.splice(index, 1);
 			return true;
 		}
@@ -176,6 +173,7 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
 	this.dialogue = this.runner.run(startDialogueNode);
 	this.dialogueData = null;
 	this.dialogueDataType = '';
+	this.dialogueText = '';
 	this.commandCalls = [];
 	this.cmdParams = [];
 	this.pauseScrolling = false;

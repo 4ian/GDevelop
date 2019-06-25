@@ -155,6 +155,14 @@ gdjs.dialogueTree.getSelectOption = function() {
 };
 
 gdjs.dialogueTree.compareDialogueLineType = function(type) {
+	if (
+		this.commandCalls.length &&
+		this.commandCalls.some(function(call) {
+			return gdjs.dialogueTree.clipTextEnd > call.time;
+		})
+	) {
+		return true;
+	}
 	return this.dialogueIsRunning ? this.dialogueDataType === type : false;
 };
 
@@ -170,21 +178,19 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
 	this.dialogueDataType = '';
 	this.commandCalls = [];
 	this.cmdParams = [];
-	this.runCommands = false;
 	this.pauseScrolling = false;
 	this.dialogueData = this.dialogue.next().value;
 	gdjs.dialogueTree.advanceDialogue();
 };
 
-gdjs.dialogueTree.lineTypeIsText = function() {
+gdjs.dialogueTree._lineTypeIsText = function() {
 	return this.dialogueData instanceof bondage.TextResult;
 };
-gdjs.dialogueTree.lineTypeIsOptions = function() {
+gdjs.dialogueTree._lineTypeIsOptions = function() {
 	return this.dialogueData instanceof bondage.OptionsResult;
 };
-gdjs.dialogueTree.lineTypeIsCommand = function() {
-	//TODO: needs REFACTOR
-	return this.dialogueData instanceof bondage.CommandResult || !isNaN(this.commandCalls[this.clipTextEnd]);
+gdjs.dialogueTree._lineTypeIsCommand = function() {
+	return this.dialogueData instanceof bondage.CommandResult;
 };
 
 gdjs.dialogueTree.cippedTextScrollingHasCompleted = function() {
@@ -200,7 +206,7 @@ gdjs.dialogueTree.advanceDialogue = function() {
 	this.selectOption = -1;
 	this.selectedOptionUpdated = false;
 
-	if (gdjs.dialogueTree.lineTypeIsText()) {
+	if (gdjs.dialogueTree._lineTypeIsText()) {
 		if (this.dialogueDataType === 'options' || this.dialogueDataType === 'text' || !this.dialogueDataType) {
 			this.clipTextEnd = 0;
 			this.dialogueText = this.dialogueData.text;
@@ -214,12 +220,12 @@ gdjs.dialogueTree.advanceDialogue = function() {
 		this.dialogueBranchTitle = this.dialogueData.data.title;
 		this.dialogueBranchBody = this.dialogueData.data.body;
 		this.dialogueData = this.dialogue.next().value;
-	} else if (gdjs.dialogueTree.lineTypeIsOptions()) {
+	} else if (gdjs.dialogueTree._lineTypeIsOptions()) {
 		this.dialogueDataType = 'options';
 		this.optionsCount = this.dialogueData.options.length;
 		this.options = this.dialogueData.options;
 		this.selectedOptionUpdated = true;
-	} else if (gdjs.dialogueTree.lineTypeIsCommand()) {
+	} else if (gdjs.dialogueTree._lineTypeIsCommand()) {
 		this.dialogueDataType = 'command';
 
 		var command = this.dialogueData.text.split(' ');
@@ -236,7 +242,7 @@ gdjs.dialogueTree.advanceDialogue = function() {
 		this.dialogueDataType = 'unknown';
 	}
 
-	if (gdjs.dialogueTree.lineTypeIsCommand()) {
+	if (gdjs.dialogueTree._lineTypeIsCommand()) {
 		this.dialogueDataType = 'command';
 		gdjs.dialogueTree.advanceDialogue();
 	}

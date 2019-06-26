@@ -53,15 +53,15 @@ gdjs.dialogueTree.scrollCippedText = function() {
 };
 
 gdjs.dialogueTree.commandParametersCount = function() {
-	if (this.cmdParams && this.cmdParams.length > 1) {
-		return this.cmdParams.length - 1;
+	if (this.commandParameters && this.commandParameters.length > 1) {
+		return this.commandParameters.length - 1;
 	}
 	return 0;
 };
 
 gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
-	if (this.cmdParams && this.cmdParams.length >= paramIndex + 1) {
-		var returnedParam = this.cmdParams[paramIndex + 1];
+	if (this.commandParameters && this.commandParameters.length >= paramIndex + 1) {
+		var returnedParam = this.commandParameters[paramIndex + 1];
 		return returnedParam ? returnedParam : '';
 	}
 	return '';
@@ -81,7 +81,7 @@ gdjs.dialogueTree.commandIsCalled = function(command) {
 			}, parseInt(call.params[1]));
 		}
 		if (call.cmd === command) {
-			gdjs.dialogueTree.cmdParams = call.params;
+			gdjs.dialogueTree.commandParameters = call.params;
 			commandCalls.splice(index, 1);
 			return true;
 		}
@@ -116,6 +116,7 @@ gdjs.dialogueTree.lineOptionsCount = function() {
 gdjs.dialogueTree.confirmSelectOption = function() {
 	if (this.dialogueData.select && !this.selectedOptionUpdated && this.selectOption !== -1) {
 		this.commandCalls = [];
+		// this.tagParameters = [];
 		this.dialogueData.select(this.selectOption);
 		this.dialogueData = this.dialogue.next().value;
 		gdjs.dialogueTree.advanceDialogue();
@@ -170,12 +171,13 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
 	this.dialogueBranchTitle = '';
 	this.dialogueBranchBody = '';
 	this.dialogueBranchTags = [];
+	this.tagParameters = [];
 	this.dialogue = this.runner.run(startDialogueNode);
 	this.dialogueData = null;
 	this.dialogueDataType = '';
 	this.dialogueText = '';
 	this.commandCalls = [];
-	this.cmdParams = [];
+	this.commandParameters = [];
 	this.pauseScrolling = false;
 	this.dialogueData = this.dialogue.next().value;
 	gdjs.dialogueTree.advanceDialogue();
@@ -285,6 +287,7 @@ gdjs.dialogueTree.getBranchTag = function(index) {
 };
 
 gdjs.dialogueTree.branchContainsTag = function(query) {
+	this.tagParameters = [];
 	if (this.dialogueIsRunning && this.dialogueBranchTags.length) {
 		return this.dialogueBranchTags.some(function(tag) {
 			var splitTag = tag.match(/([^\(]+)\(([^\)]+)\)/i);
@@ -292,6 +295,7 @@ gdjs.dialogueTree.branchContainsTag = function(query) {
 			return splitTag ? splitTag[1] === query : tag === query;
 		});
 	}
+
 	return false;
 };
 

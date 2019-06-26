@@ -317,6 +317,19 @@ module.exports = {
 
 		extension
 			.addStrExpression(
+				'GetTagParameter',
+				_('Get Parameter from a Tag found by the Branch contains tag condition'),
+				_('Get Parameter from a Tag found by the Branch contains tag condition'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('expression', _('parameter Index Number'), '', true)
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialogueTree.getTagParameter');
+
+		extension
+			.addStrExpression(
 				'GetVisitedBranchTitles',
 				_('Get a list of all visited branches'),
 				_('Get a list of all visited branches'),

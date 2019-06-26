@@ -284,11 +284,23 @@ gdjs.dialogueTree.getBranchTag = function(index) {
 	return '';
 };
 
-gdjs.dialogueTree.branchContainsTag = function(tag) {
-	if (this.dialogueIsRunning) {
-		return this.dialogueBranchTags.includes(tag);
+gdjs.dialogueTree.branchContainsTag = function(query) {
+	if (this.dialogueIsRunning && this.dialogueBranchTags.length) {
+		return this.dialogueBranchTags.some(function(tag) {
+			var splitTag = tag.match(/([^\(]+)\(([^\)]+)\)/i);
+			gdjs.dialogueTree.tagParameters = splitTag ? splitTag[2].split(',') : [];
+			return splitTag ? splitTag[1] === query : tag === query;
+		});
 	}
 	return false;
+};
+
+gdjs.dialogueTree.getTagParameter = function(paramIndex) {
+	if (this.dialogueIsRunning && this.tagParameters.length >= paramIndex) {
+		var returnedParam = this.tagParameters[paramIndex];
+		return returnedParam ? returnedParam : '';
+	}
+	return '';
 };
 
 gdjs.dialogueTree.getVisitedBranchTitles = function() {

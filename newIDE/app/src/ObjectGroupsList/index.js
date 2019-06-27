@@ -299,7 +299,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       "This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?"
     );
     if (!answer) return;
-  
+
     globalObjectGroups.insertNew(groupName, globalObjectGroups.count());
     objectGroups.remove(groupName);
     this.forceUpdate();

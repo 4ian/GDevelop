@@ -299,4 +299,5 @@ gdjs.InputManager.prototype.onFrameEnded = function() {
     this._endedTouches.length = 0;
     this._releasedKeys.clear();
     this._releasedMouseButtons.length = 0;
+    this._mouseWheelDelta = 0;
 };

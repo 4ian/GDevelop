@@ -61,6 +61,9 @@ MouseExtension::MouseExtension() {
   GetAllExpressions()["LastEndedTouchId"].SetFunctionName(
       "gdjs.evtTools.input.getLastEndedTouchId");
 
+  GetAllExpressions()["MouseWheelDelta"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseWheelDelta");
+
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:
 }

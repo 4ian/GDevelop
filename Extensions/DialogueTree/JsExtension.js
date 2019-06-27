@@ -193,18 +193,6 @@ module.exports = {
 			.setFunctionName('gdjs.dialogueTree.getLineText');
 
 		extension
-			.addStrExpression(
-				'GetLineType',
-				_('Get the current dialogue line type as a text'),
-				_('Get the current dialogue line type as a text'),
-				_('Dialogue Tree'),
-				'JsPlatform/Extensions/yarn24.png',
-				'JsPlatform/Extensions/yarn32.png'
-			)
-			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialogueTree.getLineType');
-
-		extension
 			.addExpression(
 				'GetOptionsCount',
 				_('Get the number of options in an Options line type'),

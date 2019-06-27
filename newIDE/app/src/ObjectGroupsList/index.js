@@ -96,6 +96,11 @@ class GroupsList extends Component<*, *> {
               }
               editingName={nameBeingEdited}
               isGlobalGroup={groupWithContext.global}
+              onSetAsGlobalGroup={
+                groupWithContext.global
+                  ? undefined
+                  : () => this.props.onSetAsGlobalGroup(groupWithContext)
+              }
             />
           );
         }}
@@ -276,6 +281,30 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
+  _setAsGlobalGroup = (groupWithContext: GroupWithContext) => {
+    const { group } = groupWithContext;
+    const { globalObjectGroups, objectGroups } = this.props;
+
+    const groupName = group.getName();
+
+    if (globalObjectGroups.has(groupName)) {
+      showWarningBox(
+        'A global object with this name already exists. Please change the object name before setting it as a global object'
+      );
+      return;
+    }
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      "This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?"
+    );
+    if (!answer) return;
+  
+    globalObjectGroups.insertNew(groupName, globalObjectGroups.count());
+    objectGroups.remove(groupName);
+    this.forceUpdate();
+  };
+
   render() {
     const { globalObjectGroups, objectGroups } = this.props;
     const { searchText } = this.state;
@@ -322,6 +351,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                 onEditName={this._onEditName}
                 onDelete={this._onDelete}
                 onRename={this._onRename}
+                onSetAsGlobalGroup={this._setAsGlobalGroup}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._onMove(oldIndex, newIndex)
                 }

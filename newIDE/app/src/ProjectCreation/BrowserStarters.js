@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
+const gd = global.gd;
 
 export default class BrowserStarters extends Component {
   render() {
@@ -127,6 +128,21 @@ export default class BrowserStarters extends Component {
                 onClick={() => {
                   sendNewGameCreated('pairs');
                   this.props.onOpen('example://pairs');
+                }}
+              />
+              <ListItem
+                primaryText={<Trans>Empty game</Trans>}
+                secondaryText={
+                  <p>
+                    <Trans>Start a new game from scratch.</Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('');
+
+                  const project = gd.ProjectHelper.createNewGDJSProject();
+                  this.props.onCreate(project);
                 }}
               />
             </List>

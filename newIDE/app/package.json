@@ -87,7 +87,8 @@
     "analyze-flow-coverage": "flow-coverage-report",
     "analyze-source-map": "source-map-explorer build/static/js/main.*",
     "extract-all-translations": "node scripts/extract-all-translations.js",
-    "compile-translations": "node scripts/compile-translations.js"
+    "compile-translations": "node scripts/compile-translations.js",
+    "reload-extensions": "node scripts/import-GDJS-Runtime.js"
   },
   "eslintConfig": {
     "extends": "react-app"

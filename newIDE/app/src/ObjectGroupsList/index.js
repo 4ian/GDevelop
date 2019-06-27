@@ -300,7 +300,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    globalObjectGroups.insertNew(groupName, globalObjectGroups.count());
+    globalObjectGroups.insert(group, globalObjectGroups.count());
     objectGroups.remove(groupName);
     this.forceUpdate();
   };

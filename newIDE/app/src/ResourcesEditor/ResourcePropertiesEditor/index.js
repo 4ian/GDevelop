@@ -136,7 +136,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     const { resources } = this.props;
 
     return (
-      <Background>
+      <Background maxWidth>
         {this._renderPreview()}
         {!resources || !resources.length
           ? this._renderEmpty()

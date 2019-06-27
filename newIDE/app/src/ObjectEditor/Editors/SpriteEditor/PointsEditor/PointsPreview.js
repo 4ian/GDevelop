@@ -21,6 +21,7 @@ type Props = {|
   pointsContainer: gdSprite, // Could potentially be generalized to other things than Sprite in the future.
   imageWidth: number,
   imageHeight: number,
+  imageZoomFactor: number,
   onPointsUpdated: () => void,
 |};
 
@@ -62,7 +63,6 @@ export default class PointsPreview extends React.Component<Props, State> {
    * Move a point with the mouse. A similar dragging implementation is done in
    * CollisionMasksPreview (but with svg elements).
    *
-   * If custom zoom is added, this should be adapted to properly set point coordinates.
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
   _onMouseMove = (event: any) => {
@@ -76,8 +76,8 @@ export default class PointsPreview extends React.Component<Props, State> {
     if (draggedPointKind === pointKindIdentifiers.CENTER) {
       this.props.pointsContainer.setDefaultCenterPoint(false);
     }
-    draggedPoint.setX(xOnContainer);
-    draggedPoint.setY(yOnContainer);
+    draggedPoint.setX(xOnContainer / this.props.imageZoomFactor);
+    draggedPoint.setY(yOnContainer / this.props.imageZoomFactor);
     this.forceUpdate();
   };
 
@@ -114,13 +114,18 @@ export default class PointsPreview extends React.Component<Props, State> {
   };
 
   render() {
-    const { pointsContainer, imageWidth, imageHeight } = this.props;
+    const {
+      pointsContainer,
+      imageWidth,
+      imageHeight,
+      imageZoomFactor,
+    } = this.props;
     const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
     const points = mapVector(nonDefaultPoints, (point, i) =>
       this._renderPoint(
         point.getName(),
-        point.getX(),
-        point.getY(),
+        point.getX() * imageZoomFactor,
+        point.getY() * imageZoomFactor,
         pointKindIdentifiers.NORMAL,
         point
       )
@@ -140,15 +145,17 @@ export default class PointsPreview extends React.Component<Props, State> {
         {points}
         {this._renderPoint(
           'Origin',
-          originPoint.getX(),
-          originPoint.getY(),
+          originPoint.getX() * imageZoomFactor,
+          originPoint.getY() * imageZoomFactor,
           pointKindIdentifiers.ORIGIN,
           originPoint
         )}
         {this._renderPoint(
           'Center',
-          !automaticCenterPosition ? centerPoint.getX() : imageWidth / 2,
-          !automaticCenterPosition ? centerPoint.getY() : imageHeight / 2,
+          (!automaticCenterPosition ? centerPoint.getX() : imageWidth / 2) *
+            imageZoomFactor,
+          (!automaticCenterPosition ? centerPoint.getY() : imageHeight / 2) *
+            imageZoomFactor,
           pointKindIdentifiers.CENTER,
           centerPoint
         )}

@@ -10,6 +10,7 @@ import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
+import BackgroundText from '../../../UI/BackgroundText';
 import ShapePreview from './ShapePreview.js';
 import PolygonEditor from './PolygonEditor.js';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
@@ -18,8 +19,6 @@ type Props = BehaviorEditorProps;
 
 type State = {|
   image: string,
-  imageWidth: number,
-  imageHeight: number,
 |};
 
 function NumericProperty(props: {|
@@ -75,15 +74,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
 
   state = {
     image: '',
-    imageWidth: 0,
-    imageHeight: 0,
-  };
-
-  _setImageSize = (width: number, height: number) => {
-    this.setState({
-      imageWidth: width,
-      imageHeight: height,
-    });
   };
 
   _isBitEnabled(bitsValue: number, pos: number) {
@@ -342,14 +332,17 @@ export default class Physics2Editor extends React.Component<Props, State> {
           />
         </Line>
         <Line>
-          <Column expand>
-            <Line>
-              <ImagePreview
-                resourceName={this.state.image}
-                project={this.props.project}
-                resourcesLoader={this.resourcesLoader}
-                onSize={this._setImageSize}
-              >
+          <div
+            style={{
+              width:
+                '100%' /* This div prevents ImagePreview to overflow outside the parent */,
+            }}
+          >
+            <ImagePreview
+              resourceName={this.state.image}
+              project={this.props.project}
+              resourcesLoader={this.resourcesLoader}
+              renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) => (
                 <ShapePreview
                   shape={properties.get('shape').getValue()}
                   dimensionA={parseFloat(
@@ -366,8 +359,9 @@ export default class Physics2Editor extends React.Component<Props, State> {
                   )}
                   polygonOrigin={properties.get('polygonOrigin').getValue()}
                   vertices={JSON.parse(properties.get('vertices').getValue())}
-                  width={this.state.imageWidth}
-                  height={this.state.imageHeight}
+                  width={imageWidth}
+                  height={imageHeight}
+                  zoomFactor={imageZoomFactor}
                   onMoveVertex={(index, newX, newY) => {
                     let vertices = JSON.parse(
                       properties.get('vertices').getValue()
@@ -383,26 +377,31 @@ export default class Physics2Editor extends React.Component<Props, State> {
                     this.forceUpdate();
                   }}
                 />
-              </ImagePreview>
-            </Line>
-            <Line>
-              <ResourceSelector
-                project={this.props.project}
-                resourceSources={this.props.resourceSources}
-                onChooseResource={this.props.onChooseResource}
-                resourceExternalEditors={this.props.resourceExternalEditors}
-                resourcesLoader={this.resourcesLoader}
-                resourceKind={'image'}
-                initialResourceName={''}
-                fullWidth={false}
-                onChange={resourceName => {
-                  this.setState({ image: resourceName });
-                  this.forceUpdate();
-                }}
-              />
-            </Line>
-          </Column>
-          {shape === 'Polygon' && (
+              )}
+            />
+          </div>
+        </Line>
+        <Line alignItems="center">
+          <ResourceSelector
+            project={this.props.project}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourcesLoader={this.resourcesLoader}
+            resourceKind={'image'}
+            initialResourceName={''}
+            fullWidth={false}
+            onChange={resourceName => {
+              this.setState({ image: resourceName });
+              this.forceUpdate();
+            }}
+          />
+          <BackgroundText>
+            An temporary image to help you visualize the shape/polygon
+          </BackgroundText>
+        </Line>
+        {shape === 'Polygon' && (
+          <Line>
             <PolygonEditor
               vertices={JSON.parse(properties.get('vertices').getValue())}
               onChangeVertexX={(newValue, index) => {
@@ -459,8 +458,8 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 this.forceUpdate();
               }}
             />
-          )}
-        </Line>
+          </Line>
+        )}
         <Line>
           <Column expand>
             <NumericProperty

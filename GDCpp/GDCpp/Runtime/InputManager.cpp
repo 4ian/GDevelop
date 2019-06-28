@@ -116,6 +116,26 @@ int InputManager::GetMouseWheelDelta() const {
   return mouseWheelDelta;
 }
 
+bool InputManager::ScrollUp() const {
+  if (!windowHasFocus && disableInputWhenNotFocused) return false;
+
+  if (mouseWheelDelta > 0) {
+      return true;
+  } else {
+      return false;
+  } 
+}
+
+bool InputManager::ScrollDown() const {
+  if (!windowHasFocus && disableInputWhenNotFocused) return false;
+
+  if (mouseWheelDelta < 0) {
+      return true;
+  } else {
+      return false;
+  } 
+}
+
 const std::map<gd::String, int>& InputManager::GetKeyNameToSfKeyMap() {
   static bool initialized = false;
   static std::map<gd::String, int>* map = new std::map<gd::String, int>();

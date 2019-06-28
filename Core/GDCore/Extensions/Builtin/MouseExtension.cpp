@@ -39,6 +39,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition("ScrollUp",
+                    _("The wheel of mouse is scroll up"),
+                    _("Test if the mouse wheel is scrolled to up"),
+                    _("The mouse scroll up"),
+                    _("Mouse and touch"),
+                    "res/conditions/touch24.png",
+                    "res/conditions/touch.png")
+
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("ScrollDown",
+                    _("The wheel of mouse is scroll down"),
+                    _("Test if the mouse wheel is scrolled to down"),
+                    _("The mouse scroll down"),
+                    _("Mouse and touch"),
+                    "res/conditions/touch24.png",
+                    "res/conditions/touch.png")
+
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsSimple();
+
+  extension
       .AddAction(
           "TouchSimulateMouse",
           _("De/activate moving the mouse cursor with touches"),

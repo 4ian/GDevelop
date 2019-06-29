@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           _("Built-in extension allowing to manipulate scenes and providing common features"),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/interface/scene-editor/events");
 
 #if defined(GD_IDE_ONLY)
 

@@ -295,6 +295,7 @@
       "objects": [
         {
           "name": "Planet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -302,27 +303,25 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "polygonOrigin": "Center",
-                "vertices": [],
-                "density": 1,
-                "friction": 0.6,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "polygonOrigin": "Center",
+              "vertices": [],
+              "density": 1,
+              "friction": 0.6,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -378,6 +377,7 @@
         },
         {
           "name": "SpaceGuy",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -385,27 +385,25 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "polygonOrigin": "Center",
-                "vertices": [],
-                "density": 1,
-                "friction": 0.6,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "polygonOrigin": "Center",
+              "vertices": [],
+              "density": 1,
+              "friction": 0.6,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -464,6 +462,7 @@
           "italic": false,
           "name": "Message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -479,6 +478,7 @@
         },
         {
           "name": "BtnLeft",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -517,6 +517,7 @@
         },
         {
           "name": "BtnRight",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -555,6 +556,7 @@
         },
         {
           "name": "BtnJump",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -981,12 +983,10 @@
         {
           "name": "Physics2",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 0,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 0,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     }

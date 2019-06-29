@@ -3220,6 +3220,7 @@
       "objects": [
         {
           "name": "MainFrame",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3227,25 +3228,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 8,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 8,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3328,6 +3327,7 @@
         },
         {
           "name": "FrontWheel",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3335,25 +3335,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 3,
-                "friction": 0.95,
-                "restitution": 0.1,
-                "linearDamping": 0,
-                "angularDamping": 0,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 3,
+              "friction": 0.95,
+              "restitution": 0.1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3390,6 +3388,7 @@
         },
         {
           "name": "BackWheel",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3397,25 +3396,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 3,
-                "friction": 0.95,
-                "restitution": 0.1,
-                "linearDamping": 0,
-                "angularDamping": 0,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 3,
+              "friction": 0.95,
+              "restitution": 0.1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3452,6 +3449,7 @@
         },
         {
           "name": "floor",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3459,25 +3457,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 1,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 32768,
-                "masks": 16384
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 1,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 32768,
+              "masks": 16384,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -3517,6 +3513,7 @@
           "italic": false,
           "name": "Timing",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3535,6 +3532,7 @@
           "italic": false,
           "name": "Elapsed",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3550,6 +3548,7 @@
         },
         {
           "name": "RearSuspension",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3557,25 +3556,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3623,6 +3620,7 @@
         },
         {
           "name": "FrontSuspensionBottom",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3672,6 +3670,7 @@
         },
         {
           "name": "Seat",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3679,25 +3678,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3745,6 +3742,7 @@
         },
         {
           "name": "Crank",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3752,25 +3750,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0,
-                "restitution": 0,
-                "linearDamping": 0,
-                "angularDamping": 0,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0,
+              "restitution": 0,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3818,6 +3814,7 @@
         },
         {
           "name": "RPedal",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3825,25 +3822,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3880,6 +3875,7 @@
         },
         {
           "name": "LPedal",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3887,25 +3883,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 16384,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 16384,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3942,6 +3936,7 @@
         },
         {
           "name": "Torso",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3949,25 +3944,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 3,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 3,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4025,6 +4018,7 @@
         },
         {
           "name": "RightThigh",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4032,25 +4026,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4098,6 +4090,7 @@
         },
         {
           "name": "LeftThigh",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4105,25 +4098,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4171,6 +4162,7 @@
         },
         {
           "name": "RightLeg",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4178,25 +4170,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4244,6 +4234,7 @@
         },
         {
           "name": "LeftLeg",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4251,25 +4242,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4317,6 +4306,7 @@
         },
         {
           "name": "RUpperArm",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4324,25 +4314,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4390,6 +4378,7 @@
         },
         {
           "name": "LUpperArm",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4397,25 +4386,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4463,6 +4450,7 @@
         },
         {
           "name": "RArm",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4470,25 +4458,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4536,6 +4522,7 @@
         },
         {
           "name": "LArm",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4543,25 +4530,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4609,6 +4594,7 @@
         },
         {
           "name": "Head",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4616,25 +4602,23 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 24576,
-                "masks": 32768
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 24576,
+              "masks": 32768,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -4677,6 +4661,7 @@
         },
         {
           "name": "Follow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4698,6 +4683,7 @@
         {
           "height": 1185,
           "name": "Win",
+          "tags": "",
           "texture": "GFX\\Win.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 100,
@@ -4706,6 +4692,7 @@
         },
         {
           "name": "Start",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4747,6 +4734,7 @@
           "italic": false,
           "name": "Force",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4765,6 +4753,7 @@
           "italic": false,
           "name": "ForceStrength",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4783,6 +4772,7 @@
           "italic": false,
           "name": "DesktopControls",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4801,6 +4791,7 @@
           "italic": false,
           "name": "GameInstructions",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4816,6 +4807,7 @@
         },
         {
           "name": "Jump",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4823,27 +4815,25 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "polygonOrigin": "Center",
-                "vertices": [],
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 32768,
-                "masks": 16384
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "polygonOrigin": "Center",
+              "vertices": [],
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 32768,
+              "masks": 16384,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -4880,6 +4870,7 @@
         },
         {
           "name": "Forward",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4918,6 +4909,7 @@
         },
         {
           "name": "Backward",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4956,6 +4948,7 @@
         },
         {
           "name": "Brake",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4994,6 +4987,7 @@
         },
         {
           "name": "Retry",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5032,6 +5026,7 @@
         },
         {
           "name": "Left",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5070,6 +5065,7 @@
         },
         {
           "name": "Right",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5112,6 +5108,7 @@
           "leftMargin": 0,
           "name": "Track",
           "rightMargin": 0,
+          "tags": "",
           "texture": "GFX\\Stone.jpg",
           "tiled": true,
           "topMargin": 0,
@@ -5122,6 +5119,7 @@
         },
         {
           "name": "Cliff",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5160,6 +5158,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5198,6 +5197,7 @@
         },
         {
           "name": "Tree",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5236,6 +5236,7 @@
         },
         {
           "name": "Bush",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5274,6 +5275,7 @@
         },
         {
           "name": "Grass",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5312,6 +5314,7 @@
         },
         {
           "name": "Sign",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5350,6 +5353,7 @@
         },
         {
           "name": "ForceIndicator",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -8601,12 +8605,10 @@
         {
           "name": "Physics2",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 200,
-            "scaleY": 200
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 200,
+          "scaleY": 200
         }
       ]
     }

@@ -147,7 +147,6 @@ export default class SceneEditor extends React.Component<Props, State> {
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsList;
   _propertiesEditor: ?InstancePropertiesEditor;
-  _objectsListToolbar: Array<React.Node>;
 
   constructor(props: Props) {
     super(props);
@@ -912,21 +911,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
-    // Create and store the toolbar for the ObjectsList only once:
-    // It's important to always use the same object (in the sense of ===) for toolbarControls,
-    // to avoid confusing MosaicWindow.shouldComponentUpdate: It makes a nasty infinite loop
-    // while it tries to compare React elements.
-    this._objectsListToolbar = this._objectsListToolbar || [
-      <I18n key="tags">
-        {({ i18n }) => (
-          <TagsButton
-            buildMenuTemplate={() => this._buildObjectTagsMenuTemplate(i18n)}
-          />
-        )}
-      </I18n>,
-      <CloseButton key="close" />,
-    ];
-
     const editors = {
       properties: (
         <MosaicWindow title={<Trans>Properties</Trans>}>
@@ -976,7 +960,18 @@ export default class SceneEditor extends React.Component<Props, State> {
       'objects-list': (
         <MosaicWindow
           title={<Trans>Objects</Trans>}
-          toolbarControls={this._objectsListToolbar}
+          toolbarControls={[
+            <I18n key="tags">
+              {({ i18n }) => (
+                <TagsButton
+                  buildMenuTemplate={() =>
+                    this._buildObjectTagsMenuTemplate(i18n)
+                  }
+                />
+              )}
+            </I18n>,
+            <CloseButton key="close" />,
+          ]}
           selectedObjectNames={
             this.state
               .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/

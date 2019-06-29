@@ -433,6 +433,7 @@
       "objects": [
         {
           "name": "Drawer",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [
             {
@@ -474,6 +475,7 @@
         },
         {
           "name": "Shapes",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -675,6 +677,7 @@
         },
         {
           "name": "BarSelect",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [
@@ -744,6 +747,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

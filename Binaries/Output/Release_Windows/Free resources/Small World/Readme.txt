@@ -1,1 +1,0 @@
-"Small World" design by Daniel Cook (Lostgarden.com)

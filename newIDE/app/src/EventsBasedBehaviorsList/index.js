@@ -47,6 +47,9 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onEventsBasedBehaviorRenamed: (
+    eventsBasedBehavior: gdEventsBasedBehavior
+  ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
 |};
 
@@ -123,6 +126,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
         if (!doRename) return;
         eventsBasedBehavior.setName(newName);
         this.forceUpdate();
+        this.props.onEventsBasedBehaviorRenamed(eventsBasedBehavior);
       }
     );
   };

@@ -20,7 +20,7 @@
 
 #if defined(GD_IDE_ONLY)
 #include <SFML/Graphics.hpp>
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #endif
 

@@ -169,6 +169,7 @@
       "objects": [
         {
           "name": "logo",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],

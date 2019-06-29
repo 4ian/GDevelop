@@ -175,13 +175,14 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
     if (field.valueType === 'boolean') {
+      const { setValue } = field;
       return (
         <InlineCheckbox
           label={getFieldLabel(this.props.instances, field)}
           key={field.name}
           checked={getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
-            this.props.instances.forEach(i => field.setValue(i, !!newValue));
+            this.props.instances.forEach(i => setValue(i, !!newValue));
             this._onInstancesModified(this.props.instances);
           }}
           disabled={field.disabled}

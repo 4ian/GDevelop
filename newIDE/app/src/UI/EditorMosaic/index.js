@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import {
   MosaicWindow as RMMosaicWindow,
-  MosaicWithoutDragDropContext as RMMosaicWithoutDragDropContext,
+  MosaicWithoutDragDropContext,
   getLeaves,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
+import ThemeConsumer from '../Theme/ThemeConsumer';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -32,17 +32,28 @@ const addRightNode = (
   };
 };
 
-const ThemableMosaicWithoutDragDropContext = props => (
-  <RMMosaicWithoutDragDropContext
-    className={`${
-      props.muiTheme.mosaicRootClassName
-    } mosaic-blueprint-theme mosaic-gd-theme`}
-    {...props}
-  />
+const defaultToolbarControls = [<CloseButton key="close" />];
+
+const renderMosaicWindowPreview = props => (
+  <div className="mosaic-preview">
+    <div className="mosaic-window-toolbar">
+      <div className="mosaic-window-title">{props.title}</div>
+    </div>
+    <div className="mosaic-window-body" />
+  </div>
 );
 
-const MosaicWithoutDragDropContext = muiThemeable()(
-  ThemableMosaicWithoutDragDropContext
+/**
+ * A window that can be used in a EditorMosaic, with a close button
+ * by default in the toolbarControls and a preview when the window is
+ * dragged.
+ */
+export const MosaicWindow = props => (
+  <RMMosaicWindow
+    {...props}
+    toolbarControls={props.toolbarControls || defaultToolbarControls}
+    renderPreview={renderMosaicWindowPreview}
+  />
 );
 
 /**
@@ -51,7 +62,7 @@ const MosaicWithoutDragDropContext = muiThemeable()(
  * Can be used to create a mosaic of resizable editors.
  * Must be used inside a component wrapped in a DragDropContext.
  */
-export default class ThemableEditorMosaic extends Component {
+export default class EditorMosaic extends Component {
   constructor(props) {
     super(props);
 
@@ -76,29 +87,20 @@ export default class ThemableEditorMosaic extends Component {
   render() {
     const { editors } = this.props;
     return (
-      <MosaicWithoutDragDropContext
-        renderTile={(editorName, path) =>
-          React.cloneElement(editors[editorName], { path })
-        }
-        value={this.state.mosaicNode}
-        onChange={this._onChange}
-      />
+      <ThemeConsumer>
+        {muiTheme => (
+          <MosaicWithoutDragDropContext
+            className={`${
+              muiTheme.mosaicRootClassName
+            } mosaic-blueprint-theme mosaic-gd-theme`}
+            renderTile={(editorName, path) =>
+              React.cloneElement(editors[editorName], { path })
+            }
+            value={this.state.mosaicNode}
+            onChange={this._onChange}
+          />
+        )}
+      </ThemeConsumer>
     );
   }
 }
-
-const defaultToolbarControls = [<CloseButton key="close" />];
-
-/**
- * @class EditorWindow
- *
- * A window that can be used in a EditorMosaic
- */
-export const MosaicWindow = props => {
-  // It's important to always use the same object (in the sense of ===) for toolbarControls,
-  // to avoid confusing MosaicWindow.shouldComponentUpdate: It makes a nasty infinite loop
-  // while it tries to compare React elements.
-  const toolbarControls = props.toolbarControls || defaultToolbarControls;
-
-  return <RMMosaicWindow {...props} toolbarControls={toolbarControls} />;
-};

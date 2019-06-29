@@ -44,7 +44,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "DestroyOutside")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetFunctionName("GetExtraBorder")
       .SetManipulatedType("number")

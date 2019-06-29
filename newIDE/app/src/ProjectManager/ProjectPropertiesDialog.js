@@ -12,6 +12,7 @@ import SubscriptionChecker from '../Profile/SubscriptionChecker';
 import { getErrors, displayProjectErrorsBox } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import { Line, Column } from '../UI/Grid';
+import HelpButton from '../UI/HelpButton';
 
 type Props = {|
   project: gdProject,
@@ -114,19 +115,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
   };
 
   render() {
-    const actions = [
-      <FlatButton
-        label={<Trans>Cancel</Trans>}
-        primary={false}
-        onClick={this.props.onClose}
-      />,
-      <FlatButton
-        label={<Trans>Apply</Trans>}
-        primary={true}
-        keyboardFocused={true}
-        onClick={this._onApply}
-      />,
-    ];
     const {
       name,
       windowDefaultWidth,
@@ -151,7 +139,27 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <Dialog
-          actions={actions}
+          actions={[
+            <FlatButton
+              label={<Trans>Cancel</Trans>}
+              primary={false}
+              onClick={this.props.onClose}
+              key="cancel"
+            />,
+            <FlatButton
+              label={<Trans>Apply</Trans>}
+              primary={true}
+              keyboardFocused={true}
+              onClick={this._onApply}
+              key="apply"
+            />,
+          ]}
+          secondaryActions={[
+            <HelpButton
+              helpPagePath="/interface/project-manager/properties"
+              key="help"
+            />,
+          ]}
           open={this.props.open}
           onRequestClose={this.props.onClose}
           autoScrollBodyContent={true}

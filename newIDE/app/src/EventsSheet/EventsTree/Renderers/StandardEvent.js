@@ -59,7 +59,11 @@ export default class StandardEvent extends React.Component<
         />
         <InstructionsList
           instrsList={standardEvent.getActions()}
-          style={styles.actionsList}
+          style={
+            {
+              ...styles.actionsList,
+            } /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+          }
           selection={this.props.selection}
           areConditions={false}
           onAddNewInstruction={this.props.onAddNewInstruction}

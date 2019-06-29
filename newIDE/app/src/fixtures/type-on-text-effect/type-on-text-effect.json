@@ -163,6 +163,7 @@
           "italic": false,
           "name": "text_display",
           "smoothed": false,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

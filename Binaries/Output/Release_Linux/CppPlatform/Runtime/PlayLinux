@@ -1,7 +1,0 @@
-#Execute this file to launch the game
-#If you can not launch it, make sure that this file
-#as well as 'ExeLinux' have the right to be executed
-#(Right click on file > Properties)
-
-export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
-./ExeLinux

@@ -47,7 +47,7 @@ JoystickExtension::JoystickExtension() {
       .AddParameter("expression", _("Joystick number ( First joystick: 0 )"))
       .AddParameter("joyaxis", _("Axis"))
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDCpp/Extensions/Builtin/JoystickTools.h");
 
 

@@ -34,6 +34,28 @@ class PanelSpriteObjectJsExtension : public gd::PlatformExtension {
             "panelspriteruntimeobject-cocos-renderer.js");
 
     GetAllActionsForObject(
+        "PanelSpriteObject::PanelSprite")["PanelSpriteObject::SetOpacity"]
+        .SetFunctionName("setOpacity")
+        .SetGetter("getOpacity")
+        .SetIncludeFile(
+            "Extensions/PanelSpriteObject/panelspriteruntimeobject.js");
+    GetAllConditionsForObject(
+        "PanelSpriteObject::PanelSprite")["PanelSpriteObject::Opacity"]
+        .SetFunctionName("getOpacity")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/panelspriteruntimeobject.js");
+    GetAllExpressionsForObject(
+        "PanelSpriteObject::PanelSprite")["Opacity"]
+        .SetFunctionName("getOpacity")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/panelspriteruntimeobject.js");
+    GetAllActionsForObject(
+        "PanelSpriteObject::PanelSprite")["PanelSpriteObject::SetColor"]
+        .SetFunctionName("setColor")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/panelspriteruntimeobject.js");
+
+    GetAllActionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"]
         .SetFunctionName("setWidth")
         .SetGetter("getWidth");

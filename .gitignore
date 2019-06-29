@@ -5,7 +5,6 @@
 /docs/GDCore Documentation
 /ExtLibs/SFML
 /ExtLibs/*.7z
-/scripts/Repository keys
 /scripts/logs/*.txt
 /scripts/gdcore-gdcpp-gdjs-extensions-messages.pot
 /Binaries/.build*
@@ -66,3 +65,4 @@
 **/.DS_Store
 **/node_modules/
 .idea
+.vscode/ipch

@@ -124,6 +124,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
             >
               <ExternalEventsField
                 project={this.props.project}
+                scope={this.props.scope}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
                 value={target}

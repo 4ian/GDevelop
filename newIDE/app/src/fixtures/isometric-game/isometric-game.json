@@ -3987,11 +3987,14 @@
       "objects": [
         {
           "name": "Minda",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "acceleration": 1000,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -3999,9 +4002,7 @@
               "deceleration": 1000,
               "ignoreDefaultControls": false,
               "maxSpeed": 150,
-              "name": "TopDownMovement",
-              "rotateObject": false,
-              "type": "TopDownMovementBehavior::TopDownMovementBehavior"
+              "rotateObject": false
             }
           ],
           "animations": [
@@ -12793,6 +12794,7 @@
         },
         {
           "name": "Tilebg",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -14050,6 +14052,7 @@
         },
         {
           "name": "Avatar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -14089,6 +14092,7 @@
         {
           "height": 32,
           "name": "Obstacle",
+          "tags": "",
           "texture": "NewFile-1.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,

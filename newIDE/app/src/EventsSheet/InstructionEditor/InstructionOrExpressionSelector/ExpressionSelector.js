@@ -3,29 +3,38 @@ import React, { Component } from 'react';
 import { enumerateExpressions } from './EnumerateExpressions';
 import InstructionOrExpressionSelector from './index';
 import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import {
+  type EnumeratedInstructionOrExpressionMetadata,
+  filterEnumeratedInstructionOrExpressionMetadataByScope,
+} from './EnumeratedInstructionOrExpressionMetadata.js';
+import { type EventsScope } from '../../EventsScope.flow';
 
-export default class ExpressionSelector extends Component<*, {||}> {
-  instructionsInfo: Array<InstructionOrExpressionInformation> = [];
-  instructionsInfoTree: ?InstructionOrExpressionTreeNode = null;
+type Props = {|
+  expressionType: string,
+  focusOnMount?: boolean,
+  selectedType: string,
+  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  scope: EventsScope,
+  style?: Object,
+|};
 
-  static defaultProps = {
-    expressionType: 'number',
-  };
-
-  componentWillMount() {
-    const { allExpressions } = enumerateExpressions(this.props.expressionType);
-    this.instructionsInfo = allExpressions;
-    this.instructionsInfoTree = createTree(allExpressions);
-  }
+export default class ExpressionSelector extends Component<Props, {||}> {
+  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
+    enumerateExpressions(this.props.expressionType).allExpressions,
+    this.props.scope
+  );
+  instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
+    this.instructionsInfo
+  );
 
   render() {
+    const { expressionType, scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
         iconSize={16}
-        {...this.props}
+        {...otherProps}
       />
     );
   }

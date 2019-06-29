@@ -387,6 +387,26 @@ export const makeTestProject = gd => {
   );
   testEventsBasedBehavior.setObjectType('Sprite');
 
+  // Add some properties
+  testEventsBasedBehavior
+    .getPropertyDescriptors()
+    .insertNew('NumberProperty', 0)
+    .setType('Number')
+    .setValue('123')
+    .setLabel('My number property');
+  testEventsBasedBehavior
+    .getPropertyDescriptors()
+    .insertNew('StringProperty', 1)
+    .setType('String')
+    .setValue('Hello World')
+    .setLabel('My string property');
+  testEventsBasedBehavior
+    .getPropertyDescriptors()
+    .insertNew('BooleanProperty', 2)
+    .setType('Boolean')
+    .setValue('true')
+    .setLabel('My boolean property');
+
   // Add a function
   const testBehaviorEventsFunction = testEventsBasedBehavior
     .getEventsFunctions()

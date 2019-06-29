@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
@@ -11,6 +12,7 @@ import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../UI/HelpButton';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 
 type Props = {|
   project: gdProject,
@@ -38,7 +40,9 @@ const importExtension = (
           ) {
             //eslint-disable-next-line
             const answer = confirm(
-              'An extension with this name already exists in the project. Importing this extension will replace it: are you sure you want to continue?'
+              i18n._(
+                t`An extension with this name already exists in the project. Importing this extension will replace it: are you sure you want to continue?`
+              )
             );
             if (!answer) return;
           }
@@ -49,6 +53,14 @@ const importExtension = (
             serializedExtension
           );
         });
+    })
+    .catch(error => {
+      showWarningBox(
+        i18n._(
+          t`An error happened while loading this extension. Please check that it is a proper extension file and compatible with this version of GDevelop`,
+          error
+        )
+      );
     });
 };
 

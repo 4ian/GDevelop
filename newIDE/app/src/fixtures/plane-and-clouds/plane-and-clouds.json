@@ -270,6 +270,7 @@
       "objects": [
         {
           "name": "Plane",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -324,6 +325,7 @@
         },
         {
           "name": "Cloud",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -467,6 +469,7 @@
           "rendererParam2": 10,
           "rendererType": "Quad",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "Smoke.png",
           "type": "ParticleSystem::ParticleEmitter",
@@ -523,6 +526,7 @@
           "rendererParam2": 1,
           "rendererType": "Line",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",

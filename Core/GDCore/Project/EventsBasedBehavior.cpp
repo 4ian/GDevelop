@@ -23,6 +23,8 @@ void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   gd::SerializerElement& eventsFunctionsElement =
       element.AddChild("eventsFunctions");
   eventsFunctionsContainer.SerializeEventsFunctionsTo(eventsFunctionsElement);
+  propertyDescriptors.SerializeElementsTo(
+      "propertyDescriptor", element.AddChild("propertyDescriptors"));
 }
 
 void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
@@ -36,6 +38,8 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
       element.GetChild("eventsFunctions");
   eventsFunctionsContainer.UnserializeEventsFunctionsFrom(
       project, eventsFunctionsElement);
+  propertyDescriptors.UnserializeElementsFrom(
+      "propertyDescriptor", element.GetChild("propertyDescriptors"));
 }
 
 }  // namespace gd

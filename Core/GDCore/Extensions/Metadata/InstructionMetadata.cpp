@@ -17,7 +17,9 @@ InstructionMetadata::InstructionMetadata()
                                                   // and *fast* to use a
                                                   // InstructionMetadata.
       canHaveSubInstructions(false),
-      hidden(true) {}
+      hidden(true),
+      usageComplexity(5),
+      isPrivate(false) {}
 
 InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
                                          const gd::String& name_,
@@ -37,7 +39,8 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
       canHaveSubInstructions(false),
       extensionNamespace(extensionNamespace_),
       hidden(false),
-      usageComplexity(5) {
+      usageComplexity(5),
+      isPrivate(false) {
 }
 
 ParameterMetadata::ParameterMetadata() : optional(false), codeOnly(false) {}

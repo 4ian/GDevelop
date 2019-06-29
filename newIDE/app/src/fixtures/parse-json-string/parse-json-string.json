@@ -160,6 +160,7 @@
           "italic": false,
           "name": "Text",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

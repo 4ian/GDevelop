@@ -7,11 +7,12 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type EventsScope } from './EventsScope.flow';
 const gd = global.gd;
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
@@ -120,7 +121,7 @@ export default class InlineParameterEditor extends React.Component<
           value={instruction.getParameter(this.props.parameterIndex)}
           onChange={this.props.onChange}
           project={this.props.project}
-          layout={this.props.layout}
+          scope={this.props.scope}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
           key={instruction.ptr}

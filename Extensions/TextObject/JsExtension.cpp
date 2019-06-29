@@ -80,6 +80,7 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getOpacity")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
+
     GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"]
         .SetFunctionName("setBold")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
@@ -101,6 +102,21 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("isWrapping")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetPadding"]
+        .SetFunctionName("setPadding")
+        .SetGetter("getPadding")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Padding"]
+        .SetFunctionName("getPadding")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetTextAlignment"]
+        .SetFunctionName("setTextAlignment")
+        .SetGetter("getTextAlignment")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::TextAlignment"]
+        .SetFunctionName("getTextAlignment")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::WrappingWidth"]
         .SetFunctionName("setWrappingWidth")
         .SetGetter("getWrappingWidth")
@@ -109,6 +125,9 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getWrappingWidth")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
+    GetAllExpressionsForObject("TextObject::Text")["Padding"]
+        .SetFunctionName("getPadding")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
     GetAllExpressionsForObject("TextObject::Text")["ScaleX"]
         .SetFunctionName("getScaleX")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
@@ -127,6 +146,20 @@ class TextObjectJsExtension : public gd::PlatformExtension {
 
     GetAllActionsForObject("TextObject::Text")["TextObject::ChangeColor"]
         .SetFunctionName("setColor")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetGradient"]
+        .SetFunctionName("setGradient")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetOutline"]
+        .SetFunctionName("setOutline")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetShadow"]
+        .SetFunctionName("setShadow")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllActionsForObject("TextObject::Text")["TextObject::ShowShadow"]
+        .SetFunctionName("showShadow")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
     // Unimplemented actions and conditions:

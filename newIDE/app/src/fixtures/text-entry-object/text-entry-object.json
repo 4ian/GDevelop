@@ -190,6 +190,7 @@
       "objects": [
         {
           "name": "Entry",
+          "tags": "",
           "type": "TextEntryObject::TextEntry",
           "variables": [],
           "behaviors": []
@@ -199,6 +200,7 @@
           "italic": false,
           "name": "Text",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -217,6 +219,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

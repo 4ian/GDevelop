@@ -19,7 +19,6 @@
 #include "GDCpp/Runtime/TinyXml/tinyxml.h"
 #include "RuntimeSpriteObject.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #endif
 #if !defined(GD_IDE_ONLY)

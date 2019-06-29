@@ -257,6 +257,7 @@
       "objects": [
         {
           "name": "load_button",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -314,6 +315,7 @@
         },
         {
           "name": "new_button",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -374,6 +376,7 @@
           "italic": false,
           "name": "load",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -392,6 +395,7 @@
           "italic": false,
           "name": "new",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -410,6 +414,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -802,6 +807,7 @@
       "objects": [
         {
           "name": "character1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -864,6 +870,7 @@
         },
         {
           "name": "character2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -926,6 +933,7 @@
         },
         {
           "name": "character3",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -988,6 +996,7 @@
         },
         {
           "name": "save_button",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1048,6 +1057,7 @@
           "italic": false,
           "name": "save",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1066,6 +1076,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1081,6 +1092,7 @@
         },
         {
           "name": "back_button",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1122,6 +1134,7 @@
           "italic": false,
           "name": "highscore",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1140,6 +1153,7 @@
           "italic": false,
           "name": "Back",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

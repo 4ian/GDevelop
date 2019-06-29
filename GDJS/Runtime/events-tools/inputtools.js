@@ -206,11 +206,11 @@ gdjs.evtTools.input.getMouseWheelDelta = function(runtimeScene) {
     return runtimeScene.getGame().getInputManager().getMouseWheelDelta();
 };
 
-gdjs.evtTools.input.ScrollUp = function(runtimeScene) {
+gdjs.evtTools.input.isScrollingUp = function(runtimeScene) {
     return runtimeScene.getGame().getInputManager().ScrollUp();
 };
 
-gdjs.evtTools.input.ScrollDown = function(runtimeScene) {
+gdjs.evtTools.input.isScrollingDown = function(runtimeScene) {
     return runtimeScene.getGame().getInputManager().ScrollDown();
 };
 

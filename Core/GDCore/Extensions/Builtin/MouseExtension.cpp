@@ -39,9 +39,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("ScrollUp",
-                    _("The wheel of mouse is scroll up"),
-                    _("Test if the mouse wheel is scrolled to up"),
+      .AddCondition("IsMouseWheelScrollingUp",
+                    _("The mouse wheel is scrolling up"),
+                    _("Check if the mouse wheel is scrolling up"),
                     _("The mouse scroll up"),
                     _("Mouse and touch"),
                     "res/conditions/touch24.png",
@@ -52,9 +52,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("ScrollDown",
-                    _("The wheel of mouse is scroll down"),
-                    _("Test if the mouse wheel is scrolled to down"),
+      .AddCondition("IsMouseWheelScrollingDown",
+                    _("The mouse wheel is scrolling down"),
+                    _("Check if the mouse wheel is scrolling down"),
                     _("The mouse scroll down"),
                     _("Mouse and touch"),
                     "res/conditions/touch24.png",

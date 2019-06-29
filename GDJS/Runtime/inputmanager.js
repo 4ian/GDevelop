@@ -301,3 +301,17 @@ gdjs.InputManager.prototype.onFrameEnded = function() {
     this._releasedMouseButtons.length = 0;
     this._mouseWheelDelta = 0;
 };
+
+/**
+ * Return true if the mouse wheel scroll to up
+ */
+gdjs.InputManager.prototype.isScrollingUp = function() {
+    return this.getMouseWheelDelta() > 0;
+};
+
+/**
+ * Return true if the mouse wheel scroll to down
+ */
+gdjs.InputManager.prototype.isScrollingDown = function() {
+    return this.getMouseWheelDelta() < 0;
+};

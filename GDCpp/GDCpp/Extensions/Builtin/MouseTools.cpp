@@ -77,11 +77,11 @@ int GD_API GetMouseWheelDelta(RuntimeScene &scene) {
 }
 
 bool GD_API ScrollUp(RuntimeScene &scene) {
-  return scene.GetInputManager().ScrollUp();
+  return scene.GetInputManager().IsScrollingUp();
 }
 
 bool GD_API ScrollDown(RuntimeScene &scene) {
-  return scene.GetInputManager().ScrollDown();
+  return scene.GetInputManager().IsScrollingDown();
 }
 
 bool GD_API CursorOnObject(

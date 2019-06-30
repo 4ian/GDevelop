@@ -148,8 +148,8 @@ export default [
         const options = {
           multiSelections,
           title: 'Choose a json file',
-          name: 'Json files',
-          extensions: ['mp4'],
+          name: 'JSON file',
+          extensions: ['json'],
         };
         return selectLocalResourcePath(project, options).then(resources => {
           return resources.map(resourcePath => {

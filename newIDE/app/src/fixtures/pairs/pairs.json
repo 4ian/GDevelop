@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "",
+    "projectFile": "/home/matthias/Programme/GD_MyFork/GDevelop/newIDE/app/resources/examples/pairs/pairs.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -24,7 +24,7 @@
     "author": "",
     "windowWidth": 800,
     "windowHeight": 600,
-    "latestCompilationDirectory": "",
+    "latestCompilationDirectory": "/home/matthias/Programme/GD_MyFork/tween_example/export",
     "maxFPS": 60,
     "minFPS": 10,
     "verticalSync": false,
@@ -961,6 +961,7 @@
       "objects": [
         {
           "name": "card_crab",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -972,8 +973,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1039,6 +1039,7 @@
         },
         {
           "name": "card_seahorse",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1050,8 +1051,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1117,6 +1117,7 @@
         },
         {
           "name": "card_snail",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1128,8 +1129,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1195,6 +1195,7 @@
         },
         {
           "name": "card_seagrass",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1206,8 +1207,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1273,6 +1273,7 @@
         },
         {
           "name": "card_coral",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1284,8 +1285,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1351,6 +1351,7 @@
         },
         {
           "name": "card_anemone",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1362,8 +1363,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1429,6 +1429,7 @@
         },
         {
           "name": "card_plasticbag",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1440,8 +1441,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1507,6 +1507,7 @@
         },
         {
           "name": "card_blowfish",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1518,8 +1519,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1585,6 +1585,7 @@
         },
         {
           "name": "position_placeholder",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1623,14 +1624,14 @@
         },
         {
           "name": "newgame_button",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1667,6 +1668,7 @@
         },
         {
           "name": "board",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1705,6 +1707,7 @@
         },
         {
           "name": "background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1746,14 +1749,14 @@
           "italic": false,
           "name": "pairs",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "string": "Pairs: ",
@@ -1770,10 +1773,16 @@
           "italic": false,
           "name": "newgame",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
           "string": "New Game",
           "font": "fonts/LuckiestGuy.ttf",
           "characterSize": 30,
@@ -1788,6 +1797,7 @@
           "italic": false,
           "name": "youwon",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1850,6 +1860,7 @@
           "rendererParam2": 1,
           "rendererType": "Quad",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": 25,
           "textureParticleName": "images/star.png",
           "type": "ParticleSystem::ParticleEmitter",
@@ -1859,14 +1870,14 @@
         },
         {
           "name": "screen_fade",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -1903,14 +1914,14 @@
         },
         {
           "name": "ui_background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -3215,7 +3226,48 @@
                       "parameters": [
                         "newgame_button",
                         "Tween",
-                        "\"pop_up\"",
+                        "\"pop_up_button\"",
+                        "1",
+                        "1",
+                        "\"elastic\"",
+                        "1500",
+                        "no"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::ScaleX"
+                      },
+                      "parameters": [
+                        "newgame",
+                        "=",
+                        "0.5"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::ScaleY"
+                      },
+                      "parameters": [
+                        "newgame",
+                        "=",
+                        "0.5"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::AddObjectScaleTween"
+                      },
+                      "parameters": [
+                        "newgame",
+                        "Tween",
+                        "\"pop_up_button_text\"",
                         "1",
                         "1",
                         "\"elastic\"",

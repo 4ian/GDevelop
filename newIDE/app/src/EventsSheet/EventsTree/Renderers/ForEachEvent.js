@@ -101,7 +101,11 @@ export default class ForEachEvent extends React.Component<
           />
           <InstructionsList
             instrsList={forEachEvent.getActions()}
-            style={styles.actionsList}
+            style={
+              {
+                ...styles.actionsList,
+              } /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+            }
             selection={this.props.selection}
             areConditions={false}
             onAddNewInstruction={this.props.onAddNewInstruction}
@@ -125,7 +129,7 @@ export default class ForEachEvent extends React.Component<
         >
           <ObjectField
             project={this.props.project}
-            layout={this.props.layout}
+            scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={objectName}

@@ -293,6 +293,34 @@ class GD_CORE_API VideoResource : public Resource {
 };
 
 /**
+ * \brief Describe a json file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API JsonResource : public Resource {
+ public:
+  JsonResource() : Resource() { SetKind("json"); };
+  virtual ~JsonResource(){};
+  virtual JsonResource* Clone() const override {
+    return new JsonResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+#if defined(GD_IDE_ONLY)
+  virtual bool UseFile() override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+#endif
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource
@@ -337,7 +365,8 @@ class GD_CORE_API ResourcesManager {
   std::shared_ptr<gd::Resource> GetResourceSPtr(const gd::String& name);
 
   /**
-   * \brief Add an already constructed resource
+   * \brief Add an already constructed resource.
+   * \note A copy of the resource is made and stored inside the ResourcesManager.
    */
   bool AddResource(const gd::Resource& resource);
 

@@ -11,8 +11,8 @@ import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type InstructionOrExpressionInformation } from '../../InstructionEditor/InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
-import { type ParameterFieldProps } from '../ParameterFieldProps.flow';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionEditor/InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
 } from './BackgroundHighlighting';
@@ -58,7 +58,7 @@ const styles = {
 type State = {|
   popoverOpen: boolean,
   parametersDialogOpen: boolean,
-  selectedExpressionInfo: ?InstructionOrExpressionInformation,
+  selectedExpressionInfo: ?EnumeratedInstructionOrExpressionMetadata,
   validatedValue: string,
   errorText: ?string,
   errorHighlights: Array<Highlight>,
@@ -144,7 +144,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   _handleExpressionChosen = (
-    expressionInfo: InstructionOrExpressionInformation
+    expressionInfo: EnumeratedInstructionOrExpressionMetadata
   ) => {
     this.setState({
       popoverOpen: false,
@@ -154,7 +154,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   insertExpression = (
-    expressionInfo: InstructionOrExpressionInformation,
+    expressionInfo: EnumeratedInstructionOrExpressionMetadata,
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;
@@ -194,6 +194,9 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionType,
     } = this.props;
     if (!project) return null;
+
+    // Validation can be time consuming (~1ms for simple expression,
+    // a few milliseconds for complex ones).
 
     const parser = new gd.ExpressionParser2(
       gd.JsPlatform.get(),
@@ -235,7 +238,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionType,
       parameterMetadata,
       project,
-      layout,
+      scope,
       globalObjectsContainer,
       objectsContainer,
       parameterRenderingService,
@@ -294,6 +297,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                 }}
                 expressionType={expressionType}
                 focusOnMount
+                scope={scope}
               />
             </Popover>
           )}
@@ -328,7 +332,7 @@ export default class ExpressionField extends React.Component<Props, State> {
           <ExpressionParametersEditorDialog
             open={true}
             project={project}
-            layout={layout}
+            scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             expressionMetadata={this.state.selectedExpressionInfo.metadata}

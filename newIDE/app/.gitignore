@@ -26,9 +26,6 @@ public/external/monaco-editor-min
 public/external/jfxr/jfxr-editor/
 
 # Resources
-public/res
-public/CppPlatform
-public/JsPlatform
 resources/GDJS
 
 # locales build files

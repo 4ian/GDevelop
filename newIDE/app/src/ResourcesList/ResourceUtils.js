@@ -3,6 +3,7 @@ import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const gd = global.gd;
 
 export const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',
@@ -13,17 +14,22 @@ export const RESOURCE_EXTENSIONS = {
 
 export const createOrUpdateResource = (
   project: gdProject,
-  resource: gdResource,
+  newlyCreatedResource: gdResource,
   resourceName: string
 ) => {
   const resourcesManager = project.getResourcesManager();
   if (resourcesManager.hasResource(resourceName)) {
     resourcesManager.removeResource(resourceName);
   }
-  resource.setFile(resourceName);
-  resource.setName(resourceName);
-  resourcesManager.addResource(resource);
-  resource.delete();
+  newlyCreatedResource.setFile(resourceName);
+  newlyCreatedResource.setName(resourceName);
+  applyResourceDefaults(project, newlyCreatedResource);
+
+  // Important, we are responsible for deleting the resources that was given to us.
+  // Otherwise we have a memory leak.
+  resourcesManager.addResource(newlyCreatedResource);
+
+  newlyCreatedResource.delete();
 };
 
 /**
@@ -89,4 +95,13 @@ export const getResourceFilePathStatus = (
 
   // The resource path seems ok
   return '';
+};
+
+export const applyResourceDefaults = (
+  project: gdProject,
+  newResource: gdResource
+) => {
+  if (newResource instanceof gd.ImageResource) {
+    newResource.setSmooth(project.getScaleMode() !== 'nearest');
+  }
 };

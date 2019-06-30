@@ -83,14 +83,6 @@ export default class LocalExport extends Component {
     if (shell) shell.openItem(this.state.outputDir);
   };
 
-  openItchioHelp = () => {
-    Window.openExternalURL(getHelpLink('/publishing/publishing-to-itch-io'));
-  };
-
-  openLearnMore = () => {
-    Window.openExternalURL(getHelpLink('/publishing'));
-  };
-
   render() {
     const { project } = this.props;
     if (!project) return null;
@@ -160,12 +152,36 @@ export default class LocalExport extends Component {
           <RaisedButton
             fullWidth
             primary
-            onClick={() => this.openItchioHelp()}
+            onClick={() =>
+              Window.openExternalURL(
+                getHelpLink('/publishing/publishing-to-gamejolt-store')
+              )
+            }
+            label={<Trans>Publish your game on Game Jolt</Trans>}
+          />
+          <RaisedButton
+            fullWidth
+            primary
+            onClick={() =>
+              Window.openExternalURL(
+                getHelpLink('/publishing/publishing-to-kongregate-store')
+              )
+            }
+            label={<Trans>Publish your game on Kongregate</Trans>}
+          />
+          <RaisedButton
+            fullWidth
+            primary
+            onClick={() =>
+              Window.openExternalURL(
+                getHelpLink('/publishing/publishing-to-itch-io')
+              )
+            }
             label={<Trans>Publish your game on Itch.io</Trans>}
           />
           <FlatButton
             fullWidth
-            onClick={() => this.openLearnMore()}
+            onClick={() => Window.openExternalURL(getHelpLink('/publishing'))}
             label={<Trans>Learn more about publishing</Trans>}
           />
         </Dialog>

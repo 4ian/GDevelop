@@ -19,3 +19,19 @@
 .mosaic-gd-default-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
   background: #9100ce !important;
 }
+
+/* Separator draggable background */
+.mosaic-gd-default-theme .mosaic-split.-column .mosaic-split-line {
+  height: 1px;
+  border-bottom: 1px solid #bbbbbb !important;
+  border-top: 1px solid #bbbbbb !important;
+  width: 100px;
+  margin: auto;
+  bottom: auto !important;
+}
+
+.mosaic-gd-default-theme .mosaic-split:hover .mosaic-split-line {
+  border-color: #2b95d6 !important;
+  box-shadow: none !important;
+  cursor: ns-resize;
+}

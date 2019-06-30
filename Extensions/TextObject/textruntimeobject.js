@@ -20,9 +20,23 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._italic = objectData.italic;
     this._underlined = objectData.underlined;
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+    this._useGradient = false;
+    this._gradient = [];
+    this._gradientType = '';
     this.opacity = 255;
+    this._textAlign = 'left';
     this._wrapping = false;
     this._wrappingWidth = 1;
+    this._outlineThickness = 0;
+    this._outlineColor = [255,255,255];
+    this._shadow = false;
+    this._shadowColor = [0,0,0];
+    this._shadowDistance = 1;
+    this._shadowBlur = 1;
+    this._shadowAngle = 0;
+    this._padding = 5;
+    this._scaleX = 1;
+    this._scaleY = 1;
 
     this._str = objectData.string;
 
@@ -189,6 +203,55 @@ gdjs.TextRuntimeObject.prototype.getHeight = function() {
 };
 
 /**
+ * Get scale of the text.
+ */
+gdjs.TextRuntimeObject.prototype.getScale = function() {
+    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0; 
+};
+
+/**
+ * Get y-scale of the text.
+ */
+gdjs.TextRuntimeObject.prototype.getScaleX = function() {
+    return this._renderer.getScaleX();
+};
+
+/**
+ * Get x-scale of the text.
+ */
+gdjs.TextRuntimeObject.prototype.getScaleY = function() {
+    return this._renderer.getScaleY();
+};
+
+/**
+ * Set the text object scale.
+ * @param {number} newScale The new scale for the text object.
+ */
+gdjs.TextRuntimeObject.prototype.setScale = function(newScale) {
+    this._scaleX = newScale;
+    this._scaleY = newScale;
+    this._renderer.setScale(newScale);
+};
+
+/**
+ * Set the text object x-scale.
+ * @param {number} newScale The new x-scale for the text object.
+ */
+gdjs.TextRuntimeObject.prototype.setScaleX = function(newScale) {
+    this._scaleX = newScale;
+    this._renderer.setScaleX(newScale);
+};
+
+/**
+ * Set the text object y-scale.
+ * @param {number} newScale The new y-scale for the text object.
+ */
+gdjs.TextRuntimeObject.prototype.setScaleY = function(newScale) {
+    this._scaleY = newScale;
+    this._renderer.setScaleY(newScale);
+};
+
+/**
  * Change the text color.
  * @param {String} color color as a "R;G;B" string, for example: "255;0;0"
  */
@@ -199,6 +262,9 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
     this._color[0] = parseInt(color[0], 10);
     this._color[1] = parseInt(color[1], 10);
     this._color[2] = parseInt(color[2], 10);
+
+    this._useGradient = false;
+
     this._renderer.updateStyle();
 };
 
@@ -208,6 +274,23 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
  */
 gdjs.TextRuntimeObject.prototype.getColor = function(str) {
     return this._color[0] + ";" + this._color[1] + ";" + this._color[2];
+};
+
+/**
+ * Set the text alignment for multiline text objects.
+ * @param {string} alignment The text alignment.
+ */
+gdjs.TextRuntimeObject.prototype.setTextAlignment = function(alignment) {
+    this._textAlign = alignment;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Get the text alignment of text object.
+ * @return {string} The text alignment.
+ */
+gdjs.TextRuntimeObject.prototype.getTextAlignment = function() {
+    return this._textAlign;
 };
 
 /**
@@ -240,5 +323,123 @@ gdjs.TextRuntimeObject.prototype.getWrappingWidth = function() {
 gdjs.TextRuntimeObject.prototype.setWrappingWidth = function(width) {
     if (width <= 1) width = 1;
     this._wrappingWidth = width;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Set the outline for the text object.
+ * @param {string} str color as a "R;G;B" string, for example: "255;0;0"
+ * @param {number} thickness thickness of the outline (0 = disabled)
+ */
+gdjs.TextRuntimeObject.prototype.setOutline = function(str, thickness) {
+    var color = str.split(";");
+    if ( color.length < 3 ) return;
+
+    this._outlineColor[0] = parseInt(color[0], 10);
+    this._outlineColor[1] = parseInt(color[1], 10);
+    this._outlineColor[2] = parseInt(color[2], 10);
+    this._outlineThickness = thickness;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Set the shadow for the text object.
+ * @param {string} str color as a "R;G;B" string, for example: "255;0;0"
+ * @param {number} distance distance between the shadow and the text, in pixels.
+ * @param {number} blur amout of shadow blur, in pixels.
+ * @param {number} angle shadow offset direction, in degrees.
+ */
+gdjs.TextRuntimeObject.prototype.setShadow = function(str, distance, blur, angle) {
+    var color = str.split(";");
+    if ( color.length < 3 ) return;
+
+    this._shadowColor[0] = parseInt(color[0], 10);
+    this._shadowColor[1] = parseInt(color[1], 10);
+    this._shadowColor[2] = parseInt(color[2], 10);
+    this._shadowDistance = distance;
+    this._shadowBlur = blur;
+    this._shadowAngle = angle;
+    this._shadow = true;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Set the gradient for the text object.
+ * @param {string} strFirstColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strSecondColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strThirdColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strFourthColor color as a "R;G;B" string, for example: "255;0;0"
+ * @param {string} strGradientType gradient type
+ */
+gdjs.TextRuntimeObject.prototype.setGradient = function(strGradientType, strFirstColor, strSecondColor, strThirdColor, strFourthColor) {
+    var colorFirst = strFirstColor.split(";");
+    var colorSecond = strSecondColor.split(";");
+    var colorThird = strThirdColor.split(";");
+    var colorFourth = strFourthColor.split(";");
+
+    this._gradient = [];
+
+    if (colorFirst.length == 3){
+        this._gradient.push([
+            parseInt(colorFirst[0], 10),
+            parseInt(colorFirst[1], 10),
+            parseInt(colorFirst[2], 10)
+        ]);
+    }
+
+    if (colorSecond.length == 3){
+        this._gradient.push([
+            parseInt(colorSecond[0], 10),
+            parseInt(colorSecond[1], 10),
+            parseInt(colorSecond[2], 10)
+        ]);
+    }
+
+    if (colorThird.length == 3){
+        this._gradient.push([
+            parseInt(colorThird[0], 10),
+            parseInt(colorThird[1], 10),
+            parseInt(colorThird[2], 10)
+        ]);
+    }
+
+    if (colorFourth.length == 3){
+        this._gradient.push([
+            parseInt(colorFourth[0], 10),
+            parseInt(colorFourth[1], 10),
+            parseInt(colorFourth[2], 10)
+        ]);
+    }
+
+    this._gradientType = strGradientType;
+
+    this._useGradient = (this._gradient.length > 1) ? true : false; 
+
+    this._renderer.updateStyle();
+};
+
+/**
+ * Show the shadow of the text object.
+ * @param {boolean} enable true to show the shadow, false to hide it
+ */
+gdjs.TextRuntimeObject.prototype.showShadow = function(enable) {
+    this._shadow = enable;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Get padding of the text object.
+ * @return {number} number of pixels around the text before it gets cropped
+ */
+gdjs.TextRuntimeObject.prototype.getPadding = function() {
+    return this._padding;
+};
+
+/**
+ * Set padding of the text object.
+ * @param {number} value number of pixels around the text before it gets cropped
+ */
+gdjs.TextRuntimeObject.prototype.setPadding = function(value) {
+    this._padding = value;
     this._renderer.updateStyle();
 };

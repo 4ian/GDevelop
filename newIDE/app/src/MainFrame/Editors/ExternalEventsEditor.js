@@ -1,3 +1,4 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import EventsSheet from '../../EventsSheet';
@@ -15,12 +16,11 @@ const styles = {
 };
 
 export default class ExternalEventsEditor extends BaseEditor {
-  constructor(props) {
-    super(props);
-    this.state = {
-      layoutChooserOpen: false,
-    };
-  }
+  editor: ?EventsSheet;
+
+  state = {
+    layoutChooserOpen: false,
+  };
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
@@ -29,15 +29,15 @@ export default class ExternalEventsEditor extends BaseEditor {
   getSerializedElements() {
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
+    if (!externalEvents) return {};
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
       events: serializeToJSObject(externalEvents),
-      uiSettings: this.editor.getUiSettings(),
     };
   }
 
-  getExternalEvents() {
+  getExternalEvents(): ?gdExternalEvents {
     const { project, externalEventsName } = this.props;
     if (!project.hasExternalEventsNamed(externalEventsName)) {
       return null;
@@ -58,7 +58,7 @@ export default class ExternalEventsEditor extends BaseEditor {
     return project.getLayout(layoutName);
   }
 
-  setAssociatedLayout = layoutName => {
+  setAssociatedLayout = (layoutName: string) => {
     const externalEvents = this.getExternalEvents();
     if (!externalEvents) return;
 
@@ -94,7 +94,9 @@ export default class ExternalEventsEditor extends BaseEditor {
             {...this.props}
             ref={editor => (this.editor = editor)}
             project={project}
-            layout={layout}
+            scope={{
+              layout,
+            }}
             globalObjectsContainer={project}
             objectsContainer={layout}
             events={externalEvents.getEvents()}

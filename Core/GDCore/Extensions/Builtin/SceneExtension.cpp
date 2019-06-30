@@ -94,7 +94,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/replaceScene24.png",
                  "res/actions/replaceScene.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Name of the new scene"))
+      .AddParameter("sceneName", _("Name of the new scene"))
       .AddParameter("yesorno", _("Stop any other paused scenes?"))
       .SetDefaultValue("true")
       .MarkAsAdvanced();
@@ -110,7 +110,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/pushScene24.png",
                  "res/actions/pushScene.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Name of the new scene"))
+      .AddParameter("sceneName", _("Name of the new scene"))
       .MarkAsAdvanced();
 
   extension
@@ -152,7 +152,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
   extension
       .AddAction("DisableInputWhenFocusIsLost",
                  _("Disable input when focus is lost"),
-                 _("Decide if the keyboard and mouse buttons must be taken "
+                 _("mouse buttons must be taken "
                    "into account even\nif the window is not active."),
                  _("Disable input when focus is lost: _PARAM1_"),
                  _("Scene"),

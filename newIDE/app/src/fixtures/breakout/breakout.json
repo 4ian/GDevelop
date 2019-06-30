@@ -295,6 +295,7 @@
       "objects": [
         {
           "name": "terrain",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -352,6 +353,7 @@
         },
         {
           "name": "barre",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -409,6 +411,7 @@
         },
         {
           "name": "balle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -466,6 +469,7 @@
         },
         {
           "name": "brick",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],

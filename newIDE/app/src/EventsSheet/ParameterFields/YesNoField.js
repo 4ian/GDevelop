@@ -1,10 +1,13 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import {
+  type ParameterFieldProps,
+  getParameterValueOrDefault,
+} from './ParameterFieldCommons';
 
 const styles = {
   button: {
@@ -20,10 +23,11 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
   focus() {}
 
   render() {
-    const { parameterMetadata } = this.props;
+    const { parameterMetadata, value } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
+    const effectiveValue = getParameterValueOrDefault(value, parameterMetadata);
 
     return (
       <Line>
@@ -32,7 +36,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
           <RaisedButton
             style={styles.button}
             label={<Trans>Yes</Trans>}
-            primary={this.props.value === 'yes'}
+            primary={effectiveValue === 'yes'}
             onClick={() => this.props.onChange('yes')}
           />
         </Column>
@@ -40,7 +44,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
           <RaisedButton
             style={styles.button}
             label={<Trans>No</Trans>}
-            primary={this.props.value === 'no'}
+            primary={effectiveValue !== 'yes'}
             onClick={() => this.props.onChange('no')}
           />
         </Column>
@@ -48,3 +52,14 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
     );
   }
 }
+
+export const renderInlineYesNo = ({
+  value,
+  parameterMetadata,
+}: ParameterInlineRendererProps) => {
+  if (getParameterValueOrDefault(value, parameterMetadata) === 'yes') {
+    return <Trans>yes</Trans>;
+  } else {
+    return <Trans>no</Trans>;
+  }
+};

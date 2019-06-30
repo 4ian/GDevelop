@@ -58,7 +58,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction(
@@ -84,7 +84,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction(
@@ -110,7 +110,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction(
@@ -136,7 +136,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction(
@@ -162,7 +162,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction(
@@ -188,7 +188,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction("ParticleSize1",
@@ -212,7 +212,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction("ParticleSize2",
@@ -236,7 +236,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction(
@@ -261,7 +261,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction(
@@ -286,7 +286,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction("ParticleAlpha1",
@@ -312,7 +312,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddAction("ParticleAlpha2",
@@ -338,7 +338,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   obj.AddCondition("NoMoreParticles",

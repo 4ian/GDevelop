@@ -858,6 +858,7 @@
       "objects": [
         {
           "name": "Ball",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -915,6 +916,7 @@
         },
         {
           "name": "Hole",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -972,6 +974,7 @@
         },
         {
           "name": "Magnet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1029,6 +1032,7 @@
         },
         {
           "name": "Table",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1086,6 +1090,7 @@
         },
         {
           "name": "small_magnet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],

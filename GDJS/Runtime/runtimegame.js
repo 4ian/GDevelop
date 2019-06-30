@@ -26,6 +26,9 @@ gdjs.RuntimeGame = function(data, spec) {
   this._fontManager = new gdjs.FontManager(
     data.resources ? data.resources.resources : undefined
   );
+  this._jsonManager = new gdjs.JsonManager(
+    data.resources ? data.resources.resources : undefined
+  );
   this._maxFPS = data ? parseInt(data.properties.maxFPS, 10) : 60;
   this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 

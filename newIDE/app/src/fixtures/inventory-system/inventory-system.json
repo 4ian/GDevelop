@@ -1149,6 +1149,7 @@
       "objects": [
         {
           "name": "inventory_background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1187,6 +1188,7 @@
         },
         {
           "name": "inventory_slot",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1682,6 +1684,7 @@
         },
         {
           "name": "inventory_bin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1787,6 +1790,7 @@
         },
         {
           "name": "button_background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1825,6 +1829,7 @@
         },
         {
           "name": "pointer_dragobject",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2298,6 +2303,7 @@
           "italic": false,
           "name": "slot_text",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2316,6 +2322,7 @@
           "italic": true,
           "name": "Inventory_title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2334,6 +2341,7 @@
           "italic": false,
           "name": "debug",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2352,6 +2360,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2370,6 +2379,7 @@
           "italic": false,
           "name": "save_text",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2388,6 +2398,7 @@
           "italic": false,
           "name": "load_text",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2403,6 +2414,7 @@
         },
         {
           "name": "item_apple",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2460,6 +2472,7 @@
         },
         {
           "name": "item_banana",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2517,6 +2530,7 @@
         },
         {
           "name": "item_cherry",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2574,6 +2588,7 @@
         },
         {
           "name": "item_grape",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2631,6 +2646,7 @@
         },
         {
           "name": "item_orange",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2688,6 +2704,7 @@
         },
         {
           "name": "item_pearl",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2745,6 +2762,7 @@
         },
         {
           "name": "item_raspberry",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2802,6 +2820,7 @@
         },
         {
           "name": "item_strawberry",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2859,6 +2878,7 @@
         },
         {
           "name": "item_watermelon",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],

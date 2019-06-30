@@ -680,6 +680,42 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.VideoResource', function() {
+    it('should have name and file', function() {
+      const resource = new gd.VideoResource();
+      resource.setName('MyVideoResource');
+      resource.setFile('MyVideoFile');
+      expect(resource.getName()).toBe('MyVideoResource');
+      expect(resource.getFile()).toBe('MyVideoFile');
+      resource.delete();
+    });
+    it('can have metadata', function() {
+      const resource = new gd.VideoResource();
+      expect(resource.getMetadata()).toBe('');
+      resource.setMetadata(JSON.stringify({ hello: 'world' }));
+      expect(resource.getMetadata()).toBe('{"hello":"world"}');
+      resource.delete();
+    });
+  });
+
+  describe('gd.JsonResource', function() {
+    it('should have name and file', function() {
+      const resource = new gd.JsonResource();
+      resource.setName('MyJsonResource');
+      resource.setFile('MyJsonFile');
+      expect(resource.getName()).toBe('MyJsonResource');
+      expect(resource.getFile()).toBe('MyJsonFile');
+      resource.delete();
+    });
+    it('can have metadata', function() {
+      const resource = new gd.VideoResource();
+      expect(resource.getMetadata()).toBe('');
+      resource.setMetadata(JSON.stringify({ hello: 'world' }));
+      expect(resource.getMetadata()).toBe('{"hello":"world"}');
+      resource.delete();
+    });
+  });
+
   describe('gd.ResourcesManager', function() {
     it('should support adding resources', function() {
       var project = gd.ProjectHelper.createNewGDJSProject();
@@ -955,6 +991,76 @@ describe('libGD.js', function() {
           'Exception caught while launching sanityCheckBehavior on a gd.BehaviorSharedDataJsImplementation.'
         );
       }
+    });
+  });
+
+  describe('gd.NamedPropertyDescriptor', function() {
+    const makeNewProperty = () => {
+      const property = new gd.NamedPropertyDescriptor();
+      property.setName("Property1")
+      .setLabel("The first property")
+      .setValue("Hello world")
+      .setType("string")
+      .addExtraInfo('Info1')
+      .addExtraInfo('Info2');
+
+      return property;
+    }
+
+    it('can be created and manipulated', function (){
+      const property = makeNewProperty();
+      expect(property.getName()).toBe('Property1');
+      expect(property.getLabel()).toBe('The first property');
+      expect(property.getValue()).toBe('Hello world');
+      expect(property.getType()).toBe('string');
+      expect(property
+        .getExtraInfo()
+        .toJSArray()).toContain("Info1");
+      expect(property
+        .getExtraInfo()
+        .toJSArray()).toContain("Info2");
+
+      property.delete();
+    });
+    it('can be serialized', function (){
+      const property = makeNewProperty();
+
+      var serializerElement = new gd.SerializerElement();
+      property.serializeTo(serializerElement);
+      property.delete();
+
+      const property2 = new gd.NamedPropertyDescriptor();
+      property2.unserializeFrom(serializerElement);
+      serializerElement.delete();
+
+      expect(property2.getName()).toBe('Property1');
+      expect(property2.getLabel()).toBe('The first property');
+      expect(property2.getValue()).toBe('Hello world');
+      expect(property2.getType()).toBe('string');
+      expect(property2
+        .getExtraInfo()
+        .toJSArray()).toContain("Info1");
+      expect(property2
+        .getExtraInfo()
+        .toJSArray()).toContain("Info2");
+    });
+  });
+
+  describe('gd.NamedPropertyDescriptorsList', function() {
+    it('can be used to store named properties', function() {
+      const list = new gd.NamedPropertyDescriptorsList();
+
+      const property1 = list.insertNew("Property1", 0);
+      expect(list.has("Property1")).toBe(true);
+      expect(list.getCount()).toBe(1);
+
+      expect(property1.getName()).toBe("Property1");
+      expect(list.getAt(0).getName()).toBe("Property1");
+
+      property1.setLabel("Property 1");
+      property1.setValue("123");
+      expect(list.getAt(0).getLabel()).toBe("Property 1");
+      expect(list.getAt(0).getValue()).toBe("123");
     });
   });
 
@@ -1797,6 +1903,16 @@ describe('libGD.js', function() {
   });
 
   describe('gd.SpriteObject', function() {
+    it('is a gd.Object and can have tags', function() {
+      var object = new gd.SpriteObject('MySpriteObject');
+
+      expect(object instanceof gd.Object).toBe(true);
+      object.setTags('tag1, tag2, tag3');
+      expect(object.getTags()).toBe('tag1, tag2, tag3');
+      expect(object.getVariables()).toBeTruthy();
+      object.delete();
+    });
+
     it('can have animations', function() {
       var obj = new gd.SpriteObject('MySpriteObject');
       obj.addAnimation(new gd.Animation());

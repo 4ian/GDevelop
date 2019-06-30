@@ -1,1 +1,0 @@
-Use JavaScript to read the state of a gamepad and use it in your game.

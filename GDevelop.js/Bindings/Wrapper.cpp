@@ -31,7 +31,8 @@
 #include <GDCore/IDE/AbstractFileSystem.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h>
-#include <GDCore/IDE/Dialogs/PropertyDescriptor.h>
+#include <GDCore/Project/PropertyDescriptor.h>
+#include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
 #include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
 #include <GDCore/IDE/Events/EventsContextAnalyzer.h>
@@ -393,6 +394,7 @@ typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserDiagnostic*> VectorExpressionParserDiagnostic;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehaviorsList;
+typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor> NamedPropertyDescriptorsList;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -539,10 +541,17 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_RenameEventsFunction RenameEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
+#define STATIC_RenameBehaviorProperty RenameBehaviorProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
 
 #define STATIC_UseOldExpressionParser UseOldExpressionParser
 #define STATIC_IsUsingOldExpressionParser IsUsingOldExpressionParser
+
+#define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
+#define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName
+#define STATIC_GetPropertyActionName GetPropertyActionName
+#define STATIC_GetPropertyConditionName GetPropertyConditionName
+#define STATIC_GetPropertyExpressionName GetPropertyExpressionName
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

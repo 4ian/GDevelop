@@ -11,7 +11,7 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include <map>
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #endif

@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import { mapVector, mapFor } from '../Utils/MapFor';
 import { caseSensitiveSlug } from '../Utils/CaseSensitiveSlug';
 import {
@@ -8,6 +9,7 @@ import {
   declareBehaviorMetadata,
   declareExtension,
   isBehaviorLifecycleFunction,
+  declareBehaviorPropertiesInstructionAndExpressions,
 } from './MetadataDeclarationHelpers';
 
 const gd = global.gd;
@@ -21,6 +23,7 @@ export type EventsFunctionCodeWriter = {|
 type Options = {|
   skipCodeGeneration?: boolean,
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
+  i18n: I18nType,
 |};
 
 const mangleName = (name: string) => {
@@ -32,7 +35,8 @@ const mangleName = (name: string) => {
  */
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
-  eventsFunctionCodeWriter: EventsFunctionCodeWriter
+  eventsFunctionCodeWriter: EventsFunctionCodeWriter,
+  i18n: I18nType
 ): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
@@ -43,7 +47,7 @@ export const loadProjectEventsFunctionsExtensions = (
       return loadProjectEventsFunctionsExtension(
         project,
         project.getEventsFunctionsExtensionAt(i),
-        { skipCodeGeneration: true, eventsFunctionCodeWriter }
+        { skipCodeGeneration: true, eventsFunctionCodeWriter, i18n }
       );
     })
   ).then(() =>
@@ -56,6 +60,7 @@ export const loadProjectEventsFunctionsExtensions = (
           {
             skipCodeGeneration: false,
             eventsFunctionCodeWriter,
+            i18n,
           }
         );
       })
@@ -222,6 +227,13 @@ function generateBehavior(
 
   return Promise.resolve().then(() => {
     const behaviorMethodMangledNames = new gd.MapStringString();
+
+    // Declare the instructions/expressions for properties
+    declareBehaviorPropertiesInstructionAndExpressions(
+      options.i18n,
+      behaviorMetadata,
+      eventsBasedBehavior
+    );
 
     // Declare all the behavior functions
     mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {

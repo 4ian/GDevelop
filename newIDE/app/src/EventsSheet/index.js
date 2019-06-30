@@ -67,13 +67,14 @@ import {
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
+import { type EventsScope } from './EventsScope.flow';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
@@ -344,6 +345,9 @@ export default class EventsSheet extends React.Component<Props, State> {
   openInstructionEditor = (instructionContext: InstructionContext) => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
+      console.warn(
+        'state.editedInstruction.instruction was containing an instruction - deleting it. Verify the logic handling the state in EventsSheet because that should not happen.'
+      );
     }
 
     this.setState({
@@ -359,10 +363,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   closeInstructionEditor(saveChanges: boolean = false) {
-    if (this.state.editedInstruction.instruction) {
-      this.state.editedInstruction.instruction.delete();
-    }
-
+    const { instruction } = this.state.editedInstruction;
     this.setState(
       {
         editedInstruction: {
@@ -373,6 +374,12 @@ export default class EventsSheet extends React.Component<Props, State> {
         },
       },
       () => {
+        // Delete from memory the instruction being edited, *after* resetting
+        // editedInstruction and after the re-rendering, in an effort to be
+        // sure that instruction is not used after deletion.
+        if (instruction) {
+          instruction.delete();
+        }
         if (saveChanges) {
           this._saveChangesToHistory();
         }
@@ -832,7 +839,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   render() {
     const {
       project,
-      layout,
+      scope,
       events,
       onOpenExternalEvents,
       onOpenLayout,
@@ -872,7 +879,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                   key={events.ptr}
                   events={events}
                   project={project}
-                  layout={layout}
+                  scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   selection={this.state.selection}
@@ -934,7 +941,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                   anchorEl={this.state.inlineEditingAnchorEl}
                   onRequestClose={this.closeParameterEditor}
                   project={project}
-                  layout={layout}
+                  scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   isCondition={this.state.editedParameter.isCondition}
@@ -1108,7 +1115,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                 {this.state.editedInstruction.instruction && (
                   <InstructionEditorDialog
                     project={project}
-                    layout={layout}
+                    scope={scope}
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     instruction={this.state.editedInstruction.instruction}

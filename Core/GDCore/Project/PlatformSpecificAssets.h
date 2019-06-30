@@ -53,16 +53,16 @@ class GD_CORE_API PlatformSpecificAssets {
 
   void ExposeResources(gd::ArbitraryResourceWorker& worker);
 
-  /** \name Saving and loading
+  /** \name Serialization
    */
   ///@{
   /**
-   * \brief Serialize objects groups container.
+   * \brief Serialize the PlatformSpecificAssets
    */
   void SerializeTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserialize the objects groups container.
+   * \brief Unserialize the PlatformSpecificAssets.
    */
   void UnserializeFrom(const SerializerElement& element);
   ///@}

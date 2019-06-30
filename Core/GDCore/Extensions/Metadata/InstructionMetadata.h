@@ -163,6 +163,8 @@ class GD_CORE_API ParameterMetadata {
   /**
    * \brief Return true if the type of the parameter is an expression of the
    * given type.
+   * \note If you had a new type of parameter, also add it in the IDE (
+   * see EventsFunctionParametersEditor) and in the EventsCodeGenerator.
    */
   static bool IsExpression(const gd::String &type,
                            const gd::String &parameterType) {
@@ -173,7 +175,8 @@ class GD_CORE_API ParameterMetadata {
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
              parameterType == "joyaxis" ||
-             parameterType == "stringWithSelector";
+             parameterType == "stringWithSelector" ||
+             parameterType == "sceneName";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";
@@ -212,13 +215,17 @@ class GD_CORE_API ParameterMetadata {
 };
 
 /**
- * \brief Contains user-friendly infos about actions/conditions, and members
- * needed to setup an instruction
+ * \brief Describe user-friendly information about an instruction (action or
+ * condition), its parameters and the function name as well as other information
+ * for code generation.
  *
  * \ingroup Events
  */
 class GD_CORE_API InstructionMetadata {
  public:
+  /**
+   * Construct a new instruction metadata.
+   */
   InstructionMetadata(const gd::String &extensionNamespace,
                       const gd::String &name,
                       const gd::String &fullname,
@@ -227,6 +234,13 @@ class GD_CORE_API InstructionMetadata {
                       const gd::String &group,
                       const gd::String &icon,
                       const gd::String &smallIcon);
+
+  /**
+   * Construct an empty InstructionMetadata.
+   * \warning Don't use this - only here to fullfil std::map requirements.
+   */
+  InstructionMetadata();
+
   virtual ~InstructionMetadata(){};
 
   const gd::String &GetFullName() const { return fullname; }
@@ -255,6 +269,21 @@ class GD_CORE_API InstructionMetadata {
    */
   InstructionMetadata &SetHelpPath(const gd::String &path) {
     helpPath = path;
+    return *this;
+  }
+
+  /**
+   * Check if the instruction is private - it can't be used outside of the
+   * object/ behavior that it is attached too.
+   */
+  bool IsPrivate() const { return isPrivate; }
+
+  /**
+   * Set that the instruction is private - it can't be used outside of the
+   * object/ behavior that it is attached too.
+   */
+  InstructionMetadata &SetPrivate() {
+    isPrivate = true;
     return *this;
   }
 
@@ -513,12 +542,6 @@ class GD_CORE_API InstructionMetadata {
     return codeExtraInformation.SetFunctionName(functionName);
   }
 
-  /** \brief DefaultConstructor.
-   * \warning Please do not use this constructor. Only here to fulfill std::map
-   * requirements.
-   */
-  InstructionMetadata();
-
   std::vector<ParameterMetadata> parameters;
 
  private:
@@ -534,6 +557,7 @@ class GD_CORE_API InstructionMetadata {
   bool hidden;
   int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
                         ///< use) to 10 (complex to understand)
+  bool isPrivate;
 };
 
 }  // namespace gd

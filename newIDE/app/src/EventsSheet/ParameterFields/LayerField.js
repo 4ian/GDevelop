@@ -1,95 +1,39 @@
 // @flow
 import React, { Component } from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
 import { mapFor } from '../../Utils/MapFor';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
-import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
-type State = {|
-  focused: boolean,
-  text: ?string,
-|};
-
-export default class LayerField extends Component<ParameterFieldProps, State> {
-  state = { focused: false, text: null };
-
-  _description: ?string;
-  _field: ?any;
-  _layersNames: Array<string> = [];
-
-  constructor(props: ParameterFieldProps) {
-    super(props);
-
-    const { parameterMetadata } = this.props;
-    this._description = parameterMetadata
-      ? parameterMetadata.getDescription()
-      : undefined;
-
-    this._loadNamesFrom(props);
-  }
+export default class LayerField extends Component<ParameterFieldProps, {||}> {
+  _field: ?SemiControlledAutoComplete;
 
   focus() {
     if (this._field) this._field.focus();
   }
 
-  componentWillReceiveProps(newProps: ParameterFieldProps) {
-    if (newProps.layout !== this.props.layout) {
-      this._loadNamesFrom(newProps);
-    }
-  }
-
-  _loadNamesFrom(props: ParameterFieldProps) {
-    const layout = props.layout;
-    if (!layout) {
-      this._layersNames = [];
-      return;
-    }
-
-    this._layersNames = mapFor(0, layout.getLayersCount(), i => {
-      const layer = layout.getLayerAt(i);
-      return layer.getName();
-    });
-  }
-
   render() {
+    const { value, onChange, isInline, scope, parameterMetadata } = this.props;
+    const { layout } = scope;
+    const layerNames = layout
+      ? mapFor(0, layout.getLayersCount(), i => {
+          const layer = layout.getLayerAt(i);
+          return layer.getName();
+        })
+      : [];
+
     return (
-      <AutoComplete
-        {...defaultAutocompleteProps}
-        floatingLabelText={this._description}
-        searchText={this.state.focused ? this.state.text : this.props.value}
-        onFocus={() => {
-          this.setState({
-            focused: true,
-            text: this.props.value,
-          });
-        }}
-        onUpdateInput={value => {
-          this.setState({
-            focused: true,
-            text: value,
-          });
-        }}
-        onBlur={event => {
-          this.props.onChange(event.target.value);
-          this.setState({
-            focused: false,
-            text: null,
-          });
-        }}
-        onNewRequest={data => {
-          // Note that data may be a string or a {text, value} object.
-          if (typeof data === 'string') {
-            this.props.onChange(data);
-          } else if (typeof data.value === 'string') {
-            this.props.onChange(data.value);
-          }
-          this.focus(); // Keep the focus after choosing an item
-        }}
-        dataSource={this._layersNames.map(layerName => ({
+      <SemiControlledAutoComplete
+        floatingLabelText={
+          parameterMetadata ? parameterMetadata.getDescription() : undefined
+        }
+        value={value}
+        onChange={onChange}
+        openOnFocus={isInline}
+        dataSource={layerNames.map(layerName => ({
           text: layerName || '(Base layer)',
           value: `"${layerName}"`,
         }))}
-        openOnFocus={!this.props.isInline}
+        hintText={'""'}
         ref={field => (this._field = field)}
       />
     );

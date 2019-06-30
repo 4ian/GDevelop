@@ -19,6 +19,7 @@ import * as PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
+import CanvasCursor from './CanvasCursor';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -54,6 +55,11 @@ export default class InstancesEditorContainer extends Component {
   }
 
   _initializeCanvasAndRenderer() {
+    // project can be used here for initializing stuff, but don't keep references to it.
+    // Instead, create editors in _mountEditorComponents (as they will be destroyed/recreated
+    // if the project changes).
+    const { project } = this.props;
+
     this.pixiRenderer = PIXI.autoDetectRenderer(
       this.props.width,
       this.props.height,
@@ -134,10 +140,12 @@ export default class InstancesEditorContainer extends Component {
         event.data.global.y
       )
     );
-    this.backgroundArea.on('panend', event => this._onEndSelectionRectangle());
+    this.backgroundArea.on('panend', event => this._onPanEnd());
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
+      initialViewX: project ? project.getMainWindowDefaultWidth() / 2 : 0,
+      initialViewY: project ? project.getMainWindowDefaultHeight() / 2 : 0,
       width: this.props.width,
       height: this.props.height,
       options: this.props.options,
@@ -165,6 +173,11 @@ export default class InstancesEditorContainer extends Component {
     this.dropHandler = new DropHandler({
       canvas: this.canvasArea,
       onDrop: this._onDrop,
+    });
+
+    this.canvasCursor = new CanvasCursor({
+      canvas: this.canvasArea,
+      shouldMoveView: () => this.keyboardShortcuts.shouldMoveView(),
     });
 
     this._mountEditorComponents(this.props);
@@ -372,7 +385,10 @@ export default class InstancesEditorContainer extends Component {
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
 
-    if (!this.keyboardShortcuts.shouldMultiSelect()) {
+    if (
+      !this.keyboardShortcuts.shouldMultiSelect() &&
+      !this.keyboardShortcuts.shouldMoveView()
+    ) {
       this.props.instancesSelection.clearSelection();
       this.props.onInstancesSelected([]);
     }
@@ -404,16 +420,20 @@ export default class InstancesEditorContainer extends Component {
     return layersVisibility;
   };
 
-  _onEndSelectionRectangle = () => {
-    let instancesSelected = this.selectionRectangle.endSelectionRectangle();
+  _onPanEnd = () => {
+    // When a pan is ended, this can be that either the user was making
+    // a selection, or that the user was moving the view.
+    if (this.selectionRectangle.hasStartedSelectionRectangle()) {
+      let instancesSelected = this.selectionRectangle.endSelectionRectangle();
 
-    this.props.instancesSelection.selectInstances(
-      instancesSelected,
-      this.keyboardShortcuts.shouldMultiSelect(),
-      this._getLayersVisibility()
-    );
-    instancesSelected = this.props.instancesSelection.getSelectedInstances();
-    this.props.onInstancesSelected(instancesSelected);
+      this.props.instancesSelection.selectInstances(
+        instancesSelected,
+        this.keyboardShortcuts.shouldMultiSelect(),
+        this._getLayersVisibility()
+      );
+      instancesSelected = this.props.instancesSelection.getSelectedInstances();
+      this.props.onInstancesSelected(instancesSelected);
+    }
   };
 
   _onInstanceClicked = instance => {
@@ -425,6 +445,12 @@ export default class InstancesEditorContainer extends Component {
   };
 
   _onDownInstance = instance => {
+    if (this.keyboardShortcuts.shouldMoveView()) {
+      // If the user wants to move the view, discard the click on an instance:
+      // it's just the beginning of the user panning the view.
+      return;
+    }
+
     if (this.keyboardShortcuts.shouldCloneInstances()) {
       const selectedInstances = this.props.instancesSelection.getSelectedInstances();
       for (var i = 0; i < selectedInstances.length; i++) {
@@ -455,6 +481,9 @@ export default class InstancesEditorContainer extends Component {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
+    // It is possible for the user to start moving an instance, then press the button
+    // to move the view, move it, then unpress it and continue to move the instance.
+    // This means that while we're in "_onMoveInstance", we must handle view moving.
     if (this.keyboardShortcuts.shouldMoveView()) {
       this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
 
@@ -585,6 +614,7 @@ export default class InstancesEditorContainer extends Component {
     if (this.fpsLimiter.shouldUpdate()) {
       this.backgroundColor.render();
       this.viewPosition.render();
+      this.canvasCursor.render();
       this.grid.render();
       this.instancesRenderer.render();
       this.highlightedInstance.render();

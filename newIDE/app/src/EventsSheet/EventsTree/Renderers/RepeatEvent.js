@@ -101,7 +101,11 @@ export default class RepeatEvent extends React.Component<
           />
           <InstructionsList
             instrsList={repeatEvent.getActions()}
-            style={styles.actionsList}
+            style={
+              {
+                ...styles.actionsList,
+              } /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+            }
             selection={this.props.selection}
             areConditions={false}
             onAddNewInstruction={this.props.onAddNewInstruction}
@@ -125,9 +129,9 @@ export default class RepeatEvent extends React.Component<
         >
           <DefaultField
             project={this.props.project}
+            scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
-            layout={this.props.layout}
             value={expression}
             onChange={text => {
               repeatEvent.setRepeatExpression(text);

@@ -103,6 +103,10 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       const projectPath = path.dirname(project.getProjectFile());
       const fullPath = path.resolve(projectPath, resources[0].getFile());
 
+      // Important, we are responsible for deleting the resources that were given to us.
+      // Otherwise we have a memory leak.
+      resources.forEach(resource => resource.delete());
+
       Promise.all([
         ...desktopSizes.map(size =>
           resizeImage(
@@ -153,6 +157,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             imageResource.setName(resourceName);
 
             resourcesManager.addResource(imageResource);
+
+            // Important, we are responsible for deleting the resources that we created
+            // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
             imageResource.delete();
           } else {
             resourcesManager.getResource(resourceName).setFile(resourceName);

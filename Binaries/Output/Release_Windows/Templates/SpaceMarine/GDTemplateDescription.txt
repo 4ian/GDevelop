@@ -1,4 +1,0 @@
-GDevelop C++ platform
-Space Marine
-Template showing how to setup a character being controlled by
-the keyboard and the mouse and how to handle obstacles

@@ -1,26 +1,30 @@
 // @flow
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import {
+  type EnumeratedInstructionOrExpressionMetadata,
+  type InstructionOrExpressionScope,
+} from './EnumeratedInstructionOrExpressionMetadata.js';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
 
 const enumerateExtensionInstructions = (
-  groupPrefix: string,
-  extensionInstructions
-): Array<InstructionOrExpressionInformation> => {
+  prefix: string,
+  instructions: gdMapStringInstructionMetadata,
+  scope: InstructionOrExpressionScope
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
-  var instructionsTypes = extensionInstructions.keys();
+  var instructionsTypes = instructions.keys();
   const allInstructions = [];
 
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
-    const instrMetadata = extensionInstructions.get(instructionsTypes.get(j));
+    const instrMetadata = instructions.get(instructionsTypes.get(j));
     if (instrMetadata.isHidden()) continue;
 
     const displayedName = instrMetadata.getFullName();
     const groupName = instrMetadata.getGroup();
     const iconFilename = instrMetadata.getIconFilename();
-    const fullGroupName = groupPrefix + groupName;
+    const fullGroupName = prefix + groupName;
 
     allInstructions.push({
       type: instructionsTypes.get(j),
@@ -28,6 +32,8 @@ const enumerateExtensionInstructions = (
       iconFilename,
       displayedName,
       fullGroupName,
+      scope,
+      isPrivate: instrMetadata.isPrivate(),
     });
   }
 
@@ -36,7 +42,7 @@ const enumerateExtensionInstructions = (
 
 export const enumerateInstructions = (
   isCondition: boolean
-): Array<InstructionOrExpressionInformation> => {
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
   let allInstructions = [];
 
   const allExtensions = gd
@@ -63,32 +69,42 @@ export const enumerateInstructions = (
       ...allInstructions,
       ...enumerateExtensionInstructions(
         prefix,
-        isCondition ? extension.getAllConditions() : extension.getAllActions()
+        isCondition ? extension.getAllConditions() : extension.getAllActions(),
+        {
+          objectMetadata: undefined,
+          behaviorMetadata: undefined,
+        }
       ),
     ];
 
     //Objects instructions:
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
+      const objectType = allObjectsTypes.get(j);
+      var objectMetadata = extension.getObjectMetadata(objectType);
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
           prefix,
           isCondition
-            ? extension.getAllConditionsForObject(allObjectsTypes.get(j))
-            : extension.getAllActionsForObject(allObjectsTypes.get(j))
+            ? extension.getAllConditionsForObject(objectType)
+            : extension.getAllActionsForObject(objectType),
+          { objectMetadata }
         ),
       ];
     }
 
     //Behaviors instructions:
     for (let j = 0; j < allBehaviorsTypes.size(); ++j) {
+      const behaviorType = allBehaviorsTypes.get(j);
+      const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
           prefix,
           isCondition
-            ? extension.getAllConditionsForBehavior(allBehaviorsTypes.get(j))
-            : extension.getAllActionsForBehavior(allBehaviorsTypes.get(j))
+            ? extension.getAllConditionsForBehavior(behaviorType)
+            : extension.getAllActionsForBehavior(behaviorType),
+          { behaviorMetadata }
         ),
       ];
     }

@@ -13,7 +13,7 @@ This project is released under the MIT License.
 #include "Triangulation/triangulate.h"
 #if defined(GD_IDE_ONLY)
 #include <map>
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #endif
 
 #undef GetObject
@@ -81,7 +81,7 @@ std::map<gd::String, gd::PropertyDescriptor> PhysicsBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("linearDamping")));
   properties[_("Angular Damping")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angularDamping")));
-  properties[_("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS")].SetValue("");
+  properties["PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS"].SetValue("");
 
   return properties;
 }

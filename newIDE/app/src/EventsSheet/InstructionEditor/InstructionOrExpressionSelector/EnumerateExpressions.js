@@ -1,15 +1,17 @@
 // @flow
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import {
+  type EnumeratedInstructionOrExpressionMetadata,
+  type InstructionOrExpressionScope,
+} from './EnumeratedInstructionOrExpressionMetadata.js';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
 
 const enumerateExtensionExpressions = (
-  prefix,
-  expressions,
-  objectMetadata,
-  behaviorMetadata
-): Array<InstructionOrExpressionInformation> => {
+  prefix: string,
+  expressions: gdMapStringExpressionMetadata,
+  scope: InstructionOrExpressionScope
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
   const allExpressions = [];
 
   //Get the map containing the metadata of the expression provided by the extension...
@@ -25,8 +27,8 @@ const enumerateExtensionExpressions = (
 
     var parameters = [];
     for (var i = 0; i < exprMetadata.getParametersCount(); i++) {
-      if (objectMetadata && i === 0) continue;
-      if (behaviorMetadata && i <= 1) continue; //Skip object and behavior parameters
+      if (scope.objectMetadata && i === 0) continue;
+      if (scope.behaviorMetadata && i <= 1) continue; //Skip object and behavior parameters
       if (exprMetadata.getParameter(i).isCodeOnly()) continue;
 
       parameters.push(exprMetadata.getParameter(i));
@@ -45,8 +47,8 @@ const enumerateExtensionExpressions = (
       iconFilename,
       metadata: exprMetadata,
       parameters: parameters,
-      objectMetadata: objectMetadata,
-      behaviorMetadata: behaviorMetadata,
+      scope,
+      isPrivate: exprMetadata.isPrivate(),
     });
   }
 
@@ -90,38 +92,38 @@ export const enumerateExpressions = (type: string) => {
       freeExpressions,
       enumerateExtensionExpressions(
         prefix,
-        allFreeExpressionsGetter.call(extension)
+        allFreeExpressionsGetter.call(extension),
+        {
+          objectMetadata: undefined,
+          behaviorMetadata: undefined,
+        }
       )
     );
 
     //Objects expressions:
     for (var j = 0; j < allObjectsTypes.size(); ++j) {
-      var objMetadata = extension.getObjectMetadata(allObjectsTypes.get(j));
+      const objectType = allObjectsTypes.get(j);
+      const objectMetadata = extension.getObjectMetadata(objectType);
       objectsExpressions.push.apply(
         objectsExpressions,
         enumerateExtensionExpressions(
           prefix,
-          allObjectExpressionsGetter.call(extension, allObjectsTypes.get(j)),
-          objMetadata
+          allObjectExpressionsGetter.call(extension, objectType),
+          { objectMetadata }
         )
       );
     }
 
     //Behaviors expressions:
     for (var k = 0; k < allBehaviorsTypes.size(); ++k) {
-      var autoMetadata = extension.getBehaviorMetadata(
-        allBehaviorsTypes.get(k)
-      );
+      const behaviorType = allBehaviorsTypes.get(k);
+      const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       behaviorsExpressions.push.apply(
         behaviorsExpressions,
         enumerateExtensionExpressions(
           prefix,
-          allBehaviorExpressionsGetter.call(
-            extension,
-            allBehaviorsTypes.get(k)
-          ),
-          undefined,
-          autoMetadata
+          allBehaviorExpressionsGetter.call(extension, behaviorType),
+          { behaviorMetadata }
         )
       );
     }
@@ -140,9 +142,9 @@ export const enumerateExpressions = (type: string) => {
 };
 
 export const filterExpressions = (
-  list: Array<InstructionOrExpressionInformation>,
+  list: Array<EnumeratedInstructionOrExpressionMetadata>,
   searchText: string
-): Array<InstructionOrExpressionInformation> => {
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
   if (!searchText) return list;
   const lowercaseSearchText = searchText.toLowerCase();
 

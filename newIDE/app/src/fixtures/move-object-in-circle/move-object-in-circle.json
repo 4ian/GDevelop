@@ -215,6 +215,7 @@
       "objects": [
         {
           "name": "Char1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -272,6 +273,7 @@
         },
         {
           "name": "Char2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -332,6 +334,7 @@
           "italic": false,
           "name": "InfoText1",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -350,6 +353,7 @@
           "italic": false,
           "name": "InfoText2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

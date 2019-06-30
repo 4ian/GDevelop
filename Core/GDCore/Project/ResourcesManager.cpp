@@ -7,7 +7,7 @@
 #include <iostream>
 #include <map>
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Serialization/Serializer.h"
@@ -75,6 +75,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<FontResource>();
   else if (kind == "video")
     return std::make_shared<VideoResource>();
+  else if (kind == "json")
+    return std::make_shared<JsonResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();
@@ -476,9 +478,7 @@ void ImageResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("alwaysLoaded", alwaysLoaded);
   element.SetAttribute("smoothed", smooth);
   element.SetAttribute("userAdded", IsUserAdded());
-  element.SetAttribute(
-      "file", GetFile());  // Keep the resource path in the current locale (but
-                           // save it in UTF8 for compatibility on other OSes)
+  element.SetAttribute("file", GetFile());
 }
 #endif
 
@@ -498,9 +498,7 @@ void AudioResource::UnserializeFrom(const SerializerElement& element) {
 #if defined(GD_IDE_ONLY)
 void AudioResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
-  element.SetAttribute(
-      "file", GetFile());  // Keep the resource path in the current locale (but
-                           // save it in UTF8 for compatibility on other OSes)
+  element.SetAttribute("file", GetFile());
 }
 #endif
 
@@ -520,9 +518,7 @@ void FontResource::UnserializeFrom(const SerializerElement& element) {
 #if defined(GD_IDE_ONLY)
 void FontResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
-  element.SetAttribute(
-      "file", GetFile());  // Keep the resource path in the current locale (but
-                           // save it in UTF8 for compatibility on other OSes)
+  element.SetAttribute("file", GetFile());
 }
 #endif
 
@@ -542,9 +538,27 @@ void VideoResource::UnserializeFrom(const SerializerElement& element) {
 #if defined(GD_IDE_ONLY)
 void VideoResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
-  element.SetAttribute(
-      "file", GetFile());  // Keep the resource path in the current locale (but
-                           // save it in UTF8 for compatibility on other OSes)
+  element.SetAttribute("file", GetFile());
+}
+#endif
+
+void JsonResource::SetFile(const gd::String& newFile) {
+  file = newFile;
+
+  // Convert all backslash to slashs.
+  while (file.find('\\') != gd::String::npos)
+    file.replace(file.find('\\'), 1, "/");
+}
+
+void JsonResource::UnserializeFrom(const SerializerElement& element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+}
+
+#if defined(GD_IDE_ONLY)
+void JsonResource::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute("file", GetFile());
 }
 #endif
 

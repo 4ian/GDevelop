@@ -78,6 +78,17 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
+   * \brief Refactor the project after a property of a behavior is
+   * renamed.
+   */
+  static void RenameBehaviorProperty(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& oldPropertyName,
+      const gd::String& newPropertyName);
+
+  /**
    * \brief Refactor the project after a behavior is renamed.
    */
   static void RenameEventsBasedBehavior(

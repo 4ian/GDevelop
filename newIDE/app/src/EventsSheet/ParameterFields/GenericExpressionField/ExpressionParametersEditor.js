@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type EventsScope } from '../../EventsScope.flow';
 import * as React from 'react';
 import { mapFor } from '../../../Utils/MapFor';
 import EmptyMessage from '../../../UI/EmptyMessage';
@@ -17,7 +17,7 @@ const styles = {
 
 type Props = {|
   project?: gdProject,
-  layout?: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   expressionMetadata: gdExpressionMetadata,
@@ -48,7 +48,7 @@ export default class ExpressionParametersEditor extends React.Component<
       expressionMetadata,
       parameterValues,
       project,
-      layout,
+      scope,
       globalObjectsContainer,
       objectsContainer,
       parameterRenderingService,
@@ -89,7 +89,7 @@ export default class ExpressionParametersEditor extends React.Component<
               value={parameterValues[i]}
               onChange={value => this.props.onChangeParameter(i, value)}
               project={project}
-              layout={layout}
+              scope={scope}
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
               key={i}

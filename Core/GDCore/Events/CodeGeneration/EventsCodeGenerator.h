@@ -185,7 +185,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \param plainString The string to convert
    * \return plainString which can be included into the generated code.
    */
-  virtual gd::String ConvertToString(gd::String plainString);
+  static gd::String ConvertToString(gd::String plainString);
 
   /**
    * \brief Convert a plain string (with line feed, quotes) to a string that
@@ -203,7 +203,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \param plainString The string to convert
    * \return plainString which can be included into the generated code.
    */
-  virtual gd::String ConvertToStringExplicit(gd::String plainString);
+  static gd::String ConvertToStringExplicit(gd::String plainString);
 
   /**
    * \brief Declare an include file to be added

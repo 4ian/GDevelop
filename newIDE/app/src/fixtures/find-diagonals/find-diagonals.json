@@ -557,6 +557,7 @@
       "objects": [
         {
           "name": "Box",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -614,6 +615,7 @@
         },
         {
           "name": "Mask",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -800,6 +802,7 @@
           "italic": false,
           "name": "Message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1386,6 +1389,7 @@
       "objects": [
         {
           "name": "Box",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1443,6 +1447,7 @@
         },
         {
           "name": "Mask",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1503,6 +1508,7 @@
           "italic": false,
           "name": "Message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2248,6 +2254,7 @@
       "objects": [
         {
           "name": "Box",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2308,6 +2315,7 @@
           "italic": false,
           "name": "Message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

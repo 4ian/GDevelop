@@ -1,0 +1,11 @@
+{
+  "name": "blueprintjsplaceholder",
+  "version": "1.0.0",
+  "description": "Placeholder for @blueprint/* packages (to avoid Webpack issuing a warning). This will throw an exception that will be catched by react-mosaic",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}

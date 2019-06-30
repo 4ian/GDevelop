@@ -173,6 +173,7 @@
       "objects": [
         {
           "name": "Coin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -211,6 +212,7 @@
         },
         {
           "name": "Brick",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -252,6 +254,7 @@
           "italic": false,
           "name": "Text",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

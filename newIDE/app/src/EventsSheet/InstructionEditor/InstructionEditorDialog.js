@@ -10,6 +10,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type EventsScope } from '../EventsScope.flow';
 
 const styles = {
   dialogContent: {
@@ -24,7 +25,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   instruction: gdInstruction,
@@ -48,16 +49,6 @@ export default class InstructionEditorDialog extends React.Component<
   Props,
   State
 > {
-  _getTitle() {
-    if (this.props.isCondition) {
-      return this.props.isNewInstruction
-        ? 'Add a new condition'
-        : 'Edit condition';
-    } else {
-      return this.props.isNewInstruction ? 'Add a new action' : 'Edit action';
-    }
-  }
-
   render() {
     const {
       isNewInstruction,

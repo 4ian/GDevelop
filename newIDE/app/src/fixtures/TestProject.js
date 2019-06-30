@@ -182,6 +182,9 @@ export const makeTestProject = gd => {
   var evt8 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 7);
+  var evtWithInvalidParameters = testLayout
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
   const groupEvent = gd.asGroupEvent(evt6);
   groupEvent.setName('Group #1');
@@ -190,11 +193,19 @@ export const makeTestProject = gd => {
   jsCodeEvent.setInlineCode('console.log("Hello, World!");');
   jsCodeEvent.setParameterObjects('MyObject');
 
-  const makeKeyPressedCondition = () => {
+  const makeKeyPressedCondition = key => {
     const condition = new gd.Instruction();
     condition.setType('KeyPressed');
     condition.setParametersCount(2);
-    condition.setParameter(1, 'Space');
+    condition.setParameter(1, key);
+    return condition; // This leaks memory if not deleted
+  };
+
+  const makeMouseButtonPressedCondition = button => {
+    const condition = new gd.Instruction();
+    condition.setType('SourisBouton');
+    condition.setParametersCount(2);
+    condition.setParameter(1, button);
     return condition; // This leaks memory if not deleted
   };
 
@@ -207,8 +218,18 @@ export const makeTestProject = gd => {
   };
 
   var standardEvt = gd.asStandardEvent(evt);
-  standardEvt.getConditions().push_back(makeKeyPressedCondition());
+  standardEvt.getConditions().push_back(makeKeyPressedCondition('Space'));
   standardEvt.getActions().push_back(makeDeleteAction('MyCharacter'));
+
+  gd.asStandardEvent(evtWithInvalidParameters)
+    .getConditions()
+    .push_back(makeKeyPressedCondition(''));
+  gd.asStandardEvent(evtWithInvalidParameters)
+    .getConditions()
+    .push_back(makeKeyPressedCondition('Invalid key'));
+  gd.asStandardEvent(evtWithInvalidParameters)
+    .getConditions()
+    .push_back(makeMouseButtonPressedCondition(''));
 
   //Add a few sub events:
   {
@@ -216,7 +237,7 @@ export const makeTestProject = gd => {
       .getSubEvents()
       .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
     const subStandardEvt = gd.asStandardEvent(subEvent);
-    subStandardEvt.getConditions().push_back(makeKeyPressedCondition());
+    subStandardEvt.getConditions().push_back(makeKeyPressedCondition('Space'));
     subStandardEvt.getActions().push_back(makeDeleteAction('MyCharacter1'));
     subStandardEvt.getActions().push_back(makeDeleteAction('MyCharacter2'));
   }
@@ -240,7 +261,7 @@ export const makeTestProject = gd => {
       );
     const standardEvt = gd.asStandardEvent(evt);
 
-    standardEvt.getConditions().push_back(makeKeyPressedCondition());
+    standardEvt.getConditions().push_back(makeKeyPressedCondition('Space'));
     standardEvt.getActions().push_back(makeDeleteAction('OtherObject' + i));
   }
 
@@ -255,7 +276,9 @@ export const makeTestProject = gd => {
       );
     const disabledStandardEvt = gd.asStandardEvent(disabledEvent);
     disabledStandardEvt.setDisabled(true);
-    disabledStandardEvt.getConditions().push_back(makeKeyPressedCondition());
+    disabledStandardEvt
+      .getConditions()
+      .push_back(makeKeyPressedCondition('Space'));
     disabledStandardEvt
       .getActions()
       .push_back(makeDeleteAction('YetAnotherObject'));
@@ -264,12 +287,12 @@ export const makeTestProject = gd => {
       .getSubEvents()
       .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
     const subStandardEvt = gd.asStandardEvent(subEvent);
-    subStandardEvt.getConditions().push_back(makeKeyPressedCondition());
+    subStandardEvt.getConditions().push_back(makeKeyPressedCondition('Space'));
     subStandardEvt.getActions().push_back(makeDeleteAction('MyCharacter1'));
     subStandardEvt.getActions().push_back(makeDeleteAction('MyCharacter2'));
   }
 
-  const testInstruction = makeKeyPressedCondition();
+  const testInstruction = makeKeyPressedCondition('Space');
 
   // Global objects
   const globalTextObject = new gd.TextObject('GlobalTextObject');
@@ -363,6 +386,26 @@ export const makeTestProject = gd => {
     'This is a test events based behavior.\n\nIt does a lot of cool things. It applies to SpriteObject only.'
   );
   testEventsBasedBehavior.setObjectType('Sprite');
+
+  // Add some properties
+  testEventsBasedBehavior
+    .getPropertyDescriptors()
+    .insertNew('NumberProperty', 0)
+    .setType('Number')
+    .setValue('123')
+    .setLabel('My number property');
+  testEventsBasedBehavior
+    .getPropertyDescriptors()
+    .insertNew('StringProperty', 1)
+    .setType('String')
+    .setValue('Hello World')
+    .setLabel('My string property');
+  testEventsBasedBehavior
+    .getPropertyDescriptors()
+    .insertNew('BooleanProperty', 2)
+    .setType('Boolean')
+    .setValue('true')
+    .setLabel('My boolean property');
 
   // Add a function
   const testBehaviorEventsFunction = testEventsBasedBehavior

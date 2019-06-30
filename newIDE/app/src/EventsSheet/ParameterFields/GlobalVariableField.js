@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 
 type State = {|
   editorOpen: boolean,
@@ -22,7 +23,7 @@ export default class GlobalVariableField extends React.Component<
   }
 
   render() {
-    const { project } = this.props;
+    const { project, scope } = this.props;
 
     return (
       <div>
@@ -36,6 +37,7 @@ export default class GlobalVariableField extends React.Component<
           onOpenDialog={() => this.setState({ editorOpen: true })}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
+          scope={scope}
         />
         {this.state.editorOpen && project && (
           <VariablesEditorDialog
@@ -44,7 +46,6 @@ export default class GlobalVariableField extends React.Component<
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
-              if (this._field) this._field.forceUpdateVariables();
             }}
             emptyExplanationMessage="Global variables are variables that are persisted across the scenes during the game."
           />
@@ -54,7 +55,9 @@ export default class GlobalVariableField extends React.Component<
   }
 }
 
-export const renderGlobalVariable = (value: string) => {
+export const renderInlineGlobalVariable = ({
+  value,
+}: ParameterInlineRendererProps) => {
   return renderVariableWithIcon(
     value,
     'res/types/globalvar.png',

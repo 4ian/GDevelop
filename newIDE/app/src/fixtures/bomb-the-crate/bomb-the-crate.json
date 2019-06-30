@@ -757,6 +757,7 @@
       "objects": [
         {
           "name": "Bomb",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -909,6 +910,7 @@
         },
         {
           "name": "Crate",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -947,6 +949,7 @@
         },
         {
           "name": "Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1041,6 +1044,7 @@
         },
         {
           "name": "Wall",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1079,6 +1083,7 @@
         },
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1706,6 +1711,7 @@
         {
           "height": 64,
           "name": "Tile_Grass",
+          "tags": "",
           "texture": "Grass-1.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 64,
@@ -1715,6 +1721,7 @@
         {
           "height": 64,
           "name": "Tile_Wall1",
+          "tags": "",
           "texture": "Wall-1.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 64,
@@ -1724,6 +1731,7 @@
         {
           "height": 64,
           "name": "Tile_Wall2",
+          "tags": "",
           "texture": "Wall-2.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 64,
@@ -1732,6 +1740,7 @@
         },
         {
           "name": "Right_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1789,6 +1798,7 @@
         },
         {
           "name": "Left_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1846,6 +1856,7 @@
         },
         {
           "name": "Up_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1903,6 +1914,7 @@
         },
         {
           "name": "Down_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1963,6 +1975,7 @@
           "italic": false,
           "name": "NewObject",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

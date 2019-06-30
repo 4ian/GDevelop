@@ -1,3 +1,0 @@
-GDevelop C++ platform
-Racing game
-A basic racing game using the physics engine and with AI controlled cars.

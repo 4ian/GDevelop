@@ -121,12 +121,44 @@ export default [
         };
         return selectLocalResourcePath(project, options).then(resources => {
           return resources.map(resourcePath => {
-            const fontResource = new gd.VideoResource();
+            const videoResource = new gd.VideoResource();
             const projectPath = path.dirname(project.getProjectFile());
-            fontResource.setFile(path.relative(projectPath, resourcePath));
-            fontResource.setName(path.relative(projectPath, resourcePath));
+            videoResource.setFile(path.relative(projectPath, resourcePath));
+            videoResource.setName(path.relative(projectPath, resourcePath));
 
-            return fontResource;
+            return videoResource;
+          });
+        });
+      };
+
+      render() {
+        return null;
+      }
+    },
+  },
+  {
+    name: 'localJsonFileOpener',
+    displayName: 'Choose a new json file',
+    kind: 'json',
+    component: class LocalJsonFileOpener extends Component {
+      chooseResources = (
+        project,
+        multiSelections = true
+      ): Promise<Array<any>> => {
+        const options = {
+          multiSelections,
+          title: 'Choose a json file',
+          name: 'JSON file',
+          extensions: ['json'],
+        };
+        return selectLocalResourcePath(project, options).then(resources => {
+          return resources.map(resourcePath => {
+            const jsonResource = new gd.JsonResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            jsonResource.setFile(path.relative(projectPath, resourcePath));
+            jsonResource.setName(path.relative(projectPath, resourcePath));
+
+            return jsonResource;
           });
         });
       };
@@ -146,7 +178,7 @@ const selectLocalResourcePath = (
     name: string,
     extensions: Array<string>,
   }
-) => {
+): Promise<Array<string>> => {
   return new Promise((resolve, reject) => {
     if (!dialog) return reject('Not supported');
 

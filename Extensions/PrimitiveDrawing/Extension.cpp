@@ -164,7 +164,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetFunctionName("GetFillOpacity")
       .SetManipulatedType("number")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -197,7 +197,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetFunctionName("GetOutlineOpacity")
       .SetManipulatedType("number")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");

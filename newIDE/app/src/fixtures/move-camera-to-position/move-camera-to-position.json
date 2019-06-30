@@ -203,6 +203,7 @@
       "objects": [
         {
           "name": "object",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -268,6 +269,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -284,6 +286,7 @@
         {
           "height": 32,
           "name": "background",
+          "tags": "",
           "texture": "bg_wood.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,

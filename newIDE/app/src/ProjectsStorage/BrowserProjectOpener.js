@@ -17,7 +17,6 @@ import changeScaleOfSprites from '../fixtures/change-scale-of-sprites/change-sca
 import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sprite-animation.json';
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import characterSelection from '../fixtures/character-selection/character-selection.json';
-import controllerInput from '../fixtures/controller-input/controller-input.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
@@ -49,6 +48,7 @@ import moveObjectInCircle from '../fixtures/move-object-in-circle/move-object-in
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
 import moveObjectWithMouseJoint from '../fixtures/move-object-with-mouse-joint/move-object-with-mouse-joint.json';
 import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-object-with-physics.json';
+import multiplayerPlatformerWithGamepads from '../fixtures/multiplayer-platformer-with-gamepads/multiplayer-platformer-with-gamepads.json';
 import multitouch from '../fixtures/multitouch/multitouch.json';
 import objectGravity from '../fixtures/object-gravity/object-gravity.json';
 import objectSelection from '../fixtures/object-selection/object-selection.json';
@@ -86,10 +86,10 @@ import screenShake from '../fixtures/screen-shake/screen-shake.json';
 import shootBulletInParabola from '../fixtures/shoot-bullet-in-parabola/shoot-bullet-in-parabola.json';
 import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
+import simpleSpaceShooter from '../fixtures/simple-space-shooter/simple-space-shooter.json';
 import snapObjectToGrid from '../fixtures/snap-object-to-grid/snap-object-to-grid.json';
 import spaceInvaders from '../fixtures/space-invaders/space-invaders.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
-import spaceShooterWithFunctions from '../fixtures/space-shooter-with-functions/space-shooter-with-functions.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
 import spriteFadeInOut from '../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
 import textEntryObject from '../fixtures/text-entry-object/text-entry-object.json';
@@ -149,8 +149,6 @@ export default class BrowserProjectOpener {
       return Promise.resolve(changeSpriteColor);
     } else if (url === 'example://character-selection') {
       return Promise.resolve(characterSelection);
-    } else if (url === 'example://controller-input') {
-      return Promise.resolve(controllerInput);
     } else if (url === 'example://device-orientation-ballgame') {
       return Promise.resolve(deviceOrientationBallgame);
     } else if (url === 'example://device-orientation-compass') {
@@ -213,6 +211,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(moveObjectWithMouseJoint);
     } else if (url === 'example://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
+    } else if (url === 'example://multiplayer-platformer-with-gamepads') {
+      return Promise.resolve(multiplayerPlatformerWithGamepads);
     } else if (url === 'example://multitouch') {
       return Promise.resolve(multitouch);
     } else if (url === 'example://object-gravity') {
@@ -278,6 +278,8 @@ export default class BrowserProjectOpener {
     } else if (url === 'example://shoot-bullets') {
       return Promise.resolve(shootBullets);
     } else if (url === 'example://shooting-bullets-explanation') {
+      return Promise.resolve(simpleSpaceShooter);
+    } else if (url === 'example://simple-space-shooter') {
       return Promise.resolve(shootingBulletsExplanation);
     } else if (url === 'example://snap-object-to-grid') {
       return Promise.resolve(snapObjectToGrid);
@@ -285,8 +287,6 @@ export default class BrowserProjectOpener {
       return Promise.resolve(spaceInvaders);
     } else if (url === 'example://space-shooter') {
       return Promise.resolve(spaceShooter);
-    } else if (url === 'example://space-shooter-with-functions') {
-      return Promise.resolve(spaceShooterWithFunctions);
     } else if (url === 'example://splash-screen') {
       return Promise.resolve(splashScreen);
     } else if (url === 'example://sprite-fade-in-out') {

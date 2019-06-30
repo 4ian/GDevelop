@@ -1,22 +1,21 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
-import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
-import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 const gd = global.gd;
 
 type State = {|
   errorText: ?string,
-  focused: boolean,
-  text: ?string,
 |};
 
 export default class BehaviorField extends React.Component<
   ParameterFieldProps,
   State
 > {
-  state = { errorText: null, focused: false, text: null };
+  state = { errorText: null };
   _description: ?string;
   _behaviorTypeAllowed: ?string;
   _behaviorNames: Array<string> = [];
@@ -93,7 +92,7 @@ export default class BehaviorField extends React.Component<
     this.setState({ errorText: this._getError(value) });
   };
 
-  componentDidUpdate() {
+  _forceChooseBehavior = () => {
     // This is a bit hacky:
     // force the behavior selection if there is only one selectable behavior
     if (this._behaviorNames.length === 1) {
@@ -101,54 +100,44 @@ export default class BehaviorField extends React.Component<
         this.props.onChange(this._behaviorNames[0]);
       }
     }
+  };
+
+  componentDidUpdate() {
+    this._forceChooseBehavior();
+  }
+
+  componentDidMount() {
+    this._forceChooseBehavior();
   }
 
   render() {
     this._updateBehaviorsList();
 
     const noBehaviorErrorText =
-      this._behaviorTypeAllowed !== ''
-        ? 'The behavior is not attached to this object. Please select another object or add the behavior'
-        : 'This object has no behaviors: please add a behavior to the object first';
+      this._behaviorTypeAllowed !== '' ? (
+        <Trans>
+          The behavior is not attached to this object. Please select another
+          object or add this behavior.
+        </Trans>
+      ) : (
+        <Trans>
+          This object has no behaviors: please add this behavior to the object
+          first.
+        </Trans>
+      );
 
     return (
-      <AutoComplete
-        {...defaultAutocompleteProps}
+      <SemiControlledAutoComplete
         floatingLabelText={this._description}
         errorText={
           !this._behaviorNames.length
             ? noBehaviorErrorText
             : this.state.errorText
         }
-        searchText={this.state.focused ? this.state.text : this.props.value}
-        onFocus={() => {
-          this.setState({
-            focused: true,
-            text: this.props.value,
-          });
-        }}
-        onUpdateInput={value => {
-          this.setState({
-            focused: true,
-            text: value,
-          });
-        }}
+        value={this.props.value}
+        onChange={this.props.onChange}
         onBlur={event => {
-          this.props.onChange(event.target.value);
-          this.setState({
-            focused: false,
-            text: null,
-          });
-          this._doValidation(event.target.value);
-        }}
-        onNewRequest={data => {
-          // Note that data may be a string or a {text, value} object.
-          if (typeof data === 'string') {
-            this.props.onChange(data);
-          } else if (typeof data.value === 'string') {
-            this.props.onChange(data.value);
-          }
-          this.focus(); // Keep the focus after choosing an item
+          this._doValidation(event.currentTarget.value);
         }}
         dataSource={this._behaviorNames.map(behaviorName => ({
           text: behaviorName,

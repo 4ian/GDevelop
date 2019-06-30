@@ -81,7 +81,7 @@ std::map<gd::String, gd::PropertyDescriptor> PhysicsBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("linearDamping")));
   properties[_("Angular Damping")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angularDamping")));
-  properties[_("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS")].SetValue("");
+  properties["PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS"].SetValue("");
 
   return properties;
 }

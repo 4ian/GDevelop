@@ -113,7 +113,7 @@ std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties(
   properties[_("Animate even if hidden or far from the screen")]
       .SetValue(updateIfNotVisible ? "true" : "false")
       .SetType("Boolean");
-  properties[_("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS")].SetValue("");
+  properties["PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS"].SetValue("");
 
   return properties;
 }

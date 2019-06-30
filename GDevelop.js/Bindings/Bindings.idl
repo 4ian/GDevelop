@@ -675,6 +675,11 @@ interface VideoResource {
 };
 VideoResource implements Resource;
 
+interface JsonResource {
+    void JsonResource();
+};
+JsonResource implements Resource;
+
 interface InitialInstance {
     void InitialInstance();
 

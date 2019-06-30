@@ -698,6 +698,24 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.JsonResource', function() {
+    it('should have name and file', function() {
+      const resource = new gd.JsonResource();
+      resource.setName('MyJsonResource');
+      resource.setFile('MyJsonFile');
+      expect(resource.getName()).toBe('MyJsonResource');
+      expect(resource.getFile()).toBe('MyJsonFile');
+      resource.delete();
+    });
+    it('can have metadata', function() {
+      const resource = new gd.VideoResource();
+      expect(resource.getMetadata()).toBe('');
+      resource.setMetadata(JSON.stringify({ hello: 'world' }));
+      expect(resource.getMetadata()).toBe('{"hello":"world"}');
+      resource.delete();
+    });
+  });
+
   describe('gd.ResourcesManager', function() {
     it('should support adding resources', function() {
       var project = gd.ProjectHelper.createNewGDJSProject();

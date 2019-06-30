@@ -130,6 +130,16 @@ class GD_API InputManager {
    */
   int GetMouseWheelDelta() const;
 
+  /**
+   * @brief Return true is mouse wheel scroll up.
+   */
+  bool IsScrollingUp() const;
+
+  /**
+   * @brief Return true is mouse wheel scroll down.
+   */
+  bool IsScrollingDown() const;
+
   static const std::map<gd::String, int>& GetButtonNameToSfButtonMap();
   static const std::map<int, gd::String>& GetSfButtonToButtonNameMap();
   ///@}

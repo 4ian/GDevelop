@@ -76,11 +76,11 @@ int GD_API GetMouseWheelDelta(RuntimeScene &scene) {
   return scene.GetInputManager().GetMouseWheelDelta();
 }
 
-bool GD_API ScrollUp(RuntimeScene &scene) {
+bool GD_API IsMouseWheelScrollingUp(RuntimeScene &scene) {
   return scene.GetInputManager().IsScrollingUp();
 }
 
-bool GD_API ScrollDown(RuntimeScene &scene) {
+bool GD_API IsMouseWheelScrollingDown(RuntimeScene &scene) {
   return scene.GetInputManager().IsScrollingDown();
 }
 

@@ -42,10 +42,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition("MouseWheelScrollingUp",
                     _("The mouse wheel is scrolling up"),
                     _("Check if the mouse wheel is scrolling up"),
-                    _("The mouse scroll up"),
+                    _("The mouse wheel is scrolling up"),
                     _("Mouse and touch"),
-                    "res/conditions/touch24.png",
-                    "res/conditions/touch.png")
+                    "res/actions/mouse24.png",
+                    "res/actions/mouse.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddCodeOnlyParameter("conditionInverted", "")
@@ -55,10 +55,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition("MouseWheelScrollingDown",
                     _("The mouse wheel is scrolling down"),
                     _("Check if the mouse wheel is scrolling down"),
-                    _("The mouse scroll down"),
+                    _("The mouse wheel is scrolling down"),
                     _("Mouse and touch"),
-                    "res/conditions/touch24.png",
-                    "res/conditions/touch.png")
+                    "res/actions/mouse24.png",
+                    "res/actions/mouse.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddCodeOnlyParameter("conditionInverted", "")

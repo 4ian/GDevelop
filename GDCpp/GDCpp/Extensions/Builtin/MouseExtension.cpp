@@ -48,10 +48,10 @@ MouseExtension::MouseExtension() {
   GetAllConditions()["MouseButtonReleased"]
       .SetFunctionName("MouseButtonReleased")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
-   GetAllConditions()["ScrollUp"]  
+   GetAllConditions()["MouseWheelScrollingUp"]  
       .SetFunctionName("ScrollUp")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
-   GetAllConditions()["ScrollDown"]  
+   GetAllConditions()["MouseWheelScrollingDown"]  
       .SetFunctionName("ScrollDown")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
 

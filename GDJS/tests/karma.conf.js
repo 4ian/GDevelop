@@ -17,6 +17,7 @@ module.exports = function(config) {
       '../Runtime/howler-sound-manager/howler-sound-manager.js',
       '../Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
       '../Runtime/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js',
+      '../Runtime/jsonmanager.js',
       '../Runtime/timemanager.js',
       '../Runtime/runtimeobject.js',
       '../Runtime/runtimescene.js',

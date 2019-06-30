@@ -3,7 +3,11 @@ import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type ResourceKind } from '../ResourceSource.flow';
 import ImagePreview from './ImagePreview';
-import AudioPreview from './AudioPreview';
+import GenericIconPreview from './GenericIconPreview';
+import Audiotrack from 'material-ui/svg-icons/image/audiotrack';
+import InsertDriveFile from 'material-ui/svg-icons/editor/insert-drive-file';
+import VideoLibrary from 'material-ui/svg-icons/av/video-library';
+import FontDownload from 'material-ui/svg-icons/content/font-download';
 
 type Props = {|
   project: gdProject,
@@ -69,13 +73,24 @@ export default class ResourcePreview extends React.Component<Props, State> {
         );
       case 'audio':
         return (
-          <AudioPreview
-            project={this.props.project}
-            resourceName={this.props.resourceName}
-            resourcesLoader={this.props.resourcesLoader}
-            children={this.props.children}
-            style={this.props.style}
-            resourcePath={this.props.resourcePath}
+          <GenericIconPreview renderIcon={props => <Audiotrack {...props} />} />
+        );
+      case 'json':
+        return (
+          <GenericIconPreview
+            renderIcon={props => <InsertDriveFile {...props} />}
+          />
+        );
+      case 'video':
+        return (
+          <GenericIconPreview
+            renderIcon={props => <VideoLibrary {...props} />}
+          />
+        );
+      case 'font':
+        return (
+          <GenericIconPreview
+            renderIcon={props => <FontDownload {...props} />}
           />
         );
       default:

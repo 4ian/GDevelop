@@ -45,10 +45,7 @@ const ThemableLayerRow = ({
       />
     </TableRowColumn>
     <TableRowColumn style={styles.toolColumn}>
-      <IconButton 
-        onClick={onRemove}
-        disabled={!layerName}
-      >
+      <IconButton onClick={onRemove} disabled={!layerName}>
         <Delete />
       </IconButton>
     </TableRowColumn>

@@ -14,7 +14,7 @@ gdjs.DestroyOutsideRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
-    this._extraBorder = behaviorData.extraBorder;
+    this._extraBorder = behaviorData.extraBorder || 0;
 };
 
 gdjs.DestroyOutsideRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );

@@ -12,6 +12,7 @@ type Props = {|
   vertices: Array<Vertex>,
   width: number,
   height: number,
+  zoomFactor: number,
   onMoveVertex: (index: number, newX: number, newY: number) => void,
 |};
 
@@ -21,11 +22,7 @@ type State = {|
 |};
 
 export default class ShapePreview extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { draggedVertex: null, draggedIndex: -1 };
-  }
-
+  state = { draggedVertex: null, draggedIndex: -1 };
   _svg: any;
 
   _onVertexDown = (vertex: Vertex, index: number) => {
@@ -52,7 +49,14 @@ export default class ShapePreview extends React.Component<Props, State> {
   };
 
   _onMouseMove = (event: any) => {
-    const { offsetX, offsetY, polygonOrigin, width, height } = this.props;
+    const {
+      offsetX,
+      offsetY,
+      polygonOrigin,
+      width,
+      height,
+      zoomFactor,
+    } = this.props;
     const { draggedVertex } = this.state;
     if (!draggedVertex) return;
 
@@ -63,14 +67,18 @@ export default class ShapePreview extends React.Component<Props, State> {
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
     draggedVertex.x =
-      pointOnSvg.x - offsetX - (polygonOrigin === 'Center' ? width / 2 : 0);
+      pointOnSvg.x / zoomFactor -
+      offsetX -
+      (polygonOrigin === 'Center' ? width / 2 : 0);
     draggedVertex.y =
-      pointOnSvg.y - offsetY - (polygonOrigin === 'Center' ? height / 2 : 0);
+      pointOnSvg.y / zoomFactor -
+      offsetY -
+      (polygonOrigin === 'Center' ? height / 2 : 0);
 
     this.forceUpdate();
   };
 
-  renderBox() {
+  _renderBox() {
     const {
       dimensionA,
       dimensionB,
@@ -78,6 +86,7 @@ export default class ShapePreview extends React.Component<Props, State> {
       height,
       offsetX,
       offsetY,
+      zoomFactor,
     } = this.props;
     const fixedWidth = dimensionA > 0 ? dimensionA : width > 0 ? width : 1;
     const fixedHeight = dimensionB > 0 ? dimensionB : height > 0 ? height : 1;
@@ -87,36 +96,43 @@ export default class ShapePreview extends React.Component<Props, State> {
         key={'boxShape'}
         fill="rgba(255,0,0,0.75)"
         strokeWidth={1}
-        x={offsetX + width / 2 - fixedWidth / 2}
-        y={offsetY + height / 2 - fixedHeight / 2}
-        width={fixedWidth}
-        height={fixedHeight}
+        x={(offsetX + width / 2 - fixedWidth / 2) * zoomFactor}
+        y={(offsetY + height / 2 - fixedHeight / 2) * zoomFactor}
+        width={fixedWidth * zoomFactor}
+        height={fixedHeight * zoomFactor}
       />
     );
   }
 
-  renderCircle() {
-    const { dimensionA, width, height, offsetX, offsetY } = this.props;
+  _renderCircle() {
+    const {
+      dimensionA,
+      width,
+      height,
+      offsetX,
+      offsetY,
+      zoomFactor,
+    } = this.props;
 
     return (
       <circle
         key={'circleShape'}
         fill="rgba(255,0,0,0.75)"
         strokeWidth={1}
-        cx={offsetX + width / 2}
-        cy={offsetY + height / 2}
+        cx={(offsetX + width / 2) * zoomFactor}
+        cy={(offsetY + height / 2) * zoomFactor}
         r={
-          dimensionA > 0
+          (dimensionA > 0
             ? dimensionA
             : width + height > 0
             ? (width + height) / 4
-            : 1
+            : 1) * zoomFactor
         }
       />
     );
   }
 
-  renderEdge() {
+  _renderEdge() {
     const {
       dimensionA,
       dimensionB,
@@ -124,6 +140,7 @@ export default class ShapePreview extends React.Component<Props, State> {
       height,
       offsetX,
       offsetY,
+      zoomFactor,
     } = this.props;
     const halfLength =
       (dimensionA > 0 ? dimensionA : width > 0 ? width : 1) / 2;
@@ -135,15 +152,15 @@ export default class ShapePreview extends React.Component<Props, State> {
         key={'edgeShape'}
         stroke="rgba(255,0,0,0.75)"
         strokeWidth={2}
-        x1={offsetX + width / 2 - halfLength * cos}
-        y1={offsetY + height / 2 - halfLength * sin}
-        x2={offsetX + width / 2 + halfLength * cos}
-        y2={offsetY + height / 2 + halfLength * sin}
+        x1={(offsetX + width / 2 - halfLength * cos) * zoomFactor}
+        y1={(offsetY + height / 2 - halfLength * sin) * zoomFactor}
+        x2={(offsetX + width / 2 + halfLength * cos) * zoomFactor}
+        y2={(offsetY + height / 2 + halfLength * sin) * zoomFactor}
       />
     );
   }
 
-  renderPolygon() {
+  _renderPolygon() {
     const {
       vertices,
       polygonOrigin,
@@ -151,6 +168,7 @@ export default class ShapePreview extends React.Component<Props, State> {
       height,
       offsetX,
       offsetY,
+      zoomFactor,
     } = this.props;
 
     return (
@@ -163,11 +181,13 @@ export default class ShapePreview extends React.Component<Props, State> {
           points={vertices
             .map(
               vertex =>
-                `${vertex.x +
+                `${(vertex.x +
                   offsetX +
-                  (polygonOrigin === 'Center' ? width / 2 : 0)},${vertex.y +
+                  (polygonOrigin === 'Center' ? width / 2 : 0)) *
+                  zoomFactor},${(vertex.y +
                   offsetY +
-                  (polygonOrigin === 'Center' ? height / 2 : 0)}`
+                  (polygonOrigin === 'Center' ? height / 2 : 0)) *
+                  zoomFactor}`
             )
             .join(' ')}
         />
@@ -177,11 +197,20 @@ export default class ShapePreview extends React.Component<Props, State> {
             key={`vertex-${index}`}
             fill="rgba(150,0,0,0.75)"
             strokeWidth={1}
+            style={{
+              cursor: 'move',
+            }}
             cx={
-              vertex.x + offsetX + (polygonOrigin === 'Center' ? width / 2 : 0)
+              (vertex.x +
+                offsetX +
+                (polygonOrigin === 'Center' ? width / 2 : 0)) *
+              zoomFactor
             }
             cy={
-              vertex.y + offsetY + (polygonOrigin === 'Center' ? height / 2 : 0)
+              (vertex.y +
+                offsetY +
+                (polygonOrigin === 'Center' ? height / 2 : 0)) *
+              zoomFactor
             }
             r={5}
           />
@@ -198,11 +227,13 @@ export default class ShapePreview extends React.Component<Props, State> {
         onPointerMove={this._onMouseMove}
         onPointerUp={this._onMouseUp}
         ref={svg => (this._svg = svg)}
+        width="100%"
+        height="100%"
       >
-        {shape === 'Box' && this.renderBox()}
-        {shape === 'Circle' && this.renderCircle()}
-        {shape === 'Edge' && this.renderEdge()}
-        {shape === 'Polygon' && this.renderPolygon()}
+        {shape === 'Box' && this._renderBox()}
+        {shape === 'Circle' && this._renderCircle()}
+        {shape === 'Edge' && this._renderEdge()}
+        {shape === 'Polygon' && this._renderPolygon()}
       </svg>
     );
   }

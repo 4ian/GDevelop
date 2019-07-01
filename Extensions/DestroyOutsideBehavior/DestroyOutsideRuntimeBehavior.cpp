@@ -19,7 +19,7 @@ This project is released under the MIT License.
 DestroyOutsideRuntimeBehavior::DestroyOutsideRuntimeBehavior(
     const gd::SerializerElement& behaviorContent)
     : RuntimeBehavior(behaviorContent), extraBorder(0) {
-  extraBorder = behaviorContent.GetDoubleAttribute("extraBorder");
+  extraBorder = behaviorContent.GetDoubleAttribute("extraBorder", 0);
 }
 
 void DestroyOutsideRuntimeBehavior::DoStepPostEvents(RuntimeScene& scene) {

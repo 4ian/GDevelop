@@ -108,6 +108,15 @@ gdjs.RuntimeGame.prototype.getInputManager = function() {
 };
 
 /**
+ * Get the JSON manager of the game, used to load JSON from game
+ * resources.
+ * @return {gdjs.JsonManager} The json manager for the game
+ */
+gdjs.RuntimeGame.prototype.getJsonManager = function() {
+  return this._jsonManager;
+};
+
+/**
  * Get the object containing the game data
  * @return {Object} The object associated to the game.
  */

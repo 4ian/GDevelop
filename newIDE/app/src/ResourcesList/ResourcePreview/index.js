@@ -14,7 +14,6 @@ type Props = {|
   resourceName: string,
   resourcePath?: string,
   resourcesLoader: typeof ResourcesLoader,
-  children?: any,
   style?: Object,
   onSize?: (number, number) => void,
 |};
@@ -27,11 +26,7 @@ type State = {|
  * Display the right preview for any given resource of a project
  */
 export default class ResourcePreview extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = this._loadFrom(props);
-  }
+  state = this._loadFrom(this.props);
 
   componentWillReceiveProps(newProps: Props) {
     if (
@@ -65,7 +60,6 @@ export default class ResourcePreview extends React.Component<Props, State> {
             project={this.props.project}
             resourceName={this.props.resourceName}
             resourcesLoader={this.props.resourcesLoader}
-            children={this.props.children}
             style={this.props.style}
             onSize={this.props.onSize}
             resourcePath={this.props.resourcePath}

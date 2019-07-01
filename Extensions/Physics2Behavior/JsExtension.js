@@ -72,10 +72,11 @@ module.exports = {
         return true;
       }
       if (propertyName === 'polygonOrigin') {
-        behaviorContent.getChild('polygonOrigin').setStringValue(newValue);
+        behaviorContent.addChild('polygonOrigin').setStringValue(newValue);
         return true;
       }
       if (propertyName === 'vertices') {
+        behaviorContent.addChild('vertices');
         behaviorContent.setChild('vertices', gd.Serializer.fromJSON(newValue));
         return true;
       }
@@ -203,7 +204,9 @@ module.exports = {
       behaviorProperties.set(
         'polygonOrigin',
         new gd.PropertyDescriptor(
-          behaviorContent.getChild('polygonOrigin').getStringValue() || 'Center'
+          behaviorContent.hasChild('polygonOrigin') ?
+            behaviorContent.getChild('polygonOrigin').getStringValue() :
+            'Center'
         )
           .setType('Choice')
           .setLabel('Polygon Origin')
@@ -214,7 +217,9 @@ module.exports = {
       behaviorProperties.set(
         'vertices',
         new gd.PropertyDescriptor(
-          gd.Serializer.toJSON(behaviorContent.getChild('vertices')) || '[]'
+          behaviorContent.hasChild('vertices') ?
+            gd.Serializer.toJSON(behaviorContent.getChild('vertices')) :
+            '[]'
         ).setLabel('Vertices')
       );
       behaviorProperties.set(

@@ -1,5 +1,12 @@
+// @flow
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+import { type ResourceSourceComponentProps } from './ResourceSource.flow';
 import { Component } from 'react';
-import { confirmResourcePath } from './ResourceUtils.js';
+import {
+  isPathInProjectFolder,
+  copyAllToProjectFolder,
+} from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
@@ -12,27 +19,30 @@ export default [
     name: 'localAudioFileOpener',
     displayName: 'Choose a new audio file',
     kind: 'audio',
-    component: class LocalAudioFileOpener extends Component {
+    component: class LocalAudioFileOpener extends Component<ResourceSourceComponentProps> {
       chooseResources = (
-        project,
-        multiSelections = true
+        project: gdProject,
+        multiSelections: boolean = true
       ): Promise<Array<any>> => {
+        const { i18n } = this.props;
         const options = {
           multiSelections,
-          title: 'Choose an audio file',
-          name: 'Audio files',
+          title: i18n._(t`Choose an audio file`),
+          name: i18n._(t`Audio files`),
           extensions: ['wav', 'mp3', 'ogg'],
         };
-        return selectLocalResourcePath(project, options).then(resources => {
-          return resources.map(resourcePath => {
-            const audioResource = new gd.AudioResource();
-            const projectPath = path.dirname(project.getProjectFile());
-            audioResource.setFile(path.relative(projectPath, resourcePath));
-            audioResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(i18n, project, options).then(
+          resources => {
+            return resources.map(resourcePath => {
+              const audioResource = new gd.AudioResource();
+              const projectPath = path.dirname(project.getProjectFile());
+              audioResource.setFile(path.relative(projectPath, resourcePath));
+              audioResource.setName(path.relative(projectPath, resourcePath));
 
-            return audioResource;
-          });
-        });
+              return audioResource;
+            });
+          }
+        );
       };
 
       render() {
@@ -44,27 +54,30 @@ export default [
     name: 'localFileOpener',
     displayName: 'Choose a new image',
     kind: 'image',
-    component: class LocalFileOpener extends Component {
+    component: class LocalFileOpener extends Component<ResourceSourceComponentProps> {
       chooseResources = (
-        project,
-        multiSelections = true
+        project: gdProject,
+        multiSelections: boolean = true
       ): Promise<Array<any>> => {
+        const { i18n } = this.props;
         const options = {
           multiSelections,
-          title: 'Choose an image',
-          name: 'Image files',
+          title: i18n._(t`Choose an image`),
+          name: i18n._(t`Image files`),
           extensions: ['png', 'jpg'],
         };
-        return selectLocalResourcePath(project, options).then(resources => {
-          return resources.map(resourcePath => {
-            const imageResource = new gd.ImageResource();
-            const projectPath = path.dirname(project.getProjectFile());
-            imageResource.setFile(path.relative(projectPath, resourcePath));
-            imageResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(i18n, project, options).then(
+          resources => {
+            return resources.map(resourcePath => {
+              const imageResource = new gd.ImageResource();
+              const projectPath = path.dirname(project.getProjectFile());
+              imageResource.setFile(path.relative(projectPath, resourcePath));
+              imageResource.setName(path.relative(projectPath, resourcePath));
 
-            return imageResource;
-          });
-        });
+              return imageResource;
+            });
+          }
+        );
       };
 
       render() {
@@ -76,27 +89,30 @@ export default [
     name: 'localFontFileOpener',
     displayName: 'Choose a new font file',
     kind: 'font',
-    component: class LocalFontFileOpener extends Component {
+    component: class LocalFontFileOpener extends Component<ResourceSourceComponentProps> {
       chooseResources = (
-        project,
-        multiSelections = true
+        project: gdProject,
+        multiSelections: boolean = true
       ): Promise<Array<any>> => {
+        const { i18n } = this.props;
         const options = {
           multiSelections,
-          title: 'Choose a font file',
-          name: 'Font files',
+          title: i18n._(t`Choose a font file`),
+          name: i18n._(t`Font files`),
           extensions: ['ttf', 'otf'],
         };
-        return selectLocalResourcePath(project, options).then(resources => {
-          return resources.map(resourcePath => {
-            const fontResource = new gd.FontResource();
-            const projectPath = path.dirname(project.getProjectFile());
-            fontResource.setFile(path.relative(projectPath, resourcePath));
-            fontResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(i18n, project, options).then(
+          resources => {
+            return resources.map(resourcePath => {
+              const fontResource = new gd.FontResource();
+              const projectPath = path.dirname(project.getProjectFile());
+              fontResource.setFile(path.relative(projectPath, resourcePath));
+              fontResource.setName(path.relative(projectPath, resourcePath));
 
-            return fontResource;
-          });
-        });
+              return fontResource;
+            });
+          }
+        );
       };
 
       render() {
@@ -108,27 +124,30 @@ export default [
     name: 'localVideoFileOpener',
     displayName: 'Choose a new video file',
     kind: 'video',
-    component: class LocalVideoFileOpener extends Component {
+    component: class LocalVideoFileOpener extends Component<ResourceSourceComponentProps> {
       chooseResources = (
-        project,
-        multiSelections = true
+        project: gdProject,
+        multiSelections: boolean = true
       ): Promise<Array<any>> => {
+        const { i18n } = this.props;
         const options = {
           multiSelections,
-          title: 'Choose a video file',
-          name: 'Video files',
+          title: i18n._(t`Choose a video file`),
+          name: i18n._(t`Video files`),
           extensions: ['mp4'],
         };
-        return selectLocalResourcePath(project, options).then(resources => {
-          return resources.map(resourcePath => {
-            const videoResource = new gd.VideoResource();
-            const projectPath = path.dirname(project.getProjectFile());
-            videoResource.setFile(path.relative(projectPath, resourcePath));
-            videoResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(i18n, project, options).then(
+          resources => {
+            return resources.map(resourcePath => {
+              const videoResource = new gd.VideoResource();
+              const projectPath = path.dirname(project.getProjectFile());
+              videoResource.setFile(path.relative(projectPath, resourcePath));
+              videoResource.setName(path.relative(projectPath, resourcePath));
 
-            return videoResource;
-          });
-        });
+              return videoResource;
+            });
+          }
+        );
       };
 
       render() {
@@ -140,27 +159,30 @@ export default [
     name: 'localJsonFileOpener',
     displayName: 'Choose a new json file',
     kind: 'json',
-    component: class LocalJsonFileOpener extends Component {
+    component: class LocalJsonFileOpener extends Component<ResourceSourceComponentProps> {
       chooseResources = (
-        project,
-        multiSelections = true
+        project: gdProject,
+        multiSelections: boolean = true
       ): Promise<Array<any>> => {
+        const { i18n } = this.props;
         const options = {
           multiSelections,
-          title: 'Choose a json file',
-          name: 'JSON file',
+          title: i18n._(t`Choose a json file`),
+          name: i18n._(t`JSON file`),
           extensions: ['json'],
         };
-        return selectLocalResourcePath(project, options).then(resources => {
-          return resources.map(resourcePath => {
-            const jsonResource = new gd.JsonResource();
-            const projectPath = path.dirname(project.getProjectFile());
-            jsonResource.setFile(path.relative(projectPath, resourcePath));
-            jsonResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(i18n, project, options).then(
+          resources => {
+            return resources.map(resourcePath => {
+              const jsonResource = new gd.JsonResource();
+              const projectPath = path.dirname(project.getProjectFile());
+              jsonResource.setFile(path.relative(projectPath, resourcePath));
+              jsonResource.setName(path.relative(projectPath, resourcePath));
 
-            return jsonResource;
-          });
-        });
+              return jsonResource;
+            });
+          }
+        );
       };
 
       render() {
@@ -171,6 +193,7 @@ export default [
 ];
 
 const selectLocalResourcePath = (
+  i18n: I18nType,
   project: gdProject,
   options: {
     multiSelections: boolean,
@@ -197,7 +220,27 @@ const selectLocalResourcePath = (
       },
       paths => {
         if (!paths) return resolve([]);
-        if (!confirmResourcePath(project, paths[0])) return resolve([]);
+
+        const outsideProjectFolderPaths = paths.filter(
+          path => !isPathInProjectFolder(project, path)
+        );
+
+        if (outsideProjectFolderPaths.length) {
+          // eslint-disable-next-line
+          const answer = confirm(
+            i18n.plural({
+              value: outsideProjectFolderPaths.length,
+              one:
+                'This file is outside the project folder. Would you like to make a copy of it in your project folder first (recommended)?',
+              other:
+                'These files are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?',
+            })
+          );
+
+          if (answer) {
+            return resolve(copyAllToProjectFolder(project, paths));
+          }
+        }
 
         return resolve(paths);
       }

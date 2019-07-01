@@ -13,6 +13,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { mapFor } from '../../../Utils/MapFor';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog from '../../../UI/Dialog';
+import HelpButton from '../../../UI/HelpButton';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
@@ -490,6 +491,12 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 onClick={() => this.openCollisionMasksEditor(false)}
               />
             }
+            secondaryActions={[
+              <HelpButton
+                helpPagePath="/objects/sprite/collision-mask"
+                key="help"
+              />,
+            ]}
             autoScrollBodyContent
             noMargin
             modal

@@ -78,7 +78,6 @@ export const renderVariableWithIcon = (
   iconPath: string,
   tooltip: string = ''
 ) => {
-  // img disabled while waiting for new icons
   return (
     <span title={tooltip}>
       <img

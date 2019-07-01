@@ -5,8 +5,8 @@ import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-// import classNames from 'classnames';
-// import { icon } from '../EventsTree/ClassNames';
+import classNames from 'classnames';
+import { icon } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const styles = {
@@ -81,13 +81,13 @@ export const renderVariableWithIcon = (
   // img disabled while waiting for new icons
   return (
     <span title={tooltip}>
-      {/* <img
+      <img
         className={classNames({
           [icon]: true,
         })}
         src={iconPath}
         alt=""
-      /> */}
+      />
       {value}
     </span>
   );

@@ -218,7 +218,7 @@ gdjs.dialogueTree.selectedOptionHasUpdated = function() {
  * There are three types:
  * - text - regular dialogue text is being parsed at the moment
  * - options - the player has reached a branching choise moment where they must select one of multiple options
- * - command - a <<command>> was called in the background, that can be usedto trigger game events, but will not be displayed in the dialogue box.
+ * - command - a <<command>> was called in the background, that can be used to trigger game events, but will not be displayed in the dialogue box.
  * @param {string} type The type you want to check for ( one of the three above )
  */
 gdjs.dialogueTree.compareDialogueLineType = function(type) {
@@ -292,8 +292,9 @@ gdjs.dialogueTree._lineTypeIsCommand = function() {
 	return this.dialogueData instanceof bondage.CommandResult;
 };
 
-// Action to progress Dialogue to the next line. Hook this to your game input.
-// Note that this action can be influenced by any <<wait>> commands
+// This is the main lifecycle function.It runs once only when the user is advancing the dialogue to the next line.
+// Use this Action to progress Dialogue to the next line. Hook it to your game input.
+// Note that this action can be influenced by any <<wait>> commands, but they work only if you have at least one commandIsCalled condition.
 gdjs.dialogueTree.advanceDialogue = function() {
 	this.optionsCount = 0;
 	this.selectOption = -1;

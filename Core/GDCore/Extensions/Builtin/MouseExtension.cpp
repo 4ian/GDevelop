@@ -50,7 +50,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "res/actions/mouse.png")
 
       .AddCodeOnlyParameter("currentScene", "")
-      .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
   extension
@@ -65,7 +64,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "res/actions/mouse.png")
 
       .AddCodeOnlyParameter("currentScene", "")
-      .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
   extension

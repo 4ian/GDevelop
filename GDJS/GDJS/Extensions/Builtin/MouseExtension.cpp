@@ -32,9 +32,9 @@ MouseExtension::MouseExtension() {
   GetAllActions()["TouchSimulateMouse"].SetFunctionName(
       "gdjs.evtTools.input.touchSimulateMouse");
 
-  GetAllConditions()["MouseWheelScrollingUp"].SetFunctionName(
+  GetAllConditions()["IsMouseWheelScrollingUp"].SetFunctionName(
       "gdjs.evtTools.input.isScrollingUp");
-  GetAllConditions()["MouseWheelScrollingDown"].SetFunctionName(
+  GetAllConditions()["IsMouseWheelScrollingDown"].SetFunctionName(
       "gdjs.evtTools.input.isScrollingDown");
 
   GetAllConditions()["SourisSurObjet"].SetFunctionName(

@@ -99,3 +99,4 @@ target_link_libraries(GD PathfindingBehavior)
 target_link_libraries(GD PhysicsBehavior)
 # target_link_libraries(GD FacebookInstantGames) - Pure JS extension
 target_link_libraries(GD ParticleSystem)
+target_link_libraries(GD SkeletonObject)

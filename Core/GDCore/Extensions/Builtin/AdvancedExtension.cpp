@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Built-in extension providing advanced control features."),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/events/functions/return");
 
 #if defined(GD_IDE_ONLY)
   extension
@@ -30,6 +30,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                     _("Other"),
                     "res/conditions/toujours24.png",
                     "res/conditions/toujours.png")
+      .SetHelpPath("/all-features/advanced-conditions")
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 

@@ -39,26 +39,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("IsMouseWheelScrollingUp",
-                    _("The mouse wheel is scrolling up"),
-                    _("Check if the mouse wheel is scrolling up"),
-                    _("The mouse wheel is scrolling up"),
-                    _("Mouse and touch"),
-                    "res/actions/mouse24.png",
-                    "res/actions/mouse.png")
+      .AddCondition(
+          "IsMouseWheelScrollingUp",
+          _("The mouse wheel is scrolling up"),
+          _("Check if the mouse wheel is scrolling up. Use MouseWheelDelta "
+            "expression if you want to know the amount that was scrolled."),
+          _("The mouse wheel is scrolling up"),
+          _("Mouse and touch"),
+          "res/actions/mouse24.png",
+          "res/actions/mouse.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
   extension
-      .AddCondition("IsMouseWheelScrollingDown",
-                    _("The mouse wheel is scrolling down"),
-                    _("Check if the mouse wheel is scrolling down"),
-                    _("The mouse wheel is scrolling down"),
-                    _("Mouse and touch"),
-                    "res/actions/mouse24.png",
-                    "res/actions/mouse.png")
+      .AddCondition(
+          "IsMouseWheelScrollingDown",
+          _("The mouse wheel is scrolling down"),
+          _("Check if the mouse wheel is scrolling down. Use MouseWheelDelta "
+            "expression if you want to know the amount that was scrolled."),
+          _("The mouse wheel is scrolling down"),
+          _("Mouse and touch"),
+          "res/actions/mouse24.png",
+          "res/actions/mouse.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddCodeOnlyParameter("conditionInverted", "")

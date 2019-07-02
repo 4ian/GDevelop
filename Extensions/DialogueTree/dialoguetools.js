@@ -34,6 +34,7 @@ gdjs.dialogueTree.loadFromJsonFile = function(runtimeScene, jsonResourceName, st
 			} else {
 				console.log(content, startDialogueNode);
 				console.log(gdjs.dialogueTree.runner);
+				console.log(content); // Looks OK, but is borked
 				if (!content) return;
 				gdjs.dialogueTree.startFrom(startDialogueNode, content);
 			}
@@ -104,7 +105,7 @@ gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
 gdjs.dialogueTree.commandIsCalled = function(command) {
 	var { commandCalls, clipTextEnd, dialogueText } = gdjs.dialogueTree;
 
-	if (this.pauseScrolling || !commandCalls) return;
+	if (this.pauseScrolling || !commandCalls) return false;
 	return this.commandCalls.some(function(call, index) {
 		if (clipTextEnd < call.time) return false;
 		if (call.cmd === 'wait' && clipTextEnd !== dialogueText.length) {
@@ -120,7 +121,6 @@ gdjs.dialogueTree.commandIsCalled = function(command) {
 			return true;
 		}
 	});
-	return false;
 };
 
 // Internal method to allow for capping option selection

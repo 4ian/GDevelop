@@ -267,7 +267,7 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode, yarnData = null) {
 	this.dialogueBranchBody = '';
 	this.dialogueBranchTags = [];
 	this.tagParameters = [];
-	this.dialogue = this.runner.run(startDialogueNode); //Breaks here if json resource is used
+	this.dialogue = this.runner.run(startDialogueNode);
 	console.log(this.runner);
 	console.log(startDialogueNode, this.yarnData);
 	console.log(this.dialogue);
@@ -277,7 +277,7 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode, yarnData = null) {
 	this.commandCalls = [];
 	this.commandParameters = [];
 	this.pauseScrolling = false;
-	this.dialogueData = this.dialogue.next().value;
+	this.dialogueData = this.dialogue.next().value; //Breaks here if json resource is used
 	gdjs.dialogueTree.advanceDialogue();
 };
 

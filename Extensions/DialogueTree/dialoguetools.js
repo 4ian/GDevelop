@@ -16,11 +16,28 @@ gdjs.dialogueTree.runner = new bondage.Runner();
 gdjs.dialogueTree.loadFromSceneVar = function(runtimeScene, sceneVar, startDialogueNode) {
 	this.runner = gdjs.dialogueTree.runner;
 	this.yarnData = JSON.parse(sceneVar.getAsString());
+	console.log(this.yarnData); //OK
 	this.runner.load(this.yarnData);
 
 	if (startDialogueNode && startDialogueNode.length > 0) {
 		gdjs.dialogueTree.startFrom(startDialogueNode);
 	}
+};
+
+gdjs.dialogueTree.loadFromJsonFile = function(runtimeScene, jsonResourceName, startDialogueNode) {
+	runtimeScene
+		.getGame()
+		.getJsonManager()
+		.loadJson(jsonResourceName, function(error, content) {
+			if (error) {
+				console.error('An error happened:', error);
+			} else {
+				console.log(content, startDialogueNode);
+				console.log(gdjs.dialogueTree.runner);
+				if (!content) return;
+				gdjs.dialogueTree.startFrom(startDialogueNode, content);
+			}
+		});
 };
 
 // Condition to check if the Dialogue Tree is currentlyu parsing data. Use this to do things like disabling player movement while talking on an npc
@@ -85,9 +102,9 @@ gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
  * @param {string} command The command you want to check for being called. Write it without the <<>>
  */
 gdjs.dialogueTree.commandIsCalled = function(command) {
-	if (this.pauseScrolling) return;
 	var { commandCalls, clipTextEnd, dialogueText } = gdjs.dialogueTree;
 
+	if (this.pauseScrolling || !commandCalls) return;
 	return this.commandCalls.some(function(call, index) {
 		if (clipTextEnd < call.time) return false;
 		if (call.cmd === 'wait' && clipTextEnd !== dialogueText.length) {
@@ -206,7 +223,7 @@ gdjs.dialogueTree.selectedOptionHasUpdated = function() {
  */
 gdjs.dialogueTree.compareDialogueLineType = function(type) {
 	if (
-		this.commandCalls.length &&
+		this.commandCalls &&
 		this.commandCalls.some(function(call) {
 			return gdjs.dialogueTree.clipTextEnd > call.time;
 		})
@@ -217,11 +234,32 @@ gdjs.dialogueTree.compareDialogueLineType = function(type) {
 };
 
 /**
+ * Condition to check if a branch exists. It is also used internaly whenever you use the start from action.
+ * @param {string} branchName The Dialogue Branch name you want to check.
+ */
+gdjs.dialogueTree.dialogueContainsBranch = function(branchName) {
+	return (
+		this.runner &&
+		this.runner.yarnNodes &&
+		Object.keys(this.runner.yarnNodes).some(function(node) {
+			return node === branchName;
+		})
+	);
+};
+
+/**
  * Action to start parsing dialogue from a specified Dialogue tree branch.
  * Use this if you want to store multiple dialogues inside a single Dialogue tree data set.
  * @param {string} startDialogueNode The Dialogue Branch name you want to start parsing from.
  */
-gdjs.dialogueTree.startFrom = function(startDialogueNode) {
+gdjs.dialogueTree.startFrom = function(startDialogueNode, yarnData = null) {
+	this.runner = gdjs.dialogueTree.runner;
+	if (yarnData) {
+		this.yarnData = yarnData;
+		this.runner.load(this.yarnData);
+		console.log('Loaded', this.yarnData);
+	}
+	if (!this.dialogueContainsBranch(startDialogueNode)) return;
 	this.optionsCount = 0;
 	this.options = [];
 	this.dialogueIsRunning = true;
@@ -229,7 +267,10 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
 	this.dialogueBranchBody = '';
 	this.dialogueBranchTags = [];
 	this.tagParameters = [];
-	this.dialogue = this.runner.run(startDialogueNode);
+	this.dialogue = this.runner.run(startDialogueNode); //Breaks here if json resource is used
+	console.log(this.runner);
+	console.log(startDialogueNode, this.yarnData);
+	console.log(this.dialogue);
 	this.dialogueData = null;
 	this.dialogueDataType = '';
 	this.dialogueText = '';

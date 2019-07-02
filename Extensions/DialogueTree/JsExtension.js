@@ -44,16 +44,33 @@ module.exports = {
 
 		extension
 			.addAction(
+				'LoadDialogueFromJsonFile',
+				_('Load Dialogue Tree from a Json File'),
+				_('Load a dialogue data object - Yarn json format, stored in a Json file'),
+				_('Load Dialogue data from Json File: _PARAM1_ and begin from _PARAM2_ Node'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addCodeOnlyParameter('currentScene', '')
+			.addParameter('jsonResource', _('Json file that holds the Yarn Json data'))
+			.addParameter('string', _('Dialogue node'))
+			.getCodeExtraInformation()
+			.setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
+			.addIncludeFile('Extensions/DialogueTree/bondage.min.js')
+			.setFunctionName('gdjs.dialogueTree.loadFromJsonFile');
+
+		extension
+			.addAction(
 				'StarDialogueFromNode',
 				_('Start Dialogue from Node'),
 				_('Start Dialogue from Node in Yarn. You can use this to store multiple Npcs in one Yarn file'),
-				_('Start Dialogue from Node: _PARAM1_'),
+				_('Start Dialogue from Node: _PARAM0_'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.addParameter('string', _('Dialogue node'))
-			.setDefaultValue('Start')
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialogueTree.startFrom');
 
@@ -393,6 +410,20 @@ module.exports = {
 			)
 			.getCodeExtraInformation()
 			.setFunctionName('gdjs.dialogueTree.isRunning');
+
+		extension
+			.addCondition(
+				'Dialogue contains a branch',
+				_('Dialogue contains a branch'),
+				_('Dialogue contains a branch'),
+				_('Dialogue contains a branch named _PARAM0_'),
+				_('Dialogue Tree'),
+				'JsPlatform/Extensions/yarn24.png',
+				'JsPlatform/Extensions/yarn32.png'
+			)
+			.addParameter('string', _('Branch name'))
+			.getCodeExtraInformation()
+			.setFunctionName('gdjs.dialogueTree.dialogueContainsBranch');
 
 		extension
 			.addCondition(

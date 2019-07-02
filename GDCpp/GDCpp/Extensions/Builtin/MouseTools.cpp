@@ -76,6 +76,14 @@ int GD_API GetMouseWheelDelta(RuntimeScene &scene) {
   return scene.GetInputManager().GetMouseWheelDelta();
 }
 
+bool GD_API IsMouseWheelScrollingUp(RuntimeScene &scene) {
+  return scene.GetInputManager().IsScrollingUp();
+}
+
+bool GD_API IsMouseWheelScrollingDown(RuntimeScene &scene) {
+  return scene.GetInputManager().IsScrollingDown();
+}
+
 bool GD_API CursorOnObject(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
     RuntimeScene &scene,

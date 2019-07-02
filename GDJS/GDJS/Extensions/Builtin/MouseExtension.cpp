@@ -32,6 +32,11 @@ MouseExtension::MouseExtension() {
   GetAllActions()["TouchSimulateMouse"].SetFunctionName(
       "gdjs.evtTools.input.touchSimulateMouse");
 
+  GetAllConditions()["IsMouseWheelScrollingUp"].SetFunctionName(
+      "gdjs.evtTools.input.isScrollingUp");
+  GetAllConditions()["IsMouseWheelScrollingDown"].SetFunctionName(
+      "gdjs.evtTools.input.isScrollingDown");
+
   GetAllConditions()["SourisSurObjet"].SetFunctionName(
       "gdjs.evtTools.input.cursorOnObject");
 
@@ -60,6 +65,9 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.getLastTouchId");
   GetAllExpressions()["LastEndedTouchId"].SetFunctionName(
       "gdjs.evtTools.input.getLastEndedTouchId");
+
+  GetAllExpressions()["MouseWheelDelta"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseWheelDelta");
 
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:

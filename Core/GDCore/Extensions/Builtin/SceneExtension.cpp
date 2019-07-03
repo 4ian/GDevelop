@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           _("Built-in extension allowing to manipulate scenes and providing common features"),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("/interface/scene-editor/events");
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
 
@@ -28,6 +28,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                      _("Random integer"),
                      _("Random"),
                      "res/actions/position.png")
+      .SetHelpPath("/all-features/expressions");
       .AddParameter("expression", _("Maximum value"));
 
   extension
@@ -36,6 +37,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                      _("Random integer in range"),
                      _("Random"),
                      "res/actions/position.png")
+      .SetHelpPath("/all-features/expressions");
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"));
 
@@ -45,6 +47,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                      _("Random float"),
                      _("Random"),
                      "res/actions/position.png")
+      .SetHelpPath("/all-features/expressions");
       .AddParameter("expression", _("Maximum value"));
 
   extension
@@ -53,6 +56,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                      _("Random float in range"),
                      _("Random"),
                      "res/actions/position.png")
+      .SetHelpPath("/all-features/expressions");
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"));
 
@@ -62,6 +66,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                      _("Random value in steps"),
                      _("Random"),
                      "res/actions/position.png")
+      .SetHelpPath("/all-features/expressions");
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"))
       .AddParameter("expression", _("Step"));
@@ -82,6 +87,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     _("Scene"),
                     "res/conditions/depart24.png",
                     "res/conditions/depart.png")
+      .SetHelpPath("/interface/scene-editor/events");
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
@@ -93,6 +99,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Scene"),
                  "res/actions/replaceScene24.png",
                  "res/actions/replaceScene.png")
+      .SetHelpPath("/interface/scene-editor/events");
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
       .AddParameter("yesorno", _("Stop any other paused scenes?"))
@@ -109,6 +116,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Scene"),
                  "res/actions/pushScene24.png",
                  "res/actions/pushScene.png")
+      .SetHelpPath("/interface/scene-editor/events");
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
       .MarkAsAdvanced();
@@ -123,6 +131,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           _("Scene"),
           "res/actions/popScene24.png",
           "res/actions/popScene.png")
+      .SetHelpPath("/interface/scene-editor/events");
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
@@ -134,6 +143,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Scene"),
                  "res/actions/quit24.png",
                  "res/actions/quit.png")
+      .SetHelpPath("/interface/scene-editor/events");
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
@@ -145,6 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Scene"),
                  "res/actions/background24.png",
                  "res/actions/background.png")
+      .SetHelpPath("/interface/scene-editor/events");
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("color", _("Color"))
       .MarkAsAdvanced();
@@ -158,6 +169,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Scene"),
                  "res/actions/window24.png",
                  "res/actions/window.png")
+      .SetHelpPath("/interface/scene-editor/events");
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("yesorno", _("Deactivate input when focus is lost"))
       .MarkAsAdvanced();

@@ -17,8 +17,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Advanced control features"),
           _("Built-in extension providing advanced control features."),
           "Florian Rival",
-          "Open source (MIT License)")
-      .SetExtensionHelpPath("/events/functions/return");
+          "Open source (MIT License)"
 
 #if defined(GD_IDE_ONLY)
   extension
@@ -44,6 +43,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Functions"),
           "res/function24.png",
           "res/function16.png")
+      .SetHelpPath("/events/functions/return");
       .AddParameter("expression", "The number to be returned")
       .MarkAsAdvanced();
 
@@ -57,6 +57,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Functions"),
           "res/function24.png",
           "res/function16.png")
+      .SetHelpPath("/events/functions/return");
       .AddParameter("string", "The text to be returned")
       .MarkAsAdvanced();
 
@@ -69,6 +70,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  _("Functions"),
                  "res/function24.png",
                  "res/function16.png")
+      .SetHelpPath("/events/functions/return");
       .AddParameter("trueorfalse", "Should the condition be true or false?")
       .MarkAsAdvanced();
 

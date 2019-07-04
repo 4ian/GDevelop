@@ -87,6 +87,7 @@ export default class ForEachEvent extends React.Component<
             selection={this.props.selection}
             areConditions
             onAddNewInstruction={this.props.onAddNewInstruction}
+            onPasteInstructions={this.props.onPasteInstructions}
             onMoveToInstruction={this.props.onMoveToInstruction}
             onMoveToInstructionsList={this.props.onMoveToInstructionsList}
             onInstructionClick={this.props.onInstructionClick}
@@ -109,6 +110,7 @@ export default class ForEachEvent extends React.Component<
             selection={this.props.selection}
             areConditions={false}
             onAddNewInstruction={this.props.onAddNewInstruction}
+            onPasteInstructions={this.props.onPasteInstructions}
             onMoveToInstruction={this.props.onMoveToInstruction}
             onMoveToInstructionsList={this.props.onMoveToInstructionsList}
             onInstructionClick={this.props.onInstructionClick}

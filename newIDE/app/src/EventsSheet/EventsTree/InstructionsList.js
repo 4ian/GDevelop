@@ -17,6 +17,7 @@ import {
 } from 'react-dnd';
 import DropIndicator from './DropIndicator';
 import { Trans } from '@lingui/macro';
+import { hasClipboardConditions, hasClipboardActions } from '../ClipboardKind';
 
 const styles = {
   addButton: {
@@ -34,6 +35,7 @@ type Props = {
   instrsList: gdInstructionsList,
   areConditions: boolean,
   onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
@@ -56,7 +58,13 @@ type Props = {
   ...DropTargetProps,
 };
 
-class InstructionsList extends React.Component<Props, *> {
+type State = {|
+  canPaste: boolean,
+|};
+
+class InstructionsList extends React.Component<Props, State> {
+  state = { canPaste: false };
+
   onAddNewInstruction = () => {
     if (this.props.onAddNewInstruction)
       this.props.onAddNewInstruction({
@@ -65,7 +73,15 @@ class InstructionsList extends React.Component<Props, *> {
       });
   };
 
+  _onPasteInstructions = () => {
+    this.props.onPasteInstructions({
+      instrsList: this.props.instrsList,
+      isCondition: this.props.areConditions,
+    });
+  };
+
   render() {
+    const { canPaste } = this.state;
     const {
       addButtonLabel,
       areConditions,
@@ -151,21 +167,47 @@ class InstructionsList extends React.Component<Props, *> {
       >
         {instructions}
         {isOver && <DropIndicator canDrop={canDrop} />}
-        <button
-          style={styles.addButton}
-          className="add-link"
-          onClick={this.onAddNewInstruction}
-          onContextMenu={e => {
-            e.stopPropagation();
-            onInstructionsListContextMenu(
-              e.clientX,
-              e.clientY,
-              instructionsListContext
-            );
+        <span
+          onPointerEnter={() => {
+            const canPaste =
+              (areConditions && hasClipboardConditions()) ||
+              (!areConditions && hasClipboardActions());
+            this.setState({ canPaste });
           }}
+          onPointerLeave={() => this.setState({ canPaste: false })}
         >
-          {addButtonLabel || addButtonDefaultLabel}
-        </button>
+          <button
+            style={styles.addButton}
+            className="add-link"
+            onClick={this.onAddNewInstruction}
+            onContextMenu={e => {
+              e.stopPropagation();
+              onInstructionsListContextMenu(
+                e.clientX,
+                e.clientY,
+                instructionsListContext
+              );
+            }}
+          >
+            {addButtonLabel || addButtonDefaultLabel}
+          </button>
+          {canPaste && (
+            <span>
+              {' '}
+              <button
+                style={styles.addButton}
+                className="add-link"
+                onClick={this._onPasteInstructions}
+              >
+                {areConditions ? (
+                  <Trans>(or paste conditions)</Trans>
+                ) : (
+                  <Trans>(or paste actions)</Trans>
+                )}
+              </button>
+            </span>
+          )}
+        </span>
       </div>
     );
 

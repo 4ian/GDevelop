@@ -27,6 +27,11 @@ gdjs.dialogueTree.loadFromSceneVar = function(
   }
 };
 
+/**
+ * Load the Dialogue Tree data of the game. Use this action to initialize The Dialogue Tree, so as it can be used in the game
+ * @param {gdjs.Variable} jsonResourceName The json fileresource to load the Dialogue tree data from. The data is a JSON file - created by YARN
+ * @param {string} startDialogueNode The Dialogue Branch to start the Dialogue Tree from. If left empty, the data will only be loaded, but can later be initialized via another action
+ */
 gdjs.dialogueTree.loadFromJsonFile = function(
   runtimeScene,
   jsonResourceName,
@@ -40,7 +45,12 @@ gdjs.dialogueTree.loadFromJsonFile = function(
         console.error("An error happened:", error);
       } else {
         if (!content) return;
-        gdjs.dialogueTree.startFrom(startDialogueNode, content);
+        gdjs.dialogueTree.yarnData = content;
+        gdjs.dialogueTree.runner.load(gdjs.dialogueTree.yarnData);
+
+        if (startDialogueNode && startDialogueNode.length > 0) {
+          gdjs.dialogueTree.startFrom(startDialogueNode);
+        }
       }
     });
 };
@@ -52,7 +62,7 @@ gdjs.dialogueTree.isRunning = function() {
 
 // Action to scroll the clipped text. Use this with a timer and user input to control how fast dialogue line text is scrolling.
 gdjs.dialogueTree.scrollCippedText = function() {
-  if (this.pauseScrolling) return;
+  if (this.pauseScrolling || !this.dialogueIsRunning) return;
 
   if (this.dialogueText) {
     this.clipTextEnd += 1;
@@ -267,13 +277,8 @@ gdjs.dialogueTree.dialogueContainsBranch = function(branchName) {
  * Use this if you want to store multiple dialogues inside a single Dialogue tree data set.
  * @param {string} startDialogueNode The Dialogue Branch name you want to start parsing from.
  */
-gdjs.dialogueTree.startFrom = function(startDialogueNode, yarnData = null) {
+gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   this.runner = gdjs.dialogueTree.runner;
-  if (yarnData) {
-    this.yarnData = yarnData;
-    this.runner.load(this.yarnData);
-    console.log("Loaded", this.yarnData);
-  }
   if (!this.dialogueContainsBranch(startDialogueNode)) return;
   this.optionsCount = 0;
   this.options = [];
@@ -282,9 +287,6 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode, yarnData = null) {
   this.dialogueBranchTags = [];
   this.tagParameters = [];
   this.dialogue = this.runner.run(startDialogueNode);
-  console.log(this.runner);
-  console.log(startDialogueNode, this.yarnData);
-  console.log(this.dialogue);
   this.dialogueData = null;
   this.dialogueDataType = "";
   this.dialogueText = "";
@@ -311,6 +313,8 @@ gdjs.dialogueTree._lineTypeIsCommand = function() {
 // Use this Action to progress Dialogue to the next line. Hook it to your game input.
 // Note that this action can be influenced by any <<wait>> commands, but they work only if you have at least one commandIsCalled condition.
 gdjs.dialogueTree.advanceDialogue = function() {
+  if (this.pauseScrolling || !this.dialogueIsRunning) return;
+
   this.optionsCount = 0;
   this.selectOption = -1;
   this.selectedOptionUpdated = false;

@@ -115,8 +115,11 @@ gd::ExpressionMetadata& ObjectMetadata::AddExpression(
 #if defined(GD_IDE_ONLY)
   // Be careful, objects expression do not have namespace ( not necessary as
   // objects inherits from only one derived object )
-  expressionsInfos[name] = ExpressionMetadata(
-      extensionNamespace, name, fullname, description, group, smallicon);
+  expressionsInfos[name] =
+      ExpressionMetadata(
+          extensionNamespace, name, fullname, description, group, smallicon)
+          .SetHelpPath(GetHelpPath());
+
   return expressionsInfos[name];
 #endif
 }
@@ -130,8 +133,11 @@ gd::ExpressionMetadata& ObjectMetadata::AddStrExpression(
 #if defined(GD_IDE_ONLY)
   // Be careful, objects expression do not have namespace ( not necessary as
   // objects inherits from only one derived object )
-  strExpressionsInfos[name] = ExpressionMetadata(
-      extensionNamespace, name, fullname, description, group, smallicon);
+  strExpressionsInfos[name] =
+      ExpressionMetadata(
+          extensionNamespace, name, fullname, description, group, smallicon)
+          .SetHelpPath(GetHelpPath());
+
   return strExpressionsInfos[name];
 #endif
 }

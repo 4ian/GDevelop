@@ -194,11 +194,10 @@ gdjs.PathfindingRuntimeBehavior.prototype.moveTo = function(runtimeScene, x, y)
     var startCellX = Math.round(owner.getX()/this._cellWidth);
     var startCellY = Math.round(owner.getY()/this._cellHeight);
     if ( startCellX == targetCellX && startCellY == targetCellY ) {
-        while (this._path.length < 2) this._path.unshift([0, 0]);
-        this._path.length = 2;
-
+        this._path.length = 0;
         this._path.push([owner.getX(), owner.getY()]);
         this._path.push([x, y]);
+
         this._enterSegment(0);
         this._pathFound = true;
 

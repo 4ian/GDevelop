@@ -137,7 +137,10 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
         this.setState({
           exportStep: 'done',
         });
-      }, handleError(t('Error while building the game.')));
+      }, handleError(t('Error while building the game.')))
+      .catch(() => {
+        /* Error handled previously */
+      });
   };
 
   openExportFolder = () => {

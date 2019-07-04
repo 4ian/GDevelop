@@ -48,6 +48,12 @@ MouseExtension::MouseExtension() {
   GetAllConditions()["MouseButtonReleased"]
       .SetFunctionName("MouseButtonReleased")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
+   GetAllConditions()["IsMouseWheelScrollingUp"]  
+      .SetFunctionName("IsMouseWheelScrollingUp")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
+   GetAllConditions()["IsMouseWheelScrollingDown"]  
+      .SetFunctionName("IsMouseWheelScrollingDown")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
 
   GetAllConditions()["SourisSurObjet"]
       .SetFunctionName("CursorOnObject")

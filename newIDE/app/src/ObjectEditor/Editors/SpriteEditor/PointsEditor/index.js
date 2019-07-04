@@ -170,14 +170,18 @@ export default class PointsEditor extends Component {
           resourceName={hasValidSprite ? sprite.getImageName() : ''}
           resourcesLoader={resourcesLoader}
           project={project}
-        >
-          {hasValidSprite && (
-            <PointsPreview
-              pointsContainer={sprite}
-              onPointsUpdated={this._updatePoints}
-            />
-          )}
-        </ImagePreview>
+          renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+            hasValidSprite && (
+              <PointsPreview
+                imageWidth={imageWidth}
+                imageHeight={imageHeight}
+                imageZoomFactor={imageZoomFactor}
+                pointsContainer={sprite}
+                onPointsUpdated={this._updatePoints}
+              />
+            )
+          }
+        />
         <Line>
           <Column expand>
             <SpriteSelector

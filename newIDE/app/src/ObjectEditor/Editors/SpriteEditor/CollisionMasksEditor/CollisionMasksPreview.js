@@ -20,6 +20,7 @@ type Props = {|
   isDefaultBoundingBox: boolean,
   imageWidth: number,
   imageHeight: number,
+  imageZoomFactor: number,
   onPolygonsUpdated: () => void,
 |};
 
@@ -60,7 +61,6 @@ export default class CollisionMasksPreview extends React.Component<
    * Move a vertex with the mouse. A similar dragging implementation is done in
    * PointsPreview (but with div and img elements).
    *
-   * If custom zoom is added, this should be adapted to properly set vertex coordinates.
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
   _onPointerMove = (event: any) => {
@@ -73,13 +73,13 @@ export default class CollisionMasksPreview extends React.Component<
     const screenToSvgMatrix = this._svg.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
-    draggedVertex.set_x(pointOnSvg.x);
-    draggedVertex.set_y(pointOnSvg.y);
+    draggedVertex.set_x(pointOnSvg.x / this.props.imageZoomFactor);
+    draggedVertex.set_y(pointOnSvg.y / this.props.imageZoomFactor);
     this.forceUpdate();
   };
 
   _renderBoundingBox() {
-    const { imageWidth, imageHeight } = this.props;
+    const { imageWidth, imageHeight, imageZoomFactor } = this.props;
 
     return (
       <polygon
@@ -87,13 +87,15 @@ export default class CollisionMasksPreview extends React.Component<
         stroke="rgba(255,0,0,0.5)"
         strokeWidth={1}
         fileRule="evenodd"
-        points={`0,0 ${imageWidth},0 ${imageWidth},${imageHeight} 0,${imageHeight}`}
+        points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
+          imageZoomFactor},${imageHeight * imageZoomFactor} 0,${imageHeight *
+          imageZoomFactor}`}
       />
     );
   }
 
   _renderPolygons() {
-    const { polygons } = this.props;
+    const { polygons, imageZoomFactor } = this.props;
 
     return (
       <React.Fragment>
@@ -108,7 +110,9 @@ export default class CollisionMasksPreview extends React.Component<
               fileRule="evenodd"
               points={mapVector(
                 vertices,
-                (vertex, j) => `${vertex.get_x()},${vertex.get_y()}`
+                (vertex, j) =>
+                  `${vertex.get_x() * imageZoomFactor},${vertex.get_y() *
+                    imageZoomFactor}`
               ).join(' ')}
             />
           );
@@ -121,8 +125,8 @@ export default class CollisionMasksPreview extends React.Component<
               key={`polygon-${i}-vertex-${j}`}
               fill="rgba(255,0,0,0.75)"
               strokeWidth={1}
-              cx={vertex.get_x()}
-              cy={vertex.get_y()}
+              cx={vertex.get_x() * imageZoomFactor}
+              cy={vertex.get_y() * imageZoomFactor}
               r={5}
               style={styles.vertexCircle}
             />
@@ -139,8 +143,8 @@ export default class CollisionMasksPreview extends React.Component<
       <svg
         onPointerMove={this._onPointerMove}
         onPointerUp={this._onEndDragVertex}
-        width={this.props.imageWidth}
-        height={this.props.imageHeight}
+        width={this.props.imageWidth * this.props.imageZoomFactor}
+        height={this.props.imageHeight * this.props.imageZoomFactor}
         style={styles.svg}
         ref={svg => (this._svg = svg)}
       >

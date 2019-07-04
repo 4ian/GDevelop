@@ -88,13 +88,15 @@ const filterExtensionShortHeaders = (
   );
 
   if (!searchText && !chosenTag) return behaviorsFilteredHeaders;
+
+  const lowercaseSearchText = searchText.toLowerCase();
   return behaviorsFilteredHeaders
     .filter(({ tags }) => !chosenTag || tags.indexOf(chosenTag) !== -1)
     .filter(
       ({ name, shortDescription }) =>
         !searchText ||
-        (name.indexOf(searchText) !== -1 ||
-          shortDescription.indexOf(searchText) !== -1)
+        (name.toLowerCase().indexOf(lowercaseSearchText) !== -1 ||
+          shortDescription.toLowerCase().indexOf(lowercaseSearchText) !== -1)
     );
 };
 

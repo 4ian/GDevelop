@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include <map>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 
 void AnchorBehavior::InitializeContent(gd::SerializerElement& content) {

@@ -228,7 +228,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default, with text', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}
       render={(value, onChange) => (
@@ -240,6 +240,40 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
               text: `Choice ${i}`,
               value: `Choice ${i}`,
             }))}
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('default, with onClick for some elements', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: 'Click me 1',
+                onClick: () => action('Click me 1 clicked'),
+              },
+              {
+                text: '',
+                value: 'Click me 2',
+                onClick: () => action('Click me 2 clicked'),
+              },
+              {
+                type: 'separator',
+              },
+            ].concat(
+              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                text: `Choice ${i}`,
+                value: `Choice ${i}`,
+              }))
+            )}
           />
           <p>State value is {value}</p>
         </React.Fragment>
@@ -1571,6 +1605,7 @@ storiesOf('ObjectSelector', module)
       initialValue={''}
       render={(value, onChange) => (
         <ObjectSelector
+          project={project}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -1589,6 +1624,7 @@ storiesOf('ObjectSelector', module)
       initialValue={''}
       render={(value, onChange) => (
         <ObjectSelector
+          project={project}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -1623,6 +1659,7 @@ storiesOf('ObjectGroupEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ObjectGroupEditor
+      project={project}
       globalObjectsContainer={project}
       objectsContainer={testLayout}
       group={group2}

@@ -10,9 +10,8 @@ import {
 } from '../GDJSInspectorDescriptions';
 import { Line } from '../../UI/Grid';
 import mapValues from 'lodash/mapValues';
-import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
-import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 type Props = {|
   runtimeScene: GameData,
@@ -134,26 +133,13 @@ export default class RuntimeSceneInspector extends React.Component<
         </p>
         {runtimeScene._objects && runtimeScene._objects.items && (
           <Line noMargin alignItems="baseline">
-            <AutoComplete
-              {...defaultAutocompleteProps}
+            <SemiControlledAutoComplete
               hintText={<Trans>Enter the name of the object</Trans>}
-              searchText={this.state.newObjectName}
-              onUpdateInput={value => {
+              value={this.state.newObjectName}
+              onChange={value => {
                 this.setState({
                   newObjectName: value,
                 });
-              }}
-              onNewRequest={data => {
-                // Note that data may be a string or a {text, value} object.
-                if (typeof data === 'string') {
-                  this.setState({
-                    newObjectName: data,
-                  });
-                } else if (typeof data.value === 'string') {
-                  this.setState({
-                    newObjectName: data.value,
-                  });
-                }
               }}
               dataSource={Object.keys(runtimeScene._objects.items).map(
                 objectName => ({
@@ -161,6 +147,7 @@ export default class RuntimeSceneInspector extends React.Component<
                   value: objectName,
                 })
               )}
+              openOnFocus
             />
             <RaisedButton
               label={<Trans>Create</Trans>}

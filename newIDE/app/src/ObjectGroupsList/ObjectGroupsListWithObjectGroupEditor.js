@@ -5,6 +5,7 @@ import { ObjectGroupEditorDialog } from '../ObjectGroupEditor/ObjectGroupEditorD
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 
 type Props = {|
+  project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   globalObjectGroups: gdObjectGroupsContainer,
@@ -48,6 +49,7 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
 
   render() {
     const {
+      project,
       objectsContainer,
       globalObjectsContainer,
       objectGroups,
@@ -67,6 +69,7 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
           onGroupRenamed={this.props.onGroupsUpdated}
         />
         <ObjectGroupEditorDialog
+          project={project}
           key={globalObjectsContainer.ptr + ';' + objectsContainer.ptr}
           open={!!this.state.editedGroup}
           group={this.state.editedGroup}

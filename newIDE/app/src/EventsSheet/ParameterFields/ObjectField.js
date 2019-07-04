@@ -34,6 +34,7 @@ export default class ObjectField extends React.Component<
   render() {
     return (
       <ObjectSelector
+        project={this.props.project}
         value={this.props.value}
         onChange={this.props.onChange}
         allowedObjectType={this._allowedObjectType}

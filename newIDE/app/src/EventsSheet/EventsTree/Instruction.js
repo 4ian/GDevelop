@@ -68,13 +68,14 @@ type Props = {|
 
   // For potential sub-instructions list:
   selection: Object,
-  onAddNewSubInstruction: Function,
+  onAddNewSubInstruction: InstructionsListContext => void,
+  onPasteSubInstructions: InstructionsListContext => void,
   onMoveToSubInstruction: (destinationContext: InstructionContext) => void,
   onMoveToSubInstructionsList: (
     destinationContext: InstructionsListContext
   ) => void,
-  onSubInstructionClick: Function,
-  onSubInstructionDoubleClick: Function,
+  onSubInstructionClick: InstructionContext => void,
+  onSubInstructionDoubleClick: InstructionContext => void,
   onSubInstructionsListContextMenu: (
     x: number,
     y: number,
@@ -215,6 +216,7 @@ class Instruction extends React.Component<Props, *> {
               areConditions={this.props.isCondition}
               selection={this.props.selection}
               onAddNewInstruction={this.props.onAddNewSubInstruction}
+              onPasteInstructions={this.props.onPasteSubInstructions}
               onMoveToInstruction={this.props.onMoveToSubInstruction}
               onMoveToInstructionsList={this.props.onMoveToSubInstructionsList}
               onInstructionClick={this.props.onSubInstructionClick}

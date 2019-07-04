@@ -1227,6 +1227,7 @@ storiesOf('EventsTree', module)
             objectsContainer={testLayout}
             selection={getInitialSelection()}
             onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
             onMoveToInstruction={action('move to instruction')}
             onMoveToInstructionsList={action('move instruction to list')}
             onInstructionClick={action('instruction click')}

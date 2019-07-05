@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
                                  "the game window and canvas"),
                                "Florian Rival",
                                "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/all-features/window");
 
 #if defined(GD_IDE_ONLY)
   extension

@@ -100,12 +100,18 @@ const publicVideoUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-Short.mp4',
 ];
 
+const publicJsonUrls = [
+  // Yarn example - todo Upload elsewhere?
+  'https://raw.githubusercontent.com/jhayley/bondage.js/master/tests/yarn_files/assignment.json',
+];
+
 const nameFromUrl = (url: string): string => {
   const urlParts = url.split('/');
   return urlParts[urlParts.length - 1]
     .replace('.png', '')
     .replace('.wav', '')
     .replace('.ogg', '')
+    .replace('.json', '')
     .replace('.mp4', '');
 };
 
@@ -308,6 +314,28 @@ export default [
             urlsAreImages={false}
             createNewResource={() => new gd.VideoResource()}
             title={<Trans>Choose a video from the library</Trans>}
+            ref={chooser => (this._chooser = chooser)}
+          />
+        );
+      }
+    },
+  },
+  {
+    name: 'publicJsonUrlChooser',
+    displayName: 'Choose a json file from library',
+    kind: 'json',
+    component: class JsonResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
+      };
+      render() {
+        return (
+          <GenericResourcesChooser
+            {...this.props}
+            urls={publicJsonUrls}
+            urlsAreImages={false}
+            createNewResource={() => new gd.JsonResource()}
+            title={<Trans>Choose a Json File from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );

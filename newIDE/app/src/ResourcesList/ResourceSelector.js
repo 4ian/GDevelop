@@ -210,6 +210,23 @@ export default class ResourceSelector extends React.Component<Props, State> {
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);
+    } else if (resourceKind === 'json') {
+      const externalEditorOptions = {
+        project,
+        resourcesLoader,
+        resourceNames: [resourceName],
+        extraOptions: {
+          initialResourceMetadata,
+        },
+        onChangesSaved: (newResourceData, newResourceName) => {
+          // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
+          resourcesLoader.burstUrlsCacheForResources(project, [
+            newResourceName,
+          ]);
+          this.props.onChange(newResourceName);
+        },
+      };
+      resourceExternalEditor.edit(externalEditorOptions);
     }
   };
 

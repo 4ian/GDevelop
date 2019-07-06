@@ -12,16 +12,28 @@ const closeWindow = () => {
 };
 
 const editorFrameEl = document.getElementById('yarn-frame');
-window.addEventListener('jfxrReady', e => {
+// editorFrameEl.addEventListener('load', function() {
+//   // alert('myframe is loaded');
+//   ipcRenderer.send('yarn-ready');
+// }, true)
+
+
+
+window.addEventListener('yarnReady', e => {
   yarn = e.mainCtrl;
-  ipcRenderer.send('jfxr-ready');
+  console.log(e);
+  ipcRenderer.send('yarn-ready');
 });
 // Trigger the load of Jfxr manually, to ensure the event listener "jfxrReady" is registered already
 editorFrameEl.src = 'yarn-editor/app/index.html';
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('yarn-open', (event, receivedOptions) => {
-  console.log('ready!');
+  console.log('ready!',receivedOptions);
+  if (!yarn) return;
+  console.log(yarn);
+  yarn.loadData(receivedOptions.yarnData, 'json', true)
+  // yarn.openFile(null, receivedOptions.resourcePath, false)
 });
 
 // const loadMetaData = externalEditorData => {

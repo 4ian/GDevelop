@@ -31,7 +31,7 @@ export const openYarn = ({
 
   const externalEditorData = {
     resourcePath: initialResourcePath,
-    externalEditorData: extraOptions.initialResourceMetadata,
+    yarnData: extraOptions.jsonContents,
     projectPath,
   };
 

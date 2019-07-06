@@ -11,7 +11,7 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import IconMenu from '../UI/Menu/IconMenu';
 import ResourcesLoader from '../ResourcesLoader';
-import { applyResourceDefaults } from './ResourceUtils';
+import { applyResourceDefaults, loadTextFile } from './ResourceUtils';
 import SemiControlledAutoComplete, {
   type DataSource,
 } from '../UI/SemiControlledAutoComplete';
@@ -155,7 +155,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
-
+    console.log(project);
     let initialResourceMetadata = {};
     const initialResourceMetadataRaw = initialResource.getMetadata();
     if (initialResourceMetadataRaw) {
@@ -211,11 +211,15 @@ export default class ResourceSelector extends React.Component<Props, State> {
       };
       resourceExternalEditor.edit(externalEditorOptions);
     } else if (resourceKind === 'json') {
+      
+      const jsonContents = loadTextFile(project, resourceName);
+      console.log(jsonContents);
       const externalEditorOptions = {
         project,
         resourcesLoader,
         resourceNames: [resourceName],
         extraOptions: {
+          jsonContents,
           initialResourceMetadata,
         },
         onChangesSaved: (newResourceData, newResourceName) => {

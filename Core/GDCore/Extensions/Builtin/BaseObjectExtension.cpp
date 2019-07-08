@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                _("Base object"),
                                "Florian Rival",
                                "Open source (MIT License)")
-      .SetExtensionHelpPath("/objects/base_object");
+      .SetExtensionHelpPath("/tutorials/basic-game-making-concepts/events");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -641,7 +641,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/ecarter.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectList", _("Objects"))
+      .AddParameter("objectList", _("Object"))
       .AddParameter("yesorno",
                     _("Ignore objects that are touching each other on their "
                       "edges, but are not overlapping (default: no)"),

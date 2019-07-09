@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                _("Base object"),
                                "Florian Rival",
                                "Open source (MIT License)")
-      .SetExtensionHelpPath("/tutorials/basic-game-making-concepts/events");
+      .SetExtensionHelpPath("/objects/base_object/events");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");

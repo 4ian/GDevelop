@@ -641,7 +641,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/ecarter.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Objects (won't move)"))
       .AddParameter("yesorno",
                     _("Ignore objects that are touching each other on their "
                       "edges, but are not overlapping (default: no)"),

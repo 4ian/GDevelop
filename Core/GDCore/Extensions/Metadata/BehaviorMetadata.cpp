@@ -5,9 +5,9 @@
  */
 #include "BehaviorMetadata.h"
 #include <iostream>
-#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 
@@ -97,7 +97,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedCondition(
     const gd::String& icon,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  gd::String nameWithNamespace = GetName() +gd::PlatformExtension::GetNamespaceSeparator() +  name;
+  gd::String nameWithNamespace =
+      GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
   conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
                                                            nameWithNamespace,
                                                            fullname,
@@ -120,7 +121,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedAction(
     const gd::String& icon,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  gd::String nameWithNamespace = GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
+  gd::String nameWithNamespace =
+      GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
                                                         nameWithNamespace,
                                                         fullname,
@@ -143,8 +145,10 @@ gd::ExpressionMetadata& BehaviorMetadata::AddExpression(
 #if defined(GD_IDE_ONLY)
   // Be careful, behaviors expression do not have namespace ( not necessary as
   // we refer to the auomatism name in the expression )
-  expressionsInfos[name] = ExpressionMetadata(
-      extensionNamespace, name, fullname, description, group, smallicon);
+  expressionsInfos[name] =
+      ExpressionMetadata(
+          extensionNamespace, name, fullname, description, group, smallicon)
+          .SetHelpPath(GetHelpPath());
   return expressionsInfos[name];
 #endif
 }
@@ -158,8 +162,10 @@ gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
 #if defined(GD_IDE_ONLY)
   // Be careful, behaviors expression do not have namespace ( not necessary as
   // we refer to the auomatism name in the expression )
-  strExpressionsInfos[name] = ExpressionMetadata(
-      extensionNamespace, name, fullname, description, group, smallicon);
+  strExpressionsInfos[name] =
+      ExpressionMetadata(
+          extensionNamespace, name, fullname, description, group, smallicon)
+          .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[name];
 #endif
 }

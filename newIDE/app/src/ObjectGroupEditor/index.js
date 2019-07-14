@@ -11,6 +11,7 @@ import { Column } from '../UI/Grid';
 const gd = global.gd;
 
 type Props = {|
+  project: ?gdProject,
   group: gdObjectGroup,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -77,7 +78,12 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { group, globalObjectsContainer, objectsContainer } = this.props;
+    const {
+      project,
+      group,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
 
     return (
       <div>
@@ -102,6 +108,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
         </List>
         <Column>
           <ObjectSelector
+            project={project}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             value={this.state.newObjectName}

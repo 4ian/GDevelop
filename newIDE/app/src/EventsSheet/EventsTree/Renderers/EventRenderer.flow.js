@@ -18,7 +18,8 @@ export type EventRendererProps = {
 
   onUpdate: () => void,
   selected: boolean,
-  onAddNewInstruction: Function,
+  onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext

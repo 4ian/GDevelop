@@ -187,6 +187,6 @@ gdjs.TiledSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
  *
  * @returns {string} rgbColor The color, in RGB format ("128;200;255").
  */
-gdjs.SpriTiledSpriteRuntimeObjectteRuntimeObject.prototype.getColor = function() {
+gdjs.TiledSpriteRuntimeObject.prototype.getColor = function() {
     return this._renderer.getColor();
 };

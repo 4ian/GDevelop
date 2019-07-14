@@ -49,7 +49,8 @@ type EventsContainerProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
-  onAddNewInstruction: Function,
+  onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
@@ -119,6 +120,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
             leftIndentWidth={this.props.leftIndentWidth}
             onUpdate={this._onEventUpdated}
             onAddNewInstruction={this.props.onAddNewInstruction}
+            onPasteInstructions={this.props.onPasteInstructions}
             onMoveToInstruction={this.props.onMoveToInstruction}
             onMoveToInstructionsList={this.props.onMoveToInstructionsList}
             onInstructionClick={this.props.onInstructionClick}
@@ -162,7 +164,8 @@ type EventsTreeProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
-  onAddNewInstruction: Function,
+  onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
@@ -399,6 +402,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         selection={this.props.selection}
         leftIndentWidth={depth * indentWidth}
         onAddNewInstruction={this.props.onAddNewInstruction}
+        onPasteInstructions={this.props.onPasteInstructions}
         onMoveToInstruction={this.props.onMoveToInstruction}
         onMoveToInstructionsList={this.props.onMoveToInstructionsList}
         onInstructionClick={this.props.onInstructionClick}

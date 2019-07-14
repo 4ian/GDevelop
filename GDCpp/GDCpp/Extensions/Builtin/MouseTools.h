@@ -24,6 +24,8 @@ double GD_API GetCursorYPosition(RuntimeScene &scene,
 bool GD_API MouseButtonPressed(RuntimeScene &scene, const gd::String &key);
 bool GD_API MouseButtonReleased(RuntimeScene &scene, const gd::String &key);
 int GD_API GetMouseWheelDelta(RuntimeScene &scene);
+bool GD_API IsMouseWheelScrollingUp(RuntimeScene &scene);
+bool GD_API IsMouseWheelScrollingDown(RuntimeScene &scene);
 bool GD_API CursorOnObject(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
     RuntimeScene &scene,

@@ -1088,6 +1088,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         )}
         <ObjectGroupEditorDialog
+          project={project}
           open={!!this.state.editedGroup}
           group={this.state.editedGroup}
           objectsContainer={layout}

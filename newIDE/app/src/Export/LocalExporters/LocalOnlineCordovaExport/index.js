@@ -226,7 +226,10 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
             this.startBuildWatch(userProfile);
           }
         );
-      }, handleError(t('Error while lauching the build of the game.')));
+      }, handleError(t('Error while lauching the build of the game.')))
+      .catch(() => {
+        /* Error handled previously */
+      });
   };
 
   _download = (key: string) => {

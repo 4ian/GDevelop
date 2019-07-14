@@ -465,6 +465,12 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 onClick={() => this.openPointsEditor(false)}
               />
             }
+            secondaryActions={[
+              <HelpButton
+                helpPagePath="/objects/sprite/edit-points"
+                key="help"
+              />,
+            ]}
             autoScrollBodyContent
             noMargin
             modal

@@ -168,8 +168,7 @@ export default class ObjectsListContainer extends React.Component<
   };
 
   sortableList: any;
-  containerObjectsList: ObjectWithContextList = [];
-  projectObjectsList: ObjectWithContextList = [];
+  _displayedObjectsList: ObjectWithContextList = [];
   state: StateType = {
     newObjectDialogOpen: false,
     renamedObjectWithContext: null,
@@ -373,41 +372,40 @@ export default class ObjectsListContainer extends React.Component<
   };
 
   _move = (oldIndex: number, newIndex: number) => {
+    // Moving objects can be discarded by the parent (this is used to allow
+    // dropping objects on the scene editor).
     if (!this.props.canMoveObjects) return;
 
     const { project, objectsContainer } = this.props;
 
-    const isInContainerObjectsList =
-      oldIndex < this.containerObjectsList.length;
-    if (isInContainerObjectsList) {
-      objectsContainer.moveObject(
-        oldIndex,
-        Math.min(newIndex, this.containerObjectsList.length - 1)
-      );
-    } else {
-      const projectOldIndex = oldIndex - this.containerObjectsList.length;
-      const projectNewIndex = newIndex - this.containerObjectsList.length;
+    const movedObjectWithContext = this._displayedObjectsList[oldIndex];
+    const destinationObjectWithContext = this._displayedObjectsList[newIndex];
+    if (!movedObjectWithContext || !destinationObjectWithContext) return;
 
-      project.moveObject(
-        projectOldIndex,
-        Math.min(projectNewIndex, this.projectObjectsList.length - 1)
-      );
+    if (movedObjectWithContext.global !== destinationObjectWithContext.global) {
+      // Can't move an object from the objects container to the global objects
+      // or vice-versa.
+      return;
     }
+
+    const container: gdObjectsContainer = movedObjectWithContext.global
+      ? project
+      : objectsContainer;
+    container.moveObject(
+      container.getObjectPosition(movedObjectWithContext.object.getName()),
+      container.getObjectPosition(destinationObjectWithContext.object.getName())
+    );
 
     this.forceUpdateList();
   };
 
   _onStartDraggingObject = ({ index }: { index: number }) => {
-    const { project, objectsContainer } = this.props;
-
-    const isInContainerObjectsList = index < this.containerObjectsList.length;
-    if (isInContainerObjectsList) {
-      this.props.onStartDraggingObject(objectsContainer.getObjectAt(index));
-    } else {
-      const projectIndex = index - this.containerObjectsList.length;
-
-      this.props.onStartDraggingObject(project.getObjectAt(projectIndex));
+    const draggedObjectWithContext = this._displayedObjectsList[index];
+    if (!draggedObjectWithContext) {
+      return;
     }
+
+    this.props.onStartDraggingObject(draggedObjectWithContext.object);
   };
 
   _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
@@ -463,19 +461,11 @@ export default class ObjectsListContainer extends React.Component<
     const { searchText, tagEditedObject } = this.state;
 
     const lists = enumerateObjects(project, objectsContainer);
-    this.containerObjectsList = filterObjectsList(lists.containerObjectsList, {
+    this._displayedObjectsList = filterObjectsList(lists.allObjectsList, {
       searchText,
       selectedTags: selectedObjectTags,
     });
-    this.projectObjectsList = filterObjectsList(lists.projectObjectsList, {
-      searchText,
-      selectedTags: selectedObjectTags,
-    });
-    const allObjectsList = filterObjectsList(lists.allObjectsList, {
-      searchText,
-      selectedTags: selectedObjectTags,
-    });
-    const fullList = allObjectsList.concat({
+    const fullList = this._displayedObjectsList.concat({
       key: 'add-objects-row',
       object: null,
     });

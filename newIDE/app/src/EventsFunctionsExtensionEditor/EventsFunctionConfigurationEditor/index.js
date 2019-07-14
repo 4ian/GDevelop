@@ -101,6 +101,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         ) : null}
         {this.state.currentTab === 'groups' ? (
           <ObjectGroupsListWithObjectGroupEditor
+            project={project}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             globalObjectGroups={globalObjectsContainer.getObjectGroups()}

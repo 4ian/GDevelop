@@ -17,7 +17,7 @@ module.exports = {
 			.setExtensionInformation(
 				'DialogueTree',
 				_('Dialoguetree'),
-				_('Initiate tree dialogues from Yarn via Bondagejs.'),
+				_('Initiate dialogue trees from Yarn via Bondagejs.'),
 				'Todor Imreorov',
 				'Open source (MIT License)'
 			)
@@ -33,7 +33,6 @@ module.exports = {
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
-			.addCodeOnlyParameter('currentScene', '')
 			.addParameter('scenevar', _('Scene variable that holds the Yarn Json data'))
 			.getCodeExtraInformation()
 			.setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
@@ -222,7 +221,7 @@ module.exports = {
 			.addStrExpression(
 				'Option',
 				_('Get the text of an option from an Options line type'),
-				_('Get the text of an option from an Options line type'),
+				_('Get the text of an option from an Options line type, using the option\'s Number. The numbers start from 0.),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
@@ -235,7 +234,7 @@ module.exports = {
 			.addExpression(
 				'SelectedOptionIndex',
 				_('Get the number of the currently selected option'),
-				_('Get the number of the currently selected option'),
+				_('Get the number of the currently selected option. Use this to help you render the option selection marker at the right place.'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
@@ -247,7 +246,7 @@ module.exports = {
 			.addStrExpression(
 				'ClippedLineText',
 				_('Get dialogue line text clipped'),
-				_('Get dialogue line text clipped'),
+				_('Get dialogue line text clipped by the typewriter effect. Use the ScrollClippedText action to control the typewriter effect.'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
@@ -296,7 +295,7 @@ module.exports = {
 			.addStrExpression(
 				'CommandParameter',
 				_('Get the parameters of a command call'),
-				_('Get the parameters of a command call'),
+				_('Get the parameters of a command call - <<command withParameter anotherParameter>>'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
@@ -371,7 +370,7 @@ module.exports = {
 			.addCondition(
 				'Is command called',
 				_('Command is called'),
-				_('Command is called'),
+				_('Check if a specific Command is called. If it is a <<command withParameter>>, you can even get the parameter with the CommandParameter expression.'),
 				_('Command <<_PARAM0_>> is called'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -385,7 +384,7 @@ module.exports = {
 			.addCondition(
 				'IsDialogueLineType',
 				_('The dialogue line type is'),
-				_('The dialogue line line type is'),
+				_('Check if the the current dialogue line line is one of the three existing types. Use this to set what logic is executed for each type.\nThe three types are as follows:\n- text: when displaying dialogue text.\n- options: when displaying [[branching/options]] for dialogue choices.\n-command: when <<commands>> are triggered by the dialogue data.'),
 				_('The dialogue line is _PARAM0_'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -399,7 +398,7 @@ module.exports = {
 			.addCondition(
 				'Is running',
 				_('Is running'),
-				_('Is running. Use this to detect when a dialogue has been initiated, for things like locking the player movement while speaking with a non player character.'),
+				_('Check if the dialogue is running. Use this to for things like locking the player movement while speaking with a non player character.'),
 				_('Is running'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -412,7 +411,7 @@ module.exports = {
 			.addCondition(
 				'HasBranch',
 				_('Dialogue has branch'),
-				_('Dialogue has a branch with specified name. Use this to check if a dialogue branch exists in the loaded dialogue data.'),
+				_('Check if the dialogue has a branch with specified name. Use this to check if a dialogue branch exists in the loaded dialogue data.'),
 				_('Dialogue has a branch named _PARAM0_'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -426,7 +425,7 @@ module.exports = {
 			.addCondition(
 				'HasSelectedOptionChanged',
 				_('Has selected option changed'),
-				_('Has selected option changed. Use this to detect when the player has selected another option, so you can re-draw where the selection arrow is.'),
+				_('Check if a selected option has changed when the current dialogue line type is options. Use this to detect when the player has selected another option, so you can re-draw where the selection arrow is.'),
 				_('Has selected option changed'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -439,7 +438,7 @@ module.exports = {
 			.addCondition(
 				'Current branch title is',
 				_('Current dialogue branch title is'),
-				_('The current dialogue branch title is'),
+				_('Check if the current dialogue branch title is equal to a string. Use this to trigger game events when the player has visited a specific dialogue branch.'),
 				_('The current dialogue branch title is _PARAM0_'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -453,7 +452,7 @@ module.exports = {
 			.addCondition(
 				'Current branch contains Tag',
 				_('Current dialogue branch contains a tag'),
-				_('The current dialogue branch contains a tag'),
+				_('Check if the current dialogue branch contains a specific tag. Tags are an alternative useful way to <<commands>> to drive game logic with the dialogue data.'),
 				_('The current dialogue branch contains a _PARAM0_ tag'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -467,7 +466,7 @@ module.exports = {
 			.addCondition(
 				'Branch has been visited before',
 				_('Branch title has been visited before'),
-				_('Branch title has been visited before'),
+				_('Check if the current branch has been visited before'),
 				_('Branch title _PARAM0_ has been visited before'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
@@ -481,8 +480,8 @@ module.exports = {
 			.addCondition(
 				'Compare dialogue state variable',
 				_('Compare dialogue state variable'),
-				_('Compare dialogue state variable'),
-				_('Branch title _PARAM0_ is equal to _PARAM1_'),
+				_('Compare dialogue state variable. Use this to trigger game events via dialogue variables.'),
+				_('Dialogue state variable _PARAM0_ is equal to _PARAM1_'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
@@ -496,7 +495,7 @@ module.exports = {
 			.addCondition(
 				'HasClippedTextScrollingCompleted',
 				_('Has clipped text scrolling completed'),
-				_('Has clipped text scrolling completed. Use this to prevent the player from going to the next dialogue line before the typing effect has revealed the entire text.'),
+				_('Check if the clipped text scrolling has completed. Use this to prevent the player from going to the next dialogue line before the typing effect has revealed the entire text.'),
 				_('Has clipped text scrolling completed'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',

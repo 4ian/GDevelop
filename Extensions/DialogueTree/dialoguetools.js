@@ -10,12 +10,10 @@ gdjs.dialogueTree.runner = new bondage.Runner();
 
 /**
  * Load the Dialogue Tree data of the game. Use this action to initialize The Dialogue Tree, so as it can be used in the game.
- * @param {gdjs.RuntimeScene} runtimeScene The scene where the dialogue is running.
  * @param {gdjs.Variable} sceneVar The variable to load the Dialogue tree data from. The data is a JSON string, created by Yarn.
  * @param {string} startDialogueNode The Dialogue Branch to start the Dialogue Tree from. If left empty, the data will only be loaded, but can later be initialized via another action
  */
 gdjs.dialogueTree.loadFromSceneVariable = function(
-  runtimeScene,
   sceneVar,
   startDialogueNode
 ) {

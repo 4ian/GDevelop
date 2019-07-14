@@ -9,11 +9,12 @@ gdjs.dialogueTree = {};
 gdjs.dialogueTree.runner = new bondage.Runner();
 
 /**
- * Load the Dialogue Tree data of the game. Use this action to initialize The Dialogue Tree, so as it can be used in the game
- * @param {gdjs.Variable} sceneVar The variable to load the Dialogue tree data from. The data is a JSON file format string - created by YARN
+ * Load the Dialogue Tree data of the game. Use this action to initialize The Dialogue Tree, so as it can be used in the game.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene where the dialogue is running.
+ * @param {gdjs.Variable} sceneVar The variable to load the Dialogue tree data from. The data is a JSON string, created by Yarn.
  * @param {string} startDialogueNode The Dialogue Branch to start the Dialogue Tree from. If left empty, the data will only be loaded, but can later be initialized via another action
  */
-gdjs.dialogueTree.loadFromSceneVar = function(
+gdjs.dialogueTree.loadFromSceneVariable = function(
   runtimeScene,
   sceneVar,
   startDialogueNode
@@ -28,8 +29,9 @@ gdjs.dialogueTree.loadFromSceneVar = function(
 };
 
 /**
- * Load the Dialogue Tree data of the game. Use this action to initialize The Dialogue Tree, so as it can be used in the game
- * @param {gdjs.Variable} jsonResourceName The json fileresource to load the Dialogue tree data from. The data is a JSON file - created by YARN
+ * Load the Dialogue Tree data of the game. Use this action to initialize The Dialogue Tree, so as it can be used in the game.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene where the dialogue is running.
+ * @param {gdjs.Variable} jsonResourceName The json fileresource to load the Dialogue tree data from. The data is a JSON string - created by Yarn.
  * @param {string} startDialogueNode The Dialogue Branch to start the Dialogue Tree from. If left empty, the data will only be loaded, but can later be initialized via another action
  */
 gdjs.dialogueTree.loadFromJsonFile = function(
@@ -55,13 +57,17 @@ gdjs.dialogueTree.loadFromJsonFile = function(
     });
 };
 
-// Condition to check if the Dialogue Tree is currentlyu parsing data. Use this to do things like disabling player movement while talking on an npc
+/**
+ * use this to check if the Dialogue Tree is currentlyu parsing data. Use this to do things like disabling player movement while talking on an npc
+ */
 gdjs.dialogueTree.isRunning = function() {
   return this.dialogueIsRunning;
 };
 
-// Action to scroll the clipped text. Use this with a timer and user input to control how fast dialogue line text is scrolling.
-gdjs.dialogueTree.scrollCippedText = function() {
+/**
+ * Scroll the clipped text. Use this with a timer and user input to control how fast dialogue line text is scrolling.
+ */
+gdjs.dialogueTree.scrollClippedText = function() {
   if (this.pauseScrolling || !this.dialogueIsRunning) return;
 
   if (this.dialogueText) {
@@ -69,31 +75,38 @@ gdjs.dialogueTree.scrollCippedText = function() {
   }
 };
 
-// Condition to check if text scrolling has completed.
-// Use this action to prevent the user from skipping to next line before the current one has been printed fully
-gdjs.dialogueTree.cippedTextScrollingHasCompleted = function() {
+/**
+ * use this to check if text scrolling has completed and to prevent the user from skipping to next line before the current one has been printed fully.
+ */
+gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
   if (this.dialogueData && this.dialogueText.length) {
     return this.clipTextEnd >= this.dialogueText.length;
   }
   return false;
 };
 
-// Expression to get the current dialogue line with a scrolling effect (recommended)
-// Use this with the scrollCippedText action to achieve a classing scrolling text,as well as any <<wait>> effects to pause scrolling
+/**
+ * use this to get the current dialogue line with a scrolling effect (recommended)
+ * Use this with the scrollClippedText to achieve a classing scrolling text,as well as any <<wait>> effects to pause scrolling
+ */
 gdjs.dialogueTree.getClippedLineText = function() {
   return this.dialogueText.length
     ? this.dialogueText.substring(0, this.clipTextEnd)
     : "";
 };
 
-// Expression to get the current complete dialogue line without using any scrolling effects.
-// Note that using this instead getClippedLineText will skip any <<wait>> commands entirely.
+/**
+ * Use this to get the current complete dialogue line without using any scrolling effects.
+ * Note that using this instead getClippedLineText will skip any <<wait>> commands entirely.
+ */
 gdjs.dialogueTree.getLineText = function() {
   this.clipTextEnd = this.dialogueText.length;
   return this.dialogueText.length ? this.dialogueText : "";
 };
 
-// Expression to get the number of command parameters in a command with parameters that has been caught by a commandIsCalled condition
+/**
+ * use this to get the number of command parameters in a command with parameters that has been caught by a isCommandCalled condition
+ */
 gdjs.dialogueTree.commandParametersCount = function() {
   if (this.commandParameters && this.commandParameters.length > 1) {
     return this.commandParameters.length - 1;
@@ -102,7 +115,7 @@ gdjs.dialogueTree.commandParametersCount = function() {
 };
 
 /**
- * Expression to get a command parameter in any command with parameters that has been caugth by a commandIsCalled condition
+ * use this to get a command parameter in any command with parameters that has been caugth by a isCommandCalled condition
  * @param {number} paramIndex The index of the parameter you want to get. If left empty, the expression will get the first parameter by default.
  */
 gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
@@ -117,11 +130,11 @@ gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
 };
 
 /**
- * Condition to catch <<commands>> and <<commands with parameters>> from the current Dialogue Line.
+ * use this to catch <<commands>> and <<commands with parameters>> from the current Dialogue Line.
  * Use this to trigger events in the event sheet that relate to the story you are telling throught the dialogue.
  * @param {string} command The command you want to check for being called. Write it without the <<>>
  */
-gdjs.dialogueTree.commandIsCalled = function(command) {
+gdjs.dialogueTree.isCommandCalled = function(command) {
   var { commandCalls, clipTextEnd, dialogueText } = gdjs.dialogueTree;
 
   if (this.pauseScrolling || !commandCalls) return false;
@@ -132,7 +145,7 @@ gdjs.dialogueTree.commandIsCalled = function(command) {
       setTimeout(function() {
         gdjs.dialogueTree.pauseScrolling = false;
         commandCalls.splice(index, 1);
-      }, parseInt(call.params[1]));
+      }, parseInt(call.params[1], 10));
     }
     if (call.cmd === command) {
       gdjs.dialogueTree.commandParameters = call.params;
@@ -142,14 +155,18 @@ gdjs.dialogueTree.commandIsCalled = function(command) {
   });
 };
 
-// Internal method to allow for capping option selection
+/**
+ * Internal method to allow for capping option selection
+ */
 gdjs.dialogueTree._normalizedOptionIndex = function(optionIndex) {
   if (optionIndex >= this.options.length) optionIndex = this.options.length - 1;
   if (optionIndex < 0) optionIndex = 0;
   return optionIndex;
 };
 
-// Internal method to allow for cycling option selection
+/**
+ * Internal method to allow for cycling option selection
+ */
 gdjs.dialogueTree._cycledOptionIndex = function(optionIndex) {
   if (optionIndex >= this.options.length) optionIndex = 0;
   if (optionIndex < 0) optionIndex = this.options.length - 1;
@@ -157,8 +174,8 @@ gdjs.dialogueTree._cycledOptionIndex = function(optionIndex) {
 };
 
 /**
- * Expression to get the text of an option the player can select.
- * Use this with lineOptionsCount to render options for the player when a line of the Options type is parsed
+ * use this to get the text of an option the player can select.
+ * Use this with getLineOptionsCount to render options for the player when a line of the Options type is parsed
  * @param {number} optionIndex The index of the option you want to get
  */
 gdjs.dialogueTree.getLineOption = function(optionIndex) {
@@ -167,86 +184,104 @@ gdjs.dialogueTree.getLineOption = function(optionIndex) {
   return this.options[optionIndex];
 };
 
-// Expression to get the number of options that are presented to the player during the parsing of an Options type line
-gdjs.dialogueTree.lineOptionsCount = function() {
+/**
+ * use this to get the number of options that are presented to the player during the parsing of an Options type line
+ */
+gdjs.dialogueTree.getLineOptionsCount = function() {
   if (this.options.length) {
     return this.optionsCount;
   }
+  return 0;
 };
 
-// Action to confirm the currently selected by the plyer option during Options type line parsing.
-// This will advance the dialogue tree to whichever dialogue branch was selected by the player
+/**
+ * Use this to confirm the currently selected by the plyer option during Options type line parsing.
+ * This will advance the dialogue tree to whichever dialogue branch was selected by the player
+ */
 gdjs.dialogueTree.confirmSelectOption = function() {
   if (
     this.dialogueData.select &&
     !this.selectedOptionUpdated &&
-    this.selectOption !== -1
+    this.selectedOption !== -1
   ) {
     this.commandCalls = [];
-    this.dialogueData.select(this.selectOption);
+    this.dialogueData.select(this.selectedOption);
     this.dialogueData = this.dialogue.next().value;
     gdjs.dialogueTree.advanceDialogue();
   }
 };
 
-// Action to Select next option during Options type line parsing. Hook this to your game input
+/**
+ * Use this to Select next option during Options type line parsing. Hook this to your game input
+ */
 gdjs.dialogueTree.selectNextOption = function() {
   if (this.dialogueData.select) {
-    this.selectOption += 1;
-    this.selectOption = gdjs.dialogueTree._cycledOptionIndex(this.selectOption);
-    this.selectedOptionUpdated = true;
-  }
-};
-
-// Action to Select previous option during Options type line parsing. Hook this to your game input
-gdjs.dialogueTree.selectPreviousOption = function() {
-  if (this.dialogueData.select) {
-    this.selectOption -= 1;
-    this.selectOption = gdjs.dialogueTree._cycledOptionIndex(this.selectOption);
-    this.selectedOptionUpdated = true;
-  }
-};
-
-/**
- * Action to Select option by index during Options type line parsing.
- * @param {number} optionIndex The index of the option you want to select
- */
-gdjs.dialogueTree.selectOption = function(optionIndex) {
-  if (this.dialogueData.select) {
-    this.selectOption = gdjs.dialogueTree._normalizedOptionIndex(
-      this.selectOption
+    this.selectedOption += 1;
+    this.selectedOption = gdjs.dialogueTree._cycledOptionIndex(
+      this.selectedOption
     );
     this.selectedOptionUpdated = true;
   }
 };
 
-// Expression to get the currently selected option
-gdjs.dialogueTree.getSelectOption = function() {
+/**
+ * Use this to Select previous option during Options type line parsing. Hook this to your game input
+ */
+gdjs.dialogueTree.selectPreviousOption = function() {
   if (this.dialogueData.select) {
-    return this.selectOption;
+    this.selectedOption -= 1;
+    this.selectedOption = gdjs.dialogueTree._cycledOptionIndex(
+      this.selectedOption
+    );
+    this.selectedOptionUpdated = true;
   }
 };
 
-// Condition to check when the player has changed option selection.
-// Use this to re-render your displayed dialogue options when needed.
-gdjs.dialogueTree.selectedOptionHasUpdated = function() {
+/**
+ * Use this to Select option by index during Options type line parsing.
+ * @param {number} optionIndex The index of the option you want to select
+ */
+gdjs.dialogueTree.selectOption = function(optionIndex) {
+  if (this.dialogueData.select) {
+    this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
+      this.selectedOption
+    );
+    this.selectedOptionUpdated = true;
+  }
+};
+
+/**
+ * use this to get the currently selected option
+ */
+gdjs.dialogueTree.getSelectedOption = function() {
+  if (this.dialogueData.select) {
+    return this.selectedOption;
+  }
+  return 0;
+};
+
+/**
+ * use this to check when the player has changed option selection.
+ * Use this to re-render your displayed dialogue options when needed.
+ */
+gdjs.dialogueTree.hasSelectedOptionChanged = function() {
   if (this.selectedOptionUpdated) {
     this.selectedOptionUpdated = false;
-    if (this.selectOption === -1) this.selectOption = 0;
+    if (this.selectedOption === -1) this.selectedOption = 0;
     return true;
   }
   return false;
 };
 
 /**
- * Condition to check the type of the Dialogue Line that is being displayed to the player at the moment.
+ * use this to check the type of the Dialogue Line that is being displayed to the player at the moment.
  * There are three types:
  * - text - regular dialogue text is being parsed at the moment
  * - options - the player has reached a branching choise moment where they must select one of multiple options
  * - command - a <<command>> was called in the background, that can be used to trigger game events, but will not be displayed in the dialogue box.
  * @param {string} type The type you want to check for ( one of the three above )
  */
-gdjs.dialogueTree.compareDialogueLineType = function(type) {
+gdjs.dialogueTree.isDialogueLineType = function(type) {
   if (
     this.commandCalls &&
     this.commandCalls.some(function(call) {
@@ -259,10 +294,10 @@ gdjs.dialogueTree.compareDialogueLineType = function(type) {
 };
 
 /**
- * Condition to check if a branch exists. It is also used internaly whenever you use the start from action.
+ * use this to check if a branch exists. It is also used internaly whenever you use the start from action.
  * @param {string} branchName The Dialogue Branch name you want to check.
  */
-gdjs.dialogueTree.dialogueContainsBranch = function(branchName) {
+gdjs.dialogueTree.hasDialogueBranch = function(branchName) {
   return (
     this.runner &&
     this.runner.yarnNodes &&
@@ -273,13 +308,13 @@ gdjs.dialogueTree.dialogueContainsBranch = function(branchName) {
 };
 
 /**
- * Action to start parsing dialogue from a specified Dialogue tree branch.
+ * Use this to start parsing dialogue from a specified Dialogue tree branch.
  * Use this if you want to store multiple dialogues inside a single Dialogue tree data set.
  * @param {string} startDialogueNode The Dialogue Branch name you want to start parsing from.
  */
 gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   this.runner = gdjs.dialogueTree.runner;
-  if (!this.dialogueContainsBranch(startDialogueNode)) return;
+  if (!this.hasDialogueBranch(startDialogueNode)) return;
   this.optionsCount = 0;
   this.options = [];
   this.dialogueBranchTitle = "";
@@ -298,7 +333,9 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   gdjs.dialogueTree.advanceDialogue();
 };
 
-// Internal methods to check the type of a Dialogue Line
+/**
+ * Internal methods to check the type of a Dialogue Line
+ */
 gdjs.dialogueTree._lineTypeIsText = function() {
   return this.dialogueData instanceof bondage.TextResult;
 };
@@ -309,14 +346,16 @@ gdjs.dialogueTree._lineTypeIsCommand = function() {
   return this.dialogueData instanceof bondage.CommandResult;
 };
 
-// This is the main lifecycle function.It runs once only when the user is advancing the dialogue to the next line.
-// Use this Action to progress Dialogue to the next line. Hook it to your game input.
-// Note that this action can be influenced by any <<wait>> commands, but they work only if you have at least one commandIsCalled condition.
+/**
+ * This is the main lifecycle function.It runs once only when the user is advancing the dialogue to the next line.
+ * Use this to progress Dialogue to the next line. Hook it to your game input.
+ * Note that this action can be influenced by any <<wait>> commands, but they work only if you have at least one isCommandCalled condition.
+ */
 gdjs.dialogueTree.advanceDialogue = function() {
   if (this.pauseScrolling || !this.dialogueIsRunning) return;
 
   this.optionsCount = 0;
-  this.selectOption = -1;
+  this.selectedOption = -1;
   this.selectedOptionUpdated = false;
 
   if (gdjs.dialogueTree._lineTypeIsText()) {
@@ -374,7 +413,9 @@ gdjs.dialogueTree.advanceDialogue = function() {
   }
 };
 
-// Expression to get the current Dialogue Tree branch title
+/**
+ * use this to get the current Dialogue Tree branch title
+ */
 gdjs.dialogueTree.getBranchTitle = function() {
   if (this.dialogueIsRunning) {
     return this.dialogueBranchTitle;
@@ -383,7 +424,7 @@ gdjs.dialogueTree.getBranchTitle = function() {
 };
 
 /**
- * Condition to check if the currently parsed Dialogue branch title is a  query.
+ * use this to check if the currently parsed Dialogue branch title is a  query.
  * @param {string} title The Dialogue Branch name you want to check for.
  */
 gdjs.dialogueTree.branchTitleIs = function(title) {
@@ -393,7 +434,9 @@ gdjs.dialogueTree.branchTitleIs = function(title) {
   return false;
 };
 
-// expression to get all the branch tags from the current Dialogue branch as a string. Useful for debugging.
+/**
+ * use this to get all the branch tags from the current Dialogue branch as a string. Useful for debugging.
+ */
 gdjs.dialogueTree.getBranchTags = function() {
   if (this.dialogueIsRunning) {
     return this.dialogueBranchTags.join(",");
@@ -402,7 +445,7 @@ gdjs.dialogueTree.getBranchTags = function() {
 };
 
 /**
- * Expression to get one of the current Dialogue branch tags via index.
+ * use this to get one of the current Dialogue branch tags via index.
  * @param {number} index The index of the Dialogue Branch tag you want to get.
  */
 gdjs.dialogueTree.getBranchTag = function(index) {
@@ -415,7 +458,7 @@ gdjs.dialogueTree.getBranchTag = function(index) {
 };
 
 /**
- * Condition to check if the current Dialogue branch contains a specific tag.
+ * use this to check if the current Dialogue branch contains a specific tag.
  * @param {string} query The name of the Dialogue Branch tag you want to check.
  */
 gdjs.dialogueTree.branchContainsTag = function(query) {
@@ -431,7 +474,7 @@ gdjs.dialogueTree.branchContainsTag = function(query) {
 };
 
 /**
- * Expression to get any tag(parameter,anotherParameter) from a tag captured by the branchContainsTag Condition
+ * use this to get any tag(parameter,anotherParameter) from a tag captured by the branchContainsTag Condition
  * @param {number} paramIndex The index of the tag parameter you want to get.
  * Leaving this empty will result in retrieving the first parameter.
  */
@@ -443,7 +486,9 @@ gdjs.dialogueTree.getTagParameter = function(paramIndex) {
   return "";
 };
 
-// Expression to get a list of all the titles of visited by the player Branches. Useful for debugging.
+/**
+ * use this to get a list of all the titles of visited by the player Branches. Useful for debugging.
+ */
 gdjs.dialogueTree.getVisitedBranchTitles = function() {
   if (this.dialogueIsRunning) {
     return Object.keys(this.runner.visited).join(",");
@@ -452,7 +497,7 @@ gdjs.dialogueTree.getVisitedBranchTitles = function() {
 };
 
 /**
- * Condition to check if a player has visited a Dialogue Branch in the past.
+ * use this to check if a player has visited a Dialogue Branch in the past.
  * @param {string} title The title of the branch to check for.
  * Leaving this empty will check if the current branch title has been visited in the past.
  */
@@ -464,7 +509,9 @@ gdjs.dialogueTree.branchTitleHasBeenVisited = function(title) {
   );
 };
 
-// Expression to get the entire unparsed text of the current Dialogue Branch
+/**
+ * use this to get the entire unparsed text of the current Dialogue Branch
+ */
 gdjs.dialogueTree.getBranchText = function() {
   if (this.dialogueIsRunning) {
     return this.dialogueBranchBody;
@@ -473,7 +520,7 @@ gdjs.dialogueTree.getBranchText = function() {
 };
 
 /**
- * Expression to get the value of a variable that was created by the Dialogue parses.
+ * use this to get the value of a variable that was created by the Dialogue parses.
  * @param {string} key The name of the variable you want to get the value of
  */
 gdjs.dialogueTree.getVariable = function(key) {
@@ -484,7 +531,7 @@ gdjs.dialogueTree.getVariable = function(key) {
 };
 
 /**
- * Condition to check if a specific variable created by the Dialogue parses exists and is equal to a specific value.
+ * use this to check if a specific variable created by the Dialogue parses exists and is equal to a specific value.
  * @param {string} key The name of the variable you want to check the value of
  * @param {string} value The value you want to check against
  */
@@ -496,7 +543,7 @@ gdjs.dialogueTree.compareVariable = function(key, value) {
 };
 
 /**
- * Action to Set a specific variable created by the Dialogue parser to a specific value.
+ * Use this to Set a specific variable created by the Dialogue parser to a specific value.
  * @param {string} key The name of the variable you want to set the value of
  * @param {string} value The value you want to set
  */
@@ -507,7 +554,7 @@ gdjs.dialogueTree.setVariable = function(key, value) {
 };
 
 /**
- * Command to store the current State of the Dialogue Parser in a specified variable.
+ * Use this to store the current State of the Dialogue Parser in a specified variable.
  * Use this to implement persistence in dialogue through your game's Load/Save function.
  * That way you can later load all the dialogue choices the player has made.
  * @param {gdjs.Variable} storeVar The variable where to store the State
@@ -522,7 +569,7 @@ gdjs.dialogueTree.saveState = function(storeVar) {
 };
 
 /**
- * Command to load the current State of the Dialogue Parser from a specified variable.
+ * Use this to load the current State of the Dialogue Parser from a specified variable.
  * Use this to implement persistence in dialogue through your game's Load/Save function.
  * That way you can later load all the dialogue choices the player has made.
  * @param {gdjs.Variable} storeVar The variable where to load the State from.

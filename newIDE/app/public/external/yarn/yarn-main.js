@@ -28,12 +28,17 @@ window.addEventListener('yarnReady', e => {
 editorFrameEl.src = 'yarn-editor/app/index.html';
 
 // Called to load a sound. Should be called after the window is fully loaded.
+let receivedData
 ipcRenderer.on('yarn-open', (event, receivedOptions) => {
-  console.log('ready!',receivedOptions);
+  // console.log('ready!',receivedOptions);
   if (!yarn) return;
-  console.log(yarn);
+  // console.log(yarn);
+  yarn.editingPath(receivedOptions.resourcePath);
+	yarn.editingType('json');
   yarn.loadData(receivedOptions.yarnData, 'json', true)
-  // yarn.openFile(null, receivedOptions.resourcePath, false)
+  receivedData = receivedOptions;
+
+  
 });
 
 // const loadMetaData = externalEditorData => {

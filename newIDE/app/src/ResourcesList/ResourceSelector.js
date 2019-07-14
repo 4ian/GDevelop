@@ -155,7 +155,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
-    console.log(project);
     let initialResourceMetadata = {};
     const initialResourceMetadataRaw = initialResource.getMetadata();
     if (initialResourceMetadataRaw) {
@@ -212,14 +211,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
       resourceExternalEditor.edit(externalEditorOptions);
     } else if (resourceKind === 'json') {
       
-      const jsonContents = loadTextFile(project, resourceName);
-      console.log(jsonContents);
+      console.log(resourceName);
+      const externalEditorData = loadTextFile(project, resourceName);
       const externalEditorOptions = {
         project,
         resourcesLoader,
         resourceNames: [resourceName],
         extraOptions: {
-          jsonContents,
+          externalEditorData,
           initialResourceMetadata,
         },
         onChangesSaved: (newResourceData, newResourceName) => {
@@ -242,7 +241,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const externalEditors = this.props.resourceExternalEditors.filter(
       externalEditor => externalEditor.kind === this.props.resourceKind
     );
-
     return (
       <div style={styles.container}>
         <SemiControlledAutoComplete

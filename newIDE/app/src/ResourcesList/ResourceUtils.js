@@ -125,8 +125,10 @@ export const applyResourceDefaults = (
 
 export const loadTextFile = (
   project: gdProject,
-  name: string
+  newResource: string
 ) => {
-  const path = getLocalResourceFullPath(project, name);
+  if (getResourceFilePathStatus(project,newResource) === 'error') return null;
+  const path = getLocalResourceFullPath(project, newResource);
+  
   return  fs.readFileSync(path,'utf8').toString();
 };

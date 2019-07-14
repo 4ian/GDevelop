@@ -31,7 +31,8 @@ export const openYarn = ({
 
   const externalEditorData = {
     resourcePath: initialResourcePath,
-    yarnData: extraOptions.jsonContents,
+    // $FlowFixMe - TODO: There is an error here to be solved.
+    externalEditorData: extraOptions.externalEditorData,
     projectPath,
   };
 
@@ -41,7 +42,7 @@ export const openYarn = ({
     (event, newFilePath, externalEditorData) => {
       const resourceName = path.relative(projectPath, newFilePath);
       console.log(resourceName);
-      // createOrUpdateResource(project, new gd.AudioResource(), resourceName);
+      createOrUpdateResource(project, new gd.JsonResource(), resourceName);
 
       // const metadata = {
       //   yarn: externalEditorData,

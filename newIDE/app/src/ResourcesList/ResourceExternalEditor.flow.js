@@ -24,6 +24,7 @@ export type ExternalEditorOpenOptions = {|
     name?: string,
     isLooping?: boolean,
     fps?: number,
+    externalEditorData?: any,
   },
 |};
 

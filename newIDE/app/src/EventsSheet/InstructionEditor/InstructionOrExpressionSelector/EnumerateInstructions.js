@@ -174,23 +174,7 @@ export const enumerateObjectInstructions = (
       continue;
     }
 
-    // const prefix =
-    //   extension.getName() === 'BuiltinObject'
-    //     ? 'Common ' +
-    //       (isCondition ? 'conditions' : 'actions') +
-    //       ' for all objects' +
-    //       GROUP_DELIMITER
-    //     : '';
     const prefix = '';
-
-    //Free instructions
-    // allInstructions = [
-    //   ...allInstructions,
-    //   ...enumerateExtensionInstructions(
-    //     prefix,
-    //     isCondition ? extension.getAllConditions() : extension.getAllActions()
-    //   ),
-    // ];
 
     //Objects instructions:
     if (hasObjectType) {
@@ -221,17 +205,17 @@ export const enumerateObjectInstructions = (
       ];
     }
 
-    //Behaviors instructions:
+    //Behaviors instructions (show them at the top of the list):
     // eslint-disable-next-line
     behaviorTypes.forEach(behaviorType => {
       allInstructions = [
-        ...allInstructions,
         ...enumerateExtensionInstructions(
           prefix,
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType)
         ),
+        ...allInstructions,
       ];
     });
   }
@@ -242,8 +226,6 @@ export const enumerateObjectInstructions = (
 /**
  * Enumerate all the instructions that are not directly tied
  * to an object.
- *
- * @param {*} isCondition
  */
 export const enumerateFreeInstructions = (
   isCondition: boolean
@@ -262,9 +244,7 @@ export const enumerateFreeInstructions = (
     if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
       prefix =
         extension.getName() === 'BuiltinObject'
-          ? 'Common ' +
-            (isCondition ? 'conditions' : 'actions') +
-            ' for all objects'
+          ? ''
           : extension.getFullName();
       prefix += GROUP_DELIMITER;
     }

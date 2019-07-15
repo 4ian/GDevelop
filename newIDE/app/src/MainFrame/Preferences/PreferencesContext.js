@@ -20,6 +20,7 @@ export type PreferencesValues = {|
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
+  useNewInstructionEditorDialog: boolean,
 |};
 
 export type Preferences = {|
@@ -34,6 +35,7 @@ export type Preferences = {|
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
+  setUseNewInstructionEditorDialog: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -47,6 +49,7 @@ export const initialPreferences = {
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
+    useNewInstructionEditorDialog: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -58,6 +61,7 @@ export const initialPreferences = {
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
+  setUseNewInstructionEditorDialog: (enabled: boolean) => {},
 };
 
 const PreferencesContext: Context<Preferences> = createReactContext(

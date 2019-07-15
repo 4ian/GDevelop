@@ -2,6 +2,7 @@
 import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
+import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
@@ -803,6 +804,62 @@ export default class EventsSheet extends React.Component<Props, State> {
     this._saveChangesToHistory();
   };
 
+  _renderInstructionEditorDialog = (newInstructionEditorDialog: boolean) => {
+    const {
+      project,
+      scope,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
+
+    const Dialog = newInstructionEditorDialog ?
+    NewInstructionEditorDialog : InstructionEditorDialog;
+
+    return this.state.editedInstruction.instruction ? (
+      <Dialog
+        project={project}
+        scope={scope}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
+        instruction={this.state.editedInstruction.instruction}
+        isCondition={this.state.editedInstruction.isCondition}
+        isNewInstruction={
+          this.state.editedInstruction.indexInList === undefined
+        }
+        open={true}
+        onCancel={() => this.closeInstructionEditor()}
+        onSubmit={() => {
+          const {
+            instrsList,
+            instruction,
+            indexInList,
+          } = this.state.editedInstruction;
+          if (!instrsList) return;
+
+          if (indexInList !== undefined) {
+            // Replace an existing instruction
+            instrsList.set(indexInList, instruction);
+          } else {
+            // Add a new instruction
+            instrsList.insert(instruction, instrsList.size());
+          }
+
+          this.closeInstructionEditor(true);
+          ensureSingleOnceInstructions(instrsList);
+          if (this._eventsTree)
+            this._eventsTree.forceEventsUpdate();
+        }}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
+        resourceExternalEditors={this.props.resourceExternalEditors}
+        openInstructionOrExpression={(extension, type) => {
+          this.closeInstructionEditor();
+          this.props.openInstructionOrExpression(extension, type);
+        }}
+      />
+    ) : undefined;
+  }
+
   render() {
     const {
       project,
@@ -1082,49 +1139,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                     },
                   ]}
                 />
-                {this.state.editedInstruction.instruction && (
-                  <NewInstructionEditorDialog
-                    project={project}
-                    scope={scope}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    instruction={this.state.editedInstruction.instruction}
-                    isCondition={this.state.editedInstruction.isCondition}
-                    isNewInstruction={
-                      this.state.editedInstruction.indexInList === undefined
-                    }
-                    open={true}
-                    onCancel={() => this.closeInstructionEditor()}
-                    onSubmit={() => {
-                      const {
-                        instrsList,
-                        instruction,
-                        indexInList,
-                      } = this.state.editedInstruction;
-                      if (!instrsList) return;
-
-                      if (indexInList !== undefined) {
-                        // Replace an existing instruction
-                        instrsList.set(indexInList, instruction);
-                      } else {
-                        // Add a new instruction
-                        instrsList.insert(instruction, instrsList.size());
-                      }
-
-                      this.closeInstructionEditor(true);
-                      ensureSingleOnceInstructions(instrsList);
-                      if (this._eventsTree)
-                        this._eventsTree.forceEventsUpdate();
-                    }}
-                    resourceSources={this.props.resourceSources}
-                    onChooseResource={this.props.onChooseResource}
-                    resourceExternalEditors={this.props.resourceExternalEditors}
-                    openInstructionOrExpression={(extension, type) => {
-                      this.closeInstructionEditor();
-                      this.props.openInstructionOrExpression(extension, type);
-                    }}
-                  />
-                )}
+                {this._renderInstructionEditorDialog(values.useNewInstructionEditorDialog)}
                 {this.state.analyzedEventsContextResult && (
                   <EventsContextAnalyzerDialog
                     onClose={this._closeEventsContextAnalyzer}

@@ -61,7 +61,7 @@ type State = {|
   chosenObjectInstructionsInfoTree: ?InstructionOrExpressionTreeNode,
 |};
 
-export default class InstructionEditorDialog extends React.Component<
+export default class NewInstructionEditorDialog extends React.Component<
   Props,
   State
 > {
@@ -72,7 +72,7 @@ export default class InstructionEditorDialog extends React.Component<
   };
   _instructionParametersEditor: ?InstructionParametersEditor;
 
-  chooseInstruction = (type: string) => {
+  _chooseInstruction = (type: string) => {
     const { instruction } = this.props;
     instruction.setType(type);
     this.forceUpdate(() => {
@@ -82,7 +82,7 @@ export default class InstructionEditorDialog extends React.Component<
     });
   };
 
-  chooseObject = (objectName: string) => {
+  _chooseObject = (objectName: string) => {
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -103,6 +103,19 @@ export default class InstructionEditorDialog extends React.Component<
       ),
     });
   };
+
+  _back = () => {
+    this.props.instruction.setType('');
+    if (this.state.chosenObjectName) {
+      this.setState({
+        chosenObjectName: null,
+        chosenObjectInstructionsInfo: null,
+        chosenObjectInstructionsInfoTree: null,
+      });
+    } else {
+      this.forceUpdate();
+    }
+  }
 
   // TOOD: This was copied from InstructionParametersEditor. Move this to a helper
   // or pass it down.
@@ -146,6 +159,8 @@ export default class InstructionEditorDialog extends React.Component<
       ? instructionMetadata.getHelpPath()
       : undefined;
 
+    const isFirstStep = instructionType || chosenObjectName;
+
     return (
       <Dialog
         actions={[
@@ -165,6 +180,14 @@ export default class InstructionEditorDialog extends React.Component<
           />,
         ]}
         secondaryActions={[
+          isFirstStep ? (
+            <FlatButton
+              label={<Trans>Back</Trans>}
+              primary={false}
+              onClick={this._back}
+              key="back"
+            />
+          ) : null,
           <HelpButton
             key="help"
             helpPagePath={instructionHelpPage || '/events'}
@@ -184,7 +207,7 @@ export default class InstructionEditorDialog extends React.Component<
         contentStyle={styles.dialogContent}
         bodyStyle={styles.dialogBody}
       >
-        {!instructionType && !chosenObjectName && (
+        {!isFirstStep && (
           <Column expand noMargin>
             <InstructionOrObjectSelector
               style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
@@ -193,13 +216,13 @@ export default class InstructionEditorDialog extends React.Component<
               objectsContainer={objectsContainer}
               isCondition={isCondition}
               selectedType={instructionType}
-              onChooseInstruction={this.chooseInstruction}
-              onChooseObject={this.chooseObject}
+              onChooseInstruction={this._chooseInstruction}
+              onChooseObject={this._chooseObject}
               focusOnMount={!instructionType}
             />
           </Column>
         )}
-        {(instructionType || chosenObjectName) && (
+        {isFirstStep && (
           <Line expand noMargin>
             {chosenObjectName &&
               chosenObjectInstructionsInfoTree &&
@@ -209,7 +232,7 @@ export default class InstructionEditorDialog extends React.Component<
                     instructionsInfo={chosenObjectInstructionsInfo}
                     instructionsInfoTree={chosenObjectInstructionsInfoTree}
                     iconSize={24}
-                    onChoose={this.chooseInstruction}
+                    onChoose={this._chooseInstruction}
                     selectedType={instructionType}
                     useSubheaders
                   />

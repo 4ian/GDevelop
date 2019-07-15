@@ -136,16 +136,13 @@ export default class InstructionOrExpressionSelector extends React.Component<
           return (
             <ListItem
               key={key}
-              style={{
-                borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-              }}
               nestedListStyle={styles.groupListItemNestedList}
               primaryText={
                 <div
                   style={{
                     color: isDeprecated
                       ? muiTheme.listItem.deprecatedGroupTextColor
-                      : muiTheme.listItem.groupTextColor,
+                      : undefined,
                   }}
                 >
                   {key}

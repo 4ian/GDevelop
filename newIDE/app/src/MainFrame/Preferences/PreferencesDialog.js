@@ -67,6 +67,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             setAutoDisplayChangelog,
             setEventsSheetShowObjectThumbnails,
             setAutosaveOnPreview,
+            setUseNewInstructionEditorDialog
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -154,6 +155,14 @@ export default class PreferencesDialog extends Component<Props, State> {
                     toggled={values.autosaveOnPreview}
                     labelPosition="right"
                     label={<Trans>Auto-save project on Preview</Trans>}
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) => setUseNewInstructionEditorDialog(check)}
+                    toggled={values.useNewInstructionEditorDialog}
+                    labelPosition="right"
+                    label={<Trans>Use the new action/condition editor</Trans>}
                   />
                 </Line>
                 <Line>

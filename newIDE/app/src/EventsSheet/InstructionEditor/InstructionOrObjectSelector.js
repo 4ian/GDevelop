@@ -11,6 +11,7 @@ import SearchBar from 'material-ui-search-bar/lib/components/SearchBar';
 import ListIcon from '../../UI/ListIcon';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import { Subheader } from 'material-ui';
 import { Trans } from '@lingui/macro';
 import { enumerateObjectsAndGroups } from '../../ObjectsList/EnumerateObjects';
@@ -28,6 +29,12 @@ const styles = {
   },
 };
 
+type TabNames = 'objects' | 'free-instructions';
+
+type State = {|
+  currentTab: TabNames,
+|};
+
 type Props = {|
   project: gdProject,
   globalObjectsContainer: gdObjectsContainer,
@@ -35,7 +42,10 @@ type Props = {|
   isCondition: boolean,
   focusOnMount?: boolean,
   selectedType: string,
-  onChooseInstruction: (type: string, InstructionOrExpressionInformation) => void,
+  onChooseInstruction: (
+    type: string,
+    InstructionOrExpressionInformation
+  ) => void,
   onChooseObject: (objectName: string) => void,
   style?: Object,
 |};
@@ -109,8 +119,10 @@ const renderInstructionTree = (
 
 export default class InstructionOrObjectSelector extends Component<
   Props,
-  {||}
+  State
 > {
+  state = { currentTab: 'objects' };
+
   instructionsInfo: Array<InstructionOrExpressionInformation> = enumerateFreeInstructions(
     this.props.isCondition
   );
@@ -131,7 +143,9 @@ export default class InstructionOrObjectSelector extends Component<
       project,
       onChooseInstruction,
       onChooseObject,
+      isCondition,
     } = this.props;
+    const { currentTab } = this.state;
 
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
       globalObjectsContainer,
@@ -160,66 +174,94 @@ export default class InstructionOrObjectSelector extends Component<
               style={styles.searchBar}
               // ref={searchBar => (this._searchBar = searchBar)} TODO
             />
-            <ScrollView>
-            <SelectableList value={selectedType}>
-              {/* TODO: search/tags */}
-              <Subheader>
-                <Trans>Objects</Trans>
-              </Subheader>
-              {allObjectsList.map(objectWithContext => {
-                const objectName = objectWithContext.object.getName();
-                return (
-                  <ListItem
-                    key={objectName}
-                    primaryText={objectName}
-                    value={objectName}
-                    leftIcon={
-                      <ListIcon
-                        iconSize={iconSize}
-                        src={ObjectsRenderingService.getThumbnail(
-                          project,
-                          objectWithContext.object
-                        )}
+
+            <Tabs
+              value={currentTab}
+              onChange={(currentTab: TabNames) =>
+                this.setState({
+                  currentTab,
+                })
+              }
+            >
+              <Tab
+                label={<Trans>Objects</Trans>}
+                value={('objects': TabNames)}
+              />
+              <Tab
+                label={
+                  isCondition ? (
+                    <Trans>Non-objects and other conditions</Trans>
+                  ) : (
+                    <Trans>Non-objects and other actions</Trans>
+                  )
+                }
+                value={('free-instructions': TabNames)}
+              >
+                {/* Manually display tabs to support flex */}
+              </Tab>
+            </Tabs>
+            {currentTab === 'objects' && (
+              <ScrollView>
+                <SelectableList value={selectedType}>
+                  {/* TODO: search/tags */}
+                  {allObjectsList.map(objectWithContext => {
+                    const objectName = objectWithContext.object.getName();
+                    return (
+                      <ListItem
+                        key={objectName}
+                        primaryText={objectName}
+                        value={objectName}
+                        leftIcon={
+                          <ListIcon
+                            iconSize={iconSize}
+                            src={ObjectsRenderingService.getThumbnail(
+                              project,
+                              objectWithContext.object
+                            )}
+                          />
+                        }
+                        onClick={() => {
+                          onChooseObject(objectName);
+                        }}
                       />
-                    }
-                    onClick={() => {
-                      onChooseObject(objectName)
-                    }}
-                  />
-                );
-              })}
-              <Subheader>
-                <Trans>Object groups</Trans>
-              </Subheader>
-              {allGroupsList.map(groupWithContext => {
-                const groupName = groupWithContext.group.getName();
-                return (
-                  <ListItem
-                    key={groupName}
-                    primaryText={groupName}
-                    value={groupName}
-                    leftIcon={
-                      <ListIcon
-                        iconSize={iconSize}
-                        src={'res/ribbon_default/objectsgroups64.png'}
+                    );
+                  })}
+                  <Subheader>
+                    <Trans>Object groups</Trans>
+                  </Subheader>
+                  {allGroupsList.map(groupWithContext => {
+                    const groupName = groupWithContext.group.getName();
+                    return (
+                      <ListItem
+                        key={groupName}
+                        primaryText={groupName}
+                        value={groupName}
+                        leftIcon={
+                          <ListIcon
+                            iconSize={iconSize}
+                            src={'res/ribbon_default/objectsgroups64.png'}
+                          />
+                        }
+                        onClick={() => {
+                          onChooseObject(groupName);
+                        }}
                       />
-                    }
-                    onClick={() => {
-                      onChooseObject(groupName)
-                    }}
-                  />
-                );
-              })}
-              <Subheader>
-                <Trans>Other conditions</Trans>
-              </Subheader>
-              {renderInstructionTree(
-                muiTheme,
-                this.instructionsInfoTree,
-                onChooseInstruction
-              )}
-            </SelectableList>
-            </ScrollView>
+                    );
+                  })}
+                </SelectableList>
+              </ScrollView>
+            )}
+            {currentTab === 'free-instructions' && (
+              <ScrollView>
+                <SelectableList value={selectedType}>
+                  {renderInstructionTree(
+                    muiTheme,
+                    this.instructionsInfoTree,
+                    onChooseInstruction
+                  )}
+                </SelectableList>
+              </ScrollView>
+            )}
           </div>
         )}
       </ThemeConsumer>

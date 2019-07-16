@@ -452,7 +452,7 @@ gdjs.dialogueTree.getBranchTags = function() {
  * @param {number} index The index of the Dialogue Branch tag you want to get.
  */
 gdjs.dialogueTree.getBranchTag = function(index) {
-  if (this.dialogueIsRunning) {
+  if (this.dialogueIsRunning && this.dialogueBranchTags.length) {
     if (index > this.dialogueBranchTags.length - 1)
       index = this.dialogueBranchTags.length - 1;
     return this.dialogueBranchTags[index];

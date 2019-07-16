@@ -16,12 +16,12 @@ module.exports = {
 		extension
 			.setExtensionInformation(
 				'DialogueTree',
-				_('Dialoguetree'),
+				_('Dialogue Tree'),
 				_('Initiate dialogue trees from Yarn via Bondagejs.'),
 				'Todor Imreorov',
 				'Open source (MIT License)'
 			)
-			.setExtensionHelpPath('/all-features/dialoguetree');
+			.setExtensionHelpPath('/all-features/dialogue-tree');
 
 		extension
 			.addAction(
@@ -73,15 +73,15 @@ module.exports = {
 		extension
 			.addAction(
 				'GoToNextLine',
-				_('Go to the Next dialogue Line'),
-				_('Go to the Next dialogue line. Use this to advance to the next dialogue line  when the player presses a button.'),
-				_('Go to the Next dialogue Line'),
+				_('Go to the next dialogue line'),
+				_('Go to the next dialogue line. Use this to advance to the next dialogue line  when the player presses a button.'),
+				_('Go to the next dialogue line'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'
 			)
 			.getCodeExtraInformation()
-			.setFunctionName('gdjs.dialogueTree.advanceDialogue');
+			.setFunctionName('gdjs.dialogueTree.goToNextDialogueLine');
 
 		extension
 			.addAction(
@@ -221,7 +221,7 @@ module.exports = {
 			.addStrExpression(
 				'Option',
 				_('Get the text of an option from an Options line type'),
-				_('Get the text of an option from an Options line type, using the option\'s Number. The numbers start from 0.),
+				_('Get the text of an option from an Options line type, using the option\'s Number. The numbers start from 0.'),
 				_('Dialogue Tree'),
 				'JsPlatform/Extensions/yarn24.png',
 				'JsPlatform/Extensions/yarn32.png'

@@ -812,8 +812,9 @@ export default class EventsSheet extends React.Component<Props, State> {
       objectsContainer,
     } = this.props;
 
-    const Dialog = newInstructionEditorDialog ?
-    NewInstructionEditorDialog : InstructionEditorDialog;
+    const Dialog = newInstructionEditorDialog
+      ? NewInstructionEditorDialog
+      : InstructionEditorDialog;
 
     return this.state.editedInstruction.instruction ? (
       <Dialog
@@ -846,8 +847,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
           this.closeInstructionEditor(true);
           ensureSingleOnceInstructions(instrsList);
-          if (this._eventsTree)
-            this._eventsTree.forceEventsUpdate();
+          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
         }}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}
@@ -857,8 +857,10 @@ export default class EventsSheet extends React.Component<Props, State> {
           this.props.openInstructionOrExpression(extension, type);
         }}
       />
-    ) : undefined;
-  }
+    ) : (
+      undefined
+    );
+  };
 
   render() {
     const {
@@ -1139,7 +1141,9 @@ export default class EventsSheet extends React.Component<Props, State> {
                     },
                   ]}
                 />
-                {this._renderInstructionEditorDialog(values.useNewInstructionEditorDialog)}
+                {this._renderInstructionEditorDialog(
+                  values.useNewInstructionEditorDialog
+                )}
                 {this.state.analyzedEventsContextResult && (
                   <EventsContextAnalyzerDialog
                     onClose={this._closeEventsContextAnalyzer}

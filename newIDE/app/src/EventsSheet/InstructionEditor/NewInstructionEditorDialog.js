@@ -16,11 +16,15 @@ import {
   createTree,
   type InstructionOrExpressionTreeNode,
 } from './InstructionOrExpressionSelector/CreateTree';
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
-import { enumerateObjectInstructions } from './InstructionOrExpressionSelector/EnumerateInstructions';
+import {
+  enumerateObjectInstructions,
+  enumerateInstructions,
+} from './InstructionOrExpressionSelector/EnumerateInstructions';
 import HelpButton from '../../UI/HelpButton';
 import ScrollView from '../../UI/ScrollView';
+import { type EventsScope } from '../EventsScope.flow';
 const gd = global.gd;
 
 const styles = {
@@ -37,7 +41,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   instruction: gdInstruction,
@@ -57,7 +61,7 @@ type Props = {|
 |};
 type State = {|
   chosenObjectName: ?string,
-  chosenObjectInstructionsInfo: ?Array<InstructionOrExpressionInformation>,
+  chosenObjectInstructionsInfo: ?Array<EnumeratedInstructionOrExpressionMetadata>,
   chosenObjectInstructionsInfoTree: ?InstructionOrExpressionTreeNode,
 |};
 
@@ -65,12 +69,35 @@ export default class NewInstructionEditorDialog extends React.Component<
   Props,
   State
 > {
-  state = {
-    chosenObjectName: null,
-    chosenObjectInstructionsInfo: null,
-    chosenObjectInstructionsInfoTree: null,
-  };
+  state = this._getInitialChosenObject();
   _instructionParametersEditor: ?InstructionParametersEditor;
+
+  _getInitialChosenObject(): State {
+    //TODO: name
+    const { isNewInstruction, isCondition, instruction } = this.props;
+
+    if (!isNewInstruction) {
+      // Could we use instruction.getType() instead?
+      const allInstructions = enumerateInstructions(isCondition);
+      const instructionType: string = instruction.getType();
+      const instructionMetadata = allInstructions.find(
+        ({ type }) => type === instructionType
+      );
+      if (
+        instructionMetadata &&
+        instructionMetadata.scope.objectMetadata &&
+        instruction.getParametersCount() > 0
+      ) {
+        return this._chooseObject(instruction.getParameter(0));
+      }
+    }
+
+    return {
+      chosenObjectName: null,
+      chosenObjectInstructionsInfo: null,
+      chosenObjectInstructionsInfoTree: null,
+    };
+  }
 
   _chooseInstruction = (type: string) => {
     const { instruction } = this.props;
@@ -82,7 +109,8 @@ export default class NewInstructionEditorDialog extends React.Component<
     });
   };
 
-  _chooseObject = (objectName: string) => {
+  _chooseObject(objectName: string): State {
+    //TODO: naming?
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -95,14 +123,14 @@ export default class NewInstructionEditorDialog extends React.Component<
       objectsContainer,
       objectName
     );
-    this.setState({
+    return {
       chosenObjectName: objectName,
       chosenObjectInstructionsInfo,
       chosenObjectInstructionsInfoTree: createTree(
         chosenObjectInstructionsInfo
       ),
-    });
-  };
+    };
+  }
 
   _back = () => {
     this.props.instruction.setType('');
@@ -115,9 +143,9 @@ export default class NewInstructionEditorDialog extends React.Component<
     } else {
       this.forceUpdate();
     }
-  }
+  };
 
-  // TOOD: This was copied from InstructionParametersEditor. Move this to a helper
+  // TODO: This was copied from InstructionParametersEditor. Move this to a helper
   // or pass it down.
   _getInstructionMetadata = (): ?gdInstructionMetadata => {
     const { instruction, isCondition, project } = this.props;
@@ -138,7 +166,7 @@ export default class NewInstructionEditorDialog extends React.Component<
   render() {
     const {
       project,
-      layout,
+      scope,
       globalObjectsContainer,
       objectsContainer,
       onCancel,
@@ -217,7 +245,9 @@ export default class NewInstructionEditorDialog extends React.Component<
               isCondition={isCondition}
               selectedType={instructionType}
               onChooseInstruction={this._chooseInstruction}
-              onChooseObject={this._chooseObject}
+              onChooseObject={objectName =>
+                this.setState(this._chooseObject(objectName))
+              }
               focusOnMount={!instructionType}
             />
           </Column>
@@ -241,7 +271,7 @@ export default class NewInstructionEditorDialog extends React.Component<
             <Column expand>
               <InstructionParametersEditor
                 project={project}
-                layout={layout}
+                scope={scope}
                 globalObjectsContainer={globalObjectsContainer}
                 objectsContainer={objectsContainer}
                 objectName={chosenObjectName}

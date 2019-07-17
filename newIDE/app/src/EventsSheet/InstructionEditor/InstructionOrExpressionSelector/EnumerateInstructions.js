@@ -123,7 +123,7 @@ export const enumerateObjectInstructions = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName: string
-): Array<InstructionOrExpressionInformation> => {
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
   let allInstructions = [];
 
   const objectType: string = gd.getTypeOfObject(
@@ -178,18 +178,21 @@ export const enumerateObjectInstructions = (
 
     //Objects instructions:
     if (hasObjectType) {
+      var objectMetadata = extension.getObjectMetadata(objectType);
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
           prefix,
           isCondition
             ? extension.getAllConditionsForObject(objectType)
-            : extension.getAllActionsForObject(objectType)
+            : extension.getAllActionsForObject(objectType),
+          { objectMetadata }
         ),
       ];
     }
 
     if (hasBaseObjectType) {
+      var objectMetadata = extension.getObjectMetadata('');
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -200,7 +203,8 @@ export const enumerateObjectInstructions = (
               )
             : extension.getAllActionsForObject(
                 '' /* An empty string means the base object */
-              )
+              ),
+          { objectMetadata }
         ),
       ];
     }
@@ -208,12 +212,14 @@ export const enumerateObjectInstructions = (
     //Behaviors instructions (show them at the top of the list):
     // eslint-disable-next-line
     behaviorTypes.forEach(behaviorType => {
+      const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       allInstructions = [
         ...enumerateExtensionInstructions(
           prefix,
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
-            : extension.getAllActionsForBehavior(behaviorType)
+            : extension.getAllActionsForBehavior(behaviorType),
+          { behaviorMetadata }
         ),
         ...allInstructions,
       ];
@@ -229,7 +235,7 @@ export const enumerateObjectInstructions = (
  */
 export const enumerateFreeInstructions = (
   isCondition: boolean
-): Array<InstructionOrExpressionInformation> => {
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
   let allFreeInstructions = [];
 
   const allExtensions = gd
@@ -243,9 +249,7 @@ export const enumerateFreeInstructions = (
     let prefix = '';
     if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
       prefix =
-        extension.getName() === 'BuiltinObject'
-          ? ''
-          : extension.getFullName();
+        extension.getName() === 'BuiltinObject' ? '' : extension.getFullName();
       prefix += GROUP_DELIMITER;
     }
 
@@ -254,7 +258,11 @@ export const enumerateFreeInstructions = (
       ...allFreeInstructions,
       ...enumerateExtensionInstructions(
         prefix,
-        isCondition ? extension.getAllConditions() : extension.getAllActions()
+        isCondition ? extension.getAllConditions() : extension.getAllActions(),
+        {
+          objectMetadata: undefined,
+          behaviorMetadata: undefined,
+        }
       ),
     ];
   }

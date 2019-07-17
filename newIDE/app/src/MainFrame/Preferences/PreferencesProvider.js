@@ -36,7 +36,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseNewInstructionEditorDialog: this._setUseNewInstructionEditorDialog.bind(this),
+    setUseNewInstructionEditorDialog: this._setUseNewInstructionEditorDialog.bind(
+      this
+    ),
   };
 
   componentDidMount() {

@@ -5,7 +5,7 @@ import {
   type InstructionOrExpressionTreeNode,
 } from './InstructionOrExpressionSelector/CreateTree';
 import { enumerateFreeInstructions } from './InstructionOrExpressionSelector/EnumerateInstructions';
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import SearchBar from 'material-ui-search-bar/lib/components/SearchBar';
 import ListIcon from '../../UI/ListIcon';
@@ -44,7 +44,7 @@ type Props = {|
   selectedType: string,
   onChooseInstruction: (
     type: string,
-    InstructionOrExpressionInformation
+    EnumeratedInstructionOrExpressionMetadata
   ) => void,
   onChooseObject: (objectName: string) => void,
   style?: Object,
@@ -56,10 +56,10 @@ const iconSize = 24;
 const renderInstructionTree = (
   muiTheme: any,
   instructionInfoTree: InstructionOrExpressionTreeNode,
-  onChoose: (type: string, InstructionOrExpressionInformation) => void
+  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void
 ): Array<ListItem> => {
   return Object.keys(instructionInfoTree).map(key => {
-    // $FlowFixMe - in theory, we should have a way to distinguish
+    // In theory, we should have a way to distinguish
     // between instruction (leaf nodes) and group (nodes). We use
     // the "type" properties, but this will fail if a group is called "type"
     // (hence the flow errors, which are valid warnings)
@@ -68,7 +68,7 @@ const renderInstructionTree = (
 
     if (typeof instructionOrGroup.type === 'string') {
       // $FlowFixMe - see above
-      const instructionInformation: InstructionOrExpressionInformation = instructionOrGroup;
+      const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
       return (
         <ListItem
           key={key}
@@ -123,7 +123,7 @@ export default class InstructionOrObjectSelector extends Component<
 > {
   state = { currentTab: 'objects' };
 
-  instructionsInfo: Array<InstructionOrExpressionInformation> = enumerateFreeInstructions(
+  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = enumerateFreeInstructions(
     this.props.isCondition
   );
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(

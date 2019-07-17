@@ -169,6 +169,12 @@ export default class InstructionOrExpressionSelector extends React.Component<
           key={instructionInfo.type}
           primaryText={instructionInfo.displayedName}
           secondaryText={instructionInfo.fullGroupName}
+          leftIcon={
+            <ListIcon
+              iconSize={this.props.iconSize}
+              src={instructionInfo.iconFilename}
+            />
+          }
           value={instructionInfo.type}
           onClick={() => {
             this.props.onChoose(instructionInfo.type, instructionInfo);

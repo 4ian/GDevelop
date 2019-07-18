@@ -131,6 +131,7 @@ import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoade
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
+import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
 
 // No i18n in this file
 
@@ -1406,6 +1407,24 @@ storiesOf('InstructionSelector', module)
       isCondition={false}
       scope={{}}
     />
+  ));
+
+storiesOf('InstructionOrObjectSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <InstructionOrObjectSelector
+        style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+        project={project}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        onChooseInstruction={action('instruction chosen')}
+        onChooseObject={action('choose object')}
+        focusOnMount
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionEditor', module)

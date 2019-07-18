@@ -180,14 +180,14 @@ export default class NewInstructionEditorDialog extends React.Component<
       chosenObjectInstructionsInfo,
       chosenObjectInstructionsInfoTree,
     } = this.state;
-    const instructionType = instruction.getType();
+    const instructionType: string = instruction.getType();
 
     const instructionMetadata = this._getInstructionMetadata();
     const instructionHelpPage = instructionMetadata
       ? instructionMetadata.getHelpPath()
       : undefined;
 
-    const isFirstStep = instructionType || chosenObjectName;
+    const isFirstStep = !instructionType && !chosenObjectName;
 
     return (
       <Dialog
@@ -208,7 +208,7 @@ export default class NewInstructionEditorDialog extends React.Component<
           />,
         ]}
         secondaryActions={[
-          isFirstStep ? (
+          !isFirstStep ? (
             <FlatButton
               label={<Trans>Back</Trans>}
               primary={false}
@@ -235,7 +235,7 @@ export default class NewInstructionEditorDialog extends React.Component<
         contentStyle={styles.dialogContent}
         bodyStyle={styles.dialogBody}
       >
-        {!isFirstStep && (
+        {isFirstStep && (
           <Column expand noMargin>
             <InstructionOrObjectSelector
               style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
@@ -243,7 +243,6 @@ export default class NewInstructionEditorDialog extends React.Component<
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
               isCondition={isCondition}
-              selectedType={instructionType}
               onChooseInstruction={this._chooseInstruction}
               onChooseObject={objectName =>
                 this.setState(this._chooseObject(objectName))
@@ -252,7 +251,7 @@ export default class NewInstructionEditorDialog extends React.Component<
             />
           </Column>
         )}
-        {isFirstStep && (
+        {!isFirstStep && (
           <Line expand noMargin>
             {chosenObjectName &&
               chosenObjectInstructionsInfoTree &&
@@ -265,6 +264,7 @@ export default class NewInstructionEditorDialog extends React.Component<
                     onChoose={this._chooseInstruction}
                     selectedType={instructionType}
                     useSubheaders
+                    focusOnMount={!instructionType}
                   />
                 </ScrollView>
               )}
@@ -286,7 +286,7 @@ export default class NewInstructionEditorDialog extends React.Component<
                 ref={instructionParametersEditor =>
                   (this._instructionParametersEditor = instructionParametersEditor)
                 }
-                focusOnMount={instruction.getType()}
+                focusOnMount={!!instructionType}
                 noHelpButton
               />
             </Column>

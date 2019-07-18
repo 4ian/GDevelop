@@ -972,6 +972,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             </I18n>,
             <CloseButton key="close" />,
           ]}
+          // TODO: Outdated
           selectedObjectNames={
             this.state
               .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/

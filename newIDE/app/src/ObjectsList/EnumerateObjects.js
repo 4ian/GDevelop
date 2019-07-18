@@ -126,6 +126,12 @@ export const filterObjectsList = (
     });
 };
 
+// TODO
+// export type GroupFilteringOptions = {|
+//   searchText: string,
+//   selectedTags: SelectedTags,
+// |};
+
 export const filterGroupsList = (
   list: GroupWithContextList,
   searchText: string

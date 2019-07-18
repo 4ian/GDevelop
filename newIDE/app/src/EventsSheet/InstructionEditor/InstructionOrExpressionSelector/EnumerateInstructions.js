@@ -13,7 +13,7 @@ const enumerateExtensionInstructions = (
   scope: InstructionOrExpressionScope
 ): Array<EnumeratedInstructionOrExpressionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
-  var instructionsTypes = instructions.keys();
+  const instructionsTypes = instructions.keys();
   const allInstructions = [];
 
   //... and add each instruction
@@ -80,7 +80,7 @@ export const enumerateInstructions = (
     //Objects instructions:
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
       const objectType = allObjectsTypes.get(j);
-      var objectMetadata = extension.getObjectMetadata(objectType);
+      const objectMetadata = extension.getObjectMetadata(objectType);
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -178,7 +178,7 @@ export const enumerateObjectInstructions = (
 
     //Objects instructions:
     if (hasObjectType) {
-      var objectMetadata = extension.getObjectMetadata(objectType);
+      const objectMetadata = extension.getObjectMetadata(objectType);
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -192,7 +192,7 @@ export const enumerateObjectInstructions = (
     }
 
     if (hasBaseObjectType) {
-      var objectMetadata = extension.getObjectMetadata('');
+      const objectMetadata = extension.getObjectMetadata('');
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -268,4 +268,35 @@ export const enumerateFreeInstructions = (
   }
 
   return allFreeInstructions;
+};
+
+export type InstructionFilteringOptions = {|
+  searchText: string,
+|};
+
+// TODO: Move near filterEnumeratedInstructionOrExpressionMetadataByScope?
+export const filterInstructionsList = (
+  list: Array<EnumeratedInstructionOrExpressionMetadata>,
+  { searchText }: InstructionFilteringOptions
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
+  if (!searchText === '') {
+    return list;
+  }
+
+  const lowercaseSearch = searchText.toLowerCase();
+
+  const matchCritera = (
+    enumeratedInstructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata
+  ) => {
+    const {
+      displayedName,
+      fullGroupName,
+    } = enumeratedInstructionOrExpressionMetadata;
+    return (
+      displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
+      fullGroupName.toLowerCase().indexOf(lowercaseSearch) !== -1
+    );
+  };
+
+  return list.filter(matchCritera);
 };

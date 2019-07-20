@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
 import Background from '../UI/Background';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import ObjectRow from './ObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';

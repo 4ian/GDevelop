@@ -88,6 +88,7 @@ class InstructionsList extends React.Component<Props, State> {
       extraClassName,
       instrsList,
       onAddNewInstruction,
+      onPasteInstructions,
       onMoveToInstruction,
       onMoveToInstructionsList,
       onInstructionClick,
@@ -136,6 +137,7 @@ class InstructionsList extends React.Component<Props, State> {
           }
           selection={selection}
           onAddNewSubInstruction={onAddNewInstruction}
+          onPasteSubInstructions={onPasteInstructions}
           onMoveToSubInstruction={onMoveToInstruction}
           onMoveToSubInstructionsList={onMoveToInstructionsList}
           onSubInstructionClick={onInstructionClick}

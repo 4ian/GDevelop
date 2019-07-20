@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { List, makeSelectable } from 'material-ui/List';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
 import { type InstructionOrExpressionTreeNode } from './CreateTree';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';

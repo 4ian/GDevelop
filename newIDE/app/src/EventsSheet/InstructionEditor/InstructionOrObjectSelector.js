@@ -10,7 +10,7 @@ import {
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import { List } from 'material-ui/List';
-import SearchBar from 'material-ui-search-bar/lib/components/SearchBar';
+import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
 import { Tabs, Tab } from 'material-ui/Tabs';
@@ -137,6 +137,7 @@ export default class InstructionOrObjectSelector extends React.Component<
           >
             {/* // TODO: Tags in search bar */}
             <SearchBar
+              value={searchText}
               onChange={searchText =>
                 this.setState({
                   searchText,

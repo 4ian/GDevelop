@@ -132,6 +132,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
+import SearchBar from '../UI/SearchBar';
 
 // No i18n in this file
 
@@ -280,6 +281,13 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
         </React.Fragment>
       )}
     />
+  ));
+
+storiesOf('UI Building Blocks/SearchBar', module)
+  .addDecorator(muiDecorator)
+  .add('empty', () => <SearchBar value="" onChange={action('change')} onRequestSearch={action('request search')} />)
+  .add('with text', () => (
+    <SearchBar value="123" onChange={action('change')} onRequestSearch={action('request search')} />
   ));
 
 storiesOf('UI Building Blocks/Background', module)

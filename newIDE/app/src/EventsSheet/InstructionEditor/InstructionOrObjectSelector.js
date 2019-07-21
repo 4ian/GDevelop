@@ -1,4 +1,9 @@
 // @flow
+import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
+
 import * as React from 'react';
 import {
   createTree,
@@ -15,11 +20,11 @@ import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { Subheader } from 'material-ui';
-import { Trans } from '@lingui/macro';
 import {
   enumerateObjectsAndGroups,
   filterObjectsList,
   filterGroupsList,
+  enumerateObjects,
 } from '../../ObjectsList/EnumerateObjects';
 import TagChips from '../../UI/TagChips';
 import SelectorGroupObjectsListItem from './SelectorListItems/SelectorGroupObjectsListItem';
@@ -27,6 +32,10 @@ import SelectorObjectListItem from './SelectorListItems/SelectorObjectListItem';
 import SelectorInstructionOrExpressionListItem from './SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../UI/EmptyMessage';
+import {
+  buildTagsMenuTemplate,
+  getTagsFromString,
+} from '../../Utils/TagsHelper';
 
 const styles = {
   searchBar: {
@@ -81,6 +90,33 @@ export default class InstructionOrObjectSelector extends React.Component<
     }
   }
 
+  _getAllObjectTags = (): Array<string> => {
+    const { globalObjectsContainer, objectsContainer } = this.props;
+
+    const tagsSet: Set<string> = new Set();
+    enumerateObjects(
+      globalObjectsContainer,
+      objectsContainer
+    ).allObjectsList.forEach(({ object }) => {
+      getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
+    });
+
+    return Array.from(tagsSet);
+  };
+
+  _buildObjectTagsMenuTemplate = (i18n: I18nType): Array<any> => {
+    const { selectedObjectTags } = this.state;
+
+    return buildTagsMenuTemplate({
+      noTagLabel: i18n._(t`No tags - add a tag to an object first`),
+      getAllTags: this._getAllObjectTags,
+      selectedTags: selectedObjectTags,
+      onChange: selectedObjectTags => {
+        this.setState({ selectedObjectTags });
+      },
+    });
+  };
+
   render() {
     const {
       style,
@@ -101,7 +137,7 @@ export default class InstructionOrObjectSelector extends React.Component<
       searchText,
       selectedTags: selectedObjectTags,
     });
-    const displayedObjectGroupsList = selectedObjectTags.length // TODO: Back selectedObjectTags in filterGroupsList
+    const displayedObjectGroupsList = selectedObjectTags.length
       ? []
       : filterGroupsList(allGroupsList, searchText);
     const displayedInstructionsList = filterInstructionsList(
@@ -132,136 +168,144 @@ export default class InstructionOrObjectSelector extends React.Component<
     };
 
     return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <div
-            style={{
-              backgroundColor: muiTheme.list.itemsBackgroundColor,
-              ...style,
-            }}
-          >
-            {/* // TODO: Tags in search bar */}
-            <SearchBar
-              value={searchText}
-              onChange={searchText =>
-                this.setState({
-                  searchText,
-                })
-              }
-              onRequestSearch={onSubmitSearch}
-              style={styles.searchBar}
-              ref={this._searchBar}
-            />
-            {!isSearching && (
-              <Tabs
-                value={currentTab}
-                onChange={(currentTab: TabNames) =>
-                  this.setState({
-                    currentTab,
-                  })
-                }
+      <I18n key="tags">
+        {({ i18n }) => (
+          <ThemeConsumer>
+            {muiTheme => (
+              <div
+                style={{
+                  backgroundColor: muiTheme.list.itemsBackgroundColor,
+                  ...style,
+                }}
               >
-                <Tab
-                  label={<Trans>Objects</Trans>}
-                  value={('objects': TabNames)}
-                />
-                <Tab
-                  label={
-                    isCondition ? (
-                      <Trans>Non-objects and other conditions</Trans>
-                    ) : (
-                      <Trans>Non-objects and other actions</Trans>
-                    )
-                  }
-                  value={('free-instructions': TabNames)}
-                >
-                  {/* Manually display tabs to support flex */}
-                </Tab>
-              </Tabs>
-            )}
-            <ScrollView>
-              {!isSearching && currentTab === 'objects' && (
-                <TagChips
-                  tags={selectedObjectTags}
-                  onChange={selectedObjectTags =>
+                <SearchBar
+                  value={searchText}
+                  onChange={searchText =>
                     this.setState({
-                      selectedObjectTags,
+                      searchText,
                     })
                   }
+                  onRequestSearch={onSubmitSearch}
+                  buildTagsMenuTemplate={() =>
+                    this._buildObjectTagsMenuTemplate(i18n)
+                  }
+                  style={styles.searchBar}
+                  ref={this._searchBar}
                 />
-              )}
-              {hasResults && (
-                <List>
-                  {(isSearching || currentTab === 'objects') &&
-                    displayedObjectsList.map(objectWithContext => (
-                      <SelectorObjectListItem
-                        project={project}
-                        objectWithContext={objectWithContext}
-                        iconSize={iconSize}
-                        onClick={() =>
-                          onChooseObject(objectWithContext.object.getName())
-                        }
-                      />
-                    ))}
-                  {(isSearching || currentTab === 'objects') &&
-                    displayedObjectGroupsList.length > 0 && (
-                      <Subheader>
-                        <Trans>Object groups</Trans>
-                      </Subheader>
-                    )}
-                  {(isSearching || currentTab === 'objects') &&
-                    displayedObjectGroupsList.map(groupWithContext => (
-                      <SelectorGroupObjectsListItem
-                        groupWithContext={groupWithContext}
-                        iconSize={iconSize}
-                        onClick={() =>
-                          onChooseObject(groupWithContext.group.getName())
-                        }
-                      />
-                    ))}
-                  {isSearching && displayedInstructionsList.length > 0 && (
-                    <Subheader>
-                      {isCondition ? (
-                        <Trans>Non-objects and other conditions</Trans>
-                      ) : (
-                        <Trans>Non-objects and other actions</Trans>
-                      )}
-                    </Subheader>
+                {!isSearching && (
+                  <Tabs
+                    value={currentTab}
+                    onChange={(currentTab: TabNames) =>
+                      this.setState({
+                        currentTab,
+                      })
+                    }
+                  >
+                    <Tab
+                      label={<Trans>Objects</Trans>}
+                      value={('objects': TabNames)}
+                    />
+                    <Tab
+                      label={
+                        isCondition ? (
+                          <Trans>Non-objects and other conditions</Trans>
+                        ) : (
+                          <Trans>Non-objects and other actions</Trans>
+                        )
+                      }
+                      value={('free-instructions': TabNames)}
+                    >
+                      {/* Manually display tabs to support flex */}
+                    </Tab>
+                  </Tabs>
+                )}
+                <ScrollView>
+                  {!isSearching && currentTab === 'objects' && (
+                    <TagChips
+                      tags={selectedObjectTags}
+                      onChange={selectedObjectTags =>
+                        this.setState({
+                          selectedObjectTags,
+                        })
+                      }
+                    />
                   )}
-                  {isSearching &&
-                    displayedInstructionsList.map(instructionMetadata => (
-                      <SelectorInstructionOrExpressionListItem
-                        instructionOrExpressionMetadata={instructionMetadata}
-                        iconSize={iconSize}
-                        onClick={() =>
-                          onChooseInstruction(
-                            instructionMetadata.type,
-                            instructionMetadata
-                          )
-                        }
-                      />
-                    ))}
-                  {!isSearching &&
-                    currentTab === 'free-instructions' &&
-                    renderInstructionTree({
-                      instructionTreeNode: this.instructionsInfoTree,
-                      onChoose: onChooseInstruction,
-                      iconSize,
-                    })}
-                </List>
-              )}
-              {!hasResults && (
-                <EmptyMessage>
-                  <Trans>
-                    Nothing corresponding to your search. Choose an object first
-                    or browse the list of actions/conditions.
-                  </Trans>
-                </EmptyMessage>
-              )}
-            </ScrollView>
-          </div>
+                  {hasResults && (
+                    <List>
+                      {(isSearching || currentTab === 'objects') &&
+                        displayedObjectsList.map(objectWithContext => (
+                          <SelectorObjectListItem
+                            project={project}
+                            objectWithContext={objectWithContext}
+                            iconSize={iconSize}
+                            onClick={() =>
+                              onChooseObject(objectWithContext.object.getName())
+                            }
+                          />
+                        ))}
+                      {(isSearching || currentTab === 'objects') &&
+                        displayedObjectGroupsList.length > 0 && (
+                          <Subheader>
+                            <Trans>Object groups</Trans>
+                          </Subheader>
+                        )}
+                      {(isSearching || currentTab === 'objects') &&
+                        displayedObjectGroupsList.map(groupWithContext => (
+                          <SelectorGroupObjectsListItem
+                            groupWithContext={groupWithContext}
+                            iconSize={iconSize}
+                            onClick={() =>
+                              onChooseObject(groupWithContext.group.getName())
+                            }
+                          />
+                        ))}
+                      {isSearching && displayedInstructionsList.length > 0 && (
+                        <Subheader>
+                          {isCondition ? (
+                            <Trans>Non-objects and other conditions</Trans>
+                          ) : (
+                            <Trans>Non-objects and other actions</Trans>
+                          )}
+                        </Subheader>
+                      )}
+                      {isSearching &&
+                        displayedInstructionsList.map(instructionMetadata => (
+                          <SelectorInstructionOrExpressionListItem
+                            instructionOrExpressionMetadata={
+                              instructionMetadata
+                            }
+                            iconSize={iconSize}
+                            onClick={() =>
+                              onChooseInstruction(
+                                instructionMetadata.type,
+                                instructionMetadata
+                              )
+                            }
+                          />
+                        ))}
+                      {!isSearching &&
+                        currentTab === 'free-instructions' &&
+                        renderInstructionTree({
+                          instructionTreeNode: this.instructionsInfoTree,
+                          onChoose: onChooseInstruction,
+                          iconSize,
+                        })}
+                    </List>
+                  )}
+                  {!hasResults && (
+                    <EmptyMessage>
+                      <Trans>
+                        Nothing corresponding to your search. Choose an object
+                        first or browse the list of actions/conditions.
+                      </Trans>
+                    </EmptyMessage>
+                  )}
+                </ScrollView>
+              </div>
+            )}
+          </ThemeConsumer>
         )}
-      </ThemeConsumer>
+      </I18n>
     );
   }
 }

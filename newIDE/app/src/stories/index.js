@@ -298,6 +298,41 @@ storiesOf('UI Building Blocks/SearchBar', module)
       onChange={action('change')}
       onRequestSearch={action('request search')}
     />
+  ))
+  .add('disabled', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+      disabled
+    />
+  ))
+  .add('with tags', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+      buildTagsMenuTemplate={() => [
+        {
+          type: 'checkbox',
+          label: 'Tag 1',
+          checked: false,
+          click: () => {},
+        },
+        {
+          type: 'checkbox',
+          label: 'Tag 2 (checked)',
+          checked: true,
+          click: () => {},
+        },
+        {
+          type: 'checkbox',
+          label: 'Tag 3',
+          checked: false,
+          click: () => {},
+        },
+      ]}
+    />
   ));
 
 storiesOf('UI Building Blocks/Background', module)

@@ -7,6 +7,8 @@ import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import Close from 'material-ui/svg-icons/navigation/close';
 import Search from 'material-ui/svg-icons/action/search';
+import FilterList from 'material-ui/svg-icons/content/filter-list';
+import IconMenu from './Menu/IconMenu';
 
 type Props = {|
   /** Disables text field. */
@@ -21,6 +23,8 @@ type Props = {|
   style?: Object,
   /** The value of the text field. */
   value: string,
+  /** If tags are supported, the function to list the tags menu */
+  buildTagsMenuTemplate?: () => any,
 |};
 
 type State = {|
@@ -63,6 +67,12 @@ const getStyles = (props: Props, state: State) => {
         transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
       },
     },
+    iconButtonFilter: {
+      style: {
+        opacity: !disabled ? 0.54 : 0.38,
+      },
+      iconStyle: {},
+    },
     input: {
       width: '100%',
     },
@@ -76,6 +86,8 @@ const getStyles = (props: Props, state: State) => {
 /**
  * Material design search bar,
  * inspired from https://github.com/TeamWertarbyte/material-ui-search-bar
+ *
+ * Customized to add optional tags button.
  */
 export default class SearchBar extends React.Component<Props, State> {
   state = {
@@ -133,7 +145,7 @@ export default class SearchBar extends React.Component<Props, State> {
   render() {
     const styles = getStyles(this.props, this.state);
     const { value } = this.state;
-    const { disabled, style } = this.props;
+    const { disabled, style, buildTagsMenuTemplate } = this.props;
 
     return (
       <Paper
@@ -157,6 +169,19 @@ export default class SearchBar extends React.Component<Props, State> {
             ref={this._textField}
           />
         </div>
+        {buildTagsMenuTemplate && (
+          <IconMenu
+            iconButtonElement={
+              <IconButton
+                style={styles.iconButtonFilter.style}
+                disabled={disabled}
+              >
+                <FilterList style={styles.iconButtonFilter.iconStyle} />
+              </IconButton>
+            }
+            buildMenuTemplate={buildTagsMenuTemplate}
+          />
+        )}
         <IconButton style={styles.iconButtonSearch.style} disabled={disabled}>
           <Search style={styles.iconButtonSearch.iconStyle} />
         </IconButton>

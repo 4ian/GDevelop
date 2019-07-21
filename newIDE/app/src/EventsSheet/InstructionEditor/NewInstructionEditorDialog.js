@@ -23,7 +23,7 @@ import {
   enumerateInstructions,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import HelpButton from '../../UI/HelpButton';
-import ScrollView from '../../UI/ScrollView';
+import Background from '../../UI/Background';
 import { type EventsScope } from '../EventsScope.flow';
 const gd = global.gd;
 
@@ -234,6 +234,7 @@ export default class NewInstructionEditorDialog extends React.Component<
         onRequestClose={onCancel}
         contentStyle={styles.dialogContent}
         bodyStyle={styles.dialogBody}
+        repositionOnUpdate={false}
       >
         {isFirstStep && (
           <Column expand noMargin>
@@ -256,7 +257,7 @@ export default class NewInstructionEditorDialog extends React.Component<
             {chosenObjectName &&
               chosenObjectInstructionsInfoTree &&
               chosenObjectInstructionsInfo && (
-                <ScrollView>
+                <Background noFullHeight>
                   <InstructionOrExpressionSelector
                     instructionsInfo={chosenObjectInstructionsInfo}
                     instructionsInfoTree={chosenObjectInstructionsInfoTree}
@@ -265,8 +266,15 @@ export default class NewInstructionEditorDialog extends React.Component<
                     selectedType={instructionType}
                     useSubheaders
                     focusOnMount={!instructionType}
+                    searchBarHintText={
+                      isCondition ? (
+                        <Trans>Search {chosenObjectName} conditions</Trans>
+                      ) : (
+                        <Trans>Search {chosenObjectName} actions</Trans>
+                      )
+                    }
                   />
-                </ScrollView>
+                </Background>
               )}
             <Column expand>
               <InstructionParametersEditor

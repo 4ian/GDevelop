@@ -15,7 +15,6 @@ type Props = {|
   selectedType: string,
   onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
   scope: EventsScope,
-  style?: Object,
 |};
 
 export default class ExpressionSelector extends Component<Props, {||}> {

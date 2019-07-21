@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { List, makeSelectable } from 'material-ui/List';
 import SearchBar from '../../../UI/SearchBar';
@@ -8,16 +9,17 @@ import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { filterInstructionsList } from './EnumerateInstructions';
 import SelectorInstructionOrExpressionListItem from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
+import EmptyMessage from '../../../UI/EmptyMessage';
+import ScrollView from '../../../UI/ScrollView';
+import { Column, Line } from '../../../UI/Grid';
 
 const SelectableList = makeSelectable(List);
 
 const styles = {
   searchBar: {
-    margin: '0 auto',
     backgroundColor: 'transparent',
-  },
-  groupListItemNestedList: {
-    padding: 0,
+    flexShrink: 0,
+    zIndex: 1, // Put the SearchBar in front of the list, to display the shadow
   },
 };
 
@@ -28,8 +30,8 @@ type Props = {|
   selectedType: string,
   onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
   iconSize: number,
-  style?: Object,
   useSubheaders?: boolean,
+  searchBarHintText?: React.Node,
 |};
 type State = {|
   searchText: string,
@@ -62,12 +64,13 @@ export default class InstructionOrExpressionSelector extends React.Component<
       iconSize,
       instructionsInfoTree,
       onChoose,
-      style,
+      searchBarHintText,
     } = this.props;
     const { searchText } = this.state;
     const displayedInstructionsList = searchText
       ? filterInstructionsList(this.props.instructionsInfo, { searchText })
       : [];
+    const hasResults = !searchText || !!displayedInstructionsList.length;
 
     const onSubmitSearch = () => {
       if (!displayedInstructionsList.length) return;
@@ -78,13 +81,9 @@ export default class InstructionOrExpressionSelector extends React.Component<
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <div
-            style={{
-              backgroundColor: muiTheme.list.itemsBackgroundColor,
-              ...style,
-            }}
-          >
+          <Column noMargin expand>
             <SearchBar
+              value={searchText}
               onChange={searchText =>
                 this.setState({
                   searchText,
@@ -92,34 +91,51 @@ export default class InstructionOrExpressionSelector extends React.Component<
               }
               onRequestSearch={onSubmitSearch}
               style={styles.searchBar}
+              placeholder={searchBarHintText}
               ref={searchBar => (this._searchBar = searchBar)}
             />
-            <SelectableList value={selectedType}>
-              {searchText
-                ? displayedInstructionsList.map(
-                    enumeratedInstructionOrExpressionMetadata => (
-                      <SelectorInstructionOrExpressionListItem
-                        instructionOrExpressionMetadata={
-                          enumeratedInstructionOrExpressionMetadata
-                        }
-                        iconSize={iconSize}
-                        onClick={() =>
-                          onChoose(
-                            enumeratedInstructionOrExpressionMetadata.type,
-                            enumeratedInstructionOrExpressionMetadata
-                          )
-                        }
-                      />
-                    )
-                  )
-                : renderInstructionTree({
-                    instructionTreeNode: instructionsInfoTree,
-                    iconSize,
-                    onChoose,
-                    useSubheaders: true,
-                  })}
-            </SelectableList>
-          </div>
+            <ScrollView
+              style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
+            >
+              {hasResults && (
+                <SelectableList value={selectedType}>
+                  {searchText
+                    ? displayedInstructionsList.map(
+                        enumeratedInstructionOrExpressionMetadata => (
+                          <SelectorInstructionOrExpressionListItem
+                            instructionOrExpressionMetadata={
+                              enumeratedInstructionOrExpressionMetadata
+                            }
+                            iconSize={iconSize}
+                            onClick={() =>
+                              onChoose(
+                                enumeratedInstructionOrExpressionMetadata.type,
+                                enumeratedInstructionOrExpressionMetadata
+                              )
+                            }
+                          />
+                        )
+                      )
+                    : renderInstructionTree({
+                        instructionTreeNode: instructionsInfoTree,
+                        iconSize,
+                        onChoose,
+                        useSubheaders: true,
+                      })}
+                </SelectableList>
+              )}
+              {!hasResults && (
+                <Line>
+                  <EmptyMessage>
+                    <Trans>
+                      Nothing corresponding to your search. Try browsing the
+                      list instead.
+                    </Trans>
+                  </EmptyMessage>
+                </Line>
+              )}
+            </ScrollView>
+          </Column>
         )}
       </ThemeConsumer>
     );

@@ -26,10 +26,10 @@ import SelectorGroupObjectsListItem from './SelectorListItems/SelectorGroupObjec
 import SelectorObjectListItem from './SelectorListItems/SelectorObjectListItem';
 import SelectorInstructionOrExpressionListItem from './SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
+import EmptyMessage from '../../UI/EmptyMessage';
 
 const styles = {
   searchBar: {
-    backgroundColor: 'transparent',
     flexShrink: 0,
   },
 };
@@ -109,6 +109,11 @@ export default class InstructionOrObjectSelector extends React.Component<
       { searchText }
     );
     const isSearching = !!searchText;
+    const hasResults =
+      !isSearching ||
+      !!displayedObjectsList.length ||
+      !!displayedObjectGroupsList.length ||
+      !!displayedInstructionsList.length;
 
     const onSubmitSearch = () => {
       if (!isSearching) return;
@@ -185,64 +190,74 @@ export default class InstructionOrObjectSelector extends React.Component<
                   }
                 />
               )}
-              <List>
-                {(isSearching || currentTab === 'objects') &&
-                  displayedObjectsList.map(objectWithContext => (
-                    <SelectorObjectListItem
-                      project={project}
-                      objectWithContext={objectWithContext}
-                      iconSize={iconSize}
-                      onClick={() =>
-                        onChooseObject(objectWithContext.object.getName())
-                      }
-                    />
-                  ))}
-                {(isSearching || currentTab === 'objects') &&
-                  displayedObjectGroupsList.length > 0 && (
+              {hasResults && (
+                <List>
+                  {(isSearching || currentTab === 'objects') &&
+                    displayedObjectsList.map(objectWithContext => (
+                      <SelectorObjectListItem
+                        project={project}
+                        objectWithContext={objectWithContext}
+                        iconSize={iconSize}
+                        onClick={() =>
+                          onChooseObject(objectWithContext.object.getName())
+                        }
+                      />
+                    ))}
+                  {(isSearching || currentTab === 'objects') &&
+                    displayedObjectGroupsList.length > 0 && (
+                      <Subheader>
+                        <Trans>Object groups</Trans>
+                      </Subheader>
+                    )}
+                  {(isSearching || currentTab === 'objects') &&
+                    displayedObjectGroupsList.map(groupWithContext => (
+                      <SelectorGroupObjectsListItem
+                        groupWithContext={groupWithContext}
+                        iconSize={iconSize}
+                        onClick={() =>
+                          onChooseObject(groupWithContext.group.getName())
+                        }
+                      />
+                    ))}
+                  {isSearching && displayedInstructionsList.length > 0 && (
                     <Subheader>
-                      <Trans>Object groups</Trans>
+                      {isCondition ? (
+                        <Trans>Non-objects and other conditions</Trans>
+                      ) : (
+                        <Trans>Non-objects and other actions</Trans>
+                      )}
                     </Subheader>
                   )}
-                {(isSearching || currentTab === 'objects') &&
-                  displayedObjectGroupsList.map(groupWithContext => (
-                    <SelectorGroupObjectsListItem
-                      groupWithContext={groupWithContext}
-                      iconSize={iconSize}
-                      onClick={() =>
-                        onChooseObject(groupWithContext.group.getName())
-                      }
-                    />
-                  ))}
-                {isSearching && displayedInstructionsList.length > 0 && (
-                  <Subheader>
-                    {isCondition ? (
-                      <Trans>Non-objects and other conditions</Trans>
-                    ) : (
-                      <Trans>Non-objects and other actions</Trans>
-                    )}
-                  </Subheader>
-                )}
-                {isSearching &&
-                  displayedInstructionsList.map(instructionMetadata => (
-                    <SelectorInstructionOrExpressionListItem
-                      instructionOrExpressionMetadata={instructionMetadata}
-                      iconSize={iconSize}
-                      onClick={() =>
-                        onChooseInstruction(
-                          instructionMetadata.type,
-                          instructionMetadata
-                        )
-                      }
-                    />
-                  ))}
-                {!isSearching &&
-                  currentTab === 'free-instructions' &&
-                  renderInstructionTree({
-                    instructionTreeNode: this.instructionsInfoTree,
-                    onChoose: onChooseInstruction,
-                    iconSize,
-                  })}
-              </List>
+                  {isSearching &&
+                    displayedInstructionsList.map(instructionMetadata => (
+                      <SelectorInstructionOrExpressionListItem
+                        instructionOrExpressionMetadata={instructionMetadata}
+                        iconSize={iconSize}
+                        onClick={() =>
+                          onChooseInstruction(
+                            instructionMetadata.type,
+                            instructionMetadata
+                          )
+                        }
+                      />
+                    ))}
+                  {!isSearching &&
+                    currentTab === 'free-instructions' &&
+                    renderInstructionTree({
+                      instructionTreeNode: this.instructionsInfoTree,
+                      onChoose: onChooseInstruction,
+                      iconSize,
+                    })}
+                </List>
+              )}
+              {!hasResults && (
+                <EmptyMessage>
+                  <Trans>
+                    Nothing corresponding to your search. Choose an object first
+                    or browse the list of actions/conditions.
+                  </Trans>
+                </EmptyMessage>
+              )}
             </ScrollView>
           </div>
         )}

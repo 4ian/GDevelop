@@ -285,9 +285,19 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
 
 storiesOf('UI Building Blocks/SearchBar', module)
   .addDecorator(muiDecorator)
-  .add('empty', () => <SearchBar value="" onChange={action('change')} onRequestSearch={action('request search')} />)
+  .add('empty', () => (
+    <SearchBar
+      value=""
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+    />
+  ))
   .add('with text', () => (
-    <SearchBar value="123" onChange={action('change')} onRequestSearch={action('request search')} />
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+    />
   ));
 
 storiesOf('UI Building Blocks/Background', module)
@@ -1378,43 +1388,53 @@ storiesOf('SearchPanel', module)
   ));
 
 storiesOf('ExpressionSelector', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('number (with focusOnMount) (no scope)', () => (
-    <ExpressionSelector
-      selectedType=""
-      expressionType="number"
-      onChoose={action('Expression chosen')}
-      focusOnMount
-      scope={{}}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <ExpressionSelector
+        selectedType=""
+        expressionType="number"
+        onChoose={action('Expression chosen')}
+        focusOnMount
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ))
   .add('string (with focusOnMount) (no scope)', () => (
-    <ExpressionSelector
-      selectedType=""
-      expressionType="string"
-      onChoose={action('(String) Expression chosen')}
-      focusOnMount
-      scope={{}}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <ExpressionSelector
+        selectedType=""
+        expressionType="string"
+        onChoose={action('(String) Expression chosen')}
+        focusOnMount
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionSelector', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('conditions (no scope)', () => (
-    <InstructionSelector
-      selectedType=""
-      onChoose={action('Instruction chosen')}
-      isCondition
-      scope={{}}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <InstructionSelector
+        selectedType=""
+        onChoose={action('Instruction chosen')}
+        isCondition
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ))
   .add('actions (no scope)', () => (
-    <InstructionSelector
-      selectedType=""
-      onChoose={action('Instruction chosen')}
-      isCondition={false}
-      scope={{}}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <InstructionSelector
+        selectedType=""
+        onChoose={action('Instruction chosen')}
+        isCondition={false}
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionOrObjectSelector', module)

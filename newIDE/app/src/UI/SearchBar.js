@@ -12,7 +12,7 @@ type Props = {|
   /** Disables text field. */
   disabled?: boolean,
   /** Sets placeholder for the embedded text field. */
-  placeholder?: string,
+  placeholder?: ?React.Node,
   /** Fired when the text value changes. */
   onChange?: string => void,
   /** Fired when the search icon is clicked. */
@@ -133,7 +133,7 @@ export default class SearchBar extends React.Component<Props, State> {
   render() {
     const styles = getStyles(this.props, this.state);
     const { value } = this.state;
-    const { disabled, style, onRequestSearch, ...inputProps } = this.props;
+    const { disabled, style } = this.props;
 
     return (
       <Paper
@@ -144,7 +144,6 @@ export default class SearchBar extends React.Component<Props, State> {
       >
         <div style={styles.searchContainer}>
           <TextField
-            {...inputProps}
             hintText={this.props.placeholder || <Trans>Search</Trans>}
             onBlur={this.handleBlur}
             value={value}

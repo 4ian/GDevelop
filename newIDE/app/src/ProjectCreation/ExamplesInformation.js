@@ -472,23 +472,23 @@ module.exports = {
     ]
   },
   "breakout": {
-    "description": "The classic Breakout arcade game adapted in GDevelop.",
+    "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
         "name": "Sprite"
       },
       {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
+        "fullName": "Text object",
+        "name": "TextObject"
       },
       {
-        "fullName": "System information",
-        "name": "SystemInfo"
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
+        "fullName": "",
+        "name": ""
       },
       {
         "fullName": "Keyboard features",
@@ -499,8 +499,12 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "External layouts",

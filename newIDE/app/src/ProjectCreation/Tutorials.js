@@ -89,6 +89,22 @@ export default class Tutorials extends PureComponent {
                   Window.openExternalURL(getHelpLink('/tutorials/roadrider'));
                 }}
               />
+              <ListItem
+                primaryText={<Trans>Breakout Tutorial</Trans>}
+                secondaryText={
+                  <p>
+                    <Trans>
+                      Create a simple breakout game where you must destroy all
+                      the bricks on the screen.
+                    </Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendTutorialOpened('Breakout');
+                  Window.openExternalURL(getHelpLink('/tutorials/breakout'));
+                }}
+              />
             </List>
           </Column>
         </Line>

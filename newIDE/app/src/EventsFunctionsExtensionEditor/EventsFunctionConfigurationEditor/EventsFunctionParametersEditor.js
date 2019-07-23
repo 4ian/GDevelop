@@ -80,7 +80,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
   _moveParameters = (oldIndex: number, newIndex: number) => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
-    
+
     gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
     this.forceUpdate();
     this.props.onParametersUpdated();

@@ -77,6 +77,15 @@ export default class EventsFunctionParametersEditor extends React.Component<
     this.props.onParametersUpdated();
   };
 
+  _moveParameters = (oldIndex: number, newIndex: number) => {
+    const { eventsFunction } = this.props;
+    const parameters = eventsFunction.getParameters();
+    
+    gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+    this.forceUpdate();
+    this.props.onParametersUpdated();
+  };
+
   render() {
     const {
       project,
@@ -160,6 +169,16 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               label: i18n._(t`Delete`),
                               enabled: !isParameterDisabled(i),
                               click: () => this._removeParameter(i),
+                            },
+                            {
+                              label: i18n._(t`Move up`),
+                              click: () => this._moveParameters(i, i - 1),
+                              enabled: i - 1 >= 0,
+                            },
+                            {
+                              label: i18n._(t`Move down`),
+                              click: () => this._moveParameters(i, i + 1),
+                              enabled: i + 1 < parameters.size(),
                             },
                           ]}
                         />

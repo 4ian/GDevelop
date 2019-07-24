@@ -158,8 +158,7 @@ export default class InstructionOrObjectSelector extends React.Component<
         onChooseObject(displayedObjectsList[0].object.getName());
       } else if (displayedObjectGroupsList.length > 0) {
         onChooseObject(displayedObjectGroupsList[0].group.getName());
-      }
-      if (displayedInstructionsList.length > 0) {
+      } else if (displayedInstructionsList.length > 0) {
         onChooseInstruction(
           displayedInstructionsList[0].type,
           displayedInstructionsList[0]

@@ -44,6 +44,7 @@ export default class PreferencesDialog extends Component<Props, State> {
     const { open, onClose } = this.props;
     const actions = [
       <FlatButton
+        key="close"
         label={<Trans>Close</Trans>}
         primary={false}
         onClick={onClose}

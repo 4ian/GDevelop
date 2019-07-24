@@ -85,7 +85,8 @@ export default class NewInstructionEditorDialog extends React.Component<
       );
       if (
         instructionMetadata &&
-        instructionMetadata.scope.objectMetadata &&
+        (instructionMetadata.scope.objectMetadata ||
+          instructionMetadata.scope.behaviorMetadata) &&
         instruction.getParametersCount() > 0
       ) {
         return this._chooseObject(instruction.getParameter(0));

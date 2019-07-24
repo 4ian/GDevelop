@@ -235,7 +235,7 @@ export default class InstructionOrObjectSelector extends React.Component<
                       {(isSearching || currentTab === 'objects') &&
                         displayedObjectsList.map(objectWithContext => (
                           <SelectorObjectListItem
-                            key={"object-" + objectWithContext.object.ptr}
+                            key={'object-' + objectWithContext.object.ptr}
                             project={project}
                             objectWithContext={objectWithContext}
                             iconSize={iconSize}
@@ -253,7 +253,7 @@ export default class InstructionOrObjectSelector extends React.Component<
                       {(isSearching || currentTab === 'objects') &&
                         displayedObjectGroupsList.map(groupWithContext => (
                           <SelectorGroupObjectsListItem
-                            key={"group-" + groupWithContext.group.ptr}
+                            key={'group-' + groupWithContext.group.ptr}
                             groupWithContext={groupWithContext}
                             iconSize={iconSize}
                             onClick={() =>
@@ -273,7 +273,7 @@ export default class InstructionOrObjectSelector extends React.Component<
                       {isSearching &&
                         displayedInstructionsList.map(instructionMetadata => (
                           <SelectorInstructionOrExpressionListItem
-                            key={"instruction-"+instructionMetadata.type}
+                            key={'instruction-' + instructionMetadata.type}
                             instructionOrExpressionMetadata={
                               instructionMetadata
                             }

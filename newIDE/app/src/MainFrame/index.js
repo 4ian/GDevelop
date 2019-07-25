@@ -125,6 +125,7 @@ type Props = {
   onChooseProject?: () => Promise<?string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
+  onSaveAsProject?: gdProject => Promise<any>,
   onAutoSaveProject?: (project: gdProject) => void,
   shouldOpenAutosave?: (
     filePath: string,
@@ -1188,6 +1189,34 @@ class MainFrame extends React.Component<Props, State> {
     }
   };
 
+  saveAs = () => {
+    console.log("save AS");
+    
+    saveUiSettings(this.state.editorTabs);
+
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+    const { i18n } = this.props;
+
+    if (this.props.saveDialog) {
+      this._openSaveDialog();
+    } else if (this.props.onSaveProject) {
+      this.props.onSaveAsProject(currentProject).then(
+        () => {
+          this._showSnackMessage(i18n._(t`Project properly saved`));
+        },
+        err => {
+          showErrorBox(
+            i18n._(
+              t`Unable to save as the project! Please try again by choosing another location.`
+            ),
+            err
+          );
+        }
+      );
+    }
+  };
+
   askToCloseProject = (cb: ?Function) => {
     if (!this.state.currentProject) return;
     const { i18n } = this.props;
@@ -1440,6 +1469,7 @@ class MainFrame extends React.Component<Props, State> {
               }
               onRenameExternalEvents={this.renameExternalEvents}
               onSaveProject={this.save}
+              onSaveAsProject={this.saveAs}
               onCloseProject={this.askToCloseProject}
               onExportProject={this.openExportDialog}
               onOpenPreferences={() => this.openPreferences(true)}

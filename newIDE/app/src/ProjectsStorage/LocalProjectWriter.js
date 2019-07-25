@@ -8,6 +8,8 @@ import {
 } from '../Utils/ObjectSplitter';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
+const electron = optionalRequire('electron');
+const dialog = electron ? electron.remote.dialog : null;
 
 const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
@@ -76,6 +78,34 @@ export default class LocalProjectWriter {
       return writeJSONFile(serializedProjectObject, filepath).catch(err => {
         console.error('Unable to write the project:', err);
         throw err;
+      });
+    }
+  };
+
+  static saveAsProject = (project: gdProject): Promise<void> => {
+    let filepath = project.getProjectFile();
+    const projectPath = path.dirname(project.getProjectFile());
+    if (!filepath) {
+      return Promise.reject('Unimplemented "Save as" feature');
+    }
+
+    const serializedProjectObject = serializeToJSObject(project);
+    if (!project.isFolderProject()) {
+      if (!dialog) return Promise.reject('Not supported');
+
+      const browserWindow = electron.remote.getCurrentWindow();
+
+      const options = {
+        defaultPath: projectPath,
+      };
+      dialog.showSaveDialog(browserWindow, options, path => {
+        console.log(path);
+        filepath = path;
+
+        return writeJSONFile(serializedProjectObject, filepath).catch(err => {
+          console.error('Unable to write the project with save as:', err);
+          throw err;
+        });
       });
     }
   };

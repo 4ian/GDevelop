@@ -16,7 +16,10 @@ import {
   createTree,
   type InstructionOrExpressionTreeNode,
 } from './InstructionOrExpressionSelector/CreateTree';
-import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+import {
+  type EnumeratedInstructionOrExpressionMetadata,
+  filterEnumeratedInstructionOrExpressionMetadataByScope,
+} from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import {
   enumerateObjectInstructions,
@@ -116,13 +119,17 @@ export default class NewInstructionEditorDialog extends React.Component<
       globalObjectsContainer,
       objectsContainer,
       isCondition,
+      scope,
     } = this.props;
 
-    const chosenObjectInstructionsInfo = enumerateObjectInstructions(
-      isCondition,
-      globalObjectsContainer,
-      objectsContainer,
-      objectName
+    const chosenObjectInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateObjectInstructions(
+        isCondition,
+        globalObjectsContainer,
+        objectsContainer,
+        objectName
+      ),
+      scope
     );
     return {
       chosenObjectName: objectName,

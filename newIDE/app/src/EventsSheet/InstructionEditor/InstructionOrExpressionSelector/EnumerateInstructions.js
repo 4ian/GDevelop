@@ -298,5 +298,23 @@ export const filterInstructionsList = (
     );
   };
 
-  return list.filter(matchCritera);
+  const favorExactMatch = (
+    list: Array<EnumeratedInstructionOrExpressionMetadata>
+  ): Array<EnumeratedInstructionOrExpressionMetadata> => {
+    if (!searchText) {
+      return list;
+    }
+
+    for (var i = 0; i < list.length; ++i) {
+      if (list[i].displayedName.toLowerCase() === lowercaseSearch) {
+        const exactMatch = list[i];
+        list.splice(i, 1);
+        list.unshift(exactMatch);
+      }
+    }
+
+    return list;
+  };
+
+  return favorExactMatch(list.filter(matchCritera));
 };

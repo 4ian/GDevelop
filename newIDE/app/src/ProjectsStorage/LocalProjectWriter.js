@@ -34,14 +34,22 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
 };
 
 export default class LocalProjectWriter {
-  static saveProject = (project: gdProject): Promise<void> => {
-    const filepath = project.getProjectFile();
+  static saveProject = (
+    project: gdProject,
+    isSaveAs: boolean = true
+  ): Promise<void> => {
+    let filepath = project.getProjectFile();
     const projectPath = path.dirname(project.getProjectFile());
     if (!filepath) {
       return Promise.reject('Unimplemented "Save as" feature');
     }
 
     const serializedProjectObject = serializeToJSObject(project);
+    const browserWindow = electron.remote.getCurrentWindow();
+    const options = {
+      defaultPath: projectPath,
+    };
+
     if (project.isFolderProject()) {
       const partialObjects = split(serializedProjectObject, {
         pathSeparator: '/',
@@ -60,6 +68,7 @@ export default class LocalProjectWriter {
 
       return Promise.all(
         partialObjects.map(partialObject => {
+          //TODO How save as multiple files ?
           return writeJSONFile(
             partialObject.object,
             path.join(projectPath, partialObject.reference) + '.json'
@@ -69,44 +78,28 @@ export default class LocalProjectWriter {
           });
         })
       ).then(() => {
-        return writeJSONFile(serializedProjectObject, filepath).catch(err => {
-          console.error('Unable to write the split project:', err);
-          throw err;
-        });
+        //REVIEW need to be tested
+        if (isSaveAs) {
+          filepath = dialog.showSaveDialog(browserWindow, options);
+        }
+        return writeJSONFile(serializedProjectObject, filepath + '.json').catch(
+          err => {
+            console.error('Unable to write the split project:', err);
+            throw err;
+          }
+        );
       });
     } else {
-      return writeJSONFile(serializedProjectObject, filepath).catch(err => {
-        console.error('Unable to write the project:', err);
-        throw err;
-      });
-    }
-  };
-
-  static saveAsProject = (project: gdProject): Promise<void> => {
-    let filepath = project.getProjectFile();
-    const projectPath = path.dirname(project.getProjectFile());
-    if (!filepath) {
-      return Promise.reject('Unimplemented "Save as" feature');
-    }
-
-    const serializedProjectObject = serializeToJSObject(project);
-    if (!project.isFolderProject()) {
-      if (!dialog) return Promise.reject('Not supported');
-
-      const browserWindow = electron.remote.getCurrentWindow();
-
-      const options = {
-        defaultPath: projectPath,
-      };
-      dialog.showSaveDialog(browserWindow, options, path => {
-        console.log(path);
-        filepath = path;
-
-        return writeJSONFile(serializedProjectObject, filepath).catch(err => {
-          console.error('Unable to write the project with save as:', err);
+      //REVIEW  working for simple file
+      if (isSaveAs) {
+        filepath = dialog.showSaveDialog(browserWindow, options);
+      }
+      return writeJSONFile(serializedProjectObject, filepath + '.json').catch(
+        err => {
+          console.error('Unable to write the project:', err);
           throw err;
-        });
-      });
+        }
+      );
     }
   };
 

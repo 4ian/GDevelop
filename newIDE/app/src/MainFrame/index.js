@@ -1190,8 +1190,6 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   saveAs = () => {
-    console.log("save AS");
-    
     saveUiSettings(this.state.editorTabs);
 
     const { currentProject } = this.state;
@@ -1200,8 +1198,8 @@ class MainFrame extends React.Component<Props, State> {
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
-    } else if (this.props.onSaveProject) {
-      this.props.onSaveAsProject(currentProject).then(
+    } else if (this.props.onSaveAsProject) {
+      this.props.onSaveProject(currentProject, true).then(
         () => {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         },

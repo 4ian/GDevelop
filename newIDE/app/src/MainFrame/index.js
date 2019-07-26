@@ -94,6 +94,7 @@ type State = {|
   exportDialogOpen: boolean,
   introDialogOpen: boolean,
   saveDialogOpen: boolean,
+  isSaveAs: boolean,
   genericDialogOpen: boolean,
   loadingProject: boolean,
   previewLoading: boolean,
@@ -149,6 +150,7 @@ class MainFrame extends React.Component<Props, State> {
     exportDialogOpen: false,
     introDialogOpen: false,
     saveDialogOpen: false,
+    isSaveAs: false,
     genericDialogOpen: false,
     loadingProject: false,
     previewLoading: false,
@@ -1164,16 +1166,19 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   save = () => {
+    this.setState({
+      isSaveAs: false,
+    });
     saveUiSettings(this.state.editorTabs);
 
-    const { currentProject } = this.state;
+    const { currentProject, isSaveAs } = this.state;
     if (!currentProject) return;
     const { i18n } = this.props;
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
     } else if (this.props.onSaveProject) {
-      this.props.onSaveProject(currentProject).then(
+      this.props.onSaveProject(currentProject, isSaveAs).then(
         () => {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         },
@@ -1190,16 +1195,19 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   saveAs = () => {
+    this.setState({
+      isSaveAs: true,
+    });
     saveUiSettings(this.state.editorTabs);
 
-    const { currentProject } = this.state;
+    const { currentProject, isSaveAs } = this.state;
     if (!currentProject) return;
     const { i18n } = this.props;
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
-    } else if (this.props.onSaveAsProject) {
-      this.props.onSaveProject(currentProject, true).then(
+    } else if (this.props.onSaveProject) {
+      this.props.onSaveProject(currentProject, isSaveAs).then(
         () => {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         },

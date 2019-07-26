@@ -36,19 +36,20 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
 export default class LocalProjectWriter {
   static saveProject = (
     project: gdProject,
-    isSaveAs: boolean = true
+    isSaveAs: boolean
   ): Promise<void> => {
     let filepath = project.getProjectFile();
-    const projectPath = path.dirname(project.getProjectFile());
-    if (!filepath) {
-      return Promise.reject('Unimplemented "Save as" feature');
-    }
-
+    let projectPath = path.dirname(project.getProjectFile());
     const serializedProjectObject = serializeToJSObject(project);
     const browserWindow = electron.remote.getCurrentWindow();
     const options = {
-      defaultPath: projectPath,
+      defaultPath: projectPath + '\\game.json',
+      filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
     };
+
+    if (isSaveAs) {
+      filepath = dialog.showSaveDialog(browserWindow, options);
+    }
 
     if (project.isFolderProject()) {
       const partialObjects = split(serializedProjectObject, {
@@ -66,9 +67,14 @@ export default class LocalProjectWriter {
         isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
       });
 
+      if (isSaveAs) {
+        if (filepath === undefined) {
+          return Promise.reject(new Error('Save As has been canceled'));
+        }
+        projectPath = path.dirname(filepath);
+      }
       return Promise.all(
         partialObjects.map(partialObject => {
-          //TODO How save as multiple files ?
           return writeJSONFile(
             partialObject.object,
             path.join(projectPath, partialObject.reference) + '.json'
@@ -78,28 +84,16 @@ export default class LocalProjectWriter {
           });
         })
       ).then(() => {
-        //REVIEW need to be tested
-        if (isSaveAs) {
-          filepath = dialog.showSaveDialog(browserWindow, options);
-        }
-        return writeJSONFile(serializedProjectObject, filepath + '.json').catch(
-          err => {
-            console.error('Unable to write the split project:', err);
-            throw err;
-          }
-        );
+        return writeJSONFile(serializedProjectObject, filepath).catch(err => {
+          console.error('Unable to write the split project:', err);
+          throw err;
+        });
       });
     } else {
-      //REVIEW  working for simple file
-      if (isSaveAs) {
-        filepath = dialog.showSaveDialog(browserWindow, options);
-      }
-      return writeJSONFile(serializedProjectObject, filepath + '.json').catch(
-        err => {
-          console.error('Unable to write the project:', err);
-          throw err;
-        }
-      );
+      return writeJSONFile(serializedProjectObject, filepath).catch(err => {
+        console.error('Unable to write the project:', err);
+        throw err;
+      });
     }
   };
 

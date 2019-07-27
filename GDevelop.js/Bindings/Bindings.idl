@@ -1824,6 +1824,15 @@ interface ResourcesMergingHelper {
     [Ref] MapStringString GetAllResourcesOldAndNewFilename();
 };
 
+interface ProjectResourcesCopier {
+    boolean STATIC_CopyAllResourcesTo([Ref] Project project,
+                                 [Ref] AbstractFileSystem fs,
+                                 [Const] DOMString destinationDirectory,
+                                 boolean updateOriginalProject,
+                                 boolean preserveAbsoluteFilenames,
+                                 boolean preserveDirectoryStructure);
+};
+
 interface ResourcesInUseHelper {
     void ResourcesInUseHelper();
 

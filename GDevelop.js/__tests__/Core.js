@@ -2092,6 +2092,7 @@ describe('libGD.js', function() {
 
   describe('gd.ResourcesMergingHelper (and gd.AbstractFileSystemJS)', function() {
     it('should export files of the project', function() {
+      // Create a project with a mix of resources
       const project = new gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const resource = new gd.ImageResource();
@@ -2115,6 +2116,7 @@ describe('libGD.js', function() {
       project.getResourcesManager().addResource(resource4);
       project.getResourcesManager().addResource(resource5);
 
+      // Create a fake file system
       const fs = new gd.AbstractFileSystemJS();
       fs.mkDir = fs.clearDir = function() {};
       fs.getTempDir = function(path) {
@@ -2133,6 +2135,7 @@ describe('libGD.js', function() {
         return path.relative(baseDirectory, absolutePath);
       };
 
+      // Check that ResourcesMergingHelper can update the filenames
       const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
       project.exposeResources(resourcesMergingHelper);
@@ -2157,6 +2160,119 @@ describe('libGD.js', function() {
       ).toBe('MyResourceWithExtension2');
 
       resourcesMergingHelper.delete();
+      project.delete();
+    });
+  });
+
+  describe('gd.ProjectResourcesCopier (and gd.AbstractFileSystemJS)', function() {
+    it('should export files of the project', function() {
+      // Create a project with a mix of resources, stored in /my/project folder.
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      project.setProjectFile("/my/project/project.json");
+      const layout = project.insertNewLayout('Scene', 0);
+      const resource = new gd.ImageResource();
+      const resource2 = new gd.ImageResource();
+      const resource3 = new gd.ImageResource();
+      const resource4 = new gd.ImageResource();
+      const resource5 = new gd.ImageResource();
+      resource.setName('MyResource');
+      resource.setFile('MyResource.png');
+      resource2.setName('MyAudioResource');
+      resource2.setFile('MyResource.wav');
+      resource3.setName('MyAbsoluteResource');
+      resource3.setFile('/my/absolute/path/MyResource2.png');
+      resource4.setName('test/MyResourceWithoutExtension');
+      resource4.setFile('test/MyResourceWithoutExtension');
+      resource5.setName('test/sub/folder/MyResourceWithoutExtension');
+      resource5.setFile('test/sub/folder/MyResourceWithoutExtension'); // Same filename as resource4
+      project.getResourcesManager().addResource(resource);
+      project.getResourcesManager().addResource(resource2);
+      project.getResourcesManager().addResource(resource3);
+      project.getResourcesManager().addResource(resource4);
+      project.getResourcesManager().addResource(resource5);
+
+      // Create a fake file system
+      const fs = new gd.AbstractFileSystemJS();
+      fs.mkDir = fs.clearDir = function() {};
+      fs.getTempDir = function(path) {
+        return '/tmp/';
+      };
+      fs.fileNameFrom = function(fullPath) {
+        return path.basename(fullPath);
+      };
+      fs.dirNameFrom = function(fullPath) {
+        return path.dirname(fullPath);
+      };
+      fs.makeAbsolute = function(relativePath, baseDirectory) {
+        return path.resolve(baseDirectory, relativePath);
+      };
+      fs.makeRelative = function(absolutePath, baseDirectory) {
+        return path.relative(baseDirectory, absolutePath);
+      };
+      fs.isAbsolute = function(fullPath) {
+        return path.isAbsolute(fullPath);
+      }
+      fs.dirExists = function(directoryPath) {
+        return true; // Fake that all directory required exist.
+      }
+
+      // In particular, create a mock copyFile, that we can track to verify
+      // files are properly copied.
+      fs.copyFile = jest.fn();
+      fs.copyFile.mockImplementation(function(srcPath, destPath) {
+        console.log(srcPath, destPath);
+        return true;
+      });
+
+      // Check that resources can be copied to another folder:
+      // * including absolute files.
+      // * preserving relative file structures
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, false, true);
+      expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/test/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/test/sub/folder/MyResourceWithoutExtension');
+
+      // Check that resources can be copied to another folder:
+      // * including absolute files.
+      // * NOT preserving relative file structures
+      // Check that filename collisions are avoided.
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, false, false);
+      expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension2');
+
+      // Check that resources can be copied to another folder:
+      // * without touching absolute files.
+      // * preserving relative file structures
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, true, true);
+      expect(fs.copyFile).toHaveBeenCalledTimes(4); // Only the 4 relative resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/test/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/test/sub/folder/MyResourceWithoutExtension');
+
+      // Check that resources can be copied to another folder:
+      // * without touching absolute files.
+      // * NOT preserving relative file structures
+      // Check that filename collisions are avoided.
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, true, false);
+      expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension2');
+
       project.delete();
     });
   });

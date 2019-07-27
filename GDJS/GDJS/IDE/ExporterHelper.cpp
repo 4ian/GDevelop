@@ -694,10 +694,9 @@ bool ExporterHelper::ExportIncludesAndLibs(
 
 void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
                                      gd::Project &project,
-                                     gd::String exportDir,
-                                     wxProgressDialog *progressDialog) {
+                                     gd::String exportDir) {
   gd::ProjectResourcesCopier::CopyAllResourcesTo(
-      project, fs, exportDir, true, progressDialog, false, false);
+      project, fs, exportDir, true, false, false);
 }
 
 }  // namespace gdjs

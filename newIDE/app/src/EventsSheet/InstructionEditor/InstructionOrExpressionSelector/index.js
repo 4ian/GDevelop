@@ -7,7 +7,7 @@ import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInst
 import { type InstructionOrExpressionTreeNode } from './CreateTree';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { filterInstructionsList } from './EnumerateInstructions';
-import SelectorInstructionOrExpressionListItem from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
+import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView from '../../../UI/ScrollView';
@@ -101,20 +101,16 @@ export default class InstructionOrExpressionSelector extends React.Component<
                 <SelectableList value={selectedType}>
                   {searchText
                     ? displayedInstructionsList.map(
-                        enumeratedInstructionOrExpressionMetadata => (
-                          <SelectorInstructionOrExpressionListItem
-                            instructionOrExpressionMetadata={
-                              enumeratedInstructionOrExpressionMetadata
-                            }
-                            iconSize={iconSize}
-                            onClick={() =>
+                        enumeratedInstructionOrExpressionMetadata =>
+                          renderInstructionOrExpressionListItem({
+                            instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                            iconSize: iconSize,
+                            onClick: () =>
                               onChoose(
                                 enumeratedInstructionOrExpressionMetadata.type,
                                 enumeratedInstructionOrExpressionMetadata
-                              )
-                            }
-                          />
-                        )
+                              ),
+                          })
                       )
                     : renderInstructionTree({
                         instructionTreeNode: instructionsInfoTree,

@@ -12,13 +12,18 @@ type Props = {|
   onClick: () => void,
 |};
 
-export default ({ project, objectWithContext, iconSize, onClick }: Props) => {
+export const renderObjectListItem = ({
+  project,
+  objectWithContext,
+  iconSize,
+  onClick,
+}: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
-      key={objectName}
+      key={'object-' + objectWithContext.object.ptr}
       primaryText={objectName}
-      value={objectName}
+      value={objectName} // TODO: same as key
       leftIcon={
         <ListIcon
           iconSize={iconSize}

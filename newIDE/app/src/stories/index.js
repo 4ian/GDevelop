@@ -133,6 +133,7 @@ import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
 import SearchBar from '../UI/SearchBar';
+import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
 
 // No i18n in this file
 
@@ -1475,19 +1476,51 @@ storiesOf('InstructionSelector', module)
 storiesOf('InstructionOrObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <InstructionOrObjectSelector
-        style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
-        project={project}
-        globalObjectsContainer={project}
-        objectsContainer={testLayout}
-        isCondition
-        onChooseInstruction={action('instruction chosen')}
-        onChooseObject={action('choose object')}
-        focusOnMount
-      />
-    </FixedHeightFlexContainer>
+  .add('"KeyPressed" condition chosen, ', () => (
+    <ValueStateHolder
+      initialValue={'free-instructions'}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <InstructionOrObjectSelector
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+            project={project}
+            currentTab={value}
+            onChangeTab={onChange}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            isCondition
+            chosenInstructionType={'KeyPressed'}
+            onChooseInstruction={action('instruction chosen')}
+            chosenObjectName={null}
+            onChooseObject={action('choose object')}
+            focusOnMount
+          />
+        </FixedHeightFlexContainer>
+      )}
+    />
+  ))
+  .add('"MySpriteObject" object chosen, ', () => (
+    <ValueStateHolder
+      initialValue={'objects'}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <InstructionOrObjectSelector
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+            project={project}
+            currentTab={value}
+            onChangeTab={onChange}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            isCondition
+            chosenInstructionType={''}
+            onChooseInstruction={action('instruction chosen')}
+            chosenObjectName={'MySpriteObject'}
+            onChooseObject={action('choose object')}
+            focusOnMount
+          />
+        </FixedHeightFlexContainer>
+      )}
+    />
   ));
 
 storiesOf('InstructionEditor', module)
@@ -1526,6 +1559,80 @@ storiesOf('InstructionEditor', module)
       resourceSources={[]}
       openInstructionOrExpression={action('open instruction or expression')}
     />
+  ));
+
+storiesOf('NewInstructionEditorDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('Existing condition (scope: in a layout)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <NewInstructionEditorDialog
+        open
+        project={project}
+        scope={{ layout: testLayout }}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        isNewInstruction={false}
+        instruction={testInstruction}
+        resourceExternalEditors={[]}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+        onCancel={action('cancel')}
+        onSubmit={action('submit')}
+      />
+    </FixedHeightFlexContainer>
+  ))
+  .add('Existing condition (scope: without layout)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <NewInstructionEditorDialog
+        open
+        project={project}
+        scope={{ layout: null }}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        isNewInstruction={false}
+        instruction={testInstruction}
+        resourceExternalEditors={[]}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+        onCancel={action('cancel')}
+        onSubmit={action('submit')}
+      />
+    </FixedHeightFlexContainer>
+  ))
+  .add('New condition (scope: without layout)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <NewInstructionEditorDialog
+        open
+        project={project}
+        scope={{ layout: null }}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        isNewInstruction={true}
+        instruction={testInstruction}
+        resourceExternalEditors={[]}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+        onCancel={action('cancel')}
+        onSubmit={action('submit')}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('TextEditor', module)

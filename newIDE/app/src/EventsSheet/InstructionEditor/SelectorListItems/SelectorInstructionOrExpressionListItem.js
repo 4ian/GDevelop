@@ -10,14 +10,15 @@ type Props = {|
   onClick: () => void,
 |};
 
-export default ({
+export const renderInstructionOrExpressionListItem = ({
   instructionOrExpressionMetadata,
   iconSize,
   onClick,
 }: Props) => {
   return (
     <ListItem
-      key={instructionOrExpressionMetadata.type}
+      key={'instruction-' + instructionOrExpressionMetadata.type}
+      value={instructionOrExpressionMetadata.type} // TODO: same as key
       primaryText={instructionOrExpressionMetadata.displayedName}
       secondaryText={instructionOrExpressionMetadata.fullGroupName}
       leftIcon={
@@ -26,7 +27,6 @@ export default ({
           src={instructionOrExpressionMetadata.iconFilename}
         />
       }
-      value={instructionOrExpressionMetadata.type}
       onClick={onClick}
     />
   );

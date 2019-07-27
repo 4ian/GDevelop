@@ -25,8 +25,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     # Build dependencies:
-    # (Cmake 3+ is required by Emscripten)
-    - cmake3
+    - cmake
     - p7zip-full
     - g++-4.8
     # SFML dependencies:

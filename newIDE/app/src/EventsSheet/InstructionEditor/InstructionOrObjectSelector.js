@@ -14,7 +14,7 @@ import {
   filterInstructionsList,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
-import { List } from 'material-ui/List';
+import { List, makeSelectable } from 'material-ui/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
@@ -27,9 +27,9 @@ import {
   enumerateObjects,
 } from '../../ObjectsList/EnumerateObjects';
 import TagChips from '../../UI/TagChips';
-import SelectorGroupObjectsListItem from './SelectorListItems/SelectorGroupObjectsListItem';
-import SelectorObjectListItem from './SelectorListItems/SelectorObjectListItem';
-import SelectorInstructionOrExpressionListItem from './SelectorListItems/SelectorInstructionOrExpressionListItem';
+import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
+import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
+import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../UI/EmptyMessage';
 import {
@@ -43,11 +43,11 @@ const styles = {
   },
 };
 
-type TabNames = 'objects' | 'free-instructions';
+const SelectableList = makeSelectable(List);
+
+export type TabName = 'objects' | 'free-instructions';
 
 type State = {|
-  currentTab: TabNames,
-
   searchText: string,
 
   // State for tags of objects:
@@ -58,12 +58,16 @@ type Props = {|
   project: gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  currentTab: TabName,
+  onChangeTab: TabName => void,
   isCondition: boolean,
   focusOnMount?: boolean,
+  chosenInstructionType: ?string,
   onChooseInstruction: (
     type: string,
     EnumeratedInstructionOrExpressionMetadata
   ) => void,
+  chosenObjectName: ?string,
   onChooseObject: (objectName: string) => void,
   style?: Object,
 |};
@@ -74,7 +78,7 @@ export default class InstructionOrObjectSelector extends React.Component<
   Props,
   State
 > {
-  state = { currentTab: 'objects', searchText: '', selectedObjectTags: [] };
+  state = { searchText: '', selectedObjectTags: [] };
   _searchBar = React.createRef<SearchBar>();
 
   instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = enumerateFreeInstructions(
@@ -123,11 +127,15 @@ export default class InstructionOrObjectSelector extends React.Component<
       globalObjectsContainer,
       objectsContainer,
       project,
+      chosenInstructionType,
       onChooseInstruction,
+      chosenObjectName,
       onChooseObject,
       isCondition,
+      currentTab,
+      onChangeTab,
     } = this.props;
-    const { currentTab, searchText, selectedObjectTags } = this.state;
+    const { searchText, selectedObjectTags } = this.state;
 
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
       globalObjectsContainer,
@@ -192,27 +200,20 @@ export default class InstructionOrObjectSelector extends React.Component<
                   ref={this._searchBar}
                 />
                 {!isSearching && (
-                  <Tabs
-                    value={currentTab}
-                    onChange={(currentTab: TabNames) =>
-                      this.setState({
-                        currentTab,
-                      })
-                    }
-                  >
+                  <Tabs value={currentTab} onChange={onChangeTab}>
                     <Tab
                       label={<Trans>Objects</Trans>}
-                      value={('objects': TabNames)}
+                      value={('objects': TabName)}
                     />
                     <Tab
                       label={
                         isCondition ? (
-                          <Trans>Non-objects and other conditions</Trans>
+                          <Trans>Other conditions</Trans>
                         ) : (
-                          <Trans>Non-objects and other actions</Trans>
+                          <Trans>Other actions</Trans>
                         )
                       }
-                      value={('free-instructions': TabNames)}
+                      value={('free-instructions': TabName)}
                     >
                       {/* Manually display tabs to support flex */}
                     </Tab>
@@ -230,19 +231,24 @@ export default class InstructionOrObjectSelector extends React.Component<
                     />
                   )}
                   {hasResults && (
-                    <List>
+                    <SelectableList
+                      value={
+                        chosenObjectName ||
+                        chosenInstructionType /* TODO: use prefixes to distinguish object (or groups) and instructions */
+                      }
+                    >
                       {(isSearching || currentTab === 'objects') &&
-                        displayedObjectsList.map(objectWithContext => (
-                          <SelectorObjectListItem
-                            key={'object-' + objectWithContext.object.ptr}
-                            project={project}
-                            objectWithContext={objectWithContext}
-                            iconSize={iconSize}
-                            onClick={() =>
-                              onChooseObject(objectWithContext.object.getName())
-                            }
-                          />
-                        ))}
+                        displayedObjectsList.map(objectWithContext =>
+                          renderObjectListItem({
+                            project: project,
+                            objectWithContext: objectWithContext,
+                            iconSize: iconSize,
+                            onClick: () =>
+                              onChooseObject(
+                                objectWithContext.object.getName()
+                              ),
+                          })
+                        )}
                       {(isSearching || currentTab === 'objects') &&
                         displayedObjectGroupsList.length > 0 && (
                           <Subheader>
@@ -250,16 +256,14 @@ export default class InstructionOrObjectSelector extends React.Component<
                           </Subheader>
                         )}
                       {(isSearching || currentTab === 'objects') &&
-                        displayedObjectGroupsList.map(groupWithContext => (
-                          <SelectorGroupObjectsListItem
-                            key={'group-' + groupWithContext.group.ptr}
-                            groupWithContext={groupWithContext}
-                            iconSize={iconSize}
-                            onClick={() =>
-                              onChooseObject(groupWithContext.group.getName())
-                            }
-                          />
-                        ))}
+                        displayedObjectGroupsList.map(groupWithContext =>
+                          renderGroupObjectsListItem({
+                            groupWithContext: groupWithContext,
+                            iconSize: iconSize,
+                            onClick: () =>
+                              onChooseObject(groupWithContext.group.getName()),
+                          })
+                        )}
                       {isSearching && displayedInstructionsList.length > 0 && (
                         <Subheader>
                           {isCondition ? (
@@ -270,21 +274,17 @@ export default class InstructionOrObjectSelector extends React.Component<
                         </Subheader>
                       )}
                       {isSearching &&
-                        displayedInstructionsList.map(instructionMetadata => (
-                          <SelectorInstructionOrExpressionListItem
-                            key={'instruction-' + instructionMetadata.type}
-                            instructionOrExpressionMetadata={
-                              instructionMetadata
-                            }
-                            iconSize={iconSize}
-                            onClick={() =>
+                        displayedInstructionsList.map(instructionMetadata =>
+                          renderInstructionOrExpressionListItem({
+                            instructionOrExpressionMetadata: instructionMetadata,
+                            iconSize: iconSize,
+                            onClick: () =>
                               onChooseInstruction(
                                 instructionMetadata.type,
                                 instructionMetadata
-                              )
-                            }
-                          />
-                        ))}
+                              ),
+                          })
+                        )}
                       {!isSearching &&
                         currentTab === 'free-instructions' &&
                         renderInstructionTree({
@@ -292,7 +292,7 @@ export default class InstructionOrObjectSelector extends React.Component<
                           onChoose: onChooseInstruction,
                           iconSize,
                         })}
-                    </List>
+                    </SelectableList>
                   )}
                   {!hasResults && (
                     <EmptyMessage>

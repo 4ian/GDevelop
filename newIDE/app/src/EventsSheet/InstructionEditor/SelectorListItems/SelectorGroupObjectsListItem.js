@@ -10,13 +10,17 @@ type Props = {|
   onClick: () => void,
 |};
 
-export default ({ groupWithContext, iconSize, onClick }: Props) => {
+export const renderGroupObjectsListItem = ({
+  groupWithContext,
+  iconSize,
+  onClick,
+}: Props) => {
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem
-      key={groupName}
+      key={'group-' + groupWithContext.group.ptr}
+      value={groupName} // TODO: same as key
       primaryText={groupName}
-      value={groupName}
       leftIcon={
         <ListIcon
           iconSize={iconSize}

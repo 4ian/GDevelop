@@ -5,10 +5,10 @@
  * @param {Object} behaviorData The data to initialize the behavior
  * @param {gdjs.RuntimeObject} owner The runtime object the behavior belongs to.
  */
-gdjs.TweenRuntimeBehavior = function(runtimeScene, behaviorData, owner) {
+gdjs.TweenRuntimeBehavior = function (runtimeScene, behaviorData, owner) {
   gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
-  /** @type Object.<string, gdjs.TweenRuntimeBehavior.TweenInstance > */
 
+  /** @type Object.<string, gdjs.TweenRuntimeBehavior.TweenInstance > */
   this._tweens = {};
   this._runtimeScene = runtimeScene;
   this._isActive = true;
@@ -17,8 +17,10 @@ gdjs.TweenRuntimeBehavior = function(runtimeScene, behaviorData, owner) {
 gdjs.TweenRuntimeBehavior.prototype = Object.create(
   gdjs.RuntimeBehavior.prototype
 );
+
 gdjs.TweenRuntimeBehavior.thisIsARuntimeBehaviorConstructor =
   "Tween::TweenBehavior";
+
 gdjs.TweenRuntimeBehavior.easings = [
   "linear",
   "easeInQuad",
@@ -56,6 +58,7 @@ gdjs.TweenRuntimeBehavior.easings = [
   "easeFrom",
   "easeTo"
 ];
+
 /**
  * A tween being played in a behavior.
  * @param {shifty.Tweenable} instance The Shifty tween that is played
@@ -63,8 +66,7 @@ gdjs.TweenRuntimeBehavior.easings = [
  * @param {number} startTime The time at which the tween starts
  * @param {number} totalDuration The time of the whole tween
  */
-
-gdjs.TweenRuntimeBehavior.TweenInstance = function(
+gdjs.TweenRuntimeBehavior.TweenInstance = function (
   instance,
   hasFinished,
   startTime,
@@ -77,7 +79,7 @@ gdjs.TweenRuntimeBehavior.TweenInstance = function(
   this.resumeOnActivate = false;
 };
 
-gdjs.TweenRuntimeBehavior.prototype._addTween = function(
+gdjs.TweenRuntimeBehavior.prototype._addTween = function (
   identifier,
   instance,
   startTime,
@@ -91,76 +93,74 @@ gdjs.TweenRuntimeBehavior.prototype._addTween = function(
   );
 };
 
-gdjs.TweenRuntimeBehavior.prototype._getTween = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype._getTween = function (identifier) {
   return this._tweens[identifier];
 };
 
-gdjs.TweenRuntimeBehavior.prototype._tweenExists = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype._tweenExists = function (identifier) {
   return !!this._tweens[identifier];
 };
 
-gdjs.TweenRuntimeBehavior.prototype._tweenIsPlaying = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype._tweenIsPlaying = function (identifier) {
   return this._tweens[identifier].instance.isPlaying();
 };
 
-gdjs.TweenRuntimeBehavior.prototype._pauseTween = function(identifier) {
-  var tween = this._tweens[identifier]; // Pause the tween, and remove it from the scene of living tweens
+gdjs.TweenRuntimeBehavior.prototype._pauseTween = function (identifier) {
+  var tween = this._tweens[identifier];
+
+  // Pause the tween, and remove it from the scene of living tweens
   // (the invariant is that scene only contains tweens being played).
-
   tween.instance.pause();
-
   if (this._runtimeScene.shiftyJsScene) {
     this._runtimeScene.shiftyJsScene.remove(tween.instance);
   }
 };
 
-gdjs.TweenRuntimeBehavior.prototype._resumeTween = function(identifier) {
-  var tween = this._tweens[identifier]; // Resume the tween, and add it back to the scene of living tweens
-  // (the invariant is that scene only contains tweens being played).
+gdjs.TweenRuntimeBehavior.prototype._resumeTween = function (identifier) {
+  var tween = this._tweens[identifier];
 
-  tween.instance.resume().catch(function() {
+  // Resume the tween, and add it back to the scene of living tweens
+  // (the invariant is that scene only contains tweens being played).
+  tween.instance.resume().catch(function () {
     // Do nothing if the Promise is rejected. Rejection is used
     // by Shifty.js to signal that the tween was not finished.
     // We catch it to avoid an uncaught promise error, and to
     // ensure that the content of the "then" is always applied:
   });
-
   if (this._runtimeScene.shiftyJsScene) {
     this._runtimeScene.shiftyJsScene.add(tween.instance);
   }
 };
 
-gdjs.TweenRuntimeBehavior.prototype._stopTween = function(
+gdjs.TweenRuntimeBehavior.prototype._stopTween = function (
   identifier,
   jumpToDest
 ) {
   return this._tweens[identifier].instance.stop(jumpToDest);
 };
 
-gdjs.TweenRuntimeBehavior.prototype._setTweenFinished = function(
+gdjs.TweenRuntimeBehavior.prototype._setTweenFinished = function (
   identifier,
   hasFinished
 ) {
   this._tweens[identifier].hasFinished = hasFinished;
 };
 
-gdjs.TweenRuntimeBehavior.prototype._tweenHasFinished = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype._tweenHasFinished = function (identifier) {
   return this._tweens[identifier].hasFinished;
 };
 
-gdjs.TweenRuntimeBehavior.prototype._removeObjectFromScene = function(
+gdjs.TweenRuntimeBehavior.prototype._removeObjectFromScene = function (
   identifier
 ) {
   this._removeTween(identifier);
-
   return this.owner.deleteFromScene(this._runtimeScene);
 };
 
-gdjs.TweenRuntimeBehavior.prototype._removeTween = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype._removeTween = function (identifier) {
   if (!this._tweens[identifier]) return;
 
   this._tweens[identifier].instance.stop();
-
   gdjs.TweenRuntimeBehavior.removeFromScene(
     this._runtimeScene,
     this._tweens[identifier].instance
@@ -168,25 +168,24 @@ gdjs.TweenRuntimeBehavior.prototype._removeTween = function(identifier) {
   delete this._tweens[identifier];
 };
 
-gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
+gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function (
   identifier,
   destroyObjectWhenFinished
 ) {
-  var _this = this;
-
+  var that = this;
   if (destroyObjectWhenFinished) {
     this._tweens[identifier].instance
       .tween()
-      .catch(function() {
+      .catch(function () {
         // Do nothing if the Promise is rejected. Rejection is used
         // by Shifty.js to signal that the tween was not finished.
         // We catch it to avoid an uncaught promise error, and to
         // ensure that the content of the "then" is always applied:
       })
-      .then(function() {
-        _this._removeObjectFromScene(identifier);
+      .then(function () {
+        that._removeObjectFromScene(identifier);
       })
-      .catch(function() {
+      .catch(function () {
         // Do nothing if the Promise is rejected. Rejection is used
         // by Shifty.js to signal that the tween was not finished.
         // We catch it to avoid an uncaught promise error, and to
@@ -195,18 +194,18 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
   } else {
     this._tweens[identifier].instance
       .tween()
-      .catch(function() {
+      .catch(function () {
         // Do nothing if the Promise is rejected. Rejection is used
         // by Shifty.js to signal that the tween was not finished.
         // We catch it to avoid an uncaught promise error, and to
         // ensure that the content of the "then" is always applied:
       })
-      .then(function() {
-        if (_this._tweens[identifier]) {
-          _this._tweens[identifier].hasFinished = true;
+      .then(function () {
+        if (that._tweens[identifier]) {
+          that._tweens[identifier].hasFinished = true;
         }
       })
-      .catch(function() {
+      .catch(function () {
         // Do nothing if the Promise is rejected. Rejection is used
         // by Shifty.js to signal that the tween was not finished.
         // We catch it to avoid an uncaught promise error, and to
@@ -214,6 +213,7 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
       });
   }
 };
+
 /**
  * Add an object variable tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -224,8 +224,7 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function (
   identifier,
   variable,
   fromValue,
@@ -244,6 +243,7 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
   var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
     this._runtimeScene
   );
+
   newTweenable.setConfig({
     from: {
       value: fromValue
@@ -267,6 +267,7 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object position tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -276,8 +277,7 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function (
   identifier,
   toX,
   toY,
@@ -285,8 +285,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this2 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
@@ -309,9 +308,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this2.owner.setX(state.x);
-
-      _this2.owner.setY(state.y);
+      that.owner.setX(state.x);
+      that.owner.setY(state.y);
     }
   });
 
@@ -324,6 +322,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object X position tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -332,16 +331,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function (
   identifier,
   toX,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this3 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
@@ -362,7 +359,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this3.owner.setX(state.x);
+      that.owner.setX(state.x);
     }
   });
 
@@ -375,6 +372,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object Y position tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -383,16 +381,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function (
   identifier,
   toY,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this4 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
@@ -413,7 +409,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this4.owner.setY(state.y);
+      that.owner.setY(state.y);
     }
   });
 
@@ -426,6 +422,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object angle tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -434,16 +431,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function (
   identifier,
   toAngle,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this5 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
@@ -464,7 +459,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this5.owner.setAngle(state.angle);
+      that.owner.setAngle(state.angle);
     }
   });
 
@@ -477,6 +472,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object scale tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -486,8 +482,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function (
   identifier,
   toScaleX,
   toScaleY,
@@ -495,10 +490,10 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this6 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!this.owner.setScaleX || !this.owner.setScaleY) return;
+
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -507,6 +502,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
 
   if (toScaleX < 0) toScaleX = 0;
   if (toScaleY < 0) toScaleY = 0;
+
   var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
     this._runtimeScene
   );
@@ -522,9 +518,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this6.owner.setScaleX(state.scaleX);
-
-      _this6.owner.setScaleY(state.scaleY);
+      that.owner.setScaleX(state.scaleX);
+      that.owner.setScaleY(state.scaleY);
     }
   });
 
@@ -537,6 +532,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object X-scale tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -545,18 +541,17 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function (
   identifier,
   toScaleX,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this7 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!this.owner.setScaleX) return;
+
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -576,7 +571,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this7.owner.setScaleX(state.scaleX);
+      that.owner.setScaleX(state.scaleX);
     }
   });
 
@@ -589,6 +584,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object scale y tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -597,18 +593,17 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function (
   identifier,
   toScaleY,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this8 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!this.owner.setScaleY) return;
+
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -628,7 +623,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this8.owner.setScaleY(state.scaleY);
+      that.owner.setScaleY(state.scaleY);
     }
   });
 
@@ -641,6 +636,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object opacity tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -649,18 +645,17 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function (
   identifier,
   toOpacity,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this9 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!this.owner.getOpacity || !this.owner.setOpacity) return;
+
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -680,7 +675,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this9.owner.setOpacity(state.opacity);
+      that.owner.setOpacity(state.opacity);
     }
   });
 
@@ -693,6 +688,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add an object color tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -701,16 +697,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function (
   identifier,
   toColor,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this10 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!this.owner.getColor || !this.owner.setColor) return;
   if (
@@ -719,6 +713,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
     )
   )
     return;
+
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -728,6 +723,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
   var fromColor = this.owner.getColor().split(";");
   var toColor = toColor.split(";");
   if (toColor.length !== 3) return;
+
   var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
     this._runtimeScene
   );
@@ -745,12 +741,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this10.owner.setColor(
+      that.owner.setColor(
         Math.floor(state.red) +
-          ";" +
-          Math.floor(state.green) +
-          ";" +
-          Math.floor(state.blue)
+        ";" +
+        Math.floor(state.green) +
+        ";" +
+        Math.floor(state.blue)
       );
     }
   });
@@ -764,6 +760,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Add a text object character size tween.
  * @param {string} identifier Unique id to idenfify the tween
@@ -772,18 +769,17 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-
-gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
+gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function (
   identifier,
   toSize,
   easingValue,
   durationValue,
   destroyObjectWhenFinished
 ) {
-  var _this11 = this;
-
+  var that = this;
   if (!this._isActive) return;
   if (!this.owner.setCharacterSize) return;
+
   if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -803,7 +799,7 @@ gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
     duration: durationValue,
     easing: easingValue,
     step: function step(state) {
-      _this11.owner.setCharacterSize(state.size);
+      that.owner.setCharacterSize(state.size);
     }
   });
 
@@ -816,58 +812,58 @@ gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
+
 /**
  * Tween is playing.
  * @param {string} identifier Unique id to idenfify the tween
  */
-
-gdjs.TweenRuntimeBehavior.prototype.isPlaying = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype.isPlaying = function (identifier) {
   if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
     return true;
   } else {
     return false;
   }
 };
+
 /**
  * Tween exists.
  * @param {string} identifier Unique id to idenfify the tween
  * @returns {boolean} The tween exists
  */
-
-gdjs.TweenRuntimeBehavior.prototype.exists = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype.exists = function (identifier) {
   return this._tweenExists(identifier);
 };
+
 /**
  * Tween has finished.
  * @param {string} identifier Unique id to idenfify the tween
  */
-
-gdjs.TweenRuntimeBehavior.prototype.hasFinished = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype.hasFinished = function (identifier) {
   if (this._tweenExists(identifier)) {
     return this._tweenHasFinished(identifier);
   } else {
     return false;
   }
 };
+
 /**
  * Pause a tween.
  * @param {string} identifier Unique id to idenfify the tween
  */
-
-gdjs.TweenRuntimeBehavior.prototype.pauseTween = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype.pauseTween = function (identifier) {
   if (!this._isActive) return;
 
   if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
     this._pauseTween(identifier);
   }
 };
+
 /**
  * Stop a tween.
  * @param {string} identifier Unique id to idenfify the tween
  * @param {boolean} jumpToDest Move to destination
  */
-
-gdjs.TweenRuntimeBehavior.prototype.stopTween = function(
+gdjs.TweenRuntimeBehavior.prototype.stopTween = function (
   identifier,
   jumpToDest
 ) {
@@ -877,80 +873,76 @@ gdjs.TweenRuntimeBehavior.prototype.stopTween = function(
     this._stopTween(identifier, jumpToDest);
   }
 };
+
 /**
  * Resume a tween.
  * @param {string} identifier Unique id to idenfify the tween
  */
-
-gdjs.TweenRuntimeBehavior.prototype.resumeTween = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype.resumeTween = function (identifier) {
   if (!this._isActive) return;
 
   if (this._tweenExists(identifier) && !this._tweenIsPlaying(identifier)) {
     this._resumeTween(identifier);
   }
 };
+
 /**
  * Remove a tween.
  * @param {string} identifierFirst Unique id to idenfify the tween
  */
-
-gdjs.TweenRuntimeBehavior.prototype.removeTween = function(identifier) {
+gdjs.TweenRuntimeBehavior.prototype.removeTween = function (identifier) {
   this._removeTween(identifier);
 };
+
 /**
  * Get tween progress.
  * @param {string} identifier Unique id to idenfify the tween
  * @returns {boolean} Progress of playing tween animation (between 0.0 and 1.0)
  */
-
-gdjs.TweenRuntimeBehavior.prototype.getProgress = function(identifier) {
-  var tween = this._getTween(identifier);
-
+gdjs.TweenRuntimeBehavior.prototype.getProgress = function (identifier) {
+  const tween = this._getTween(identifier);
   if (tween) {
     var currentTime = this._runtimeScene.getTimeManager().getTimeFromStart();
-
     if (currentTime >= tween.startTime + tween.totalDuration) return 1;
+
     return (currentTime - tween.startTime) / tween.totalDuration;
   } else {
     return 0;
   }
 };
 
-gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {
+gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function () {
   if (!this._isActive) return;
 
-  for (var key in this._tweens) {
+  for (const key in this._tweens) {
     if (this._tweens.hasOwnProperty(key)) {
-      var tween = this._tweens[key];
+      const tween = this._tweens[key];
 
       if (tween.instance.isPlaying()) {
         tween.resumeOnActivate = true;
-
         this._pauseTween(key);
       }
     }
   }
-
   this._isActive = false;
 };
 
-gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
+gdjs.TweenRuntimeBehavior.prototype.onActivate = function () {
   if (this._isActive) return;
 
-  for (var key in this._tweens) {
+  for (const key in this._tweens) {
     if (this._tweens.hasOwnProperty(key)) {
-      var tween = this._tweens[key];
+      const tween = this._tweens[key];
 
       if (tween.resumeOnActivate) {
         tween.resumeOnActivate = false;
-
         this._resumeTween(key);
       }
     }
   }
-
   this._isActive = true;
 };
+
 /**
  * Static function to create a Tweenable associated to a scene.
  * Don't create manually shifty.Tweenable, otherwise they won't be
@@ -959,8 +951,7 @@ gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
  * @param {gdjs.RuntimeScene} runtimeScene
  * @returns {shifty.Tweenable} The new tweenable
  */
-
-gdjs.TweenRuntimeBehavior.makeNewTweenable = function(runtimeScene) {
+gdjs.TweenRuntimeBehavior.makeNewTweenable = function (runtimeScene) {
   if (!runtimeScene.shiftyJsScene) {
     runtimeScene.shiftyJsScene = new shifty.Scene();
   }
@@ -969,71 +960,79 @@ gdjs.TweenRuntimeBehavior.makeNewTweenable = function(runtimeScene) {
   runtimeScene.shiftyJsScene.add(tweenable);
   return tweenable;
 };
+
 /**
  * Static function to remove a Tweenable from a scene.
  *
  * @param {gdjs.RuntimeScene} runtimeScene
  * @param {shifty.Tweenable} tweenable
  */
-
-gdjs.TweenRuntimeBehavior.removeFromScene = function(runtimeScene, tweenable) {
+gdjs.TweenRuntimeBehavior.removeFromScene = function (runtimeScene, tweenable) {
   if (!runtimeScene.shiftyJsScene) return;
+
   runtimeScene.shiftyJsScene.remove(tweenable);
-}; // Callbacks called to pause/resume Shifty scene when a gdjs.RuntimeScene
+};
+
+// Callbacks called to pause/resume Shifty scene when a gdjs.RuntimeScene
 // is paused/resumed
 
 /**
  * Stop and "destroy" all the tweens when a scene is unloaded.
  * @private
  */
-
-gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneUnloaded = function(
+gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneUnloaded = function (
   runtimeScene
 ) {
-  if (!runtimeScene.shiftyJsScene) return; // Stop and explictly remove all tweenables to be sure to drop
-  // all references to the tweenables of the scene.
+  if (!runtimeScene.shiftyJsScene) return;
 
+  // Stop and explictly remove all tweenables to be sure to drop
+  // all references to the tweenables of the scene.
   runtimeScene.shiftyJsScene.stop(false);
   runtimeScene.shiftyJsScene.tweenables.forEach(
     runtimeScene.shiftyJsScene.remove.bind(runtimeScene.shiftyJsScene)
   );
 };
+
 /**
  * When a scene is paused, pause all the tweens of this scene.
  * @private
  */
-
-gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeScenePaused = function(
+gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeScenePaused = function (
   runtimeScene
 ) {
   if (!runtimeScene.shiftyJsScene) return;
+
   runtimeScene.shiftyJsScene.pause();
 };
+
 /**
  * When a scene is paused, resume all the tweens of this scene.
  * @private
  */
-
-gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneResumed = function(
+gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneResumed = function (
   runtimeScene
 ) {
-  if (!runtimeScene.shiftyJsScene) return; // It is important to set immediately the current Shifty time back to the
+  if (!runtimeScene.shiftyJsScene) return;
+
+  // It is important to set immediately the current Shifty time back to the
   // time of the scene, as the call `resume` will process the tweens.
   // (If not done, tweens will be resumed with the time of the previous
   // scene, that could create weird result/make tweens act as if not paused).
-
   gdjs.TweenRuntimeBehavior._currentTweenTime = runtimeScene
     .getTimeManager()
     .getTimeFromStart();
-  runtimeScene.shiftyJsScene.resume(); // Note that per the invariant of shiftyJsScene, shiftyJsScene will only
-  // contains tweenables that should be playing (so calling resume is safe).
-}; // Handle Shifty.js updates (the time and the "tick" of tweens
-// is controlled by the behavior)
+  runtimeScene.shiftyJsScene.resume();
 
+  // Note that per the invariant of shiftyJsScene, shiftyJsScene will only
+  // contains tweenables that should be playing (so calling resume is safe).
+};
+
+// Handle Shifty.js updates (the time and the "tick" of tweens
+// is controlled by the behavior)
 gdjs.TweenRuntimeBehavior._tweensProcessed = false;
 gdjs.TweenRuntimeBehavior._currentTweenTime = 0;
 
-gdjs.TweenRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
+gdjs.TweenRuntimeBehavior.prototype.doStepPreEvents = function (runtimeScene) {
   // Process tweens (once per frame).
   if (!gdjs.TweenRuntimeBehavior._tweensProcessed) {
     gdjs.TweenRuntimeBehavior._currentTweenTime = runtimeScene
@@ -1044,17 +1043,19 @@ gdjs.TweenRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
   }
 };
 
-gdjs.TweenRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
+gdjs.TweenRuntimeBehavior.prototype.doStepPostEvents = function (runtimeScene) {
   gdjs.TweenRuntimeBehavior._tweensProcessed = false;
-}; // Set up Shifty.js so that the processing ("tick"/updates) is handled
-// by the behavior (once per frame):
+};
 
-shifty.Tweenable.setScheduleFunction(function() {
+// Set up Shifty.js so that the processing ("tick"/updates) is handled
+// by the behavior (once per frame):
+shifty.Tweenable.setScheduleFunction(function () {
   /* Do nothing, we'll call processTweens manually. */
-}); // Set up Shifty.js so that the time is handled by the behavior.
+});
+
+// Set up Shifty.js so that the time is handled by the behavior.
 // It will be set to be the time of the current scene, and should be updated
 // before any tween processing (processTweens, resume).
-
-shifty.Tweenable.now = function() {
+shifty.Tweenable.now = function () {
   return gdjs.TweenRuntimeBehavior._currentTweenTime;
 };

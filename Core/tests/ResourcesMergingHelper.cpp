@@ -110,7 +110,7 @@ TEST_CASE("ResourcesMergingHelper", "[common]") {
     auto resourcesFilenames =
         resourcesMerger.GetAllResourcesOldAndNewFilename();
     REQUIRE(resourcesFilenames["MakeAbsolute(/image1.png)"] ==
-            "MakeRelative(MakeAbsolute(/image1.png))");
+            "FileNameFrom(MakeAbsolute(/image1.png))");
     REQUIRE(resourcesFilenames["MakeAbsolute(image2.png)"] ==
             "MakeRelative(MakeAbsolute(image2.png))");
     REQUIRE(resourcesFilenames["MakeAbsolute(audio1.png)"] ==

@@ -900,7 +900,7 @@ gdjs.TweenRuntimeBehavior.prototype.removeTween = function (identifier) {
  * @returns {boolean} Progress of playing tween animation (between 0.0 and 1.0)
  */
 gdjs.TweenRuntimeBehavior.prototype.getProgress = function (identifier) {
-  const tween = this._getTween(identifier);
+  var tween = this._getTween(identifier);
   if (tween) {
     var currentTime = this._runtimeScene.getTimeManager().getTimeFromStart();
     if (currentTime >= tween.startTime + tween.totalDuration) return 1;
@@ -914,9 +914,9 @@ gdjs.TweenRuntimeBehavior.prototype.getProgress = function (identifier) {
 gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function () {
   if (!this._isActive) return;
 
-  for (const key in this._tweens) {
+  for (var key in this._tweens) {
     if (this._tweens.hasOwnProperty(key)) {
-      const tween = this._tweens[key];
+      var tween = this._tweens[key];
 
       if (tween.instance.isPlaying()) {
         tween.resumeOnActivate = true;
@@ -930,9 +930,9 @@ gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function () {
 gdjs.TweenRuntimeBehavior.prototype.onActivate = function () {
   if (this._isActive) return;
 
-  for (const key in this._tweens) {
+  for (var key in this._tweens) {
     if (this._tweens.hasOwnProperty(key)) {
-      const tween = this._tweens[key];
+      var tween = this._tweens[key];
 
       if (tween.resumeOnActivate) {
         tween.resumeOnActivate = false;

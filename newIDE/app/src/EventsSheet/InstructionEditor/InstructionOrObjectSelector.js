@@ -36,6 +36,10 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../../Utils/TagsHelper';
+import {
+  getObjectOrObjectGroupListItemKey,
+  getInstructionListItemKey,
+} from './SelectorListItems/Keys';
 
 const styles = {
   searchBar: {
@@ -235,8 +239,11 @@ export default class InstructionOrObjectSelector extends React.Component<
                   {hasResults && (
                     <SelectableList
                       value={
-                        chosenObjectName ||
-                        chosenInstructionType /* TODO: use prefixes to distinguish object (or groups) and instructions */
+                        chosenObjectName
+                          ? getObjectOrObjectGroupListItemKey(chosenObjectName)
+                          : chosenInstructionType
+                          ? getInstructionListItemKey(chosenInstructionType)
+                          : ''
                       }
                     >
                       {(isSearching || currentTab === 'objects') &&

@@ -12,6 +12,7 @@ import { renderInstructionTree } from '../SelectorListItems/SelectorInstructions
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView from '../../../UI/ScrollView';
 import { Column, Line } from '../../../UI/Grid';
+import { getInstructionListItemKey } from '../SelectorListItems/Keys';
 
 const SelectableList = makeSelectable(List);
 
@@ -65,6 +66,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
       instructionsInfoTree,
       onChoose,
       searchBarHintText,
+      useSubheaders,
     } = this.props;
     const { searchText } = this.state;
     const displayedInstructionsList = searchText
@@ -98,7 +100,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
               style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
             >
               {hasResults && (
-                <SelectableList value={selectedType}>
+                <SelectableList value={getInstructionListItemKey(selectedType)}>
                   {searchText
                     ? displayedInstructionsList.map(
                         enumeratedInstructionOrExpressionMetadata =>
@@ -116,7 +118,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
                         instructionTreeNode: instructionsInfoTree,
                         iconSize,
                         onChoose,
-                        useSubheaders: true,
+                        useSubheaders,
                       })}
                 </SelectableList>
               )}

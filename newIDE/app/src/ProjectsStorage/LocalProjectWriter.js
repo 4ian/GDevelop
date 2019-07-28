@@ -96,7 +96,8 @@ export default class LocalProjectWriter {
       filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
     };
 
-    const newProjectFolder = dialog.showSaveDialog(browserWindow, options);
+    const newFilepath = dialog.showSaveDialog(browserWindow, options);
+    const newProjectFolder = path.dirname(newFilepath);
 
     if (!filepath || filepath === '') {
       return Promise.reject('Filepath from dialog is empty');
@@ -136,7 +137,7 @@ export default class LocalProjectWriter {
           });
         })
       ).then(() => {
-        return writeJSONFile(serializedProjectObject, newProjectFolder).catch(
+        return writeJSONFile(serializedProjectObject, newFilepath).catch(
           err => {
             console.error('Unable to write the split project:', err);
             throw err;
@@ -144,12 +145,10 @@ export default class LocalProjectWriter {
         );
       });
     } else {
-      return writeJSONFile(serializedProjectObject, newProjectFolder).catch(
-        err => {
-          console.error('Unable to write the project:', err);
-          throw err;
-        }
-      );
+      return writeJSONFile(serializedProjectObject, newFilepath).catch(err => {
+        console.error('Unable to write the project:', err);
+        throw err;
+      });
     }
   };
 

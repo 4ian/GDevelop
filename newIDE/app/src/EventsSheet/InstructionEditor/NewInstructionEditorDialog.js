@@ -313,7 +313,7 @@ export default class NewInstructionEditorDialog extends React.Component<
     );
 
     const renderParameters = () => (
-      <Column expand key="parameters">
+      <Column expand justifyContent="center" key="parameters">
         <InstructionParametersEditor
           project={project}
           scope={scope}
@@ -378,7 +378,7 @@ export default class NewInstructionEditorDialog extends React.Component<
               />,
             ]}
             secondaryActions={[
-              width !== 'large' && step !== 'instruction-or-object-selector' ? (
+              width !== 'large' && step !== 'object-or-free-instructions' ? (
                 <FlatButton
                   label={<Trans>Back</Trans>}
                   primary={false}
@@ -390,7 +390,9 @@ export default class NewInstructionEditorDialog extends React.Component<
                 key="help"
                 helpPagePath={instructionHelpPage || '/events'}
                 label={
-                  !instructionHelpPage ? (
+                  !instructionHelpPage ||
+                  (width === 'small' &&
+                    step === 'object-or-free-instructions') ? (
                     <Trans>Help</Trans>
                   ) : this.props.isCondition ? (
                     <Trans>Help for this condition</Trans>

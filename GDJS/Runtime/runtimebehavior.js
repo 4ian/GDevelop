@@ -86,6 +86,15 @@ gdjs.RuntimeBehavior.prototype.activate = function(enable) {
 };
 
 /**
+ * Reimplement this to do extra work when the behavior is created (i.e: an
+ * object using it was created), after the object is fully initialized (so
+ * you can use `this.owner` without risk).
+ */
+gdjs.RuntimeBehavior.prototype.onCreated = function() {
+
+};
+
+/**
  * Return true if the behavior is activated
  */
 gdjs.RuntimeBehavior.prototype.activated = function() {
@@ -93,23 +102,22 @@ gdjs.RuntimeBehavior.prototype.activated = function() {
 };
 
 /**
- * Behaviors writers: Reimplement this method to do extra work
- * when the behavior is activated
+ * Reimplement this method to do extra work when the behavior is activated (after
+ * it has been deactivated, see `onDeActivate`).
  */
 gdjs.RuntimeBehavior.prototype.onActivate = function() {
 
 };
 
 /**
- * Behaviors writers: Reimplement this method to do extra work
- * when the behavior is deactivated
+ * Reimplement this method to do extra work when the behavior is deactivated.
  */
 gdjs.RuntimeBehavior.prototype.onDeActivate = function() {
 
 };
 
 /**
- * Behaviors writers: This method is called each tick before events are done.
+ * This method is called each tick before events are done.
  * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
@@ -117,7 +125,7 @@ gdjs.RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
 };
 
 /**
- * Behaviors writers: This method is called each tick after events are done.
+ * This method is called each tick after events are done.
  * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
@@ -125,10 +133,10 @@ gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 }
 
 /**
- * Behaviors writers: This method is called when the owner of the behavior
- * was removed from its scene and is about to be destroyed/reused later.
+ * This method is called when the owner of the behavior
+ * is being removed from the scene and is about to be destroyed/reused later,
  */
-gdjs.RuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
+gdjs.RuntimeBehavior.prototype.onDestroy = function() {
 
 }
 

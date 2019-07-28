@@ -14,6 +14,9 @@
  * However, you should not be calling the constructor on an already existing object
  * which is not a RuntimeObject.
  *
+ * A `gdjs.RuntimeObject` should not be instanciated directly, always a child class
+ * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
+ *
  * @memberof gdjs
  * @class RuntimeObject
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
@@ -101,6 +104,21 @@ gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avo
 //Common members functions related to the object and its runtimeScene :
 
 /**
+ * To be called by the child classes in their constructor, at the very end.
+ * Notify the behaviors that they have been constructed (this must be done when
+ * the object is ready, otherwise behaviors can do operations on the object which
+ * could be not initialized yet).
+ *
+ * If you redefine this function, **make sure to call the original method**
+ * (`gdjs.RuntimeObject.prototype.onCreated.call(this);`).
+ */
+gdjs.RuntimeObject.prototype.onCreated = function() {
+    for(var i =0;i<this._behaviors.length;++i) {
+        this._behaviors[i].onCreated();
+    }
+}
+
+/**
  * Return the time elapsed since the last frame,
  * in milliseconds, for the object.
  *
@@ -133,8 +151,9 @@ gdjs.RuntimeObject.prototype.extraInitializationFromInitialInstance = function(i
 };
 
 /**
- * Remove an object from a scene.<br>
- * Extensions writers, do not change this method. Instead, redefine the onDeletedFromScene method.
+ * Remove an object from a scene.
+ *
+ * Do not change/redefine this method. Instead, redefine the onDestroyFromScene method.
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
  */
 gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
@@ -145,13 +164,19 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
 };
 
 /**
- * Called when the object is removed from its scene.
+ * Called when the object is destroyed (because it is removed from a scene or the scene
+ * is being unloaded). If you redefine this function, **make sure to call the original method**
+ * (`gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);`).
  *
- * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object.
  */
-gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
+gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
     theLayer.getRenderer().removeRendererObject(this.getRendererObject());
+
+    for(var j = 0, lenj = this._behaviors.length;j<lenj;++j) {
+        this._behaviors[j].onDestroy();
+    }
 };
 
 //Rendering:
@@ -716,8 +741,8 @@ gdjs.RuntimeObject.prototype.averageForceAngleIs = function(angle, toleranceInDe
 /**
  * Get the hit boxes for the object.<br>
  * The default implementation returns a basic bouding box based the size (getWidth and
- * getHeight) and the center point of the object (getCenterX and getCenterY). 
- * 
+ * getHeight) and the center point of the object (getCenterX and getCenterY).
+ *
  * You should probably redefine updateHitBoxes instead of this function.
  *
  * @return {Array} An array composed of polygon.
@@ -737,7 +762,7 @@ gdjs.RuntimeObject.prototype.getHitBoxes = function() {
 
 /**
  * Update the hit boxes for the object.
- * 
+ *
  * The default implementation set a basic bounding box based on the size (getWidth and
  * getHeight) and the center point of the object (getCenterX and getCenterY).
  * Result is cached until invalidated (by a position change, angle change...).
@@ -788,11 +813,11 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
 
 /**
  * Get the AABB (axis aligned bounding box) for the object.
- * 
+ *
  * The default implementation uses either the position/size of the object (when angle is 0) or
  * hitboxes (when angle is not 0) to compute the bounding box.
  * Result is cached until invalidated (by a position change, angle change...).
- * 
+ *
  * You should probably redefine updateAABB instead of this function.
  *
  * @return {AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`)
@@ -811,9 +836,9 @@ gdjs.RuntimeObject.prototype.getAABB = function() {
  * Get the AABB (axis aligned bounding box) to be used to determine if the object
  * is visible on screen. The gdjs.RuntimeScene will hide the renderer object if
  * the object is not visible on screen ("culling").
- * 
+ *
  * The default implementation uses the AABB returned by getAABB.
- * 
+ *
  * If `null` is returned, the object is assumed to be always visible.
  *
  * @return {?AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`) or `null`.
@@ -824,10 +849,10 @@ gdjs.RuntimeObject.prototype.getVisibilityAABB = function() {
 
 /**
  * Update the AABB (axis aligned bounding box) for the object.
- * 
+ *
  * Default implementation uses either the position/size of the object (when angle is 0) or
  * hitboxes (when angle is not 0) to compute the bounding box.
- * 
+ *
  * You should not call this function by yourself, it is called when necessary by getAABB method.
  * However, you can redefine it if your object can have a faster implementation.
  */
@@ -848,8 +873,8 @@ gdjs.RuntimeObject.prototype.updateAABB = function() {
         for(var i = 0;i<this.hitBoxes.length;i++) {
             for(var j = 0;j<this.hitBoxes[i].vertices.length;j++) {
                 var vertex = this.hitBoxes[i].vertices[j];
-    
-                if (first) { 
+
+                if (first) {
                     this.aabb.min[0] = vertex[0];
                     this.aabb.max[0] = vertex[0];
                     this.aabb.min[1] = vertex[1];
@@ -888,9 +913,9 @@ gdjs.RuntimeObject.prototype.stepBehaviorsPostEvents = function(runtimeScene) {
 
 /**
  * Get a behavior from its name.
- * 
+ *
  * Be careful, the behavior must exists, no check is made on the name.
- * 
+ *
  * @param name {String} The behavior name.
  * @return {gdjs.RuntimeBehavior} The behavior with the given name, or undefined.
  */
@@ -1312,7 +1337,7 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
 
     if ( diffX*diffX + diffY*diffY > sqBoundingR + sqDist + 2*Math.sqrt(sqDist*sqBoundingR) )
         return result;
-    
+
     var testSqDist = closest ? sqDist : 0;
 
     var hitBoxes = this.getHitBoxes();
@@ -1329,7 +1354,7 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
             }
         }
     }
-    
+
     return result;
 };
 

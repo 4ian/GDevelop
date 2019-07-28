@@ -56,6 +56,7 @@ class BehaviorCodeGenerator {
     return "_set" + propertyName;
   }
 
+
  private:
   gd::String GenerateRuntimeBehaviorTemplateCode(
       const gd::String& extensionName,
@@ -73,6 +74,9 @@ class BehaviorCodeGenerator {
   gd::String GenerateInitializePropertyFromDefaultValueCode(
       const gd::NamedPropertyDescriptor& property);
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
+  gd::String GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace);
 
   gd::Project& project;
 };

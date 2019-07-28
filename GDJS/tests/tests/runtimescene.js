@@ -1,9 +1,9 @@
 /**
- * Test for gdjs.RuntimeBehavior
+ * Test for gdjs.RuntimeScene
  */
 
 describe('gdjs.RuntimeScene integration tests', function() {
-  describe('Object and behavior lifecycles (using ChangeTextTestRuntimeBehavior)', function () {
+  describe('Object and behavior lifecycles (using TestObject and TestBehavior)', function () {
     it('should properly create and destroy object, including the behaviors', function() {
 	    const runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
@@ -12,11 +12,11 @@ describe('gdjs.RuntimeScene integration tests', function() {
         variables: [],
         behaviorsSharedData: [],
         objects: [{
-          type: '', // A gdjs.RuntimeObject
+          type: 'TestObject::TestObject',
           name: 'Object1',
           behaviors: [
             {
-              type: 'TestRuntimeBehavior::TestRuntimeBehavior',
+              type: 'TestBehavior::TestBehavior',
             },
           ],
         }],
@@ -40,18 +40,18 @@ describe('gdjs.RuntimeScene integration tests', function() {
           .getVariables()
           .get('lastState')
           .getAsString()
-      ).to.eql('onOwnerRemovedFromScene');
+      ).to.eql('onDestroy');
 
       const object2 = runtimeScene.createObject('Object1');
 
       // Check that the behaviors are properly destroyed
-      // runtimeScene.unloadScene();
-      // expect(
-      //   object2
-      //     .getVariables()
-      //     .get('lastState')
-      //     .getAsString()
-      // ).to.eql('onOwnerRemovedFromScene');
+      runtimeScene.unloadScene();
+      expect(
+        object2
+          .getVariables()
+          .get('lastState')
+          .getAsString()
+      ).to.eql('onDestroy');
     });
 
   });

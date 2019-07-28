@@ -16,6 +16,9 @@ gdjs.DummyRuntimeObject = function(runtimeScene, objectData) {
   if (this._renderer)
     gdjs.DummyRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else this._renderer = new gdjs.DummyRuntimeObjectRenderer(this, runtimeScene);
+
+  // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+  this.onCreated();
 };
 
 gdjs.DummyRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);

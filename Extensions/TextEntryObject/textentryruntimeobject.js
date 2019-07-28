@@ -20,16 +20,19 @@ gdjs.TextEntryRuntimeObject = function(runtimeScene, objectData)
         gdjs.TextEntryRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
         this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this, runtimeScene);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.TextEntryRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TextEntryRuntimeObject.thisIsARuntimeObjectConstructor = "TextEntryObject::TextEntry";
 
-gdjs.TextEntryRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.TextEntryRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-    if (this._renderer.onOwnerRemovedFromScene) {
-        this._renderer.onOwnerRemovedFromScene();
+    if (this._renderer.onDestroy) {
+        this._renderer.onDestroy();
     }
 };
 

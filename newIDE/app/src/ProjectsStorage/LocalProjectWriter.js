@@ -130,7 +130,7 @@ export default class LocalProjectWriter {
         partialObjects.map(partialObject => {
           return writeJSONFile(
             partialObject.object,
-            path.join(projectPath, partialObject.reference) + '.json'
+            path.join(newProjectFolder, partialObject.reference) + '.json'
           ).catch(err => {
             console.error('Unable to write a partial file:', err);
             throw err;

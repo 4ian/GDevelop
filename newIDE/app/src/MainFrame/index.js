@@ -94,7 +94,6 @@ type State = {|
   exportDialogOpen: boolean,
   introDialogOpen: boolean,
   saveDialogOpen: boolean,
-  isSaveAs: boolean,
   genericDialogOpen: boolean,
   loadingProject: boolean,
   previewLoading: boolean,
@@ -126,7 +125,7 @@ type Props = {
   onChooseProject?: () => Promise<?string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
-  onSaveAsProject?: gdProject => Promise<any>,
+  onSaveProjectAs?: gdProject => Promise<any>,
   onAutoSaveProject?: (project: gdProject) => void,
   shouldOpenAutosave?: (
     filePath: string,
@@ -150,7 +149,6 @@ class MainFrame extends React.Component<Props, State> {
     exportDialogOpen: false,
     introDialogOpen: false,
     saveDialogOpen: false,
-    isSaveAs: false,
     genericDialogOpen: false,
     loadingProject: false,
     previewLoading: false,
@@ -1166,19 +1164,16 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   save = () => {
-    this.setState({
-      isSaveAs: false,
-    });
     saveUiSettings(this.state.editorTabs);
 
-    const { currentProject, isSaveAs } = this.state;
+    const { currentProject } = this.state;
     if (!currentProject) return;
     const { i18n } = this.props;
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
     } else if (this.props.onSaveProject) {
-      this.props.onSaveProject(currentProject, isSaveAs).then(
+      this.props.onSaveProject(currentProject).then(
         () => {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         },
@@ -1195,19 +1190,16 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   saveAs = () => {
-    this.setState({
-      isSaveAs: true,
-    });
     saveUiSettings(this.state.editorTabs);
 
-    const { currentProject, isSaveAs } = this.state;
+    const { currentProject } = this.state;
     if (!currentProject) return;
     const { i18n } = this.props;
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
-    } else if (this.props.onSaveProject) {
-      this.props.onSaveProject(currentProject, isSaveAs).then(
+    } else if (this.props.onSaveProjectAs) {
+      this.props.onSaveProjectAs(currentProject).then(
         () => {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         },
@@ -1475,7 +1467,6 @@ class MainFrame extends React.Component<Props, State> {
               }
               onRenameExternalEvents={this.renameExternalEvents}
               onSaveProject={this.save}
-              onSaveAsProject={this.saveAs}
               onCloseProject={this.askToCloseProject}
               onExportProject={this.openExportDialog}
               onOpenPreferences={() => this.openPreferences(true)}

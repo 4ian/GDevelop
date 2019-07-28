@@ -1,6 +1,6 @@
 describe('Inventory', function() {
 	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
-	var runtimeScene = new gdjs.RuntimeScene(runtimeGame, null);
+	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
 	gdjs.evtTools.inventory.add(runtimeScene, "MyInventory", "sword");
 	gdjs.evtTools.inventory.add(runtimeScene, "MyInventory", "sword");

@@ -55,6 +55,9 @@ module.exports = function(config) {
       '../../Extensions/Inventory/inventory.js',
       '../../Extensions/Inventory/inventorytools.js',
 
+      // Test extensions:
+      './tests/Extensions/**.js',
+
       //All tests files:
       './tests/init.js',
       '../../Extensions/**/tests/**.spec.js',

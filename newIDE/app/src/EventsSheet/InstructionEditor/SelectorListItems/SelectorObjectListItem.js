@@ -4,6 +4,7 @@ import { ListItem } from 'material-ui/List';
 import ListIcon from '../../../UI/ListIcon';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import type { ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
+import { getObjectOrObjectGroupListItemKey } from './Keys';
 
 type Props = {|
   project: gdProject,
@@ -21,9 +22,12 @@ export const renderObjectListItem = ({
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
-      key={'object-' + objectWithContext.object.ptr}
+      key={
+        getObjectOrObjectGroupListItemKey(objectName) +
+        (objectWithContext.global ? '-global' : '')
+      }
+      value={getObjectOrObjectGroupListItemKey(objectName)}
       primaryText={objectName}
-      value={objectName} // TODO: same as key
       leftIcon={
         <ListIcon
           iconSize={iconSize}

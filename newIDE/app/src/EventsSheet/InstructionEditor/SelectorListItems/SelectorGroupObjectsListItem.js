@@ -3,6 +3,7 @@ import * as React from 'react';
 import { ListItem } from 'material-ui/List';
 import ListIcon from '../../../UI/ListIcon';
 import type { GroupWithContext } from '../../../ObjectsList/EnumerateObjects';
+import { getObjectOrObjectGroupListItemKey } from './Keys';
 
 type Props = {|
   groupWithContext: GroupWithContext,
@@ -18,8 +19,11 @@ export const renderGroupObjectsListItem = ({
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem
-      key={'group-' + groupWithContext.group.ptr}
-      value={groupName} // TODO: same as key
+      key={
+        getObjectOrObjectGroupListItemKey(groupName) +
+        (groupWithContext.global ? '-global' : '')
+      }
+      value={getObjectOrObjectGroupListItemKey(groupName)}
       primaryText={groupName}
       leftIcon={
         <ListIcon

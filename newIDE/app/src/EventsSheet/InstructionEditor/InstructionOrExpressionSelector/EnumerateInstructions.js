@@ -274,7 +274,6 @@ export type InstructionFilteringOptions = {|
   searchText: string,
 |};
 
-// TODO: Move near filterEnumeratedInstructionOrExpressionMetadataByScope?
 export const filterInstructionsList = (
   list: Array<EnumeratedInstructionOrExpressionMetadata>,
   { searchText }: InstructionFilteringOptions

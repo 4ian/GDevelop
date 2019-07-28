@@ -6,6 +6,7 @@ import { type InstructionOrExpressionTreeNode } from '../InstructionOrExpression
 import { type EnumeratedInstructionOrExpressionMetadata } from '../InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import Subheader from 'material-ui/Subheader';
 import flatten from 'lodash/flatten';
+import { getSubheaderListItemKey, getInstructionListItemKey } from './Keys';
 
 type Props = {|
   instructionTreeNode: InstructionOrExpressionTreeNode,
@@ -38,11 +39,12 @@ export const renderInstructionTree = ({
       if (typeof instructionOrGroup.type === 'string') {
         // $FlowFixMe - see above
         const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
+        const value = getInstructionListItemKey(instructionOrGroup.type);
         return (
           <ListItem
-            key={key}
+            key={value}
             primaryText={key}
-            value={instructionOrGroup.type}
+            value={value}
             leftIcon={
               <ListIcon
                 iconSize={iconSize}
@@ -58,7 +60,9 @@ export const renderInstructionTree = ({
         // $FlowFixMe - see above
         const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
         if (useSubheaders) {
-          return [<Subheader key={'subheader-' + key}>{key}</Subheader>].concat(
+          return [
+            <Subheader key={getSubheaderListItemKey(key)}>{key}</Subheader>,
+          ].concat(
             renderInstructionTree({
               instructionTreeNode: groupOfInstructionInformation,
               onChoose,

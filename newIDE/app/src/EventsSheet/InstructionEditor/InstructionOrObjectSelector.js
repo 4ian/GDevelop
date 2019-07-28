@@ -73,6 +73,7 @@ type Props = {|
 |};
 
 const iconSize = 24;
+const minHeight = 400; // Avoid a super small list in empty scenes. 400 is enough to be displayed on an iPhone SE.
 
 export default class InstructionOrObjectSelector extends React.Component<
   Props,
@@ -182,6 +183,7 @@ export default class InstructionOrObjectSelector extends React.Component<
               <div
                 style={{
                   backgroundColor: muiTheme.list.itemsBackgroundColor,
+                  minHeight,
                   ...style,
                 }}
               >
@@ -294,6 +296,17 @@ export default class InstructionOrObjectSelector extends React.Component<
                         })}
                     </SelectableList>
                   )}
+                  {!isSearching &&
+                    currentTab === 'objects' &&
+                    !allObjectsList.length && (
+                      <EmptyMessage>
+                        <Trans>
+                          There is no object in your game or in this scene.
+                          Start by adding an new object in the scene editor,
+                          using the objects list.
+                        </Trans>
+                      </EmptyMessage>
+                    )}
                   {!hasResults && (
                     <EmptyMessage>
                       <Trans>

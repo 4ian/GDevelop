@@ -26,11 +26,13 @@ import { type EventsScope } from '../EventsScope.flow';
 const gd = global.gd;
 
 const styles = {
+  // When displaying parameters, take all the height:
   container: {
     display: 'flex',
     flexDirection: 'column',
     flex: 1,
   },
+  // When displaying the empty message, center the message:
   emptyContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -204,8 +206,8 @@ export default class InstructionParametersEditor extends React.Component<
       <div style={{ ...styles.emptyContainer, ...this.props.style }}>
         <EmptyMessage>
           {this.props.isCondition
-            ? 'Choose a condition on the left'
-            : 'Choose an action on the left'}
+            ? 'Choose a condition (or an object then a condition) on the left'
+            : 'Choose an action (or an object then an action) on the left'}
         </EmptyMessage>
       </div>
     );

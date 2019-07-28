@@ -1566,73 +1566,67 @@ storiesOf('NewInstructionEditorDialog', module)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
   .add('Existing condition (scope: in a layout)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <NewInstructionEditorDialog
-        open
-        project={project}
-        scope={{ layout: testLayout }}
-        globalObjectsContainer={project}
-        objectsContainer={testLayout}
-        isCondition
-        isNewInstruction={false}
-        instruction={testInstruction}
-        resourceExternalEditors={[]}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
-        }}
-        resourceSources={[]}
-        openInstructionOrExpression={action('open instruction or expression')}
-        onCancel={action('cancel')}
-        onSubmit={action('submit')}
-      />
-    </FixedHeightFlexContainer>
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: testLayout }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={false}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
+    />
   ))
   .add('Existing condition (scope: without layout)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <NewInstructionEditorDialog
-        open
-        project={project}
-        scope={{ layout: null }}
-        globalObjectsContainer={project}
-        objectsContainer={testLayout}
-        isCondition
-        isNewInstruction={false}
-        instruction={testInstruction}
-        resourceExternalEditors={[]}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
-        }}
-        resourceSources={[]}
-        openInstructionOrExpression={action('open instruction or expression')}
-        onCancel={action('cancel')}
-        onSubmit={action('submit')}
-      />
-    </FixedHeightFlexContainer>
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: null }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={false}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
+    />
   ))
   .add('New condition (scope: without layout)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <NewInstructionEditorDialog
-        open
-        project={project}
-        scope={{ layout: null }}
-        globalObjectsContainer={project}
-        objectsContainer={testLayout}
-        isCondition
-        isNewInstruction={true}
-        instruction={testInstruction}
-        resourceExternalEditors={[]}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
-        }}
-        resourceSources={[]}
-        openInstructionOrExpression={action('open instruction or expression')}
-        onCancel={action('cancel')}
-        onSubmit={action('submit')}
-      />
-    </FixedHeightFlexContainer>
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: null }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={true}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
+    />
   ));
 
 storiesOf('TextEditor', module)

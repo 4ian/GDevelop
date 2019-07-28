@@ -369,10 +369,15 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
 
             this._releaseGrabbedPlatform(); //Ensure nothing is grabbed.
         }
-        else{
+        else {
+            // Avoid landing on a platform if the object is not going down.
+            // (which could happen for Jumpthru, when the object jump and pass just at the top
+            // of a jumpthru, it could be considered as landing if not this this extra check).
+            var canLand = requestedDeltaY >= 0;
+
             //Check if landing on a new floor: (Exclude already overlapped jump truh)
             var collidingPlatform = this._getCollidingPlatform();
-            if (collidingPlatform !== null) {
+            if (canLand && collidingPlatform !== null) {
                 this._isOnFloor = true;
                 this._canJump = true;
                 this._jumping = false;

@@ -9,7 +9,7 @@ import LinearProgress from 'material-ui/LinearProgress';
 
 const buildTypesConfig = {
   'cordova-build': {
-    estimatedTimeInSeconds: () => 180,
+    estimatedTimeInSeconds: () => 300,
     completeDescription:
       'You can download it on your Android phone and install it.',
   },

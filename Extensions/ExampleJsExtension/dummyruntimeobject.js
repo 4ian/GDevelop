@@ -6,7 +6,7 @@
  * @extends RuntimeObject
  */
 gdjs.DummyRuntimeObject = function(runtimeScene, objectData) {
-  // Always call the base gdjs.RuntimeObject constructor.
+  // *ALWAYS* call the base gdjs.RuntimeObject constructor.
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
   // Load any required data from the object properties.

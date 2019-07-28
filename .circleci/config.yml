@@ -29,7 +29,7 @@ jobs:
           name: Install system dependencies for Electron builder
           command: sudo apt install icnsutils && sudo apt install graphicsmagick && sudo apt install rsync
 
-      # Node.js dependencies
+      # GDevelop.js dependencies
       - restore_cache:
           keys:
             - gd-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
@@ -40,6 +40,12 @@ jobs:
           name: Install GDevelop.js dependencies and build it
           command: cd GDevelop.js && sudo npm install -g grunt-cli && npm install && cd ..
 
+      # Build GDevelop.js
+      - run:
+          name: Build GDevelop.js
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
+
+      # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
       - run:
           name: Install GDevelop IDE dependencies
           command: cd newIDE/app && npm install && cd ../electron-app && npm install
@@ -51,11 +57,7 @@ jobs:
             - GDevelop.js/node_modules
           key: gd-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}
 
-      # Build GDevelop IDE (including GDevelop.js)
-      - run:
-          name: Build GDevelop.js
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
-
+      # Build GDevelop IDE
       - run:
           name: Build GDevelop IDE
           command: cd newIDE/electron-app && npm run build -- --mac --win --linux tar.gz --publish=never

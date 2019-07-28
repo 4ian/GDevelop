@@ -25,6 +25,9 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
         gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
         this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(this, runtimeScene);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );

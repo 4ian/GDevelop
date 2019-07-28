@@ -30,6 +30,9 @@ gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
   if (this._renderer)
     gdjs.VideoRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
+
+  // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+  this.onCreated();
 };
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
@@ -52,10 +55,10 @@ gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = funct
   }
 };
 
-gdjs.VideoRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-  gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.VideoRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+  gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-  this._renderer.onOwnerRemovedFromScene();
+  this._renderer.onDestroy();
 };
 
 gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {

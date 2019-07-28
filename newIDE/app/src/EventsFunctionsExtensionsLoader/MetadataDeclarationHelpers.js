@@ -141,7 +141,10 @@ export const isBehaviorLifecycleFunction = (functionName: string) => {
       'onDeActivate',
       'doStepPreEvents',
       'doStepPostEvents',
+      'onDestroy',
+      // Compatibility with GD <= 5.0 beta 75
       'onOwnerRemovedFromScene',
+      // end of compatibility code
     ].indexOf(functionName) !== -1
   );
 };

@@ -38,6 +38,53 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   }
 };
 
+const writeProjectFiles = ( project: gdProject, newFilepath: string): Promise<void> => {
+
+  const newProjectFolder = path.dirname(newFilepath);
+  const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
+  const serializedProjectObject = serializeToJSObject(project);
+  gd.ProjectResourcesCopier.copyAllResourcesTo(project, fileSystem, newProjectFolder, true, false, true);
+
+  if (project.isFolderProject()) {
+    const partialObjects = split(serializedProjectObject, {
+      pathSeparator: '/',
+      getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
+      shouldSplit: splitPaths(
+        new Set([
+          '/layouts/*',
+          '/externalLayouts/*',
+          '/externalEvents/*',
+          '/layouts/*',
+          '/eventsFunctionsExtensions/*',
+        ])
+      ),
+      isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
+    });
+
+    return Promise.all(
+      partialObjects.map(partialObject => {
+        return writeJSONFile(
+          partialObject.object,
+          path.join(newProjectFolder, partialObject.reference) + '.json'
+        ).catch(err => {
+          console.error('Unable to write a partial file:', err);
+          throw err;
+        });
+      })
+    ).then(() => {
+      return writeJSONFile(serializedProjectObject, newFilepath).catch(err => {
+        console.error('Unable to write the split project:', err);
+        throw err;
+      });
+    });
+  } else {
+    return writeJSONFile(serializedProjectObject, newFilepath).catch(err => {
+      console.error('Unable to write the project:', err);
+      throw err;
+    });
+  }
+};
+
 export default class LocalProjectWriter {
   static saveProject = (project: gdProject): Promise<void> => {
     const filepath = project.getProjectFile();
@@ -87,17 +134,15 @@ export default class LocalProjectWriter {
   };
 
   static saveProjectAs = (project: gdProject): Promise<void> => {
-    const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
     let filepath = project.getProjectFile();
     const projectPath = path.dirname(project.getProjectFile());
     const browserWindow = electron.remote.getCurrentWindow();
     const options = {
-      defaultPath: projectPath + '\\game.json',
+      defaultPath: path.join(projectPath, 'game.json'),
       filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
     };
 
     const newFilepath = dialog.showSaveDialog(browserWindow, options);
-    const newProjectFolder = path.dirname(newFilepath);
 
     if (!filepath || filepath === '') {
       return Promise.reject('Filepath from dialog is empty');
@@ -107,49 +152,7 @@ export default class LocalProjectWriter {
       return Promise.reject('Unimplemented dialog electron feature');
     }
 
-    const serializedProjectObject = serializeToJSObject(project);
-    gd.ProjectResourcesCopier.copyAllResourcesTo(project, fileSystem, newProjectFolder, true, false, true);
-
-    if (project.isFolderProject()) {
-      const partialObjects = split(serializedProjectObject, {
-        pathSeparator: '/',
-        getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
-        shouldSplit: splitPaths(
-          new Set([
-            '/layouts/*',
-            '/externalLayouts/*',
-            '/externalEvents/*',
-            '/layouts/*',
-            '/eventsFunctionsExtensions/*',
-          ])
-        ),
-        isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
-      });
-
-      return Promise.all(
-        partialObjects.map(partialObject => {
-          return writeJSONFile(
-            partialObject.object,
-            path.join(newProjectFolder, partialObject.reference) + '.json'
-          ).catch(err => {
-            console.error('Unable to write a partial file:', err);
-            throw err;
-          });
-        })
-      ).then(() => {
-        return writeJSONFile(serializedProjectObject, newFilepath).catch(
-          err => {
-            console.error('Unable to write the split project:', err);
-            throw err;
-          }
-        );
-      });
-    } else {
-      return writeJSONFile(serializedProjectObject, newFilepath).catch(err => {
-        console.error('Unable to write the project:', err);
-        throw err;
-      });
-    }
+    return writeProjectFiles(project,  newFilepath);
   };
 
   static autoSaveProject = (project: gdProject) => {

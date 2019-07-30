@@ -1200,8 +1200,9 @@ class MainFrame extends React.Component<Props, State> {
       this._openSaveDialog();
     } else if (this.props.onSaveProjectAs) {
       this.props.onSaveProjectAs(currentProject).then(
-        () => {
-          this._showSnackMessage(i18n._(t`Project properly saved`));
+        saveDone => {
+          if (saveDone)
+            this._showSnackMessage(i18n._(t`Project properly saved`));
         },
         err => {
           showErrorBox(

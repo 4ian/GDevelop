@@ -38,12 +38,13 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   }
 };
 
-const writeProjectFiles = ( project: gdProject, newFilepath: string): Promise<void> => {
+const writeProjectFiles = (
+  project: gdProject,
+  newFilepath: string,
+  newProjectFolder: string
+): Promise<void> => {
 
-  const newProjectFolder = path.dirname(newFilepath);
-  const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const serializedProjectObject = serializeToJSObject(project);
-  gd.ProjectResourcesCopier.copyAllResourcesTo(project, fileSystem, newProjectFolder, true, false, true);
 
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
@@ -134,25 +135,35 @@ export default class LocalProjectWriter {
   };
 
   static saveProjectAs = (project: gdProject): Promise<void> => {
-    let filepath = project.getProjectFile();
+    const filepath = project.getProjectFile();
+    const filenameWithExtension = path.basename(project.getProjectFile()) || "game.json";
     const projectPath = path.dirname(project.getProjectFile());
+    const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
     const browserWindow = electron.remote.getCurrentWindow();
     const options = {
-      defaultPath: path.join(projectPath, 'game.json'),
-      filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
+    defaultPath: path.join(projectPath, filenameWithExtension),
+    filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
     };
 
-    const newFilepath = dialog.showSaveDialog(browserWindow, options);
-
-    if (!filepath || filepath === '') {
-      return Promise.reject('Filepath from dialog is empty');
-    }
-
     if (!dialog) {
-      return Promise.reject('Unimplemented dialog electron feature');
+    return Promise.reject('Unsupported');
     }
+    const newFilepath = dialog.showSaveDialog(browserWindow, options);
+    if (!newFilepath || newFilepath === '') {
+    return Promise.reject('Filepath from dialog is empty');
+    }
+    const newProjectFolder = path.dirname(newFilepath);
 
-    return writeProjectFiles(project,  newFilepath);
+    gd.ProjectResourcesCopier.copyAllResourcesTo(
+    project,
+    fileSystem,
+    newProjectFolder,
+    true,
+    false,
+    true
+    );
+
+    return writeProjectFiles(project, newFilepath, newProjectFolder);
   };
 
   static autoSaveProject = (project: gdProject) => {

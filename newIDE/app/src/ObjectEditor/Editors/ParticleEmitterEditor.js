@@ -62,6 +62,7 @@ export default class ParticleEmitterEditor extends React.Component<
           <Line>
             <Column expand noMargin>
               <SemiControlledTextField
+                commitOnBlur
                 floatingLabelText={<Trans>Size</Trans>}
                 fullWidth
                 type="number"
@@ -79,6 +80,7 @@ export default class ParticleEmitterEditor extends React.Component<
           <Line>
             <Column expand noMargin>
               <SemiControlledTextField
+                commitOnBlur
                 floatingLabelText={<Trans>Lines length</Trans>}
                 fullWidth
                 type="number"
@@ -91,6 +93,7 @@ export default class ParticleEmitterEditor extends React.Component<
             </Column>
             <Column expand noMargin>
               <SemiControlledTextField
+                commitOnBlur
                 floatingLabelText={<Trans>Lines thickness</Trans>}
                 fullWidth
                 type="number"
@@ -124,6 +127,7 @@ export default class ParticleEmitterEditor extends React.Component<
             <Line>
               <Column expand noMargin>
                 <SemiControlledTextField
+                  commitOnBlur
                   floatingLabelText={<Trans>Particles start width</Trans>}
                   fullWidth
                   type="number"
@@ -138,6 +142,7 @@ export default class ParticleEmitterEditor extends React.Component<
               </Column>
               <Column expand noMargin>
                 <SemiControlledTextField
+                  commitOnBlur
                   floatingLabelText={<Trans>Particles start height</Trans>}
                   fullWidth
                   type="number"
@@ -173,12 +178,13 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
           <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Start opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={particleEmitterObject.getParticleAlpha1()}
             onChange={value => {
-              particleEmitterObject.setParticleAlpha1(parseInt(value, 10));
+              particleEmitterObject.setParticleAlpha1(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
@@ -203,12 +209,13 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
           <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>End opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={particleEmitterObject.getParticleAlpha2()}
             onChange={value => {
-              particleEmitterObject.setParticleAlpha2(parseInt(value, 10));
+              particleEmitterObject.setParticleAlpha2(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
@@ -237,6 +244,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Maximum number of particles displayed</Trans>
               }
@@ -244,7 +252,9 @@ export default class ParticleEmitterEditor extends React.Component<
               type="number"
               value={particleEmitterObject.getMaxParticleNb()}
               onChange={value => {
-                particleEmitterObject.setMaxParticleNb(parseInt(value, 10));
+                particleEmitterObject.setMaxParticleNb(
+                  parseInt(value, 10) || 0
+                );
                 this.forceUpdate();
               }}
             />
@@ -253,6 +263,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Number of particles in tank (-1 for infinite)</Trans>
               }
@@ -260,13 +271,14 @@ export default class ParticleEmitterEditor extends React.Component<
               type="number"
               value={particleEmitterObject.getTank()}
               onChange={value => {
-                particleEmitterObject.setTank(parseInt(value, 10));
+                particleEmitterObject.setTank(parseInt(value, 10) || 0);
                 this.forceUpdate();
               }}
             />
           </Column>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Flow of particles (particles/seconds)</Trans>
               }
@@ -274,7 +286,7 @@ export default class ParticleEmitterEditor extends React.Component<
               type="number"
               value={particleEmitterObject.getFlow()}
               onChange={value => {
-                particleEmitterObject.setFlow(parseInt(value, 10));
+                particleEmitterObject.setFlow(parseInt(value, 10) || 0);
                 this.forceUpdate();
               }}
             />
@@ -283,6 +295,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Minimum emitter force applied on particles</Trans>
               }
@@ -290,13 +303,16 @@ export default class ParticleEmitterEditor extends React.Component<
               type="number"
               value={particleEmitterObject.getEmitterForceMin()}
               onChange={value => {
-                particleEmitterObject.setEmitterForceMin(parseInt(value, 10));
+                particleEmitterObject.setEmitterForceMin(
+                  parseInt(value, 10) || 0
+                );
                 this.forceUpdate();
               }}
             />
           </Column>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Maximum emitter force applied on particles</Trans>
               }
@@ -304,7 +320,9 @@ export default class ParticleEmitterEditor extends React.Component<
               type="number"
               value={particleEmitterObject.getEmitterForceMax()}
               onChange={value => {
-                particleEmitterObject.setEmitterForceMax(parseInt(value, 10));
+                particleEmitterObject.setEmitterForceMax(
+                  parseInt(value, 10) || 0
+                );
                 this.forceUpdate();
               }}
             />
@@ -313,24 +331,28 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={<Trans>Spray cone angle (in degrees)</Trans>}
               fullWidth
               type="number"
               value={particleEmitterObject.getConeSprayAngle()}
               onChange={value => {
-                particleEmitterObject.setConeSprayAngle(parseInt(value, 10));
+                particleEmitterObject.setConeSprayAngle(
+                  parseInt(value, 10) || 0
+                );
                 this.forceUpdate();
               }}
             />
           </Column>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={<Trans>Radius of the emitter</Trans>}
               fullWidth
               type="number"
               value={particleEmitterObject.getZoneRadius()}
               onChange={value => {
-                particleEmitterObject.setZoneRadius(parseInt(value, 10));
+                particleEmitterObject.setZoneRadius(parseInt(value, 10) || 0);
                 this.forceUpdate();
               }}
             />
@@ -339,6 +361,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={<Trans>Gravity on particles on X axis</Trans>}
               fullWidth
               type="number"
@@ -351,6 +374,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={<Trans>Gravity on particles on Y axis</Trans>}
               fullWidth
               type="number"
@@ -365,6 +389,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={<Trans>Friction on particles</Trans>}
               fullWidth
               type="number"
@@ -379,6 +404,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Particle minimum lifetime (in seconds)</Trans>
               }
@@ -393,6 +419,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Particle maximum lifetime (in seconds)</Trans>
               }
@@ -409,6 +436,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Particle start size (in percents)</Trans>
               }
@@ -423,6 +451,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={<Trans>Particle end size (in percents)</Trans>}
               fullWidth
               type="number"
@@ -437,6 +466,7 @@ export default class ParticleEmitterEditor extends React.Component<
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Particle minimum rotation speed (degrees/second)</Trans>
               }
@@ -451,6 +481,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
           <Column expand noMargin>
             <SemiControlledTextField
+              commitOnBlur
               floatingLabelText={
                 <Trans>Particle maximum rotation speed (degrees/second)</Trans>
               }

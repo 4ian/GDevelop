@@ -123,10 +123,14 @@ export default class LocalProjectWriter {
       project,
       fileSystem,
       projectPath,
-      true,
-      false,
-      true
+      true, // Update the project with the new resource paths
+      false, // Don't move absolute files
+      true // Keep relative files folders structure.
     );
+
+    // Update the project with the new file path (resources have already been updated)
+    project.setProjectFile(filePath);
+
     return writeProjectFiles(project, filePath, projectPath).then(() => {
       return true; // Save was properly done
     });

@@ -90,34 +90,35 @@ export default class LocalProjectWriter {
     const filePath = project.getProjectFile();
     const projectPath = path.dirname(project.getProjectFile());
     if (!filePath) {
-      return Promise.reject('Unimplemented "Save as" feature');
+      return Promise.reject(
+        'Project file is empty, "Save as" should have been called?'
+      );
     }
 
     return writeProjectFiles(project, filePath, projectPath).then(() => {
-      return true;
+      return true; // Save was properly done
     });
   };
 
   static saveProjectAs = (project: gdProject): Promise<boolean> => {
-    let filePath = project.getProjectFile();
-    //const filenameWithExtension = path.basename(project.getProjectFile()) || 'game.json';
-    let projectPath = path.dirname(filePath);
+    const defaultPath = project.getProjectFile();
     const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
     const browserWindow = electron.remote.getCurrentWindow();
     const options = {
-      defaultPath: filePath,
+      defaultPath,
       filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
     };
 
     if (!dialog) {
       return Promise.reject('Unsupported');
     }
-    filePath = dialog.showSaveDialog(browserWindow, options);
+    const filePath = dialog.showSaveDialog(browserWindow, options);
     if (!filePath) {
-      return Promise.reject(false);
+      return Promise.resolve(false); // Nothing was saved.
     }
-    projectPath = path.dirname(filePath);
+    const projectPath = path.dirname(filePath);
 
+    // TODO: Ideally, errors while copying resources should be reported.
     gd.ProjectResourcesCopier.copyAllResourcesTo(
       project,
       fileSystem,
@@ -127,7 +128,7 @@ export default class LocalProjectWriter {
       true
     );
     return writeProjectFiles(project, filePath, projectPath).then(() => {
-      return true;
+      return true; // Save was properly done
     });
   };
 

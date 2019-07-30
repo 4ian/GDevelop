@@ -1169,6 +1169,47 @@ module.exports = {
       }
     ]
   },
+  "filesystem-create-directory": {
+    "description": "Show how to ask the user for a folder name and create it on the disk.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Text entry object",
+        "name": "TextEntryObject"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Filesystem",
+        "name": "FileSystem"
+      }
+    ]
+  },
   "find-diagonals": {
     "description": "Show how to delete objects that are located at the diagonals of the click of the player in a board game.",
     "usedExtensions": [

@@ -30,6 +30,7 @@ import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-sto
 import endlessUpRunner from '../fixtures/endless-up-runner/endless-up-runner.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
 import facebookInstantGame from '../fixtures/facebook-instant-game/facebook-instant-game.json';
+import filesystemCreateDirectory from '../fixtures/filesystem-create-directory/filesystem-create-directory.json';
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
 import geodash from '../fixtures/geodash/geodash.json';
 import healthBar from '../fixtures/health-bar/health-bar.json';
@@ -175,6 +176,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(exitApp);
     } else if (url === 'example://facebook-instant-game') {
       return Promise.resolve(facebookInstantGame);
+    } else if (url === 'example://filesystem-create-directory') {
+      return Promise.resolve(filesystemCreateDirectory);
     } else if (url === 'example://find-diagonals') {
       return Promise.resolve(findDiagonals);
     } else if (url === 'example://geodash') {

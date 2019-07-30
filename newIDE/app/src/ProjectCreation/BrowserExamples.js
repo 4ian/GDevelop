@@ -42,6 +42,7 @@ const exampleNames = [
   'endless-up-runner',
   'exit-app',
   'facebook-instant-game',
+  'filesystem-create-directory',
   'find-diagonals',
   'geodash',
   'health-bar',

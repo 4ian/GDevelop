@@ -241,6 +241,64 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.ObjectsContainer', function() {
+    it('can move objects between containers, without moving them in memory', function() {
+      // Prepare two containers, one with 3 objects and one empty
+      const objectsContainer1 = new gd.ObjectsContainer();
+      const objectsContainer2 = new gd.ObjectsContainer();
+      const mySpriteObject = new gd.SpriteObject("MySprite");
+      const mySprite2Object = new gd.SpriteObject("MySprite2");
+      const mySprite3Object = new gd.SpriteObject("MySprite3");
+      objectsContainer1.insertObject(mySpriteObject, 0);
+      objectsContainer1.insertObject(mySprite2Object, 1);
+      objectsContainer1.insertObject(mySprite3Object, 2);
+
+      // Objects are copied when inserted in the container, so we delete them:
+      mySpriteObject.delete();
+      mySprite2Object.delete();
+      mySprite3Object.delete();
+
+      // Find the pointer to the objects in memory
+      expect(objectsContainer1.getObjectsCount()).toBe(3);
+      expect(objectsContainer2.getObjectsCount()).toBe(0);
+      const mySpriteObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(0));
+      const mySprite2ObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(1));
+      const mySprite3ObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(2));
+
+      // Move objects between containers
+      objectsContainer1.moveObjectToAnotherContainer("MySprite2", objectsContainer2, 0);
+      expect(objectsContainer1.getObjectsCount()).toBe(2);
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite");
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe("MySprite3");
+      expect(objectsContainer2.getObjectsCount()).toBe(1);
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite2");
+
+      objectsContainer1.moveObjectToAnotherContainer("MySprite3", objectsContainer2, 1);
+      expect(objectsContainer1.getObjectsCount()).toBe(1);
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite");
+      expect(objectsContainer2.getObjectsCount()).toBe(2);
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite2");
+      expect(objectsContainer2.getObjectAt(1).getName()).toBe("MySprite3");
+
+      // Check that the object in memory are the same, even if moved to another container
+      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(mySpriteObjectPtr);
+      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(mySprite2ObjectPtr);
+      expect(gd.getPointer(objectsContainer2.getObjectAt(1))).toBe(mySprite3ObjectPtr);
+
+      objectsContainer2.moveObjectToAnotherContainer("MySprite2", objectsContainer1, 0);
+      expect(objectsContainer1.getObjectsCount()).toBe(2);
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite2");
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe("MySprite");
+      expect(objectsContainer2.getObjectsCount()).toBe(1);
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite3");
+
+      // Check again that the object in memory are the same, even if moved to another container
+      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(mySprite2ObjectPtr);
+      expect(gd.getPointer(objectsContainer1.getObjectAt(1))).toBe(mySpriteObjectPtr);
+      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(mySprite3ObjectPtr);
+    });
+  });
+
   describe('gd.InitialInstancesContainer', function() {
     let container = null;
     let containerCopy = null;

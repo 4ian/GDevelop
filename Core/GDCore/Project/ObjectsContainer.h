@@ -106,13 +106,17 @@ class GD_CORE_API ObjectsContainer {
    * \note The object passed by parameter is copied.
    * \param object The object that must be copied and inserted into the project
    * \param position Insertion position. If the position is invalid, the object
-   * is inserted at the end of the objects list. \return A reference to the
-   * object in the list.
+   * is inserted at the end of the objects list.
+   *
+   * \return A reference to the object in the list.
    */
   gd::Object& InsertObject(const gd::Object& object, std::size_t position);
 
   /**
    * \brief Delete an object.
+   * \warning When calling this function, be sure to drop any reference that you
+   * might hold to the object - otherwise you'll access deleted memory.
+   *
    * \param name The name of the object to be deleted.
    */
   void RemoveObject(const gd::String& name);
@@ -126,6 +130,15 @@ class GD_CORE_API ObjectsContainer {
    * \brief Swap the position of the specified objects.
    */
   void SwapObjects(std::size_t firstObjectIndex, std::size_t secondObjectIndex);
+
+  /**
+   * Move the specified object to another container, removing it from the current one
+   * and adding it to the new one at the specified position.
+   *
+   * \note This does not invalidate the references to the object (object is not moved in memory,
+   * as referenced by smart pointers internally).
+   */
+  void MoveObjectToAnotherContainer(const gd::String& name, gd::ObjectsContainer & newContainer, std::size_t newPosition);
 
   /**
    * Provide a raw access to the vector containing the objects

@@ -17,17 +17,21 @@ export const createTree = (
   const tree = {};
   allExpressions.forEach(
     (expressionInfo: EnumeratedInstructionOrExpressionMetadata) => {
-      update(
-        tree,
-        compact(expressionInfo.fullGroupName.split(GROUP_DELIMITER)),
-        groupInfo => {
-          const existingGroupInfo = groupInfo || {};
-          return {
-            ...existingGroupInfo,
-            [expressionInfo.displayedName]: expressionInfo,
-          };
-        }
+      let pathInTree = compact(
+        expressionInfo.fullGroupName.split(GROUP_DELIMITER)
       );
+      if (!pathInTree.length) {
+        // Group items without a group in an empty group
+        pathInTree = [''];
+      }
+
+      update(tree, pathInTree, groupInfo => {
+        const existingGroupInfo = groupInfo || {};
+        return {
+          ...existingGroupInfo,
+          [expressionInfo.displayedName]: expressionInfo,
+        };
+      });
     }
   );
 

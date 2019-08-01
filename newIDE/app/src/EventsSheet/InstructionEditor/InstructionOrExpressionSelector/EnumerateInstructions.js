@@ -113,6 +113,19 @@ export const enumerateInstructions = (
   return allInstructions;
 };
 
+const orderFirstInstructionsWithoutGroup = (
+  allInstructions: Array<EnumeratedInstructionOrExpressionMetadata>
+) => {
+  const noGroupInstructions = allInstructions.filter(
+    instructionMetadata => instructionMetadata.fullGroupName.length === 0
+  );
+  const instructionsWithGroups = allInstructions.filter(
+    instructionMetadata => instructionMetadata.fullGroupName.length !== 0
+  );
+
+  return [...noGroupInstructions, ...instructionsWithGroups];
+};
+
 /**
  * List all the instructions that can be used for the given object,
  * in the given context. This includes instructions for the behaviors
@@ -226,7 +239,7 @@ export const enumerateObjectInstructions = (
     });
   }
 
-  return allInstructions;
+  return orderFirstInstructionsWithoutGroup(allInstructions);
 };
 
 /**

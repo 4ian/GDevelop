@@ -139,8 +139,8 @@ export class Toolbar extends PureComponent {
               accelerator: 'CmdOrCtrl+-',
             },
             {
-              label: 'Center view',
-              click: () => this.props.centerView(),              
+              label: 'Center View',
+              click: () => this.props.centerView(),
             },
             { type: 'separator' },
             { label: '5%', click: () => this.props.setZoomFactor(0.05) },

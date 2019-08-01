@@ -73,6 +73,7 @@ type Props = {|
   ) => void,
   chosenObjectName: ?string,
   onChooseObject: (objectName: string) => void,
+  onSearchStartOrReset?: () => void,
   style?: Object,
 |};
 
@@ -139,6 +140,7 @@ export default class InstructionOrObjectSelector extends React.Component<
       isCondition,
       currentTab,
       onChangeTab,
+      onSearchStartOrReset,
     } = this.props;
     const { searchText, selectedObjectTags } = this.state;
 
@@ -193,11 +195,20 @@ export default class InstructionOrObjectSelector extends React.Component<
               >
                 <SearchBar
                   value={searchText}
-                  onChange={searchText =>
+                  onChange={searchText => {
+                    const oldSearchText = this.state.searchText;
                     this.setState({
                       searchText,
-                    })
-                  }
+                    });
+
+                    // Notify if needed that we started or cleared a search
+                    if (
+                      (!oldSearchText && searchText) ||
+                      (oldSearchText && !searchText)
+                    ) {
+                      if (onSearchStartOrReset) onSearchStartOrReset();
+                    }
+                  }}
                   onRequestSearch={onSubmitSearch}
                   buildTagsMenuTemplate={() =>
                     this._buildObjectTagsMenuTemplate(i18n)

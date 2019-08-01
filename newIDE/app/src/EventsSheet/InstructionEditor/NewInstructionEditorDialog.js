@@ -307,6 +307,9 @@ export default class NewInstructionEditorDialog extends React.Component<
               this.setState(this._chooseObject(objectName, true));
             }}
             focusOnMount={!instructionType}
+            onSearchStartOrReset={() => {
+              this.forceUpdate(); /*Force update to ensure dialog is properly positioned*/
+            }}
           />
         </Background>
       </div>

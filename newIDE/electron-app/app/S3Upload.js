@@ -51,7 +51,7 @@ module.exports = {
         async.series(
           allFiles.map((localFile, fileIndex) => callback => {
             const body = fs.createReadStream(localFile);
-            const filename = path.relative(localDir, localFile).replace(/\\/g,'/');;
+            const filename = path.relative(localDir, localFile).replace(/\\/g,'/');
             const fileExtension = path.extname(filename);
             awsS3Client
               .upload({

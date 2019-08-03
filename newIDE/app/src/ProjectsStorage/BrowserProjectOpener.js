@@ -43,6 +43,7 @@ import levelEditor from '../fixtures/level-editor/level-editor.json';
 import loadImageFromUrl from '../fixtures/load-image-from-url/load-image-from-url.json';
 import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
+import menuWithFunctionsAndTextEffects from '../fixtures/menu-with-functions-and-text-effects/menu-with-functions-and-text-effects.json';
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
 import moveObjectBackAndForth from '../fixtures/move-object-back-and-forth/move-object-back-and-forth.json';
 import moveObjectInCircle from '../fixtures/move-object-in-circle/move-object-in-circle.json';
@@ -202,6 +203,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(magnet);
     } else if (url === 'example://manipulate-text-object') {
       return Promise.resolve(manipulateTextObject);
+    } else if (url === 'example://menu-with-functions-and-text-effects') {
+      return Promise.resolve(menuWithFunctionsAndTextEffects);
     } else if (url === 'example://move-camera-to-position') {
       return Promise.resolve(moveCameraToPosition);
     } else if (url === 'example://move-object-back-and-forth') {

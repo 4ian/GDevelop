@@ -1730,6 +1730,23 @@ module.exports = {
       }
     ]
   },
+  "menu-with-functions-and-text-effects": {
+    "description": "How to implement the same menu across multiple scenes using functions and text effects for hover/active states.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      }
+    ]
+  },
   "move-camera-to-position": {
     "description": "This shows how to move the camera to the position of an object on a map.",
     "usedExtensions": [

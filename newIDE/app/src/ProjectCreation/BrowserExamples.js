@@ -55,6 +55,7 @@ const exampleNames = [
   'load-image-from-url',
   'magnet',
   'manipulate-text-object',
+  'menu-with-functions-and-text-effects',
   'move-camera-to-position',
   'move-object-back-and-forth',
   'move-object-in-circle',

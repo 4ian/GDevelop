@@ -218,6 +218,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         isWindowMaskShown={() => !!this.state.uiSettings.windowMask}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
+        centerView={this.centerView}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
@@ -780,6 +781,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.forceUpdatePropertiesEditor();
       }
     );
+  };
+
+  centerView = () => {
+    if (this.editor) this.editor.centerView();
   };
 
   setZoomFactor = (zoomFactor: number) => {

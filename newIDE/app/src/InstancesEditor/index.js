@@ -578,6 +578,12 @@ export default class InstancesEditorContainer extends Component {
     this.viewPosition.scrollTo(x, y);
   }
 
+  centerView() {
+    const x = this.props.project.getMainWindowDefaultWidth() / 2;
+    const y = this.props.project.getMainWindowDefaultHeight() / 2;
+    this.viewPosition.scrollTo(x, y);
+  }
+
   centerViewOn(instances) {
     if (!instances.length) return;
 

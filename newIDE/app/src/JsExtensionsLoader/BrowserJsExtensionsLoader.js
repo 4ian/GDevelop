@@ -42,6 +42,10 @@ const jsExtensions = [
     name: 'Video',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Video/JsExtension.js'),
   },
+  {
+    name: 'FileSystem',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FileSystem/JsExtension.js'),
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

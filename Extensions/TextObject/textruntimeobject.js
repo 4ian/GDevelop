@@ -44,6 +44,9 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
         gdjs.TextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
         this._renderer = new gdjs.TextRuntimeObjectRenderer(this, runtimeScene);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.TextRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
@@ -206,7 +209,7 @@ gdjs.TextRuntimeObject.prototype.getHeight = function() {
  * Get scale of the text.
  */
 gdjs.TextRuntimeObject.prototype.getScale = function() {
-    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0; 
+    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0;
 };
 
 /**
@@ -413,7 +416,7 @@ gdjs.TextRuntimeObject.prototype.setGradient = function(strGradientType, strFirs
 
     this._gradientType = strGradientType;
 
-    this._useGradient = (this._gradient.length > 1) ? true : false; 
+    this._useGradient = (this._gradient.length > 1) ? true : false;
 
     this._renderer.updateStyle();
 };

@@ -5,7 +5,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import React, { Component } from 'react';
-import SearchBar from 'material-ui-search-bar';
 import {
   getExtensionsRegistry,
   type ExtensionsRegistry,
@@ -115,7 +114,6 @@ export default class ExtensionsSearch extends Component<Props, State> {
     error: null,
     chosenTag: '',
   };
-  _searchBar = React.createRef<SearchBar>();
 
   componentDidMount() {
     this._loadExtensionsRegistry();
@@ -241,7 +239,6 @@ export default class ExtensionsSearch extends Component<Props, State> {
                       chosenTag,
                     })
                   }
-                  ref={this._searchBar}
                 />
                 <List>
                   {!extensionsRegistry && !error && <PlaceholderLoader />}

@@ -151,6 +151,19 @@ class GD_CORE_API ExpressionMetadata {
   }
 
   /**
+   * Get the help path of the expression, relative to the documentation root.
+   */
+  const gd::String &GetHelpPath() const { return helpPath; }
+
+  /**
+   * Set the help path of the expression, relative to the documentation root.
+   */
+  ExpressionMetadata &SetHelpPath(const gd::String &path) {
+    helpPath = path;
+    return *this;
+  }
+
+  /**
    * Check if the instruction is private - it can't be used outside of the
    * object/ behavior that it is attached too.
    */
@@ -233,6 +246,7 @@ class GD_CORE_API ExpressionMetadata {
  private:
   gd::String fullname;
   gd::String description;
+  gd::String helpPath;
   gd::String group;
   bool shown;
 

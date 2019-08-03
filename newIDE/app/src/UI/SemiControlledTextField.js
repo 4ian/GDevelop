@@ -40,6 +40,7 @@ type Props = {|
   style?: Object,
   type?: string,
   rows?: number,
+  rowsMax?: number,
 |};
 
 /**

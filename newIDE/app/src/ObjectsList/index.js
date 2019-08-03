@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
 import Background from '../UI/Background';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import ObjectRow from './ObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -261,6 +261,11 @@ export default class ObjectsListContainer extends React.Component<
     );
     if (!answer) return;
 
+    // It's important to call onDeleteObject, because the parent might
+    // have to do some refactoring/clean up work before the object is deleted
+    // (typically, the SceneEditor will remove instances refering to the object,
+    // leading to the removal of their renderer - which can keep a reference to
+    // the object).
     this.props.onDeleteObject(objectWithContext, doRemove => {
       if (!doRemove) return;
 
@@ -428,11 +433,14 @@ export default class ObjectsListContainer extends React.Component<
     );
     if (!answer) return;
 
-    project.insertObject(
-      objectsContainer.getObject(objectName),
+    // It's safe to call moveObjectToAnotherContainer because it does not invalidate the
+    // references to the object in memory - so other editors like InstancesRenderer can
+    // continue to work.
+    objectsContainer.moveObjectToAnotherContainer(
+      objectName,
+      project,
       project.getObjectsCount()
     );
-    objectsContainer.removeObject(objectName);
 
     this.forceUpdateList();
   };

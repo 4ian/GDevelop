@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import Background from '../UI/Background';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import GroupRow from './GroupRow';
 import { ListItem } from 'material-ui/List';
 import newNameGenerator from '../Utils/NewNameGenerator';

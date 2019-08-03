@@ -12,6 +12,12 @@ export type ProjectErrors = {
   [string]: Array<ProjectError>,
 };
 
+export const validatePackageName = (packageName: string) => {
+  const pattern = /^([A-Za-z]{1}[A-Za-z\d_]*\.)+[A-Za-z][A-Za-z\d_]*$/i;
+
+  return pattern.test(packageName);
+};
+
 type TFunction = string => string; //TODO
 
 export const getErrors = (t: TFunction, project: gdProject): ProjectErrors => {
@@ -44,6 +50,15 @@ export const getErrors = (t: TFunction, project: gdProject): ProjectErrors => {
       'packageName',
       'error',
       t('The package name is too long.'),
+      t('Change the package name in the game properties.')
+    );
+  } else if (!validatePackageName(project.getPackageName())) {
+    addError(
+      'packageName',
+      'error',
+      t(
+        'The package name is containing invalid characters or not following the convention "xxx.yyy.zzz" (numbers allowed after a letter only).'
+      ),
       t('Change the package name in the game properties.')
     );
   }

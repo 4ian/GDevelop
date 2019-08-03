@@ -62,8 +62,7 @@ class ExporterHelper {
    */
   static void ExportResources(gd::AbstractFileSystem &fs,
                               gd::Project &project,
-                              gd::String exportDir,
-                              wxProgressDialog *progressDlg = NULL);
+                              gd::String exportDir);
 
   /**
    * \brief Add libraries files from Pixi.js or Cocos2d to the list of includes.

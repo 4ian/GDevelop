@@ -21,28 +21,44 @@ void ResourcesMergingHelper::ExposeFile(gd::String& resourceFilename) {
   gd::String resourceFullFilename = resourceFilename;
   resourceFullFilename = gd::AbstractFileSystem::NormalizeSeparator(
       resourceFullFilename);  // Protect against \ on Linux.
-  fs.MakeAbsolute(resourceFullFilename, baseDirectory);
 
-  if (!preserveDirectoriesStructure)
+  // In the case of absolute filnames that we don't want to preserve, or
+  // in the case of copying files without preserving relative folders, the new
+  // names will be generated from the filename alone (with collision protection).
+  auto stripToFilenameOnly = [&]() {
+    fs.MakeAbsolute(resourceFullFilename, baseDirectory);
     SetNewFilename(resourceFullFilename, fs.FileNameFrom(resourceFullFilename));
-  else {
-    // We want to preserve the directory structure:
-    // keep paths relative to the base directory
-    gd::String relativeFilename = resourceFullFilename;
-    if (fs.MakeRelative(relativeFilename, baseDirectory))
-      SetNewFilename(resourceFullFilename, relativeFilename);
-    else  // Unless the filename cannot be made relative. In this case:
-    {
-      // Just strip the filename to its file part
-      // if we do not want to preserve the absolute filenames.
-      if (!preserveAbsoluteFilenames)
-        SetNewFilename(resourceFullFilename,
-                       fs.FileNameFrom(resourceFullFilename));
-    }
+    resourceFilename = oldFilenames[resourceFullFilename];
+  };
+
+  // if we do not want to preserve the folders at all,
+  // strip the filename to its file part.
+  if (!preserveDirectoriesStructure) {
+    stripToFilenameOnly();
+    return;
   }
 
-  gd::String newResourceFilename = oldFilenames[resourceFullFilename];
-  resourceFilename = newResourceFilename;
+  // We want to preserve the directory structure:
+  // keep paths relative to the base directory, as possible.
+  if (!fs.IsAbsolute(resourceFullFilename)) {
+    fs.MakeAbsolute(resourceFullFilename, baseDirectory);
+    gd::String relativeFilename = resourceFullFilename;
+    if (fs.MakeRelative(relativeFilename, baseDirectory)) {
+      SetNewFilename(resourceFullFilename, relativeFilename);
+      resourceFilename = oldFilenames[resourceFullFilename];
+    } else {
+      // The filename cannot be made relative. Consider that it is absolute.
+      // Just strip the filename to its file part
+      // if we do not want to preserve the absolute filenames.
+      if (!preserveAbsoluteFilenames) {
+        stripToFilenameOnly();
+      }
+    }
+  } else { // If the path is absolute, check if we want to preserve it or not.
+    if (!preserveAbsoluteFilenames) {
+      stripToFilenameOnly();
+    }
+  }
 }
 
 void ResourcesMergingHelper::SetNewFilename(gd::String oldFilename,

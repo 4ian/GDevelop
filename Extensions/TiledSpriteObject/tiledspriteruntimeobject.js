@@ -24,6 +24,9 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
 
     this.setWidth(objectData.width);
     this.setHeight(objectData.height);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
@@ -33,11 +36,11 @@ gdjs.TiledSpriteRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
 
-gdjs.TiledSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.TiledSpriteRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-    if (this._renderer.onOwnerRemovedFromScene) {
-        this._renderer.onOwnerRemovedFromScene();
+    if (this._renderer.onDestroy) {
+        this._renderer.onDestroy();
     }
 };
 

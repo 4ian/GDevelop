@@ -91,7 +91,8 @@ gd::ExpressionMetadata& PlatformExtension::AddExpression(
                                                            fullname,
                                                            description,
                                                            group,
-                                                           smallicon);
+                                                           smallicon)
+                                            .SetHelpPath(GetHelpPath());
   return expressionsInfos[nameWithNamespace];
 #endif
 }
@@ -110,7 +111,8 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
                                                               fullname,
                                                               description,
                                                               group,
-                                                              smallicon);
+                                                              smallicon)
+                                               .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[nameWithNamespace];
 #endif
 }
@@ -349,16 +351,15 @@ CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(
   return NULL;
 }
 
-gd::Behavior* PlatformExtension::GetBehavior(
-    gd::String type) const {
+gd::Behavior* PlatformExtension::GetBehavior(gd::String type) const {
   if (behaviorsInfo.find(type) != behaviorsInfo.end())
     return &behaviorsInfo.find(type)->second.Get();
 
   return nullptr;
 }
 
-gd::BehaviorsSharedData*
-PlatformExtension::GetBehaviorSharedDatas(gd::String type) const {
+gd::BehaviorsSharedData* PlatformExtension::GetBehaviorSharedDatas(
+    gd::String type) const {
   if (behaviorsInfo.find(type) != behaviorsInfo.end() &&
       behaviorsInfo.find(type)->second.GetSharedDataInstance())
     return behaviorsInfo.find(type)->second.GetSharedDataInstance();

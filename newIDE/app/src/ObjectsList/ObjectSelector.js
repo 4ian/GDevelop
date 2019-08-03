@@ -1,12 +1,15 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
-import Divider from 'material-ui/Divider';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
-import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type DataSource,
+} from '../UI/SemiControlledAutoComplete';
+import ListIcon from '../UI/ListIcon';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 
 type Props = {|
+  project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   allowedObjectType?: ?string,
@@ -23,14 +26,16 @@ type Props = {|
   hintText?: ?React.Node,
 |};
 
-type DataSource = Array<{| text: string, value: React.Node |}>;
+const iconSize = 24;
 
 const getObjectsAndGroupsDataSource = ({
+  project,
   globalObjectsContainer,
   objectsContainer,
   noGroups,
   allowedObjectType,
 }: {|
+  project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
@@ -45,6 +50,14 @@ const getObjectsAndGroupsDataSource = ({
     return {
       text: object.getName(),
       value: object.getName(),
+      renderLeftIcon: project
+        ? () => (
+            <ListIcon
+              iconSize={iconSize}
+              src={ObjectsRenderingService.getThumbnail(project, object)}
+            />
+          )
+        : undefined,
     };
   });
   const groups = noGroups
@@ -56,11 +69,11 @@ const getObjectsAndGroupsDataSource = ({
         };
       });
 
-  return [...objects, { text: '', value: <Divider /> }, ...groups];
+  return [...objects, { type: 'separator' }, ...groups];
 };
 
 export default class ObjectSelector extends React.Component<Props, {||}> {
-  _field: ?AutoComplete;
+  _field: ?SemiControlledAutoComplete;
 
   // Don't add a componentWillUnmount that would call onChange. This can lead to
   // calling callbacks that would then update a deleted instruction parameters.
@@ -74,6 +87,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       value,
       onChange,
       onChoose,
+      project,
       globalObjectsContainer,
       objectsContainer,
       allowedObjectType,
@@ -83,13 +97,16 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
     } = this.props;
 
     const objectAndGroups = getObjectsAndGroupsDataSource({
+      project,
       globalObjectsContainer,
       objectsContainer,
       noGroups,
       allowedObjectType,
     });
-    const hasValidObject =
-      objectAndGroups.filter(choice => value === choice.text).length !== 0;
+    const hasValidChoice =
+      objectAndGroups.filter(
+        choice => choice.text !== undefined && value === choice.text
+      ).length !== 0;
 
     return (
       <SemiControlledAutoComplete
@@ -98,7 +115,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         onChange={onChange}
         onChoose={onChoose}
         dataSource={objectAndGroups}
-        errorText={hasValidObject ? undefined : errorTextIfInvalid}
+        errorText={hasValidChoice ? undefined : errorTextIfInvalid}
         ref={field => (this._field = field)}
         {...rest}
       />

@@ -12,7 +12,11 @@ cache:
 env:
   global:
     - GCC_VERSION="4.8"
-
+    
+services:
+  # Virtual Framebuffer 'fake' X server for SFML
+  - xvfb
+  
 addons:
   artifacts:
     s3_region: "us-east-1"
@@ -25,8 +29,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     # Build dependencies:
-    # (Cmake 3+ is required by Emscripten)
-    - cmake3
+    - cmake
     - p7zip-full
     - g++-4.8
     # SFML dependencies:
@@ -43,7 +46,6 @@ before_install:
   #Activate X Virtual Framebuffer to allow tests to
   #use SFML.
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
   # This workaround is required to avoid libstdc++ errors (Emscripten requires a recent version of libstdc++)
   - wget -q -O libstdc++6 http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.10_amd64.deb
   - sudo dpkg --force-all -i libstdc++6

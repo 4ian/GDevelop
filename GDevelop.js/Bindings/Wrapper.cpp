@@ -48,6 +48,7 @@
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>
 #include <GDCore/IDE/Project/ProjectResourcesAdder.h>
+#include <GDCore/IDE/Project/ProjectResourcesCopier.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 
 #include <GDCore/Events/Builtin/CommentEvent.h>
@@ -552,6 +553,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetPropertyActionName GetPropertyActionName
 #define STATIC_GetPropertyConditionName GetPropertyConditionName
 #define STATIC_GetPropertyExpressionName GetPropertyExpressionName
+
+#define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

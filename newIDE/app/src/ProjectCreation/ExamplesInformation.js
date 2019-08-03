@@ -472,23 +472,23 @@ module.exports = {
     ]
   },
   "breakout": {
-    "description": "The classic Breakout arcade game adapted in GDevelop.",
+    "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
         "name": "Sprite"
       },
       {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
+        "fullName": "Text object",
+        "name": "TextObject"
       },
       {
-        "fullName": "System information",
-        "name": "SystemInfo"
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
+        "fullName": "",
+        "name": ""
       },
       {
         "fullName": "Keyboard features",
@@ -499,8 +499,12 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "External layouts",
@@ -1165,6 +1169,47 @@ module.exports = {
       }
     ]
   },
+  "filesystem-create-directory": {
+    "description": "Show how to ask the user for a folder name and create it on the disk.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Text entry object",
+        "name": "TextEntryObject"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Filesystem",
+        "name": "FileSystem"
+      }
+    ]
+  },
   "find-diagonals": {
     "description": "Show how to delete objects that are located at the diagonals of the click of the player in a board game.",
     "usedExtensions": [
@@ -1682,6 +1727,23 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "menu-with-functions-and-text-effects": {
+    "description": "How to implement the same menu across multiple scenes using functions and text effects for hover/active states.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },

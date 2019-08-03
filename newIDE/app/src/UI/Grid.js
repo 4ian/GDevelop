@@ -24,6 +24,7 @@ export const Column = props => (
       marginRight: props.noMargin ? 0 : marginsSize * 2,
       flexDirection: 'column',
       alignItems: props.alignItems || 'stretch',
+      justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
     }}
   >

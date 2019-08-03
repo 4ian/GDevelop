@@ -1,21 +1,34 @@
 // @flow
 import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
-import { defaultAutocompleteProps } from './AutocompleteProps';
+import Divider from 'material-ui/Divider';
+import MenuItem from 'material-ui/MenuItem';
+import ListIcon from './ListIcon';
+import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 
 type State = {|
   focused: boolean,
   text: ?string,
 |};
 
+export type DataSource = Array<
+  | {|
+      type: 'separator',
+    |}
+  | {|
+      text: string, // The text used for filtering
+      value: string, // The value to show on screen
+      onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
+      renderLeftIcon?: ?() => React.Element<typeof ListIcon>,
+      renderRightIcon?: ?() => React.Element<typeof ListIcon>,
+    |}
+>;
+
 type Props = {|
   value: string,
   onChange: string => void,
   onChoose?: string => void, // Optionally called when Enter pressed or item clicked.
-  dataSource: Array<{|
-    text: string,
-    value: React.Node,
-  |}>,
+  dataSource: DataSource,
 
   // Some AutoComplete props that can be reused:
   id?: string,
@@ -39,6 +52,25 @@ type Props = {|
   filter?: (string, string) => boolean,
   openOnFocus?: boolean,
 |};
+
+/**
+ * Provides props for material-ui AutoComplete components that specify
+ * sensible defaults for size and popover size/positioning.
+ */
+const defaultAutocompleteProps = {
+  fullWidth: true,
+  textFieldStyle: {
+    minWidth: 300,
+  },
+  menuProps: {
+    maxHeight: 250,
+  },
+  popoverProps: {
+    // Ensure that the Popover menu is always visible on screen
+    canAutoPosition: true,
+  },
+  filter: fuzzyOrEmptyFilter,
+};
 
 /**
  * This component works like a material-ui AutoComplete, except that
@@ -96,16 +128,51 @@ export default class SemiControlledAutoComplete extends React.Component<
           if (onBlur) onBlur(event);
         }}
         onNewRequest={data => {
-          const callback = onChoose || onChange;
-          // Note that data may be a string or a {text, value} object.
-          if (typeof data === 'string') {
-            callback(data);
-          } else if (typeof data.value === 'string') {
-            callback(data.value);
+          if (data.onClick) {
+            data.onClick();
+            return;
+          } else if (
+            data.value &&
+            data.value.props &&
+            typeof data.value.props.value === 'string'
+          ) {
+            const callback = onChoose || onChange;
+            callback(data.value.props.value);
+          } else {
+            console.error(
+              'SemiControlledAutoComplete internal error: no value could be found. This must be fixed and can be due to an upgrade in Material UI or the way data source is created'
+            );
           }
           this.focus(); // Keep the focus after choosing an item
         }}
-        dataSource={dataSource}
+        dataSource={dataSource.map(item => {
+          if (item.type === 'separator') {
+            return {
+              text: '',
+              value: <Divider />,
+            };
+          }
+
+          // Encapsulate everything in a MenuItem
+          // (which is what material-ui is doing anyway),
+          // to get a consistent experience.
+          return {
+            text: item.text,
+            value: (
+              <MenuItem
+                primaryText={item.value}
+                rightIcon={
+                  item.renderRightIcon ? item.renderRightIcon() : undefined
+                }
+                leftIcon={
+                  item.renderLeftIcon ? item.renderLeftIcon() : undefined
+                }
+                value={item.value}
+              />
+            ),
+            onClick: item.onClick,
+          };
+        })}
         ref={field => (this._field = field)}
       />
     );

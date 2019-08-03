@@ -3,13 +3,13 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from 'material-ui/Checkbox';
-import TextField from 'material-ui/TextField';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
 const gd = global.gd;
 
 const toolbarItemStyle = {
@@ -45,12 +45,13 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           <MiniToolbarText>
             <Trans>Size:</Trans>
           </MiniToolbarText>
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             type="number"
             style={styles.sizeTextField}
             value={textObject.getCharacterSize()}
-            onChange={(e, value) => {
-              textObject.setCharacterSize(parseInt(value, 10));
+            onChange={value => {
+              textObject.setCharacterSize(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
@@ -108,7 +109,8 @@ export default class TextEditor extends React.Component<EditorProps, void> {
         <Line noMargin>
           <Column expand>
             <Line>
-              <TextField
+              <SemiControlledTextField
+                commitOnBlur
                 hintText={
                   <Trans>Enter the text to be displayed by the object</Trans>
                 }
@@ -117,7 +119,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 rows={8}
                 rowsMax={8}
                 value={textObject.getString()}
-                onChange={(e, value) => {
+                onChange={value => {
                   textObject.setString(value);
                   this.forceUpdate();
                   this.props.onSizeUpdated();

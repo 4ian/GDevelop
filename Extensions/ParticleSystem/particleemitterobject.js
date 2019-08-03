@@ -51,6 +51,9 @@ gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
     this._alphaDirty = true;
     this._textureDirty = true;
     this._flowDirty = true;
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 gdjs.ParticleEmitterObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
 gdjs.ParticleEmitterObject.thisIsARuntimeObjectConstructor = "ParticleSystem::ParticleEmitter";
@@ -127,9 +130,9 @@ gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
     }
 };
 
-gdjs.ParticleEmitterObject.prototype.onDeletedFromScene = function(runtimeScene){
+gdjs.ParticleEmitterObject.prototype.onDestroyFromScene = function(runtimeScene){
     this._renderer.destroy();
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 };
 
 gdjs.ParticleEmitterObject.prototype.getEmitterForceMin = function(){

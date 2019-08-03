@@ -218,6 +218,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         isWindowMaskShown={() => !!this.state.uiSettings.windowMask}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
+        centerView={this.centerView}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
@@ -782,6 +783,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  centerView = () => {
+    if (this.editor) this.editor.centerView();
+  };
+
   setZoomFactor = (zoomFactor: number) => {
     if (this.editor) this.editor.setZoomFactor(zoomFactor);
   };
@@ -972,6 +977,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             </I18n>,
             <CloseButton key="close" />,
           ]}
+          // TODO: Outdated
           selectedObjectNames={
             this.state
               .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
@@ -1088,6 +1094,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         )}
         <ObjectGroupEditorDialog
+          project={project}
           open={!!this.state.editedGroup}
           group={this.state.editedGroup}
           objectsContainer={layout}

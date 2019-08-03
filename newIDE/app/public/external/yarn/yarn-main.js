@@ -8,9 +8,13 @@ const remote = electron.remote;
 let yarn = null;
 
 const saveAndClose = () => {
-  yarn.data.trySaveCurrent(() => remote.getCurrentWindow().close());
-
-  // todo - send to GD the path of the currently edited file - so if it was changed - gd can adopt to the change
+  console.log(yarn.data.getSaveData('json'));
+  console.log(receivedData.resourcePath);
+  yarn.data.saveTo(
+    receivedData.resourcePath,
+    yarn.data.getSaveData('json'),
+    () => remote.getCurrentWindow().close()
+  );
 };
 
 const closeWindow = () => {
@@ -28,7 +32,6 @@ editorFrameEl.src = 'yarn-editor/app/index.html';
 // Called to load yarn data. Should be called after the window is fully loaded.
 let receivedData;
 ipcRenderer.on('yarn-open', (event, receivedOptions) => {
-  console.log('ready!', receivedOptions);
   if (!yarn) return;
   yarn.data.editingPath(receivedOptions.resourcePath);
   yarn.data.editingType('json');
@@ -44,6 +47,4 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
     .getElementsByClassName('app-menu')[0]
     .appendChild(saveToGdButton);
   saveToGdButton.childNodes[1].firstChild.data = 'Save & close';
-
-  console.log(yarn.data);
 });

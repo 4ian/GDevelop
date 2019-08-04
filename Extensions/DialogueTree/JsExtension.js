@@ -16,8 +16,8 @@ module.exports = {
 		extension
 			.setExtensionInformation(
 				'DialogueTree',
-				_('Dialogue Tree'),
-				_('Initiate dialogue trees from Yarn via Bondagejs.'),
+				_('Dialogue Tree (Experimental)'),
+				_('Start dialogue trees, made using Yarn, powered by Bondage.js. Experimental extension that can change in the future.'),
 				'Todor Imreorov',
 				'Open source (MIT License)'
 			)

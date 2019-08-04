@@ -15,7 +15,7 @@ By default, when you have just "cloned" your repository, there is only the singl
 
 > Not using the **command line?**. This quick guide is written for someone using the Git command line. It can be easier to start with a git client like GitHub Desktop, GitKraken.com, Tortoise Git, SourceTree, or [another GUI client](https://git-scm.com/downloads/guis). This being said, **the workflow** explained here is still valid.
 
-## 2. Larn about the `master` branch, branches and Pull Requests
+## 2. Learn about the `master` branch, branches and Pull Requests
 
 In git, all the code is stored in the repository, and changes are stored in *commits*. The latest version of the source code is in a "branch", which is called `master` (it's an arbitrary convention).
 

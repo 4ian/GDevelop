@@ -1,0 +1,32 @@
+[
+	{
+		"title": "NonNested",
+		"tags": "Tag",
+		"body": "This is a test line\n-> Option 1\n\tThis is the first option\n-> Option 2\n\tThis is the second option\nThis is after both options",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Nested",
+		"tags": "Tag",
+		"body": "text\n-> shortcut1\n\tText1\n\t-> nestedshortcut1\n\t\tNestedText1\n\t-> nestedshortcut2\n\t\tNestedText2\n-> shortcut2\n\tText2\nmore text",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Conditional",
+		"tags": "Tag",
+		"body": "This is a test line\n-> Option 1\n\tThis is the first option\n-> Option 2 <<if 1 == 0>>\n\tThis is the second option\n-> Option 3\n\tThis is the third option\nThis is after both options",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	}
+]

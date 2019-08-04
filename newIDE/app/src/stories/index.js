@@ -30,6 +30,7 @@ import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
+import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/ParameterFields/ExternalEventsField';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
@@ -37,6 +38,7 @@ import MouseField from '../EventsSheet/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
 import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/ParameterFields/KeyField';
+import AudioResourceField from '../EventsSheet/ParameterFields/AudioResourceField';
 import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/ParameterFields/StringField';
 import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
@@ -561,6 +563,25 @@ storiesOf('HelpFinder', module)
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
+  .add('AudioResourceField', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <AudioResourceField
+          project={project}
+          scope={{ layout: testLayout }}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+          resourceSources={[]}
+          onChooseResource={() => Promise.reject('unimplemented')}
+          resourceExternalEditors={[]}
+        />
+      )}
+    />
+  ))
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
@@ -2191,6 +2212,45 @@ storiesOf('ResourcePreview', module)
     <ResourcePreview
       project={project}
       resourceName="fake-audio1.mp3"
+      resourcesLoader={ResourcesLoader}
+    />
+  ));
+
+storiesOf('ResourceSelector', module)
+  .addDecorator(muiDecorator)
+  .add('image resource (not existing/missing resource)', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="resource-that-does-not-exists-in-the-project"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="icon128.png"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('audio resource', () => (
+    <ResourceSelector
+      resourceKind="audio"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="fake-audio1.mp3"
+      onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
     />
   ));

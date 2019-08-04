@@ -4,11 +4,18 @@ GDevelop source code is hosted on GitHub, which is based on the Git version cont
 
 > If you have never used GitHub, you may first want to go on [GDevelop GitHub](https://github.com/4ian/GDevelop), and click on **Fork** to get a copy of the GDevelop source code. This will be "your" copy of the source code, where you can create new features and open **Pull Requests**, which are proposal of changes to the source code - most of the time to implement new features or fix bugs.
 
-## Cloning the repository
+## 1. Cloning the repository
 
-If it's the first time and you have just "forked" GDevelop on GitHub, clone your repository: `git clone git@github.com:your-username/GDevelop.git`
+If it's the first time and you have just "forked" GDevelop on GitHub, clone your repository: `git clone git@github.com:your-username/GDevelop.git`. This will download your copy of the repository on your local computer.
 
-## The `master` branch, branches and Pull Requests
+* Your own repository is usually called, in git jargon, a "remote" repository, named `origin`. When you do a `git push`, `git pull`, your usually, unless specified otherwise, getting or sending code to your repository.
+* The [GDevelop "official repository"](https://github.com/4ian/GDevelop) is also a remote, usually called `upstream`.
+
+By default, when you have just "cloned" your repository, there is only the single remote `origin`. It will be useful later to have the `upstream` remote (to get the latest code from GDevelop). You can do it by entering: `git remote add upstream https://github.com/4ian/GDevelop.git`.
+
+> Not using the **command line?**. This quick guide is written for someone using the Git command line. It can be easier to start with a git client like GitHub Desktop, GitKraken.com, Tortoise Git, SourceTree, or [another GUI client](https://git-scm.com/downloads/guis). This being said, **the workflow** explained here is still valid.
+
+## 2. Larn about the `master` branch, branches and Pull Requests
 
 In git, all the code is stored in the repository, and changes are stored in *commits*. The latest version of the source code is in a "branch", which is called `master` (it's an arbitrary convention).
 
@@ -20,7 +27,7 @@ When you'll make new additions to GDevelop, you'll make a new "branch". Imagine 
 
 At this point, you can discard your branch and go back to master: `git checkout master`.
 
-## Step by step commands
+## 3. Step by step commands for making changes
 
 - Always start from your master branch (`git checkout master`). When you start a new branch (using `git checkout -b branch-name`), you will start this branch **from the previous branch you were on** (read more about this - but most of the time you want to do this when you're on master, not when you're already on a branch).
 - Get the latest commits from the "upstream", which is [this repository](https://github.com/4ian/GDevelop). 
@@ -36,9 +43,9 @@ At this point, you can discard your branch and go back to master: `git checkout 
   - Go on master, pull the latest changes (`git pull upstream master`)
   - Go on your branch and either:
     - Easy: merge master in the branch: `git merge master`
-    - More risky but allowing to get a clean history (no merge commit): `git pull --rebase origin master` (or directly `git pull --rebase upstream master`). This pulls the commits from master, then take the commits you did on your branch, and put them back *on the top* of the commits of master. The only "risk" is that in case of conflicts, you'll have to solve them (`git add` to mark a file as resolved, `git rebase --continue` to finish solving conflicts and apply the next commit until it's finished, `git rebase --abort` if everything is broken and you want to cancel everything).
+    - More risky but allowing to get a *clean history* (no merge commit): `git pull --rebase origin master` (or directly `git pull --rebase upstream master`). This pulls the commits from master, then take the commits you did on your branch, and put them back *on the top* of the commits of master. The only "risk" is that in case of conflicts, you'll have to solve them (`git add` to mark a file as resolved, `git rebase --continue` to finish solving conflicts and apply the next commit until it's finished, `git rebase --abort` if everything is broken and you want to cancel everything).
 
-## I made a PR that got merged, what to do with my branch?
+## 4. I made a PR that got merged, what to do with my branch?
 
 First, congratulations, and thanks for contributing to GDevelop! 🙌
 Forget this branch and go back to master (`git checkout master`). Get the latest commits: `git pull upstream master`.
@@ -49,7 +56,7 @@ Forget this branch and go back to master (`git checkout master`). Get the latest
 
 > If you want to, you can delete the branch you made, as it is not useful: `git branch -D my-branch`. **Make sure that your commits are merged into GDevelop before doing so**. Don't do it before a pull request is merged. 
 
-## Afraid of doing something? Checkpoint! Make a new branch from your existing branch
+## Afraid of doing something? 🚩Checkpoint! Make a new branch from your existing branch
 
 Last tip: if you're unsure about doing something on your branches, make a copy of your branch.
 It's as simple as going on your branch: `git checkout my-feature-branch` and creating a new branch from it, that will be a copy: `git checkout -b my-save` and go back to your branch `git checkout my-feature-branch`. Now you can always checkout `my-save` if you have wrongly rebased/merged something.

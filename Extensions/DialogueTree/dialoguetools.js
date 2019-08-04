@@ -33,7 +33,7 @@ gdjs.dialogueTree.loadFromSceneVariable = function(
 
 /**
  * Load the Dialogue Tree data from a JSON resource.
- * 
+ *
  * @param {gdjs.RuntimeScene} runtimeScene The scene where the dialogue is running.
  * @param {string} jsonResourceName The JSON resource where to load the Dialogue Tree data from. The data is a JSON string usually created with [Yarn Dialogue Editor](https://github.com/InfiniteAmmoInc/Yarn).
  * @param {string} startDialogueNode The Dialogue Branch to start the Dialogue Tree from. If left empty, the data will only be loaded, but can later be initialized via another action
@@ -48,7 +48,7 @@ gdjs.dialogueTree.loadFromJsonFile = function(
     .getJsonManager()
     .loadJson(jsonResourceName, function(error, content) {
       if (error) {
-        console.error("An error happened while loading JSON resource:", error);
+        console.error('An error happened while loading JSON resource:', error);
       } else {
         if (!content) return;
         gdjs.dialogueTree.yarnData = content;
@@ -62,7 +62,7 @@ gdjs.dialogueTree.loadFromJsonFile = function(
 };
 
 /**
- * Check if the Dialogue Tree is currently parsing data. 
+ * Check if the Dialogue Tree is currently parsing data.
  * For example, you can do things like disabling player movement while talking to a NPC.
  */
 gdjs.dialogueTree.isRunning = function() {
@@ -98,7 +98,7 @@ gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
 gdjs.dialogueTree.getClippedLineText = function() {
   return this.dialogueText.length
     ? this.dialogueText.substring(0, this.clipTextEnd)
-    : "";
+    : '';
 };
 
 /**
@@ -107,7 +107,7 @@ gdjs.dialogueTree.getClippedLineText = function() {
  */
 gdjs.dialogueTree.getLineText = function() {
   this.clipTextEnd = this.dialogueText.length;
-  return this.dialogueText.length ? this.dialogueText : "";
+  return this.dialogueText.length ? this.dialogueText : '';
 };
 
 /**
@@ -130,15 +130,15 @@ gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
     this.commandParameters.length >= paramIndex + 1
   ) {
     var returnedParam = this.commandParameters[paramIndex + 1];
-    return returnedParam ? returnedParam : "";
+    return returnedParam ? returnedParam : '';
   }
-  return "";
+  return '';
 };
 
 /**
  * Catch <<commands>> and <<commands with parameters>> from the current Dialogue Line.
  * You can trigger custom logic that relate to the story you are telling during the dialogue.
- * 
+ *
  * @param {string} command The command you want to check for being called. Write it without the `<<>>`.
  */
 gdjs.dialogueTree.isCommandCalled = function(command) {
@@ -149,7 +149,7 @@ gdjs.dialogueTree.isCommandCalled = function(command) {
   if (this.pauseScrolling || !commandCalls) return false;
   return this.commandCalls.some(function(call, index) {
     if (clipTextEnd < call.time) return false;
-    if (call.cmd === "wait" && clipTextEnd !== dialogueText.length) {
+    if (call.cmd === 'wait' && clipTextEnd !== dialogueText.length) {
       gdjs.dialogueTree.pauseScrolling = true;
       setTimeout(function() {
         gdjs.dialogueTree.pauseScrolling = false;
@@ -208,7 +208,7 @@ gdjs.dialogueTree.getLineOptionsCount = function() {
 
 /**
  * Confirm the currently selected option, during the parsing of an Options type line.
- * 
+ *
  * This will advance the dialogue tree to the dialogue branch was selected by the player.
  */
 gdjs.dialogueTree.confirmSelectOption = function() {
@@ -276,9 +276,9 @@ gdjs.dialogueTree.getSelectedOption = function() {
 
 /**
  * Check when the player has changed option selection since the last call to this function.
- * 
+ *
  * Can be used to re-render your displayed dialogue options when needed.
- * 
+ *
  * @returns {boolean} true if the selected option was updated since the last call to this function
  */
 gdjs.dialogueTree.hasSelectedOptionChanged = function() {
@@ -292,12 +292,12 @@ gdjs.dialogueTree.hasSelectedOptionChanged = function() {
 
 /**
  * Check the type of the Dialogue Line that is being displayed to the player at the moment.
- * 
+ *
  * There are three types:
  * - text - regular dialogue text is being parsed at the moment
  * - options - the player has reached a branching choise moment where they must select one of multiple options
  * - command - a <<command>> was called in the background, that can be used to trigger game events, but will not be displayed in the dialogue box.
- * 
+ *
  * @param {string} type The type you want to check for ( one of the three above )
  */
 gdjs.dialogueTree.isDialogueLineType = function(type) {
@@ -336,14 +336,14 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   if (!this.hasDialogueBranch(startDialogueNode)) return;
   this.optionsCount = 0;
   this.options = [];
-  this.dialogueBranchTitle = "";
-  this.dialogueBranchBody = "";
+  this.dialogueBranchTitle = '';
+  this.dialogueBranchBody = '';
   this.dialogueBranchTags = [];
   this.tagParameters = [];
   this.dialogue = this.runner.run(startDialogueNode);
   this.dialogueData = null;
-  this.dialogueDataType = "";
-  this.dialogueText = "";
+  this.dialogueDataType = '';
+  this.dialogueText = '';
   this.commandCalls = [];
   this.commandParameters = [];
   this.pauseScrolling = false;
@@ -379,8 +379,8 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
 
   if (gdjs.dialogueTree._isLineTypeText()) {
     if (
-      this.dialogueDataType === "options" ||
-      this.dialogueDataType === "text" ||
+      this.dialogueDataType === 'options' ||
+      this.dialogueDataType === 'text' ||
       !this.dialogueDataType
     ) {
       this.clipTextEnd = 0;
@@ -390,39 +390,39 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
       this.dialogueText += this.dialogueData.text;
     }
 
-    this.dialogueDataType = "text";
+    this.dialogueDataType = 'text';
     this.dialogueBranchTags = this.dialogueData.data.tags;
     this.dialogueBranchTitle = this.dialogueData.data.title;
     this.dialogueBranchBody = this.dialogueData.data.body;
     this.dialogueData = this.dialogue.next().value;
   } else if (gdjs.dialogueTree._isLineTypeOptions()) {
-    this.dialogueDataType = "options";
+    this.dialogueDataType = 'options';
     this.optionsCount = this.dialogueData.options.length;
     this.options = this.dialogueData.options;
     this.selectedOptionUpdated = true;
   } else if (gdjs.dialogueTree._isLineTypeCommand()) {
-    this.dialogueDataType = "command";
+    this.dialogueDataType = 'command';
 
-    var command = this.dialogueData.text.split(" ");
+    var command = this.dialogueData.text.split(' ');
     // If last command was to wait, increase time by one
     var offsetTime =
       this.commandCalls.length &&
-      this.commandCalls[this.commandCalls.length - 1].cmd === "wait"
+      this.commandCalls[this.commandCalls.length - 1].cmd === 'wait'
         ? 1
         : 0;
     this.commandCalls.push({
       cmd: command[0],
       params: command,
-      time: this.dialogueText.length + offsetTime
+      time: this.dialogueText.length + offsetTime,
     });
     this.dialogueData = this.dialogue.next().value;
     gdjs.dialogueTree.goToNextDialogueLine();
   } else {
-    this.dialogueDataType = "unknown";
+    this.dialogueDataType = 'unknown';
   }
 
   if (gdjs.dialogueTree._isLineTypeCommand()) {
-    this.dialogueDataType = "command";
+    this.dialogueDataType = 'command';
     gdjs.dialogueTree.goToNextDialogueLine();
   }
 
@@ -440,7 +440,7 @@ gdjs.dialogueTree.getBranchTitle = function() {
   if (this.dialogueIsRunning) {
     return this.dialogueBranchTitle;
   }
-  return "";
+  return '';
 };
 
 /**
@@ -460,9 +460,9 @@ gdjs.dialogueTree.branchTitleIs = function(title) {
  */
 gdjs.dialogueTree.getBranchTags = function() {
   if (this.dialogueIsRunning) {
-    return this.dialogueBranchTags.join(",");
+    return this.dialogueBranchTags.join(',');
   }
-  return "";
+  return '';
 };
 
 /**
@@ -476,7 +476,7 @@ gdjs.dialogueTree.getBranchTag = function(index) {
       index = this.dialogueBranchTags.length - 1;
     return this.dialogueBranchTags[index];
   }
-  return "";
+  return '';
 };
 
 /**
@@ -488,7 +488,7 @@ gdjs.dialogueTree.branchContainsTag = function(query) {
   if (this.dialogueIsRunning && this.dialogueBranchTags.length) {
     return this.dialogueBranchTags.some(function(tag) {
       var splitTag = tag.match(/([^\(]+)\(([^\)]+)\)/i);
-      gdjs.dialogueTree.tagParameters = splitTag ? splitTag[2].split(",") : [];
+      gdjs.dialogueTree.tagParameters = splitTag ? splitTag[2].split(',') : [];
       return splitTag ? splitTag[1] === query : tag === query;
     });
   }
@@ -503,9 +503,9 @@ gdjs.dialogueTree.branchContainsTag = function(query) {
 gdjs.dialogueTree.getTagParameter = function(paramIndex) {
   if (this.dialogueIsRunning && this.tagParameters.length >= paramIndex) {
     var returnedParam = this.tagParameters[paramIndex];
-    return returnedParam ? returnedParam : "";
+    return returnedParam ? returnedParam : '';
   }
-  return "";
+  return '';
 };
 
 /**
@@ -513,9 +513,9 @@ gdjs.dialogueTree.getTagParameter = function(paramIndex) {
  */
 gdjs.dialogueTree.getVisitedBranchTitles = function() {
   if (this.dialogueIsRunning) {
-    return Object.keys(this.runner.visited).join(",");
+    return Object.keys(this.runner.visited).join(',');
   }
-  return "";
+  return '';
 };
 
 /**
@@ -538,7 +538,7 @@ gdjs.dialogueTree.getBranchText = function() {
   if (this.dialogueIsRunning) {
     return this.dialogueBranchBody;
   }
-  return "";
+  return '';
 };
 
 /**
@@ -549,7 +549,7 @@ gdjs.dialogueTree.getVariable = function(key) {
   if (this.dialogueIsRunning && key in this.runner.variables.data) {
     return this.runner.variables.data[key];
   }
-  return "";
+  return '';
 };
 
 /**
@@ -584,7 +584,7 @@ gdjs.dialogueTree.setVariable = function(key, value) {
 gdjs.dialogueTree.saveState = function(outputVariable) {
   const dialogueState = {
     variables: gdjs.dialogueTree.runner.variables.data,
-    visited: gdjs.dialogueTree.runner.visited
+    visited: gdjs.dialogueTree.runner.visited,
   };
   gdjs.evtTools.network._objectToVariable(dialogueState, outputVariable);
 };

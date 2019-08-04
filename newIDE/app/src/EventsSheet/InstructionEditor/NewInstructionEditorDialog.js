@@ -45,7 +45,7 @@ const styles = {
   dialogBody: {
     padding: 0,
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
   },
 };
 
@@ -278,41 +278,31 @@ export default class NewInstructionEditorDialog extends React.Component<
       : undefined;
 
     const renderInstructionOrObjectSelector = () => (
-      <div
-        key="instruction-or-object-selector"
-        style={{
-          flex: 1,
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          display: true ? 'flex' : 'none',
-        }}
-      >
-        <Background noFullHeight>
-          <InstructionOrObjectSelector
-            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
-            project={project}
-            currentTab={currentInstructionOrObjectSelectorTab}
-            onChangeTab={currentInstructionOrObjectSelectorTab =>
-              this.setState({
-                currentInstructionOrObjectSelectorTab,
-              })
-            }
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            isCondition={isCondition}
-            chosenInstructionType={instructionType}
-            onChooseInstruction={this._chooseFreeInstruction}
-            chosenObjectName={chosenObjectName}
-            onChooseObject={objectName => {
-              this.setState(this._chooseObject(objectName, true));
-            }}
-            focusOnMount={!instructionType}
-            onSearchStartOrReset={() => {
-              this.forceUpdate(); /*Force update to ensure dialog is properly positioned*/
-            }}
-          />
-        </Background>
-      </div>
+      <Background noFullHeight key="instruction-or-object-selector">
+        <InstructionOrObjectSelector
+          style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+          project={project}
+          currentTab={currentInstructionOrObjectSelectorTab}
+          onChangeTab={currentInstructionOrObjectSelectorTab =>
+            this.setState({
+              currentInstructionOrObjectSelectorTab,
+            })
+          }
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          isCondition={isCondition}
+          chosenInstructionType={instructionType}
+          onChooseInstruction={this._chooseFreeInstruction}
+          chosenObjectName={chosenObjectName}
+          onChooseObject={objectName => {
+            this.setState(this._chooseObject(objectName, true));
+          }}
+          focusOnMount={!instructionType}
+          onSearchStartOrReset={() => {
+            this.forceUpdate(); /*Force update to ensure dialog is properly positioned*/
+          }}
+        />
+      </Background>
     );
 
     const renderParameters = () => (

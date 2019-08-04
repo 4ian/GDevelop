@@ -10,7 +10,7 @@ type Props<TColumnName> = {|
 export const SelectColumns = (props: Props<string>) => {
   const columns = props.getColumns();
   return (
-    <Line noMargin>
+    <Line noMargin expand>
       {columns.map(columnName =>
         props.columnsRenderer[columnName]
           ? props.columnsRenderer[columnName]()

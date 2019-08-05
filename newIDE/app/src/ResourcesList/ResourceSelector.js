@@ -11,7 +11,7 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import IconMenu from '../UI/Menu/IconMenu';
 import ResourcesLoader from '../ResourcesLoader';
-import { applyResourceDefaults, loadTextFile } from './ResourceUtils';
+import { applyResourceDefaults } from './ResourceUtils';
 import SemiControlledAutoComplete, {
   type DataSource,
 } from '../UI/SemiControlledAutoComplete';
@@ -210,22 +210,15 @@ export default class ResourceSelector extends React.Component<Props, State> {
       };
       resourceExternalEditor.edit(externalEditorOptions);
     } else if (resourceKind === 'json') {
-      
-      console.log(resourceName);
-      const externalEditorData = loadTextFile(project, resourceName);
       const externalEditorOptions = {
         project,
         resourcesLoader,
         resourceNames: [resourceName],
         extraOptions: {
-          externalEditorData,
           initialResourceMetadata,
         },
         onChangesSaved: (newResourceData, newResourceName) => {
           // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceName,
-          ]);
           this.props.onChange(newResourceName);
         },
       };

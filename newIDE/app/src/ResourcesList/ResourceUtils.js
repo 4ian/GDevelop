@@ -122,13 +122,3 @@ export const applyResourceDefaults = (
     newResource.setSmooth(project.getScaleMode() !== 'nearest');
   }
 };
-
-export const loadTextFile = (
-  project: gdProject,
-  newResource: string
-) => {
-  if (getResourceFilePathStatus(project,newResource) === 'error') return null;
-  const path = getLocalResourceFullPath(project, newResource);
-  
-  return  fs.readFileSync(path,'utf8').toString();
-};

@@ -1,5 +1,5 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, plural } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { type ResourceSourceComponentProps } from './ResourceSource.flow';
 import { Component } from 'react';
@@ -228,13 +228,15 @@ const selectLocalResourcePath = (
         if (outsideProjectFolderPaths.length) {
           // eslint-disable-next-line
           const answer = confirm(
-            i18n.plural({
-              value: outsideProjectFolderPaths.length,
-              one:
-                'This file is outside the project folder. Would you like to make a copy of it in your project folder first (recommended)?',
-              other:
-                'These files are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?',
-            })
+            i18n._(
+              plural({
+                value: outsideProjectFolderPaths.length,
+                one:
+                  'This file is outside the project folder. Would you like to make a copy of it in your project folder first (recommended)?',
+                other:
+                  'These files are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?',
+              })
+            )
           );
 
           if (answer) {

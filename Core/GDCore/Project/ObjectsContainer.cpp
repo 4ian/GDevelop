@@ -119,13 +119,33 @@ void ObjectsContainer::MoveObject(std::size_t oldIndex, std::size_t newIndex) {
 }
 
 void ObjectsContainer::RemoveObject(const gd::String& name) {
-  std::vector<std::unique_ptr<gd::Object> >::iterator object =
+  std::vector<std::unique_ptr<gd::Object> >::iterator objectIt =
       find_if(initialObjects.begin(),
               initialObjects.end(),
               bind2nd(ObjectHasName(), name));
-  if (object == initialObjects.end()) return;
+  if (objectIt == initialObjects.end()) return;
 
-  initialObjects.erase(object);
+  initialObjects.erase(objectIt);
+}
+
+void ObjectsContainer::MoveObjectToAnotherContainer(
+    const gd::String& name,
+    gd::ObjectsContainer& newContainer,
+    std::size_t newPosition) {
+  std::vector<std::unique_ptr<gd::Object> >::iterator objectIt =
+      find_if(initialObjects.begin(),
+              initialObjects.end(),
+              bind2nd(ObjectHasName(), name));
+  if (objectIt == initialObjects.end()) return;
+
+  std::unique_ptr<gd::Object> object = std::move(*objectIt);
+  initialObjects.erase(objectIt);
+
+  newContainer.initialObjects.insert(
+      newPosition < newContainer.initialObjects.size()
+          ? newContainer.initialObjects.begin() + newPosition
+          : newContainer.initialObjects.end(),
+      std::move(object));
 }
 
 }  // namespace gd

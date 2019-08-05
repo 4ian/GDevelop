@@ -35,9 +35,9 @@ TextObject::TextObject(gd::String name_)
       bold(false),
       italic(false),
       underlined(false),
-      colorR(255),
-      colorG(255),
-      colorB(255)
+      colorR(0),
+      colorG(0),
+      colorB(0)
 {
 }
 

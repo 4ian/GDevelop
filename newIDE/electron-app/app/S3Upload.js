@@ -51,7 +51,9 @@ module.exports = {
         async.series(
           allFiles.map((localFile, fileIndex) => callback => {
             const body = fs.createReadStream(localFile);
-            const filename = path.relative(localDir, localFile);
+            // Convert backslashs in paths to forward slash as they won't
+            // work in AWS urls.
+            const filename = path.relative(localDir, localFile).replace(/\\/g,'/');
             const fileExtension = path.extname(filename);
             awsS3Client
               .upload({

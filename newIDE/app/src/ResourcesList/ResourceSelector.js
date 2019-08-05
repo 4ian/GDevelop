@@ -142,10 +142,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
         if (!this.state.notExistingError) {
           if (this.props.onChange) this.props.onChange(resourceName);
         }
-
-        // Keep focusing the field after choosing something (won't do anything
-        // if we're just typing text).
-        this.focus();
       }
     );
   };

@@ -104,7 +104,7 @@ gdjs.PathfindingObstacleRuntimeBehavior = function(runtimeScene, behaviorData, o
 gdjs.PathfindingObstacleRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.PathfindingObstacleRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "PathfindingBehavior::PathfindingObstacleBehavior";
 
-gdjs.PathfindingObstacleRuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
+gdjs.PathfindingObstacleRuntimeBehavior.prototype.onDestroy = function() {
 	if ( this._manager && this._registeredInManager ) this._manager.removeObstacle(this);
 };
 

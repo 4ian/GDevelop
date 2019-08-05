@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import WarningIcon from 'material-ui/svg-icons/alert/warning';

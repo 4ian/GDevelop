@@ -17,7 +17,7 @@ gdjs.VideoRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {}
 /**
  * To be called when the object is removed from the scene: will pause the video.
  */
-gdjs.VideoRuntimeObjectCocosRenderer.prototype.onOwnerRemovedFromScene = function() {};
+gdjs.VideoRuntimeObjectCocosRenderer.prototype.onDestroy = function() {};
 
 gdjs.VideoRuntimeObjectCocosRenderer.prototype.ensureUpToDate = function() {};
 

@@ -1,5 +1,6 @@
 const shell = require('shelljs');
 const path = require('path');
+const fs = require('fs');
 const { getLocales, getLocalePath } = require('./lib/Locales');
 const isWin = /^win/.test(process.platform);
 
@@ -8,8 +9,16 @@ const newIdeAppPath = path.join(__dirname, '..');
 
 let hasErrors = false;
 
+// Clean existing English messages catalog, if any
+const enMessagesJsPath = path.join(newIdeAppPath, 'src/locales/en/messages.js');
+if (fs.existsSync(enMessagesJsPath)) {
+  shell.echo(`ℹ️ Removing ${enMessagesJsPath} as "en" should not have any translations ("pot" file)`);
+  shell.rm(enMessagesJsPath);
+}
+
 // Launch "lingui extract" for extracting newIDE translations
 shell.echo('ℹ️ Extracting translations for newIDE...');
+
 hasErrors |= shell.exec(
   'node node_modules/.bin/lingui extract --clean --overwrite',
   {

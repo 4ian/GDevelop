@@ -29,6 +29,9 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
     else
         this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(this, runtimeScene,
             objectData.texture, objectData.tiled);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
@@ -38,11 +41,11 @@ gdjs.PanelSpriteRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
 
-gdjs.PanelSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.PanelSpriteRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-    if (this._renderer.onOwnerRemovedFromScene) {
-        this._renderer.onOwnerRemovedFromScene();
+    if (this._renderer.onDestroy) {
+        this._renderer.onDestroy();
     }
 };
 

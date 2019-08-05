@@ -31,9 +31,9 @@ const styles = {
   textFieldAndHightlightContainer: {
     position: 'relative',
   },
-  expressionSelector: {
+  expressionSelectorPopoverContent: {
+    display: 'flex',
     maxHeight: 350,
-    overflowY: 'scroll',
   },
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -289,16 +289,17 @@ export default class ExpressionField extends React.Component<Props, State> {
               targetOrigin={{ horizontal: 'left', vertical: 'top' }}
               onRequestClose={this._handleRequestClose}
             >
-              <ExpressionSelector
-                style={styles.expressionSelector}
-                selectedType=""
-                onChoose={(type, expression) => {
-                  this._handleExpressionChosen(expression);
-                }}
-                expressionType={expressionType}
-                focusOnMount
-                scope={scope}
-              />
+              <div style={styles.expressionSelectorPopoverContent}>
+                <ExpressionSelector
+                  selectedType=""
+                  onChoose={(type, expression) => {
+                    this._handleExpressionChosen(expression);
+                  }}
+                  expressionType={expressionType}
+                  focusOnMount
+                  scope={scope}
+                />
+              </div>
             </Popover>
           )}
         </div>

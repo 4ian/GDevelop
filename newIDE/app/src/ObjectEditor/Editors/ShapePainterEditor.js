@@ -2,11 +2,11 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import { Line, Column, Spacer } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import { type EditorProps } from './EditorProps.flow';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -54,23 +54,25 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Outline opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={shapePainterObject.getOutlineOpacity()}
-            onChange={(e, value) => {
-              shapePainterObject.setOutlineOpacity(parseInt(value, 10));
+            onChange={value => {
+              shapePainterObject.setOutlineOpacity(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Outline size (in pixels)</Trans>}
             fullWidth
             type="number"
             value={shapePainterObject.getOutlineSize()}
-            onChange={(e, value) => {
-              shapePainterObject.setOutlineSize(parseInt(value, 10));
+            onChange={value => {
+              shapePainterObject.setOutlineSize(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
@@ -95,13 +97,14 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Fill opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={shapePainterObject.getFillOpacity()}
             onChange={(e, value) => {
-              shapePainterObject.setFillOpacity(parseInt(value, 10));
+              shapePainterObject.setFillOpacity(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />

@@ -30,6 +30,7 @@ import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
+import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/ParameterFields/ExternalEventsField';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
@@ -37,6 +38,7 @@ import MouseField from '../EventsSheet/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
 import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/ParameterFields/KeyField';
+import AudioResourceField from '../EventsSheet/ParameterFields/AudioResourceField';
 import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/ParameterFields/StringField';
 import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
@@ -131,6 +133,9 @@ import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoade
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
+import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
+import SearchBar from '../UI/SearchBar';
+import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
 
 // No i18n in this file
 
@@ -278,6 +283,58 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
           <p>State value is {value}</p>
         </React.Fragment>
       )}
+    />
+  ));
+
+storiesOf('UI Building Blocks/SearchBar', module)
+  .addDecorator(muiDecorator)
+  .add('empty', () => (
+    <SearchBar
+      value=""
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+    />
+  ))
+  .add('with text', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+    />
+  ))
+  .add('disabled', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+      disabled
+    />
+  ))
+  .add('with tags', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+      buildTagsMenuTemplate={() => [
+        {
+          type: 'checkbox',
+          label: 'Tag 1',
+          checked: false,
+          click: () => {},
+        },
+        {
+          type: 'checkbox',
+          label: 'Tag 2 (checked)',
+          checked: true,
+          click: () => {},
+        },
+        {
+          type: 'checkbox',
+          label: 'Tag 3',
+          checked: false,
+          click: () => {},
+        },
+      ]}
     />
   ));
 
@@ -506,6 +563,25 @@ storiesOf('HelpFinder', module)
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
+  .add('AudioResourceField', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <AudioResourceField
+          project={project}
+          scope={{ layout: testLayout }}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+          resourceSources={[]}
+          onChooseResource={() => Promise.reject('unimplemented')}
+          resourceExternalEditors={[]}
+        />
+      )}
+    />
+  ))
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
@@ -1369,42 +1445,102 @@ storiesOf('SearchPanel', module)
   ));
 
 storiesOf('ExpressionSelector', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('number (with focusOnMount) (no scope)', () => (
-    <ExpressionSelector
-      selectedType=""
-      expressionType="number"
-      onChoose={action('Expression chosen')}
-      focusOnMount
-      scope={{}}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <ExpressionSelector
+        selectedType=""
+        expressionType="number"
+        onChoose={action('Expression chosen')}
+        focusOnMount
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ))
   .add('string (with focusOnMount) (no scope)', () => (
-    <ExpressionSelector
-      selectedType=""
-      expressionType="string"
-      onChoose={action('(String) Expression chosen')}
-      focusOnMount
-      scope={{}}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <ExpressionSelector
+        selectedType=""
+        expressionType="string"
+        onChoose={action('(String) Expression chosen')}
+        focusOnMount
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionSelector', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('conditions (no scope)', () => (
-    <InstructionSelector
-      selectedType=""
-      onChoose={action('Instruction chosen')}
-      isCondition
-      scope={{}}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <InstructionSelector
+        selectedType=""
+        onChoose={action('Instruction chosen')}
+        isCondition
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ))
   .add('actions (no scope)', () => (
-    <InstructionSelector
-      selectedType=""
-      onChoose={action('Instruction chosen')}
-      isCondition={false}
-      scope={{}}
+    <FixedHeightFlexContainer height={400}>
+      <InstructionSelector
+        selectedType=""
+        onChoose={action('Instruction chosen')}
+        isCondition={false}
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('InstructionOrObjectSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('"KeyPressed" condition chosen, ', () => (
+    <ValueStateHolder
+      initialValue={'free-instructions'}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <InstructionOrObjectSelector
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+            project={project}
+            currentTab={value}
+            onChangeTab={onChange}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            isCondition
+            chosenInstructionType={'KeyPressed'}
+            onChooseInstruction={action('instruction chosen')}
+            chosenObjectName={null}
+            onChooseObject={action('choose object')}
+            focusOnMount
+          />
+        </FixedHeightFlexContainer>
+      )}
+    />
+  ))
+  .add('"MySpriteObject" object chosen, ', () => (
+    <ValueStateHolder
+      initialValue={'objects'}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <InstructionOrObjectSelector
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+            project={project}
+            currentTab={value}
+            onChangeTab={onChange}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            isCondition
+            chosenInstructionType={''}
+            onChooseInstruction={action('instruction chosen')}
+            chosenObjectName={'MySpriteObject'}
+            onChooseObject={action('choose object')}
+            focusOnMount
+          />
+        </FixedHeightFlexContainer>
+      )}
     />
   ));
 
@@ -1443,6 +1579,74 @@ storiesOf('InstructionEditor', module)
       }}
       resourceSources={[]}
       openInstructionOrExpression={action('open instruction or expression')}
+    />
+  ));
+
+storiesOf('NewInstructionEditorDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('Existing condition (scope: in a layout)', () => (
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: testLayout }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={false}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
+    />
+  ))
+  .add('Existing condition (scope: without layout)', () => (
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: null }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={false}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
+    />
+  ))
+  .add('New condition (scope: without layout)', () => (
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: null }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={true}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
     />
   ));
 
@@ -2008,6 +2212,45 @@ storiesOf('ResourcePreview', module)
     <ResourcePreview
       project={project}
       resourceName="fake-audio1.mp3"
+      resourcesLoader={ResourcesLoader}
+    />
+  ));
+
+storiesOf('ResourceSelector', module)
+  .addDecorator(muiDecorator)
+  .add('image resource (not existing/missing resource)', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="resource-that-does-not-exists-in-the-project"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="icon128.png"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('audio resource', () => (
+    <ResourceSelector
+      resourceKind="audio"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="fake-audio1.mp3"
+      onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
     />
   ));

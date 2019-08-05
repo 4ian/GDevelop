@@ -73,15 +73,13 @@ bool Exporter::ExportWholePixiProject(
     if (exportForFacebookInstantGames)
       exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
 
-    wxProgressDialog* progressDialogPtr = NULL;
-
     // Prepare the export directory
     fs.MkDir(exportDir);
     std::vector<gd::String> includesFiles;
 
     // Export the resources (before generating events as some resources
     // filenames may be updated)
-    helper.ExportResources(fs, exportedProject, exportDir, progressDialogPtr);
+    helper.ExportResources(fs, exportedProject, exportDir);
 
     // Export engine libraries
     helper.AddLibsInclude(true, false, false, includesFiles);
@@ -173,7 +171,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   // Export the resources (before generating events as some resources filenames
   // may be updated)
   helper.ExportResources(
-      fs, exportedProject, exportDir + "/res", progressDialogPtr);
+      fs, exportedProject, exportDir + "/res");
 
   // Export engine libraries
   helper.AddLibsInclude(false, true, false, includesFiles);

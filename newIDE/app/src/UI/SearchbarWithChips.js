@@ -4,7 +4,7 @@ import Chip from 'material-ui/Chip';
 import TextField from 'material-ui/TextField';
 import { Column, Line } from '../UI/Grid';
 import randomColor from 'randomcolor';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 
 type Props = {|
   value: string,

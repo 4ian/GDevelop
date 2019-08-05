@@ -241,6 +241,64 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.ObjectsContainer', function() {
+    it('can move objects between containers, without moving them in memory', function() {
+      // Prepare two containers, one with 3 objects and one empty
+      const objectsContainer1 = new gd.ObjectsContainer();
+      const objectsContainer2 = new gd.ObjectsContainer();
+      const mySpriteObject = new gd.SpriteObject("MySprite");
+      const mySprite2Object = new gd.SpriteObject("MySprite2");
+      const mySprite3Object = new gd.SpriteObject("MySprite3");
+      objectsContainer1.insertObject(mySpriteObject, 0);
+      objectsContainer1.insertObject(mySprite2Object, 1);
+      objectsContainer1.insertObject(mySprite3Object, 2);
+
+      // Objects are copied when inserted in the container, so we delete them:
+      mySpriteObject.delete();
+      mySprite2Object.delete();
+      mySprite3Object.delete();
+
+      // Find the pointer to the objects in memory
+      expect(objectsContainer1.getObjectsCount()).toBe(3);
+      expect(objectsContainer2.getObjectsCount()).toBe(0);
+      const mySpriteObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(0));
+      const mySprite2ObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(1));
+      const mySprite3ObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(2));
+
+      // Move objects between containers
+      objectsContainer1.moveObjectToAnotherContainer("MySprite2", objectsContainer2, 0);
+      expect(objectsContainer1.getObjectsCount()).toBe(2);
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite");
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe("MySprite3");
+      expect(objectsContainer2.getObjectsCount()).toBe(1);
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite2");
+
+      objectsContainer1.moveObjectToAnotherContainer("MySprite3", objectsContainer2, 1);
+      expect(objectsContainer1.getObjectsCount()).toBe(1);
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite");
+      expect(objectsContainer2.getObjectsCount()).toBe(2);
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite2");
+      expect(objectsContainer2.getObjectAt(1).getName()).toBe("MySprite3");
+
+      // Check that the object in memory are the same, even if moved to another container
+      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(mySpriteObjectPtr);
+      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(mySprite2ObjectPtr);
+      expect(gd.getPointer(objectsContainer2.getObjectAt(1))).toBe(mySprite3ObjectPtr);
+
+      objectsContainer2.moveObjectToAnotherContainer("MySprite2", objectsContainer1, 0);
+      expect(objectsContainer1.getObjectsCount()).toBe(2);
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite2");
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe("MySprite");
+      expect(objectsContainer2.getObjectsCount()).toBe(1);
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite3");
+
+      // Check again that the object in memory are the same, even if moved to another container
+      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(mySprite2ObjectPtr);
+      expect(gd.getPointer(objectsContainer1.getObjectAt(1))).toBe(mySpriteObjectPtr);
+      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(mySprite3ObjectPtr);
+    });
+  });
+
   describe('gd.InitialInstancesContainer', function() {
     let container = null;
     let containerCopy = null;
@@ -2092,6 +2150,7 @@ describe('libGD.js', function() {
 
   describe('gd.ResourcesMergingHelper (and gd.AbstractFileSystemJS)', function() {
     it('should export files of the project', function() {
+      // Create a project with a mix of resources
       const project = new gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
       const resource = new gd.ImageResource();
@@ -2115,6 +2174,7 @@ describe('libGD.js', function() {
       project.getResourcesManager().addResource(resource4);
       project.getResourcesManager().addResource(resource5);
 
+      // Create a fake file system
       const fs = new gd.AbstractFileSystemJS();
       fs.mkDir = fs.clearDir = function() {};
       fs.getTempDir = function(path) {
@@ -2133,6 +2193,7 @@ describe('libGD.js', function() {
         return path.relative(baseDirectory, absolutePath);
       };
 
+      // Check that ResourcesMergingHelper can update the filenames
       const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
       project.exposeResources(resourcesMergingHelper);
@@ -2157,6 +2218,119 @@ describe('libGD.js', function() {
       ).toBe('MyResourceWithExtension2');
 
       resourcesMergingHelper.delete();
+      project.delete();
+    });
+  });
+
+  describe('gd.ProjectResourcesCopier (and gd.AbstractFileSystemJS)', function() {
+    it('should export files of the project', function() {
+      // Create a project with a mix of resources, stored in /my/project folder.
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      project.setProjectFile("/my/project/project.json");
+      const layout = project.insertNewLayout('Scene', 0);
+      const resource = new gd.ImageResource();
+      const resource2 = new gd.ImageResource();
+      const resource3 = new gd.ImageResource();
+      const resource4 = new gd.ImageResource();
+      const resource5 = new gd.ImageResource();
+      resource.setName('MyResource');
+      resource.setFile('MyResource.png');
+      resource2.setName('MyAudioResource');
+      resource2.setFile('MyResource.wav');
+      resource3.setName('MyAbsoluteResource');
+      resource3.setFile('/my/absolute/path/MyResource2.png');
+      resource4.setName('test/MyResourceWithoutExtension');
+      resource4.setFile('test/MyResourceWithoutExtension');
+      resource5.setName('test/sub/folder/MyResourceWithoutExtension');
+      resource5.setFile('test/sub/folder/MyResourceWithoutExtension'); // Same filename as resource4
+      project.getResourcesManager().addResource(resource);
+      project.getResourcesManager().addResource(resource2);
+      project.getResourcesManager().addResource(resource3);
+      project.getResourcesManager().addResource(resource4);
+      project.getResourcesManager().addResource(resource5);
+
+      // Create a fake file system
+      const fs = new gd.AbstractFileSystemJS();
+      fs.mkDir = fs.clearDir = function() {};
+      fs.getTempDir = function(path) {
+        return '/tmp/';
+      };
+      fs.fileNameFrom = function(fullPath) {
+        return path.basename(fullPath);
+      };
+      fs.dirNameFrom = function(fullPath) {
+        return path.dirname(fullPath);
+      };
+      fs.makeAbsolute = function(relativePath, baseDirectory) {
+        return path.resolve(baseDirectory, relativePath);
+      };
+      fs.makeRelative = function(absolutePath, baseDirectory) {
+        return path.relative(baseDirectory, absolutePath);
+      };
+      fs.isAbsolute = function(fullPath) {
+        return path.isAbsolute(fullPath);
+      }
+      fs.dirExists = function(directoryPath) {
+        return true; // Fake that all directory required exist.
+      }
+
+      // In particular, create a mock copyFile, that we can track to verify
+      // files are properly copied.
+      fs.copyFile = jest.fn();
+      fs.copyFile.mockImplementation(function(srcPath, destPath) {
+        console.log(srcPath, destPath);
+        return true;
+      });
+
+      // Check that resources can be copied to another folder:
+      // * including absolute files.
+      // * preserving relative file structures
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, false, true);
+      expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/test/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/test/sub/folder/MyResourceWithoutExtension');
+
+      // Check that resources can be copied to another folder:
+      // * including absolute files.
+      // * NOT preserving relative file structures
+      // Check that filename collisions are avoided.
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, false, false);
+      expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension2');
+
+      // Check that resources can be copied to another folder:
+      // * without touching absolute files.
+      // * preserving relative file structures
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, true, true);
+      expect(fs.copyFile).toHaveBeenCalledTimes(4); // Only the 4 relative resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/test/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/test/sub/folder/MyResourceWithoutExtension');
+
+      // Check that resources can be copied to another folder:
+      // * without touching absolute files.
+      // * NOT preserving relative file structures
+      // Check that filename collisions are avoided.
+      fs.copyFile.mockClear();
+      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, true, false);
+      expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension2');
+
       project.delete();
     });
   });

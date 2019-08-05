@@ -65,6 +65,14 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
                   methodFullyQualifiedName,
                   includeFiles,
                   compilationForRuntime);
+
+          // Compatibility with GD <= 5.0 beta 75
+          if (functionName == "onOwnerRemovedFromScene") {
+            runtimeBehaviorMethodsCode +=
+                GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+                    eventsBasedBehavior, codeNamespace);
+          }
+          // end of compatibility code
         }
 
         return runtimeBehaviorMethodsCode;
@@ -94,8 +102,6 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = function(runtimeScene, behaviorData,
 
     this._behaviorData = {};
     INITIALIZE_PROPERTIES_CODE
-
-    if (this.onCreated) { this.onCreated(); }
 };
 
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
@@ -172,6 +178,20 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
   }
 
   return "0 /* Error: property was of an unrecognized type */";
+}
+
+gd::String BehaviorCodeGenerator::
+    GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+        const gd::EventsBasedBehavior& eventsBasedBehavior,
+        const gd::String& codeNamespace) {
+  return gd::String(R"jscode_template(
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.onDestroy = function() {
+  // Redirect call to onOwnerRemovedFromScene (the old name of onDestroy)
+  if (this.onOwnerRemovedFromScene) this.onOwnerRemovedFromScene();
+};)jscode_template")
+      .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
+                      eventsBasedBehavior.GetName())
+      .FindAndReplace("CODE_NAMESPACE", codeNamespace);
 }
 
 }  // namespace gdjs

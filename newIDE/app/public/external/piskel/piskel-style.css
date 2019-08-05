@@ -2,15 +2,67 @@
  * Additional styles for the embedded Piskel editor
  */
 
-html, body {
+html,
+body {
   font-family: Helvetica;
   margin: 0;
-  overflow-y:hidden;
+  overflow-y: hidden;
 }
 
 #piskel-frame {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
   border: none;
-  overflow-y:hidden;
+  overflow-y: hidden;
+}
+
+#path-editor-header .leftSide {
+  width: 100%;
+}
+
+#path-editor-header > span > * {
+  padding-left: 5px;
+}
+
+#path-editor-header > span > label {
+  height: 27px;
+  color: aqua;
+  float: left;
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+#path-editor-header .rightButtons {
+  display: flex;
+  padding-bottom: 4px;
+  width: 170px;
+}
+
+#path-editor-header .rightButtons > button {
+  right: 0;
+  margin-right: 4px;
+  margin-top: 5px;
+}
+
+#path-editor-header > button,
+#path-editor-header > span > button {
+  background-color: whitesmoke;
+  border: 2px solid lightblue;
+  border-radius: 3px;
+  max-height: 30px;
+  margin-top: 5px;
+}
+
+#path-editor-header > span > input {
+  font-family: 'Courier New';
+  height: 27px;
+  width: 90px;
+  float: left;
+  padding: 4px;
+  margin-top: 4px;
+  font-size: 15px;
+  border: 2px solid #e5cd50;
+  border-radius: 3px;
+  background-color: black;
+  color: #e5cd50;
 }

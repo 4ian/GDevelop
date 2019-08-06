@@ -44,15 +44,8 @@ export const openYarn = ({
       console.log(resourceName);
       createOrUpdateResource(project, new gd.JsonResource(), resourceName);
 
-      const metadata = {
-        yarn: externalEditorData,
-      };
-      project
-        .getResourcesManager()
-        .getResource(resourceName)
-        .setMetadata(JSON.stringify(metadata));
       // $FlowFixMe - TODO: There is an error here to be solved.
-      onChangesSaved([{ metadata }], resourceName);
+      onChangesSaved([{}], resourceName);
     }
   );
 

@@ -9,16 +9,8 @@ const remote = electron.remote;
 let yarn = null;
 let receivedData;
 
-const saveAndCloseCustomPath = pathEditor => {
+const saveAndClose = pathEditor => {
   const savePath = pathEditor.state.fullPath;
-  yarn.data.saveTo(savePath, yarn.data.getSaveData('json'), () => {
-    ipcRenderer.send('yarn-changes-saved', savePath, receivedData);
-    remote.getCurrentWindow().close();
-  });
-};
-
-const saveAndClose = () => {
-  const savePath = receivedData.resourcePath;
   yarn.data.saveTo(savePath, yarn.data.getSaveData('json'), () => {
     ipcRenderer.send('yarn-changes-saved', savePath, receivedData);
     remote.getCurrentWindow().close();
@@ -47,7 +39,7 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
   const pathControl = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
-    onSaveToGd: saveAndCloseCustomPath,
+    onSaveToGd: saveAndClose,
     onCancelChanges: closeWindow,
     projectPath: receivedOptions.projectPath,
     initialResourcePath: receivedOptions.resourcePath,
@@ -57,13 +49,13 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
   const saveToGdButton = yarn.document
     .getElementsByClassName('menu')[0]
     .cloneNode(true);
-  saveToGdButton.onclick = () => saveAndClose();
+  saveToGdButton.onclick = () => saveAndClose(pathControl);
   yarn.document
     .getElementsByClassName('app-menu')[0]
     .appendChild(saveToGdButton);
   saveToGdButton.childNodes[0].firstChild.data = 'Save & close';
 
-  // process file
+  // process the json file,if it exists
   if (fileExists(receivedOptions.resourcePath)) {
     receivedOptions.externalEditorData = fs
       .readFileSync(receivedOptions.resourcePath, 'utf8')
@@ -74,7 +66,7 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
 
     pathControl.toggle();
   } else {
-    // If GD has sent no path, we need to create one for the new object
+    // If GD has sent no path, we need to set one for yarn
     receivedOptions.resourcePath =
       receivedOptions.projectPath + '/NewFile.json';
   }

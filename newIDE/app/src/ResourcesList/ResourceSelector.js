@@ -214,7 +214,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
           initialResourceMetadata,
         },
         onChangesSaved: (newResourceData, newResourceName) => {
-          // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
           this.props.onChange(newResourceName);
         },
       };

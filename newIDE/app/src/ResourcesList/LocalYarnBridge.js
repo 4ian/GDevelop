@@ -41,7 +41,6 @@ export const openYarn = ({
     'yarn-changes-saved',
     (event, newFilePath, externalEditorData) => {
       const resourceName = path.relative(projectPath, newFilePath);
-      console.log(resourceName);
       createOrUpdateResource(project, new gd.JsonResource(), resourceName);
 
       // $FlowFixMe - TODO: There is an error here to be solved.

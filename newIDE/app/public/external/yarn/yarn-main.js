@@ -27,16 +27,14 @@ window.addEventListener('yarnReady', e => {
   yarn.app.fs = fs;
   ipcRenderer.send('yarn-ready');
 });
-editorFrameEl.src = 'yarn-editor/app/index.html';
+editorFrameEl.src = 'yarn-editor/index.html';
 
 // Called to load yarn data. Should be called after the window is fully loaded.
 
 ipcRenderer.on('yarn-open', (event, receivedOptions) => {
-  if (!yarn) return;
-
   //Make a header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
-  const pathControl = createPathEditorHeader({
+  const pathEditorHeader = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
     onSaveToGd: saveAndClose,
@@ -49,7 +47,7 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
   const saveToGdButton = yarn.document
     .getElementsByClassName('menu')[0]
     .cloneNode(true);
-  saveToGdButton.onclick = () => saveAndClose(pathControl);
+  saveToGdButton.onclick = () => saveAndClose(pathEditorHeader);
   yarn.document
     .getElementsByClassName('app-menu')[0]
     .appendChild(saveToGdButton);
@@ -64,7 +62,7 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
     yarn.data.loadData(receivedOptions.externalEditorData, 'json', true);
     electronWindow.setTitle('Yarn in GD: ' + receivedOptions.resourcePath);
 
-    pathControl.toggle();
+    pathEditorHeader.toggle();
   } else {
     // If GD has sent no path, we need to set one for yarn
     receivedOptions.resourcePath =

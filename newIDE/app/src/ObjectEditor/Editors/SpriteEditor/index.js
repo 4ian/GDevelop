@@ -32,6 +32,7 @@ import {
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { Column, Line } from '../../../UI/Grid';
 
 const gd = global.gd;
 
@@ -45,11 +46,6 @@ const styles = {
   animationTools: {
     flexShrink: 0,
   },
-  lastLine: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   addAnimation: {
     display: 'flex',
   },
@@ -59,17 +55,20 @@ const styles = {
 };
 
 const AddAnimationLine = ({ onAdd, extraTools }) => (
-  <div style={styles.lastLine}>
-    {extraTools}
-    <div style={styles.addAnimation}>
-      <EmptyMessage style={styles.addAnimationText}>
-        Click to add an animation:
-      </EmptyMessage>
-      <IconButton onClick={onAdd}>
-        <Add />
-      </IconButton>
-    </div>
-  </div>
+  <Column>
+    <Line justifyContent="space-between" expand>
+      {extraTools}
+      <div style={styles.addAnimation}>
+        <RaisedButton
+          label={<Trans>Add an animation</Trans>}
+          primary
+          onClick={onAdd}
+          labelPosition="before"
+          icon={<Add />}
+        />
+      </div>
+    </Line>
+  </Column>
 );
 
 type AnimationProps = {|
@@ -343,6 +342,14 @@ class AnimationsListContainer extends React.Component<
   render() {
     return (
       <div>
+        {this.props.spriteObject.getAnimationsCount() === 0 && (
+          <EmptyMessage>
+            <Trans>
+              This object has no animations containing images. Start by adding
+              an animation.
+            </Trans>
+          </EmptyMessage>
+        )}
         <SortableAnimationsList
           spriteObject={this.props.spriteObject}
           objectName={this.props.objectName}

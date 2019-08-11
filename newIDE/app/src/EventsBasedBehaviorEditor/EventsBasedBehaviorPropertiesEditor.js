@@ -20,6 +20,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import Add from 'material-ui/svg-icons/content/add';
 
 const gd = global.gd;
 
@@ -295,13 +296,17 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                     </Trans>
                   </EmptyMessage>
                 ) : null}
-                <Line justifyContent="center">
-                  <RaisedButton
-                    primary
-                    label={<Trans>Add a property</Trans>}
-                    onClick={this._addProperty}
-                  />
-                </Line>
+                <Column>
+                  <Line justifyContent="flex-end" expand>
+                    <RaisedButton
+                      primary
+                      label={<Trans>Add a property</Trans>}
+                      onClick={this._addProperty}
+                      labelPosition="before"
+                      icon={<Add />}
+                    />
+                  </Line>
+                </Column>
               </div>
             </Line>
           </Column>

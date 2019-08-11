@@ -1,9 +1,10 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
 import Add from 'material-ui/svg-icons/content/add';
-import IconButton from 'material-ui/IconButton';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import ImageThumbnail, {
@@ -22,6 +23,7 @@ import {
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
+import FlatButton from 'material-ui/FlatButton';
 const gd = global.gd;
 const path = require('path');
 
@@ -49,9 +51,7 @@ const styles = {
 const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   return (
     <div style={styles.addSpriteButton}>
-      <IconButton onClick={onAdd} style={styles.spriteThumbnailImage}>
-        <Add />
-      </IconButton>
+      <FlatButton label={<Trans>Add</Trans>} icon={<Add />} />
     </div>
   );
 });

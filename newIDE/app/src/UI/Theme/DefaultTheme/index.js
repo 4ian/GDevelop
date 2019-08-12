@@ -12,7 +12,14 @@ const gdevelopDarkBlue = '#3c4698';
 
 const systemSelectionColor = '#4c92ff'; //OS X selection
 
+/**
+ * The background color of the main window
+ */
 const backgroundColor = '#f7f7f7';
+
+/**
+ * The background color of the "papers", "dialogs", etc...
+ */
 const canvasColor = '#f0f0f0';
 
 const theme = {
@@ -21,6 +28,7 @@ const theme = {
     primary1Color: gdevelopLightBlue,
     primary2Color: gdevelopDarkBlue,
     accent1Color: gdevelopPurple,
+    disabledColor: '#8a8a8a',
     canvasColor,
   },
   avatar: {

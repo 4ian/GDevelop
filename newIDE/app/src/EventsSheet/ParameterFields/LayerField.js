@@ -30,7 +30,7 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
         onChange={onChange}
         openOnFocus={isInline}
         dataSource={layerNames.map(layerName => ({
-          text: layerName || '(Base layer)',
+          text: layerName ? `"${layerName}"` : '"" (Base layer)',
           value: `"${layerName}"`,
         }))}
         hintText={'""'}

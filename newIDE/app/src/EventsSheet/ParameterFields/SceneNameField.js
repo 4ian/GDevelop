@@ -35,7 +35,7 @@ export default class SceneNameField extends Component<
         onChange={onChange}
         openOnFocus={isInline}
         dataSource={layoutNames.map(layoutName => ({
-          text: layoutName,
+          text: `"${layoutName}"`,
           value: `"${layoutName}"`,
         }))}
         hintText={'""'}

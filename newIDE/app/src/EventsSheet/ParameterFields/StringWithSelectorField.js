@@ -41,7 +41,7 @@ export default class StringWithSelectorField extends Component<
         value={value}
         onChange={onChange}
         dataSource={getChoices(parameterMetadata).map(choice => ({
-          text: choice,
+          text: '"' + choice + '"',
           value: '"' + choice + '"',
         }))}
         openOnFocus={!isInline}

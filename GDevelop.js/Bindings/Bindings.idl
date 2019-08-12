@@ -52,6 +52,15 @@ interface MapStringBoolean {
     [Value] VectorString MAP_keys();
 };
 
+interface MapStringDouble {
+    void MapStringDouble();
+
+    double MAP_get([Const] DOMString name);
+    void MAP_set([Const] DOMString name, double value);
+    double MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
 interface MapStringVariable {
     [Ref] Variable MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] Variable prop);
@@ -571,13 +580,39 @@ interface ExternalLayout {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface Effect {
+  void Effect();
+
+  void SetName([Const] DOMString name_);
+  [Const, Ref] DOMString GetName();
+
+  void SetEffectName([Const] DOMString effectName_);
+  [Const, Ref] DOMString GetEffectName();
+
+  void SetParameter([Const] DOMString name, float value);
+  float GetParameter([Const] DOMString name);
+  [Const, Ref] MapStringDouble GetAllParameters();
+
+  void SerializeTo([Ref] SerializerElement element);
+  void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
 interface Layer {
     void Layer();
-
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+
+    boolean HasEffectNamed([Const] DOMString name);
+    [Ref] Effect GetEffect([Const] DOMString name);
+    [Ref] Effect GetEffectAt(unsigned long index);
+    unsigned long GetEffectPosition([Const] DOMString name);
+    unsigned long GetEffectsCount();
+    [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
+    void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
+    void RemoveEffect([Const] DOMString name);
+    void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
 };
 
 interface PropertyDescriptor {

@@ -16,6 +16,7 @@
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
 #include <GDCore/Project/VariablesContainer.h>
+#include <GDCore/Project/Effect.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 
@@ -373,6 +374,7 @@ typedef std::vector<std::pair<gd::String, TextFormatting>>
 typedef std::vector<gd::ObjectGroup> VectorObjectGroup;
 typedef std::map<gd::String, gd::String> MapStringString;
 typedef std::map<gd::String, bool> MapStringBoolean;
+typedef std::map<gd::String, double> MapStringDouble;
 typedef std::map<gd::String, gd::ExpressionMetadata>
     MapStringExpressionMetadata;
 typedef std::map<gd::String, gd::InstructionMetadata>
@@ -568,6 +570,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveEventAt RemoveEvent
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
+#define GetEffectAt GetEffect
 
 // We don't use prefix in .idl file to workaround a webidl_binder.py bug
 // that can't find in its list of interfaces a class which has a prefix.

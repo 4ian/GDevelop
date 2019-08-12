@@ -33,7 +33,7 @@ import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
-import EditorBar from '../UI/EditorBar';
+import EditorBar, { editorBarHeight } from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -1108,6 +1108,9 @@ export default class SceneEditor extends React.Component<Props, State> {
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
+            style={{
+              height: `calc(100% - ${editorBarHeight}px)`,
+            }}
           />
         </Drawer>
         <Drawer

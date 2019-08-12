@@ -162,6 +162,7 @@ export const enumerateObjectInstructions = (
       )
     )
   );
+  const baseObjectType = ''; /* An empty string means the base object */
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -177,7 +178,7 @@ export const enumerateObjectInstructions = (
       extension
         .getExtensionObjectsTypes()
         .toJSArray()
-        .indexOf('' /* An empty string means the base object */) !== -1;
+        .indexOf(baseObjectType) !== -1;
     const behaviorTypes = extension
       .getBehaviorsTypes()
       .toJSArray()
@@ -190,7 +191,7 @@ export const enumerateObjectInstructions = (
     const prefix = '';
 
     //Objects instructions:
-    if (hasObjectType) {
+    if (objectType !== baseObjectType && hasObjectType) {
       const objectMetadata = extension.getObjectMetadata(objectType);
       allInstructions = [
         ...allInstructions,
@@ -211,12 +212,8 @@ export const enumerateObjectInstructions = (
         ...enumerateExtensionInstructions(
           prefix,
           isCondition
-            ? extension.getAllConditionsForObject(
-                '' /* An empty string means the base object */
-              )
-            : extension.getAllActionsForObject(
-                '' /* An empty string means the base object */
-              ),
+            ? extension.getAllConditionsForObject(baseObjectType)
+            : extension.getAllActionsForObject(baseObjectType),
           { objectMetadata }
         ),
       ];

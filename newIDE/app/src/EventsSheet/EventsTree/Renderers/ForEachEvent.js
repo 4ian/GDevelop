@@ -78,7 +78,9 @@ export default class ForEachEvent extends React.Component<
             {objectName ? (
               `Repeat for each ${objectName} object:`
             ) : (
-              <i>Click to choose for which objects this event will be repeated</i>
+              <i>
+                Click to choose for which objects this event will be repeated
+              </i>
             )}
           </span>
         </div>

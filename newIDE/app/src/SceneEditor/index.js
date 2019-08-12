@@ -977,19 +977,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             </I18n>,
             <CloseButton key="close" />,
           ]}
-          // TODO: Outdated
-          selectedObjectNames={
-            this.state
-              .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
-          }
-          canDropDraggedObject={
-            this.state
-              .canDropDraggedObject /*Ensure MosaicWindow content is updated when canDropDraggedObject changes*/
-          }
-          selectedObjectTags={
-            this.state
-              .selectedObjectTags /*Ensure MosaicWindow content is updated when selectedObjectTags changes*/
-          }
         >
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(

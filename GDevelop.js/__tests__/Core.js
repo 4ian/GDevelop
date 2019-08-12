@@ -173,6 +173,67 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.Layer', function() {
+    it('can have a name and visibility', function() {
+      const layer = new gd.Layer();
+
+      layer.setName("GUI");
+      layer.setVisibility(false);
+      expect(layer.getName()).toBe("GUI");
+      expect(layer.getVisibility()).toBe(false);
+
+      layer.delete();
+    });
+    it('can have effects', function() {
+      const layer = new gd.Layer();
+
+      expect(layer.hasEffectNamed("EffectThatDoesNotExist")).toBe(false);
+      expect(layer.getEffectsCount()).toBe(0);
+
+      layer.insertNewEffect("MyEffect", 0);
+      expect(layer.hasEffectNamed("EffectThatDoesNotExist")).toBe(false);
+      expect(layer.hasEffectNamed("MyEffect")).toBe(true);
+      expect(layer.getEffectsCount()).toBe(1);
+      expect(layer.getEffectPosition("MyEffect")).toBe(0);
+
+      const effect2 = new gd.Effect();
+      effect2.setName("MyEffect2");
+
+      layer.insertEffect(effect2, 1);
+      expect(layer.hasEffectNamed("MyEffect2")).toBe(true);
+      expect(layer.getEffectsCount()).toBe(2);
+      expect(layer.getEffectPosition("MyEffect")).toBe(0);
+      expect(layer.getEffectPosition("MyEffect2")).toBe(1);
+
+      layer.swapEffects(0, 1);
+      expect(layer.getEffectPosition("MyEffect2")).toBe(0);
+      expect(layer.getEffectPosition("MyEffect")).toBe(1);
+
+      layer.delete();
+    });
+  });
+
+  describe('gd.Effect', function() {
+    it('can have a name, effect name and parameters', function() {
+      const effect = new gd.Effect();
+
+      effect.setName("MyEffect");
+      effect.setEffectName("Sepia");
+      expect(effect.getName()).toBe("MyEffect");
+      expect(effect.getEffectName()).toBe("Sepia");
+
+      effect.setParameter("Brightness", 1);
+      effect.setParameter("Darkness", 0.3);
+      effect.setParameter("Param3", 6);
+      expect(effect.getAllParameters().keys().size()).toBe(3);
+      expect(effect.getParameter("Brightness")).toBe(1);
+      expect(effect.getParameter("Darkness")).toBe(0.3);
+      expect(effect.getParameter("Param3")).toBe(6);
+
+      effect.delete();
+    });
+  });
+
   describe('gd.ObjectsContainer (using gd.Layout)', function() {
     let project = null;
     beforeAll(() => (project = gd.ProjectHelper.createNewGDJSProject()));

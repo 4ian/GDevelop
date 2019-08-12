@@ -67,18 +67,20 @@ export default class ForEachEvent extends React.Component<
           [executableEventContainer]: true,
         })}
       >
-        <div
-          className={classNames({
-            [selectableArea]: true,
-            [disabledText]: this.props.disabled,
-          })}
-          onClick={this.edit}
-        >
-          {objectName ? (
-            `Repeat for each ${objectName} object:`
-          ) : (
-            <i>Click to choose for which objects this event will be repeated</i>
-          )}
+        <div>
+          <span
+            className={classNames({
+              [selectableArea]: true,
+              [disabledText]: this.props.disabled,
+            })}
+            onClick={this.edit}
+          >
+            {objectName ? (
+              `Repeat for each ${objectName} object:`
+            ) : (
+              <i>Click to choose for which objects this event will be repeated</i>
+            )}
+          </span>
         </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList

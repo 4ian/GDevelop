@@ -8,6 +8,7 @@ import {
   type ParameterFieldProps,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
+import { focusButton } from '../../UI/Button';
 
 const styles = {
   button: {
@@ -20,7 +21,11 @@ const styles = {
 };
 
 export default class YesNoField extends Component<ParameterFieldProps, void> {
-  focus() {}
+  _yesButton = React.createRef<RaisedButton>();
+
+  focus() {
+    focusButton(this._yesButton);
+  }
 
   render() {
     const { parameterMetadata, value } = this.props;
@@ -38,6 +43,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
             label={<Trans>Yes</Trans>}
             primary={effectiveValue === 'yes'}
             onClick={() => this.props.onChange('yes')}
+            ref={this._yesButton}
           />
         </Column>
         <Column noMargin>

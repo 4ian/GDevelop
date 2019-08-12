@@ -8,6 +8,7 @@ import {
   type ParameterFieldProps,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
+import { focusButton } from '../../UI/Button';
 
 const styles = {
   button: {
@@ -23,7 +24,11 @@ export default class TrueFalseField extends Component<
   ParameterFieldProps,
   void
 > {
-  focus() {}
+  _trueButton = React.createRef<RaisedButton>();
+
+  focus() {
+    focusButton(this._trueButton);
+  }
 
   render() {
     const { parameterMetadata, value } = this.props;
@@ -41,6 +46,7 @@ export default class TrueFalseField extends Component<
             label={<Trans>True</Trans>}
             primary={effectiveValue === 'True'}
             onClick={() => this.props.onChange('True')}
+            ref={this._trueButton}
           />
         </Column>
         <Column noMargin>

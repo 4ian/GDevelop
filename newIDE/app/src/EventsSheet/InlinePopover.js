@@ -9,6 +9,7 @@ const styles = {
     maxWidth: 600,
     height: 80,
     overflowY: 'hidden',
+    minWidth: 200, // Avoid extra small popover for some parameters like relational operator
   },
   contentContainer: {
     overflow: 'hidden',

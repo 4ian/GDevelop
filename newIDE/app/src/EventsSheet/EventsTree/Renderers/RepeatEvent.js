@@ -67,18 +67,20 @@ export default class RepeatEvent extends React.Component<
           [executableEventContainer]: true,
         })}
       >
-        <div
-          className={classNames({
-            [selectableArea]: true,
-            [disabledText]: this.props.disabled,
-          })}
-          onClick={this.edit}
-        >
-          {expression ? (
-            `Repeat ${expression} times:`
-          ) : (
-            <i>Click to choose how many times will be repeated</i>
-          )}
+        <div>
+          <span
+            className={classNames({
+              [selectableArea]: true,
+              [disabledText]: this.props.disabled,
+            })}
+            onClick={this.edit}
+          >
+            {expression ? (
+              `Repeat ${expression} times:`
+            ) : (
+              <i>Click to choose how many times will be repeated</i>
+            )}
+          </span>
         </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList

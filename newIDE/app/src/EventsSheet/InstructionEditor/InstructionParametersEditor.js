@@ -16,7 +16,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { Line } from '../../UI/Grid';
+import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import { getExtraInstructionInformation } from '../../Hints';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
@@ -258,7 +258,7 @@ export default class InstructionParametersEditor extends React.Component<
                 </AlertMessage>
               </Line>
             )}
-            <Divider />
+            <Spacer />
             <div key={type} style={styles.parametersContainer}>
               {mapFor(0, instructionMetadata.getParametersCount(), i => {
                 const parameterMetadata = instructionMetadata.getParameter(i);

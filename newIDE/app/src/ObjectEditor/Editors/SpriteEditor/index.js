@@ -49,8 +49,8 @@ const styles = {
   addAnimation: {
     display: 'flex',
   },
-  addAnimationText: {
-    justifyContent: 'flex-end',
+  buttonRightMargin: {
+    marginRight: 4,
   },
 };
 
@@ -453,6 +453,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
+                style={styles.buttonRightMargin}
               />
               <RaisedButton
                 label={<Trans>Edit points</Trans>}

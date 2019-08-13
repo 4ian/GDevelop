@@ -1115,7 +1115,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         </Drawer>
         <Drawer
           open={this.state.layersListOpen}
-          width={400}
+          width={500}
           openSecondary={true}
         >
           <EditorBar

@@ -136,6 +136,7 @@ import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
 import SearchBar from '../UI/SearchBar';
 import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
+import EffectsList from '../EffectsList';
 
 // No i18n in this file
 
@@ -161,6 +162,9 @@ const {
   testEmptyEventsBasedBehavior,
   testBehaviorEventsFunction,
   testBehaviorLifecycleEventsFunction,
+  layerWithEffects,
+  layerWithEffectWithoutEffectName,
+  layerWithoutEffects,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -2588,4 +2592,27 @@ storiesOf('ExtensionsSearchDialog', module)
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('EffectsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('with some effects', () => (
+    <EffectsList
+      effectsContainer={layerWithEffects}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('with an effect without effect name', () => (
+    <EffectsList
+      effectsContainer={layerWithEffectWithoutEffectName}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('without effects', () => (
+    <EffectsList
+      effectsContainer={layerWithoutEffects}
+      onEffectsUpdated={action('effects updated')}
+    />
   ));

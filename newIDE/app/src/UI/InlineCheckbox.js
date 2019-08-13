@@ -4,8 +4,13 @@ import Checkbox from 'material-ui/Checkbox';
 
 const styles = {
   root: {
+    display: 'inline-block',
     width: 'auto',
     marginRight: 16,
+  },
+  rootWihoutLabel: {
+    display: 'inline-block',
+    width: 'auto',
   },
   label: {
     width: 'auto',
@@ -13,7 +18,7 @@ const styles = {
 };
 
 type Props = {|
-  label: React.Node,
+  label?: ?React.Node,
   checked: boolean,
   onCheck?: (e: {||}, checked: boolean) => void,
   checkedIcon?: React.Node,
@@ -26,5 +31,9 @@ type Props = {|
  * without having it taking the full width of its container.
  */
 export default (props: Props) => (
-  <Checkbox style={styles.root} labelStyle={styles.label} {...props} />
+  <Checkbox
+    style={props.label ? styles.root : styles.rootWihoutLabel}
+    labelStyle={styles.label}
+    {...props}
+  />
 );

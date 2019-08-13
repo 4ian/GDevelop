@@ -29,13 +29,11 @@ export default class VariablesEditorDialog extends Component {
     const actions = [
       <FlatButton
         label={<Trans>Cancel</Trans>}
-        secondary={true}
         keyboardFocused={true}
         onClick={() => this.props.onClose(false)}
       />,
       <FlatButton
         label={<Trans>Remove objects</Trans>}
-        secondary={true}
         onClick={() => this.props.onClose(true, null)}
       />,
       <FlatButton

@@ -443,6 +443,26 @@ export const makeTestProject = gd => {
     'This is a test events based behavior, without any functions.'
   );
 
+  // Create a layer with some effects
+  const layerWithEffects = new gd.Layer();
+
+  const effect1 = layerWithEffects.insertNewEffect('MyEffect1', 0);
+  const effect2 = layerWithEffects.insertNewEffect('MyEffect2', 1);
+
+  effect1.setEffectName('Sepia');
+  effect1.setParameter('opacity', 0.6);
+  effect2.setEffectName('Night');
+  effect2.setParameter('intensity', 0.1);
+  effect2.setParameter('opacity', 0.2);
+
+  const layerWithEffectWithoutEffectName = new gd.Layer();
+  layerWithEffectWithoutEffectName.insertNewEffect(
+    'MyEffectWithoutEffectName',
+    0
+  );
+
+  const layerWithoutEffects = new gd.Layer();
+
   return {
     project,
     shapePainterObject,
@@ -467,5 +487,8 @@ export const makeTestProject = gd => {
     testEmptyEventsBasedBehavior,
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
+    layerWithEffects,
+    layerWithEffectWithoutEffectName,
+    layerWithoutEffects,
   };
 };

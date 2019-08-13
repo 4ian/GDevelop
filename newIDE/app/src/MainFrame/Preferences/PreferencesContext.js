@@ -8,7 +8,8 @@ export type AlertMessageIdentifier =
   | 'minimum-fps-too-low'
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
-  | 'empty-events-based-behavior-explanation';
+  | 'empty-events-based-behavior-explanation'
+  | 'effects-usage';
 
 export type PreferencesValues = {|
   language: string,

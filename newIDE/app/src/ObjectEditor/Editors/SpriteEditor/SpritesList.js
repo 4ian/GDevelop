@@ -51,7 +51,7 @@ const styles = {
 const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   return (
     <div style={styles.addSpriteButton}>
-      <FlatButton label={<Trans>Add</Trans>} icon={<Add />} />
+      <FlatButton onClick={onAdd} label={<Trans>Add</Trans>} icon={<Add />} />
     </div>
   );
 });

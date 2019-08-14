@@ -18,7 +18,12 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
     return (
       <Dialog
         noMargin
-        secondaryActions={[<HelpButton key="help" helpPagePath="TODO" />]}
+        secondaryActions={[
+          <HelpButton
+            key="help"
+            helpPagePath="/interface/scene-editor/layers-and-cameras"
+          />,
+        ]}
         actions={[
           <FlatButton
             label={<Trans>Ok</Trans>}

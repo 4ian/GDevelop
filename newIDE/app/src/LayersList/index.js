@@ -15,8 +15,8 @@ import styles from './styles';
 import LayerRow from './LayerRow';
 import AddLayerRow from './AddLayerRow';
 import EffectsListDialog from '../EffectsList/EffectsListDialog';
+import BackgroundColorRow from './BackgroundColorRow';
 
-const SortableAddLayerRow = SortableElement(AddLayerRow);
 const SortableLayerRow = SortableElement(LayerRow);
 
 type LayersListBodyState = {|
@@ -83,31 +83,29 @@ class LayersListBody extends Component<*, LayersListBodyState> {
       );
     });
 
-    const addRow = (
-      <SortableAddLayerRow
-        index={layersContainer.getLayersCount()}
-        key={'add-layer-row'}
-        disabled
-        onAdd={() => {
-          const name = newNameGenerator('Layer', name =>
-            layersContainer.hasLayerNamed(name)
-          );
-          layersContainer.insertNewLayer(
-            name,
-            layersContainer.getLayersCount()
-          );
-          this.forceUpdate();
-        }}
-      />
-    );
-
     return (
       <TableBody
         displayRowCheckbox={false}
         deselectOnClickaway={true}
         showRowHover={true}
       >
-        {containerLayersList.concat(addRow)}
+        {containerLayersList}
+        <BackgroundColorRow
+          layout={layersContainer}
+          onBackgroundColorChanged={() => this.forceUpdate()}
+        />
+        <AddLayerRow
+          onAdd={() => {
+            const name = newNameGenerator('Layer', name =>
+              layersContainer.hasLayerNamed(name)
+            );
+            layersContainer.insertNewLayer(
+              name,
+              layersContainer.getLayersCount()
+            );
+            this.forceUpdate();
+          }}
+        />
       </TableBody>
     );
   }

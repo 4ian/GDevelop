@@ -7,6 +7,7 @@ export default {
   },
   effectsColumn: {
     width: 100,
+    textAlign: 'center',
   },
   toolColumn: {
     width: 96,

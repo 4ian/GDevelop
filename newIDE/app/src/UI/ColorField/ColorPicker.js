@@ -103,10 +103,12 @@ class ColorPicker extends React.Component<Props, State> {
           </div>
         </div>
         {this.state.displayColorPicker ? (
-          <div style={styles.popover}>
+          <React.Fragment>
             <div style={styles.cover} onClick={this.handleClose} />
-            <SketchPicker color={displayedColor} {...otherProps} />
-          </div>
+            <div style={styles.popover}>
+              <SketchPicker color={displayedColor} {...otherProps} />
+            </div>
+          </React.Fragment>
         ) : null}
       </div>
     );

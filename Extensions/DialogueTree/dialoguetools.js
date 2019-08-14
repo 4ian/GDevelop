@@ -66,6 +66,14 @@ gdjs.dialogueTree.loadFromJsonFile = function(
  * For example, you can do things like disabling player movement while talking to a NPC.
  */
 gdjs.dialogueTree.isRunning = function() {
+  if (
+    this.dialogueIsRunning &&
+    !this.dialogueData &&
+    this.dialogueText &&
+    this.clipTextEnd >= this.dialogueText.length
+  ) {
+    this.dialogueIsRunning = false;
+  }
   return this.dialogueIsRunning;
 };
 
@@ -424,11 +432,6 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   if (gdjs.dialogueTree._isLineTypeCommand()) {
     this.dialogueDataType = 'command';
     gdjs.dialogueTree.goToNextDialogueLine();
-  }
-
-  // Dialogue has finished
-  if (!this.dialogueData) {
-    this.dialogueIsRunning = false;
   }
 };
 

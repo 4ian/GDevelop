@@ -204,6 +204,24 @@ gdjs.dialogueTree.getLineOption = function(optionIndex) {
 };
 
 /**
+ * Get the text of the options the player can select, along with the selection cursor.
+ * @param {string} optionSelectionCursor The string used to draw the currently selected option's cursor
+ */
+gdjs.dialogueTree.getLineOptionsText = function(optionSelectionCursor) {
+  if (!this.options.length) return '';
+  var textResult = '';
+  this.options.forEach(function(optionText, index) {
+    if (index === gdjs.dialogueTree.selectedOption) {
+      textResult += optionSelectionCursor;
+    } else {
+      textResult += optionSelectionCursor.replace(/.*/g, ' ');
+    }
+    textResult += optionText;
+  });
+  return textResult;
+};
+
+/**
  * Get the number of options that are presented to the player, during the parsing of an Options type line.
  * @returns {number} The number of options
  */

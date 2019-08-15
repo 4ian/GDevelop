@@ -265,6 +265,22 @@ module.exports = {
       .setFunctionName('gdjs.dialogueTree.getLineOption');
 
     extension
+      .addStrExpression(
+        'OptionsText',
+        _('Get the text of all available options from an Options line type'),
+        _(
+          "Get the text of all available options from an Options line type. You can also pass the selected option's cursor string, which by default is ->"
+        ),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Options Selection Cursor'), '->')
+      .setDefaultValue('->')
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getLineOptionsText');
+
+    extension
       .addExpression(
         'SelectedOptionIndex',
         _('Get the number of the currently selected option'),

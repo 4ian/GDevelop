@@ -465,12 +465,12 @@ module.exports = {
 
     extension
       .addCondition(
-        'Is running',
-        _('Is running'),
+        'Dialogue is running',
+        _('Dialogue is running'),
         _(
           'Check if the dialogue is running. Use this to for things like locking the player movement while speaking with a non player character.'
         ),
-        _('Is running'),
+        _('Dialogue is running'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -496,12 +496,12 @@ module.exports = {
 
     extension
       .addCondition(
-        'HasSelectedOptionChanged',
-        _('Has selected option changed'),
+        'SelectedOptionHasChanged',
+        _('Selected option has changed'),
         _(
           'Check if a selected option has changed when the current dialogue line type is options. Use this to detect when the player has selected another option, so you can re-draw where the selection arrow is.'
         ),
-        _('Has selected option changed'),
+        _('Selected option has changed'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -574,12 +574,12 @@ module.exports = {
 
     extension
       .addCondition(
-        'HasClippedTextScrollingCompleted',
-        _('Has clipped text scrolling completed'),
+        'ClippedTextScrollingHasCompleted',
+        _('Clipped text has completed scrolling'),
         _(
           'Check if the clipped text scrolling has completed. Use this to prevent the player from going to the next dialogue line before the typing effect has revealed the entire text.'
         ),
-        _('Has clipped text scrolling completed'),
+        _('Clipped text has completed scrolling'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'

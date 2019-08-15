@@ -252,21 +252,13 @@ gdjs.dialogueTree.confirmSelectOption = function() {
     this.selectedOption !== -1
   ) {
     this.commandCalls = [];
-    var selectedOptionText = this.options[this.selectedOption]
-      ? this.options[this.selectedOption]
-      : '';
     try {
-      if (!this.hasDialogueBranch(selectedOptionText)) {
-        console.error(
-          `The selected option: ${selectedOptionText} wasn't found in the dialogue tree data.`
-        );
-      }
       this.dialogueData.select(this.selectedOption);
       this.dialogueData = this.dialogue.next().value;
       gdjs.dialogueTree.goToNextDialogueLine();
     } catch (error) {
       console.error(
-        `An error happened when trying to access the ${selectedOptionText} dialogue branch!`,
+        `An error happened when trying to access the dialogue branch!`,
         error
       );
     }

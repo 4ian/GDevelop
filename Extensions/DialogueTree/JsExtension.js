@@ -39,7 +39,9 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Scene variable that holds the Yarn Json data')
+        _('Scene variable that holds the Yarn Json data'),
+        '',
+        false
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
@@ -61,7 +63,9 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
         'jsonResource',
-        _('Json file that holds the Yarn Json data')
+        _('Json file that holds the Yarn Json data'),
+        '',
+        false
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
@@ -80,7 +84,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Dialogue branch'))
+      .addParameter('string', _('Dialogue branch'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.startFrom');
 
@@ -156,7 +160,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('expression', _('Option index number'))
+      .addParameter('expression', _('Option index number'), '', false)
       .setDefaultValue('0')
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.selectPreviousOption');
@@ -188,8 +192,8 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('State Variable Name'))
-      .addParameter('expression', _('Variable Value'))
+      .addParameter('string', _('State Variable Name'), '', false)
+      .addParameter('expression', _('Variable Value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
 
@@ -221,7 +225,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('globalvar', _('Global Variable'))
+      .addParameter('globalvar', _('Global Variable'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.loadState');
 
@@ -260,7 +264,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('expression', _('Option Index Number'))
+      .addParameter('expression', _('Option Index Number'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getLineOption');
 
@@ -275,7 +279,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Options Selection Cursor'), '->')
+      .addParameter('string', _('Options Selection Cursor'), '', false)
       .setDefaultValue('->')
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getLineOptionsText');
@@ -341,7 +345,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('expression', _('Tag Index Number'))
+      .addParameter('expression', _('Tag Index Number'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getBranchTag');
 
@@ -422,7 +426,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Variable Name'))
+      .addParameter('string', _('Variable Name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getVariable');
 
@@ -438,7 +442,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Command String'))
+      .addParameter('string', _('Command String'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.isCommandCalled');
 
@@ -490,7 +494,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Branch name'))
+      .addParameter('string', _('Branch name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.hasDialogueBranch');
 
@@ -521,7 +525,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('title name'))
+      .addParameter('string', _('title name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.branchTitleIs');
 
@@ -537,7 +541,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('tag name'))
+      .addParameter('string', _('tag name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.branchContainsTag');
 
@@ -551,7 +555,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('branch title'))
+      .addParameter('string', _('branch title'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.branchTitleHasBeenVisited');
 
@@ -567,8 +571,8 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('State variable'))
-      .addParameter('string', _('Equal to'))
+      .addParameter('string', _('State variable'), '', false)
+      .addParameter('string', _('Equal to'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.compareVariable');
 

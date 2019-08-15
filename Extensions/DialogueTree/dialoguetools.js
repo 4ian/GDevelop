@@ -52,7 +52,15 @@ gdjs.dialogueTree.loadFromJsonFile = function(
       } else {
         if (!content) return;
         gdjs.dialogueTree.yarnData = content;
-        gdjs.dialogueTree.runner.load(gdjs.dialogueTree.yarnData);
+
+        try {
+          gdjs.dialogueTree.runner.load(gdjs.dialogueTree.yarnData);
+        } catch (error) {
+          console.error(
+            'An error happened while loading oarsing the dialogue tree data:',
+            error
+          );
+        }
 
         if (startDialogueNode && startDialogueNode.length > 0) {
           gdjs.dialogueTree.startFrom(startDialogueNode);
@@ -244,9 +252,16 @@ gdjs.dialogueTree.confirmSelectOption = function() {
     this.selectedOption !== -1
   ) {
     this.commandCalls = [];
-    this.dialogueData.select(this.selectedOption);
-    this.dialogueData = this.dialogue.next().value;
-    gdjs.dialogueTree.goToNextDialogueLine();
+    try {
+      this.dialogueData.select(this.selectedOption);
+      this.dialogueData = this.dialogue.next().value;
+      gdjs.dialogueTree.goToNextDialogueLine();
+    } catch (error) {
+      console.error(
+        'An error happened when trying to access the dialogue branch!',
+        error
+      );
+    }
   }
 };
 

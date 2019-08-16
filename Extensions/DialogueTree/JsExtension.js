@@ -280,6 +280,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('Options Selection Cursor'), '', false)
+      .setDefaultValue('>')
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getLineOptionsTextHorizontal');
 
@@ -295,6 +296,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('Options Selection Cursor'), '', false)
+      .setDefaultValue('>')
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getLineOptionsTextVertical');
 

@@ -214,8 +214,12 @@ gdjs.dialogueTree.getLineOption = function(optionIndex) {
 /**
  * Get the text of the options the player can select, along with the selection cursor.
  * @param {string} optionSelectionCursor The string used to draw the currently selected option's cursor
+ * @param {boolean} addNewLine when true each option is rendered on a new line.
  */
-gdjs.dialogueTree.getLineOptionsText = function(optionSelectionCursor) {
+gdjs.dialogueTree.getLineOptionsText = function(
+  optionSelectionCursor,
+  addNewLine
+) {
   if (!this.options.length) return '';
   var textResult = '';
   this.options.forEach(function(optionText, index) {
@@ -224,7 +228,7 @@ gdjs.dialogueTree.getLineOptionsText = function(optionSelectionCursor) {
     } else {
       textResult += optionSelectionCursor.replace(/.*/g, ' ');
     }
-    textResult += optionText;
+    textResult += optionText + addNewLine ? '\n' : '';
   });
   return textResult;
 };

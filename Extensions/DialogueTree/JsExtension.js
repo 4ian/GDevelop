@@ -281,6 +281,8 @@ module.exports = {
       )
       .addParameter('string', _('Options Selection Cursor'), '', false)
       .setDefaultValue('->')
+      .addParameter('yesorno', _('Print each option on a new line'), '', false)
+      .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getLineOptionsText');
 

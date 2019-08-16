@@ -228,9 +228,18 @@ gdjs.dialogueTree.getLineOptionsText = function(
     } else {
       textResult += optionSelectionCursor.replace(/.*/g, ' ');
     }
-    textResult += optionText + addNewLine ? '\n' : '';
+    textResult += optionText;
+    if (addNewLine) textResult += '\n';
   });
   return textResult;
+};
+gdjs.dialogueTree.getLineOptionsTextHorizontal = function(
+  optionSelectionCursor
+) {
+  return this.getLineOptionsText(optionSelectionCursor, false);
+};
+gdjs.dialogueTree.getLineOptionsTextVertical = function(optionSelectionCursor) {
+  return this.getLineOptionsText(optionSelectionCursor, true);
 };
 
 /**

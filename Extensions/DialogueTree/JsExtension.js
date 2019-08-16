@@ -270,21 +270,33 @@ module.exports = {
 
     extension
       .addStrExpression(
-        'OptionsText',
-        _('Get the text of all available options from an Options line type'),
+        'HorizontalOptionsList',
+        _('Get a Horizontal list of options from the Options line type'),
         _(
-          "Get the text of all available options from an Options line type. You can also pass the selected option's cursor string, which by default is ->"
+          "Get the text of all available options from an Options line type as a horizontal list. You can also pass the selected option's cursor string, which by default is ->"
         ),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('Options Selection Cursor'), '', false)
-      .setDefaultValue('->')
-      .addParameter('yesorno', _('Print each option on a new line'), '', false)
-      .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setFunctionName('gdjs.dialogueTree.getLineOptionsText');
+      .setFunctionName('gdjs.dialogueTree.getLineOptionsTextHorizontal');
+
+    extension
+      .addStrExpression(
+        'VerticalOptionsList',
+        _('Get a Vertical list of options from the Options line type'),
+        _(
+          "Get the text of all available options from an Options line type as a vertical list. You can also pass the selected option's cursor string, which by default is ->"
+        ),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Options Selection Cursor'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getLineOptionsTextVertical');
 
     extension
       .addExpression(

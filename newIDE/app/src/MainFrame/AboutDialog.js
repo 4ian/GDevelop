@@ -97,7 +97,7 @@ const contributors = [
   { name: 'Diego Schiavon', description: 'Indiegogo Ubuntu contributor' },
   { name: 'conceptgame', description: 'Indiegogo super contributor' },
   {
-    name: 'Jose David Coartas Correa',
+    name: 'Jose David Cuartas Correa',
     description:
       'Author of Digitopolis (a book on how to make games with GDevelop4)',
   },

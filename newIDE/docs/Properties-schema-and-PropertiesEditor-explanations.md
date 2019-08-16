@@ -2,7 +2,7 @@
 
 ## The need for a concept of "properties"
 
-A lot of elements in GDevelop can be have fields that can be edited by the user. For example:
+A lot of elements in GDevelop can have fields which can be edited by the user. For example:
 * a behavior has properties that are, for most behaviors, strings, numbers and booleans.
 * an object also has properties that are shown in the editor. They are often strings (the text to display in a text object), numbers (the number of particles), booleans (a checkbox to set if a text is displayed in bold or not) and also sometimes can be a resource (for example, the image to be displayed by a tiled sprite object or the font to be used by a text object).
 * an instance on a scene also has a bunch of properties: its X and Y coordinates, its angle, etc...
@@ -62,9 +62,9 @@ That's why object and behaviors can have "properties". A property is defined by 
 * **Behaviors** can also have properties (check example of existing behaviors in `JsExtension.js` or in C++ behaviors)
 * **Instances** of objects can also have custom properties.
 
-> Declaring properties is not enough, for behaviors, objects and instances you also need to implement `updateProperty` in JS (or `UpdateProperty` in C++), that will be called to update a property when the user change it in the editor. Use this method to add any validation if needed.
+> Declaring properties is not enough, for behaviors, objects and instances you also need to implement `updateProperty` in JS (or `UpdateProperty` in C++), that will be called to update a property when the user changes it in the editor. Use this method to add any validation if needed.
 
-## What are the "type" of properties supported?
+## What "types" of properties are supported?
 
 The `PropertyDescriptor` has a `setType` (or `SetType` in C++) method. You can call it with:
 
@@ -74,8 +74,8 @@ The `PropertyDescriptor` has a `setType` (or `SetType` in C++) method. You can c
 * `"resource"` to get a resource selector. The resource will be stored as a string, but the editor will show a selector allowing to choose a resource, that will be added to the project.
   * In this case, you also need to call `addExtraInfo` (`AddExtraInfo` in C++) with the type of the resource: `"image"`, `"audio"`, `"font"` or `"json"`.
 
-## Where can I find the source code for those?
+## Where can I find their source code?
 
 * [PropertyDescriptor](https://github.com/4ian/GDevelop/blob/master/Core/GDCore/Project/PropertyDescriptor.h)
 * A PropertyDescriptor is mapped to [a schema](https://github.com/4ian/GDevelop/blob/bc80d1c98f22bb8aae559b1fbcb25452d9a6b9d8/newIDE/app/src/PropertiesEditor/PropertiesMapToSchema.js#L109-L124) that is then displayed by [PropertiesEditor](https://github.com/4ian/GDevelop/blob/bc80d1c98f22bb8aae559b1fbcb25452d9a6b9d8/newIDE/app/src/PropertiesEditor/index.js#L314).
-* A "schema" describe what a PropertiesEditor will display on screen. It's somewhat similar to PropertyDescriptor. The two concepts should be merged at some point.
+* A "schema" describes what a PropertiesEditor will display on screen. It's somewhat similar to PropertyDescriptor. The two concepts should be merged at some point.

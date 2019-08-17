@@ -15,6 +15,7 @@ export const getExperimentalObjects = (): {
   [string]: boolean,
 } => ({
   'Video::VideoObject': true,
+  'SkeletonObject::Skeleton': true,
 });
 
 export const getExtraObjectsInformation = (): {

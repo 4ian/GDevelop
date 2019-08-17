@@ -82,8 +82,8 @@ gdjs.JsonManager.prototype.preloadJsons = function(onProgress, onComplete) {
 
 /**
  * Request the json file from the given resource name.
- * When loaded, the `callback` is called with the error (null if none) and the loaded
- * json (string).
+ * This method is asynchronous. When loaded, the `callback` is called with the error
+ * (null if none) and the loaded json (a JS Object).
  *
  * @param {string} resourceName The resource pointing to the json file to load.
  * @param {JsonManagerRequestCallback} callback The callback function called when json is loaded (or an error occured).
@@ -131,10 +131,22 @@ gdjs.JsonManager.prototype.loadJson = function(resourceName, callback) {
   xhr.send();
 };
 
+/**
+ * Check if the given json resource was loaded (preloaded or loaded with `loadJson`).
+ * @param {string} resourceName The name of the json resource.
+ * @returns {boolean} true if the content of the json resource is loaded. false otherwise.
+ */
 gdjs.JsonManager.prototype.isJsonLoaded = function(resourceName) {
   return !!this._loadedJsons[resourceName];
 };
 
+/**
+ * Get the object for the given resource that is already loaded (preloaded or loaded with `loadJson`).
+ * If the resource is not loaded, `null` will be returned.
+ *
+ * @param {string} resourceName The name of the json resource.
+ * @returns {?Object} the content of the json resource, if loaded. `null` otherwise.
+ */
 gdjs.JsonManager.prototype.getLoadedJson = function(resourceName) {
-  return this._loadedJsons[resourceName];
+  return this._loadedJsons[resourceName] || null;
 };

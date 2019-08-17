@@ -29,7 +29,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           _("Built-in extension providing standard events."),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/all-features/advanced-conditions");
 
 #if defined(GD_IDE_ONLY)
   extension

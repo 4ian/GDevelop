@@ -206,6 +206,14 @@ gdjs.evtTools.input.getMouseWheelDelta = function(runtimeScene) {
     return runtimeScene.getGame().getInputManager().getMouseWheelDelta();
 };
 
+gdjs.evtTools.input.isScrollingUp = function(runtimeScene) {
+    return runtimeScene.getGame().getInputManager().isScrollingUp();
+};
+
+gdjs.evtTools.input.isScrollingDown = function(runtimeScene) {
+    return runtimeScene.getGame().getInputManager().isScrollingDown();
+};
+
 gdjs.evtTools.input.getMouseX = function(runtimeScene, layer, camera) {
     return runtimeScene.getLayer(layer).convertCoords(
         runtimeScene.getGame().getInputManager().getMouseX(),
@@ -268,6 +276,8 @@ gdjs.evtTools.input.popEndedTouch = function(runtimeScene) {
 
     return false;
 };
+
+
 
 gdjs.evtTools.input.touchSimulateMouse = function(runtimeScene, enable) {
     runtimeScene.getGame().getInputManager().touchSimulateMouse(enable);

@@ -1283,6 +1283,7 @@
       "objects": [
         {
           "name": "a",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1350,6 +1351,7 @@
         },
         {
           "name": "b",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1417,6 +1419,7 @@
         },
         {
           "name": "c",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1484,6 +1487,7 @@
         },
         {
           "name": "d",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1551,6 +1555,7 @@
         },
         {
           "name": "e",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1618,6 +1623,7 @@
         },
         {
           "name": "f",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1685,6 +1691,7 @@
         },
         {
           "name": "g",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1752,6 +1759,7 @@
         },
         {
           "name": "h",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1819,6 +1827,7 @@
         },
         {
           "name": "i",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1886,6 +1895,7 @@
         },
         {
           "name": "j",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1953,6 +1963,7 @@
         },
         {
           "name": "k",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2020,6 +2031,7 @@
         },
         {
           "name": "l",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2087,6 +2099,7 @@
         },
         {
           "name": "m",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2154,6 +2167,7 @@
         },
         {
           "name": "n",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2221,6 +2235,7 @@
         },
         {
           "name": "o",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2288,6 +2303,7 @@
         },
         {
           "name": "p",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2355,6 +2371,7 @@
         },
         {
           "name": "q",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2422,6 +2439,7 @@
         },
         {
           "name": "r",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2489,6 +2507,7 @@
         },
         {
           "name": "s",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2556,6 +2575,7 @@
         },
         {
           "name": "t",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2623,6 +2643,7 @@
         },
         {
           "name": "u",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2690,6 +2711,7 @@
         },
         {
           "name": "v",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2757,6 +2779,7 @@
         },
         {
           "name": "w",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2824,6 +2847,7 @@
         },
         {
           "name": "x",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2891,6 +2915,7 @@
         },
         {
           "name": "y",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2958,6 +2983,7 @@
         },
         {
           "name": "z",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3025,6 +3051,7 @@
         },
         {
           "name": "space",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3095,6 +3122,7 @@
           "italic": false,
           "name": "txt_keys_pressed",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3113,6 +3141,7 @@
           "italic": false,
           "name": "time",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4115,6 +4144,7 @@
           "italic": false,
           "name": "gameover",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4133,6 +4163,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4151,6 +4182,7 @@
           "italic": false,
           "name": "playagain",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

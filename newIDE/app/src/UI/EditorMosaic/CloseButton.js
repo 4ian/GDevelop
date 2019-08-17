@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import IconButton from 'material-ui/IconButton';
 import Close from 'material-ui/svg-icons/navigation/close';
+import { MosaicWindowContext, MosaicContext } from 'react-mosaic-component';
 
 const styles = {
   container: {
@@ -12,22 +12,24 @@ const styles = {
 };
 
 export default class CloseButton extends Component {
-  static contextTypes = {
-    mosaicActions: PropTypes.object,
-    mosaicWindowActions: PropTypes.object,
-  };
-
   render() {
-    const { mosaicActions, mosaicWindowActions } = this.context;
     return (
-      <IconButton
-        onClick={() => {
-          mosaicActions.remove(mosaicWindowActions.getPath());
-        }}
-        style={styles.container}
-      >
-        <Close color="white" />
-      </IconButton>
+      <MosaicContext.Consumer>
+        {({ mosaicActions }) => (
+          <MosaicWindowContext.Consumer>
+            {({ mosaicWindowActions }) => (
+              <IconButton
+                onClick={() => {
+                  mosaicActions.remove(mosaicWindowActions.getPath());
+                }}
+                style={styles.container}
+              >
+                <Close color="white" />
+              </IconButton>
+            )}
+          </MosaicWindowContext.Consumer>
+        )}
+      </MosaicContext.Consumer>
     );
   }
 }

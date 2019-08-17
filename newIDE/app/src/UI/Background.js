@@ -6,7 +6,6 @@ const styles = {
   container: {
     flex: 1,
     display: 'flex',
-    height: '100%',
     flexDirection: 'column',
   },
   maxWidth: {
@@ -17,6 +16,8 @@ const styles = {
 type Props = {|
   children: ?React.Node,
   maxWidth?: boolean,
+  width?: number | string,
+  noFullHeight?: boolean,
 |};
 
 /**
@@ -30,6 +31,8 @@ const Background = (props: Props) => (
   <Paper
     style={{
       ...styles.container,
+      height: props.noFullHeight ? undefined : '100%',
+      width: props.width ? props.width : undefined,
       ...(props.maxWidth ? styles.maxWidth : undefined),
     }}
   >

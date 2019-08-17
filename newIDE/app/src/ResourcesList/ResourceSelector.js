@@ -1,8 +1,5 @@
 // @flow
 import * as React from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
-import MenuItem from 'material-ui/MenuItem';
-import Divider from 'material-ui/Divider';
 import IconButton from 'material-ui/IconButton';
 import Add from 'material-ui/svg-icons/content/add';
 import Brush from 'material-ui/svg-icons/image/brush';
@@ -14,8 +11,10 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import IconMenu from '../UI/Menu/IconMenu';
 import ResourcesLoader from '../ResourcesLoader';
-import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 import { applyResourceDefaults } from './ResourceUtils';
+import SemiControlledAutoComplete, {
+  type DataSource,
+} from '../UI/SemiControlledAutoComplete';
 
 type Props = {|
   project: gdProject,
@@ -36,16 +35,7 @@ type State = {|
   resourceName: string,
 |};
 
-type AutoCompleteItem =
-  | {|
-      text: string,
-      value: React.Node,
-      onClick?: () => void,
-    |}
-  | string;
-
 const styles = {
-  autoComplete: { minWidth: 300 },
   container: { display: 'flex', flex: 1, alignItems: 'baseline' },
 };
 
@@ -65,9 +55,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
   }
 
   allResourcesNames: Array<string>;
-  defaultItems: Array<AutoCompleteItem>;
-  autoCompleteData: ?Array<AutoCompleteItem>;
-  _autoComplete: ?AutoComplete;
+  autoCompleteData: DataSource;
+  _autoComplete: ?SemiControlledAutoComplete;
 
   focus() {
     if (this._autoComplete) this._autoComplete.focus();
@@ -81,21 +70,19 @@ export default class ResourceSelector extends React.Component<Props, State> {
     }
   }
 
-  _getDefaultItems(): Array<AutoCompleteItem> {
+  _getResourceSourceItems(): DataSource {
     const sources = this.props.resourceSources || [];
     return [
       ...sources
         .filter(source => source.kind === this.props.resourceKind)
         .map(source => ({
           text: '',
-          value: (
-            <MenuItem primaryText={source.displayName} rightIcon={<Add />} />
-          ),
+          value: source.displayName,
+          renderRightIcon: () => <Add />,
           onClick: () => this._addFrom(source),
         })),
       {
-        text: '',
-        value: <Divider />,
+        type: 'separator',
       },
     ];
   }
@@ -110,8 +97,12 @@ export default class ResourceSelector extends React.Component<Props, State> {
         );
       });
     }
-    this.defaultItems = this._getDefaultItems();
-    this.autoCompleteData = [...this.defaultItems, ...this.allResourcesNames];
+    const resourceSourceItems = this._getResourceSourceItems();
+    const resourceItems = this.allResourcesNames.map(resourceName => ({
+      text: resourceName,
+      value: resourceName,
+    }));
+    this.autoCompleteData = [...resourceSourceItems, ...resourceItems];
   }
 
   _addFrom = (source: ResourceSource) => {
@@ -129,7 +120,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         project.getResourcesManager().addResource(resource);
 
         this._loadFrom(project.getResourcesManager());
-        this._onUpdate(resource.getName());
+        this._onChangeResourceName(resource.getName());
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
@@ -141,32 +132,18 @@ export default class ResourceSelector extends React.Component<Props, State> {
       });
   };
 
-  _onUpdate = (searchText: string) => {
+  _onChangeResourceName = (resourceName: string) => {
     this.setState(
       {
-        resourceName: searchText,
-        notExistingError: this.allResourcesNames.indexOf(searchText) === -1,
+        resourceName,
+        notExistingError: this.allResourcesNames.indexOf(resourceName) === -1,
       },
       () => {
         if (!this.state.notExistingError) {
-          if (this.props.onChange) this.props.onChange(searchText);
+          if (this.props.onChange) this.props.onChange(resourceName);
         }
-
-        // Keep focusing the field after choosing something (won't do anything
-        // if we're just typing text).
-        this.focus();
       }
     );
-  };
-
-  _onItemChosen = (text: string, index: number) => {
-    if (index === -1 || index >= this.defaultItems.length)
-      return this._onUpdate(text);
-
-    // We're now sure that onClick is defined
-    // $FlowFixMe
-    const onClick = this.defaultItems[index].onClick;
-    if (onClick) onClick();
   };
 
   _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
@@ -243,18 +220,15 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
     return (
       <div style={styles.container}>
-        <AutoComplete
-          {...defaultAutocompleteProps}
+        <SemiControlledAutoComplete
           floatingLabelText={this.props.floatingLabelText}
           hintText={this.props.hintText}
           openOnFocus
           dataSource={this.autoCompleteData || []}
-          onUpdateInput={this._onUpdate}
-          onNewRequest={this._onItemChosen}
+          value={this.state.resourceName}
+          onChange={this._onChangeResourceName}
           errorText={errorText}
-          searchText={this.state.resourceName}
           fullWidth={this.props.fullWidth}
-          style={styles.autoComplete}
           ref={autoComplete => (this._autoComplete = autoComplete)}
         />
         {!!externalEditors.length && (

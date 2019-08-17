@@ -5,7 +5,7 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #include "PathfindingObstacleBehavior.h"
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/Serialization/SerializerElement.h"
 

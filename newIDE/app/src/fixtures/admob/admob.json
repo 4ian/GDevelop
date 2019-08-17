@@ -704,6 +704,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -745,6 +746,7 @@
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -760,6 +762,7 @@
         },
         {
           "name": "LoadAtTop",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -798,6 +801,7 @@
         },
         {
           "name": "LoadAtBottom",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -836,6 +840,7 @@
         },
         {
           "name": "Show",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -874,6 +879,7 @@
         },
         {
           "name": "Hide",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -912,6 +918,7 @@
         },
         {
           "name": "LoadAtTopAndDisplay",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -950,6 +957,7 @@
         },
         {
           "name": "LoadAtBottomAndDisplay",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -988,6 +996,7 @@
         },
         {
           "name": "Remove",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1029,6 +1038,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1047,6 +1057,7 @@
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1062,6 +1073,7 @@
         },
         {
           "name": "GoToInterstitials",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1100,6 +1112,7 @@
         },
         {
           "name": "GoToRewardVideos",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2471,6 +2484,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2512,6 +2526,7 @@
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2527,6 +2542,7 @@
         },
         {
           "name": "Load",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2565,6 +2581,7 @@
         },
         {
           "name": "Display",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2603,6 +2620,7 @@
         },
         {
           "name": "LoadAndDisplay",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2644,6 +2662,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2662,6 +2681,7 @@
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2677,6 +2697,7 @@
         },
         {
           "name": "GoToBanners",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2715,6 +2736,7 @@
         },
         {
           "name": "GoToRewardVideos",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3736,6 +3758,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3777,6 +3800,7 @@
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3792,6 +3816,7 @@
         },
         {
           "name": "Load",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3830,6 +3855,7 @@
         },
         {
           "name": "Display",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3868,6 +3894,7 @@
         },
         {
           "name": "LoadAndDisplay",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3906,6 +3933,7 @@
         },
         {
           "name": "ClaimReward",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3947,6 +3975,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3965,6 +3994,7 @@
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3980,6 +4010,7 @@
         },
         {
           "name": "GoToBanners",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4018,6 +4049,7 @@
         },
         {
           "name": "GoToInterstitials",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],

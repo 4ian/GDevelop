@@ -4,6 +4,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type EventsScope } from '../EventsScope.flow';
 
 type CommonProps = {|
   // The parameter
@@ -13,7 +14,7 @@ type CommonProps = {|
 
   // Context
   project?: gdProject,
-  layout?: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   isInline?: boolean,

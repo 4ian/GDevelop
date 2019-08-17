@@ -13,6 +13,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { mapFor } from '../../../Utils/MapFor';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog from '../../../UI/Dialog';
+import HelpButton from '../../../UI/HelpButton';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
@@ -31,6 +32,7 @@ import {
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { Column, Line } from '../../../UI/Grid';
 
 const gd = global.gd;
 
@@ -44,31 +46,29 @@ const styles = {
   animationTools: {
     flexShrink: 0,
   },
-  lastLine: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   addAnimation: {
     display: 'flex',
   },
-  addAnimationText: {
-    justifyContent: 'flex-end',
+  buttonRightMargin: {
+    marginRight: 4,
   },
 };
 
 const AddAnimationLine = ({ onAdd, extraTools }) => (
-  <div style={styles.lastLine}>
-    {extraTools}
-    <div style={styles.addAnimation}>
-      <EmptyMessage style={styles.addAnimationText}>
-        Click to add an animation:
-      </EmptyMessage>
-      <IconButton onClick={onAdd}>
-        <Add />
-      </IconButton>
-    </div>
-  </div>
+  <Column>
+    <Line justifyContent="space-between" expand>
+      {extraTools}
+      <div style={styles.addAnimation}>
+        <RaisedButton
+          label={<Trans>Add an animation</Trans>}
+          primary
+          onClick={onAdd}
+          labelPosition="before"
+          icon={<Add />}
+        />
+      </div>
+    </Line>
+  </Column>
 );
 
 type AnimationProps = {|
@@ -342,6 +342,14 @@ class AnimationsListContainer extends React.Component<
   render() {
     return (
       <div>
+        {this.props.spriteObject.getAnimationsCount() === 0 && (
+          <EmptyMessage>
+            <Trans>
+              This object has no animations containing images. Start by adding
+              an animation.
+            </Trans>
+          </EmptyMessage>
+        )}
         <SortableAnimationsList
           spriteObject={this.props.spriteObject}
           objectName={this.props.objectName}
@@ -445,6 +453,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
+                style={styles.buttonRightMargin}
               />
               <RaisedButton
                 label={<Trans>Edit points</Trans>}
@@ -464,6 +473,12 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 onClick={() => this.openPointsEditor(false)}
               />
             }
+            secondaryActions={[
+              <HelpButton
+                helpPagePath="/objects/sprite/edit-points"
+                key="help"
+              />,
+            ]}
             autoScrollBodyContent
             noMargin
             modal
@@ -490,6 +505,12 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 onClick={() => this.openCollisionMasksEditor(false)}
               />
             }
+            secondaryActions={[
+              <HelpButton
+                helpPagePath="/objects/sprite/collision-mask"
+                key="help"
+              />,
+            ]}
             autoScrollBodyContent
             noMargin
             modal

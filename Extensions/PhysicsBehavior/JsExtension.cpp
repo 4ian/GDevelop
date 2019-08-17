@@ -135,7 +135,7 @@ class PhysicsBehaviorJsExtension : public gd::PlatformExtension {
             .AddParameter("object", _("Object"))
             .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
             .AddParameter("relationalOperator", _("Comparison sign"))
-            .AddParameter("expression", _("Value to test"))
+            .AddParameter("expression", _("Value to compare"))
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
 
@@ -150,7 +150,7 @@ class PhysicsBehaviorJsExtension : public gd::PlatformExtension {
             .AddParameter("object", _("Object"))
             .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
             .AddParameter("relationalOperator", _("Comparison sign"))
-            .AddParameter("expression", _("Value to test"))
+            .AddParameter("expression", _("Value to compare"))
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("GetPolygonScaleY").SetManipulatedType("number").SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
 

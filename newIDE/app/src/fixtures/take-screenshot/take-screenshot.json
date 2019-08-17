@@ -234,6 +234,7 @@
       "objects": [
         {
           "name": "GDLogo",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -275,6 +276,7 @@
           "italic": false,
           "name": "Description",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -290,6 +292,7 @@
         },
         {
           "name": "Button",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -331,6 +334,7 @@
           "italic": false,
           "name": "ScreenshotPath",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

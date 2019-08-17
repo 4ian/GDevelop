@@ -12,6 +12,8 @@ import NewBehaviorDialog from './NewBehaviorDialog';
 import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import { isNullPtr } from '../Utils/IsNullPtr';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from 'material-ui/RaisedButton';
 const gd = global.gd;
 
 const styles = {
@@ -30,14 +32,17 @@ const styles = {
   },
 };
 const AddBehaviorLine = ({ onAdd }) => (
-  <div style={styles.addBehaviorLine}>
-    <EmptyMessage style={styles.addBehaviorText}>
-      Click to add a behavior to the object:
-    </EmptyMessage>
-    <IconButton onClick={onAdd}>
-      <Add />
-    </IconButton>
-  </div>
+  <Column>
+    <Line justifyContent="flex-end" expand>
+      <RaisedButton
+        label={<Trans>Add a behavior to the object</Trans>}
+        primary
+        onClick={onAdd}
+        labelPosition="before"
+        icon={<Add />}
+      />
+    </Line>
+  </Column>
 );
 
 export default class BehaviorsEditor extends Component {

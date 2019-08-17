@@ -46,7 +46,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(
       .AddParameter("expression", _("Joystick number (first joystick: 0)"))
       .AddParameter("joyaxis", _("Axis"))
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .SetManipulatedType("number");
 
   extension

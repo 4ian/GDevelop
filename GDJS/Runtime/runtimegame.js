@@ -26,6 +26,9 @@ gdjs.RuntimeGame = function(data, spec) {
   this._fontManager = new gdjs.FontManager(
     data.resources ? data.resources.resources : undefined
   );
+  this._jsonManager = new gdjs.JsonManager(
+    data.resources ? data.resources.resources : undefined
+  );
   this._maxFPS = data ? parseInt(data.properties.maxFPS, 10) : 60;
   this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
@@ -102,6 +105,15 @@ gdjs.RuntimeGame.prototype.getFontManager = function() {
  */
 gdjs.RuntimeGame.prototype.getInputManager = function() {
   return this._inputManager;
+};
+
+/**
+ * Get the JSON manager of the game, used to load JSON from game
+ * resources.
+ * @return {gdjs.JsonManager} The json manager for the game
+ */
+gdjs.RuntimeGame.prototype.getJsonManager = function() {
+  return this._jsonManager;
 };
 
 /**

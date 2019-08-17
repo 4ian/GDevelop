@@ -1,17 +1,14 @@
 // @flow
 import * as React from 'react';
 import EventsTree from './EventsTree';
+import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu from '../UI/Menu/ContextMenu';
-import Clipboard from '../Utils/Clipboard';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
+import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type HistoryState,
   undo,
@@ -40,7 +37,6 @@ import {
   clearSelection,
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
-  getSelectedInstructionsListsContexts,
   selectInstructionsList,
 } from './SelectionHandler';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
@@ -67,13 +63,21 @@ import {
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
+import { type EventsScope } from './EventsScope.flow';
+import {
+  pasteEventsFromClipboardInSelection,
+  copySelectionToClipboard,
+  pasteInstructionsFromClipboardInSelection,
+  hasClipboardEvents,
+  hasClipboardActions,
+  hasClipboardConditions,
+  pasteInstructionsFromClipboardInInstructionsList,
+} from './ClipboardKind';
 const gd = global.gd;
-
-const CLIPBOARD_KIND = 'EventsAndInstructions';
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
@@ -105,7 +109,7 @@ type State = {|
     isCondition: boolean,
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
-    indexInList: number,
+    indexInList: ?number,
   },
   editedParameter: {
     // TODO: This could be adapted to be a ParameterContext
@@ -341,7 +345,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     return newEvents;
   };
 
-  openInstructionEditor = (instructionContext: InstructionContext) => {
+  openInstructionEditor = (
+    instructionContext: InstructionContext | InstructionsListContext
+  ) => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
       console.warn(
@@ -356,7 +362,10 @@ export default class EventsSheet extends React.Component<Props, State> {
         instruction: instructionContext.instruction
           ? instructionContext.instruction.clone()
           : new gd.Instruction(),
-        indexInList: instructionContext.indexInList,
+        indexInList:
+          instructionContext.indexInList !== undefined
+            ? instructionContext.indexInList
+            : undefined,
       },
     });
   };
@@ -570,23 +579,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   copySelection = () => {
-    const eventsList = new gd.EventsList();
-    const instructionsList = new gd.InstructionsList();
-
-    getSelectedEvents(this.state.selection).forEach(event =>
-      eventsList.insertEvent(event, eventsList.getEventsCount())
-    );
-    getSelectedInstructions(this.state.selection).forEach(instruction =>
-      instructionsList.insert(instruction, instructionsList.size())
-    );
-
-    Clipboard.set(CLIPBOARD_KIND, {
-      eventsList: serializeToJSObject(eventsList),
-      instructionsList: serializeToJSObject(instructionsList),
-    });
-
-    eventsList.delete();
-    instructionsList.delete();
+    copySelectionToClipboard(this.state.selection);
   };
 
   cutSelection = () => {
@@ -596,27 +589,13 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   pasteEvents = () => {
     if (
-      !hasEventSelected(this.state.selection) ||
-      !Clipboard.has(CLIPBOARD_KIND)
-    )
+      !pasteEventsFromClipboardInSelection(
+        this.props.project,
+        this.state.selection
+      )
+    ) {
       return;
-
-    const eventsList = new gd.EventsList();
-    unserializeFromJSObject(
-      eventsList,
-      Clipboard.get(CLIPBOARD_KIND).eventsList,
-      'unserializeFrom',
-      this.props.project
-    );
-    getSelectedEventContexts(this.state.selection).forEach(eventContext => {
-      eventContext.eventsList.insertEvents(
-        eventsList,
-        0,
-        eventsList.getEventsCount(),
-        eventContext.indexInList
-      );
-    });
-    eventsList.delete();
+    }
 
     this._saveChangesToHistory(() => {
       if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -625,40 +604,13 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   pasteInstructions = () => {
     if (
-      (!hasInstructionSelected(this.state.selection) &&
-        !hasInstructionsListSelected(this.state.selection)) ||
-      !Clipboard.has(CLIPBOARD_KIND)
-    )
+      !pasteInstructionsFromClipboardInSelection(
+        this.props.project,
+        this.state.selection
+      )
+    ) {
       return;
-
-    const instructionsList = new gd.InstructionsList();
-    unserializeFromJSObject(
-      instructionsList,
-      Clipboard.get(CLIPBOARD_KIND).instructionsList,
-      'unserializeFrom',
-      this.props.project
-    );
-    getSelectedInstructionsContexts(this.state.selection).forEach(
-      instructionContext => {
-        instructionContext.instrsList.insertInstructions(
-          instructionsList,
-          0,
-          instructionsList.size(),
-          instructionContext.indexInList
-        );
-      }
-    );
-    getSelectedInstructionsListsContexts(this.state.selection).forEach(
-      instructionsListContext => {
-        instructionsListContext.instrsList.insertInstructions(
-          instructionsList,
-          0,
-          instructionsList.size(),
-          instructionsListContext.instrsList.size()
-        );
-      }
-    );
-    instructionsList.delete();
+    }
 
     this._saveChangesToHistory(() => {
       if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -671,6 +623,23 @@ export default class EventsSheet extends React.Component<Props, State> {
       this.pasteInstructions();
     else if (hasInstructionsListSelected(this.state.selection))
       this.pasteInstructions();
+  };
+
+  pasteInstructionsInInstructionsList = (
+    instructionsListContext: InstructionsListContext
+  ) => {
+    if (
+      !pasteInstructionsFromClipboardInInstructionsList(
+        this.props.project,
+        instructionsListContext
+      )
+    ) {
+      return;
+    }
+
+    this._saveChangesToHistory(() => {
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    });
   };
 
   _invertSelectedConditions = () => {
@@ -835,10 +804,68 @@ export default class EventsSheet extends React.Component<Props, State> {
     this._saveChangesToHistory();
   };
 
+  _renderInstructionEditorDialog = (newInstructionEditorDialog: boolean) => {
+    const {
+      project,
+      scope,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
+
+    const Dialog = newInstructionEditorDialog
+      ? NewInstructionEditorDialog
+      : InstructionEditorDialog;
+
+    return this.state.editedInstruction.instruction ? (
+      <Dialog
+        project={project}
+        scope={scope}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
+        instruction={this.state.editedInstruction.instruction}
+        isCondition={this.state.editedInstruction.isCondition}
+        isNewInstruction={
+          this.state.editedInstruction.indexInList === undefined
+        }
+        open={true}
+        onCancel={() => this.closeInstructionEditor()}
+        onSubmit={() => {
+          const {
+            instrsList,
+            instruction,
+            indexInList,
+          } = this.state.editedInstruction;
+          if (!instrsList) return;
+
+          if (indexInList !== undefined) {
+            // Replace an existing instruction
+            instrsList.set(indexInList, instruction);
+          } else {
+            // Add a new instruction
+            instrsList.insert(instruction, instrsList.size());
+          }
+
+          this.closeInstructionEditor(true);
+          ensureSingleOnceInstructions(instrsList);
+          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+        }}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
+        resourceExternalEditors={this.props.resourceExternalEditors}
+        openInstructionOrExpression={(extension, type) => {
+          this.closeInstructionEditor();
+          this.props.openInstructionOrExpression(extension, type);
+        }}
+      />
+    ) : (
+      undefined
+    );
+  };
+
   render() {
     const {
       project,
-      layout,
+      scope,
       events,
       onOpenExternalEvents,
       onOpenLayout,
@@ -878,7 +905,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                   key={events.ptr}
                   events={events}
                   project={project}
-                  layout={layout}
+                  scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   selection={this.state.selection}
@@ -889,6 +916,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                     this.openInstructionsListContextMenu
                   }
                   onAddNewInstruction={this.openInstructionEditor}
+                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
                   onMoveToInstruction={this.moveSelectionToInstruction}
                   onMoveToInstructionsList={
                     this.moveSelectionToInstructionsList
@@ -940,7 +968,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                   anchorEl={this.state.inlineEditingAnchorEl}
                   onRequestClose={this.closeParameterEditor}
                   project={project}
-                  layout={layout}
+                  scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   isCondition={this.state.editedParameter.isCondition}
@@ -979,7 +1007,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                     {
                       label: 'Paste',
                       click: () => this.pasteEvents(),
-                      enabled: Clipboard.has(CLIPBOARD_KIND),
+                      enabled: hasClipboardEvents(),
                       accelerator: 'CmdOrCtrl+V',
                     },
                     {
@@ -1054,7 +1082,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                     {
                       label: 'Paste',
                       click: () => this.pasteInstructions(),
-                      enabled: Clipboard.has(CLIPBOARD_KIND),
+                      enabled:
+                        hasClipboardConditions() || hasClipboardActions(),
                       accelerator: 'CmdOrCtrl+V',
                     },
                     { type: 'separator' },
@@ -1093,7 +1122,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                     {
                       label: 'Paste',
                       click: () => this.pasteInstructions(),
-                      enabled: Clipboard.has(CLIPBOARD_KIND),
+                      enabled:
+                        hasClipboardConditions() || hasClipboardActions(),
                       accelerator: 'CmdOrCtrl+V',
                     },
                     { type: 'separator' },
@@ -1111,48 +1141,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                     },
                   ]}
                 />
-                {this.state.editedInstruction.instruction && (
-                  <InstructionEditorDialog
-                    project={project}
-                    layout={layout}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    instruction={this.state.editedInstruction.instruction}
-                    isCondition={this.state.editedInstruction.isCondition}
-                    isNewInstruction={
-                      this.state.editedInstruction.indexInList === undefined
-                    }
-                    open={true}
-                    onCancel={() => this.closeInstructionEditor()}
-                    onSubmit={() => {
-                      const {
-                        instrsList,
-                        instruction,
-                        indexInList,
-                      } = this.state.editedInstruction;
-                      if (!instrsList) return;
-
-                      if (indexInList !== undefined) {
-                        // Replace an existing instruction
-                        instrsList.set(indexInList, instruction);
-                      } else {
-                        // Add a new instruction
-                        instrsList.insert(instruction, instrsList.size());
-                      }
-
-                      this.closeInstructionEditor(true);
-                      ensureSingleOnceInstructions(instrsList);
-                      if (this._eventsTree)
-                        this._eventsTree.forceEventsUpdate();
-                    }}
-                    resourceSources={this.props.resourceSources}
-                    onChooseResource={this.props.onChooseResource}
-                    resourceExternalEditors={this.props.resourceExternalEditors}
-                    openInstructionOrExpression={(extension, type) => {
-                      this.closeInstructionEditor();
-                      this.props.openInstructionOrExpression(extension, type);
-                    }}
-                  />
+                {this._renderInstructionEditorDialog(
+                  values.useNewInstructionEditorDialog
                 )}
                 {this.state.analyzedEventsContextResult && (
                   <EventsContextAnalyzerDialog

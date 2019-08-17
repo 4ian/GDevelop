@@ -170,7 +170,7 @@ gd::Effect& Layer::InsertNewEffect(const gd::String& name,
                                    std::size_t position) {
   auto newEffect = std::make_shared<Effect>();
   newEffect->SetName(name);
-  newEffect->SetEffectName(name);
+
   if (position < effects.size())
     effects.insert(effects.begin() + position, newEffect);
   else

@@ -28,7 +28,7 @@ type Props = {
   selected: true,
   onItemSelected: () => void,
   errorStatus: '' | 'error' | 'warning',
-  buildMenuTemplate: () => any,
+  buildMenuTemplate: () => Array<any>,
 };
 
 class ThemableItemRow extends React.Component<Props, *> {

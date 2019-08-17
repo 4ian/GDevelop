@@ -82,6 +82,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
       event => this._editor && this._editor.save()
     );
     ipcRenderer.on(
+      ('main-menu-save-as': MainMenuEvent),
+      event => this._editor && this._editor.saveAs()
+    );
+    ipcRenderer.on(
       ('main-menu-close': MainMenuEvent),
       event => this._editor && this._editor.askToCloseProject(() => {})
     );
@@ -158,7 +162,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         },
         {
           label: i18n._(t`Save as...`),
-          enabled: false, // TODO: Unimplemented for now
+          accelerator: 'CommandOrControl+Alt+S',
           onClickSendEvent: 'main-menu-save-as',
         },
         { type: 'separator' },

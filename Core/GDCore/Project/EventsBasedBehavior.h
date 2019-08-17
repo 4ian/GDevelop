@@ -8,6 +8,8 @@
 #define GDCORE_EVENTSBASEDBEHAVIOR_H
 
 #include <vector>
+#include "GDCore/Project/NamedPropertyDescriptor.h"
+#include "GDCore/Tools/SerializableWithNameList.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -105,6 +107,36 @@ class GD_CORE_API EventsBasedBehavior {
     return eventsFunctionsContainer;
   }
 
+  /**
+   * \brief Return a reference to the list of the properties.
+   */
+  SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors() {
+    return propertyDescriptors;
+  }
+
+  /**
+   * \brief Return a const reference to the list of the properties.
+   */
+  const SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors()
+      const {
+    return propertyDescriptors;
+  }
+
+  /**
+   * \brief Get the name of the action to change a property.
+   */
+  static gd::String GetPropertyActionName(const gd::String& propertyName) { return "SetProperty" + propertyName; };
+
+  /**
+   * \brief Get the name of the condition to compare a property.
+   */
+  static gd::String GetPropertyConditionName(const gd::String& propertyName) { return "Property" + propertyName; };
+
+  /**
+   * \brief Get the name of the expression to get a property.
+   */
+  static gd::String GetPropertyExpressionName(const gd::String& propertyName) { return "Property" + propertyName; };
+
   /** \name Serialization
    */
   ///@{
@@ -126,6 +158,7 @@ class GD_CORE_API EventsBasedBehavior {
   gd::String description;
   gd::String objectType;
   gd::EventsFunctionsContainer eventsFunctionsContainer;
+  SerializableWithNameList<NamedPropertyDescriptor> propertyDescriptors;
 };
 
 }  // namespace gd

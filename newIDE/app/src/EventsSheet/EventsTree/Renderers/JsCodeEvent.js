@@ -133,9 +133,8 @@ export default class JsCodeEvent extends React.Component<
           : ' /* Click here to choose objects to pass to JavaScript */'}
       </span>
     );
-    // "eventsFunctionContext" is passed when existing, which is the case
-    // when there is no layout, i.e: when we are in an event function.
-    const eventsFunctionContext = !this.props.layout ? (
+
+    const eventsFunctionContext = this.props.scope.eventsFunction ? (
       <span>, eventsFunctionContext</span>
     ) : null;
 
@@ -192,7 +191,7 @@ export default class JsCodeEvent extends React.Component<
           >
             <ObjectField
               project={this.props.project}
-              layout={this.props.layout}
+              scope={this.props.scope}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
               value={parameterObjects}

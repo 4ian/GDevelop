@@ -37,6 +37,8 @@ export default (
       );
     };
 
+    if (property.isHidden()) return null;
+
     if (valueType === 'number') {
       return {
         name,

@@ -8,7 +8,7 @@ const AddLayerRow = ({ onAdd }) => (
   <TableRow key="add-row">
     <TableRowColumn style={styles.handleColumn} />
     <TableRowColumn />
-    <TableRowColumn style={styles.visibleColumn} />
+    <TableRowColumn style={styles.effectsColumn} />
     <TableRowColumn style={styles.toolColumn}>
       <IconButton onClick={onAdd}>
         <Add />

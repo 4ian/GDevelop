@@ -11,6 +11,7 @@ import LinearProgress from 'material-ui/LinearProgress';
 import { GDevelopHostingApi } from '../../Utils/GDevelopServices/ApiConfigs';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import TextField from 'material-ui/TextField';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -106,8 +107,10 @@ export default class LocalS3Export extends Component {
         });
       })
       .catch(err => {
-        console.error(err);
-        /*TODO: error*/
+        showErrorBox(
+          'An error occured while exporting the game online. Please check your internet connection and try again.',
+          err
+        );
       })
       .then(() =>
         this.setState({
@@ -123,7 +126,7 @@ export default class LocalS3Export extends Component {
   renderUrl = () => {
     return (
       <Line alignItems="baseline">
-        You game is available here:
+        <Trans>You game is available here:</Trans>
         <Spacer />
         <TextField value={this.state.url} style={{ flex: 1 }} />
         <Spacer />

@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -46,6 +46,9 @@ type Props = {|
     eventsBasedBehavior: gdEventsBasedBehavior,
     newName: string,
     cb: (boolean) => void
+  ) => void,
+  onEventsBasedBehaviorRenamed: (
+    eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
 |};
@@ -123,6 +126,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
         if (!doRename) return;
         eventsBasedBehavior.setName(newName);
         this.forceUpdate();
+        this.props.onEventsBasedBehaviorRenamed(eventsBasedBehavior);
       }
     );
   };

@@ -2,11 +2,11 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import { Line, Column } from '../../UI/Grid';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { type EditorProps } from './EditorProps.flow';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -55,67 +55,73 @@ export default class PanelSpriteEditor extends React.Component<
           />
         </Line>
         <Line>
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Top margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getTopMargin()}
-            onChange={(e, value) => {
-              panelSpriteObject.setTopMargin(parseInt(value, 10));
+            onChange={value => {
+              panelSpriteObject.setTopMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Bottom margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getBottomMargin()}
-            onChange={(e, value) => {
-              panelSpriteObject.setBottomMargin(parseInt(value, 10));
+            onChange={value => {
+              panelSpriteObject.setBottomMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
         </Line>
         <Line>
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Left margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getLeftMargin()}
-            onChange={(e, value) => {
-              panelSpriteObject.setLeftMargin(parseInt(value, 10));
+            onChange={value => {
+              panelSpriteObject.setLeftMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Right margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getRightMargin()}
-            onChange={(e, value) => {
-              panelSpriteObject.setRightMargin(parseInt(value, 10));
+            onChange={value => {
+              panelSpriteObject.setRightMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
         </Line>
         <Line>
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getWidth()}
-            onChange={(e, value) => {
-              panelSpriteObject.setWidth(parseInt(value, 10));
+            onChange={value => {
+              panelSpriteObject.setWidth(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Default height (in pixels)</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getHeight()}
-            onChange={(e, value) => {
-              panelSpriteObject.setHeight(parseInt(value, 10));
+            onChange={value => {
+              panelSpriteObject.setHeight(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />

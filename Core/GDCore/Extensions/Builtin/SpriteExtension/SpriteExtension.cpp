@@ -319,7 +319,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetManipulatedType("number");
 
@@ -333,7 +333,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetManipulatedType("number");
 
@@ -348,7 +348,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsSimple()
       .SetManipulatedType("number");
 
@@ -365,7 +365,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression",
-                    _("Value to test (0: Alpha, 1: Add, 2: Multiply, 3: None)"))
+                    _("Value to compare (0: Alpha, 1: Add, 2: Multiply, 3: None)"))
       .MarkAsAdvanced()
       .SetManipulatedType("number");
 

@@ -400,6 +400,7 @@
       "objects": [
         {
           "name": "Video",
+          "tags": "",
           "type": "Video::VideoObject",
           "variables": [
             {
@@ -414,8 +415,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "content": {
@@ -427,6 +427,7 @@
         },
         {
           "name": "State_video",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -438,8 +439,7 @@
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -679,6 +679,7 @@
         },
         {
           "name": "Play_Pause",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -862,6 +863,7 @@
         },
         {
           "name": "Volume_Background_Transparent",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -900,6 +902,7 @@
         },
         {
           "name": "Volume_Background_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -938,6 +941,7 @@
         },
         {
           "name": "Volume_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -976,6 +980,7 @@
         },
         {
           "name": "VOLUME_CIRCLE",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1014,6 +1019,7 @@
         },
         {
           "name": "Fullscreen",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1052,6 +1058,7 @@
         },
         {
           "name": "Prevent_click",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1090,6 +1097,7 @@
         },
         {
           "name": "Cursor",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1128,6 +1136,7 @@
         },
         {
           "name": "Sound",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1224,6 +1233,7 @@
         },
         {
           "name": "Time_Background_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1262,6 +1272,7 @@
         },
         {
           "name": "Time_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1300,6 +1311,7 @@
         },
         {
           "name": "Time_Circle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1341,6 +1353,7 @@
           "italic": false,
           "name": "DEBUG_VIDEO",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1359,6 +1372,7 @@
           "italic": false,
           "name": "TimeCode",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1374,6 +1388,7 @@
         },
         {
           "name": "DEBUG_CIRCLE",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1415,6 +1430,7 @@
           "italic": false,
           "name": "Explain",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1430,6 +1446,7 @@
         },
         {
           "name": "Looped",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1500,6 +1517,7 @@
           "italic": false,
           "name": "Credit",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1518,6 +1536,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -5307,7 +5326,8 @@
                   "folded": false,
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": "window.scene = runtimeScene;\nvariables = scene.getVariables();\n\n//currenttime of video object, for more see DEBUG group\ncurrentTime = Math.round(variables.get(\"exp_currentTime\").getAsNumber());\ncurrentTime_formated = variables.get(\"currentTime_formated\");\n\n//duration of video object, for more see debug group\nduration = Math.round(variables.get(\"exp_duration\").getAsNumber());\nduration_formated = variables.get(\"duration_formated\"); //this init the variable\n\n\n\nfunction format_time(time_second) {\n    if (Number.isInteger(time_second)) {\n        date = new Date(null);\n        date.setSeconds(time_second);\n        if (time_second >= 3600) {\n            return date.toISOString().substr(11, 8); // MM:SS\n        } else {\n            return date.toISOString().substr(14, 5); // HH:MM:SS\n        }\n\n\n    }\n}\n\n//update the new variables with time formated, ready to use in this group Time display\nduration_formated.setString(format_time(duration));\ncurrentTime_formated.setString(format_time(currentTime));\n\n",
-                  "parameterObjects": ""
+                  "parameterObjects": "",
+                  "useStrict": false
                 },
                 {
                   "disabled": false,
@@ -6063,10 +6083,13 @@
   "externalEvents": [],
   "eventsFunctionsExtensions": [
     {
+      "author": "",
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
       "name": "Utils",
+      "shortDescription": "",
+      "tags": "",
       "version": "",
       "eventsFunctions": [
         {
@@ -6246,7 +6269,8 @@
           ],
           "objectGroups": []
         }
-      ]
+      ],
+      "eventsBasedBehaviors": []
     }
   ],
   "externalLayouts": [],

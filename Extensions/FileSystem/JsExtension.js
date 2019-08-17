@@ -296,7 +296,7 @@ module.exports = {
       .addAction(
         'DeleteFileAsync',
         _('Delete a file (Async)'),
-        _('Delete a file from the filesystem asyncrounouse.'),
+        _('Delete a file from the filesystem asynchronously. The option result variable will be updated once the file is deleted.'),
         _('Delete the file _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_delete_file24.png',

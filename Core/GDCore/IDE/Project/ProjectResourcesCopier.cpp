@@ -1,6 +1,6 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
 #include "ProjectResourcesCopier.h"
@@ -22,13 +22,11 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
     AbstractFileSystem& fs,
     gd::String destinationDirectory,
     bool updateOriginalProject,
-    wxProgressDialog* optionalProgressDialog,
-    bool askAboutAbsoluteFilenames,
+    bool preserveAbsoluteFilenames,
     bool preserveDirectoryStructure) {
   // Check if there are some resources with absolute filenames
   gd::ResourcesAbsolutePathChecker absolutePathChecker(fs);
   originalProject.ExposeResources(absolutePathChecker);
-  bool copyAlsoResourcesWithAbsolutePath = !askAboutAbsoluteFilenames;
 
   auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
   std::cout << "Copying all ressources from " << projectDirectory << " to "
@@ -40,7 +38,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
   resourcesMergingHelper.PreserveDirectoriesStructure(
       preserveDirectoryStructure);
   resourcesMergingHelper.PreserveAbsoluteFilenames(
-      !copyAlsoResourcesWithAbsolutePath);
+      preserveAbsoluteFilenames);
 
   if (updateOriginalProject) {
     originalProject.ExposeResources(resourcesMergingHelper);

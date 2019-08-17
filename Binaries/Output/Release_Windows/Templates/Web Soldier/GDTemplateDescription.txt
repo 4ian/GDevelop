@@ -1,4 +1,0 @@
-GDevelop JS platform
-Web Soldier game
-2D shooter game where the player is controlling a soldier
-on a battlefield.

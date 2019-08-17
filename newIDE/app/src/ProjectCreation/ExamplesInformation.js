@@ -472,23 +472,23 @@ module.exports = {
     ]
   },
   "breakout": {
-    "description": "The classic Breakout arcade game adapted in GDevelop.",
+    "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
         "name": "Sprite"
       },
       {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
+        "fullName": "Text object",
+        "name": "TextObject"
       },
       {
-        "fullName": "System information",
-        "name": "SystemInfo"
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
+        "fullName": "",
+        "name": ""
       },
       {
         "fullName": "Keyboard features",
@@ -499,8 +499,12 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "External layouts",
@@ -757,67 +761,6 @@ module.exports = {
       {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
-      }
-    ]
-  },
-  "controller-input": {
-    "description": "Use JavaScript to read the state of a gamepad and use it in your game.",
-    "usedExtensions": [
-      {
-        "fullName": "Sprite",
-        "name": "Sprite"
-      },
-      {
-        "fullName": "Tiled Sprite Object",
-        "name": "TiledSpriteObject"
-      },
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Platform Behavior",
-        "name": "PlatformBehavior"
-      },
-      {
-        "fullName": "Anchor",
-        "name": "AnchorBehavior"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "System information",
-        "name": "SystemInfo"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Audio",
-        "name": "BuiltinAudio"
-      },
-      {
-        "fullName": "Cameras and layers features",
-        "name": "BuiltinCamera"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
       }
     ]
   },
@@ -1223,6 +1166,47 @@ module.exports = {
       {
         "fullName": "Facebook Instant Games",
         "name": "FacebookInstantGames"
+      }
+    ]
+  },
+  "filesystem-create-directory": {
+    "description": "Show how to ask the user for a folder name and create it on the disk.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Text entry object",
+        "name": "TextEntryObject"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Filesystem",
+        "name": "FileSystem"
       }
     ]
   },
@@ -1746,6 +1730,23 @@ module.exports = {
       }
     ]
   },
+  "menu-with-functions-and-text-effects": {
+    "description": "How to implement the same menu across multiple scenes using functions and text effects for hover/active states.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      }
+    ]
+  },
   "move-camera-to-position": {
     "description": "This shows how to move the camera to the position of an object on a map.",
     "usedExtensions": [
@@ -1909,6 +1910,71 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "multiplayer-platformer-with-gamepads": {
+    "description": "Example showing how to use the Gamepads extension to read the state of gamepads (or controllers), for 2 players.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Anchor",
+        "name": "AnchorBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },
@@ -3117,6 +3183,63 @@ module.exports = {
       }
     ]
   },
+  "simple-space-shooter": {
+    "description": "An older, simple space shooter demo, made without any behaviors from extensions. Prefer taking a look at the Space Shooter starter to learn about useful behaviors and patterns for making your games.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      }
+    ]
+  },
   "snap-object-to-grid": {
     "description": "Example showing how to create a grid and have objects snapped to the grid.",
     "usedExtensions": [
@@ -3216,7 +3339,7 @@ module.exports = {
     ]
   },
   "space-shooter": {
-    "description": "A space shooter game (Shoot 'em up) made with GDevelop.",
+    "description": "A beautiful, retro side-scrolling shooter where you must defeat incoming enemies with your mecha transforming spaceship. Huge boss included!\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -3227,109 +3350,48 @@ module.exports = {
         "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Top-down movement",
-        "name": "TopDownMovementBehavior"
-      },
-      {
-        "fullName": "Destroy Outside Screen Behavior",
-        "name": "DestroyOutsideBehavior"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "Time",
-        "name": "BuiltinTime"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Cameras and layers features",
-        "name": "BuiltinCamera"
-      },
-      {
-        "fullName": "Audio",
-        "name": "BuiltinAudio"
-      }
-    ]
-  },
-  "space-shooter-with-functions": {
-    "description": "The space shooter example with some events rewritten to be reusable functions (custom conditions/actions or expressions).",
-    "usedExtensions": [
-      {
-        "fullName": "Sprite",
-        "name": "Sprite"
-      },
-      {
-        "fullName": "Tiled Sprite Object",
-        "name": "TiledSpriteObject"
-      },
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Top-down movement",
-        "name": "TopDownMovementBehavior"
-      },
-      {
-        "fullName": "Destroy Outside Screen Behavior",
-        "name": "DestroyOutsideBehavior"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "Time",
-        "name": "BuiltinTime"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Cameras and layers features",
-        "name": "BuiltinCamera"
-      },
-      {
-        "fullName": "Audio",
-        "name": "BuiltinAudio"
+        "fullName": "Panel Sprite (9-patch) Object",
+        "name": "PanelSpriteObject"
       },
       {
         "fullName": "",
         "name": ""
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       }
     ]
   },

@@ -371,6 +371,7 @@
       "objects": [
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -412,6 +413,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -430,6 +432,7 @@
           "italic": false,
           "name": "Start",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -445,6 +448,7 @@
         },
         {
           "name": "Pattern",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1548,11 +1552,14 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -1561,10 +1568,8 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "name": "PlatformerObject",
               "roundCoordinates": true,
               "slopeMaxAngle": 60,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -1603,6 +1608,7 @@
         },
         {
           "name": "Skin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1641,6 +1647,7 @@
         },
         {
           "name": "Follow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1680,16 +1687,17 @@
         {
           "height": 32,
           "name": "Platforms",
+          "tags": "",
           "texture": "Platforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -1697,6 +1705,7 @@
         {
           "height": 32,
           "name": "Spikes",
+          "tags": "",
           "texture": "Spikes.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -1709,6 +1718,7 @@
           "leftMargin": 0,
           "name": "Goal",
           "rightMargin": 0,
+          "tags": "",
           "texture": "Goal.png",
           "tiled": false,
           "topMargin": 0,
@@ -1719,6 +1729,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1758,16 +1769,17 @@
         {
           "height": 16,
           "name": "HalfPlatforms",
+          "tags": "",
           "texture": "HalfPlatforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -1821,6 +1833,7 @@
           "rendererParam2": 3,
           "rendererType": "Point",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
@@ -1830,6 +1843,7 @@
         },
         {
           "name": "Pattern",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1871,6 +1885,7 @@
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2845,11 +2860,14 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -2858,10 +2876,8 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "name": "PlatformerObject",
               "roundCoordinates": true,
               "slopeMaxAngle": 60,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -2900,6 +2916,7 @@
         },
         {
           "name": "Skin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2938,6 +2955,7 @@
         },
         {
           "name": "Follow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2977,16 +2995,17 @@
         {
           "height": 32,
           "name": "Platforms",
+          "tags": "",
           "texture": "Platforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -2994,6 +3013,7 @@
         {
           "height": 32,
           "name": "Spikes",
+          "tags": "",
           "texture": "Spikes.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -3006,6 +3026,7 @@
           "leftMargin": 0,
           "name": "Goal",
           "rightMargin": 0,
+          "tags": "",
           "texture": "Goal.png",
           "tiled": false,
           "topMargin": 0,
@@ -3016,6 +3037,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3055,16 +3077,17 @@
         {
           "height": 16,
           "name": "HalfPlatforms",
+          "tags": "",
           "texture": "HalfPlatforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -3118,6 +3141,7 @@
           "rendererParam2": 3,
           "rendererType": "Point",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
@@ -3127,6 +3151,7 @@
         },
         {
           "name": "Pattern",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3168,6 +3193,7 @@
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4130,11 +4156,14 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -4143,10 +4172,8 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "name": "PlatformerObject",
               "roundCoordinates": true,
               "slopeMaxAngle": 60,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -4185,6 +4212,7 @@
         },
         {
           "name": "Skin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4223,6 +4251,7 @@
         },
         {
           "name": "Follow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4262,16 +4291,17 @@
         {
           "height": 32,
           "name": "Platforms",
+          "tags": "",
           "texture": "Platforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -4279,6 +4309,7 @@
         {
           "height": 32,
           "name": "Spikes",
+          "tags": "",
           "texture": "Spikes.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -4291,6 +4322,7 @@
           "leftMargin": 0,
           "name": "Goal",
           "rightMargin": 0,
+          "tags": "",
           "texture": "Goal.png",
           "tiled": false,
           "topMargin": 0,
@@ -4301,6 +4333,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4340,16 +4373,17 @@
         {
           "height": 16,
           "name": "HalfPlatforms",
+          "tags": "",
           "texture": "HalfPlatforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -4403,6 +4437,7 @@
           "rendererParam2": 3,
           "rendererType": "Point",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
@@ -4412,6 +4447,7 @@
         },
         {
           "name": "Pattern",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4453,6 +4489,7 @@
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -5262,11 +5299,14 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -5275,10 +5315,8 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "name": "PlatformerObject",
               "roundCoordinates": true,
               "slopeMaxAngle": 60,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -5317,6 +5355,7 @@
         },
         {
           "name": "Skin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5355,6 +5394,7 @@
         },
         {
           "name": "Follow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5394,16 +5434,17 @@
         {
           "height": 32,
           "name": "Platforms",
+          "tags": "",
           "texture": "Platforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -5411,6 +5452,7 @@
         {
           "height": 32,
           "name": "Spikes",
+          "tags": "",
           "texture": "Spikes.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -5423,6 +5465,7 @@
           "leftMargin": 0,
           "name": "Goal",
           "rightMargin": 0,
+          "tags": "",
           "texture": "Goal.png",
           "tiled": false,
           "topMargin": 0,
@@ -5433,6 +5476,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5472,16 +5516,17 @@
         {
           "height": 16,
           "name": "HalfPlatforms",
+          "tags": "",
           "texture": "HalfPlatforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -5535,6 +5580,7 @@
           "rendererParam2": 3,
           "rendererType": "Point",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
@@ -5544,6 +5590,7 @@
         },
         {
           "name": "Pattern",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5585,6 +5632,7 @@
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6394,11 +6442,14 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -6407,10 +6458,8 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "name": "PlatformerObject",
               "roundCoordinates": true,
               "slopeMaxAngle": 60,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -6449,6 +6498,7 @@
         },
         {
           "name": "Skin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -6487,6 +6537,7 @@
         },
         {
           "name": "Follow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -6526,16 +6577,17 @@
         {
           "height": 32,
           "name": "Platforms",
+          "tags": "",
           "texture": "Platforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -6543,6 +6595,7 @@
         {
           "height": 32,
           "name": "Spikes",
+          "tags": "",
           "texture": "Spikes.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -6555,6 +6608,7 @@
           "leftMargin": 0,
           "name": "Goal",
           "rightMargin": 0,
+          "tags": "",
           "texture": "Goal.png",
           "tiled": false,
           "topMargin": 0,
@@ -6565,6 +6619,7 @@
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -6604,16 +6659,17 @@
         {
           "height": 16,
           "name": "HalfPlatforms",
+          "tags": "",
           "texture": "HalfPlatforms.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": false,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": false,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -6667,6 +6723,7 @@
           "rendererParam2": 3,
           "rendererType": "Point",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
@@ -6676,6 +6733,7 @@
         },
         {
           "name": "Pattern",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -6717,6 +6775,7 @@
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

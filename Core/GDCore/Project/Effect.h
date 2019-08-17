@@ -32,11 +32,11 @@ class GD_CORE_API Effect {
   }
   const gd::String& GetEffectName() const { return effectName; }
 
-  void SetParameter(const gd::String& name, float value) {
+  void SetParameter(const gd::String& name, double value) {
     parameters[name] = value;
   }
-  float GetParameter(const gd::String& name) { return parameters[name]; }
-  const std::map<gd::String, float>& GetAllParameters() const {
+  double GetParameter(const gd::String& name) { return parameters[name]; }
+  const std::map<gd::String, double>& GetAllParameters() const {
     return parameters;
   }
 
@@ -55,7 +55,7 @@ class GD_CORE_API Effect {
  private:
   gd::String name;        ///< The name of the layer
   gd::String effectName;  ///< The name of the effect to apply
-  std::map<gd::String, float> parameters;
+  std::map<gd::String, double> parameters;
 };
 
 }  // namespace gd

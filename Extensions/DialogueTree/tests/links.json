@@ -1,0 +1,72 @@
+[
+	{
+		"title": "OneNode",
+		"tags": "Tag",
+		"body": "This is a test line",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "ThreeNodes",
+		"tags": "",
+		"body": "This is a test line\nThis is another test line[[Option1]]\n[[Option2]]",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Option1",
+		"tags": "",
+		"body": "This is Option1's test line",
+		"position": {
+			"x": 770,
+			"y": 84
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Option2",
+		"tags": "",
+		"body": "This is Option2's test line",
+		"position": {
+			"x": 774,
+			"y": 404
+		},
+		"colorID": 0
+	},
+	{
+		"title": "NamedLink",
+		"tags": "",
+		"body": "This is a test line\nThis is another test line\n[[First choice|Option1]]\n[[Second choice|Option2]]",
+		"position": {
+			"x": 774,
+			"y": 404
+		},
+		"colorID": 0
+	},
+	{
+		"title": "OneLinkPassthrough",
+		"tags": "",
+		"body": "First test line\n[[Option1]]",
+		"position": {
+			"x": 774,
+			"y": 404
+		},
+		"colorID": 0
+	},
+	{
+		"title": "LinkAfterShortcuts",
+		"tags": "",
+		"body": "First test line\n-> Shortcut 1\n\tThis is the first shortcut\n-> Shortcut 2\n\tThis is the second shortcut\n[[First link|Option1]][[Second link|Option2]]",
+		"position": {
+			"x": 774,
+			"y": 404
+		},
+		"colorID": 0
+	}
+]

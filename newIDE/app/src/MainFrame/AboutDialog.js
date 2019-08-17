@@ -41,12 +41,18 @@ const contributors = [
     description:
       'Numerous contributions to GDevelop (particle engine, bugfixes, new conditions, examples, tutorials...)',
   },
+  {
+    name: "Christina 'Castpixel' Antoinette Neofotistou",
+    description: 'Art and assets for the 8-bit Space Shooter example.',
+    link: 'https://www.patreon.com/castpixel',
+  },
   { name: 'ale26reg', description: 'Contributions to GDevelop' },
   { name: 'dos1', description: 'Contributions to GDevelop' },
   { name: 'Bouh', description: 'Contributions to GDevelop' },
   {
     name: 'Todor Imreorov',
-    description: 'Contributions to GDevelop: added Piskel sprite editor',
+    description:
+      'Numerous contributions to GDevelop, added Piskel sprite editor and jfxr',
   },
   { name: 'brylie', description: 'Contributions to GDevelop' },
   { name: 'Nnarol', description: 'Contributions to GDevelop' },
@@ -91,7 +97,7 @@ const contributors = [
   { name: 'Diego Schiavon', description: 'Indiegogo Ubuntu contributor' },
   { name: 'conceptgame', description: 'Indiegogo super contributor' },
   {
-    name: 'Jose David Coartas Correa',
+    name: 'Jose David Cuartas Correa',
     description:
       'Author of Digitopolis (a book on how to make games with GDevelop4)',
   },

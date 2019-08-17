@@ -52,6 +52,15 @@ interface MapStringBoolean {
     [Value] VectorString MAP_keys();
 };
 
+interface MapStringDouble {
+    void MapStringDouble();
+
+    double MAP_get([Const] DOMString name);
+    void MAP_set([Const] DOMString name, double value);
+    double MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
 interface MapStringVariable {
     [Ref] Variable MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] Variable prop);
@@ -260,6 +269,7 @@ interface ObjectsContainer {
     void RemoveObject([Const] DOMString name);
     void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
+    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
 
     [Ref] ObjectGroupsContainer GetObjectGroups();
@@ -367,6 +377,7 @@ interface Project {
     void RemoveObject([Const] DOMString name);
     void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
+    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
 
     [Ref] ObjectGroupsContainer GetObjectGroups();
@@ -449,7 +460,7 @@ interface gdObject {
     BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
     [Ref] BehaviorContent GetBehavior([Const] DOMString name);
     void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
+    boolean RenameBehavior([Const] DOMString oldName, [Const] DOMString name);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -532,6 +543,7 @@ interface Layout {
     void RemoveObject([Const] DOMString name);
     void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
+    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
 
     [Ref] ObjectGroupsContainer GetObjectGroups();
@@ -568,13 +580,39 @@ interface ExternalLayout {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface Effect {
+  void Effect();
+
+  void SetName([Const] DOMString name_);
+  [Const, Ref] DOMString GetName();
+
+  void SetEffectName([Const] DOMString effectName_);
+  [Const, Ref] DOMString GetEffectName();
+
+  void SetParameter([Const] DOMString name, float value);
+  float GetParameter([Const] DOMString name);
+  [Const, Ref] MapStringDouble GetAllParameters();
+
+  void SerializeTo([Ref] SerializerElement element);
+  void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
 interface Layer {
     void Layer();
-
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+
+    boolean HasEffectNamed([Const] DOMString name);
+    [Ref] Effect GetEffect([Const] DOMString name);
+    [Ref] Effect GetEffectAt(unsigned long index);
+    unsigned long GetEffectPosition([Const] DOMString name);
+    unsigned long GetEffectsCount();
+    [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
+    void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
+    void RemoveEffect([Const] DOMString name);
+    void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
 };
 
 interface PropertyDescriptor {
@@ -588,7 +626,22 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetLabel();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Value] VectorString GetExtraInfo();
+    [Ref] PropertyDescriptor SetHidden(boolean enable);
+    boolean IsHidden();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+
+interface NamedPropertyDescriptor {
+    void NamedPropertyDescriptor();
+
+    [Ref] PropertyDescriptor SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+
+    [Value] PropertyDescriptor ToPropertyDescriptor();
+};
+NamedPropertyDescriptor implements PropertyDescriptor;
 
 interface MapStringPropertyDescriptor {
     void MapStringPropertyDescriptor();
@@ -642,99 +695,28 @@ interface ImageResource {
 
     boolean IsSmooth();
     void SetSmooth(boolean enable);
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+ImageResource implements Resource;
 
 interface AudioResource {
     void AudioResource();
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+AudioResource implements Resource;
 
 interface FontResource {
     void FontResource();
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+FontResource implements Resource;
 
 interface VideoResource {
     void VideoResource();
-
-    //Inherited from Resource:
-    Resource Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetKind([Const] DOMString kind);
-    [Const, Ref] DOMString GetKind();
-    boolean IsUserAdded();
-    void SetUserAdded(boolean yes);
-    boolean UseFile();
-    void SetFile([Const] DOMString file);
-    [Const, Ref] DOMString GetFile();
-    void SetMetadata([Const] DOMString metadata);
-    [Const, Ref] DOMString GetMetadata();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+VideoResource implements Resource;
+
+interface JsonResource {
+    void JsonResource();
+};
+JsonResource implements Resource;
 
 interface InitialInstance {
     void InitialInstance();
@@ -955,11 +937,12 @@ interface InstructionMetadata {
     [Const, Ref] VectorParameterMetadata GetParameters();
     long GetUsageComplexity();
     boolean IsHidden();
+    boolean IsPrivate();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
-    [Ref] InstructionMetadata SetGroup([Const] DOMString group); //TODO: check if useful
+    [Ref] InstructionMetadata SetPrivate();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,
@@ -980,12 +963,13 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetGroup();
     [Const, Ref] DOMString GetSmallIconFilename();
     boolean IsShown();
+    boolean IsPrivate();
     [Ref] ParameterMetadata GetParameter(unsigned long id);
     unsigned long GetParametersCount();
     [Const, Ref] VectorParameterMetadata GetParameters();
 
     [Ref] ExpressionMetadata SetHidden();
-    [Ref] ExpressionMetadata SetGroup([Const] DOMString str); //TODO: check if useful
+    [Ref] ExpressionMetadata SetPrivate();
     [Ref] ExpressionMetadata AddParameter(
         [Const] DOMString type,
         [Const] DOMString description,
@@ -1519,6 +1503,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameBehaviorProperty(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_RenameEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -1706,14 +1696,19 @@ interface EventsBasedBehavior {
     [Const, Ref] DOMString GetObjectType();
 
     [Ref] EventsFunctionsContainer GetEventsFunctions();
+    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
 };
 
 interface EventsBasedBehaviorsList {
     [Ref] EventsBasedBehavior InsertNew([Const] DOMString name, unsigned long pos);
-    [Ref] EventsBasedBehavior Insert([Const, Ref] EventsBasedBehavior eventsFunction, unsigned long pos);
+    [Ref] EventsBasedBehavior Insert([Const, Ref] EventsBasedBehavior item, unsigned long pos);
     boolean Has([Const] DOMString name);
     [Ref] EventsBasedBehavior Get([Const] DOMString name);
     [Ref] EventsBasedBehavior GetAt(unsigned long pos);
@@ -1723,6 +1718,22 @@ interface EventsBasedBehaviorsList {
 
     unsigned long size();
     [Ref] EventsBasedBehavior at(unsigned long index);
+};
+
+interface NamedPropertyDescriptorsList {
+    void NamedPropertyDescriptorsList();
+
+    [Ref] NamedPropertyDescriptor InsertNew([Const] DOMString name, unsigned long pos);
+    [Ref] NamedPropertyDescriptor Insert([Const, Ref] NamedPropertyDescriptor item, unsigned long pos);
+    boolean Has([Const] DOMString name);
+    [Ref] NamedPropertyDescriptor Get([Const] DOMString name);
+    [Ref] NamedPropertyDescriptor GetAt(unsigned long pos);
+    void Remove([Const] DOMString name);
+    void Move(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetCount();
+
+    unsigned long size();
+    [Ref] NamedPropertyDescriptor at(unsigned long index);
 };
 
 interface EventsFunctionsExtension {
@@ -1849,6 +1860,15 @@ interface ResourcesMergingHelper {
 
     void SetBaseDirectory([Const] DOMString basePath);
     [Ref] MapStringString GetAllResourcesOldAndNewFilename();
+};
+
+interface ProjectResourcesCopier {
+    boolean STATIC_CopyAllResourcesTo([Ref] Project project,
+                                 [Ref] AbstractFileSystem fs,
+                                 [Const] DOMString destinationDirectory,
+                                 boolean updateOriginalProject,
+                                 boolean preserveAbsoluteFilenames,
+                                 boolean preserveDirectoryStructure);
 };
 
 interface ResourcesInUseHelper {
@@ -1985,34 +2005,8 @@ interface SpriteObject {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+SpriteObject implements gdObject;
 
 [Prefix="sf::"]
 interface Vector2f {
@@ -2054,34 +2048,8 @@ interface TextObject {
     unsigned long GetColorR();
     unsigned long GetColorG();
     unsigned long GetColorB();
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+TextObject implements gdObject;
 
 interface TiledSpriteObject {
     void TiledSpriteObject([Const] DOMString name);
@@ -2092,34 +2060,8 @@ interface TiledSpriteObject {
     float GetWidth();
     void SetHeight(float height);
     float GetHeight();
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+TiledSpriteObject implements gdObject;
 
 interface PanelSpriteObject {
     void PanelSpriteObject([Const] DOMString name);
@@ -2146,34 +2088,8 @@ interface PanelSpriteObject {
     float GetWidth();
     void SetHeight(float height);
     float GetHeight();
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+PanelSpriteObject implements gdObject;
 
 interface ShapePainterObject {
     void ShapePainterObject([Const] DOMString name);
@@ -2200,65 +2116,13 @@ interface ShapePainterObject {
     unsigned long GetFillColorR();
     unsigned long GetFillColorG();
     unsigned long GetFillColorB();
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+ShapePainterObject implements gdObject;
 
 interface TextEntryObject {
     void TextEntryObject([Const] DOMString name);
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+TextEntryObject implements gdObject;
 
 interface SkeletonObject {
     void SkeletonObject([Const] DOMString name);
@@ -2389,33 +2253,8 @@ interface ParticleEmitterObject {
     void SetParticleAngleRandomness2(float newValue);
     float GetParticleAngleRandomness2();
 
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+ParticleEmitterObject implements gdObject;
 
 //GDJS bindings:
 
@@ -2429,6 +2268,9 @@ interface EventsCodeGenerator {
 interface BehaviorCodeGenerator {
     void BehaviorCodeGenerator([Ref] Project project);
     [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
+
 };
 
 [Prefix="gdjs::"]

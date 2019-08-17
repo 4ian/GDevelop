@@ -15,6 +15,5 @@ export const showErrorBox = (message: string, rawError: any) => {
 
 export const showWarningBox = (message: string, rawError: any) => {
   Window.showMessageBox(message, 'warning');
-  sendErrorMessage(message, 'warning', rawError);
   console.warn(message, 'raw error:', rawError);
 };

@@ -20,7 +20,7 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
             "external layouts"),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/interface/scene-editor/external-layouts");
 
 #if defined(GD_IDE_ONLY)
   extension

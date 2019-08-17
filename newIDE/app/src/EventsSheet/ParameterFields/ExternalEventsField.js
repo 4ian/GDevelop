@@ -1,16 +1,15 @@
 // @flow
 import * as React from 'react';
-import Divider from 'material-ui/Divider';
 import {
   enumerateLayouts,
   enumerateExternalEvents,
 } from '../../ProjectManager/EnumerateProjectItems';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type DataSource,
+} from '../../UI/SemiControlledAutoComplete';
 
-type DataSourceType = Array<{| text: string, value: React.Node |}>;
-
-const getList = (project: ?gdProject): DataSourceType => {
+const getList = (project: ?gdProject): DataSource => {
   if (!project) {
     return [];
   }
@@ -25,7 +24,7 @@ const getList = (project: ?gdProject): DataSourceType => {
     text: layout.getName(),
     value: layout.getName(),
   }));
-  return [...externalEvents, { text: '', value: <Divider /> }, ...layouts];
+  return [...externalEvents, { type: 'separator' }, ...layouts];
 };
 
 export default class ExternalEventsField extends React.Component<

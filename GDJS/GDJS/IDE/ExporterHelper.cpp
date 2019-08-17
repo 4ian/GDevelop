@@ -499,6 +499,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "libs/hshg.js");
   InsertUnique(includesFiles, "libs/rbush.js");
   InsertUnique(includesFiles, "inputmanager.js");
+  InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
@@ -693,10 +694,9 @@ bool ExporterHelper::ExportIncludesAndLibs(
 
 void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
                                      gd::Project &project,
-                                     gd::String exportDir,
-                                     wxProgressDialog *progressDialog) {
+                                     gd::String exportDir) {
   gd::ProjectResourcesCopier::CopyAllResourcesTo(
-      project, fs, exportDir, true, progressDialog, false, false);
+      project, fs, exportDir, true, false, false);
 }
 
 }  // namespace gdjs

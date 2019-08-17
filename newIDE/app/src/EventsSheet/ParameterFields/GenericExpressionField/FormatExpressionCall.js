@@ -1,5 +1,5 @@
 //@flow
-import { type InstructionOrExpressionInformation } from '../../InstructionEditor/InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionEditor/InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterValues } from './ExpressionParametersEditorDialog';
 
 const filterOutCodeOnlyParameters = (
@@ -20,12 +20,12 @@ const filterOutCodeOnlyParameters = (
 };
 
 export const formatExpressionCall = (
-  expressionInfo: InstructionOrExpressionInformation,
+  expressionInfo: EnumeratedInstructionOrExpressionMetadata,
   parameterValues: ParameterValues
 ): string => {
   const functionName = expressionInfo.name || '';
 
-  if (expressionInfo.objectMetadata) {
+  if (expressionInfo.scope.objectMetadata) {
     const objectName = parameterValues[0];
 
     const functionArgs = filterOutCodeOnlyParameters(
@@ -34,7 +34,7 @@ export const formatExpressionCall = (
       1
     ).join(', ');
     return `${objectName}.${functionName}(${functionArgs})`;
-  } else if (expressionInfo.behaviorMetadata) {
+  } else if (expressionInfo.scope.behaviorMetadata) {
     const objectName = parameterValues[0];
     const behaviorName = parameterValues[1];
 

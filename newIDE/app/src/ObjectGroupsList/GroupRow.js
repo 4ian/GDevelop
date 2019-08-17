@@ -44,6 +44,11 @@ export default class ThemableGroupRow extends React.Component<Props, {||}> {
             click: () => this.props.onEdit(group),
           },
           {
+            label: 'Set as Global group',
+            enabled: !this.props.isGlobalGroup,
+            click: () => this.props.onSetAsGlobalGroup(),
+          },
+          {
             label: 'Rename',
             enabled: !!this.props.onEdit,
             click: () => this.props.onEditName(),
@@ -94,6 +99,7 @@ export default class ThemableGroupRow extends React.Component<Props, {||}> {
         style={{
           ...styles.groupName,
           fontStyle: isGlobalGroup ? 'italic' : undefined,
+          fontWeight: isGlobalGroup ? 'bold' : 'normal',
         }}
       >
         {groupName}

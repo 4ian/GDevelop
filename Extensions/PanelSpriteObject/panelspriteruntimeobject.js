@@ -21,6 +21,7 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
     this._tiled = objectData.tiled;
     this._width = objectData.width;
     this._height = objectData.height;
+    this.opacity = 255;
 
     if (this._renderer)
         gdjs.PanelSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene,
@@ -28,6 +29,9 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
     else
         this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(this, runtimeScene,
             objectData.texture, objectData.tiled);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
@@ -37,11 +41,11 @@ gdjs.PanelSpriteRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
 
-gdjs.PanelSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.PanelSpriteRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-    if (this._renderer.onOwnerRemovedFromScene) {
-        this._renderer.onOwnerRemovedFromScene();
+    if (this._renderer.onDestroy) {
+        this._renderer.onDestroy();
     }
 };
 
@@ -127,4 +131,42 @@ gdjs.PanelSpriteRuntimeObject.prototype.setWidth = function(width) {
 gdjs.PanelSpriteRuntimeObject.prototype.setHeight = function(height) {
     this._height = height;
     this._renderer.updateHeight();
+};
+
+/**
+ * Change the transparency of the object.
+ * @param {number} opacity The new opacity, between 0 (transparent) and 255 (opaque).
+ */
+gdjs.PanelSpriteRuntimeObject.prototype.setOpacity = function(opacity) {
+    if ( opacity < 0 ) opacity = 0;
+    if ( opacity > 255 ) opacity = 255;
+
+    this.opacity = opacity;
+    this._renderer.updateOpacity();
+};
+
+/**
+ * Get the transparency of the object.
+ * @return {number} The opacity, between 0 (transparent) and 255 (opaque).
+ */
+gdjs.PanelSpriteRuntimeObject.prototype.getOpacity = function() {
+    return this.opacity;
+};
+
+/**
+ * Change the tint of the panel sprite object.
+ *
+ * @param {string} rgbColor The color, in RGB format ("128;200;255").
+ */
+gdjs.PanelSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
+    this._renderer.setColor(rgbColor);
+};
+
+/**
+ * Get the tint of the panel sprite object.
+ *
+ * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ */
+gdjs.PanelSpriteRuntimeObject.prototype.getColor = function() {
+    return this._renderer.getColor();
 };

@@ -125,6 +125,7 @@ type Props = {
   onChooseProject?: () => Promise<?string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
+  onSaveProjectAs?: gdProject => Promise<any>,
   onAutoSaveProject?: (project: gdProject) => void,
   shouldOpenAutosave?: (
     filePath: string,
@@ -1188,6 +1189,33 @@ class MainFrame extends React.Component<Props, State> {
     }
   };
 
+  saveAs = () => {
+    saveUiSettings(this.state.editorTabs);
+
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+    const { i18n } = this.props;
+
+    if (this.props.saveDialog) {
+      this._openSaveDialog();
+    } else if (this.props.onSaveProjectAs) {
+      this.props.onSaveProjectAs(currentProject).then(
+        saveDone => {
+          if (saveDone)
+            this._showSnackMessage(i18n._(t`Project properly saved`));
+        },
+        err => {
+          showErrorBox(
+            i18n._(
+              t`Unable to save as the project! Please try again by choosing another location.`
+            ),
+            err
+          );
+        }
+      );
+    }
+  };
+
   askToCloseProject = (cb: ?Function) => {
     if (!this.state.currentProject) return;
     const { i18n } = this.props;
@@ -1392,6 +1420,7 @@ class MainFrame extends React.Component<Props, State> {
       previewLauncher,
       resourceExternalEditors,
       eventsFunctionsExtensionsState,
+      i18n,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1575,19 +1604,20 @@ class MainFrame extends React.Component<Props, State> {
             onExport: () => this.openExportDialog(true),
             onChangeSubscription: () => this.openSubscription(true),
           })}
-        {resourceSources.map((resourceSource, index) => {
-          // $FlowFixMe
-          const Component = resourceSource.component;
-          return (
-            // $FlowFixMe
-            <Component
-              key={resourceSource.name}
-              ref={dialog =>
-                (this._resourceSourceDialogs[resourceSource.name] = dialog)
-              }
-            />
-          );
-        })}
+        {resourceSources.map(
+          (resourceSource, index): React.Node => {
+            const Component = resourceSource.component;
+            return (
+              <Component
+                key={resourceSource.name}
+                ref={dialog =>
+                  (this._resourceSourceDialogs[resourceSource.name] = dialog)
+                }
+                i18n={i18n}
+              />
+            );
+          }
+        )}
         <ProfileDialog
           open={profileDialogOpen}
           onClose={() => this.openProfile(false)}

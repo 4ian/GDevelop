@@ -11,11 +11,18 @@ const almostWhite = '#EEE';
 const lightWhite = '#DDD';
 const notSoWhite = '#CCC';
 const gdevelopDarkBlue = '#3c4698';
-const blue = '#2C5FD2';
+const blue = '#2c6bf5';
 
 const systemSelectionColor = '#4c92ff'; //OS X selection
 
+/**
+ * The background color of the main window
+ */
 const backgroundColor = '#252525';
+
+/**
+ * The background color of the "papers", "dialogs", etc...
+ */
 const canvasColor = '#303030';
 
 const theme: Theme = {

@@ -45,6 +45,7 @@ export default class StandardEvent extends React.Component<
           selection={this.props.selection}
           areConditions
           onAddNewInstruction={this.props.onAddNewInstruction}
+          onPasteInstructions={this.props.onPasteInstructions}
           onMoveToInstruction={this.props.onMoveToInstruction}
           onMoveToInstructionsList={this.props.onMoveToInstructionsList}
           onInstructionClick={this.props.onInstructionClick}
@@ -59,10 +60,15 @@ export default class StandardEvent extends React.Component<
         />
         <InstructionsList
           instrsList={standardEvent.getActions()}
-          style={styles.actionsList}
+          style={
+            {
+              ...styles.actionsList,
+            } /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+          }
           selection={this.props.selection}
           areConditions={false}
           onAddNewInstruction={this.props.onAddNewInstruction}
+          onPasteInstructions={this.props.onPasteInstructions}
           onMoveToInstruction={this.props.onMoveToInstruction}
           onMoveToInstructionsList={this.props.onMoveToInstructionsList}
           onInstructionClick={this.props.onInstructionClick}

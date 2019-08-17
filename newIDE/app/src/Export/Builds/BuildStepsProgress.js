@@ -103,7 +103,15 @@ export default ({
     <Step>
       <StepLabel>Build and download</StepLabel>
       <StepContent>
-        {!build && (
+        {errored && (
+          <p>
+            <Trans>
+              Build could not start or errored. Please check your internet
+              connection or try again later.
+            </Trans>
+          </p>
+        )}
+        {!build && !errored && (
           <p>
             <Trans>Build is starting...</Trans>
           </p>

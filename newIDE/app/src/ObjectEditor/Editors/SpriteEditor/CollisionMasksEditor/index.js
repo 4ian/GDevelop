@@ -206,15 +206,19 @@ export default class CollisionMasksEditor extends Component {
           resourcesLoader={resourcesLoader}
           project={project}
           onSize={this._setCurrentSpriteSize}
-        >
-          {hasValidSprite && (
-            <CollisionMasksPreview
-              isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
-              polygons={sprite.getCustomCollisionMask()}
-              onPolygonsUpdated={this._updateCollisionMasks}
-            />
-          )}
-        </ImagePreview>
+          renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+            hasValidSprite && (
+              <CollisionMasksPreview
+                imageWidth={imageWidth}
+                imageHeight={imageHeight}
+                imageZoomFactor={imageZoomFactor}
+                isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
+                polygons={sprite.getCustomCollisionMask()}
+                onPolygonsUpdated={this._updateCollisionMasks}
+              />
+            )
+          }
+        />
         <Line>
           <Column expand>
             <SpriteSelector

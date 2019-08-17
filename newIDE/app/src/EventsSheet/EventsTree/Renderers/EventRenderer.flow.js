@@ -6,10 +6,11 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../../SelectionHandler';
+import { type EventsScope } from '../../EventsScope.flow';
 
 export type EventRendererProps = {
   project: gdProject,
-  layout?: ?gdLayout,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   event: gdBaseEvent,
@@ -17,7 +18,8 @@ export type EventRendererProps = {
 
   onUpdate: () => void,
   selected: boolean,
-  onAddNewInstruction: Function,
+  onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext

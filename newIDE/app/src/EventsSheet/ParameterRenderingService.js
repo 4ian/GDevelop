@@ -34,6 +34,7 @@ import ObjectVariableField, {
 import LayerField from './ParameterFields/LayerField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
+import JsonResourceField from './ParameterFields/JsonResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
 import ForceMultiplierField, {
   renderInlineForceMultiplier,
@@ -62,6 +63,7 @@ const components = {
   musicfile: AudioResourceField,
   soundfile: AudioResourceField,
   videoResource: VideoResourceField,
+  jsonResource: JsonResourceField,
   color: ColorExpressionField,
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO

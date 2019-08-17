@@ -44,7 +44,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to test"))
+      .AddParameter("expression", _("Value to compare"))
       .MarkAsAdvanced()
       .SetManipulatedType("number");
 

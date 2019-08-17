@@ -1,6 +1,8 @@
 import React from 'react';
 import AppBar from 'material-ui/AppBar';
 
+export const editorBarHeight = 32;
+
 export default props => {
   return (
     <AppBar
@@ -10,7 +12,7 @@ export default props => {
         flexShrink: 0,
       }}
       titleStyle={{
-        height: 32,
+        height: editorBarHeight,
         fontSize: '15px',
         lineHeight: '31px',
       }}

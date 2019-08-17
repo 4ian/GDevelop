@@ -23,7 +23,7 @@ import {
   enumerateBehaviorsMetadata,
   filterEnumeratedBehaviorMetadata,
 } from './EnumerateBehaviorsMetadata';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
 import ExtensionsSearch from '../ExtensionsSearch';
 import Window from '../Utils/Window';

@@ -29,6 +29,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
         this._spritesContainer.addChild(this._borderSprites[i]);
     }
 
+    this._alpha = this._spritesContainer.alpha;
     runtimeScene.getLayer("").getRenderer().addRendererObject(this._spritesContainer, runtimeObject.getZOrder());
 };
 
@@ -39,12 +40,22 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function
 };
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
-    if (this._spritesContainer.visible && this._wasRendered) {
-        this._spritesContainer.cacheAsBitmap = true;
+    if (this._spritesContainer.visible && this._wasRendered) { 
+        // Update the alpha of the container to make sure that it's applied.
+        // If not done, the alpha will be back to full opaque when changing the color
+        // of the object.
+        this._spritesContainer.alpha = this._alpha;
+        this._spritesContainer.cacheAsBitmap = true;        
     }
 
     this._wasRendered = true;
 };
+
+gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
+    //TODO: Workaround a not working property in PIXI.js:
+    this._spritesContainer.alpha = this._spritesContainer.visible ? this._object.opacity/255 : 0;
+    this._alpha = this._spritesContainer.alpha;
+}
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
     this._spritesContainer.rotation = gdjs.toRad(this._object.angle);
@@ -173,3 +184,21 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateHeight = function() {
     this._updateLocalPositions();
     this.updatePosition();
 };
+
+gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setColor = function(rgbColor) {
+    var colors = rgbColor.split(";");
+    if ( colors.length < 3 ) return;
+ 
+    this._centerSprite.tint = "0x" + gdjs.rgbToHex(parseInt(colors[0], 10), parseInt(colors[1], 10), parseInt(colors[2], 10));
+
+    for (var borderCounter = 0; borderCounter < this._borderSprites.length; borderCounter++){
+        this._borderSprites[borderCounter].tint = "0x" + gdjs.rgbToHex(parseInt(colors[0], 10), parseInt(colors[1], 10), parseInt(colors[2], 10));
+    }
+
+    this._spritesContainer.cacheAsBitmap = false;
+ };
+ 
+ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getColor = function() {
+     var rgb = PIXI.utils.hex2rgb(this._centerSprite.tint)
+     return Math.floor(rgb[0]*255) + ';' + Math.floor(rgb[1]*255) + ';' + Math.floor(rgb[2]*255);
+ }

@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "PathfindingBehavior.h"
 #include <map>
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/Serialization/SerializerElement.h"
 

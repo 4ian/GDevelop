@@ -41,22 +41,24 @@ export default class TiledSpriteEditor extends React.Component<
         </Line>
         <Line>
           <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}
             fullWidth
             type="number"
             value={tiledSpriteObject.getWidth()}
             onChange={value => {
-              tiledSpriteObject.setWidth(parseInt(value, 10));
+              tiledSpriteObject.setWidth(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
           <SemiControlledTextField
+            commitOnBlur
             floatingLabelText={<Trans>Default height (in pixels)</Trans>}
             fullWidth
             type="number"
             value={tiledSpriteObject.getHeight()}
             onChange={value => {
-              tiledSpriteObject.setHeight(parseInt(value, 10));
+              tiledSpriteObject.setHeight(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />

@@ -11,7 +11,7 @@ import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type InstructionOrExpressionInformation } from '../../InstructionEditor/InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionEditor/InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
@@ -31,9 +31,9 @@ const styles = {
   textFieldAndHightlightContainer: {
     position: 'relative',
   },
-  expressionSelector: {
+  expressionSelectorPopoverContent: {
+    display: 'flex',
     maxHeight: 350,
-    overflowY: 'scroll',
   },
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -58,7 +58,7 @@ const styles = {
 type State = {|
   popoverOpen: boolean,
   parametersDialogOpen: boolean,
-  selectedExpressionInfo: ?InstructionOrExpressionInformation,
+  selectedExpressionInfo: ?EnumeratedInstructionOrExpressionMetadata,
   validatedValue: string,
   errorText: ?string,
   errorHighlights: Array<Highlight>,
@@ -144,7 +144,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   _handleExpressionChosen = (
-    expressionInfo: InstructionOrExpressionInformation
+    expressionInfo: EnumeratedInstructionOrExpressionMetadata
   ) => {
     this.setState({
       popoverOpen: false,
@@ -154,7 +154,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   insertExpression = (
-    expressionInfo: InstructionOrExpressionInformation,
+    expressionInfo: EnumeratedInstructionOrExpressionMetadata,
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;
@@ -238,7 +238,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionType,
       parameterMetadata,
       project,
-      layout,
+      scope,
       globalObjectsContainer,
       objectsContainer,
       parameterRenderingService,
@@ -289,15 +289,17 @@ export default class ExpressionField extends React.Component<Props, State> {
               targetOrigin={{ horizontal: 'left', vertical: 'top' }}
               onRequestClose={this._handleRequestClose}
             >
-              <ExpressionSelector
-                style={styles.expressionSelector}
-                selectedType=""
-                onChoose={(type, expression) => {
-                  this._handleExpressionChosen(expression);
-                }}
-                expressionType={expressionType}
-                focusOnMount
-              />
+              <div style={styles.expressionSelectorPopoverContent}>
+                <ExpressionSelector
+                  selectedType=""
+                  onChoose={(type, expression) => {
+                    this._handleExpressionChosen(expression);
+                  }}
+                  expressionType={expressionType}
+                  focusOnMount
+                  scope={scope}
+                />
+              </div>
             </Popover>
           )}
         </div>
@@ -331,7 +333,7 @@ export default class ExpressionField extends React.Component<Props, State> {
           <ExpressionParametersEditorDialog
             open={true}
             project={project}
-            layout={layout}
+            scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             expressionMetadata={this.state.selectedExpressionInfo.metadata}

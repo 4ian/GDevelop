@@ -21,6 +21,7 @@ import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import Add from 'material-ui/svg-icons/content/add';
 
 const gd = global.gd;
 
@@ -278,15 +279,19 @@ export default class EventsFunctionParametersEditor extends React.Component<
                     <Trans>No parameters for this function.</Trans>
                   </EmptyMessage>
                 ) : null}
-                <Line justifyContent="center">
-                  {!freezeParameters && (
-                    <RaisedButton
-                      primary
-                      label={<Trans>Add a parameter</Trans>}
-                      onClick={this._addParameter}
-                    />
-                  )}
-                </Line>
+                <Column>
+                  <Line justifyContent="flex-end" expand>
+                    {!freezeParameters && (
+                      <RaisedButton
+                        primary
+                        label={<Trans>Add a parameter</Trans>}
+                        onClick={this._addParameter}
+                        labelPosition="before"
+                        icon={<Add />}
+                      />
+                    )}
+                  </Line>
+                </Column>
               </div>
             </Line>
             {helpPagePath ? (

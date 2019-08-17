@@ -33,7 +33,7 @@ import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
-import EditorBar from '../UI/EditorBar';
+import EditorBar, { editorBarHeight } from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -147,7 +147,6 @@ export default class SceneEditor extends React.Component<Props, State> {
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsList;
   _propertiesEditor: ?InstancePropertiesEditor;
-  _objectsListToolbar: Array<React.Node>;
 
   constructor(props: Props) {
     super(props);
@@ -219,6 +218,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         isWindowMaskShown={() => !!this.state.uiSettings.windowMask}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
+        centerView={this.centerView}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
@@ -783,6 +783,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  centerView = () => {
+    if (this.editor) this.editor.centerView();
+  };
+
   setZoomFactor = (zoomFactor: number) => {
     if (this.editor) this.editor.setZoomFactor(zoomFactor);
   };
@@ -912,21 +916,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
-    // Create and store the toolbar for the ObjectsList only once:
-    // It's important to always use the same object (in the sense of ===) for toolbarControls,
-    // to avoid confusing MosaicWindow.shouldComponentUpdate: It makes a nasty infinite loop
-    // while it tries to compare React elements.
-    this._objectsListToolbar = this._objectsListToolbar || [
-      <I18n key="tags">
-        {({ i18n }) => (
-          <TagsButton
-            buildMenuTemplate={() => this._buildObjectTagsMenuTemplate(i18n)}
-          />
-        )}
-      </I18n>,
-      <CloseButton key="close" />,
-    ];
-
     const editors = {
       properties: (
         <MosaicWindow title={<Trans>Properties</Trans>}>
@@ -976,19 +965,18 @@ export default class SceneEditor extends React.Component<Props, State> {
       'objects-list': (
         <MosaicWindow
           title={<Trans>Objects</Trans>}
-          toolbarControls={this._objectsListToolbar}
-          selectedObjectNames={
-            this.state
-              .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
-          }
-          canDropDraggedObject={
-            this.state
-              .canDropDraggedObject /*Ensure MosaicWindow content is updated when canDropDraggedObject changes*/
-          }
-          selectedObjectTags={
-            this.state
-              .selectedObjectTags /*Ensure MosaicWindow content is updated when selectedObjectTags changes*/
-          }
+          toolbarControls={[
+            <I18n key="tags">
+              {({ i18n }) => (
+                <TagsButton
+                  buildMenuTemplate={() =>
+                    this._buildObjectTagsMenuTemplate(i18n)
+                  }
+                />
+              )}
+            </I18n>,
+            <CloseButton key="close" />,
+          ]}
         >
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
@@ -1093,6 +1081,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         )}
         <ObjectGroupEditorDialog
+          project={project}
           open={!!this.state.editedGroup}
           group={this.state.editedGroup}
           objectsContainer={layout}
@@ -1119,11 +1108,14 @@ export default class SceneEditor extends React.Component<Props, State> {
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
+            style={{
+              height: `calc(100% - ${editorBarHeight}px)`,
+            }}
           />
         </Drawer>
         <Drawer
           open={this.state.layersListOpen}
-          width={400}
+          width={500}
           openSecondary={true}
         >
           <EditorBar

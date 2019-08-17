@@ -8,6 +8,7 @@ import { makeNonBreakable } from '../../Utils/StringHelpers';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
 import BackgroundText from '../../UI/BackgroundText';
+import { focusButton } from '../../UI/Button';
 
 type State = {|
   showDeprecatedNumericValue: boolean,
@@ -17,6 +18,7 @@ export default class ForceMultiplierField extends Component<
   ParameterFieldProps,
   State
 > {
+  _instantButton = React.createRef<RaisedButton>();
   state = {
     showDeprecatedNumericValue:
       this.props.value !== '' &&
@@ -24,7 +26,9 @@ export default class ForceMultiplierField extends Component<
       this.props.value !== '0',
   };
 
-  focus() {}
+  focus() {
+    focusButton(this._instantButton);
+  }
 
   render() {
     const { showDeprecatedNumericValue } = this.state;
@@ -36,6 +40,7 @@ export default class ForceMultiplierField extends Component<
               label={makeNonBreakable('Instant')}
               primary={this.props.value === '' || this.props.value === '0'}
               onClick={() => this.props.onChange('0')}
+              ref={this._instantButton}
             />
           </Column>
           <Column>

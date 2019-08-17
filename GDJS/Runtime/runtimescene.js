@@ -170,9 +170,18 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 
     if (this._profiler) this.stopProfiler();
 
+    // Notify the objects they are being destroyed
+    this._constructListOfAllInstances();
+    for(var i = 0, len = this._allInstancesList.length;i<len;++i) {
+        var object = this._allInstancesList[i];
+        object.onDestroyFromScene(this);
+    }
+
+    // Notify the renderer
     if (this._renderer && this._renderer.onSceneUnloaded)
         this._renderer.onSceneUnloaded();
 
+    // Notify the global callbacks
     for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
         gdjs.callbacksRuntimeSceneUnloaded[i](this);
     }
@@ -374,7 +383,7 @@ gdjs.RuntimeScene.prototype._cacheOrClearRemovedInstances = function() {
 };
 
 /**
- * Tool function filling _allObjectsList member with all the instances.
+ * Tool function filling _allInstancesList member with all the living object instances.
  * @private
  */
 gdjs.RuntimeScene.prototype._constructListOfAllInstances = function() {
@@ -565,10 +574,7 @@ gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
     }
 
     //Notify the object it was removed from the scene
-    obj.onDeletedFromScene(this);
-    for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
-        obj._behaviors[j].onOwnerRemovedFromScene();
-    }
+    obj.onDestroyFromScene(this);
 
     //Call global callback
     for(var j = 0;j<gdjs.callbacksObjectDeletedFromScene.length;++j) {
@@ -623,7 +629,8 @@ gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
 
 /**
  * Get the layer with the given name
- * @param {gdjs.Layer} name The name of the layer
+ * @param {string} name The name of the layer
+ * @returns {gdjs.Layer} The layer, or the base layer if not found
  */
 gdjs.RuntimeScene.prototype.getLayer = function(name) {
     if ( this._layers.containsKey(name) )
@@ -632,6 +639,10 @@ gdjs.RuntimeScene.prototype.getLayer = function(name) {
     return this._layers.get("");
 };
 
+/**
+ * Check if a layer exists
+ * @param {string} name The name of the layer
+ */
 gdjs.RuntimeScene.prototype.hasLayer = function(name) {
     return this._layers.containsKey(name);
 };

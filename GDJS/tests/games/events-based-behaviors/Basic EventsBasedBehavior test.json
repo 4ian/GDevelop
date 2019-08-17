@@ -187,13 +187,15 @@
           "italic": false,
           "name": "NewObject",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
           "behaviors": [
             {
               "name": "MyBehavior",
-              "type": "NewEventsFunctionsExtension::MyBehavior"
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "BooleanTestProperty": true
             }
           ],
           "string": "Text",
@@ -210,6 +212,7 @@
           "italic": false,
           "name": "NewObject2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -233,6 +236,7 @@
           "italic": false,
           "name": "NewObject3",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -257,6 +261,21 @@
         }
       ],
       "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Should display Hello World 42!",
+          "comment2": ""
+        },
         {
           "disabled": false,
           "folded": false,
@@ -377,7 +396,32 @@
                   "disabled": false,
                   "folded": false,
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::MyBehavior::PropertyAddedNumber"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "42"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::MyBehavior::PropertyBooleanTestProperty"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
@@ -387,7 +431,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsString(\"Text\")+\"!\""
+                        "GetArgumentAsString(\"Text\")+Object.Behavior::PropertySuffixText()"
                       ],
                       "subInstructions": []
                     }
@@ -399,16 +443,16 @@
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Object",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "TextObject::Text",
-                  "type": "objectList"
+                  "type": "object"
                 },
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Behavior",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -459,16 +503,16 @@
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Object",
                   "name": "Object",
                   "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "objectList"
+                  "supplementaryInformation": "TextObject::Text",
+                  "type": "object"
                 },
                 {
                   "codeOnly": false,
                   "defaultValue": "",
-                  "description": "",
+                  "description": "Behavior",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -512,7 +556,7 @@
                   "description": "Object",
                   "name": "Object",
                   "optional": false,
-                  "supplementaryInformation": "",
+                  "supplementaryInformation": "TextObject::Text",
                   "type": "object"
                 },
                 {
@@ -546,7 +590,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "GetArgumentAsNumber(\"Value\") + 1"
+                        "GetArgumentAsNumber(\"Value\") + Object.Behavior::PropertyAddedNumber()"
                       ],
                       "subInstructions": []
                     }
@@ -584,6 +628,32 @@
                 }
               ],
               "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "!",
+              "type": "String",
+              "label": "Suffix text to be appended",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "SuffixText"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "label": "Number to be added",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AddedNumber"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Boolean test property",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "BooleanTestProperty"
             }
           ]
         },
@@ -651,7 +721,8 @@
               ],
               "objectGroups": []
             }
-          ]
+          ],
+          "propertyDescriptors": []
         }
       ]
     }

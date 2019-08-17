@@ -152,7 +152,6 @@ export default class UserProfileProvider extends React.Component<Props, State> {
           this.setState({
             loginError,
           });
-          throw loginError;
         }
       )
     );
@@ -173,7 +172,6 @@ export default class UserProfileProvider extends React.Component<Props, State> {
           this.setState({
             loginError,
           });
-          throw loginError;
         }
       )
     );
@@ -195,7 +193,6 @@ export default class UserProfileProvider extends React.Component<Props, State> {
           showWarningBox(
             "Unable to send you an email to reset your password. Please double-check that the email address that you've entered is valid."
           );
-          throw loginError;
         }
       )
     );

@@ -356,6 +356,7 @@
       "objects": [
         {
           "name": "play",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -394,6 +395,7 @@
         },
         {
           "name": "pause",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -432,6 +434,7 @@
         },
         {
           "name": "mute",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -499,6 +502,7 @@
         },
         {
           "name": "music",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -569,6 +573,7 @@
           "italic": false,
           "name": "track_info",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -584,6 +589,7 @@
         },
         {
           "name": "volume_background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -622,6 +628,7 @@
         },
         {
           "name": "volume_slider",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -666,6 +673,7 @@
         },
         {
           "name": "slider_button",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],

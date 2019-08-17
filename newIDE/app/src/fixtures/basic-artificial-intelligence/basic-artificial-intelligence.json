@@ -627,6 +627,7 @@
       "objects": [
         {
           "name": "Perso",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -684,6 +685,7 @@
         },
         {
           "name": "Mur",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -751,6 +753,7 @@
         },
         {
           "name": "IA",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1075,6 +1078,7 @@
           "italic": false,
           "name": "Note",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1090,6 +1094,7 @@
         },
         {
           "name": "Alert",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],

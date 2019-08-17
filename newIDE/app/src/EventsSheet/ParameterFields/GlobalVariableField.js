@@ -23,7 +23,7 @@ export default class GlobalVariableField extends React.Component<
   }
 
   render() {
-    const { project } = this.props;
+    const { project, scope } = this.props;
 
     return (
       <div>
@@ -37,6 +37,7 @@ export default class GlobalVariableField extends React.Component<
           onOpenDialog={() => this.setState({ editorOpen: true })}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
+          scope={scope}
         />
         {this.state.editorOpen && project && (
           <VariablesEditorDialog

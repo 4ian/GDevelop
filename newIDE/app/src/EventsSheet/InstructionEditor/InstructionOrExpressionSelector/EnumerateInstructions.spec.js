@@ -1,3 +1,4 @@
+// @flow
 import { createTree } from './CreateTree';
 import { enumerateInstructions } from './EnumerateInstructions';
 
@@ -48,7 +49,7 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can create the tree of instructions', () => {
-    const instructions = enumerateInstructions('number');
+    const instructions = enumerateInstructions(true);
     expect(createTree(instructions)).toMatchObject({
       Advanced: {
         'Trigger once while true': {

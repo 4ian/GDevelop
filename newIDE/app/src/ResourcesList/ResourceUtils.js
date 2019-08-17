@@ -63,19 +63,36 @@ export const isPathInProjectFolder = (
   return resourcePath.includes(projectPath);
 };
 
-export const confirmResourcePath = (
+export const copyAllToProjectFolder = (
   project: gdProject,
-  resourcePath: string
-) => {
-  if (!isPathInProjectFolder(project, resourcePath)) {
-    // eslint-disable-next-line
-    const answer = confirm(
-      resourcePath +
-        ' is located outside of the project folder. If the project is moved, the path to the resource can be broken.\nAre you sure you want to proceed?'
-    );
-    return answer;
+  resourcePaths: Array<string>
+): Promise<Array<string>> => {
+  if (!fs || !path) {
+    return Promise.resolve(resourcePaths);
   }
-  return true;
+
+  const projectPath = path.dirname(project.getProjectFile());
+
+  return Promise.all(
+    resourcePaths.map(resourcePath => {
+      if (isPathInProjectFolder(project, resourcePath)) {
+        return resourcePath;
+      }
+
+      const resourceBasename = path.basename(resourcePath);
+      const resourceNewPath = path.join(projectPath, resourceBasename);
+
+      return new Promise(resolve => {
+        fs.copyFile(resourcePath, resourceNewPath, err => {
+          if (err) {
+            return resolve(resourcePath);
+          }
+
+          return resolve(resourceNewPath);
+        });
+      });
+    })
+  );
 };
 
 export const getResourceFilePathStatus = (

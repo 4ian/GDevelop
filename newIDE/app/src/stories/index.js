@@ -30,6 +30,7 @@ import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
+import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/ParameterFields/ExternalEventsField';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
@@ -37,6 +38,7 @@ import MouseField from '../EventsSheet/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
 import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/ParameterFields/KeyField';
+import AudioResourceField from '../EventsSheet/ParameterFields/AudioResourceField';
 import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/ParameterFields/StringField';
 import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
@@ -131,6 +133,10 @@ import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoade
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
+import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
+import SearchBar from '../UI/SearchBar';
+import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
+import EffectsList from '../EffectsList';
 
 // No i18n in this file
 
@@ -156,6 +162,9 @@ const {
   testEmptyEventsBasedBehavior,
   testBehaviorEventsFunction,
   testBehaviorLifecycleEventsFunction,
+  layerWithEffects,
+  layerWithEffectWithoutEffectName,
+  layerWithoutEffects,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -228,7 +237,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default, with text', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}
       render={(value, onChange) => (
@@ -244,6 +253,92 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
           <p>State value is {value}</p>
         </React.Fragment>
       )}
+    />
+  ))
+  .add('default, with onClick for some elements', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: 'Click me 1',
+                onClick: () => action('Click me 1 clicked'),
+              },
+              {
+                text: '',
+                value: 'Click me 2',
+                onClick: () => action('Click me 2 clicked'),
+              },
+              {
+                type: 'separator',
+              },
+            ].concat(
+              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                text: `Choice ${i}`,
+                value: `Choice ${i}`,
+              }))
+            )}
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ));
+
+storiesOf('UI Building Blocks/SearchBar', module)
+  .addDecorator(muiDecorator)
+  .add('empty', () => (
+    <SearchBar
+      value=""
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+    />
+  ))
+  .add('with text', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+    />
+  ))
+  .add('disabled', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+      disabled
+    />
+  ))
+  .add('with tags', () => (
+    <SearchBar
+      value="123"
+      onChange={action('change')}
+      onRequestSearch={action('request search')}
+      buildTagsMenuTemplate={() => [
+        {
+          type: 'checkbox',
+          label: 'Tag 1',
+          checked: false,
+          click: () => {},
+        },
+        {
+          type: 'checkbox',
+          label: 'Tag 2 (checked)',
+          checked: true,
+          click: () => {},
+        },
+        {
+          type: 'checkbox',
+          label: 'Tag 3',
+          checked: false,
+          click: () => {},
+        },
+      ]}
     />
   ));
 
@@ -472,13 +567,32 @@ storiesOf('HelpFinder', module)
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
+  .add('AudioResourceField', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <AudioResourceField
+          project={project}
+          scope={{ layout: testLayout }}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+          resourceSources={[]}
+          onChooseResource={() => Promise.reject('unimplemented')}
+          resourceExternalEditors={[]}
+        />
+      )}
+    />
+  ))
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
       render={(value, onChange) => (
         <ExpressionField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -496,7 +610,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExpressionField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -512,7 +626,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <StringField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -528,7 +642,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ObjectField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -543,6 +657,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExternalEventsField
           project={project}
+          scope={{}}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -556,6 +671,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Test'}
       render={(value, onChange) => (
         <ExternalEventsField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -570,7 +686,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <LayerField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -584,6 +700,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"GUI"'}
       render={(value, onChange) => (
         <LayerField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -598,7 +715,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <SceneNameField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -612,6 +729,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"TestLayout"'}
       render={(value, onChange) => (
         <SceneNameField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -626,6 +744,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <KeyField
           project={project}
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -654,7 +773,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <SceneVariableField
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -668,6 +787,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <SceneVariableField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -681,6 +801,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <ObjectVariableField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -694,6 +815,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -707,6 +829,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -721,6 +844,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <TrueFalseField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -735,6 +859,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <YesNoField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -749,6 +874,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <ForceMultiplierField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -762,6 +888,7 @@ storiesOf('ParameterFields', module)
       initialValue={'0.8'}
       render={(value, onChange) => (
         <ForceMultiplierField
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -1168,18 +1295,19 @@ storiesOf('LayoutChooserDialog', module)
 
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default (no scope)', () => (
     <DragDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
           <EventsTree
             events={testLayout.getEvents()}
             project={project}
-            layout={testLayout}
+            scope={{ layout: testLayout }}
             globalObjectsContainer={project}
             objectsContainer={testLayout}
             selection={getInitialSelection()}
             onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
             onMoveToInstruction={action('move to instruction')}
             onMoveToInstructionsList={action('move instruction to list')}
             onInstructionClick={action('instruction click')}
@@ -1206,12 +1334,12 @@ storiesOf('EventsTree', module)
 
 storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default (no scope)', () => (
     <DragDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
-          layout={testLayout}
+          scope={{ layout: testLayout }}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           events={testLayout.getEvents()}
@@ -1234,12 +1362,12 @@ storiesOf('EventsSheet', module)
       </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ))
-  .add('empty (no events)', () => (
+  .add('empty (no events) (no scope)', () => (
     <DragDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
-          layout={emptyLayout}
+          scope={{ layout: emptyLayout }}
           globalObjectsContainer={project}
           objectsContainer={emptyLayout}
           events={emptyLayout.getEvents()}
@@ -1321,41 +1449,112 @@ storiesOf('SearchPanel', module)
   ));
 
 storiesOf('ExpressionSelector', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('number (with focusOnMount)', () => (
-    <ExpressionSelector
-      selectedType=""
-      expressionType="number"
-      onChoose={action('Expression chosen')}
-      focusOnMount
-    />
+  .add('number (with focusOnMount) (no scope)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExpressionSelector
+        selectedType=""
+        expressionType="number"
+        onChoose={action('Expression chosen')}
+        focusOnMount
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ))
-  .add('string (with focusOnMount)', () => (
-    <ExpressionSelector
-      selectedType=""
-      expressionType="string"
-      onChoose={action('(String) Expression chosen')}
-      focusOnMount
-    />
+  .add('string (with focusOnMount) (no scope)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExpressionSelector
+        selectedType=""
+        expressionType="string"
+        onChoose={action('(String) Expression chosen')}
+        focusOnMount
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionSelector', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <InstructionSelector
-      selectedType=""
-      onChoose={action('Instruction chosen')}
-      isCondition
+  .add('conditions (no scope)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <InstructionSelector
+        selectedType=""
+        onChoose={action('Instruction chosen')}
+        isCondition
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
+  ))
+  .add('actions (no scope)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <InstructionSelector
+        selectedType=""
+        onChoose={action('Instruction chosen')}
+        isCondition={false}
+        scope={{}}
+      />
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('InstructionOrObjectSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('"KeyPressed" condition chosen, ', () => (
+    <ValueStateHolder
+      initialValue={'free-instructions'}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <InstructionOrObjectSelector
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+            project={project}
+            currentTab={value}
+            onChangeTab={onChange}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            isCondition
+            chosenInstructionType={'KeyPressed'}
+            onChooseInstruction={action('instruction chosen')}
+            chosenObjectName={null}
+            onChooseObject={action('choose object')}
+            focusOnMount
+          />
+        </FixedHeightFlexContainer>
+      )}
+    />
+  ))
+  .add('"MySpriteObject" object chosen, ', () => (
+    <ValueStateHolder
+      initialValue={'objects'}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <InstructionOrObjectSelector
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+            project={project}
+            currentTab={value}
+            onChangeTab={onChange}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            isCondition
+            chosenInstructionType={''}
+            onChooseInstruction={action('instruction chosen')}
+            chosenObjectName={'MySpriteObject'}
+            onChooseObject={action('choose object')}
+            focusOnMount
+          />
+        </FixedHeightFlexContainer>
+      )}
     />
   ));
 
 storiesOf('InstructionEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default (no scope)', () => (
     <InstructionEditor
       project={project}
-      layout={testLayout}
+      scope={{ layout: testLayout }}
       globalObjectsContainer={project}
       objectsContainer={testLayout}
       isCondition
@@ -1369,10 +1568,10 @@ storiesOf('InstructionEditor', module)
       openInstructionOrExpression={action('open instruction or expression')}
     />
   ))
-  .add('without layout', () => (
+  .add('without layout (no scope)', () => (
     <InstructionEditor
       project={project}
-      layout={null}
+      scope={{ layout: null }}
       globalObjectsContainer={project}
       objectsContainer={testLayout}
       isCondition
@@ -1384,6 +1583,74 @@ storiesOf('InstructionEditor', module)
       }}
       resourceSources={[]}
       openInstructionOrExpression={action('open instruction or expression')}
+    />
+  ));
+
+storiesOf('NewInstructionEditorDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('Existing condition (scope: in a layout)', () => (
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: testLayout }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={false}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
+    />
+  ))
+  .add('Existing condition (scope: without layout)', () => (
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: null }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={false}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
+    />
+  ))
+  .add('New condition (scope: without layout)', () => (
+    <NewInstructionEditorDialog
+      open
+      project={project}
+      scope={{ layout: null }}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      isNewInstruction={true}
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
+      onCancel={action('cancel')}
+      onSubmit={action('submit')}
     />
   ));
 
@@ -1547,6 +1814,7 @@ storiesOf('ObjectSelector', module)
       initialValue={''}
       render={(value, onChange) => (
         <ObjectSelector
+          project={project}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -1565,6 +1833,7 @@ storiesOf('ObjectSelector', module)
       initialValue={''}
       render={(value, onChange) => (
         <ObjectSelector
+          project={project}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
           value={value}
@@ -1599,6 +1868,7 @@ storiesOf('ObjectGroupEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ObjectGroupEditor
+      project={project}
       globalObjectsContainer={project}
       objectsContainer={testLayout}
       group={group2}
@@ -1950,6 +2220,45 @@ storiesOf('ResourcePreview', module)
     />
   ));
 
+storiesOf('ResourceSelector', module)
+  .addDecorator(muiDecorator)
+  .add('image resource (not existing/missing resource)', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="resource-that-does-not-exists-in-the-project"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="icon128.png"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('audio resource', () => (
+    <ResourceSelector
+      resourceKind="audio"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="fake-audio1.mp3"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ));
+
 storiesOf('ResourcesList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -2086,6 +2395,7 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   ));
 
 storiesOf('EventsBasedBehaviorEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
   .add('default', () => (
@@ -2093,6 +2403,9 @@ storiesOf('EventsBasedBehaviorEditor', module)
       project={project}
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEventsBasedBehavior}
+      onPropertiesUpdated={action('properties updated')}
+      onTabChanged={action('tab changed')}
+      onRenameProperty={action('property rename')}
     />
   ))
   .add('events based behavior without functions', () => (
@@ -2100,6 +2413,9 @@ storiesOf('EventsBasedBehaviorEditor', module)
       project={project}
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEmptyEventsBasedBehavior}
+      onPropertiesUpdated={action('properties updated')}
+      onTabChanged={action('tab changed')}
+      onRenameProperty={action('property rename')}
     />
   ));
 
@@ -2113,6 +2429,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEventsBasedBehavior}
       onApply={action('apply')}
+      onRenameProperty={action('property rename')}
     />
   ))
   .add('events based behavior without functions', () => (
@@ -2121,6 +2438,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEmptyEventsBasedBehavior}
       onApply={action('apply')}
+      onRenameProperty={action('property rename')}
     />
   ));
 
@@ -2274,4 +2592,27 @@ storiesOf('ExtensionsSearchDialog', module)
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('EffectsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('with some effects', () => (
+    <EffectsList
+      effectsContainer={layerWithEffects}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('with an effect without effect name', () => (
+    <EffectsList
+      effectsContainer={layerWithEffectWithoutEffectName}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('without effects', () => (
+    <EffectsList
+      effectsContainer={layerWithoutEffects}
+      onEffectsUpdated={action('effects updated')}
+    />
   ));

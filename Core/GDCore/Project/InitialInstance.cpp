@@ -10,7 +10,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #endif
 
 namespace gd {

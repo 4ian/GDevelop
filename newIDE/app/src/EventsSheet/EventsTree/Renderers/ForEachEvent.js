@@ -67,18 +67,22 @@ export default class ForEachEvent extends React.Component<
           [executableEventContainer]: true,
         })}
       >
-        <div
-          className={classNames({
-            [selectableArea]: true,
-            [disabledText]: this.props.disabled,
-          })}
-          onClick={this.edit}
-        >
-          {objectName ? (
-            `Repeat for each ${objectName} object:`
-          ) : (
-            <i>Click to choose for which objects this event will be repeated</i>
-          )}
+        <div>
+          <span
+            className={classNames({
+              [selectableArea]: true,
+              [disabledText]: this.props.disabled,
+            })}
+            onClick={this.edit}
+          >
+            {objectName ? (
+              `Repeat for each ${objectName} object:`
+            ) : (
+              <i>
+                Click to choose for which objects this event will be repeated
+              </i>
+            )}
+          </span>
         </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
@@ -87,6 +91,7 @@ export default class ForEachEvent extends React.Component<
             selection={this.props.selection}
             areConditions
             onAddNewInstruction={this.props.onAddNewInstruction}
+            onPasteInstructions={this.props.onPasteInstructions}
             onMoveToInstruction={this.props.onMoveToInstruction}
             onMoveToInstructionsList={this.props.onMoveToInstructionsList}
             onInstructionClick={this.props.onInstructionClick}
@@ -101,10 +106,15 @@ export default class ForEachEvent extends React.Component<
           />
           <InstructionsList
             instrsList={forEachEvent.getActions()}
-            style={styles.actionsList}
+            style={
+              {
+                ...styles.actionsList,
+              } /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+            }
             selection={this.props.selection}
             areConditions={false}
             onAddNewInstruction={this.props.onAddNewInstruction}
+            onPasteInstructions={this.props.onPasteInstructions}
             onMoveToInstruction={this.props.onMoveToInstruction}
             onMoveToInstructionsList={this.props.onMoveToInstructionsList}
             onInstructionClick={this.props.onInstructionClick}
@@ -125,7 +135,7 @@ export default class ForEachEvent extends React.Component<
         >
           <ObjectField
             project={this.props.project}
-            layout={this.props.layout}
+            scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={objectName}

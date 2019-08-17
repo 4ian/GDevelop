@@ -401,6 +401,7 @@
       "objects": [
         {
           "name": "Sprite",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -458,6 +459,7 @@
         },
         {
           "name": "Sprite2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -518,6 +520,7 @@
           "italic": false,
           "name": "Counter",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -536,6 +539,7 @@
           "italic": false,
           "name": "Counter2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],

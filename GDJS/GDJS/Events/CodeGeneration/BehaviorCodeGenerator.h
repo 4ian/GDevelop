@@ -10,6 +10,9 @@
 #include <string>
 #include <vector>
 #include "GDCore/Project/EventsBasedBehavior.h"
+namespace gd {
+class NamedPropertyDescriptor;
+}
 
 namespace gdjs {
 
@@ -35,8 +38,45 @@ class BehaviorCodeGenerator {
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 
+  /**
+   * \brief Generate the name of the method to get the value of the property
+   * of a behavior.
+   */
+  static gd::String GetBehaviorPropertyGetterName(
+      const gd::String& propertyName) {
+    return "_get" + propertyName;
+  }
+
+  /**
+   * \brief Generate the name of the method to set the value of the property
+   * of a behavior.
+   */
+  static gd::String GetBehaviorPropertySetterName(
+      const gd::String& propertyName) {
+    return "_set" + propertyName;
+  }
+
+
  private:
-  gd::String GetRuntimeBehaviorTemplateCode();
+  gd::String GenerateRuntimeBehaviorTemplateCode(
+      const gd::String& extensionName,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace,
+      std::function<gd::String()> generateInitializePropertiesCode,
+      std::function<gd::String()> generateMethodsCode,
+      std::function<gd::String()> generatePropertiesCode);
+  gd::String GenerateRuntimeBehaviorPropertyTemplateCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace,
+      const gd::NamedPropertyDescriptor& property);
+  gd::String GenerateInitializePropertyFromDataCode(
+      const gd::NamedPropertyDescriptor& property);
+  gd::String GenerateInitializePropertyFromDefaultValueCode(
+      const gd::NamedPropertyDescriptor& property);
+  gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
+  gd::String GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace);
 
   gd::Project& project;
 };

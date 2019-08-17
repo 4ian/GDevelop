@@ -18,7 +18,10 @@ declare type gdObjectsContainer = gdEmscriptenObject;
 declare type gdObjectGroup = gdEmscriptenObject;
 declare type gdObjectGroupsContainer = gdEmscriptenObject;
 declare type gdProject = gdObjectsContainer & gdEmscriptenObject;
+declare type gdEffect = gdEmscriptenObject;
+declare type gdEffectsContainer = gdEmscriptenObject;
 declare type gdLayout = gdObjectsContainer & gdEmscriptenObject;
+declare type gdLayer = gdEffectsContainer & gdEmscriptenObject;
 declare type gdExternalLayout = gdEmscriptenObject;
 declare type gdExternalEvents = gdEmscriptenObject;
 declare type gdSerializerElement = gdEmscriptenObject;
@@ -32,10 +35,12 @@ declare type gdEventsFunction = gdEmscriptenObject;
 
 declare type gdInstruction = gdEmscriptenObject;
 declare type gdInstructionMetadata = gdEmscriptenObject;
+declare type gdMapStringInstructionMetadata = gdEmscriptenObject;
 declare type gdInstructionsList = gdEmscriptenObject;
 declare type gdParameterMetadata = gdEmscriptenObject;
 declare type gdExpression = gdEmscriptenObject;
 declare type gdExpressionMetadata = gdEmscriptenObject;
+declare type gdMapStringExpressionMetadata = gdEmscriptenObject;
 declare type gdObjectMetadata = gdEmscriptenObject;
 declare type gdBehaviorMetadata = gdEmscriptenObject;
 
@@ -59,6 +64,10 @@ declare type gdEventsFunctionsExtension = gdEventsFunctionsContainer & gdEmscrip
 
 declare type gdVectorEventsSearchResult = gdEmscriptenObject;
 declare type gdMapStringPropertyDescriptor = gdEmscriptenObject;
+declare type gdPropertyDescriptor = gdEmscriptenObject;
+declare type gdNamedPropertyDescriptor = gdEmscriptenObject;
+declare type gdNamedPropertyDescriptorsList = gdEmscriptenObject;
+
 
 declare type gdEventsContext = gdEmscriptenObject;
 

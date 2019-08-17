@@ -1,3 +1,4 @@
+// @flow
 import RenderedUnknownInstance from './Renderers/RenderedUnknownInstance';
 import RenderedSpriteInstance from './Renderers/RenderedSpriteInstance';
 import RenderedTiledSpriteInstance from './Renderers/RenderedTiledSpriteInstance';
@@ -27,7 +28,7 @@ export default {
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
-  getThumbnail: function(project, object) {
+  getThumbnail: function(project: gdProject, object: gdObject) {
     var objectType = object.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
@@ -43,11 +44,11 @@ export default {
       );
   },
   createNewInstanceRenderer: function(
-    project,
-    layout,
-    instance,
-    associatedObject,
-    pixiContainer
+    project: gdProject,
+    layout: gdLayout,
+    instance: gdInitialInstance,
+    associatedObject: gdObject,
+    pixiContainer: any
   ) {
     var objectType = associatedObject.getType();
     if (this.renderers.hasOwnProperty(objectType))
@@ -73,7 +74,7 @@ export default {
       );
     }
   },
-  registerInstanceRenderer: function(objectType, renderer) {
+  registerInstanceRenderer: function(objectType: string, renderer: any) {
     if (!renderer.getThumbnail) {
       console.warn(
         `Tried to register renderer for object "${objectType}", but getThumbnail is not defined.`

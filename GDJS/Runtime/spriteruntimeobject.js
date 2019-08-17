@@ -190,6 +190,9 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
         this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
 
     this._updateFrame();
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.SpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );

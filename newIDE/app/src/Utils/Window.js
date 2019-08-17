@@ -182,6 +182,17 @@ export default class Window {
     if (!electron)
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
-    return electron.remote.require('electron-is').dev();
+    try {
+      const isDev = electron.remote.require('electron-is').dev();
+      return isDev;
+    } catch (err) {
+      // This rarely, but sometimes happen that require throw ("missing remote object").
+      // Catch the error in the hope that things will continue to work.
+      console.error(
+        "Caught an error while calling electron.remote.require('electron-is').dev",
+        err
+      );
+      return false; // Assume we're not in development mode. Might be incorrect but better not consider production as development.
+    }
   }
 }

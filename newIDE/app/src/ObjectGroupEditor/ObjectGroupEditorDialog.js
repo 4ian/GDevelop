@@ -8,7 +8,7 @@ const gd = global.gd;
 
 export class ObjectGroupEditorDialog extends Component {
   render() {
-    const { group } = this.props;
+    const { project, group } = this.props;
     if (!group) return null;
 
     const actions = [
@@ -37,6 +37,7 @@ export class ObjectGroupEditorDialog extends Component {
         title={`Edit ${group.getName()} group`}
       >
         <ObjectGroupEditor
+          project={project}
           group={group}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}

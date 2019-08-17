@@ -5,7 +5,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import React, { Component } from 'react';
-import SearchBar from 'material-ui-search-bar';
 import {
   getExtensionsRegistry,
   type ExtensionsRegistry,
@@ -88,13 +87,15 @@ const filterExtensionShortHeaders = (
   );
 
   if (!searchText && !chosenTag) return behaviorsFilteredHeaders;
+
+  const lowercaseSearchText = searchText.toLowerCase();
   return behaviorsFilteredHeaders
     .filter(({ tags }) => !chosenTag || tags.indexOf(chosenTag) !== -1)
     .filter(
       ({ name, shortDescription }) =>
         !searchText ||
-        (name.indexOf(searchText) !== -1 ||
-          shortDescription.indexOf(searchText) !== -1)
+        (name.toLowerCase().indexOf(lowercaseSearchText) !== -1 ||
+          shortDescription.toLowerCase().indexOf(lowercaseSearchText) !== -1)
     );
 };
 
@@ -113,7 +114,6 @@ export default class ExtensionsSearch extends Component<Props, State> {
     error: null,
     chosenTag: '',
   };
-  _searchBar = React.createRef<SearchBar>();
 
   componentDidMount() {
     this._loadExtensionsRegistry();
@@ -239,7 +239,6 @@ export default class ExtensionsSearch extends Component<Props, State> {
                       chosenTag,
                     })
                   }
-                  ref={this._searchBar}
                 />
                 <List>
                   {!extensionsRegistry && !error && <PlaceholderLoader />}

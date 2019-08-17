@@ -36,14 +36,42 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     style.fontWeight = this._object._bold ? 'bold' : 'normal';
     style.fontSize = this._object._characterSize;
     style.fontFamily = fontName;
-    style.fill = gdjs.rgbToHexNumber(
-        this._object._color[0],
-        this._object._color[1],
-        this._object._color[2]
-    );
+
+    if (this._object._useGradient){
+        style.fill = this._getGradientHex();
+    } else {
+        style.fill = this._getColorHex();
+    }
+
+    if (this._object._gradientType === 'LINEAR_VERTICAL'){
+        style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_VERTICAL;
+    } else {
+        style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_HORIZONTAL;
+    }
+
+    style.align = this._object._textAlign;
     style.wordWrap = this._object._wrapping;
     style.wordWrapWidth = this._object._wrappingWidth;
     style.breakWords = true;
+    style.stroke = gdjs.rgbToHexNumber(
+        this._object._outlineColor[0],
+        this._object._outlineColor[1],
+        this._object._outlineColor[2]
+    );
+    style.strokeThickness = this._object._outlineThickness;
+    style.dropShadow = this._object._shadow;
+    style.dropShadowColor = gdjs.rgbToHexNumber(
+        this._object._shadowColor[0],
+        this._object._shadowColor[1],
+        this._object._shadowColor[2]
+    );
+    style.dropShadowBlur = this._object._shadowBlur;
+    style.dropShadowAngle = this._object._shadowAngle;
+    style.dropShadowDistance = this._object._shadowDistance;
+    style.padding = this._object._padding;
+    // Prevent spikey outlines by adding a miter limit 
+    style.miterLimit = 3;
+
     this.updatePosition();
 
     // Manually ask the PIXI object to re-render as we changed a style property
@@ -77,6 +105,27 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
     return this._text.height;
 };
 
+gdjs.TextRuntimeObjectPixiRenderer.prototype._getColorHex = function() {
+    return gdjs.rgbToHexNumber(
+        this._object._color[0],
+        this._object._color[1],
+        this._object._color[2]
+    );
+}
+
+gdjs.TextRuntimeObjectPixiRenderer.prototype._getGradientHex = function() {
+    var gradient = [];
+    for (var colorIndex = 0; colorIndex < this._object._gradient.length; colorIndex++){
+        gradient.push(
+            '#' + gdjs.rgbToHex(
+                this._object._gradient[colorIndex][0],
+                this._object._gradient[colorIndex][1],
+                this._object._gradient[colorIndex][2]
+            )
+        );
+    } 
+    return gradient;
+}
 /**
  * Get y-scale of the text.
  */

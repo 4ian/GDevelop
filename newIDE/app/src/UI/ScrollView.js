@@ -8,8 +8,8 @@ const styles = {
   },
 };
 
-type Props = {| children: React.Node |};
+type Props = {| children: React.Node, style?: ?Object |};
 
-export default ({ children }: Props) => (
-  <div style={{ ...styles.container }}>{children}</div>
+export default ({ children, style }: Props) => (
+  <div style={{ ...styles.container, ...style }}>{children}</div>
 );

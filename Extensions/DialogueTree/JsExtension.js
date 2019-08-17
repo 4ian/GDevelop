@@ -74,7 +74,7 @@ module.exports = {
 
     extension
       .addAction(
-        'StarDialogueFromBranch',
+        'StartDialogueFromBranch',
         _('Start dialogue from branch'),
         _(
           'Start dialogue from branch. Use this to initiate the dialogue from a specified branch.'
@@ -87,6 +87,19 @@ module.exports = {
       .addParameter('string', _('Dialogue branch'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.startFrom');
+
+    extension
+      .addAction(
+        'StopRunningDialogue',
+        _('Stop running dialogue'),
+        _('Stop running dialogue.Use this to interupt dialogue parsing'),
+        _('Stop running dialogue'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.stopRunningDialogue');
 
     extension
       .addAction(

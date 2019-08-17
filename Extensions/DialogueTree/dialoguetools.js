@@ -70,6 +70,16 @@ gdjs.dialogueTree.loadFromJsonFile = function(
 };
 
 /**
+ * Stop the currently running dialogue
+ */
+gdjs.dialogueTree.stopRunningDialogue = function() {
+  if (this.dialogueIsRunning) this.dialogueIsRunning = false;
+  if (this.dialogueData) this.dialogueData = null;
+  this.dialogueText = '';
+  this.clipTextEnd = 0;
+};
+
+/**
  * Check if the Dialogue Tree is currently parsing data.
  * For example, you can do things like disabling player movement while talking to a NPC.
  */

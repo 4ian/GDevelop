@@ -368,11 +368,12 @@ gdjs.dialogueTree.isDialogueLineType = function(type) {
   if (
     this.commandCalls &&
     this.commandCalls.some(function(call) {
-      return gdjs.dialogueTree.clipTextEnd > call.time;
+      return gdjs.dialogueTree.clipTextEnd > call.time && call.cmd === 'wait';
     })
   ) {
-    return true;
+    return !this.pauseScrolling;
   }
+
   return this.dialogueIsRunning ? this.dialogueDataType === type : false;
 };
 

@@ -107,6 +107,15 @@ gdjs.dialogueTree.scrollClippedText = function() {
 };
 
 /**
+ * Scroll the clipped text to its end, so the entire text is printed. This can be useful in keeping the event sheet logic simpler, while supporting more variation.
+ */
+gdjs.dialogueTree.completeClippedTextScrolling = function() {
+  if (this.pauseScrolling || !this.dialogueIsRunning || !this.dialogueText)
+    return;
+  this.clipTextEnd = this.dialogueText.length;
+};
+
+/**
  * Check if text scrolling has completed.
  * Useful to prevent the user from skipping to next line before the current one has been printed fully.
  */
@@ -132,7 +141,7 @@ gdjs.dialogueTree.getClippedLineText = function() {
  * Note that using this instead getClippedLineText will skip any <<wait>> commands entirely.
  */
 gdjs.dialogueTree.getLineText = function() {
-  this.clipTextEnd = this.dialogueText.length;
+  this.completeClippedTextScrolling();
   return this.dialogueText.length ? this.dialogueText : '';
 };
 

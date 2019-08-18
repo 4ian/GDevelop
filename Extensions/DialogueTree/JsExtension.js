@@ -195,6 +195,21 @@ module.exports = {
 
     extension
       .addAction(
+        'CompleteClippedTextScrolling',
+        _('Complete clipped text scrolling'),
+        _(
+          'Complete clipped text scrolling. Use this action whenever you want to trigger skipping scrolling'
+        ),
+        _('Complete clipped text scrolling'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.completeClippedTextScrolling');
+
+    extension
+      .addAction(
         'SetVariable',
         _('Set dialogue state variable'),
         _(

@@ -409,6 +409,7 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   this.dialogueData = null;
   this.dialogueDataType = '';
   this.dialogueText = '';
+  this.clipTextEnd = 0;
   this.commandCalls = [];
   this.commandParameters = [];
   this.pauseScrolling = false;

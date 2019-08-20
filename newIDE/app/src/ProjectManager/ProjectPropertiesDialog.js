@@ -17,6 +17,8 @@ import {
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import { Line, Column } from '../UI/Grid';
 import HelpButton from '../UI/HelpButton';
+// import SeparateWindowDialog from '../UI/SeparateWindowDialog';
+import NewWindow from 'react-new-window'
 
 type Props = {|
   project: gdProject,
@@ -118,6 +120,10 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     this.props.onApply();
   };
 
+  componentWillUnmount() {
+    console.log("componentWillUnmount ProjectPropertiesDialog");
+  }
+
   render() {
     const {
       name,
@@ -136,13 +142,37 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       isFolderProject,
     } = this.state;
 
+
+    console.log("RENDER ProjectPropertiesDialog");
+
     const defaultPackageName = 'com.example.mygame';
     const admobHint = 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY';
     const defaultVersion = '1.0.0';
 
     return (
       <React.Fragment>
-        <Dialog
+        <NewWindow
+        >
+        {/* <SeparateWindowDialog
+          onRequestClose={this.props.onClose}
+          actions={[
+            <FlatButton
+              label={<Trans>Cancel</Trans>}
+              primary={false}
+              onClick={this.props.onClose}
+              key="cancel"
+            />,
+            <FlatButton
+              label={<Trans>Apply</Trans>}
+              primary={true}
+              keyboardFocused={true}
+              onClick={this._onApply}
+              key="apply"
+            />,
+          ]}
+        > */}
+          <div>
+        {/* <Dialog
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}
@@ -167,7 +197,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           open={this.props.open}
           onRequestClose={this.props.onClose}
           autoScrollBodyContent={true}
-        >
+        > */}
           <SemiControlledTextField
             floatingLabelText={<Trans>Game name</Trans>}
             fullWidth
@@ -422,7 +452,23 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               });
             }}
           />
-        </Dialog>
+          <FlatButton
+            label={<Trans>Cancel</Trans>}
+            primary={false}
+            onClick={this.props.onClose}
+            key="cancel"
+          />
+          <FlatButton
+            label={<Trans>Apply</Trans>}
+            primary={true}
+            keyboardFocused={true}
+            onClick={this._onApply}
+            key="apply"
+          />
+        {/* </Dialog> */}
+        </div>
+        {/* </SeparateWindowDialog> */}
+        </NewWindow>
         <SubscriptionChecker
           ref={subscriptionChecker =>
             (this._subscriptionChecker = subscriptionChecker)

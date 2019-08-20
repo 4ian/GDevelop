@@ -74,6 +74,7 @@ app.on('ready', function() {
     x: args.x,
     y: args.y,
     webPreferences: {
+      nativeWindowOpen: true, // TODO
       webSecurity: false, // Allow to access to local files
     },
     enableLargerThanScreen: true,
@@ -130,10 +131,11 @@ app.on('ready', function() {
   });
 
   //Prevent opening any website or url inside Electron.
-  mainWindow.webContents.on('new-window', (e, url) => {
-    console.info('Opening in browser (because of new-window): ', url);
-    e.preventDefault();
-    electron.shell.openExternal(url);
+  mainWindow.webContents.on('new-window', (event, url, frameName) => {
+    console.info(url, frameName);
+    // console.info('Opening in browser (because of new-window): ', url);
+    // e.preventDefault();
+    // electron.shell.openExternal(url);
   });
 
   ipcMain.on('piskel-open-then-load-animation', (event, externalEditorData) => {

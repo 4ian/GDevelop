@@ -429,6 +429,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   <MosaicWindow
                     title={<Trans>Function Configuration</Trans>}
                     toolbarControls={[]}
+                    // TODO: deprecated
                     // /!\ Force re-rendering if selectedEventsFunction, globalObjectsContainer
                     // or objectsContainer change,
                     // otherwise we risk using deleted objects (because of the shouldComponentUpdate

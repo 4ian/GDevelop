@@ -606,6 +606,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const forceOpen = searchText !== '' ? true : undefined;
 
+    console.log('projectPropertiesDialogOpen', this.state.projectPropertiesDialogOpen);
     return (
       <div style={styles.container}>
         <List style={styles.list}>
@@ -959,10 +960,10 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ProjectPropertiesDialog
             open={this.state.projectPropertiesDialogOpen}
             project={project}
-            onClose={() =>
+            onClose={() => console.log("onClose") ||
               this.setState({ projectPropertiesDialogOpen: false })
             }
-            onApply={() =>
+            onApply={() => console.log("onApply") ||
               this.setState({ projectPropertiesDialogOpen: false })
             }
             onChangeSubscription={this.props.onChangeSubscription}

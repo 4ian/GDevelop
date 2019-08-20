@@ -13,7 +13,7 @@ import InstructionParametersEditor from './InstructionParametersEditor';
 import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -35,6 +35,7 @@ import {
   ResponsiveWidthMeasurer,
   type WidthType,
 } from '../../UI/Reponsive/ReponsiveWidthMeasurer';
+import NewWindow from 'react-new-window';
 const gd = global.gd;
 
 const styles = {
@@ -353,7 +354,8 @@ export default class NewInstructionEditorDialog extends React.Component<
     return (
       <ResponsiveWidthMeasurer>
         {width => (
-          <Dialog
+        <NewWindow>
+          {/* <Dialog
             actions={[
               <FlatButton
                 label={<Trans>Cancel</Trans>}
@@ -399,7 +401,10 @@ export default class NewInstructionEditorDialog extends React.Component<
             onRequestClose={onCancel}
             contentStyle={styles.dialogContent}
             bodyStyle={styles.dialogBody}
-          >
+          > */}
+          <Background>
+            <Column>
+          <div style={{height: 500}}>
             <SelectColumns
               columnsRenderer={{
                 'instruction-or-object-selector': renderInstructionOrObjectSelector,
@@ -438,7 +443,25 @@ export default class NewInstructionEditorDialog extends React.Component<
                 }
               }}
             />
-          </Dialog>
+            </div>
+            <Line><FlatButton
+                label={<Trans>Cancel</Trans>}
+                primary={false}
+                onClick={onCancel}
+                key="cancel"
+              />
+              <FlatButton
+                label={<Trans>Ok</Trans>}
+                primary={true}
+                keyboardFocused={false}
+                disabled={!instructionType}
+                onClick={onSubmit}
+                key="ok"
+              /></Line>
+              </Column>
+            </Background>
+          {/* </Dialog> */}
+          </NewWindow>
         )}
       </ResponsiveWidthMeasurer>
     );

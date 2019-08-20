@@ -103,7 +103,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={shapePainterObject.getFillOpacity()}
-            onChange={(e, value) => {
+            onChange={value => {
               shapePainterObject.setFillOpacity(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}

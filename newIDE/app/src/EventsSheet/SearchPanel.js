@@ -8,7 +8,7 @@ import { Line, Column } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import {
   type SearchInEventsInputs,
@@ -175,13 +175,17 @@ export default class SearchPanel extends PureComponent<Props, State> {
               </p>
               <IconButton
                 disabled={!resultsCount}
-                onClick={() => onGoToPreviousSearchResult()}
+                onClick={() => {
+                  onGoToPreviousSearchResult();
+                }}
               >
                 <ChevronLeft />
               </IconButton>
               <IconButton
                 disabled={!resultsCount}
-                onClick={() => onGoToNextSearchResult()}
+                onClick={() => {
+                  onGoToNextSearchResult();
+                }}
               >
                 <ChevronRight />
               </IconButton>

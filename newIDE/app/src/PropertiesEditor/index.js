@@ -9,7 +9,7 @@ import FlatButton from '../UI/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Edit from 'material-ui/svg-icons/image/edit';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import {
   type ResourceKind,
   type ResourceSource,

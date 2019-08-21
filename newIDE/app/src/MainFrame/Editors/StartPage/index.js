@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import React from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import Paper from 'material-ui/Paper';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../../UI/IconButton';
 import Language from 'material-ui/svg-icons/action/language';
 import BaseEditor from '../BaseEditor';
 import Window from '../../../Utils/Window';

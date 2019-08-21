@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
 import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';

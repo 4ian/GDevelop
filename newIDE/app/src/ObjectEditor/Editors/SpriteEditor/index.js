@@ -7,7 +7,7 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
 import Add from 'material-ui/svg-icons/content/add';
 import Delete from 'material-ui/svg-icons/action/delete';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../../UI/IconButton';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
 import { mapFor } from '../../../Utils/MapFor';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import Add from 'material-ui/svg-icons/content/add';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import ContentCopy from 'material-ui/svg-icons/content/content-copy';
 import ContentPaste from 'material-ui/svg-icons/content/content-paste';

@@ -9,7 +9,7 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import { type Schema } from '../../PropertiesEditor';
 import VariablesList from '../../VariablesList';
 import getObjectByName from '../../Utils/GetObjectByName';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
 
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';

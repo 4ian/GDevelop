@@ -30,7 +30,7 @@ import { passFullSize } from '../UI/FullSizeMeasurer';
 import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import Drawer from 'material-ui/Drawer';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import EditorBar, { editorBarHeight } from '../UI/EditorBar';

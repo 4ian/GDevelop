@@ -1,7 +1,7 @@
 import React from 'react';
 import { TableRow, TableRowColumn } from 'material-ui/Table';
 import Add from 'material-ui/svg-icons/content/add';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../../../UI/IconButton';
 import styles from './styles';
 
 const AddPointRow = ({ onAdd }) => (

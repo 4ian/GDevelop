@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import HelpOutline from 'material-ui/svg-icons/action/help-outline';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../IconButton';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 

@@ -8,7 +8,7 @@ import SearchBar from '../UI/SearchBar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import WarningIcon from 'material-ui/svg-icons/alert/warning';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import ListIcon from '../UI/ListIcon';
 import { makeAddItem, makeSearchItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';

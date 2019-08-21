@@ -8,7 +8,7 @@ import Checkbox from 'material-ui/Checkbox';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
 import TextField from '../UI/TextField';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import Reset from 'material-ui/svg-icons/av/replay';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';

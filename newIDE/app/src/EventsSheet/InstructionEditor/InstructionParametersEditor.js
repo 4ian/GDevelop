@@ -20,7 +20,7 @@ import AlertMessage from '../../UI/AlertMessage';
 import { getExtraInstructionInformation } from '../../Hints';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../EventsScope.flow';
 const gd = global.gd;
 
@@ -245,7 +245,11 @@ export default class InstructionParametersEditor extends React.Component<
               />
               <p>{instructionMetadata.getDescription()}</p>
               {isAnEventFunctionMetadata(instructionMetadata) && (
-                <IconButton onClick={() => this._openExtension(i18n)}>
+                <IconButton
+                  onClick={() => {
+                    this._openExtension(i18n);
+                  }}
+                >
                   <OpenInNew />
                 </IconButton>
               )}

@@ -584,6 +584,13 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
+
     if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox(i18n._(t`Another scene with this name already exists.`));
       return;
@@ -608,6 +615,13 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
@@ -638,6 +652,13 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(
@@ -672,6 +693,13 @@ class MainFrame extends React.Component<Props, State> {
       newName === oldName
     )
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
       showWarningBox(

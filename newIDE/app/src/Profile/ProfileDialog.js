@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import Dialog from '../UI/Dialog';
 import { Column } from '../UI/Grid';

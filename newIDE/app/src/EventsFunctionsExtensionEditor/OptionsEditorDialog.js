@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import TextField from 'material-ui/TextField';
 import CloudUpload from 'material-ui/svg-icons/file/cloud-upload';
 import { Column, Line } from '../UI/Grid';

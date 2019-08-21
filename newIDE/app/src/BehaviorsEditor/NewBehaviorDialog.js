@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Subheader from 'material-ui/Subheader';
 import Avatar from 'material-ui/Avatar';
 import { Tabs, Tab } from 'material-ui/Tabs';

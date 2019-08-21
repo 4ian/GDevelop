@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Window from '../Utils/Window';
 import { List, ListItem } from 'material-ui/List';
 import { Column } from '../UI/Grid';

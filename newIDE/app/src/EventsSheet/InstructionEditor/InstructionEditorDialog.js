@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import InstructionEditor from './index.js';
 import {
   type ResourceSource,

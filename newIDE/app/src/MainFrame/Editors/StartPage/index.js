@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
 import React from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../../UI/FlatButton';
 import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
 import Language from 'material-ui/svg-icons/action/language';

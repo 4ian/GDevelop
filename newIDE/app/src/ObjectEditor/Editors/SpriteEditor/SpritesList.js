@@ -23,7 +23,7 @@ import {
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../../UI/FlatButton';
 const gd = global.gd;
 const path = require('path');
 

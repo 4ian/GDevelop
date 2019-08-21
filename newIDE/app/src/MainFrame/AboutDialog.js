@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { PureComponent } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import Dialog from '../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';

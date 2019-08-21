@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../../../UI/FlatButton';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';

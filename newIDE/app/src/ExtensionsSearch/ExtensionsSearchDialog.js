@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import CloudDownload from 'material-ui/svg-icons/file/cloud-download';
 import ExtensionsSearch, { addSerializedExtensionToProject } from '.';
 import EventsFunctionsExtensionsContext, {
@@ -92,13 +92,13 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                         icon={<CloudDownload />}
                         key="import"
                         label={<Trans>Import extension</Trans>}
-                        onClick={() =>
+                        onClick={() => {
                           importExtension(
                             i18n,
                             eventsFunctionsExtensionsState,
                             project
-                          )
-                        }
+                          );
+                        }}
                       />
                     ) : null,
                   ]}

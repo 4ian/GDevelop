@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
 import Dialog from '../../UI/Dialog';

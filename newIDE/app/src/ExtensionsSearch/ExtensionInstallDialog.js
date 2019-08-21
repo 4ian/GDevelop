@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import {
   type ExtensionShortHeader,
   type ExtensionHeader,
@@ -18,7 +18,7 @@ type Props = {|
   extensionShortHeader: ExtensionShortHeader,
   isInstalling: boolean,
   onClose: () => void,
-  onInstall: (type: string, defaultName: string) => void,
+  onInstall: () => void,
   alreadyInstalled: boolean,
 |};
 type State = {|

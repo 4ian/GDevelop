@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
 import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../FlatButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;

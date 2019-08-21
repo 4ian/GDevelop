@@ -1,9 +1,13 @@
 // @flow
 import ReactDOM from 'react-dom';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import MUIRaisedButton from 'material-ui/RaisedButton';
+import MUIFlatButton from 'material-ui/FlatButton';
+import FlatButton from './FlatButton';
 
-type Button = typeof RaisedButton | typeof FlatButton;
+type Button = typeof MUIRaisedButton | typeof MUIFlatButton | typeof FlatButton;
+
+// If you're searching for button components,
+// take a look at FlatButton or RaisedButton.
 
 /**
  * Focus a button. This won't display the material-ui Ripple effect

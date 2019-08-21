@@ -5,7 +5,7 @@ import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../ResourcesLoader';
 import Subheader from 'material-ui/Subheader';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Edit from 'material-ui/svg-icons/image/edit';

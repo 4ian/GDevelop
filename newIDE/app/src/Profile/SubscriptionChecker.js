@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import Star from 'material-ui/svg-icons/toggle/star';
 import Favorite from 'material-ui/svg-icons/action/favorite';

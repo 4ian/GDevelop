@@ -3,7 +3,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Popover from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../../UI/RaisedButton';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import { mapVector } from '../../../Utils/MapFor';
 import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';

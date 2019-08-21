@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import RaisedButton from 'material-ui/RaisedButton/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import MeasuresTable from './MeasuresTable';
 import { type ProfilerOutput } from '..';
 import EmptyMessage from '../../UI/EmptyMessage';

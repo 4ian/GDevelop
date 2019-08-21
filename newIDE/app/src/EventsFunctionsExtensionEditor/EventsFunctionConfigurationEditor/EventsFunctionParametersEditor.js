@@ -8,7 +8,7 @@ import { Column, Line, Spacer } from '../../UI/Grid';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import { mapVector } from '../../Utils/MapFor';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import EmptyMessage from '../../UI/EmptyMessage';
 import IconMenu from '../../UI/Menu/IconMenu';

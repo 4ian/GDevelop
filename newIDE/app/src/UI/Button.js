@@ -1,10 +1,9 @@
 // @flow
 import ReactDOM from 'react-dom';
-import MUIRaisedButton from 'material-ui/RaisedButton';
-import MUIFlatButton from 'material-ui/FlatButton';
 import FlatButton from './FlatButton';
+import RaisedButton from './RaisedButton';
 
-type Button = typeof MUIRaisedButton | typeof MUIFlatButton | typeof FlatButton;
+type Button = typeof RaisedButton | typeof FlatButton;
 
 // If you're searching for button components,
 // take a look at FlatButton or RaisedButton.

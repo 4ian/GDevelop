@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
 import { makeNonBreakable } from '../../Utils/StringHelpers';
 import { type ParameterFieldProps } from './ParameterFieldCommons';

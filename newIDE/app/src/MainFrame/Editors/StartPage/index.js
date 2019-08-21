@@ -12,7 +12,7 @@ import Window from '../../../Utils/Window';
 import { Line } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
 import ScrollBackground from './ScrollBackground';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../../UI/RaisedButton';
 
 const styles = {
   innerContainer: {

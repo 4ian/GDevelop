@@ -14,6 +14,10 @@ const importsToReplace = [
     oldImport: 'material-ui/FlatButton',
     newImport: path.join(newIdeAppSrcPath, 'UI/FlatButton'),
   },
+  {
+    oldImport: 'material-ui/RaisedButton',
+    newImport: path.join(newIdeAppSrcPath, 'UI/RaisedButton'),
+  },
 ];
 
 /**

@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../../UI/RaisedButton';
 import Checkbox from 'material-ui/Checkbox';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {

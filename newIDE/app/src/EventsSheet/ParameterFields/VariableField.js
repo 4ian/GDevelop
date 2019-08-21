@@ -2,7 +2,7 @@
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';

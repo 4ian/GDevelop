@@ -1,15 +1,14 @@
 // @flow
 import * as React from 'react';
-import MUIFlatButton from 'material-ui/FlatButton';
+import MUIRaisedButton from 'material-ui/RaisedButton';
 
-// We support a subset of the props supported by Material-UI v0.x FlatButton
+// We support a subset of the props supported by Material-UI v0.x RaisedButton
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
-  label: React.Node,
+  label?: React.Node,
   onClick: ?() => void,
   primary?: boolean,
   disabled?: boolean,
-  keyboardFocused?: boolean,
   fullWidth?: boolean,
   icon?: React.Node,
   style?: {|
@@ -19,14 +18,14 @@ type Props = {|
     marginRight?: number,
     margin?: number,
   |},
-  target?: '_blank',
+  labelPosition?: 'before',
 |};
 
 /**
- * A "flat" button based on Material-UI button.
+ * A raised button based on Material-UI button.
  */
-export default class FlatButton extends React.Component<Props, {||}> {
+export default class RaisedButton extends React.Component<Props, {||}> {
   render() {
-    return <MUIFlatButton {...this.props} />;
+    return <MUIRaisedButton {...this.props} />;
   }
 }

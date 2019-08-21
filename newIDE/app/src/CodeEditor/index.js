@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { setupAutocompletions } from './LocalCodeEditorAutocompletions';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { getAllThemes } from './Theme';
 

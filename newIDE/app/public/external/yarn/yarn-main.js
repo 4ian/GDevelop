@@ -60,7 +60,7 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
       .toString();
 
     yarn.data.loadData(receivedOptions.externalEditorData, 'json', true);
-    electronWindow.setTitle('Yarn in GD: ' + receivedOptions.resourcePath);
+    electronWindow.setTitle('GDevelop Dialogue Tree Editor --' + receivedOptions.resourcePath);
 
     pathEditorHeader.toggle();
   } else {

@@ -584,6 +584,15 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
+    if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        i18n._(
+          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your scene name.`
+        )
+      );
+      return;
+    }
+
     if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox(i18n._(t`Another scene with this name already exists.`));
       return;
@@ -608,6 +617,15 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
       return;
+
+    if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        i18n._(
+          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your external layout name.`
+        )
+      );
+      return;
+    }
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
@@ -638,6 +656,15 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
       return;
+
+    if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        i18n._(
+          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your external events name.`
+        )
+      );
+      return;
+    }
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(

@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import './MainFrame.css';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import Drawer from 'material-ui/Drawer';
 import Snackbar from 'material-ui/Snackbar';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';

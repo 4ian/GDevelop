@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import IconButton from 'material-ui/IconButton';
+import IconButton from './IconButton';
 import TextField from './TextField';
 import Paper from 'material-ui/Paper';
 import Close from 'material-ui/svg-icons/navigation/close';

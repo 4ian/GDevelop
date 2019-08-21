@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../IconButton';
 import FilterList from 'material-ui/svg-icons/content/filter-list';
 import IconMenu from '../Menu/IconMenu';
 

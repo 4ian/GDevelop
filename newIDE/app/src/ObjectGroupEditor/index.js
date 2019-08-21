@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import Remove from 'material-ui/svg-icons/content/remove';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import EmptyMessage from '../UI/EmptyMessage';

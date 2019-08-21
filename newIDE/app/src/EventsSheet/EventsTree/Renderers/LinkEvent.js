@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../../UI/IconButton';
 import classNames from 'classnames';
 import {
   largeSelectedArea,

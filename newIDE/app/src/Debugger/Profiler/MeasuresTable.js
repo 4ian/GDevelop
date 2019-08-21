@@ -6,7 +6,7 @@ import { AutoSizer, Table, Column } from 'react-virtualized';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import flatMap from 'lodash/flatMap';
 import { type ProfilerMeasuresSection } from '..';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../UI/IconButton';
 import ExpandMore from 'material-ui/svg-icons/navigation/expand-more';
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 

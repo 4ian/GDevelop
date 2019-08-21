@@ -1,8 +1,8 @@
 import React from 'react';
-import IconButton from 'material-ui/IconButton';
+import IconButton from './IconButton';
 import Add from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
-import EmptyMessage from '../UI/EmptyMessage';
+import EmptyMessage from './EmptyMessage';
 // No i18n in this file
 
 const styles = {

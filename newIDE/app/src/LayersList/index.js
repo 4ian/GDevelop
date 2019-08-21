@@ -18,7 +18,7 @@ import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from 'material-ui/svg-icons/content/add';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 
 const SortableLayerRow = SortableElement(LayerRow);
 

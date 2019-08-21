@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import TextField from '../UI/TextField';
 import Add from 'material-ui/svg-icons/content/add';
 import Delete from 'material-ui/svg-icons/action/delete';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import MiniToolbar from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';

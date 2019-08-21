@@ -7,7 +7,10 @@ type ValueProps =
   | {|
       type?: 'text' | 'password',
       value: string,
-      onChange?: (event: {| target: {| value: string |} |}, text: string) => void,
+      onChange?: (
+        event: {| target: {| value: string |} |},
+        text: string
+      ) => void,
     |}
   // Support "number" type:
   | {|

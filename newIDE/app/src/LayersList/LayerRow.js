@@ -6,7 +6,7 @@ import { TableRow, TableRowColumn } from 'material-ui/Table';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
 import TextField from '../UI/TextField';
 import FlatButton from '../UI/FlatButton';

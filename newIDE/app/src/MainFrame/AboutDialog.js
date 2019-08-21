@@ -8,7 +8,7 @@ import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import PreferencesContext from './Preferences/PreferencesContext';
 import {

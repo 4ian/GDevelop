@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import IconButton from 'material-ui/IconButton';
+import IconButton from './IconButton';
 import ThemeConsumer from './Theme/ThemeConsumer';
 
 /**

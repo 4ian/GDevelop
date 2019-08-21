@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../UI/IconButton';
 import Add from 'material-ui/svg-icons/content/add';
 import Brush from 'material-ui/svg-icons/image/brush';
 import {

@@ -10,7 +10,7 @@ import {
 } from 'material-ui/Table';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Warning from 'material-ui/svg-icons/alert/warning';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../../UI/IconButton';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import Delete from 'material-ui/svg-icons/action/delete';
 

@@ -21,7 +21,7 @@ export const getAllEffectDescriptions = (
     schema: [
       {
         name: 'opacity',
-        getLabel: () => i18n._(t`Opacity (between 0 and 1)`),
+        getLabel: () => 'opacity ' + i18n._(t`(between 0 and 1)`),
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('opacity'),
         setValue: (effect: gdEffect, newValue: number) =>
@@ -40,7 +40,7 @@ export const getAllEffectDescriptions = (
     schema: [
       {
         name: 'opacity',
-        getLabel: () => i18n._(t`Opacity (between 0 and 1)`),
+        getLabel: () => 'opacity ' + i18n._(t`(between 0 and 1)`),
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('opacity'),
         setValue: (effect: gdEffect, newValue: number) =>
@@ -48,7 +48,7 @@ export const getAllEffectDescriptions = (
       },
       {
         name: 'intensity',
-        getLabel: () => i18n._(t`Intensity (between 0 and 1)`),
+        getLabel: () => 'intensity ' + i18n._(t` (between 0 and 1)`),
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('intensity'),
         setValue: (effect: gdEffect, newValue: number) =>
@@ -71,7 +71,7 @@ export const getAllEffectDescriptions = (
     schema: [
       {
         name: 'opacity',
-        getLabel: () => i18n._(t`Opacity (between 0 and 1)`),
+        getLabel: () => 'opacity ' + i18n._(t`(between 0 and 1)`),
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('opacity'),
         setValue: (effect: gdEffect, newValue: number) =>

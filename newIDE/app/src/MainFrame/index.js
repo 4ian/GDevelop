@@ -582,12 +582,14 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (
-      !currentProject.hasLayoutNamed(oldName) ||
-      newName === oldName ||
-      newName === ''
-    )
+    if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
       return;
+    }
 
     if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox(i18n._(t`Another scene with this name already exists.`));
@@ -611,12 +613,15 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (
-      !currentProject.hasExternalLayoutNamed(oldName) ||
-      newName === oldName ||
-      newName === ''
-    )
+    if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
@@ -645,12 +650,15 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (
-      !currentProject.hasExternalEventsNamed(oldName) ||
-      newName === oldName ||
-      newName === ''
-    )
+    if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(
@@ -682,10 +690,16 @@ class MainFrame extends React.Component<Props, State> {
 
     if (
       !currentProject.hasEventsFunctionsExtensionNamed(oldName) ||
-      newName === oldName ||
-      newName === ''
+      newName === oldName
     )
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
       showWarningBox(

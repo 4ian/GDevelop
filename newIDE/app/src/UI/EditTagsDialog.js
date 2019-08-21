@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Dialog from './Dialog';
 import { TextField } from 'material-ui';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
 import { type Tags, getTagsFromString } from '../Utils/TagsHelper';
 

@@ -2,7 +2,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import Window from '../Utils/Window';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 
 export default class BetaIntroDialog extends Component {
   _onOpenWebsite() {

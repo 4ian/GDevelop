@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import Dialog from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
@@ -87,7 +87,9 @@ export default class LanguageDialog extends Component<Props, State> {
                         )
                       }
                       primary={false}
-                      onClick={onClose}
+                      onClick={() => {
+                        onClose(false);
+                      }}
                       disabled={isLoadingLanguage}
                     />,
                   ]}

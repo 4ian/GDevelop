@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import { Card, CardActions, CardHeader } from 'material-ui/Card';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import UserProfileContext, { UserProfile } from './UserProfileContext';
 import { Column, Line } from '../UI/Grid';

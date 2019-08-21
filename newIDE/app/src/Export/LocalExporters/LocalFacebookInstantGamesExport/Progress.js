@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
 import CircularProgress from 'material-ui/CircularProgress';
 import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../../UI/FlatButton';
 import { Line, Spacer } from '../../../UI/Grid';
 import { type LocalFacebookInstantGamesExportStep } from '.';
 

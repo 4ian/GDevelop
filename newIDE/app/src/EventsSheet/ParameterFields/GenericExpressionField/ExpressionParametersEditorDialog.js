@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { type EventsScope } from '../../EventsScope.flow';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog from '../../../UI/Dialog';
 

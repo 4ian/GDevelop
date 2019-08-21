@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import { Spacer, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import difference_in_seconds from 'date-fns/difference_in_seconds';

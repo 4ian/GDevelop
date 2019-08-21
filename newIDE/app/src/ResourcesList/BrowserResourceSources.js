@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import ListIcon from '../UI/ListIcon';
 import { List, ListItem, makeSelectable } from 'material-ui/List';

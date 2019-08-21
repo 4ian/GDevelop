@@ -9,7 +9,7 @@ import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
 import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import DragHandle from '../UI/DragHandle';
 import styles from './styles';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';

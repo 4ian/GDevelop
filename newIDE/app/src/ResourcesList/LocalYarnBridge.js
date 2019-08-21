@@ -43,8 +43,7 @@ export const openYarn = ({
       const resourceName = path.relative(projectPath, newFilePath);
       createOrUpdateResource(project, new gd.JsonResource(), resourceName);
 
-      // $FlowFixMe - TODO: There is an error here to be solved.
-      onChangesSaved([{}], resourceName);
+      onChangesSaved([], resourceName);
     }
   );
 

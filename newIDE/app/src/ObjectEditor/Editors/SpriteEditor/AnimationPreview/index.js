@@ -8,7 +8,7 @@ import Replay from 'material-ui/svg-icons/av/replay';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import Pause from 'material-ui/svg-icons/av/pause';
 import Timer from 'material-ui/svg-icons/image/timer';
-import TextField from 'material-ui/TextField';
+import TextField from '../../../../UI/TextField';
 import { FlatButton } from 'material-ui';
 
 type Props = {|

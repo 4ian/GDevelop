@@ -10,7 +10,7 @@ import { Column, Line, Spacer } from '../../UI/Grid';
 import LinearProgress from 'material-ui/LinearProgress';
 import { GDevelopHostingApi } from '../../Utils/GDevelopServices/ApiConfigs';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
-import TextField from 'material-ui/TextField';
+import TextField from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');

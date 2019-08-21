@@ -3,7 +3,7 @@ import { ListItem } from 'material-ui/List';
 import IconMenu from '../Menu/IconMenu';
 import ListIcon from '../ListIcon';
 import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
+import TextField from '../TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { type Item } from '.';

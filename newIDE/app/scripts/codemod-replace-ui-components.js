@@ -18,6 +18,10 @@ const importsToReplace = [
     oldImport: 'material-ui/RaisedButton',
     newImport: path.join(newIdeAppSrcPath, 'UI/RaisedButton'),
   },
+  {
+    oldImport: 'material-ui/TextField',
+    newImport: path.join(newIdeAppSrcPath, 'UI/TextField'),
+  },
 ];
 
 /**

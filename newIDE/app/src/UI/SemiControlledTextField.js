@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from './TextField';
 
 type State = {|
   focused: boolean,
@@ -58,7 +58,7 @@ export default class SemiControlledTextField extends React.Component<
     text: null,
   };
 
-  _field: ?any = null;
+  _field: ?TextField = null;
 
   focus() {
     if (this._field) this._field.focus();
@@ -79,8 +79,10 @@ export default class SemiControlledTextField extends React.Component<
     } = this.props;
 
     return (
+      // $FlowFixMe - not sure why Flow can't infer that we're using the "string version" of TextField.
       <TextField
         {...otherProps}
+        type="text"
         ref={field => (this._field = field)}
         value={this.state.focused ? this.state.text : value}
         onFocus={event => {

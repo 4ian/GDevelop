@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import FlatButton from '../UI/FlatButton';
 import Window from '../Utils/Window';
 import { List, ListItem } from 'material-ui/List';

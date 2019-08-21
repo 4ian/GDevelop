@@ -2,7 +2,7 @@ import React from 'react';
 import { ListItem } from 'material-ui/List';
 import IconMenu from '../UI/Menu/IconMenu';
 import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import { Column, Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import ObjectTypeSelector from '../ObjectTypeSelector';

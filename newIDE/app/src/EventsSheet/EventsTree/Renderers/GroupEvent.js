@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import classNames from 'classnames';
-import TextField from 'material-ui/TextField';
+import TextField from '../../../UI/TextField';
 import {
   largeSelectedArea,
   largeSelectableArea,

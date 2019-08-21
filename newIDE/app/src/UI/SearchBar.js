@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
+import TextField from './TextField';
 import Paper from 'material-ui/Paper';
 import Close from 'material-ui/svg-icons/navigation/close';
 import Search from 'material-ui/svg-icons/action/search';
@@ -126,7 +126,7 @@ export default class SearchBar extends React.Component<Props, State> {
     }
   };
 
-  handleInput = (e: { target: { value: string } }) => {
+  handleInput = (e: {| target: {| value: string |} |}) => {
     this.setState({ value: e.target.value });
     this.props.onChange && this.props.onChange(e.target.value);
   };

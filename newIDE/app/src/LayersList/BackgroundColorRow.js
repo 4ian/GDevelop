@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import { TableRow, TableRowColumn } from 'material-ui/Table';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 
 import styles from './styles';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';

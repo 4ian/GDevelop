@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import renderer from 'react-test-renderer';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import V0MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import defaultTheme from '../../../UI/Theme/DefaultTheme';
 import StartPage from '.';
 import { I18nProvider } from '@lingui/react';
@@ -12,9 +12,9 @@ describe('StartPage', () => {
     const tree = renderer
       .create(
         <I18nProvider language="en">
-          <MuiThemeProvider muiTheme={defaultTheme}>
+          <V0MuiThemeProvider muiTheme={defaultTheme}>
             <StartPage project={null} />
-          </MuiThemeProvider>
+          </V0MuiThemeProvider>
         </I18nProvider>
       )
       .toJSON();
@@ -26,9 +26,9 @@ describe('StartPage', () => {
     const tree = renderer
       .create(
         <I18nProvider language="en">
-          <MuiThemeProvider muiTheme={defaultTheme}>
+          <V0MuiThemeProvider muiTheme={defaultTheme}>
             <StartPage project={project} />
-          </MuiThemeProvider>
+          </V0MuiThemeProvider>
         </I18nProvider>
       )
       .toJSON();

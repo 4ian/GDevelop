@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import V0MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { getTheme } from '../UI/Theme';
 import UserProfileProvider from '../Profile/UserProfileProvider';
 import Authentification from '../Utils/GDevelopServices/Authentification';
@@ -52,7 +52,7 @@ export default class Providers extends React.Component<Props, {||}> {
           <PreferencesContext.Consumer>
             {({ values }) => (
               <GDI18nProvider language={values.language}>
-                <MuiThemeProvider muiTheme={getTheme(values.themeName)}>
+                <V0MuiThemeProvider muiTheme={getTheme(values.themeName)}>
                   <UserProfileProvider authentification={authentification}>
                     <I18n update>
                       {({ i18n }) => (
@@ -75,7 +75,7 @@ export default class Providers extends React.Component<Props, {||}> {
                       )}
                     </I18n>
                   </UserProfileProvider>
-                </MuiThemeProvider>
+                </V0MuiThemeProvider>
               </GDI18nProvider>
             )}
           </PreferencesContext.Consumer>

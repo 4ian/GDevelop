@@ -1,16 +1,16 @@
 // @flow
 import React from 'react';
 import renderer from 'react-test-renderer';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import V0MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import HelpButton from '.';
 
 describe('HelpButton', () => {
   it('renders the button linking to a help page', () => {
     const tree = renderer
       .create(
-        <MuiThemeProvider>
+        <V0MuiThemeProvider>
           <HelpButton helpPagePath="/objects/tiled_sprite" />
-        </MuiThemeProvider>
+        </V0MuiThemeProvider>
       )
       .toJSON();
     expect(tree).toMatchSnapshot();
@@ -18,9 +18,9 @@ describe('HelpButton', () => {
   it('renders nothing if the helpPagePath is empty', () => {
     const tree = renderer
       .create(
-        <MuiThemeProvider>
+        <V0MuiThemeProvider>
           <HelpButton helpPagePath="" />
-        </MuiThemeProvider>
+        </V0MuiThemeProvider>
       )
       .toJSON();
     expect(tree).toMatchSnapshot();

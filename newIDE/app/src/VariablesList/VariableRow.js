@@ -7,7 +7,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Checkbox from 'material-ui/Checkbox';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import IconButton from 'material-ui/IconButton';
 import Reset from 'material-ui/svg-icons/av/replay';
 import muiThemeable from 'material-ui/styles/muiThemeable';

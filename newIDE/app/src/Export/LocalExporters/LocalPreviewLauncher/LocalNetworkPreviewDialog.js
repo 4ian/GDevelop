@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../../UI/Dialog';
 import FlatButton from '../../../UI/FlatButton';
-import TextField from 'material-ui/TextField';
+import TextField from '../../../UI/TextField';
 import { Line } from '../../../UI/Grid';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 

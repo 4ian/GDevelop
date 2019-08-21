@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
 import Paper from 'material-ui/Paper';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import { Line, Column } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';

@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from '../TextField';
 import ColorPicker from './ColorPicker';
 
 const styles = {

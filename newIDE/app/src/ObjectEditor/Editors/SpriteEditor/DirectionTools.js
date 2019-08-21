@@ -8,7 +8,7 @@ import Checkbox from 'material-ui/Checkbox';
 import Repeat from 'material-ui/svg-icons/av/repeat';
 import Brush from 'material-ui/svg-icons/image/brush';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
-import TextField from 'material-ui/TextField';
+import TextField from '../../../UI/TextField';
 import Dialog from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';

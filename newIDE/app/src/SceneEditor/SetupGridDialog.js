@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import Dialog from '../UI/Dialog';
 
 export default class SetupGridDialog extends Component {

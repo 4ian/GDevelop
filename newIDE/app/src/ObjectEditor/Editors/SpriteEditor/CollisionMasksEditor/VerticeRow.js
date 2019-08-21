@@ -2,7 +2,7 @@ import React from 'react';
 import { TableRow, TableRowColumn } from 'material-ui/Table';
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
-import TextField from 'material-ui/TextField';
+import TextField from '../../../../UI/TextField';
 import Warning from 'material-ui/svg-icons/alert/warning';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';

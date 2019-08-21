@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import Chip from 'material-ui/Chip';
-import TextField from 'material-ui/TextField';
 import { Column, Line } from '../UI/Grid';
 import randomColor from 'randomcolor';
 import SearchBar from '../UI/SearchBar';
@@ -34,10 +33,10 @@ const getChipColor = (tag: string) => {
 };
 
 export default class SearchbarWithChips extends Component<Props> {
-  _textField: ?TextField;
+  _searchBar: ?SearchBar;
 
   componentDidMount() {
-    if (this._textField) this._textField.focus();
+    if (this._searchBar) this._searchBar.focus();
   }
 
   render() {
@@ -58,7 +57,7 @@ export default class SearchbarWithChips extends Component<Props> {
           onChange={value => {
             onChange(value);
           }}
-          ref={textField => (this._textField = textField)}
+          ref={searchBar => (this._searchBar = searchBar)}
         />
         <Line>
           <Column>

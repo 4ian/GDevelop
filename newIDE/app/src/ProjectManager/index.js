@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import SearchBar from '../UI/SearchBar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
@@ -201,7 +201,7 @@ class Item extends React.Component<ItemProps, {||}> {
         id="rename-item-field"
         ref={textField => (this.textField = textField)}
         defaultValue={this.props.primaryText}
-        onBlur={e => this.props.onRename(e.target.value)}
+        onBlur={e => this.props.onRename(e.currentTarget.value)}
         onKeyPress={event => {
           if (event.charCode === 13) {
             // enter key pressed

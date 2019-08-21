@@ -6,7 +6,7 @@ import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
 import { Column, Line, Spacer } from '../UI/Grid';
-import TextField from 'material-ui/TextField/TextField';
+import TextField from '../UI/TextField';
 import {
   type LoginForm,
   type LoginError,

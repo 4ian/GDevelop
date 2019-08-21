@@ -5,7 +5,7 @@ import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import React, { PureComponent } from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from '../TextField';
 import FlatButton from '../FlatButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');

@@ -36,6 +36,25 @@ export const getAllEffectDescriptions = (
     ],
   },
   {
+    name: 'BlackAndWhite',
+    schema: [
+      {
+        name: 'opacity',
+        getLabel: () => 'opacity ' + i18n._(t`(between 0 and 1)`),
+        valueType: 'number',
+        getValue: (effect: gdEffect) => effect.getParameter('opacity'),
+        setValue: (effect: gdEffect, newValue: number) =>
+          effect.setParameter('opacity', clampValue(newValue)),
+      },
+    ],
+    parameterDefaultValues: [
+      {
+        name: 'opacity',
+        value: 1,
+      },
+    ],
+  },
+  {
     name: 'Night',
     schema: [
       {

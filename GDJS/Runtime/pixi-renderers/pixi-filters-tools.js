@@ -96,6 +96,18 @@ gdjs.PixiFiltersTools._filters = {
             filter.alpha = value;
         },
     },
+    BlackAndWhite: {
+        makeFilter: function() {
+            var colorMatrix = new PIXI.filters.ColorMatrixFilter();
+            colorMatrix.blackAndWhite ();
+            return colorMatrix;
+        },
+        updateParameter: function(filter, parameterName, value) {
+            if (parameterName !== 'opacity') return;
+
+            filter.alpha = value;
+        },
+    },
 };
 
 gdjs.PixiFiltersTools.getFilter = function(filterName) {

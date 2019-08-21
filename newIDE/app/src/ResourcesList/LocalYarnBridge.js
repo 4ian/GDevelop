@@ -31,7 +31,6 @@ export const openYarn = ({
 
   const externalEditorData = {
     resourcePath: initialResourcePath,
-    // $FlowFixMe - TODO: There is an error here to be solved.
     externalEditorData: extraOptions.externalEditorData,
     projectPath,
   };

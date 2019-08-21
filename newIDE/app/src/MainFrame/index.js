@@ -582,16 +582,12 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
-
-    if (!gd.Project.validateObjectName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your scene name.`
-        )
-      );
+    if (
+      !currentProject.hasLayoutNamed(oldName) ||
+      newName === oldName ||
+      newName === ''
+    )
       return;
-    }
 
     if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox(i18n._(t`Another scene with this name already exists.`));
@@ -615,17 +611,12 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
+    if (
+      !currentProject.hasExternalLayoutNamed(oldName) ||
+      newName === oldName ||
+      newName === ''
+    )
       return;
-
-    if (!gd.Project.validateObjectName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your external layout name.`
-        )
-      );
-      return;
-    }
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
@@ -654,17 +645,12 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
+    if (
+      !currentProject.hasExternalEventsNamed(oldName) ||
+      newName === oldName ||
+      newName === ''
+    )
       return;
-
-    if (!gd.Project.validateObjectName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your external events name.`
-        )
-      );
-      return;
-    }
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(
@@ -696,7 +682,8 @@ class MainFrame extends React.Component<Props, State> {
 
     if (
       !currentProject.hasEventsFunctionsExtensionNamed(oldName) ||
-      newName === oldName
+      newName === oldName ||
+      newName === ''
     )
       return;
 

@@ -15,8 +15,8 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
 /**
  * Keep only the specified object in the lists of picked objects.
  *
- * @param objectsLists The lists of objects to trim
- * @param runtimeObject {gdjs.RuntimeObject} The object to keep in the lists
+ * @param  {Hashtable} objectsLists The lists of objects to trim
+ * @param  {gdjs.RuntimeObject} runtimeObject The object to keep in the lists
  */
 gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
     for (var listName in objectsLists.items) {
@@ -34,8 +34,16 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
 };
 
 /**
+ * A predicate to be passed to `gdjs.evtTools.object.twoListsTest`.
+ * @callback gdjsTwoListsTestPredicate
+ * @param {gdjs.RuntimeObject} object1 First object
+ * @param {gdjs.RuntimeObject} object2 Second object
+ * @param {*} extraArg An optional extra argument
+ * @return {boolean} true if the pair satisfy the predicate (for example,there is a collision), meaning that the objects will be picked, false otherwise (no collision).
+ */
+
+/**
  * Do a test on two tables of objects so as to pick only the pair of objects for which the test is true.
- * If inverted == true, only the objects of the first table are filtered.
  *
  * Note that the predicate method is not called stricly for each pair: When considering a pair of objects, if
  * these objects have already been marked as picked, the predicate method won't be called again.
@@ -51,9 +59,12 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
  *  + Cost(predicate)*(NbObjList1+NbObjList2)
  *  + Cost(Testing NbObjList1+NbObjList2 booleans)
  *
- * Note: predicate is called with the two objects to compare, and an optional argument `extraArg`.
- * This should be used to avoid declaring the predicate as a closure that would be created and destroyed
- * at each call to twoListsTest (potentially multiple time per frame).
+ *
+ * @param  {gdjsTwoListsTestPredicate} predicate The predicate function is called with the two objects to compare, and an optional argument `extraArg` 
+ * @param  {Hashtable} objectsLists1 e.g. Hashtable.newFrom({ A: objects1 });
+ * @param  {Hashtable} objectsLists2 e.g. Hashtable.newFrom({ B: objects2 });
+ * @param  {boolean} inverted If `inverted` == true, only the objects of the first table are filtered.
+ * @param  {*} extraArg (optional) This argument should be used to avoid declaring the predicate as a closure that would be created and destroyed at each call to twoListsTest (potentially multiple time per frame).
  */
 gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraArg) {
 
@@ -151,11 +162,11 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  *
  * Objects that do not fullfil the predicate are removed from objects lists.
  *
- * @param predicate The function applied to each object: must return true if the object fulfill the predicate.
- * @param objectsLists The lists of objects to trim
- * @param negatePredicate If set to true, the result of the predicate is negated.
- * @param extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
- * @return true if at least one object fulfill the predicate.
+ * @param  {Function} predicate The function applied to each object: must return true if the object fulfill the predicate.
+ * @param  {Hashtable} objectsLists The lists of objects to trim
+ * @param  {boolean} negatePredicate If set to true, the result of the predicate is negated.
+ * @param  {*} extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
+ * @return {boolean} true if at least one object fulfill the predicate.
  */
 gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate, extraArg) {
     var isTrue = false;

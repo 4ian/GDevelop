@@ -10,7 +10,7 @@ import {
 } from '../GDJSInspectorDescriptions';
 import { Line } from '../../UI/Grid';
 import mapValues from 'lodash/mapValues';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 type Props = {|
@@ -152,9 +152,9 @@ export default class RuntimeSceneInspector extends React.Component<
             <RaisedButton
               label={<Trans>Create</Trans>}
               primary
-              onClick={() =>
-                onCall(['createObject'], [this.state.newObjectName])
-              }
+              onClick={() => {
+                onCall(['createObject'], [this.state.newObjectName]);
+              }}
             />
           </Line>
         )}

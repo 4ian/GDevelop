@@ -13,7 +13,7 @@ import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { Column, Line } from '../UI/Grid';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 const gd = global.gd;
 
 const styles = {

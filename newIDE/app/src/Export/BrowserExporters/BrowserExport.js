@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 

@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import Star from 'material-ui/svg-icons/toggle/star';

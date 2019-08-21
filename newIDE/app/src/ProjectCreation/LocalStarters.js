@@ -4,7 +4,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';

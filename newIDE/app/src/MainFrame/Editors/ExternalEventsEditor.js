@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import EventsSheet from '../../EventsSheet';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';

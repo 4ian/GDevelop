@@ -2,7 +2,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import axios from 'axios';
 import { sleep } from 'wait-promise';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
 import LocalExport from './LocalExport';
 import optionalRequire from '../../Utils/OptionalRequire';

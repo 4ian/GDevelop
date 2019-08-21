@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import { serializeToJSObject } from '../Utils/Serializer';
 const gd = global.gd;
 

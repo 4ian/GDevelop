@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import { List, ListItem } from 'material-ui/List';
 import PlaceholderLoader from '../UI/PlaceholderLoader';

@@ -6,7 +6,7 @@ import ReactErrorBoundary from 'react-error-boundary';
 import BugReport from 'material-ui/svg-icons/action/bug-report';
 import PlaceholderMessage from './PlaceholderMessage';
 import Divider from 'material-ui/Divider';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from './RaisedButton';
 import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 

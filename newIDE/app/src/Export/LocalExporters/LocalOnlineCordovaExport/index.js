@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../../UI/RaisedButton';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,

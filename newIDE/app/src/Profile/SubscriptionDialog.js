@@ -13,7 +13,7 @@ import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
 } from '../Utils/GDevelopServices/Usage';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import CheckCircle from 'material-ui/svg-icons/action/check-circle';
 import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';

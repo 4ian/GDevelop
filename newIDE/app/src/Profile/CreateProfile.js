@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 
 const styles = {

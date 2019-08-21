@@ -11,7 +11,7 @@ import HelpButton from '../UI/HelpButton';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 
 type Props = {|
@@ -217,12 +217,12 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                         icon={<CloudUpload />}
                         primary
                         label={<Trans>Export to a file</Trans>}
-                        onClick={() =>
+                        onClick={() => {
                           exportExtension(
                             eventsFunctionsExtensionsState,
                             eventsFunctionsExtension
-                          )
-                        }
+                          );
+                        }}
                       />
                       <FlatButton
                         label={<Trans>Submit extension to the community</Trans>}

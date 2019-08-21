@@ -5,7 +5,7 @@ import * as React from 'react';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import Background from '../UI/Background';
 import get from 'lodash/get';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import InspectorsList from './InspectorsList';
 import {

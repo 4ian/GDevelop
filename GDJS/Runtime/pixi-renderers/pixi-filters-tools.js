@@ -110,8 +110,8 @@ gdjs.PixiFiltersTools._filters = {
     },
     Noise: {
         makeFilter: function() {
-            var filter = new PIXI.filters.NoiseFilter();
-            return filter;
+            var noise = new PIXI.filters.NoiseFilter();
+            return noise;
         },
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'noise') return;

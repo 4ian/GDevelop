@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
 import MenuItem from '../../UI/MenuItem';
-import Toggle from 'material-ui/Toggle';
+import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { Column, Line } from '../../UI/Grid';

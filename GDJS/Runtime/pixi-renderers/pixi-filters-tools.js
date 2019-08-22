@@ -99,13 +99,38 @@ gdjs.PixiFiltersTools._filters = {
     BlackAndWhite: {
         makeFilter: function() {
             var colorMatrix = new PIXI.filters.ColorMatrixFilter();
-            colorMatrix.blackAndWhite ();
+            colorMatrix.blackAndWhite();
             return colorMatrix;
         },
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'opacity') return;
 
             filter.alpha = value;
+        },
+    },
+    Noise: {
+        makeFilter: function() {
+            var filter = new PIXI.filters.NoiseFilter();
+            return filter;
+        },
+        updateParameter: function(filter, parameterName, value) {
+            if (parameterName !== 'noise') return;
+
+            filter.noise = value;
+        },
+    },
+    Blur: {
+        makeFilter: function() {
+            var blur = new PIXI.filters.BlurFilter();
+            return blur;
+        },
+        updateParameter: function(filter, parameterName, value) {
+            if (parameterName !== 'blur' &&
+                parameterName !== 'quality' &&
+                parameterName !== 'kernelSize' &&
+                parameterName !== 'resolution') return;
+
+            filter[parameterName] = value;
         },
     },
 };

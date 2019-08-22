@@ -51,7 +51,7 @@ export class ListItem extends React.Component<ListItemProps, {||}> {
   // into ListItem props and assumes nestedItems is always an array.
   static defaultProps = {
     nestedItems: [],
-  }
+  };
 
   render() {
     return <MUIListItem {...this.props} />;

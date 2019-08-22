@@ -9,7 +9,7 @@ import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import Subheader from 'material-ui/Subheader';
 import Avatar from 'material-ui/Avatar';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import { List, ListItem } from 'material-ui/List';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';

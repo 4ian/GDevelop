@@ -6,7 +6,7 @@ import TextField from '../UI/TextField';
 import { Column, Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import ObjectTypeSelector from '../ObjectTypeSelector';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import EventsBasedBehaviorPropertiesEditor from './EventsBasedBehaviorPropertiesEditor';

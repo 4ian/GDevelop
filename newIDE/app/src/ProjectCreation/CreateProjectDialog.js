@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 
 type State = {|

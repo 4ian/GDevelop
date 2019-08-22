@@ -46,6 +46,10 @@ const importsToReplace = [
     oldImport: 'material-ui/Toggle',
     newImport: path.join(newIdeAppSrcPath, 'UI/Toggle'),
   },
+  {
+    oldImport: 'material-ui/Tabs',
+    newImport: path.join(newIdeAppSrcPath, 'UI/Tabs'),
+  },
 ];
 
 /**

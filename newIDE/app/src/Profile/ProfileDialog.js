@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
 import { Column } from '../UI/Grid';
 import CreateProfile from './CreateProfile';

@@ -12,7 +12,7 @@ import HelpIcon from '../UI/HelpIcon';
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs, Tab } from '../UI/ClosableTabs';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';

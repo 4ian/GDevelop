@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 
 const styles = {
   logo: {
@@ -8,9 +8,10 @@ const styles = {
   },
 };
 
-const ThemableGDevelopLogo = ({ muiTheme }) => (
-  <img src={muiTheme.logo.src} alt="" style={styles.logo} />
+const GDevelopLogo = () => (
+  <ThemeConsumer>
+    {muiTheme => <img src={muiTheme.logo.src} alt="" style={styles.logo} />}
+  </ThemeConsumer>
 );
 
-const GDevelopLogo = muiThemeable()(ThemableGDevelopLogo);
 export default GDevelopLogo;

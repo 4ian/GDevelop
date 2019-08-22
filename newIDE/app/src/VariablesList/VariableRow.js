@@ -10,9 +10,9 @@ import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirector
 import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
 import Reset from 'material-ui/svg-icons/av/replay';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 //TODO: Refactor into TreeTable?
 const Indent = ({ width }) => (
@@ -34,7 +34,6 @@ type Props = {|
   onChangeValue: string => void,
   onResetToDefaultValue: () => void,
   children?: React.Node,
-  muiTheme: Object,
   showHandle: boolean,
   showSelectionCheckbox: boolean,
   isSelected: boolean,
@@ -42,7 +41,7 @@ type Props = {|
   origin: VariableOrigin,
 |};
 
-const ThemableVariableRow = ({
+const VariableRow = ({
   name,
   variable,
   depth,
@@ -53,7 +52,6 @@ const ThemableVariableRow = ({
   onChangeValue,
   onResetToDefaultValue,
   children,
-  muiTheme,
   showHandle,
   showSelectionCheckbox,
   isSelected,
@@ -143,16 +141,19 @@ const ThemableVariableRow = ({
   );
 
   return (
-    <div>
-      <TreeTableRow
-        style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
-      >
-        {columns}
-      </TreeTableRow>
-      {children}
-    </div>
+    <ThemeConsumer>
+      {muiTheme => (
+        <div>
+          <TreeTableRow
+            style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
+          >
+            {columns}
+          </TreeTableRow>
+          {children}
+        </div>
+      )}
+    </ThemeConsumer>
   );
 };
 
-const VariableRow = muiThemeable()(ThemableVariableRow);
 export default VariableRow;

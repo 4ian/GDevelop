@@ -2,44 +2,42 @@ import React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
+import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 
-const ThemablePolygonRow = ({
-  onRemove,
-  isConvex,
-  verticesCount,
-  muiTheme,
-}) => {
+const PolygonRow = ({ onRemove, isConvex, verticesCount }) => {
   return (
-    <TableRow
-      style={{
-        backgroundColor: muiTheme.list.itemsBackgroundColor,
-      }}
-    >
-      <TableRowColumn style={styles.handleColumn}>
-        {/* <DragHandle /> Reordering polygons is not supported for now */}
-      </TableRowColumn>
-      {isConvex && (
-        <TableRowColumn>
-          {verticesCount === 3 && `Triangle`}
-          {verticesCount === 4 && `Quadrilateral`}
-          {verticesCount >= 5 && `Polygon with ${verticesCount} vertices`}
-        </TableRowColumn>
+    <ThemeConsumer>
+      {muiTheme => (
+        <TableRow
+          style={{
+            backgroundColor: muiTheme.list.itemsBackgroundColor,
+          }}
+        >
+          <TableRowColumn style={styles.handleColumn}>
+            {/* <DragHandle /> Reordering polygons is not supported for now */}
+          </TableRowColumn>
+          {isConvex && (
+            <TableRowColumn>
+              {verticesCount === 3 && `Triangle`}
+              {verticesCount === 4 && `Quadrilateral`}
+              {verticesCount >= 5 && `Polygon with ${verticesCount} vertices`}
+            </TableRowColumn>
+          )}
+          {!isConvex && <TableRowColumn>Polygon is not convex!</TableRowColumn>}
+          <TableRowColumn style={styles.coordinateColumn} />
+          <TableRowColumn style={styles.coordinateColumn} />
+          <TableRowColumn style={styles.toolColumn}>
+            {!!onRemove && (
+              <IconButton onClick={onRemove}>
+                <Delete />
+              </IconButton>
+            )}
+          </TableRowColumn>
+        </TableRow>
       )}
-      {!isConvex && <TableRowColumn>Polygon is not convex!</TableRowColumn>}
-      <TableRowColumn style={styles.coordinateColumn} />
-      <TableRowColumn style={styles.coordinateColumn} />
-      <TableRowColumn style={styles.toolColumn}>
-        {!!onRemove && (
-          <IconButton onClick={onRemove}>
-            <Delete />
-          </IconButton>
-        )}
-      </TableRowColumn>
-    </TableRow>
+    </ThemeConsumer>
   );
 };
 
-const PointRow = muiThemeable()(ThemablePolygonRow);
-export default PointRow;
+export default PolygonRow;

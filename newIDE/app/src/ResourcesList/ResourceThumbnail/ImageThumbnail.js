@@ -1,6 +1,6 @@
 import React from 'react';
 import Checkbox from '../../UI/Checkbox';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -36,7 +36,7 @@ const styles = {
   },
 };
 
-const ThemableImageThumbnail = ({
+const ImageThumbnail = ({
   project,
   resourceName,
   resourcesLoader,
@@ -48,37 +48,40 @@ const ThemableImageThumbnail = ({
   muiTheme,
 }) => {
   return (
-    <div
-      title={resourceName}
-      style={{
-        ...styles.spriteThumbnail,
-        borderColor: selected
-          ? muiTheme.imageThumbnail.selectedBorderColor
-          : undefined,
-        ...style,
-      }}
-      onContextMenu={e => {
-        e.stopPropagation();
-        if (onContextMenu) onContextMenu(e.clientX, e.clientY);
-      }}
-    >
-      <img
-        style={styles.spriteThumbnailImage}
-        alt={resourceName}
-        src={resourcesLoader.getResourceFullUrl(project, resourceName)}
-        crossOrigin="anonymous"
-      />
-      {selectable && (
-        <div style={styles.checkboxContainer}>
-          <Checkbox
-            checked={selected}
-            onCheck={(e, check) => onSelect(check)}
+    <ThemeConsumer>
+      {muiTheme => (
+        <div
+          title={resourceName}
+          style={{
+            ...styles.spriteThumbnail,
+            borderColor: selected
+              ? muiTheme.imageThumbnail.selectedBorderColor
+              : undefined,
+            ...style,
+          }}
+          onContextMenu={e => {
+            e.stopPropagation();
+            if (onContextMenu) onContextMenu(e.clientX, e.clientY);
+          }}
+        >
+          <img
+            style={styles.spriteThumbnailImage}
+            alt={resourceName}
+            src={resourcesLoader.getResourceFullUrl(project, resourceName)}
+            crossOrigin="anonymous"
           />
+          {selectable && (
+            <div style={styles.checkboxContainer}>
+              <Checkbox
+                checked={selected}
+                onCheck={(e, check) => onSelect(check)}
+              />
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </ThemeConsumer>
   );
 };
 
-const ImageThumbnail = muiThemeable()(ThemableImageThumbnail);
 export default ImageThumbnail;

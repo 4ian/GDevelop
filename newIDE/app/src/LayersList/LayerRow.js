@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import { TableRow, TableRowColumn } from 'material-ui/Table';
+import { TableRow, TableRowColumn } from '../UI/Table';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';

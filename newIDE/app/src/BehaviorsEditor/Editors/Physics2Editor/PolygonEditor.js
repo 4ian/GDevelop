@@ -7,7 +7,7 @@ import {
   TableBody,
   TableHeader,
   TableHeaderColumn,
-} from 'material-ui/Table';
+} from '../../../UI/Table';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Warning from 'material-ui/svg-icons/alert/warning';
 import IconButton from '../../../UI/IconButton';

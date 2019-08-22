@@ -9,7 +9,7 @@ import {
   TableHeaderColumn,
   TableRow,
   TableRowColumn,
-} from 'material-ui/Table';
+} from '../UI/Table';
 import { type Usages } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import EmptyMessage from '../UI/EmptyMessage';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TableRow, TableRowColumn } from 'material-ui/Table';
+import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
 import muiThemeable from 'material-ui/styles/muiThemeable';

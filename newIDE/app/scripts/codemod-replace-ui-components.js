@@ -38,6 +38,10 @@ const importsToReplace = [
     oldImport: 'material-ui/Checkbox',
     newImport: path.join(newIdeAppSrcPath, 'UI/Checkbox'),
   },
+  {
+    oldImport: 'material-ui/Table',
+    newImport: path.join(newIdeAppSrcPath, 'UI/Table'),
+  },
 ];
 
 /**

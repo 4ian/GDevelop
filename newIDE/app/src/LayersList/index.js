@@ -8,7 +8,7 @@ import {
   TableHeaderColumn,
   TableRow,
   TableRowColumn,
-} from 'material-ui/Table';
+} from '../UI/Table';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';

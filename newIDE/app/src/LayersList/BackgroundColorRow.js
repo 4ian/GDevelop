@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import { TableRow, TableRowColumn } from 'material-ui/Table';
+import { TableRow, TableRowColumn } from '../UI/Table';
 import TextField from '../UI/TextField';
 
 import styles from './styles';

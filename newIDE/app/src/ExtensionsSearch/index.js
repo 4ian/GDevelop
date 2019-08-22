@@ -12,7 +12,7 @@ import {
   type SerializedExtension,
   getExtension,
 } from '../Utils/GDevelopServices/Extension';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { unserializeFromJSObject } from '../Utils/Serializer';

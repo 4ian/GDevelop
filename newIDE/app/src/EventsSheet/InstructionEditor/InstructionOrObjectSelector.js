@@ -14,7 +14,7 @@ import {
   filterInstructionsList,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
-import { List, makeSelectable } from 'material-ui/List';
+import { SelectableList } from '../../UI/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
@@ -46,8 +46,6 @@ const styles = {
     flexShrink: 0,
   },
 };
-
-const SelectableList = makeSelectable(List);
 
 export type TabName = 'objects' | 'free-instructions';
 

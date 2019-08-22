@@ -5,7 +5,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import Avatar from 'material-ui/Avatar';
 import Subheader from 'material-ui/Subheader';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 import {

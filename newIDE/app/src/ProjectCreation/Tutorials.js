@@ -4,7 +4,7 @@ import { Column, Line } from '../UI/Grid';
 import { sendTutorialOpened } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import { Subheader } from 'material-ui';
 
 export default class Tutorials extends PureComponent {

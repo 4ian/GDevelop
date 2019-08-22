@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import type { GroupWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { getObjectOrObjectGroupListItemKey } from './Keys';

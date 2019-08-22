@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../UI/List';
 import IconMenu from '../UI/Menu/IconMenu';
 import ListIcon from '../UI/ListIcon';
 import IconButton from '../UI/IconButton';

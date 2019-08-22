@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import ListIcon from '../UI/ListIcon';
-import { List, ListItem, makeSelectable } from 'material-ui/List';
-const SelectableList = makeSelectable(List);
+import { SelectableList, ListItem } from '../UI/List';
 const gd = global.gd;
 
 const styles = {

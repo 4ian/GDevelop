@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../UI/List';
 import IconMenu from '../UI/Menu/IconMenu';
 import IconButton from '../UI/IconButton';
 import TextField from '../UI/TextField';

@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Subheader from 'material-ui/Subheader';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import Create from '../UI/CustomSvgIcons/Behaviors/Create';

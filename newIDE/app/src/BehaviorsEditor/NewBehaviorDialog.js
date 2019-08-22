@@ -10,7 +10,7 @@ import FlatButton from '../UI/FlatButton';
 import Subheader from 'material-ui/Subheader';
 import Avatar from 'material-ui/Avatar';
 import { Tabs, Tab } from '../UI/Tabs';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 import Create from 'material-ui/svg-icons/content/create';

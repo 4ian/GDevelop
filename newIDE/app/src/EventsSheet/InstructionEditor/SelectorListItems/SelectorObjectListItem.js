@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import type { ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';

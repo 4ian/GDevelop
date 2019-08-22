@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import TextField from '../UI/TextField';
 import SearchBar from '../UI/SearchBar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
@@ -64,7 +64,7 @@ type ProjectStructureItemProps = {|
   autoGenerateNestedIndicator: boolean,
   initiallyOpen: boolean,
   leftIcon: React$Element<any>,
-  nestedItems: Array<React$Element<any>>,
+  nestedItems: Array<React$Element<any> | null>,
   primaryText: React.Node,
   primaryTogglesNestedList: boolean,
   error?: ?Error,
@@ -72,35 +72,35 @@ type ProjectStructureItemProps = {|
   open?: boolean,
 |};
 
-const ProjectStructureItem = ({
-  onRefresh,
-  ...props
-}: ProjectStructureItemProps) => (
+const ProjectStructureItem = (props: ProjectStructureItemProps) => (
   <ThemeConsumer>
-    {muiTheme => (
-      <ListItem
-        style={{
-          backgroundColor: muiTheme.listItem.groupBackgroundColor,
-          borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-        }}
-        nestedListStyle={styles.projectStructureItemNestedList}
-        {...props}
-        leftIcon={props.error ? <WarningIcon /> : props.leftIcon}
-        rightIconButton={
-          props.error ? (
-            <IconButton
-              tooltip={`An error has occured in functions. Click to reload them.`}
-              tooltipPosition="bottom-left"
-              onClick={onRefresh}
-            >
-              <RefreshIcon />
-            </IconButton>
-          ) : (
-            undefined
-          )
-        }
-      />
-    )}
+    {muiTheme => {
+      const { error, leftIcon, onRefresh, ...otherProps } = props;
+      return (
+        <ListItem
+          style={{
+            backgroundColor: muiTheme.listItem.groupBackgroundColor,
+            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+          }}
+          nestedListStyle={styles.projectStructureItemNestedList}
+          {...otherProps}
+          leftIcon={error ? <WarningIcon /> : leftIcon}
+          rightIconButton={
+            error ? (
+              <IconButton
+                tooltip={`An error has occured in functions. Click to reload them.`}
+                tooltipPosition="bottom-left"
+                onClick={onRefresh}
+              >
+                <RefreshIcon />
+              </IconButton>
+            ) : (
+              undefined
+            )
+          }
+        />
+      );
+    }}
   </ThemeConsumer>
 );
 

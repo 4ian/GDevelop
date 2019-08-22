@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';

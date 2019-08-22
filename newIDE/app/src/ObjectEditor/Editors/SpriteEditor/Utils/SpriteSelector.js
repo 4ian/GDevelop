@@ -5,7 +5,7 @@ import * as React from 'react';
 import SelectField from '../../../../UI/SelectField';
 import MenuItem from '../../../../UI/MenuItem';
 
-import Toggle from 'material-ui/Toggle';
+import Toggle from '../../../../UI/Toggle';
 import { Line } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import { getCurrentElements } from './SpriteObjectHelper';
@@ -25,7 +25,7 @@ type Props = {|
   sameForAllSprites: boolean,
 
   setSameForAllAnimations: boolean => void,
-  setSameForAllSprites: number => void,
+  setSameForAllSprites: boolean => void,
 
   setSameForAllAnimationsLabel: string,
   setSameForAllSpritesLabel: string,

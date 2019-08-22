@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import Toggle from 'material-ui/Toggle';
+import Toggle from '../../UI/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';

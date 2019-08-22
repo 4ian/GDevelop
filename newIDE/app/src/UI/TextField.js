@@ -26,8 +26,8 @@ type ValueProps =
 // We support a subset of the props supported by Material-UI v0.x TextField
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
+  // Value and change handling:
   ...ValueProps,
-  fullWidth?: boolean,
   onFocus?: ({
     currentTarget: {
       value: string,
@@ -46,21 +46,42 @@ type Props = {|
   errorText?: React.Node,
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
-  fullWidth?: boolean,
+  name?: string,
   hintText?: React.Node,
   id?: string,
-  inputStyle?: Object,
+
+  // Keyboard focus:
+  autoFocus?: boolean,
+
+  // Number text field:
   precision?: number,
   max?: number,
   min?: number,
-  multiLine?: boolean,
-  name?: string,
   step?: number,
-  style?: Object,
+
+  // Support for multiline:
+  multiLine?: boolean,
   rows?: number,
   rowsMax?: number,
-  autoFocus?: boolean,
 
+  // Styling:
+  fullWidth?: boolean,
+  style?: {|
+    fontSize?: 18,
+    fontStyle?: 'normal' | 'italic',
+    width?: number | '100%',
+    flex?: 1,
+    top?: number,
+  |},
+  inputStyle?: {|
+    // Allow to customize color (replace by color prop?)
+    color?: string,
+    WebkitTextFillColor?: string,
+
+    // Allow to display monospaced font
+    fontFamily?: '"Lucida Console", Monaco, monospace',
+    lineHeight?: 1.4,
+  |},
   underlineFocusStyle?: {| borderColor: string |},
   underlineShow?: boolean,
 |};

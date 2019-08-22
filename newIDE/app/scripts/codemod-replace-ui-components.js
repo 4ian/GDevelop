@@ -26,6 +26,14 @@ const importsToReplace = [
     oldImport: 'material-ui/IconButton',
     newImport: path.join(newIdeAppSrcPath, 'UI/IconButton'),
   },
+  {
+    oldImport: 'material-ui/SelectField',
+    newImport: path.join(newIdeAppSrcPath, 'UI/SelectField'),
+  },
+  {
+    oldImport: 'material-ui/MenuItem',
+    newImport: path.join(newIdeAppSrcPath, 'UI/MenuItem'),
+  },
 ];
 
 /**

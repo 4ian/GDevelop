@@ -1,8 +1,8 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import MenuItem from '../../UI/MenuItem';
 
 export default class RelationalOperatorField extends Component {
   focus() {}

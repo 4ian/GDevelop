@@ -2,9 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
+import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
-import MenuItem from 'material-ui/MenuItem';
+import MenuItem from '../../UI/MenuItem';
 import Toggle from 'material-ui/Toggle';
 import Dialog from '../../UI/Dialog';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -80,7 +80,7 @@ export default class PreferencesDialog extends Component<Props, State> {
                   <SelectField
                     floatingLabelText={<Trans>UI Theme</Trans>}
                     value={values.themeName}
-                    onChange={(e, i, value) => setThemeName(value)}
+                    onChange={(e, i, value: string) => setThemeName(value)}
                   >
                     {Object.keys(themes).map(themeName => (
                       <MenuItem
@@ -93,7 +93,7 @@ export default class PreferencesDialog extends Component<Props, State> {
                   <SelectField
                     floatingLabelText={<Trans>Code editor Theme</Trans>}
                     value={values.codeEditorThemeName}
-                    onChange={(e, i, value) => setCodeEditorThemeName(value)}
+                    onChange={(e, i, value: string) => setCodeEditorThemeName(value)}
                   >
                     {getAllThemes().map(codeEditorTheme => (
                       <MenuItem

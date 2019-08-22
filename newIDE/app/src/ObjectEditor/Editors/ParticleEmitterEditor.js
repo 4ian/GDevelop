@@ -3,8 +3,8 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from 'material-ui/Checkbox';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import MenuItem from '../../UI/MenuItem';
 import { Line, Column } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -34,7 +34,7 @@ export default class ParticleEmitterEditor extends React.Component<
               fullWidth
               floatingLabelText={<Trans>Particles kind</Trans>}
               value={particleEmitterObject.getRendererType()}
-              onChange={(e, i, value) => {
+              onChange={(e, i, value: number) => {
                 particleEmitterObject.setRendererType(value);
                 if (value !== gd.ParticleEmitterObject.Quad) {
                   particleEmitterObject.setParticleTexture('');

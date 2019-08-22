@@ -5,8 +5,8 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import MenuItem from '../UI/MenuItem';
 import { mapVector } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
@@ -195,7 +195,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           <SelectField
                             floatingLabelText={<Trans>Type</Trans>}
                             value={property.getType()}
-                            onChange={(e, i, value) => {
+                            onChange={(e, i, value: string) => {
                               property.setType(value);
                               this.forceUpdate();
                               this.props.onPropertiesUpdated();

@@ -7,8 +7,8 @@ import FlatButton from '../../UI/FlatButton';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
 import { Line, Column, Spacer } from '../../UI/Grid';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import MenuItem from '../../UI/MenuItem';
 import Divider from 'material-ui/Divider';
 import {
   setupFunctionFromEvents,

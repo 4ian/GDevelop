@@ -4,8 +4,8 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Checkbox from 'material-ui/Checkbox';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import MenuItem from '../UI/MenuItem';
 import Dialog from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
@@ -35,7 +35,7 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
-  scaleMode: 'linear' | 'nearest',
+  scaleMode: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
   minFPS: number,
@@ -217,7 +217,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             fullWidth
             floatingLabelText={<Trans>Project file type</Trans>}
             value={isFolderProject}
-            onChange={(e, i, value) =>
+            onChange={(e, i, value: boolean) =>
               this.setState({ isFolderProject: value })
             }
           >
@@ -318,7 +318,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>Device orientation (for iOS and Android)</Trans>
             }
             value={orientation}
-            onChange={(e, i, value) => this.setState({ orientation: value })}
+            onChange={(e, i, value: string) => this.setState({ orientation: value })}
           >
             <MenuItem
               value="default"
@@ -337,7 +337,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             }
             floatingLabelFixed
             value={scaleMode}
-            onChange={(e, i, value) => this.setState({ scaleMode: value })}
+            onChange={(e, i, value: string) => this.setState({ scaleMode: value })}
           >
             <MenuItem
               value="linear"
@@ -374,7 +374,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             floatingLabelText={<Trans>Fullscreen/game size mode</Trans>}
             floatingLabelFixed
             value={sizeOnStartupMode}
-            onChange={(e, i, value) =>
+            onChange={(e, i, value: string) =>
               this.setState({ sizeOnStartupMode: value })
             }
           >

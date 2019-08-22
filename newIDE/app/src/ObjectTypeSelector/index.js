@@ -2,8 +2,8 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import MenuItem from '../UI/MenuItem';
 import {
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
@@ -47,7 +47,7 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
         floatingLabelText={floatingLabelText || <Trans>Object type</Trans>}
         floatingLabelFixed
         value={value}
-        onChange={(e, i, value) => {
+        onChange={(e, i, value: string) => {
           onChange(value);
         }}
         disabled={disabled}

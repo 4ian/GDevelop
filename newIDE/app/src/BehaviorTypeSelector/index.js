@@ -1,8 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import MenuItem from '../UI/MenuItem';
 import {
   type EnumeratedBehaviorMetadata,
   enumerateBehaviorsMetadata,
@@ -43,7 +43,7 @@ export default class BehaviorTypeSelector extends React.Component<
         floatingLabelText={<Trans>Behavior type</Trans>}
         floatingLabelFixed
         value={value}
-        onChange={(e, i, value) => {
+        onChange={(e, i, value: string) => {
           onChange(value);
         }}
         disabled={disabled}

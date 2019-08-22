@@ -6,8 +6,8 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import MenuItem from '../../UI/MenuItem';
 import { mapVector } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -112,7 +112,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   value={type}
                   fullWidth
                   disabled={!!freezeEventsFunctionType}
-                  onChange={(e, i, value) => {
+                  onChange={(e, i, value: string) => {
                     eventsFunction.setFunctionType(value);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     this.forceUpdate();

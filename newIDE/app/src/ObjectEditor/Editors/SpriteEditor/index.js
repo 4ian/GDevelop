@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { GridList, GridTile } from 'material-ui/GridList';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
 import Add from 'material-ui/svg-icons/content/add';
@@ -114,7 +113,7 @@ class Animation extends React.Component<AnimationProps, void> {
 
     const animationName = animation.getName();
     return (
-      <GridTile>
+      <div>
         <MiniToolbar smallest>
           <DragHandle />
           <span style={styles.animationTitle}>
@@ -155,7 +154,7 @@ class Animation extends React.Component<AnimationProps, void> {
             />
           );
         })}
-      </GridTile>
+      </div>
     );
   }
 }
@@ -181,7 +180,7 @@ const SortableAnimationsList = SortableContainer(
     onReplaceDirection,
   }) => {
     return (
-      <GridList style={styles.gridList} cellHeight="auto" cols={1}>
+      <div style={styles.gridList}>
         {[
           ...mapFor(0, spriteObject.getAnimationsCount(), i => {
             const animation = spriteObject.getAnimation(i);
@@ -216,7 +215,7 @@ const SortableAnimationsList = SortableContainer(
             extraTools={extraBottomTools}
           />,
         ]}
-      </GridList>
+      </div>
     );
   }
 );

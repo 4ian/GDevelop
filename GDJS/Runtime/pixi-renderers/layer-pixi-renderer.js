@@ -109,5 +109,4 @@ gdjs.LayerPixiRenderer.prototype.setEffectParameter = function (name, parameterN
 
     var theFilter = this._filters[name];
     theFilter.updateParameter(theFilter.filter, parameterName, value);
-    //this._addFilters();
 };

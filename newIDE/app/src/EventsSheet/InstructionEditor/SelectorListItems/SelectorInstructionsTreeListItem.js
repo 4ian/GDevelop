@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import { type InstructionOrExpressionTreeNode } from '../InstructionOrExpressionSelector/CreateTree';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
@@ -26,7 +26,7 @@ export const renderInstructionTree = ({
   onChoose,
   iconSize,
   useSubheaders,
-}: Props): Array<ListItem> => {
+}: Props): Array<React$Element<any> | null> => {
   return flatten(
     Object.keys(instructionTreeNode).map(key => {
       // In theory, we should have a way to distinguish

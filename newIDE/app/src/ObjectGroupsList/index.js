@@ -6,7 +6,7 @@ import { AutoSizer, List } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import GroupRow from './GroupRow';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../UI/List';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { makeAddItem } from '../UI/ListCommonItem';

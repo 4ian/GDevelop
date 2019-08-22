@@ -50,6 +50,10 @@ const importsToReplace = [
     oldImport: 'material-ui/Tabs',
     newImport: path.join(newIdeAppSrcPath, 'UI/Tabs'),
   },
+  {
+    oldImport: 'material-ui/List',
+    newImport: path.join(newIdeAppSrcPath, 'UI/List'),
+  },
 ];
 
 /**

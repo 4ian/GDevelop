@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import { getInstructionListItemKey } from './Keys';

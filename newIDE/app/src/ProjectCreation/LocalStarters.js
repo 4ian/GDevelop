@@ -8,7 +8,7 @@ import RaisedButton from '../UI/RaisedButton';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { findEmptyPath } from './LocalPathFinder';

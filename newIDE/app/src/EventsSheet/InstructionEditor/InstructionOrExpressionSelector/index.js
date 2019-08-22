@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import { List, makeSelectable } from 'material-ui/List';
+import { SelectableList } from '../../../UI/List';
 import SearchBar from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
 import { type InstructionOrExpressionTreeNode } from './CreateTree';
@@ -13,8 +13,6 @@ import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView from '../../../UI/ScrollView';
 import { Column, Line } from '../../../UI/Grid';
 import { getInstructionListItemKey } from '../SelectorListItems/Keys';
-
-const SelectableList = makeSelectable(List);
 
 const styles = {
   searchBar: {

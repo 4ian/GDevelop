@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import get from 'lodash/get';
 import {
   type InspectorDescription,
@@ -36,7 +36,7 @@ export default class InspectorsList extends React.Component<Props, void> {
     gameData: GameData,
     getInspectorDescriptions: InspectorDescriptionsGetter,
     path: Array<string>
-  ): Array<React.Node> {
+  ): Array<React$Element<any> | null> {
     return getInspectorDescriptions(gameData).map(inspectorDescription => {
       if (!inspectorDescription) return null;
       const fullInspectorPath = path.concat(inspectorDescription.key);

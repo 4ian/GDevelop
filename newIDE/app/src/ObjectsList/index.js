@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../UI/List';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import ObjectRow from './ObjectRow';

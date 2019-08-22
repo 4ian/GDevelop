@@ -19,7 +19,7 @@ export class Tabs<TabName> extends React.Component<TabsProps<TabName>, {||}> {
   }
 }
 
-// We support a subset of the props supported by Material-UI v0.x Table
+// We support a subset of the props supported by Material-UI v0.x Tabs
 // They should be self descriptive - refer to Material UI docs otherwise.
 type TabProps = {|
   label: React.Node,
@@ -31,7 +31,7 @@ type TabProps = {|
  * A Tab based on Material-UI Tab.
  */
 export class Tab extends React.Component<TabProps, {||}> {
-  // Set muiName to let Material-UI's v0.x Table recognise
+  // Set muiName to let Material-UI's v0.x Tabs recognise
   // the component.
   static muiName = 'Tab';
   render() {

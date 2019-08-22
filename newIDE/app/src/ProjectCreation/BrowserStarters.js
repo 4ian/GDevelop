@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import RaisedButton from '../UI/RaisedButton';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';

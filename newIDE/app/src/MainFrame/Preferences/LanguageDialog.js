@@ -2,9 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
+import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
-import MenuItem from 'material-ui/MenuItem';
+import MenuItem from '../../UI/MenuItem';
 import Dialog from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
@@ -125,7 +125,7 @@ export default class LanguageDialog extends Component<Props, State> {
                           <Trans>Choose GDevelop language</Trans>
                         }
                         value={values.language}
-                        onChange={(e, i, value) => {
+                        onChange={(e, i, value: string) => {
                           setLanguage(value);
                           this.setState({
                             languageDidChange: true,

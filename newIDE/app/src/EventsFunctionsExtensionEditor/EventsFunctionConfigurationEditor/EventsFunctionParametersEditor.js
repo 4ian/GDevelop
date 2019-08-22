@@ -5,8 +5,8 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import MenuItem from '../../UI/MenuItem';
 import { mapVector } from '../../Utils/MapFor';
 import RaisedButton from '../../UI/RaisedButton';
 import IconButton from '../../UI/IconButton';
@@ -171,7 +171,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                             <SelectField
                               floatingLabelText={<Trans>Type</Trans>}
                               value={parameter.getType()}
-                              onChange={(e, i, value) => {
+                              onChange={(e, i, value: string) => {
                                 parameter.setType(value);
                                 this.forceUpdate();
                                 this.props.onParametersUpdated();

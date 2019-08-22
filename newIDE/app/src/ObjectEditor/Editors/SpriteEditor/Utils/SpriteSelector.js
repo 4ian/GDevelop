@@ -2,8 +2,8 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../../../UI/SelectField';
+import MenuItem from '../../../../UI/MenuItem';
 
 import Toggle from 'material-ui/Toggle';
 import { Line } from '../../../../UI/Grid';
@@ -73,7 +73,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
           <SelectField
             floatingLabelText={<Trans>Animation</Trans>}
             value={this.props.animationIndex}
-            onChange={(e, i, value) => chooseAnimation(value)}
+            onChange={(e, i, value: number) => chooseAnimation(value)}
           >
             {mapFor(0, spriteObject.getAnimationsCount(), i => {
               const animation = spriteObject.getAnimation(i);
@@ -90,7 +90,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
             <SelectField
               floatingLabelText={<Trans>Direction</Trans>}
               value={this.props.directionIndex}
-              onChange={(e, i, value) => chooseDirection(value)}
+              onChange={(e, i, value: number) => chooseDirection(value)}
             >
               {mapFor(0, animation.getDirectionsCount(), i => {
                 return (
@@ -103,7 +103,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
             <SelectField
               floatingLabelText={<Trans>Frame</Trans>}
               value={this.props.spriteIndex}
-              onChange={(e, i, value) => chooseSprite(value)}
+              onChange={(e, i, value: number) => chooseSprite(value)}
             >
               {mapFor(0, direction.getSpritesCount(), i => {
                 return (

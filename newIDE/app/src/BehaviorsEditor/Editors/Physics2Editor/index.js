@@ -4,8 +4,8 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { Line, Column } from '../../../UI/Grid';
 import Checkbox from 'material-ui/Checkbox';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../../UI/SelectField';
+import MenuItem from '../../../UI/MenuItem';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
@@ -106,7 +106,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
             floatingLabelText={properties.get('bodyType').getLabel()}
             floatingLabelFixed
             value={properties.get('bodyType').getValue()}
-            onChange={(e, index, newValue) => {
+            onChange={(e, index, newValue: string) => {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'bodyType',
@@ -187,7 +187,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
             floatingLabelText={properties.get('shape').getLabel()}
             floatingLabelFixed
             value={properties.get('shape').getValue()}
-            onChange={(e, index, newValue) => {
+            onChange={(e, index, newValue: string) => {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'shape',
@@ -273,7 +273,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               floatingLabelText={properties.get('polygonOrigin').getLabel()}
               floatingLabelFixed
               value={properties.get('polygonOrigin').getValue()}
-              onChange={(e, index, newValue) => {
+              onChange={(e, index, newValue: string) => {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   'polygonOrigin',

@@ -4,8 +4,8 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import MenuItem from '../UI/MenuItem';
 import { mapFor } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
@@ -155,7 +155,7 @@ export default class EffectsList extends React.Component<Props, {||}> {
                       <Column expand>
                         <SelectField
                           value={effectName}
-                          onChange={(e, i, newEffectName) =>
+                          onChange={(e, i, newEffectName: string) =>
                             this._chooseEffectName(
                               allEffectDescriptions,
                               effect,

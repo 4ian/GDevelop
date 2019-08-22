@@ -2,8 +2,8 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import MenuItem from '../UI/MenuItem';
 import enumerateLayers from './EnumerateLayers';
 
 export default class VariablesEditorDialog extends Component {

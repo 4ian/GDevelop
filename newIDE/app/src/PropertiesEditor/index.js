@@ -6,8 +6,8 @@ import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../ResourcesLoader';
 import Subheader from 'material-ui/Subheader';
 import FlatButton from '../UI/FlatButton';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import MenuItem from '../UI/MenuItem';
 import Edit from 'material-ui/svg-icons/image/edit';
 import IconButton from '../UI/IconButton';
 import {
@@ -258,7 +258,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
-          onChange={(event, index, newValue) => {
+          onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i =>
               setValue(i, parseFloat(newValue) || 0)
             );
@@ -270,7 +270,8 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           {children}
         </SelectField>
       );
-    } else {
+    } else if (field.valueType === 'string') {
+      const { setValue } = field;
       return (
         <SelectField
           value={getFieldValue(
@@ -281,9 +282,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
-          onChange={(event, index, newValue) => {
+          onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, newValue || '')
+              setValue(i, newValue || '')
             );
             this._onInstancesModified(this.props.instances);
           }}

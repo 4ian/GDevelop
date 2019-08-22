@@ -6,7 +6,7 @@ import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 
 import { Column, Line } from '../UI/Grid';

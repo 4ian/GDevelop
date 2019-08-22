@@ -5,7 +5,7 @@ import React, { PureComponent } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
 import IconButton from '../UI/IconButton';

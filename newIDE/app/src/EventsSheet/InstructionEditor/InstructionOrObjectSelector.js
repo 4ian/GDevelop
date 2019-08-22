@@ -18,7 +18,7 @@ import { List, makeSelectable } from 'material-ui/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../../UI/Tabs';
 import { Subheader } from 'material-ui';
 import {
   enumerateObjectsAndGroups,

@@ -19,7 +19,7 @@ import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs, Tab } from '../UI/ClosableTabs';
 import {
   getEditorTabsInitialState,
   openEditorTab,

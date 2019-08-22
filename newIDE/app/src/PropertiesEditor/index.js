@@ -283,9 +283,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
           onChange={(event, index, newValue: string) => {
-            this.props.instances.forEach(i =>
-              setValue(i, newValue || '')
-            );
+            this.props.instances.forEach(i => setValue(i, newValue || ''));
             this._onInstancesModified(this.props.instances);
           }}
           style={styles.field}

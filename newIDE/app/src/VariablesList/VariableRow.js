@@ -4,7 +4,7 @@ import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../UI/Checkbox';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
 import TextField from '../UI/TextField';

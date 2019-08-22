@@ -34,6 +34,10 @@ const importsToReplace = [
     oldImport: 'material-ui/MenuItem',
     newImport: path.join(newIdeAppSrcPath, 'UI/MenuItem'),
   },
+  {
+    oldImport: 'material-ui/Checkbox',
+    newImport: path.join(newIdeAppSrcPath, 'UI/Checkbox'),
+  },
 ];
 
 /**

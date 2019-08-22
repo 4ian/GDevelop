@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
 import MenuItem from '../UI/MenuItem';
 import Dialog from '../UI/Dialog';
@@ -318,7 +318,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>Device orientation (for iOS and Android)</Trans>
             }
             value={orientation}
-            onChange={(e, i, value: string) => this.setState({ orientation: value })}
+            onChange={(e, i, value: string) =>
+              this.setState({ orientation: value })
+            }
           >
             <MenuItem
               value="default"
@@ -337,7 +339,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             }
             floatingLabelFixed
             value={scaleMode}
-            onChange={(e, i, value: string) => this.setState({ scaleMode: value })}
+            onChange={(e, i, value: string) =>
+              this.setState({ scaleMode: value })
+            }
           >
             <MenuItem
               value="linear"

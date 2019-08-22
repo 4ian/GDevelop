@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { Line, Column } from '../../../UI/Grid';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../../../UI/Checkbox';
 import SelectField from '../../../UI/SelectField';
 import MenuItem from '../../../UI/MenuItem';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';

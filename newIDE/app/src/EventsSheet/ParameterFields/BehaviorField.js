@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
@@ -19,7 +18,7 @@ export default class BehaviorField extends React.Component<
   _description: ?string;
   _behaviorTypeAllowed: ?string;
   _behaviorNames: Array<string> = [];
-  _field: ?AutoComplete;
+  _field: ?SemiControlledAutoComplete;
 
   constructor(props: ParameterFieldProps) {
     super(props);

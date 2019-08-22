@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 
 const styles = {
   scrollContainer: {
@@ -10,16 +10,23 @@ const styles = {
   },
 };
 
-const ThemableScrollBackground = ({ muiTheme, children }) => (
-  <div
-    style={{
-      ...styles.scrollContainer,
-      backgroundColor: muiTheme.palette.canvasColor,
-    }}
-  >
-    {children}
-  </div>
+type Props = {|
+  children: React.Node,
+|};
+
+const ScrollBackground = ({ children }: Props) => (
+  <ThemeConsumer>
+    {muiTheme => (
+      <div
+        style={{
+          ...styles.scrollContainer,
+          backgroundColor: muiTheme.palette.canvasColor,
+        }}
+      >
+        {children}
+      </div>
+    )}
+  </ThemeConsumer>
 );
 
-const ScrollBackground = muiThemeable()(ThemableScrollBackground);
 export default ScrollBackground;

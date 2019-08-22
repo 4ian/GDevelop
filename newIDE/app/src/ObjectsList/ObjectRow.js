@@ -7,8 +7,8 @@ import TextField from '../UI/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import Clipboard from '../Utils/Clipboard';
 import { CLIPBOARD_KIND } from './ClipboardKind';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import { buildTagsMenuTemplate, getTagsFromString } from '../Utils/TagsHelper';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 const LEFT_MOUSE_BUTTON = 0;
 
@@ -37,7 +37,7 @@ const getPasteLabel = isGlobalObject => {
     : 'Paste ' + clipboardObjectName;
 };
 
-class ThemableObjectRow extends React.Component {
+class ObjectRow extends React.Component {
   _renderObjectMenu(object) {
     return (
       <IconMenu
@@ -128,80 +128,80 @@ class ThemableObjectRow extends React.Component {
   };
 
   render() {
-    const {
-      project,
-      object,
-      selected,
-      isGlobalObject,
-      style,
-      muiTheme,
-    } = this.props;
-
-    const objectName = object.getName();
-    const label = this.props.editingName ? (
-      <TextField
-        id="rename-object-field"
-        ref={textField => (this.textField = textField)}
-        defaultValue={objectName}
-        onBlur={e => this.props.onRename(e.target.value)}
-        onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
-            this.textField.blur();
-          }
-        }}
-        fullWidth
-        style={styles.textField}
-      />
-    ) : (
-      <div
-        style={{
-          ...styles.objectName,
-          color: selected ? muiTheme.listItem.selectedTextColor : undefined,
-          fontStyle: isGlobalObject ? 'italic' : undefined,
-          fontWeight: isGlobalObject ? 'bold' : 'normal',
-        }}
-      >
-        {objectName}
-      </div>
-    );
-
-    const itemStyle = {
-      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-      backgroundColor: selected
-        ? muiTheme.listItem.selectedBackgroundColor
-        : undefined,
-    };
+    const { project, object, selected, isGlobalObject, style } = this.props;
 
     return (
-      <ListItem
-        style={{ ...itemStyle, ...style }}
-        onContextMenu={this._onContextMenu}
-        primaryText={label}
-        leftIcon={
-          <ListIcon
-            iconSize={32}
-            src={this.props.getThumbnail(project, object)}
-          />
-        }
-        rightIconButton={this._renderObjectMenu(object)}
-        onClick={() => {
-          if (!this.props.onObjectSelected) return;
-          if (this.props.editingName) return;
-          this.props.onObjectSelected(selected ? '' : objectName);
-        }}
-        onDoubleClick={event => {
-          if (event.button !== LEFT_MOUSE_BUTTON) return;
-          if (!this.props.onEdit) return;
-          if (this.props.editingName) return;
+      <ThemeConsumer>
+        {muiTheme => {
+          const objectName = object.getName();
+          const label = this.props.editingName ? (
+            <TextField
+              id="rename-object-field"
+              ref={textField => (this.textField = textField)}
+              defaultValue={objectName}
+              onBlur={e => this.props.onRename(e.target.value)}
+              onKeyPress={event => {
+                if (event.charCode === 13) {
+                  // enter key pressed
+                  this.textField.blur();
+                }
+              }}
+              fullWidth
+              style={styles.textField}
+            />
+          ) : (
+            <div
+              style={{
+                ...styles.objectName,
+                color: selected
+                  ? muiTheme.listItem.selectedTextColor
+                  : undefined,
+                fontStyle: isGlobalObject ? 'italic' : undefined,
+                fontWeight: isGlobalObject ? 'bold' : 'normal',
+              }}
+            >
+              {objectName}
+            </div>
+          );
 
-          this.props.onObjectSelected('');
-          this.props.onEdit(object);
+          const itemStyle = {
+            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+            backgroundColor: selected
+              ? muiTheme.listItem.selectedBackgroundColor
+              : undefined,
+          };
+
+          return (
+            <ListItem
+              style={{ ...itemStyle, ...style }}
+              onContextMenu={this._onContextMenu}
+              primaryText={label}
+              leftIcon={
+                <ListIcon
+                  iconSize={32}
+                  src={this.props.getThumbnail(project, object)}
+                />
+              }
+              rightIconButton={this._renderObjectMenu(object)}
+              onClick={() => {
+                if (!this.props.onObjectSelected) return;
+                if (this.props.editingName) return;
+                this.props.onObjectSelected(selected ? '' : objectName);
+              }}
+              onDoubleClick={event => {
+                if (event.button !== LEFT_MOUSE_BUTTON) return;
+                if (!this.props.onEdit) return;
+                if (this.props.editingName) return;
+
+                this.props.onObjectSelected('');
+                this.props.onEdit(object);
+              }}
+            />
+          );
         }}
-      />
+      </ThemeConsumer>
     );
   }
 }
 
-const ObjectRow = muiThemeable()(ThemableObjectRow);
 export default ObjectRow;

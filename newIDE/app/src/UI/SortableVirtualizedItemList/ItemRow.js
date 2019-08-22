@@ -5,8 +5,8 @@ import ListIcon from '../ListIcon';
 import IconButton from '../IconButton';
 import TextField from '../TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import { type Item } from '.';
+import ThemeConsumer from '../Theme/ThemeConsumer';
 
 const styles = {
   itemName: {
@@ -31,7 +31,7 @@ type Props = {
   buildMenuTemplate: () => Array<any>,
 };
 
-class ThemableItemRow extends React.Component<Props, *> {
+class ItemRow extends React.Component<Props, *> {
   _renderItemMenu(item) {
     return (
       <IconMenu
@@ -59,78 +59,78 @@ class ThemableItemRow extends React.Component<Props, *> {
   };
 
   render() {
-    const {
-      item,
-      selected,
-      style,
-      getThumbnail,
-      errorStatus,
-      muiTheme,
-    } = this.props;
-
-    const itemName = item.getName();
-    const label = this.props.editingName ? (
-      <TextField
-        id="rename-item-field"
-        ref={textField => (this.textField = textField)}
-        defaultValue={itemName}
-        onBlur={e => this.props.onRename(e.target.value)}
-        onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
-            this.textField.blur();
-          }
-        }}
-        fullWidth
-        style={styles.textField}
-      />
-    ) : (
-      <div
-        style={{
-          ...styles.itemName,
-          color: selected ? muiTheme.listItem.selectedTextColor : undefined,
-        }}
-      >
-        {itemName}
-      </div>
-    );
-
-    const itemStyle = {
-      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-      backgroundColor: selected
-        ? errorStatus === ''
-          ? muiTheme.listItem.selectedBackgroundColor
-          : errorStatus === 'error'
-          ? muiTheme.listItem.selectedErrorBackgroundColor
-          : muiTheme.listItem.selectedWarningBackgroundColor
-        : undefined,
-      color:
-        errorStatus === ''
-          ? undefined
-          : errorStatus === 'error'
-          ? muiTheme.listItem.errorTextColor
-          : muiTheme.listItem.warningTextColor,
-    };
+    const { item, selected, style, getThumbnail, errorStatus } = this.props;
 
     return (
-      <ListItem
-        style={{ ...itemStyle, ...style }}
-        onContextMenu={this._onContextMenu}
-        primaryText={label}
-        leftIcon={
-          getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
-        }
-        rightIconButton={this._renderItemMenu(item)}
-        onClick={() => {
-          if (!this.props.onItemSelected) return;
-          if (this.props.editingName) return;
+      <ThemeConsumer>
+        {muiTheme => {
+          const itemName = item.getName();
+          const label = this.props.editingName ? (
+            <TextField
+              id="rename-item-field"
+              ref={textField => (this.textField = textField)}
+              defaultValue={itemName}
+              onBlur={e => this.props.onRename(e.target.value)}
+              onKeyPress={event => {
+                if (event.charCode === 13) {
+                  // enter key pressed
+                  this.textField.blur();
+                }
+              }}
+              fullWidth
+              style={styles.textField}
+            />
+          ) : (
+            <div
+              style={{
+                ...styles.itemName,
+                color: selected
+                  ? muiTheme.listItem.selectedTextColor
+                  : undefined,
+              }}
+            >
+              {itemName}
+            </div>
+          );
 
-          this.props.onItemSelected(selected ? null : item);
+          const itemStyle = {
+            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+            backgroundColor: selected
+              ? errorStatus === ''
+                ? muiTheme.listItem.selectedBackgroundColor
+                : errorStatus === 'error'
+                ? muiTheme.listItem.selectedErrorBackgroundColor
+                : muiTheme.listItem.selectedWarningBackgroundColor
+              : undefined,
+            color:
+              errorStatus === ''
+                ? undefined
+                : errorStatus === 'error'
+                ? muiTheme.listItem.errorTextColor
+                : muiTheme.listItem.warningTextColor,
+          };
+
+          return (
+            <ListItem
+              style={{ ...itemStyle, ...style }}
+              onContextMenu={this._onContextMenu}
+              primaryText={label}
+              leftIcon={
+                getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
+              }
+              rightIconButton={this._renderItemMenu(item)}
+              onClick={() => {
+                if (!this.props.onItemSelected) return;
+                if (this.props.editingName) return;
+
+                this.props.onItemSelected(selected ? null : item);
+              }}
+            />
+          );
         }}
-      />
+      </ThemeConsumer>
     );
   }
 }
 
-const ItemRow = muiThemeable()(ThemableItemRow);
 export default ItemRow;

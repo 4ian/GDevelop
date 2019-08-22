@@ -4,7 +4,6 @@ import Paper from 'material-ui/Paper';
 
 const styles = {
   container: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
   },
@@ -18,6 +17,7 @@ type Props = {|
   maxWidth?: boolean,
   width?: number | string,
   noFullHeight?: boolean,
+  noExpand?: boolean,
 |};
 
 /**
@@ -33,6 +33,7 @@ const Background = (props: Props) => (
       ...styles.container,
       height: props.noFullHeight ? undefined : '100%',
       width: props.width ? props.width : undefined,
+      flex: props.noExpand ? undefined : 1,
       ...(props.maxWidth ? styles.maxWidth : undefined),
     }}
   >

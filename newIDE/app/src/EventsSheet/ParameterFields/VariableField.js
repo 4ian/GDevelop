@@ -1,7 +1,6 @@
 // @flow
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import React, { Component } from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
@@ -26,7 +25,7 @@ type Props = {
 };
 
 export default class VariableField extends Component<Props, {||}> {
-  _field: ?AutoComplete;
+  _field: ?SemiControlledAutoComplete;
 
   focus() {
     if (this._field) this._field.focus();

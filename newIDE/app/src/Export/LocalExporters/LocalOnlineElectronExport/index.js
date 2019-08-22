@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
 import RaisedButton from '../../../UI/RaisedButton';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../../../UI/Checkbox';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,

@@ -16,7 +16,7 @@ import {
 } from './GDJSInspectorDescriptions';
 import RawContentInspector from './Inspectors/RawContentInspector';
 import EmptyMessage from '../UI/EmptyMessage';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../UI/Checkbox';
 import Flash from 'material-ui/svg-icons/image/flash-on';
 import FlashOff from 'material-ui/svg-icons/image/flash-off';
 import HelpButton from '../UI/HelpButton';

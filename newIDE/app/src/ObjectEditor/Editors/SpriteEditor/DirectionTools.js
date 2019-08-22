@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Timer from 'material-ui/svg-icons/image/timer';
 import FlatButton from '../../../UI/FlatButton';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../../../UI/Checkbox';
 import Repeat from 'material-ui/svg-icons/av/repeat';
 import Brush from 'material-ui/svg-icons/image/brush';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';

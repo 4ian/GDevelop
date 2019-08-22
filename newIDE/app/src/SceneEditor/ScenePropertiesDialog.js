@@ -11,7 +11,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../UI/Checkbox';
 import { isNullPtr } from '../Utils/IsNullPtr';
 const gd = global.gd;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../../UI/Checkbox';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 
 const SPRITE_SIZE = 100;

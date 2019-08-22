@@ -93,7 +93,9 @@ export default class PreferencesDialog extends Component<Props, State> {
                   <SelectField
                     floatingLabelText={<Trans>Code editor Theme</Trans>}
                     value={values.codeEditorThemeName}
-                    onChange={(e, i, value: string) => setCodeEditorThemeName(value)}
+                    onChange={(e, i, value: string) =>
+                      setCodeEditorThemeName(value)
+                    }
                   >
                     {getAllThemes().map(codeEditorTheme => (
                       <MenuItem

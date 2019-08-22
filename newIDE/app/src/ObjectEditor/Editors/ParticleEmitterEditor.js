@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../../UI/Checkbox';
 import SelectField from '../../UI/SelectField';
 import MenuItem from '../../UI/MenuItem';
 import { Line, Column } from '../../UI/Grid';

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from './Checkbox';
 
 const styles = {
   root: {

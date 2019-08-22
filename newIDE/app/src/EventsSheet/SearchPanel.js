@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import TextField from '../UI/TextField';
 import { Line, Column } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
@@ -98,7 +98,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     const { searchText, replaceText, searchInSelection } = this.state;
 
     return (
-      <Paper>
+      <Background noFullHeight noExpand>
         <Column>
           <Line alignItems="baseline">
             <TextField
@@ -192,7 +192,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
             </Line>
           </Line>
         </Column>
-      </Paper>
+      </Background>
     );
   }
 }

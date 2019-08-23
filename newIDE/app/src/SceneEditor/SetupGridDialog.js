@@ -22,11 +22,13 @@ export default class SetupGridDialog extends Component {
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onCancel}
       />,
       <FlatButton
+        key="apply"
         label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}

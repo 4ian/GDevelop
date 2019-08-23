@@ -23,6 +23,7 @@ export default class ChangelogDialog extends React.Component<Props, State> {
 
     const actions = [
       <FlatButton
+        key="close"
         label={<Trans>Close</Trans>}
         primary={true}
         onClick={onClose}

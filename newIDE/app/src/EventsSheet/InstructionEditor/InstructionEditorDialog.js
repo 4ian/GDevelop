@@ -59,11 +59,13 @@ export default class InstructionEditorDialog extends React.Component<
     } = this.props;
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={onCancel}
       />,
       <FlatButton
+        key="ok"
         label={<Trans>Ok</Trans>}
         primary={true}
         keyboardFocused={false}

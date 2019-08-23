@@ -60,6 +60,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
     const { onClose, eventsContextResult } = this.props;
     const actions = [
       <FlatButton
+        key="close"
         label={<Trans>Close</Trans>}
         primary={true}
         onClick={this.props.onClose}

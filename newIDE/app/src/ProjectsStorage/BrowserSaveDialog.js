@@ -34,11 +34,13 @@ export default class BrowserSaveDialog extends Component {
 
     const actions = [
       <FlatButton
+        key="download"
         label={<Trans>Download GDevelop desktop version</Trans>}
         primary={false}
         onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
       />,
       <FlatButton
+        key="close"
         label={<Trans>Close</Trans>}
         primary={false}
         onClick={onClose}

@@ -91,6 +91,7 @@ export default class LanguageDialog extends Component<Props, State> {
                         onClose(false);
                       }}
                       disabled={isLoadingLanguage}
+                      key="close"
                     />,
                   ]}
                   secondaryActions={[

@@ -13,11 +13,13 @@ export class ObjectGroupEditorDialog extends Component {
 
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         keyboardFocused
         onClick={this.props.onCancel}
       />,
       <FlatButton
+        key="apply"
         label={<Trans>Apply</Trans>}
         primary
         keyboardFocused

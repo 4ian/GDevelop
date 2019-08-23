@@ -213,11 +213,13 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onClose}
       />,
       <FlatButton
+        key="apply"
         label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}

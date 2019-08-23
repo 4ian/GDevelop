@@ -139,11 +139,13 @@ export default class AboutDialog extends PureComponent<Props, *> {
       <Dialog
         actions={[
           <FlatButton
+            key="website"
             label={<Trans>GDevelop Website</Trans>}
             primary={false}
             onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
           />,
           <FlatButton
+            key="close"
             label={<Trans>Close</Trans>}
             primary={false}
             onClick={onClose}

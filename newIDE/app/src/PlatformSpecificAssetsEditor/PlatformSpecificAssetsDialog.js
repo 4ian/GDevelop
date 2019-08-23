@@ -16,6 +16,7 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import optionalRequire from '../Utils/OptionalRequire';
+import Text from '../UI/Text';
 const path = optionalRequire('path');
 const gd = global.gd;
 
@@ -253,17 +254,17 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               onClick={this._generateFromFile}
             />
           ) : (
-            <p>
+            <Text>
               <Trans>
                 Download GDevelop desktop version to generate the Android and
                 iOS icons of your game.
               </Trans>
-            </p>
+            </Text>
           )}
         </Line>
-        <p>
+        <Text>
           <Trans>Desktop (Windows, macOS and Linux) icon:</Trans>
-        </p>
+        </Text>
         {desktopSizes.map((size, index) => (
           <ResourceSelectorWithThumbnail
             key={size}
@@ -283,9 +284,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }}
           />
         ))}
-        <p>
+        <Text>
           <Trans>Android icons:</Trans>
-        </p>
+        </Text>
         {androidSizes.map((size, index) => (
           <ResourceSelectorWithThumbnail
             key={size}
@@ -305,9 +306,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }}
           />
         ))}
-        <p>
+        <Text>
           <Trans>iOS (iPhone and iPad) icons:</Trans>
-        </p>
+        </Text>
         {iosSizes.map((size, index) => (
           <ResourceSelectorWithThumbnail
             key={size}

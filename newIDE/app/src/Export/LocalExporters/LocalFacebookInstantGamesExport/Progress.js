@@ -6,6 +6,7 @@ import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
 import CircularProgress from 'material-ui/CircularProgress';
 import RaisedButton from '../../../UI/RaisedButton';
 import FlatButton from '../../../UI/FlatButton';
+import Text from '../../../UI/Text';
 import { Line, Spacer } from '../../../UI/Grid';
 import { type LocalFacebookInstantGamesExportStep } from '.';
 
@@ -40,9 +41,9 @@ export default ({
         <Line alignItems="center">
           <CircularProgress size={20} />
           <Spacer />
-          <p>
+          <Text>
             <Trans>Export in progress...</Trans>
-          </p>
+          </Text>
         </Line>
       </StepContent>
     </Step>
@@ -50,19 +51,19 @@ export default ({
       <StepLabel>Upload to build service</StepLabel>
       <StepContent>
         {errored ? (
-          <p>
+          <Text>
             <Trans>
               Can't compress the game. Please check that you have rights to
               write on this computer.
             </Trans>
-          </p>
+          </Text>
         ) : (
           <Line alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
-            <p>
+            <Text>
               <Trans>Compressing...</Trans>
-            </p>
+            </Text>
           </Line>
         )}
       </StepContent>

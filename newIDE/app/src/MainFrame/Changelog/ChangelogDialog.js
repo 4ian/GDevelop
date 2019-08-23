@@ -5,6 +5,7 @@ import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import Changelog from '.';
+import Text from '../../UI/Text';
 
 type Props = {|
   open: boolean,
@@ -39,11 +40,11 @@ export default class ChangelogDialog extends React.Component<Props, State> {
         autoScrollBodyContent
         modal
       >
-        <p>
+        <Text>
           <Trans>
             GDevelop was upgraded to a new version! Check out the changes.
           </Trans>
-        </p>
+        </Text>
         <Changelog
           onUpdated={() => {
             this.forceUpdate(); /*Force update to ensure dialog is properly positionned*/

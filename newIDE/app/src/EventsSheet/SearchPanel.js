@@ -10,6 +10,7 @@ import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import IconButton from '../UI/IconButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
+import Text from '../UI/Text';
 import {
   type SearchInEventsInputs,
   type ReplaceInEventsInputs,
@@ -141,9 +142,9 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={!this.state.matchCase}
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
-              <p>
+              <Text>
                 <Trans>Filter by</Trans>
-              </p>
+              </Text>
               <InlineCheckbox
                 label={<Trans>Conditions</Trans>}
                 checked={this.state.searchInConditions}
@@ -166,13 +167,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
               /> */}
             </Line>
             <Line noMargin alignItems="center">
-              <p>
+              <Text>
                 {resultsCount === null || resultsCount === undefined
                   ? ''
                   : resultsCount !== 0
                   ? `${resultsCount} results`
                   : `No results`}
-              </p>
+              </Text>
               <IconButton
                 disabled={!resultsCount}
                 onClick={() => {

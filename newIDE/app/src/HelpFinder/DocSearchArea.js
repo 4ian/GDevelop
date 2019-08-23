@@ -9,6 +9,7 @@ import { List, ListItem } from '../UI/List';
 import { Column } from '../UI/Grid';
 import algoliasearch from 'algoliasearch/lite';
 import debounce from 'lodash/debounce';
+import Text from '../UI/Text';
 
 const styles = {
   dropdownMenuContainer: {
@@ -150,11 +151,11 @@ export default class DocSearchArea extends React.Component<Props, State> {
           </List>
         ) : (
           <React.Fragment>
-            <p>
+            <Text>
               <Trans>Examples:</Trans>
-            </p>
+            </Text>
             <Column expand>
-              <p>
+              <Text>
                 Coins in platformer
                 <br />
                 Export on Android
@@ -165,17 +166,17 @@ export default class DocSearchArea extends React.Component<Props, State> {
                 <br />
                 ...
                 <br />
-              </p>
+              </Text>
             </Column>
           </React.Fragment>
         )}
-        <p style={styles.poweredByText}>
+        <Text style={styles.poweredByText}>
           This search is powered by{' '}
           <FlatButton
             onClick={() => Window.openExternalURL('http://algolia.com/')}
             label={'Algolia'}
           />
-        </p>
+        </Text>
       </div>
     );
   }

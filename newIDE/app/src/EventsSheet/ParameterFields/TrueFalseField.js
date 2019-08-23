@@ -9,6 +9,7 @@ import {
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
 import { focusButton } from '../../UI/Button';
+import Text from '../../UI/Text';
 
 const styles = {
   button: {
@@ -39,7 +40,7 @@ export default class TrueFalseField extends Component<
 
     return (
       <Line>
-        <p style={styles.description}>{description}</p>
+        <Text style={styles.description}>{description}</Text>
         <Column noMargin>
           <RaisedButton
             style={styles.button}

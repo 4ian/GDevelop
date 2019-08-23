@@ -7,6 +7,7 @@ import { Column, Line } from '../UI/Grid';
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
+import Text from '../UI/Text';
 
 const styles = {
   title: {
@@ -28,11 +29,11 @@ export default ({ profile }: Props) =>
         <span style={styles.title}>You are connected as {profile.email}</span>
       </Line>
       <Line>
-        <p>
+        <Text>
           <Trans>
             An account allows you to access GDevelop services online.
           </Trans>
-        </p>
+        </Text>
       </Line>
     </Column>
   ) : (

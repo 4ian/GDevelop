@@ -7,6 +7,7 @@ import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
 import TextField from '../../../../UI/TextField';
 import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
+import Text from '../../../../UI/Text';
 
 const PointRow = ({
   pointName,
@@ -51,9 +52,9 @@ const PointRow = ({
               }
             />
           ) : (
-            <p>
+            <Text>
               <Trans>(auto)</Trans>
-            </p>
+            </Text>
           )}
         </TableRowColumn>
         <TableRowColumn style={styles.coordinateColumn}>
@@ -67,9 +68,9 @@ const PointRow = ({
               }
             />
           ) : (
-            <p>
+            <Text>
               <Trans>(auto)</Trans>
-            </p>
+            </Text>
           )}
         </TableRowColumn>
         <TableRowColumn style={styles.toolColumn}>

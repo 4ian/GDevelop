@@ -13,6 +13,7 @@ import { Line } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
+import Text from '../../../UI/Text';
 
 const styles = {
   innerContainer: {
@@ -83,12 +84,12 @@ class StartPage extends BaseEditor {
                     }}
                   >
                     <GDevelopLogo />
-                    <p>
+                    <Text>
                       <Trans>
                         GDevelop is an easy-to-use game creator with no
                         programming language to learn.
                       </Trans>
-                    </p>
+                    </Text>
                   </Paper>
                   {!project && canOpen && (
                     <RaisedButton

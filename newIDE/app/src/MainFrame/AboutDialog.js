@@ -9,6 +9,7 @@ import { Tabs, Tab } from '../UI/Tabs';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
 import IconButton from '../UI/IconButton';
+import Text from '../UI/Text';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import PreferencesContext from './Preferences/PreferencesContext';
 import {
@@ -197,14 +198,14 @@ export default class AboutDialog extends PureComponent<Props, *> {
                 </Tab>
                 <Tab label={<Trans>Contributors</Trans>} value="contributors">
                   <Column>
-                    <p>
+                    <Text>
                       <Trans>
                         GDevelop was created by Florian "4ian" Rival.
                       </Trans>
-                    </p>
-                    <p>
+                    </Text>
+                    <Text>
                       <Trans>Contributors, in no particular order:</Trans>
-                    </p>
+                    </Text>
                   </Column>
                   <List>
                     {contributors.map(contributor => (
@@ -230,13 +231,13 @@ export default class AboutDialog extends PureComponent<Props, *> {
                     ))}
                   </List>
                   <Column expand>
-                    <p>
+                    <Text>
                       <Trans>
                         Thanks to all users of GDevelop! There must be missing
                         tons of people, please send your name if you've
                         contributed and you're not listed.
                       </Trans>
-                    </p>
+                    </Text>
                     <Line alignItems="center" justifyContent="center">
                       <FlatButton
                         label={<Trans>Contribute to GDevelop</Trans>}

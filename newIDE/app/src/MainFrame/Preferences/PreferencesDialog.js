@@ -15,6 +15,7 @@ import Window from '../../Utils/Window';
 import PreferencesContext, {
   type AlertMessageIdentifier,
 } from './PreferencesContext';
+import Text from '../../UI/Text';
 
 type Props = {|
   open: boolean,
@@ -107,13 +108,13 @@ export default class PreferencesDialog extends Component<Props, State> {
                   </SelectField>
                 </Line>
                 <Line noMargin>
-                  <p>
+                  <Text>
                     You can contribute and create your own themes:{' '}
                     <FlatButton
                       label={<Trans>Learn more</Trans>}
                       onClick={this.createTheme}
                     />{' '}
-                  </p>
+                  </Text>
                 </Line>
                 <Line>
                   <Toggle
@@ -173,12 +174,12 @@ export default class PreferencesDialog extends Component<Props, State> {
                 <Line>
                   {dismissedAlertMessages.length ? (
                     <Column noMargin>
-                      <p>
+                      <Text>
                         <Trans>
                           You have dismissed some hints. Click to enable them
                           again:
                         </Trans>
-                      </p>
+                      </Text>
                       {dismissedAlertMessages.map(name => (
                         <FlatButton
                           label={name}

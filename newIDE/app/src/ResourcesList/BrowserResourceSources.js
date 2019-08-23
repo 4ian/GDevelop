@@ -4,6 +4,7 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import ListIcon from '../UI/ListIcon';
 import { SelectableList, ListItem } from '../UI/List';
+import Text from '../UI/Text';
 const gd = global.gd;
 
 const styles = {
@@ -208,12 +209,12 @@ class GenericResourcesChooser extends Component {
         autoScrollBodyContent
       >
         <div style={styles.explanations}>
-          <p>
+          <Text>
             <Trans>
               Adding resources from Dropbox, Google Drive... is coming soon!
               Download GDevelop desktop version to use your own assets.
             </Trans>
-          </p>
+          </Text>
         </div>
         <SelectableList
           value={this.state.chosenResourceUrl}

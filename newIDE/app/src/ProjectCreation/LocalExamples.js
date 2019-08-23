@@ -6,6 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
+import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import { findExamples } from './LocalExamplesFinder';
@@ -98,9 +99,9 @@ export default class LocalExamples extends Component<Props, State> {
         {({ i18n }) => (
           <Column noMargin>
             <Column>
-              <p>
+              <Text>
                 <Trans>Choose or search for an example to open:</Trans>
-              </p>
+              </Text>
             </Column>
             <Line>
               <ExamplesList

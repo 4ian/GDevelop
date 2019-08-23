@@ -13,6 +13,7 @@ import EventsFunctionsExtensionsContext, {
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
+import Text from '../UI/Text';
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -203,14 +204,14 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                 >
                   <Column expand>
                     <Line>
-                      <p>
+                      <Text>
                         <Trans>
                           You can export the extension to a file to easily
                           import it in another project. If your extension is
                           providing useful and reusable functions or behaviors,
                           consider sharing it with the GDevelop community!
                         </Trans>
-                      </p>
+                      </Text>
                     </Line>
                     <Line>
                       <RaisedButton

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ThemeConsumer from './Theme/ThemeConsumer';
+import Text from './Text';
 
 const style = {
   display: 'flex',
@@ -36,7 +37,7 @@ const toolbarTextStyle = {
 };
 
 export const MiniToolbarText = ({ children }) => (
-  <p style={toolbarTextStyle}>{children}</p>
+  <Text style={toolbarTextStyle}>{children}</Text>
 );
 
 export default MiniToolbar;

@@ -9,6 +9,7 @@ import { Line, Spacer } from '../../UI/Grid';
 import BuildProgress from './BuildProgress';
 import { type Build } from '../../Utils/GDevelopServices/Build';
 import EmptyMessage from '../../UI/EmptyMessage';
+import Text from '../../UI/Text';
 
 const styles = {
   stepper: { flex: 1 },
@@ -64,9 +65,9 @@ export default ({
         <Line alignItems="center">
           <CircularProgress size={20} />
           <Spacer />
-          <p>
+          <Text>
             <Trans>Export in progress...</Trans>
-          </p>
+          </Text>
         </Line>
       </StepContent>
     </Step>
@@ -74,19 +75,19 @@ export default ({
       <StepLabel>Upload to build service</StepLabel>
       <StepContent>
         {errored ? (
-          <p>
+          <Text>
             <Trans>
               Can't upload your game to the build service. Please check your
               internet connection or try again later.
             </Trans>
-          </p>
+          </Text>
         ) : exportStep === 'compress' ? (
           <Line alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
-            <p>
+            <Text>
               <Trans>Compressing before upload...</Trans>
-            </p>
+            </Text>
           </Line>
         ) : (
           <Line alignItems="center" expand>
@@ -104,17 +105,17 @@ export default ({
       <StepLabel>Build and download</StepLabel>
       <StepContent>
         {errored && (
-          <p>
+          <Text>
             <Trans>
               Build could not start or errored. Please check your internet
               connection or try again later.
             </Trans>
-          </p>
+          </Text>
         )}
         {!build && !errored && (
-          <p>
+          <Text>
             <Trans>Build is starting...</Trans>
-          </p>
+          </Text>
         )}
         {build && <BuildProgress build={build} onDownload={onDownload} />}
         {showSeeAllMyBuildsExplanation && (

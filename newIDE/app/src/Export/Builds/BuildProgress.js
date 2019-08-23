@@ -6,6 +6,7 @@ import { Spacer, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import difference_in_seconds from 'date-fns/difference_in_seconds';
 import LinearProgress from 'material-ui/LinearProgress';
+import Text from '../../UI/Text';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -65,9 +66,9 @@ export default ({ build, onDownload }: Props) => {
   return build.status === 'error' ? (
     <React.Fragment>
       <Line alignItems="center">
-        <p>
+        <Text>
           <Trans>Something wrong happened :(</Trans>
-        </p>
+        </Text>
         <Spacer />
         <RaisedButton
           label={<Trans>See logs</Trans>}
@@ -93,13 +94,13 @@ export default ({ build, onDownload }: Props) => {
       />
       <Spacer />
       {estimatedRemainingTime > 0 ? (
-        <p>
+        <Text>
           <Trans>~{Math.round(estimatedRemainingTime / 60)} minutes.</Trans>
-        </p>
+        </Text>
       ) : (
-        <p>
+        <Text>
           <Trans>Should finish soon.</Trans>
-        </p>
+        </Text>
       )}
     </Line>
   ) : build.status === 'complete' ? (

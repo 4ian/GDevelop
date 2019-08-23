@@ -5,6 +5,7 @@ import * as React from 'react';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import { List, ListItem } from '../UI/List';
+import Text from '../UI/Text';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ExamplesSearchbar from './ExamplesSearchbar';
 import ExamplesInformation from './ExamplesInformation';
@@ -166,9 +167,9 @@ export default class LocalExamples extends React.Component<Props, State> {
             </List>
             {!!electron && (
               <Column expand>
-                <p>
+                <Text>
                   <Trans>Want to contribute to the examples?</Trans>
-                </p>
+                </Text>
                 <Line alignItems="center" justifyContent="center">
                   <RaisedButton
                     label={<Trans>Submit your example</Trans>}

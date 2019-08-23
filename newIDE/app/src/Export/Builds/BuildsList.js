@@ -10,6 +10,7 @@ import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import BuildProgress from './BuildProgress';
 import format from 'date-fns/format';
 import difference_in_calendar_days from 'date-fns/difference_in_calendar_days';
+import Text from '../../UI/Text';
 
 type Props = {|
   builds: ?Array<Build>,
@@ -54,10 +55,10 @@ export default ({ builds, onDownload }: Props) => {
 
               return (
                 <Paper style={styles.buildContainer} key={build.id}>
-                  <p>
+                  <Text>
                     {build.type} - Last updated on{' '}
                     {format(build.updatedAt, 'YYYY-MM-DD HH:mm:ss')}
-                  </p>
+                  </Text>
                   {!isOld && (
                     <BuildProgress
                       build={build}

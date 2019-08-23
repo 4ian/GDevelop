@@ -23,6 +23,7 @@ import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
 } from '../Utils/Analytics/EventSender';
+import Text from '../UI/Text';
 
 const styles = {
   descriptionText: {
@@ -177,14 +178,14 @@ export default class SubscriptionDialog extends Component<Props, State> {
           >
             <Column>
               <Line>
-                <p>
+                <Text>
                   <Trans>
                     Get a subscription to package your games for Android,
                     Windows, macOS and Linux, use live preview over wifi and
                     more. With a subscription, you're also supporting the
                     development of GDevelop, which is an open-source software.
                   </Trans>
-                </p>
+                </Text>
               </Line>
             </Column>
             {getSubscriptionPlans().map(plan => (
@@ -201,13 +202,13 @@ export default class SubscriptionDialog extends Component<Props, State> {
                   <Column key={index} expand>
                     <Line noMargin alignItems="center">
                       <CheckCircle style={styles.bulletIcon} />
-                      <p style={styles.bulletText}>{bulletText}</p>
+                      <Text style={styles.bulletText}>{bulletText}</Text>
                     </Line>
                   </Column>
                 ))}
-                <p style={styles.descriptionText}>
+                <Text style={styles.descriptionText}>
                   {plan.extraDescription || ''}
-                </p>
+                </Text>
                 <CardActions style={styles.actions}>
                   {userProfile.subscription &&
                   userProfile.subscription.planId === plan.planId ? (
@@ -250,13 +251,13 @@ export default class SubscriptionDialog extends Component<Props, State> {
             </Column>
             {!userProfile.authenticated && (
               <PlaceholderMessage>
-                <p>
+                <Text>
                   <Trans>
                     Create a GDevelop account to continue. It's free and you'll
                     be able to access to online services like one-click build
                     for Android:
                   </Trans>
-                </p>
+                </Text>
                 <RaisedButton
                   label={<Trans>Create my account</Trans>}
                   primary

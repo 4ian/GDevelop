@@ -14,6 +14,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import AlertMessage from '../../UI/AlertMessage';
+import Text from '../../UI/Text';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -136,11 +137,11 @@ export default class LocalExport extends Component {
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          <p>
+          <Text>
             <Trans>
               You can now upload the game to a web hosting to play to the game.
             </Trans>
-          </p>
+          </Text>
           <AlertMessage kind="warning">
             <Trans>
               Your game won't work if you open index.html on your computer. You

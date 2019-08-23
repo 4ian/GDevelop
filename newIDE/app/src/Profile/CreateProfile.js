@@ -5,6 +5,7 @@ import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
+import Text from '../UI/Text';
 
 const styles = {
   orDivider: {
@@ -21,10 +22,10 @@ type Props = {
 export default ({ message, onLogin }: Props) => (
   <Column noMargin>
     <Line>
-      <p>
+      <Text>
         {message ||
           'You are not connected. Create an account and connect to access to GDevelop online services, like building your game for Android in one click!'}
-      </p>
+      </Text>
     </Line>
     <Line justifyContent="center" alignItems="center">
       <RaisedButton

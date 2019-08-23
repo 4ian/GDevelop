@@ -12,6 +12,7 @@ import { Line } from '../../UI/Grid';
 import mapValues from 'lodash/mapValues';
 import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import Text from '../../UI/Text';
 
 type Props = {|
   runtimeScene: GameData,
@@ -112,9 +113,9 @@ export default class RuntimeSceneInspector extends React.Component<
 
     return (
       <div style={styles.container}>
-        <p>
+        <Text>
           <Trans>Layers:</Trans>
-        </p>
+        </Text>
         <ReactJsonView
           collapsed={false}
           name={false}
@@ -126,11 +127,11 @@ export default class RuntimeSceneInspector extends React.Component<
           groupArraysAfterLength={50}
           theme="monokai"
         />
-        <p>
+        <Text>
           <Trans>
             Create a new instance on the scene (will be at position 0;0):
           </Trans>
-        </p>
+        </Text>
         {runtimeScene._objects && runtimeScene._objects.items && (
           <Line noMargin alignItems="baseline">
             <SemiControlledAutoComplete

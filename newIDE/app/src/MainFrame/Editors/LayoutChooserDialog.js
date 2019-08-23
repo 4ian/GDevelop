@@ -4,6 +4,7 @@ import FlatButton from '../../UI/FlatButton';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import Dialog from '../../UI/Dialog';
 import { mapFor } from '../../Utils/MapFor';
+import Text from '../../UI/Text';
 
 export default class LayoutChooserDialog extends Component {
   constructor(props) {
@@ -60,7 +61,7 @@ export default class LayoutChooserDialog extends Component {
         autoScrollBodyContent={true}
         contentStyle={{ width: '350px' }}
       >
-        {this.props.helpText && <p>{this.props.helpText}</p>}
+        {this.props.helpText && <Text>{this.props.helpText}</Text>}
         <RadioButtonGroup
           name="associated-layout"
           valueSelected={selectedLayoutName}

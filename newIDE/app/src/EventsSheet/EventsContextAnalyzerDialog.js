@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import Text from '../UI/Text';
 
 export type EventsContextResult = {|
   objectsNames: Array<string>,
@@ -69,19 +70,19 @@ export default class EventsContextAnalyzerDialog extends React.Component<
 
     return (
       <Dialog actions={actions} open onRequestClose={onClose}>
-        <p>
+        <Text>
           <Trans>
             Objects or groups being directly referenced in the events:{' '}
             {eventsContextResult.objectOrGroupNames.join(', ')}
           </Trans>
-        </p>
-        <p>
+        </Text>
+        <Text>
           <Trans>
             All objects potentially used in events:{' '}
             {eventsContextResult.objectsNames.join(', ')}
           </Trans>
-        </p>
-        <p>
+        </Text>
+        <Text>
           <Trans>All behaviors being directly referenced in the events:</Trans>{' '}
           {Object.keys(eventsContextResult.objectOrGroupBehaviorNames).map(
             objectOrGroupName => {
@@ -96,7 +97,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
               );
             }
           )}
-        </p>
+        </Text>
       </Dialog>
     );
   }

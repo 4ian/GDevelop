@@ -5,6 +5,7 @@ import * as React from 'react';
 import { setupAutocompletions } from './LocalCodeEditorAutocompletions';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from '../UI/RaisedButton';
+import Text from '../UI/Text';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { getAllThemes } from './Theme';
 
@@ -105,9 +106,9 @@ export class CodeEditor extends React.Component<Props, State> {
     if (error) {
       return (
         <React.Fragment>
-          <p>
+          <Text>
             <Trans>Unable to load the code editor</Trans>
-          </p>
+          </Text>
           <RaisedButton
             label={<Trans>Retry</Trans>}
             onClick={this.loadMonacoEditor}

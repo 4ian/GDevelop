@@ -9,6 +9,7 @@ import MiniToolbar from '../../UI/MiniToolbar';
 import ZoomIn from 'material-ui/svg-icons/action/zoom-in';
 import ZoomOut from 'material-ui/svg-icons/action/zoom-out';
 import ZoomOutMap from 'material-ui/svg-icons/maps/zoom-out-map';
+import Text from '../../UI/Text';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -212,9 +213,9 @@ export default class ImagePreview extends React.Component<Props, State> {
                 }}
               >
                 {!!this.state.errored && (
-                  <p>
+                  <Text>
                     <Trans>Unable to load the image</Trans>
-                  </p>
+                  </Text>
                 )}
                 {!this.state.errored && (
                   <img

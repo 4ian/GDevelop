@@ -13,6 +13,7 @@ import {
   sendSubscriptionCheckDismiss,
 } from '../Utils/Analytics/EventSender';
 import { Trans } from '@lingui/macro';
+import Text from '../UI/Text';
 
 type Props = {|
   title: React.Node,
@@ -109,46 +110,46 @@ export class SubscriptionCheckDialog extends React.Component<
         <Column noMargin>
           <Line noMargin alignItems="center">
             {mode === 'try' ? (
-              <p>
+              <Text>
                 <Trans>
                   You can try this feature, but if you're using it regularly, we
                   ask you to get a subscription to GDevelop.
                 </Trans>
-              </p>
+              </Text>
             ) : (
-              <p>
+              <Text>
                 <Trans>
                   To use this feature, we ask you to get a subscription to
                   GDevelop.
                 </Trans>
-              </p>
+              </Text>
             )}
           </Line>
           <Line noMargin alignItems="center">
             <Star style={styles.icon} />
-            <p style={styles.iconText}>
+            <Text style={styles.iconText}>
               <Trans>
                 Having a subscription allows you to use the one-click export for
                 Android, Windows, macOS and Linux, launch live previews over
                 wifi, disable the GDevelop splashscreen during loading and more!
               </Trans>
-            </p>
+            </Text>
           </Line>
           <Line noMargin alignItems="center">
             <Favorite style={styles.icon} />
-            <p style={styles.iconText}>
+            <Text style={styles.iconText}>
               <Trans>
                 You're also supporting the development of GDevelop, an
                 open-source software! In the future, more online services will
                 be available for users with a subscription.
               </Trans>
-            </p>
+            </Text>
           </Line>
-          <p style={styles.thanksText}>
+          <Text style={styles.thanksText}>
             <b>
               <Trans>Thanks!</Trans>
             </b>
-          </p>
+          </Text>
         </Column>
       </Dialog>
     );

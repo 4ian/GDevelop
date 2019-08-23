@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
 import RaisedButton from '../UI/RaisedButton';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
+import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import { List, ListItem } from '../UI/List';
@@ -86,9 +87,9 @@ export default class LocalStarters extends Component<Props, State> {
           <Column noMargin>
             <Line>
               <Column>
-                <p>
+                <Text>
                   <Trans>Choose a game to use as a starter:</Trans>
-                </p>
+                </Text>
               </Column>
             </Line>
             <Line>

@@ -6,6 +6,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import { type Limit, type Subscription } from '../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import Text from '../UI/Text';
 
 type Props = {|
   subscription: ?Subscription,
@@ -20,19 +21,19 @@ export default ({ subscription, limit, onChangeSubscription }: Props) => {
 
   return (
     <Column noMargin>
-      <p>
+      <Text>
         <Trans>
           You have {Math.max(limit.max - limit.current, 0)} remaining builds for
           today (out of {limit.max}).
         </Trans>
-      </p>
+      </Text>
       {hasSubscription && limit.limitReached && (
-        <p>
+        <Text>
           <Trans>
             Need more power? You can upgrade to a new plan to increase the
             limit!
           </Trans>
-        </p>
+        </Text>
       )}
       {hasSubscription && limit.limitReached && (
         <Line justifyContent="center" alignItems="center">
@@ -44,11 +45,11 @@ export default ({ subscription, limit, onChangeSubscription }: Props) => {
         </Line>
       )}
       {noSubscription && (
-        <p>
+        <Text>
           <Trans>
             You don't have a subscription. Get one to increase the limits!
           </Trans>
-        </p>
+        </Text>
       )}
       {noSubscription && (
         <Line justifyContent="center" alignItems="center">

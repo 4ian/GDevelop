@@ -19,6 +19,7 @@ import {
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import Window from '../../Utils/Window';
+import Text from '../../UI/Text';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -114,15 +115,15 @@ class LocalCordovaExport extends Component<Props, State> {
       <Column noMargin>
         <Line>
           <Column noMargin>
-            <p>
+            <Text>
               This will export your game as a Cordova project. Cordova is a
               technology that enables HTML5 games to be packaged for <b>iOS</b>,{' '}
               <b>Android</b> and more.
-            </p>
-            <p>
+            </Text>
+            <Text>
               Third-party tools like <b>Adobe PhoneGap Build</b> allow game
               developers to bundle their games using Cordova.
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line>
@@ -169,17 +170,17 @@ class LocalCordovaExport extends Component<Props, State> {
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          <p>
+          <Text>
             You can now compress and upload the game to <b>PhoneGap Build</b>{' '}
             which will compile it for you to an iOS and Android app.
-          </p>
-          <p>
+          </Text>
+          <Text>
             <Trans>
               You can also compile the game by yourself using Cordova
               command-line tool to iOS (XCode is required) or Android (Android
               SDK is required).
             </Trans>
-          </p>
+          </Text>
           <RaisedButton
             fullWidth
             primary

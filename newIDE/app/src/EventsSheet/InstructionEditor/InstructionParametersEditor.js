@@ -23,6 +23,7 @@ import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../EventsScope.flow';
 import { getObjectParameterIndex } from './InstructionOrExpressionSelector/EnumerateInstructions';
+import Text from '../../UI/Text';
 const gd = global.gd;
 
 const styles = {
@@ -249,7 +250,7 @@ export default class InstructionParametersEditor extends React.Component<
                 alt=""
                 style={styles.icon}
               />
-              <p>{instructionMetadata.getDescription()}</p>
+              <Text>{instructionMetadata.getDescription()}</Text>
               {isAnEventFunctionMetadata(instructionMetadata) && (
                 <IconButton
                   onClick={() => {

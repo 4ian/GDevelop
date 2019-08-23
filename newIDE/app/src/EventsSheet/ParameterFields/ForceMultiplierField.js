@@ -9,6 +9,7 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
 import BackgroundText from '../../UI/BackgroundText';
 import { focusButton } from '../../UI/Button';
+import Text from '../../UI/Text';
 
 type State = {|
   showDeprecatedNumericValue: boolean,
@@ -44,13 +45,13 @@ export default class ForceMultiplierField extends Component<
             />
           </Column>
           <Column>
-            <p>
+            <Text>
               <Trans>
                 The force will only push the object during the time of one
                 frame. Typically used in an event with no conditions or with
                 conditions that stay valid for a certain amount of time.
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line expand alignItems="center">
@@ -62,14 +63,14 @@ export default class ForceMultiplierField extends Component<
             />
           </Column>
           <Column>
-            <p>
+            <Text>
               <Trans>
                 The force will push the object forever, unless you use the
                 action "Stop the object". Typically used in an event with
                 conditions that are only true once, or with a "Trigger Once"
                 condition.
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         {showDeprecatedNumericValue && (

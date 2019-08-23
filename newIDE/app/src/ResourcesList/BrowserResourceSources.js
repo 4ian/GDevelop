@@ -185,11 +185,13 @@ class GenericResourcesChooser extends Component {
 
     const actions = [
       <FlatButton
+        key="close"
         label={<Trans>Close</Trans>}
         primary={false}
         onClick={this._onClose}
       />,
       <FlatButton
+        key="choose"
         label={<Trans>Choose</Trans>}
         primary={false}
         disabled={!this.state.chosenResourceUrl}

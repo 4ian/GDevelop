@@ -50,6 +50,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
         title={<Trans>Create a new game</Trans>}
         actions={[
           <FlatButton
+            key="close"
             label={<Trans>Close</Trans>}
             primary={false}
             onClick={onClose}

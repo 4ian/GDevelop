@@ -13,11 +13,17 @@ export default class BetaIntroDialog extends Component {
     const { open, onClose } = this.props;
     const actions = [
       <FlatButton
+        key="download"
         label={<Trans>Download full GDevelop desktop version</Trans>}
         primary={false}
         onClick={this._onOpenWebsite}
       />,
-      <FlatButton label={<Trans>Ok</Trans>} primary={true} onClick={onClose} />,
+      <FlatButton
+        label={<Trans>Ok</Trans>}
+        primary={true}
+        onClick={onClose}
+        key="close"
+      />,
     ];
 
     return (

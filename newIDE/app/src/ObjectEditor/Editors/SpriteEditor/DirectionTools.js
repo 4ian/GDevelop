@@ -156,6 +156,7 @@ export default class DirectionTools extends Component<Props, State> {
                 label={<Trans>OK</Trans>}
                 primary
                 onClick={() => this.openPreview(false)}
+                key="ok"
               />
             }
             autoScrollBodyContent

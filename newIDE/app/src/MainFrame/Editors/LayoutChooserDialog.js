@@ -30,11 +30,13 @@ export default class LayoutChooserDialog extends Component {
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onClose}
       />,
       <FlatButton
+        key="choose"
         label={<Trans>Choose</Trans>}
         primary={true}
         keyboardFocused={true}

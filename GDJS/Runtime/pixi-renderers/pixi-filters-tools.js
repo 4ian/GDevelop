@@ -1,5 +1,8 @@
 gdjs.PixiFiltersTools = function() {};
 
+const clampValue = (value, min, max) => Math.max(min, Math.min(max, value));
+const clampKernelSize = value => ([5, 7, 9, 11, 13, 15].includes(value)) ? value : 5;
+
 gdjs.NightPixiFilter = function() {
   var vertexShader = null;
   var fragmentShader = [
@@ -70,7 +73,7 @@ gdjs.PixiFiltersTools._filters = {
             if (parameterName !== 'intensity' &&
                 parameterName !== 'opacity') return;
 
-            filter.uniforms[parameterName] = value;
+            filter.uniforms[parameterName] = clampValue(value, 0, 1);
         },
     },
     LightNight: {
@@ -81,7 +84,7 @@ gdjs.PixiFiltersTools._filters = {
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'opacity') return;
 
-            filter.uniforms.opacity = value;
+            filter.uniforms.opacity = clampValue(value, 0, 1);
         },
     },
     Sepia: {
@@ -93,7 +96,7 @@ gdjs.PixiFiltersTools._filters = {
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'opacity') return;
 
-            filter.alpha = value;
+            filter.alpha = clampValue(value, 0, 1);
         },
     },
     BlackAndWhite: {
@@ -105,7 +108,7 @@ gdjs.PixiFiltersTools._filters = {
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'opacity') return;
 
-            filter.alpha = value;
+            filter.alpha = clampValue(value, 0, 1);
         },
     },
     Noise: {
@@ -116,7 +119,7 @@ gdjs.PixiFiltersTools._filters = {
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'noise') return;
 
-            filter.noise = value;
+            filter.noise = clampValue(value, 0, 1);
         },
     },
     Blur: {
@@ -129,7 +132,11 @@ gdjs.PixiFiltersTools._filters = {
                 parameterName !== 'quality' &&
                 parameterName !== 'kernelSize' &&
                 parameterName !== 'resolution') return;
-
+            
+            if (parameterName === 'kernelSize'){
+                value = clampKernelSize(value);
+            }
+            
             filter[parameterName] = value;
         },
     },

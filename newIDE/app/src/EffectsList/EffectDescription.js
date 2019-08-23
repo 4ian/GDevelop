@@ -11,9 +11,6 @@ export type EffectDescription = {|
   parameterDefaultValues: Array<EffectDefaultValue>,
 |};
 
-const clampValue = value => Math.max(0, Math.min(1, value));
-const clampKernelSize = value => ([5, 7, 9, 11, 13, 15].includes(value)) ? value : 5;
-
 export const getAllEffectDescriptions = (
   i18n: I18nType
 ): Array<EffectDescription> => [
@@ -26,7 +23,7 @@ export const getAllEffectDescriptions = (
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('opacity'),
         setValue: (effect: gdEffect, newValue: number) =>
-          effect.setParameter('opacity', clampValue(newValue)),
+          effect.setParameter('opacity', newValue),
       },
     ],
     parameterDefaultValues: [
@@ -45,7 +42,7 @@ export const getAllEffectDescriptions = (
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('opacity'),
         setValue: (effect: gdEffect, newValue: number) =>
-          effect.setParameter('opacity', clampValue(newValue)),
+          effect.setParameter('opacity', newValue),
       },
     ],
     parameterDefaultValues: [
@@ -88,7 +85,7 @@ export const getAllEffectDescriptions = (
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('kernelSize'),
         setValue: (effect: gdEffect, newValue: number) =>
-          effect.setParameter('kernelSize', clampKernelSize(newValue)),
+          effect.setParameter('kernelSize', newValue),
       },
     ],
     parameterDefaultValues: [
@@ -119,7 +116,7 @@ export const getAllEffectDescriptions = (
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('opacity'),
         setValue: (effect: gdEffect, newValue: number) =>
-          effect.setParameter('opacity', clampValue(newValue)),
+          effect.setParameter('opacity', newValue),
       },
       {
         name: 'intensity',
@@ -127,7 +124,7 @@ export const getAllEffectDescriptions = (
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('intensity'),
         setValue: (effect: gdEffect, newValue: number) =>
-          effect.setParameter('intensity', clampValue(newValue)),
+          effect.setParameter('intensity', newValue),
       },
     ],
     parameterDefaultValues: [
@@ -150,7 +147,7 @@ export const getAllEffectDescriptions = (
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('opacity'),
         setValue: (effect: gdEffect, newValue: number) =>
-          effect.setParameter('opacity', clampValue(newValue)),
+          effect.setParameter('opacity', newValue),
       },
     ],
     parameterDefaultValues: [
@@ -169,7 +166,7 @@ export const getAllEffectDescriptions = (
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('noise'),
         setValue: (effect: gdEffect, newValue: number) =>
-          effect.setParameter('noise', clampValue(newValue)),
+          effect.setParameter('noise', newValue),
       },
     ],
     parameterDefaultValues: [

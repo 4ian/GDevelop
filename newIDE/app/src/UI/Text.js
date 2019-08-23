@@ -30,4 +30,4 @@ type Props = {|
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help to maintain
 // consistency of text in the whole app.
-export default ({ children }: Props) => <p>{children}</p>;
+export default ({ children, style }: Props) => <p style={style}>{children}</p>;

@@ -173,10 +173,12 @@ export default class AboutDialog extends PureComponent<Props, *> {
                 <Tab label={<Trans>About GDevelop</Trans>} value="about">
                   <Column>
                     <Line>
-                      <Trans>
-                        GDevelop {getIDEVersion()} based on GDevelop.js{' '}
-                        {getGDCoreVersion()}
-                      </Trans>
+                      <Text>
+                        <Trans>
+                          GDevelop {getIDEVersion()} based on GDevelop.js{' '}
+                          {getGDCoreVersion()}
+                        </Trans>
+                      </Text>
                     </Line>
                     <Line>{updateStatusString}</Line>
                     <Line justifyContent="center">

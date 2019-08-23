@@ -5,6 +5,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
+import Text from '../UI/Text';
 const gd = global.gd;
 
 export default class BrowserStarters extends Component {
@@ -13,9 +14,9 @@ export default class BrowserStarters extends Component {
       <Column noMargin>
         <Line>
           <Column>
-            <p>
+            <Text>
               <Trans>Choose a game to use as a starter:</Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line>

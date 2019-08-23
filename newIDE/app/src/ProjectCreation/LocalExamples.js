@@ -98,11 +98,13 @@ export default class LocalExamples extends Component<Props, State> {
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
-            <Column>
-              <Text>
-                <Trans>Choose or search for an example to open:</Trans>
-              </Text>
-            </Column>
+            <Line>
+              <Column>
+                <Text>
+                  <Trans>Choose or search for an example to open:</Trans>
+                </Text>
+              </Column>
+            </Line>
             <Line>
               <ExamplesList
                 exampleNames={this.state.exampleNames}

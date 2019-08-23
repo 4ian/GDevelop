@@ -121,11 +121,13 @@ export default class BrowserExamples extends Component {
   render() {
     return (
       <Column noMargin>
-        <Column>
-          <Text>
-            <Trans>Choose or search for an example to open:</Trans>
-          </Text>
-        </Column>
+        <Line>
+          <Column>
+            <Text>
+              <Trans>Choose or search for an example to open:</Trans>
+            </Text>
+          </Column>
+        </Line>
         <Line>
           <ExamplesList
             exampleNames={exampleNames}

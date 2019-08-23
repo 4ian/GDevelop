@@ -43,6 +43,10 @@ type Props = {|
  * A button showing just an icon, based on Material-UI icon button.
  */
 export default class IconButton extends React.Component<Props, {||}> {
+  // Set muiName to let Material-UI's v0.x AppBar recognise
+  // the component (and apply proper color).
+  static muiName = 'IconButton';
+
   render() {
     return <MUIIconButton {...this.props} />;
   }

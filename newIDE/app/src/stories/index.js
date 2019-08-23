@@ -1659,7 +1659,15 @@ storiesOf('TextEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={textObject}>
-      <TextEditor object={textObject} project={project} />
+      <TextEditor
+        object={textObject}
+        project={project}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)
+        }
+        resourceExternalEditors={[]}
+      />
     </SerializedObjectDisplay>
   ));
 

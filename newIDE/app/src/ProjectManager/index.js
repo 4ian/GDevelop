@@ -756,7 +756,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     }
                     onEdit={() => this.props.onOpenLayout(name)}
                     onDelete={() => this.props.onDeleteLayout(layout)}
-                    addLabel={'Add a new scene'}
+                    addLabel={'Add a New Scene'}
                     onAdd={() => this._addLayout(name, i)}
                     onRename={newName => {
                       this.props.onRenameLayout(name, newName);
@@ -813,7 +813,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     onDelete={() =>
                       this.props.onDeleteExternalEvents(externalEvents)
                     }
-                    addLabel={'Add a new external event'}
+                    addLabel={'Add New External Events'}
                     onAdd={() => this._addExternalEvents(name, i)}
                     onRename={newName => {
                       this.props.onRenameExternalEvents(name, newName);
@@ -872,7 +872,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     onDelete={() =>
                       this.props.onDeleteExternalLayout(externalLayout)
                     }
-                    addLabel={'Add a new external layout'}
+                    addLabel={'Add a New External Layout'}
                     onAdd={() => this._addExternalLayout(name, i)}
                     onRename={newName => {
                       this.props.onRenameExternalLayout(name, newName);
@@ -939,7 +939,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         eventsFunctionsExtension
                       )
                     }
-                    addLabel={'Add a new functions and behaviors'}
+                    addLabel={'Add a New Extension'}
                     onAdd={() => this._addEventsFunctionsExtension(name, i)}
                     onRename={newName => {
                       this.props.onRenameEventsFunctionsExtension(

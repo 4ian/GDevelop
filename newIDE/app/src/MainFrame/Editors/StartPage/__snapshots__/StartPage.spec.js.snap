@@ -73,9 +73,9 @@ exports[`StartPage renders the start page with a project 1`] = `
               }
             }
           />
-          <Text>
+          <p>
             GDevelop is an easy-to-use game creator with no programming language to learn.
-          </Text>
+          </p>
         </div>
         <div
           style={

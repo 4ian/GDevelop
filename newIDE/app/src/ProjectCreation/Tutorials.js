@@ -5,6 +5,7 @@ import { sendTutorialOpened } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
 import { List, ListItem } from '../UI/List';
+import Text from '../UI/Text';
 import { Subheader } from 'material-ui';
 
 export default class Tutorials extends PureComponent {
@@ -13,12 +14,12 @@ export default class Tutorials extends PureComponent {
       <Column noMargin>
         <Line>
           <Column>
-            <p>
+            <Text>
               <Trans>
                 Tutorials are available on GDevelop wiki. Choose a tutorial to
                 read:
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line>

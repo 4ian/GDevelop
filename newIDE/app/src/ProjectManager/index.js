@@ -109,7 +109,7 @@ type ItemProps = {|
   editingName: boolean,
   onEdit: () => void,
   onDelete: () => void,
-  typeAddedable: string,
+  addLabel: string,
   onAdd: () => void,
   onRename: string => void,
   onEditName: () => void,
@@ -164,7 +164,8 @@ class Item extends React.Component<ItemProps, {||}> {
             click: () => this.props.onDelete(),
           },
           {
-            label: 'Add a new one',
+            label: this.props.addLabel,
+            visible: !!this.props.onAdd,
             click: () => this.props.onAdd(),
           },
           { type: 'separator' },
@@ -755,8 +756,8 @@ export default class ProjectManager extends React.Component<Props, State> {
                     }
                     onEdit={() => this.props.onOpenLayout(name)}
                     onDelete={() => this.props.onDeleteLayout(layout)}
+                    addLabel={'Add a new scene'}
                     onAdd={() => this._addLayout(name, i)}
-                    typeAddedable={'layout'}
                     onRename={newName => {
                       this.props.onRenameLayout(name, newName);
                       this._onEditName(null, '');
@@ -812,7 +813,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     onDelete={() =>
                       this.props.onDeleteExternalEvents(externalEvents)
                     }
-                    typeAddedable={'external-events'}
+                    addLabel={'Add a new external event'}
                     onAdd={() => this._addExternalEvents(name, i)}
                     onRename={newName => {
                       this.props.onRenameExternalEvents(name, newName);
@@ -871,7 +872,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     onDelete={() =>
                       this.props.onDeleteExternalLayout(externalLayout)
                     }
-                    typeAddedable={'external-layout'}
+                    addLabel={'Add a new external layout'}
                     onAdd={() => this._addExternalLayout(name, i)}
                     onRename={newName => {
                       this.props.onRenameExternalLayout(name, newName);
@@ -938,7 +939,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         eventsFunctionsExtension
                       )
                     }
-                    typeAddedable={'events-functions-extension'}
+                    addLabel={'Add a new functions and behaviors'}
                     onAdd={() => this._addEventsFunctionsExtension(name, i)}
                     onRename={newName => {
                       this.props.onRenameEventsFunctionsExtension(

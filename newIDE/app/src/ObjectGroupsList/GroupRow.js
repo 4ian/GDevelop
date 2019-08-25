@@ -118,7 +118,10 @@ export default class ThemableGroupRow extends React.Component<Props, {||}> {
             primaryText={label}
             rightIconButton={this._renderGroupMenu(group)}
             onClick={() => {
-              this.props.onEdit(group);
+              // It's essential to discard clicks when editing the name,
+              // to avoid weird opening of an editor when clicking on the
+              // text field.
+              if (!this.props.editingName) this.props.onEdit(group);
             }}
           />
         )}

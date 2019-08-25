@@ -3,9 +3,9 @@
 GDevelop is using CircleCI (a continous deployment/integration service) to automatically build new versions for **every commit on `master`** branch.
 
 You can download these here - **replace XX by the current beta version number**:
-* Windows: `https://gdevelop-releases.s3-us-east-1.amazonaws.com/master/latest/GDevelop 5 Setup 5.0.0-betaXX.exe`
-* macOS: `https://gdevelop-releases.s3-us-east-1.amazonaws.com/master/latest/GDevelop 5-5.0.0-betaXX-mac.zip`
-* Linux: `https://gdevelop-releases.s3-us-east-1.amazonaws.com/master/latest/gdevelop-5.0.0-betaXX.tar.gz`
+* Windows: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5 Setup 5.0.0-betaXX.exe`
+* macOS: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-5.0.0-betaXX-mac.zip`
+* Linux: `https://gdevelop-releases.s3.amazonaws.com/master/latest/gdevelop-5.0.0-betaXX.tar.gz`
 
 > In theory, the builds from `master` branch should always be stable and working well. In practice, they are not tested and can contain bugs or regressions. Make backups of your games and **use them at your own risk**. The software is provided "as is", **without warranty of any kind**. For more information, read the [license under which GDevelop is provided](https://github.com/4ian/GDevelop/blob/master/license.txt).
 
@@ -23,6 +23,6 @@ You can download these here - **replace XX by the current beta version number**:
 1. Verify that the CircleCI build was done for the commit. Click on the green check or the yellow circle on GitHub next to the commit or checks, and verify that `ci/circleci: build — Your tests passed on CircleCI!` is written - otherwise the build is still being done.
 2. Find the hash of the commit. Usually, click on a commit title (in a Pull Requests or in the list of commits of a branch) and read the *hash* in the URL. For example, for https://github.com/4ian/GDevelop/commit/5c648e3f2b8c444bd99221cea56b92c00cdddddd, the hash is `5c648e3f2b8c444bd99221cea56b92c00cdddddd`.
 3. Download the version built for it (replace XX, THE_BRANCH and THE_COMMIT_HASH):
-  * Windows: `https://gdevelop-releases.s3-us-east-1.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5 Setup 5.0.0-betaXX.exe`
-  * macOS: `https://gdevelop-releases.s3-us-east-1.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5-5.0.0-betaXX-mac.zip`
-  * Linux: `https://gdevelop-releases.s3-us-east-1.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/gdevelop-5.0.0-betaXX.tar.gz`
+  * Windows: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5 Setup 5.0.0-betaXX.exe`
+  * macOS: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5-5.0.0-betaXX-mac.zip`
+  * Linux: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/gdevelop-5.0.0-betaXX.tar.gz`

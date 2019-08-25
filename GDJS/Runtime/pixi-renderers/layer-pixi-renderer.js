@@ -117,3 +117,10 @@ gdjs.LayerPixiRenderer.prototype.enableEffect = function (name, value) {
     var theFilter = this._filters[name];
     gdjs.PixiFiltersTools.enableEffect(theFilter.filter, value);
 };
+
+gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
+    if (!this._filters.hasOwnProperty(name)) return 1;
+
+    var theFilter = this._filters[name];
+    return gdjs.PixiFiltersTools.isEffectEnabled(theFilter.filter);
+};

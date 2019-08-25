@@ -128,10 +128,30 @@ gdjs.evtTools.camera.setLayerEffectParameter = function(runtimeScene, layer, eff
     return runtimeScene.getLayer(layer).setEffectParameter(effect, parameter, value);
 }
 
+/**
+ * Enable an effect.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
+ * @param {string} layer The name of the layer
+ * @param {string} effect The name of the effect
+ * @param {number} value The new value
+ */
 gdjs.evtTools.camera.enableLayerEffect = function(runtimeScene, layer, effect, value) {
     if ( !runtimeScene.hasLayer(layer) ) { return; }
 
-    return runtimeScene.getLayer(layer).enableEffect(effect, value);
+    runtimeScene.getLayer(layer).enableEffect(effect, value);
+}
+
+/**
+ * Enable an effect.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
+ * @param {string} layer The name of the layer
+ * @param {string} filter The name of the effect
+ * @return {boolean} Filter is enabled
+ */
+gdjs.evtTools.camera.layerEffectEnabled = function(runtimeScene, layer, effect) {
+    if ( !runtimeScene.hasLayer(layer) ) { return 1; }
+
+    return runtimeScene.getLayer(layer).isEffectEnabled(effect);
 }
 
 gdjs.evtTools.camera.setLayerTimeScale = function(runtimeScene, layer, timeScale) {

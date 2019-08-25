@@ -216,8 +216,22 @@ gdjs.Layer.prototype.setEffectParameter = function(name, parameterIndex, value) 
     return this._renderer.setEffectParameter(name, parameterIndex, value);
 };
 
+/**
+ * Enable an effect.
+ * @param {string} filter The name of the filter effect
+ * @param {boolean} value true to enable, false to disable
+ */
 gdjs.Layer.prototype.enableEffect = function(name, value) {
-    return this._renderer.enableEffect(name, value);
+    this._renderer.enableEffect(name, value);
+};
+
+/**
+ * Enable an effect.
+ * @param {string} filter The name of the filter effect
+ * @return {boolean} Filter is enabled
+ */
+gdjs.Layer.prototype.isEffectEnabled = function(name) {
+    return this._renderer.isEffectEnabled(name);
 };
 
 gdjs.Layer.prototype.setEffectsDefaultParameters = function() {

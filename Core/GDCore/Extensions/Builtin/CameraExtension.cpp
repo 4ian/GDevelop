@@ -395,6 +395,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddCondition(
+          "LayerEffectEnabled",
+          _("Layer effect is enabled"),
+          _("The effect on a layer is enabled"),
+          _("Effect _PARAM2_ on layer _PARAM1_ is enabled"),
+          _("Layers and cameras/Effects"),
+          "res/conditions/camera24.png",
+          "res/conditions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("string", _("Effect"))
+      .MarkAsAdvanced();
+
+  extension
       .AddAction(
           "EnableLayerEffect",
           _("Enable layer effect"),

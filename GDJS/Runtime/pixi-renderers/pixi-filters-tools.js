@@ -142,6 +142,15 @@ gdjs.PixiFiltersTools._filters = {
     },
 };
 
+/**
+ * Enable an effect.
+ * @param {string} filter The name of the filter effect
+ * @param {boolean} value Set to true to enable, false to disable
+ */
+gdjs.PixiFiltersTools.enableEffect = function(filter, value) {
+    filter.enabled = value;
+}
+
 gdjs.PixiFiltersTools.getFilter = function(filterName) {
     if (gdjs.PixiFiltersTools._filters.hasOwnProperty(filterName))
         return gdjs.PixiFiltersTools._filters[filterName];

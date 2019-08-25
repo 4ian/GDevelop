@@ -216,6 +216,10 @@ gdjs.Layer.prototype.setEffectParameter = function(name, parameterIndex, value) 
     return this._renderer.setEffectParameter(name, parameterIndex, value);
 };
 
+gdjs.Layer.prototype.enableEffect = function(name, value) {
+    return this._renderer.enableEffect(name, value);
+};
+
 gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
     for (var i = 0; i < this._effects.length; ++i) {
         var effect = this._effects[i];

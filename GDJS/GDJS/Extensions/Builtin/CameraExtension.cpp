@@ -65,6 +65,8 @@ CameraExtension::CameraExtension() {
 
   GetAllActions()["SetLayerEffectParameter"].SetFunctionName(
       "gdjs.evtTools.camera.setLayerEffectParameter");
+  GetAllActions()["EnableLayerEffect"].SetFunctionName(
+      "gdjs.evtTools.camera.enableLayerEffect");
 
   GetAllConditions()["LayerTimeScale"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerTimeScale");

@@ -149,7 +149,7 @@ gdjs.evtTools.camera.enableLayerEffect = function(runtimeScene, layer, effect, v
  * @return {boolean} Filter is enabled
  */
 gdjs.evtTools.camera.layerEffectEnabled = function(runtimeScene, layer, effect) {
-    if ( !runtimeScene.hasLayer(layer) ) { return 1; }
+    if ( !runtimeScene.hasLayer(layer) ) { return true; }
 
     return runtimeScene.getLayer(layer).isEffectEnabled(effect);
 }

@@ -111,6 +111,18 @@ gdjs.PixiFiltersTools._filters = {
             filter.alpha = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
         },
     },
+    Brightness: {
+        makeFilter: function() {
+            var brightness = new PIXI.filters.ColorMatrixFilter();
+            brightness.brightness();
+            return brightness;
+        },
+        updateParameter: function(filter, parameterName, value) {
+            if (parameterName !== 'brightness') return;
+
+            filter.brightness(gdjs.PixiFiltersTools.clampValue(value, 0, 1));
+        },
+    },
     Noise: {
         makeFilter: function() {
             var noise = new PIXI.filters.NoiseFilter();
@@ -144,7 +156,7 @@ gdjs.PixiFiltersTools._filters = {
 
 /**
  * Enable an effect.
- * @param {string} filter The name of the filter effect
+ * @param {PIXI.Filter} filter The filter to enable or disable
  * @param {boolean} value Set to true to enable, false to disable
  */
 gdjs.PixiFiltersTools.enableEffect = function(filter, value) {
@@ -152,9 +164,9 @@ gdjs.PixiFiltersTools.enableEffect = function(filter, value) {
 }
 
 /**
- * Enable an effect.
- * @param {string} filter The name of the filter effect
- * @return {boolean} Filter is enabled
+ * Effect is enabled.
+ * @param {PIXI.Filter} filter The filter to be checked
+ * @return {boolean} true if the filter is enabled
  */
 gdjs.PixiFiltersTools.isEffectEnabled = function(filter) {
     return filter.enabled;

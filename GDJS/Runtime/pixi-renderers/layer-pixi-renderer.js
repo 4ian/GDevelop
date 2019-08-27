@@ -110,3 +110,17 @@ gdjs.LayerPixiRenderer.prototype.setEffectParameter = function (name, parameterN
     var theFilter = this._filters[name];
     theFilter.updateParameter(theFilter.filter, parameterName, value);
 };
+
+gdjs.LayerPixiRenderer.prototype.enableEffect = function (name, value) {
+    if (!this._filters.hasOwnProperty(name)) return;
+
+    var theFilter = this._filters[name];
+    gdjs.PixiFiltersTools.enableEffect(theFilter.filter, value);
+};
+
+gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
+    if (!this._filters.hasOwnProperty(name)) return false;
+
+    var theFilter = this._filters[name];
+    return gdjs.PixiFiltersTools.isEffectEnabled(theFilter.filter);
+};

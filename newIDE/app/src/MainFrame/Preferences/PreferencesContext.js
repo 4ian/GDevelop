@@ -9,6 +9,7 @@ export type AlertMessageIdentifier =
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
   | 'empty-events-based-behavior-explanation'
+  | 'too-much-effects'
   | 'effects-usage';
 
 export type PreferencesValues = {|

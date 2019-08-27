@@ -1,3 +1,6 @@
+/**
+ * Contains tools related to PIXI filters handling.
+ */
 gdjs.PixiFiltersTools = function() {};
 
 gdjs.PixiFiltersTools.clampValue = function(value, min, max) { return Math.max(min, Math.min(max, value)); };
@@ -144,11 +147,11 @@ gdjs.PixiFiltersTools._filters = {
                 parameterName !== 'quality' &&
                 parameterName !== 'kernelSize' &&
                 parameterName !== 'resolution') return;
-            
+
             if (parameterName === 'kernelSize'){
                 value = gdjs.PixiFiltersTools.clampKernelSize(value);
             }
-            
+
             filter[parameterName] = value;
         },
     },
@@ -172,9 +175,24 @@ gdjs.PixiFiltersTools.isEffectEnabled = function(filter) {
     return filter.enabled;
 }
 
+/**
+ * Return the filter with the given name, if any.
+ * @param {string} filterName The name of the filter to get
+ * @return {?gdjsPixiFiltersToolsFilter} The filter wrapper, if any (null otherwise).
+ */
 gdjs.PixiFiltersTools.getFilter = function(filterName) {
     if (gdjs.PixiFiltersTools._filters.hasOwnProperty(filterName))
         return gdjs.PixiFiltersTools._filters[filterName];
 
     return null;
 }
+
+// Type definitions:
+
+/**
+ * The type of a filter used to manipulate a Pixi filter.
+ * @typedef gdjsPixiFiltersToolsFilter
+ * @type {object}
+ * @property {PIXI.Filter} filter The PIXI filter
+ * @property {Function} updateParameter The function to be called to update a parameter
+ */

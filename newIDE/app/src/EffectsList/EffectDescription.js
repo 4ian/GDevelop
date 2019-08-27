@@ -12,7 +12,8 @@ export type EffectDescription = {|
 |};
 
 const clampValue = (value, min, max) => Math.max(min, Math.min(max, value));
-const clampKernelSize = value => ([5, 7, 9, 11, 13, 15].includes(value)) ? value : 5;
+const clampKernelSize = value =>
+  [5, 7, 9, 11, 13, 15].includes(value) ? value : 5;
 
 export const getAllEffectDescriptions = (
   i18n: I18nType
@@ -87,7 +88,9 @@ export const getAllEffectDescriptions = (
       },
       {
         name: 'quality',
-        getLabel: () => 'quality ' + i18n._(t`(Number of render passes. High values cause lag.)`),
+        getLabel: () =>
+          'quality ' +
+          i18n._(t`(Number of render passes. High values cause lag.)`),
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('quality'),
         setValue: (effect: gdEffect, newValue: number) =>
@@ -103,7 +106,8 @@ export const getAllEffectDescriptions = (
       },
       {
         name: 'kernelSize',
-        getLabel: () => 'kernelSize ' + i18n._(t`(one of these values: 5, 7, 9, 11, 13, 15)`),
+        getLabel: () =>
+          'kernelSize ' + i18n._(t`(one of these values: 5, 7, 9, 11, 13, 15)`),
         valueType: 'number',
         getValue: (effect: gdEffect) => effect.getParameter('kernelSize'),
         setValue: (effect: gdEffect, newValue: number) =>

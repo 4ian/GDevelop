@@ -91,8 +91,6 @@ export default class EffectsList extends React.Component<Props, {||}> {
         {({ i18n }) => {
           const allEffectDescriptions = getAllEffectDescriptions(i18n);
 
-          const cantAddMoreEffects = effectsContainer.getEffectsCount() > 0;
-
           return (
             <Column noMargin expand>
               <Line>
@@ -111,6 +109,24 @@ export default class EffectsList extends React.Component<Props, {||}> {
                   </DismissableAlertMessage>
                 </Column>
               </Line>
+              {effectsContainer.getEffectsCount() > 3 && (
+                <Line>
+                  <Column>
+                    <DismissableAlertMessage
+                      identifier="too-much-effects"
+                      kind="warning"
+                    >
+                      <Trans>
+                        Using a lot of effects can have a severe negative impact
+                        on the rendering performance, especially on low-end or
+                        mobile devices. Consider using less effects if possible.
+                        You can also disable and re-enable effects as needed
+                        using events.
+                      </Trans>
+                    </DismissableAlertMessage>
+                  </Column>
+                </Line>
+              )}
               {mapFor(0, effectsContainer.getEffectsCount(), (i: number) => {
                 const effect: gdEffect = effectsContainer.getEffectAt(i);
                 const effectName = effect.getEffectName();
@@ -193,18 +209,12 @@ export default class EffectsList extends React.Component<Props, {||}> {
               ) : null}
               <Column>
                 <Line justifyContent="flex-end" alignItems="center" expand>
-                  {cantAddMoreEffects && (
-                    <BackgroundText style={{ marginRight: 4 }}>
-                      <Trans>Only 1 effect is supported for now</Trans>
-                    </BackgroundText>
-                  )}
                   <RaisedButton
                     primary
                     label={<Trans>Add an effect</Trans>}
                     onClick={this._addEffect}
                     labelPosition="before"
                     icon={<Add />}
-                    disabled={cantAddMoreEffects}
                   />
                 </Line>
               </Column>

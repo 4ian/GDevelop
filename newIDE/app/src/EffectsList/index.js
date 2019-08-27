@@ -21,7 +21,6 @@ import {
   type EffectDescription,
 } from './EffectDescription';
 import PropertiesEditor from '../PropertiesEditor';
-import BackgroundText from '../UI/BackgroundText';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 
 type Props = {|

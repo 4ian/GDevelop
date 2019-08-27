@@ -1,10 +1,8 @@
+// @flow
 import React from 'react';
-import { ListItem } from 'material-ui/List';
-import IconMenu from '../Menu/IconMenu';
+import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
-import IconButton from '../IconButton';
-import TextField from '../TextField';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import { type Item } from '.';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 
@@ -15,7 +13,7 @@ const styles = {
     textOverflow: 'ellipsis',
   },
   textField: {
-    top: -16,
+    top: noMarginTextFieldInListItemTopOffset,
   },
 };
 
@@ -26,37 +24,22 @@ type Props = {
   editingName: boolean,
   getThumbnail?: () => string,
   selected: true,
-  onItemSelected: () => void,
+  onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => Array<any>,
+  style: Object,
 };
 
 class ItemRow extends React.Component<Props, *> {
-  _renderItemMenu(item) {
-    return (
-      <IconMenu
-        ref={iconMenu => (this._iconMenu = iconMenu)}
-        iconButtonElement={
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={this.props.buildMenuTemplate}
-      />
-    );
-  }
+  textField: ?TextField;
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
         if (this.textField) this.textField.focus();
       }, 100);
     }
   }
-
-  _onContextMenu = event => {
-    if (this._iconMenu) this._iconMenu.open(event);
-  };
 
   render() {
     const { item, selected, style, getThumbnail, errorStatus } = this.props;
@@ -68,13 +51,14 @@ class ItemRow extends React.Component<Props, *> {
           const label = this.props.editingName ? (
             <TextField
               id="rename-item-field"
+              margin="none"
               ref={textField => (this.textField = textField)}
               defaultValue={itemName}
-              onBlur={e => this.props.onRename(e.target.value)}
+              onBlur={e => this.props.onRename(e.currentTarget.value)}
               onKeyPress={event => {
                 if (event.charCode === 13) {
                   // enter key pressed
-                  this.textField.blur();
+                  if (this.textField) this.textField.blur();
                 }
               }}
               fullWidth
@@ -113,12 +97,12 @@ class ItemRow extends React.Component<Props, *> {
           return (
             <ListItem
               style={{ ...itemStyle, ...style }}
-              onContextMenu={this._onContextMenu}
               primaryText={label}
               leftIcon={
                 getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
               }
-              rightIconButton={this._renderItemMenu(item)}
+              displayMenuButton
+              buildMenuTemplate={this.props.buildMenuTemplate}
               onClick={() => {
                 if (!this.props.onItemSelected) return;
                 if (this.props.editingName) return;

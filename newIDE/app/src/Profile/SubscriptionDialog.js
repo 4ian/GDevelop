@@ -2,7 +2,10 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import { Card, CardActions, CardHeader } from 'material-ui/Card';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
@@ -14,7 +17,7 @@ import {
   getRedirectToCheckoutUrl,
 } from '../Utils/GDevelopServices/Usage';
 import RaisedButton from '../UI/RaisedButton';
-import CheckCircle from 'material-ui/svg-icons/action/check-circle';
+import CheckCircle from '@material-ui/icons/CheckCircle';
 import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
 import LeftLoader from '../UI/LeftLoader';
@@ -42,8 +45,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'flex-end',
   },
-  bulletIcon: { width: 20, height: 20, marginLeft: 15, marginRight: 10 },
-  bulletText: { flex: 1, marginTop: 5, marginBottom: 5 },
+  bulletIcon: { width: 20, height: 20, marginLeft: 5, marginRight: 10 },
+  bulletText: { flex: 1 },
 };
 
 type Props = {|
@@ -181,19 +184,21 @@ export default class SubscriptionDialog extends Component<Props, State> {
                       <b>{plan.name}</b> - {this._renderPrice(plan)}
                     </span>
                   }
-                  subtitle={plan.smallDescription}
+                  subheader={plan.smallDescription}
                 />
-                {plan.descriptionBullets.map((bulletText, index) => (
-                  <Column key={index} expand>
-                    <Line noMargin alignItems="center">
-                      <CheckCircle style={styles.bulletIcon} />
-                      <Text style={styles.bulletText}>{bulletText}</Text>
-                    </Line>
-                  </Column>
-                ))}
-                <Text style={styles.descriptionText}>
-                  {plan.extraDescription || ''}
-                </Text>
+                <CardContent>
+                  {plan.descriptionBullets.map((bulletText, index) => (
+                    <Column key={index} expand>
+                      <Line noMargin alignItems="center">
+                        <CheckCircle style={styles.bulletIcon} />
+                        <Text style={styles.bulletText}>{bulletText}</Text>
+                      </Line>
+                    </Column>
+                  ))}
+                  <Text style={styles.descriptionText}>
+                    {plan.extraDescription || ''}
+                  </Text>
+                </CardContent>
                 <CardActions style={styles.actions}>
                   {userProfile.subscription &&
                   userProfile.subscription.planId === plan.planId ? (

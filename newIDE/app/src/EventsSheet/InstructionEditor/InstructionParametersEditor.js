@@ -19,7 +19,7 @@ import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import { getExtraInstructionInformation } from '../../Hints';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../EventsScope.flow';
 import { getObjectParameterIndex } from './InstructionOrExpressionSelector/EnumerateInstructions';

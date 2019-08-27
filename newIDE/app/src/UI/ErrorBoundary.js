@@ -3,13 +3,14 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import ReactErrorBoundary from 'react-error-boundary';
-import BugReport from 'material-ui/svg-icons/action/bug-report';
+import BugReport from '@material-ui/icons/BugReport';
 import PlaceholderMessage from './PlaceholderMessage';
-import Divider from 'material-ui/Divider';
+import Divider from '@material-ui/core/Divider';
 import RaisedButton from './RaisedButton';
 import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import Text from './Text';
+import { Line, Spacer } from './Grid';
 
 const errorHandler = (error: Error, componentStack: string) => {
   console.error('Error catched by Boundary:', error, componentStack);
@@ -17,12 +18,6 @@ const errorHandler = (error: Error, componentStack: string) => {
     error,
     componentStack,
   });
-};
-
-const styles = {
-  title: {
-    fontSize: 24,
-  },
 };
 
 export const ErrorFallbackComponent = ({
@@ -33,9 +28,11 @@ export const ErrorFallbackComponent = ({
   error: Error,
 }) => (
   <PlaceholderMessage>
-    <Text style={styles.title}>
-      <BugReport /> This editor encountered a problem.
-    </Text>
+    <Line>
+      <BugReport fontSize="large" />
+      <Spacer />
+      <Text size="title">This editor encountered a problem.</Text>
+    </Line>
     <Divider />
     <Text>
       Something wrong happened :(

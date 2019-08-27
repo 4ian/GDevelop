@@ -4,10 +4,10 @@ import { Trans } from '@lingui/macro';
 import React from 'react';
 import { TableRow, TableRowColumn } from '../UI/Table';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from 'material-ui/svg-icons/action/visibility';
-import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import IconButton from '../UI/IconButton';
-import Delete from 'material-ui/svg-icons/action/delete';
+import Delete from '@material-ui/icons/Delete';
 import TextField from '../UI/TextField';
 import FlatButton from '../UI/FlatButton';
 import DragHandle from '../UI/DragHandle';
@@ -48,6 +48,7 @@ export default ({
         </TableRowColumn>
         <TableRowColumn>
           <TextField
+            margin="none"
             defaultValue={layerName || 'Base layer'}
             id={layerName}
             errorText={

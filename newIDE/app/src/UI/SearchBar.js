@@ -1,20 +1,21 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import IconButton from './IconButton';
 import TextField from './TextField';
-import Paper from 'material-ui/Paper';
-import Close from 'material-ui/svg-icons/navigation/close';
-import Search from 'material-ui/svg-icons/action/search';
-import FilterList from 'material-ui/svg-icons/content/filter-list';
-import IconMenu from './Menu/IconMenu';
+import Paper from '@material-ui/core/Paper';
+import Close from '@material-ui/icons/Close';
+import Search from '@material-ui/icons/Search';
+import FilterList from '@material-ui/icons/FilterList';
+import ElementWithMenu from './Menu/ElementWithMenu';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   /** Disables text field. */
   disabled?: boolean,
   /** Sets placeholder for the embedded text field. */
-  placeholder?: ?React.Node,
+  placeholder?: MessageDescriptor,
   /** Fired when the text value changes. */
   onChange?: string => void,
   /** Fired when the search icon is clicked. */
@@ -89,7 +90,7 @@ const getStyles = (props: Props, state: State) => {
  *
  * Customized to add optional tags button.
  */
-export default class SearchBar extends React.Component<Props, State> {
+export default class SearchBar extends React.PureComponent<Props, State> {
   state = {
     focus: false,
     value: this.props.value,
@@ -156,7 +157,8 @@ export default class SearchBar extends React.Component<Props, State> {
       >
         <div style={styles.searchContainer}>
           <TextField
-            hintText={this.props.placeholder || <Trans>Search</Trans>}
+            margin="none"
+            hintText={this.props.placeholder || t`Search`}
             onBlur={this.handleBlur}
             value={value}
             onChange={this.handleInput}
@@ -170,8 +172,8 @@ export default class SearchBar extends React.Component<Props, State> {
           />
         </div>
         {buildTagsMenuTemplate && (
-          <IconMenu
-            iconButtonElement={
+          <ElementWithMenu
+            element={
               <IconButton
                 style={styles.iconButtonFilter.style}
                 disabled={disabled}

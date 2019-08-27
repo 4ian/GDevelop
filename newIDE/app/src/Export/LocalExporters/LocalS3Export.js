@@ -7,11 +7,12 @@ import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
 import LocalExport from './LocalExport';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import LinearProgress from 'material-ui/LinearProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import { GDevelopHostingApi } from '../../Utils/GDevelopServices/ApiConfigs';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import TextField from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import Text from '../../UI/Text';
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -156,17 +157,18 @@ export default class LocalS3Export extends Component {
     return (
       <Column noMargin>
         <Line>
-          <Trans>
-            This will export your game and upload it on GDevelop games hosting.
-            The game will be free and available for a few days.
-          </Trans>
+          <Text>
+            <Trans>
+              This will export your game and upload it on GDevelop games
+              hosting. The game will be free and available for a few days.
+            </Trans>
+          </Text>
         </Line>
         <Line alignItems="center">
           <LinearProgress
             style={{ flex: 1 }}
-            max={uploadMax}
-            value={uploadProgress}
-            mode={
+            value={uploadMax > 0 ? (uploadProgress / uploadMax) * 100 : 0}
+            variant={
               (exportStarted && !exportDone) || (uploadDone && !deployDone)
                 ? 'indeterminate'
                 : 'determinate'

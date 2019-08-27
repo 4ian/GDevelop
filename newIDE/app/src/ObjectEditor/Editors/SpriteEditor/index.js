@@ -1,11 +1,12 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
-import Add from 'material-ui/svg-icons/content/add';
-import Delete from 'material-ui/svg-icons/action/delete';
+import Add from '@material-ui/icons/Add';
+import Delete from '@material-ui/icons/Delete';
 import IconButton from '../../../UI/IconButton';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -14,7 +15,7 @@ import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
 import EmptyMessage from '../../../UI/EmptyMessage';
-import MiniToolbar from '../../../UI/MiniToolbar';
+import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
 import ContextMenu from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
@@ -116,20 +117,20 @@ class Animation extends React.Component<AnimationProps, void> {
       <div>
         <MiniToolbar smallest>
           <DragHandle />
-          <span style={styles.animationTitle}>
-            Animation #{id}{' '}
+          <MiniToolbarText>Animation #{id} </MiniToolbarText>
+          <Column expand margin>
             <SemiControlledTextField
               commitOnBlur
+              margin="none"
               value={animation.getName()}
-              hintText={<Trans>Optional animation name</Trans>}
+              hintText={t`Optional animation name`}
               onChange={text => onChangeName(text)}
+              fullWidth
             />
-          </span>
-          <span style={styles.animationTools}>
-            <IconButton onClick={onRemove}>
-              <Delete />
-            </IconButton>
-          </span>
+          </Column>
+          <IconButton onClick={onRemove}>
+            <Delete />
+          </IconButton>
         </MiniToolbar>
         {mapFor(0, animation.getDirectionsCount(), i => {
           const direction = animation.getDirection(i);

@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import ReactJsonView from 'react-json-view';
@@ -133,9 +134,9 @@ export default class RuntimeSceneInspector extends React.Component<
           </Trans>
         </Text>
         {runtimeScene._objects && runtimeScene._objects.items && (
-          <Line noMargin alignItems="baseline">
+          <Line noMargin alignItems="center">
             <SemiControlledAutoComplete
-              hintText={<Trans>Enter the name of the object</Trans>}
+              hintText={t`Enter the name of the object`}
               value={this.state.newObjectName}
               onChange={value => {
                 this.setState({
@@ -149,6 +150,7 @@ export default class RuntimeSceneInspector extends React.Component<
                 })
               )}
               openOnFocus
+              fullWidth
             />
             <RaisedButton
               label={<Trans>Create</Trans>}

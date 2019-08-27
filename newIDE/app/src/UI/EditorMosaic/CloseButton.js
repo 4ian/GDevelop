@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import IconButton from '../IconButton';
-import Close from 'material-ui/svg-icons/navigation/close';
+import Close from '@material-ui/icons/Close';
 import { MosaicWindowContext, MosaicContext } from 'react-mosaic-component';
 
 const styles = {
@@ -24,7 +24,7 @@ export default class CloseButton extends Component {
                 }}
                 style={styles.container}
               >
-                <Close color="white" />
+                <Close htmlColor="white" />
               </IconButton>
             )}
           </MosaicWindowContext.Consumer>

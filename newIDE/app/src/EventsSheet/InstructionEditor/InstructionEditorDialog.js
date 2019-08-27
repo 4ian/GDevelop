@@ -12,17 +12,6 @@ import {
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { type EventsScope } from '../EventsScope.flow';
 
-const styles = {
-  dialogContent: {
-    width: 'calc(100% - 16px)',
-    maxWidth: 'none',
-  },
-  dialogBody: {
-    padding: 0,
-    display: 'flex',
-  },
-};
-
 type Props = {|
   project: gdProject,
   scope: EventsScope,
@@ -78,8 +67,9 @@ export default class InstructionEditorDialog extends React.Component<
         actions={actions}
         open={open}
         onRequestClose={onCancel}
-        contentStyle={styles.dialogContent}
-        bodyStyle={styles.dialogBody}
+        maxWidth={false}
+        flexBody
+        noMargin
       >
         <InstructionEditor {...otherProps} />
       </Dialog>

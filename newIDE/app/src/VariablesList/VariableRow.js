@@ -1,18 +1,19 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Checkbox from '../UI/Checkbox';
-import AddCircle from 'material-ui/svg-icons/content/add-circle';
-import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
+import AddCircle from '@material-ui/icons/AddCircle';
+import SubdirectoryArrowRight from '@material-ui/icons/SubdirectoryArrowRight';
 import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
-import Reset from 'material-ui/svg-icons/av/replay';
+import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import Text from '../UI/Text';
 
 //TODO: Refactor into TreeTable?
 const Indent = ({ width }) => (
@@ -20,8 +21,6 @@ const Indent = ({ width }) => (
     <SubdirectoryArrowRight color={styles.indentIconColor} />
   </div>
 );
-
-const InlineCheckbox = props => <Checkbox {...props} style={{ width: 32 }} />;
 
 type Props = {|
   name: string,
@@ -70,12 +69,13 @@ const VariableRow = ({
       )}
       {depth === 0 && showHandle && <DragHandle />}
       {showSelectionCheckbox && !limitEditing && (
-        <InlineCheckbox
+        <Checkbox
           checked={isSelected}
           onCheck={(e, checked) => onSelect(checked)}
         />
       )}
       <TextField
+        margin="none"
         style={{
           fontStyle: origin !== 'inherited' ? 'normal' : 'italic',
         }}
@@ -92,6 +92,7 @@ const VariableRow = ({
     columns.push(
       <TreeTableCell key="value">
         <SemiControlledTextField
+          margin="none"
           commitOnBlur
           fullWidth
           name={key + 'value'}
@@ -112,7 +113,7 @@ const VariableRow = ({
         key="value"
         style={limitEditing ? styles.fadedButton : undefined}
       >
-        (Structure)
+        <Text>(Structure)</Text>
       </TreeTableCell>
     );
   }
@@ -122,17 +123,16 @@ const VariableRow = ({
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
-          tooltip={<Trans>Reset</Trans>}
+          tooltip={t`Reset`}
         >
-          <Reset />
+          <Replay />
         </IconButton>
       )}
       {!(origin === 'inherited' && depth === 0) && origin !== 'parent' && (
         <IconButton
           onClick={onAddChild}
           style={isStructure ? undefined : styles.fadedButton}
-          tooltip={<Trans>Add child variable</Trans>}
-          tooltipPosition="bottom-left"
+          tooltip={t`Add child variable`}
         >
           <AddCircle />
         </IconButton>

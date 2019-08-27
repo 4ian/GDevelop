@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
 import TextField from '../TextField';
@@ -68,7 +69,7 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
           type="text"
-          hintText={<Trans>Click to choose</Trans>}
+          hintText={t`Click to choose`}
           value={this.props.value}
           onChange={(event, value) => this.props.onChange(value)}
         />

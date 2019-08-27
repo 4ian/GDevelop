@@ -1,5 +1,5 @@
 // @flow
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 import React, { Component } from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
@@ -47,6 +47,7 @@ export default class VariableField extends Component<Props, {||}> {
           floatingLabelText={
             parameterMetadata ? parameterMetadata.getDescription() : undefined
           }
+          fullWidth
           value={value}
           onChange={onChange}
           dataSource={enumerateVariables(variablesContainer).map(

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import SelectField from '../UI/SelectField';
-import MenuItem from '../UI/MenuItem';
+import SelectOption from '../UI/SelectOption';
 import {
   type EnumeratedBehaviorMetadata,
   enumerateBehaviorsMetadata,
@@ -50,14 +50,14 @@ export default class BehaviorTypeSelector extends React.Component<
         fullWidth
       >
         {behaviorMetadata.map((metadata: EnumeratedBehaviorMetadata) => (
-          <MenuItem
+          <SelectOption
             key={metadata.type}
             value={metadata.type}
             primaryText={metadata.fullName}
           />
         ))}
         {!valueIsListed && value && (
-          <MenuItem value={value} primaryText={value} />
+          <SelectOption value={value} primaryText={value} />
         )}
       </SelectField>
     );

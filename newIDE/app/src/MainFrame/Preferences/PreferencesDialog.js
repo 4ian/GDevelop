@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
-import MenuItem from '../../UI/MenuItem';
+import SelectOption from '../../UI/SelectOption';
 import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -84,7 +84,7 @@ export default class PreferencesDialog extends Component<Props, State> {
                     onChange={(e, i, value: string) => setThemeName(value)}
                   >
                     {Object.keys(themes).map(themeName => (
-                      <MenuItem
+                      <SelectOption
                         value={themeName}
                         primaryText={themeName}
                         key={themeName}
@@ -99,7 +99,7 @@ export default class PreferencesDialog extends Component<Props, State> {
                     }
                   >
                     {getAllThemes().map(codeEditorTheme => (
-                      <MenuItem
+                      <SelectOption
                         value={codeEditorTheme.themeName}
                         primaryText={codeEditorTheme.name}
                         key={codeEditorTheme.themeName}
@@ -182,6 +182,7 @@ export default class PreferencesDialog extends Component<Props, State> {
                       </Text>
                       {dismissedAlertMessages.map(name => (
                         <FlatButton
+                          key={name}
                           label={name}
                           onClick={() => showAlertMessage(name, true)}
                         />

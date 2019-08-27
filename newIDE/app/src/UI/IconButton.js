@@ -1,6 +1,10 @@
 // @flow
 import * as React from 'react';
-import MUIIconButton from 'material-ui/IconButton';
+import MUIIconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import { I18n } from '@lingui/react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { adaptAcceleratorString } from '../UI/AcceleratorString';
 
 type IconProps =
   | {|
@@ -8,7 +12,7 @@ type IconProps =
     |}
   // Support a few specific icons from iconmoon-font.css
   | {|
-      iconClassName: 'icon-twitter' | 'icon-facebook',
+      className: 'icon-twitter' | 'icon-facebook',
     |};
 
 // We support a subset of the props supported by Material-UI v0.x IconButton
@@ -27,27 +31,40 @@ type Props = {|
     opacity?: number,
     marginRight?: number,
   |},
-  iconStyle?: {|
-    marginLeft: number,
-    marginTop: number,
-    maxWidth: number,
-    maxHeight: number,
-    filter: ?string,
-  |},
+  size?: 'small',
 
-  tooltip?: React.Node,
-  tooltipPosition?: 'bottom-left' | 'bottom-right',
+  tooltip?: MessageDescriptor,
+  acceleratorString?: string,
 |};
 
 /**
  * A button showing just an icon, based on Material-UI icon button.
+ * Supports displaying a tooltip.
  */
 export default class IconButton extends React.Component<Props, {||}> {
-  // Set muiName to let Material-UI's v0.x AppBar recognise
-  // the component (and apply proper color).
-  static muiName = 'IconButton';
-
   render() {
-    return <MUIIconButton {...this.props} />;
+    const { tooltip, acceleratorString, ...otherProps } = this.props;
+    const iconButton = <MUIIconButton {...otherProps} />;
+
+    return tooltip && !this.props.disabled ? (
+      <I18n>
+        {({ i18n }) => (
+          <Tooltip
+            title={
+              i18n._(tooltip) +
+              (acceleratorString
+                ? ' ' + adaptAcceleratorString(acceleratorString)
+                : '')
+            }
+            placement="bottom"
+            enterDelay={300}
+          >
+            {iconButton}
+          </Tooltip>
+        )}
+      </I18n>
+    ) : (
+      iconButton
+    );
   }
 }

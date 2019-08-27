@@ -5,7 +5,7 @@ import FlatButton from '../../UI/FlatButton';
 import { Spacer, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import difference_in_seconds from 'date-fns/difference_in_seconds';
-import LinearProgress from 'material-ui/LinearProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import Text from '../../UI/Text';
 
 const buildTypesConfig = {
@@ -88,9 +88,14 @@ export default ({ build, onDownload }: Props) => {
     <Line alignItems="center" expand>
       <LinearProgress
         style={{ flex: 1 }}
-        max={config.estimatedTimeInSeconds(build)}
-        value={config.estimatedTimeInSeconds(build) - estimatedRemainingTime}
-        mode={estimatedRemainingTime > 0 ? 'determinate' : 'indeterminate'}
+        value={
+          config.estimatedTimeInSeconds(build) > 0
+            ? ((config.estimatedTimeInSeconds(build) - estimatedRemainingTime) /
+                config.estimatedTimeInSeconds(build)) *
+              100
+            : 0
+        }
+        variant={estimatedRemainingTime > 0 ? 'determinate' : 'indeterminate'}
       />
       <Spacer />
       {estimatedRemainingTime > 0 ? (
@@ -123,7 +128,7 @@ export default ({ build, onDownload }: Props) => {
           onClick={() => onDownload('logsKey')}
         />
       </Line>
-      <Line expand>{config && config.completeDescription}</Line>
+      <Line expand>{config && <Text>{config.completeDescription}</Text>}</Line>
     </React.Fragment>
   ) : (
     <Line>

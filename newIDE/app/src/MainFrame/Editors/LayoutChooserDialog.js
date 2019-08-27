@@ -1,7 +1,9 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from '../../UI/FlatButton';
-import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import Dialog from '../../UI/Dialog';
 import { mapFor } from '../../Utils/MapFor';
 import Text from '../../UI/Text';
@@ -59,18 +61,25 @@ export default class LayoutChooserDialog extends Component {
         title={this.props.title}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}
-        contentStyle={{ width: '350px' }}
+        fullWidth
+        maxWidth="sm"
       >
         {this.props.helpText && <Text>{this.props.helpText}</Text>}
-        <RadioButtonGroup
+        <RadioGroup
+          aria-label="Associated scene"
           name="associated-layout"
-          valueSelected={selectedLayoutName}
-          onChange={(e, layoutName) => this.chooseLayout(layoutName)}
+          value={selectedLayoutName}
+          onChange={event => this.chooseLayout(event.target.value)}
         >
           {layoutNames.map(name => (
-            <RadioButton value={name} label={name} key={name} />
+            <FormControlLabel
+              key={name}
+              value={name}
+              control={<Radio color="primary" />}
+              label={name}
+            />
           ))}
-        </RadioButtonGroup>
+        </RadioGroup>
       </Dialog>
     );
   }

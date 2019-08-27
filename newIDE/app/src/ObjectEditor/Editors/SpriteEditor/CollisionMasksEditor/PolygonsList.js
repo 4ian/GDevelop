@@ -127,15 +127,7 @@ class PolygonsListBody extends Component<PolygonsListBodyProps, void> {
       />
     );
 
-    return (
-      <TableBody
-        displayRowCheckbox={false}
-        deselectOnClickaway={true}
-        showRowHover={true}
-      >
-        {[...polygonRows, addRow]}
-      </TableBody>
-    );
+    return <TableBody>{[...polygonRows, addRow]}</TableBody>;
   }
 }
 
@@ -152,8 +144,8 @@ type Props = {|
 export default class PolygonsList extends Component<Props, void> {
   render() {
     return (
-      <Table selectable={false}>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+      <Table>
+        <TableHeader>
           <TableRow>
             <TableHeaderColumn style={styles.handleColumn} />
             <TableHeaderColumn>Polygon</TableHeaderColumn>

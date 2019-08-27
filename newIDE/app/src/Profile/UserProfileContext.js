@@ -1,5 +1,5 @@
 // @flow
-import createReactContext from 'create-react-context';
+import * as React from 'react';
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import {
   type Limits,
@@ -31,6 +31,6 @@ export const initialUserProfile = {
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 
-const UserProfileContext = createReactContext<UserProfile>(initialUserProfile);
+const UserProfileContext = React.createContext<UserProfile>(initialUserProfile);
 
 export default UserProfileContext;

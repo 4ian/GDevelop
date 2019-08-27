@@ -1,6 +1,6 @@
 import React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
-import AddCircle from 'material-ui/svg-icons/content/add-circle';
+import AddCircle from '@material-ui/icons/AddCircle';
 import IconButton from '../../../../UI/IconButton';
 import styles from './styles';
 

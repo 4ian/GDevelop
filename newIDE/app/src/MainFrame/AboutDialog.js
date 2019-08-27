@@ -8,9 +8,7 @@ import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
-import IconButton from '../UI/IconButton';
 import Text from '../UI/Text';
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import PreferencesContext from './Preferences/PreferencesContext';
 import {
   getUpdateStatusLabel,
@@ -25,6 +23,16 @@ type Props = {
   open: boolean,
   onClose: Function,
   updateStatus: UpdateStatus,
+};
+
+type State = {|
+  currentTab: string,
+|};
+
+const styles = {
+  logo: {
+    width: '100%',
+  },
 };
 
 // There must be missing tons of people.
@@ -118,7 +126,11 @@ const contributors = [
   },
 ];
 
-export default class AboutDialog extends PureComponent<Props, *> {
+export default class AboutDialog extends PureComponent<Props, State> {
+  state = {
+    currentTab: 'about',
+  };
+
   _openContributePage = () => {
     Window.openExternalURL('https://gdevelop-app.com/contribute/');
   };
@@ -129,8 +141,13 @@ export default class AboutDialog extends PureComponent<Props, *> {
     Window.openExternalURL(link);
   };
 
+  _changeTab = (currentTab: string) => {
+    this.setState({ currentTab });
+  };
+
   render() {
     const { open, onClose, updateStatus } = this.props;
+    const { currentTab } = this.state;
     if (!open) return null;
 
     const updateStatusString = getUpdateStatusLabel(updateStatus.status);
@@ -154,9 +171,7 @@ export default class AboutDialog extends PureComponent<Props, *> {
         ]}
         onRequestClose={onClose}
         open={open}
-        contentStyle={{
-          maxWidth: 535,
-        }}
+        maxWidth="sm"
         noMargin
         autoScrollBodyContent
       >
@@ -166,11 +181,15 @@ export default class AboutDialog extends PureComponent<Props, *> {
               <img
                 src="res/GD-logo.png"
                 alt="GDevelop logo"
-                width="535"
-                height="283"
+                style={styles.logo}
               />
-              <Tabs onChange={() => this.forceUpdate()}>
-                <Tab label={<Trans>About GDevelop</Trans>} value="about">
+              <Tabs value={currentTab} onChange={this._changeTab}>
+                <Tab label={<Trans>About GDevelop</Trans>} value="about" />
+                <Tab label={<Trans>What's new?</Trans>} value="changelog" />
+                <Tab label={<Trans>Contributors</Trans>} value="contributors" />
+              </Tabs>
+              {currentTab === 'about' && (
+                <React.Fragment>
                   <Column>
                     <Line>
                       <Text>
@@ -192,13 +211,15 @@ export default class AboutDialog extends PureComponent<Props, *> {
                       )}
                     </Line>
                   </Column>
-                </Tab>
-                <Tab label={<Trans>What's new?</Trans>} value="changelog">
-                  <Column>
-                    <Changelog />
-                  </Column>
-                </Tab>
-                <Tab label={<Trans>Contributors</Trans>} value="contributors">
+                </React.Fragment>
+              )}
+              {currentTab === 'changelog' && (
+                <Column>
+                  <Changelog />
+                </Column>
+              )}
+              {currentTab === 'contributors' && (
+                <React.Fragment>
                   <Column>
                     <Text>
                       <Trans>
@@ -214,20 +235,13 @@ export default class AboutDialog extends PureComponent<Props, *> {
                       <ListItem
                         key={contributor.name}
                         primaryText={contributor.name}
-                        secondaryText={<p>{contributor.description}</p>}
+                        secondaryText={contributor.description}
                         secondaryTextLines={
                           contributor.description.length < 30 ? 1 : 2
                         }
-                        rightIconButton={
-                          contributor.link ? (
-                            <IconButton
-                              onClick={() =>
-                                this._openLink(contributor.link || '')
-                              }
-                            >
-                              <OpenInNew />
-                            </IconButton>
-                          ) : null
+                        displayLinkButton={contributor.link ? true : false}
+                        onOpenLink={() =>
+                          this._openLink(contributor.link || '')
                         }
                       />
                     ))}
@@ -247,8 +261,8 @@ export default class AboutDialog extends PureComponent<Props, *> {
                       />
                     </Line>
                   </Column>
-                </Tab>
-              </Tabs>
+                </React.Fragment>
+              )}
             </Column>
           )}
         </PreferencesContext.Consumer>

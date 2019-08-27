@@ -31,6 +31,7 @@ export default class SceneNameField extends Component<
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        fullWidth
         value={value}
         onChange={onChange}
         openOnFocus={isInline}

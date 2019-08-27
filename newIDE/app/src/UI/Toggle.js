@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import MUIToggle from 'material-ui/Toggle';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 // We support a subset of the props supported by Material-UI v0.x Toggle
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -21,6 +22,19 @@ type Props = {|
  */
 export default class Toggle extends React.Component<Props, {||}> {
   render() {
-    return <MUIToggle {...this.props} />;
+    return (
+      <FormControlLabel
+        control={
+          <Switch
+            checked={this.props.toggled}
+            onChange={event => this.props.onToggle(event, event.target.checked)}
+            color="primary"
+          />
+        }
+        label={this.props.label}
+        disabled={this.props.disabled}
+        style={this.props.style}
+      />
+    );
   }
 }

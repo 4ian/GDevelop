@@ -29,9 +29,7 @@ import Clipboard from '../Utils/Clipboard';
 import { passFullSize } from '../UI/FullSizeMeasurer';
 import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
-import Drawer from 'material-ui/Drawer';
-import IconButton from '../UI/IconButton';
-import NavigationClose from 'material-ui/svg-icons/navigation/close';
+import Drawer from '@material-ui/core/Drawer';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import EditorBar, { editorBarHeight } from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
@@ -77,6 +75,19 @@ const styles = {
     display: 'flex',
     flex: 1,
     position: 'relative',
+    overflow: 'hidden',
+  },
+};
+
+const layersDrawerPaperProps = {
+  style: {
+    width: 500,
+  },
+};
+
+const instancesDrawerPaperProps = {
+  style: {
+    width: 500,
     overflow: 'hidden',
   },
 };
@@ -1117,28 +1128,27 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
           />
         )}
-        <ObjectGroupEditorDialog
-          project={project}
-          open={!!this.state.editedGroup}
-          group={this.state.editedGroup}
-          objectsContainer={layout}
-          globalObjectsContainer={project}
-          onCancel={() => this.editGroup(null)}
-          onApply={() => this.editGroup(null)}
-        />
+        {!!this.state.editedGroup && (
+          <ObjectGroupEditorDialog
+            project={project}
+            open
+            group={this.state.editedGroup}
+            objectsContainer={layout}
+            globalObjectsContainer={project}
+            onCancel={() => this.editGroup(null)}
+            onApply={() => this.editGroup(null)}
+          />
+        )}
         <Drawer
           open={this.state.instancesListOpen}
-          width={500}
-          openSecondary={true}
-          containerStyle={{ overflow: 'hidden' }}
+          PaperProps={instancesDrawerPaperProps}
+          anchor="right"
+          onClose={this.toggleInstancesList}
         >
           <EditorBar
             title={<Trans>Instances</Trans>}
-            iconElementLeft={
-              <IconButton onClick={this.toggleInstancesList}>
-                <NavigationClose />
-              </IconButton>
-            }
+            displayLeftCloseButton
+            onClose={this.toggleInstancesList}
           />
           <InstancesList
             freezeUpdate={!this.state.instancesListOpen}
@@ -1152,16 +1162,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         </Drawer>
         <Drawer
           open={this.state.layersListOpen}
-          width={500}
-          openSecondary={true}
+          PaperProps={layersDrawerPaperProps}
+          anchor="right"
+          onClose={this.toggleLayersList}
         >
           <EditorBar
             title={<Trans>Layers</Trans>}
-            iconElementLeft={
-              <IconButton onClick={this.toggleLayersList}>
-                <NavigationClose />
-              </IconButton>
-            }
+            displayLeftCloseButton
+            onClose={this.toggleLayersList}
           />
           <LayersList
             freezeUpdate={!this.state.layersListOpen}
@@ -1171,6 +1179,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         </Drawer>
         <InfoBar
+          identifier="instance-drag-n-drop-explanation"
           message={
             <Trans>
               Drag and Drop the object to the scene or use the right click menu
@@ -1180,6 +1189,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
+          identifier="objects-panel-explanation"
           message={
             <Trans>
               Objects panel is already opened: use it to add and edit objects.
@@ -1188,63 +1198,88 @@ export default class SceneEditor extends React.Component<Props, State> {
           show={!!this.state.showObjectsListInfoBar}
         />
         <InfoBar
-          message={<Trans>Properties panel is already opened.</Trans>}
+          identifier="instance-properties-panel-explanation"
+          message={
+            <Trans>
+              Properties panel is already opened. After selecting an instance on
+              the scene, inspect and change its properties from this panel.
+            </Trans>
+          }
           show={!!this.state.showPropertiesInfoBar}
         />
-        <SetupGridDialog
-          open={this.state.setupGridOpen}
-          gridOptions={this.state.uiSettings}
-          onCancel={() => this.openSetupGrid(false)}
-          onApply={gridOptions => {
-            this.setUiSettings(gridOptions);
-            this.openSetupGrid(false);
-          }}
-        />
-        <VariablesEditorDialog
-          open={!!this.state.variablesEditedInstance}
-          variablesContainer={
-            this.state.variablesEditedInstance &&
-            this.state.variablesEditedInstance.getVariables()
-          }
-          onCancel={() => this.editInstanceVariables(null)}
-          onApply={() => this.editInstanceVariables(null)}
-          emptyExplanationMessage="Instance variables will override the default values of the variables of the object."
-          title="Instance Variables"
-          onEditObjectVariables={() => {
-            if (!this.instancesSelection.hasSelectedInstances()) {
-              return;
+        {this.state.setupGridOpen && (
+          <SetupGridDialog
+            open
+            gridOptions={this.state.uiSettings}
+            onCancel={() => this.openSetupGrid(false)}
+            onApply={gridOptions => {
+              this.setUiSettings(gridOptions);
+              this.openSetupGrid(false);
+            }}
+          />
+        )}
+        {!!this.state.variablesEditedInstance && (
+          <VariablesEditorDialog
+            open
+            variablesContainer={
+              this.state.variablesEditedInstance &&
+              this.state.variablesEditedInstance.getVariables()
             }
-            const associatedObjectName = this.instancesSelection
-              .getSelectedInstances()[0]
-              .getObjectName();
-            const object = getObjectByName(
-              project,
-              layout,
-              associatedObjectName
-            );
-            if (object) {
-              this.editObjectVariables(object);
-              this.editInstanceVariables(null);
+            onCancel={() => this.editInstanceVariables(null)}
+            onApply={() => this.editInstanceVariables(null)}
+            emptyExplanationMessage={
+              <Trans>
+                Instance variables will override the default values of the
+                variables of the object.
+              </Trans>
             }
-          }}
-        />
-        <VariablesEditorDialog
-          open={!!this.state.variablesEditedObject}
-          variablesContainer={
-            this.state.variablesEditedObject &&
-            this.state.variablesEditedObject.getVariables()
-          }
-          onCancel={() => this.editObjectVariables(null)}
-          onApply={() => this.editObjectVariables(null)}
-          emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
-          title="Object Variables"
-        />
-        <LayerRemoveDialog
-          open={!!this.state.layerRemoveDialogOpen}
-          layersContainer={layout}
-          layerRemoved={this.state.layerRemoved}
-          onClose={this.state.onCloseLayerRemoveDialog}
-        />
+            title={<Trans>Instance Variables</Trans>}
+            onEditObjectVariables={() => {
+              if (!this.instancesSelection.hasSelectedInstances()) {
+                return;
+              }
+              const associatedObjectName = this.instancesSelection
+                .getSelectedInstances()[0]
+                .getObjectName();
+              const object = getObjectByName(
+                project,
+                layout,
+                associatedObjectName
+              );
+              if (object) {
+                this.editObjectVariables(object);
+                this.editInstanceVariables(null);
+              }
+            }}
+          />
+        )}
+        {!!this.state.variablesEditedObject && (
+          <VariablesEditorDialog
+            open
+            variablesContainer={
+              this.state.variablesEditedObject &&
+              this.state.variablesEditedObject.getVariables()
+            }
+            onCancel={() => this.editObjectVariables(null)}
+            onApply={() => this.editObjectVariables(null)}
+            emptyExplanationMessage={
+              <Trans>
+                When you add variables to an object, any instance of the object
+                put on the scene or created during the game will have these
+                variables attached to it.
+              </Trans>
+            }
+            title={<Trans>Object Variables</Trans>}
+          />
+        )}
+        {!!this.state.layerRemoveDialogOpen && (
+          <LayerRemoveDialog
+            open
+            layersContainer={layout}
+            layerRemoved={this.state.layerRemoved}
+            onClose={this.state.onCloseLayerRemoveDialog}
+          />
+        )}
         {this.state.scenePropertiesDialogOpen && (
           <ScenePropertiesDialog
             open
@@ -1256,15 +1291,27 @@ export default class SceneEditor extends React.Component<Props, State> {
             onOpenMoreSettings={this.props.onOpenMoreSettings}
           />
         )}
-        <VariablesEditorDialog
-          open={!!this.state.layoutVariablesDialogOpen}
-          variablesContainer={layout.getVariables()}
-          onCancel={() => this.editLayoutVariables(false)}
-          onApply={() => this.editLayoutVariables(false)}
-          title="Scene variables"
-          emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
-          emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
-        />
+        {!!this.state.layoutVariablesDialogOpen && (
+          <VariablesEditorDialog
+            open
+            variablesContainer={layout.getVariables()}
+            onCancel={() => this.editLayoutVariables(false)}
+            onApply={() => this.editLayoutVariables(false)}
+            title={<Trans>Scene Variables</Trans>}
+            emptyExplanationMessage={
+              <Trans>
+                Scene variables can be used to store any value or text during
+                the game.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called Score representing
+                the current score of the player.
+              </Trans>
+            }
+          />
+        )}
         <ContextMenu
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [

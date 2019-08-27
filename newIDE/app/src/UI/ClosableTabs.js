@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
-import { Tabs as MaterialUITabs, Tab as MaterialUITab } from 'material-ui/Tabs';
-import Close from 'material-ui/svg-icons/navigation/close';
-import FlatButton from 'material-ui/FlatButton';
+// @flow
+import React, { Component, useEffect, type Node, useRef } from 'react';
+import Close from '@material-ui/icons/Close';
+import ButtonBase from '@material-ui/core/ButtonBase';
 import ThemeConsumer from './Theme/ThemeConsumer';
+import ContextMenu from './Menu/ContextMenu';
 
 const styles = {
   tabsContainerStyle: {
@@ -11,45 +12,76 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
-  tabTemplateStyle: {
+  tabContentContainer: {
     width: '100%',
     position: 'relative',
     textAlign: 'initial',
     height: '100%',
+    display: 'flex',
+    flex: 1,
+  },
+  tabLabel: {
+    maxWidth: 400,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    marginTop: 7,
+    marginBottom: 7,
+    marginLeft: 10,
+    marginRight: 10,
+    textTransform: 'uppercase',
+    fontSize: '13px',
+  },
+  closeButton: {
+    marginTop: 7,
+    marginBottom: 7,
+    marginRight: 5,
+    marginLeft: 5,
   },
 };
 
+type TabContentContainerProps = {|
+  active: boolean,
+  children: Node,
+|};
+
 /**
- * This is to override the default material-ui tab template used to wrap the content of each tab element.
- * 2 changes (**please port them to your new implementation if you change the tabs**):
+ * Contains the content of a tab. Two important things:
  *
  * 1) Instead of setting the "height" of hidden tabs to "0", we set "display" to "none" to avoid
  * messing with components (in particular components where you can scroll: when collapsed because of height=0,
  * they will lose they scrolling position).
  *
  * 2) shouldComponentUpdate is used to avoid updating the content of a tab that is not selected.
- *
- * Rest of the implementation is the same.
  */
-class TabTemplate extends Component {
-  shouldComponentUpdate(nextProps) {
-    return this.props.selected || nextProps.selected;
+export class TabContentContainer extends Component<TabContentContainerProps> {
+  shouldComponentUpdate(nextProps: TabContentContainerProps) {
+    return this.props.active || nextProps.active;
   }
 
   render() {
-    const { children, selected, style } = this.props;
-    const templateStyle = { ...styles.tabTemplateStyle, ...style };
-    if (!selected) {
-      templateStyle.display = 'none';
-    }
-
-    return <div style={templateStyle}>{children}</div>;
+    const { children, active } = this.props;
+    return (
+      <div
+        style={{
+          ...styles.tabContentContainer,
+          ...(active ? undefined : { display: 'none' }),
+        }}
+      >
+        {children}
+      </div>
+    );
   }
 }
 
-export class Tabs extends Component {
+type ClosableTabsProps = {|
+  hideLabels?: boolean,
+  children: Node,
+|};
+
+export class ClosableTabs extends Component<ClosableTabsProps> {
   render() {
-    const { hideLabels, ...tabsProps } = this.props;
+    const { hideLabels, children } = this.props;
 
     return (
       <ThemeConsumer>
@@ -57,118 +89,121 @@ export class Tabs extends Component {
           const tabItemContainerStyle = {
             maxWidth: '100%', // Tabs should take all width
             flexShrink: 0, // Tabs height should never be reduced
-            overflowX: 'auto',
-            display: hideLabels ? 'none' : 'block',
+            display: hideLabels ? 'none' : 'flex',
+            flexWrap: 'nowrap', // Single line of tab...
+            overflowX: 'auto', // ...scroll horizontally if needed
             backgroundColor: muiTheme.closableTabs.backgroundColor,
           };
 
-          const contentContainerStyle = {
-            overflowY: 'hidden',
-            height: hideLabels
-              ? '100%'
-              : `calc(100% - ${muiTheme.closableTabs.height}px)`,
-          };
-
-          return (
-            <MaterialUITabs
-              style={styles.tabsContainerStyle}
-              tabTemplate={TabTemplate}
-              contentContainerStyle={contentContainerStyle}
-              tabItemContainerStyle={tabItemContainerStyle}
-              inkBarStyle={{ display: 'none' }}
-              {...tabsProps}
-            />
-          );
+          return <div style={tabItemContainerStyle}>{children}</div>;
         }}
       </ThemeConsumer>
     );
   }
 }
-Tabs.muiName = 'Tabs';
 
-export class Tab extends Component {
-  static muiName = 'Tab';
+type ClosableTabProps = {|
+  active: boolean,
+  label: Node,
+  closable: boolean,
+  onClose: () => void,
+  onCloseOthers: () => void,
+  onCloseAll: () => void,
+  onClick: () => void,
+  onActivated: () => void,
+|};
 
-  render() {
-    const { selected, onClose, label, closable, ...tabProps } = this.props;
+export function ClosableTab({
+  active,
+  onClose,
+  onCloseOthers,
+  onCloseAll,
+  label,
+  closable,
+  onClick,
+  onActivated,
+}: ClosableTabProps) {
+  useEffect(
+    () => {
+      if (active) {
+        onActivated();
+      }
+    },
+    [active]
+  );
+  const contextMenu = useRef<ContextMenu>(null);
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => {
-          const truncatedLabel = (
+  const openContextMenu = event => {
+    event.stopPropagation();
+    if (contextMenu.current) {
+      contextMenu.current.open(event.clientX, event.clientY);
+    }
+  };
+
+  return (
+    <ThemeConsumer>
+      {muiTheme => {
+        const textColor = !active
+          ? muiTheme.closableTabs.textColor
+          : muiTheme.closableTabs.selectedTextColor;
+
+        return (
+          <React.Fragment>
             <span
               style={{
-                width:
-                  muiTheme.closableTabs.width -
-                  muiTheme.closableTabs.closeButtonWidth * 1.5,
-                marginRight: muiTheme.closableTabs.closeButtonWidth,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {label}
-            </span>
-          );
-
-          return (
-            <span
-              style={{
+                flexShrink: 0, // Tabs are never resized to fit in flex container
                 position: 'relative',
-                width: muiTheme.closableTabs.width,
                 display: 'inline-block',
+                backgroundColor: !active
+                  ? muiTheme.closableTabs.backgroundColor
+                  : muiTheme.closableTabs.selectedBackgroundColor,
               }}
             >
-              <MaterialUITab
-                {...tabProps}
-                label={truncatedLabel}
-                selected={selected}
-                buttonStyle={{
-                  height: muiTheme.closableTabs.height,
-                  backgroundColor: selected
-                    ? muiTheme.closableTabs.selectedBackgroundColor
-                    : muiTheme.closableTabs.backgroundColor,
-                  color: selected
-                    ? muiTheme.closableTabs.selectedTextColor
-                    : muiTheme.closableTabs.textColor,
-                }}
-                style={{
-                  height: '100%',
-                  width: '100%',
-                }}
-              />
-              {closable && (
-                <FlatButton
-                  backgroundColor="transparent"
-                  hoverColor={muiTheme.selectedBackgroundColor}
-                  onClick={onClose}
+              <ButtonBase onClick={onClick} onContextMenu={openContextMenu}>
+                <span
                   style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    borderRadius: 0,
-                    width: muiTheme.closableTabs.closeButtonWidth,
-                    minWidth: muiTheme.closableTabs.closeButtonWidth,
+                    ...styles.tabLabel,
+                    color: textColor,
+                    fontFamily: muiTheme.closableTabs.fontFamily,
                   }}
-                  icon={
-                    <Close
-                      color={
-                        selected
-                          ? muiTheme.closableTabs.selectedTextColor
-                          : muiTheme.closableTabs.textColor
-                      }
-                      style={{
-                        width: muiTheme.closableTabs.height / 2,
-                        height: muiTheme.closableTabs.height / 2,
-                      }}
-                    />
-                  }
-                />
+                >
+                  {label}
+                </span>
+              </ButtonBase>
+              {closable && (
+                <ButtonBase onClick={onClose} onContextMenu={openContextMenu}>
+                  <Close
+                    style={{
+                      ...styles.closeButton,
+                      width: muiTheme.closableTabs.height / 2,
+                      height: muiTheme.closableTabs.height / 2,
+                    }}
+                    htmlColor={textColor}
+                  />
+                </ButtonBase>
               )}
             </span>
-          );
-        }}
-      </ThemeConsumer>
-    );
-  }
+            <ContextMenu
+              ref={contextMenu}
+              buildMenuTemplate={() => [
+                {
+                  label: 'Close',
+                  click: onClose,
+                  enabled: closable,
+                },
+                {
+                  label: 'Close others',
+                  click: onCloseOthers,
+                },
+                {
+                  label: 'Close all',
+                  click: onCloseAll,
+                },
+              ]}
+            />
+          </React.Fragment>
+        );
+      }}
+    </ThemeConsumer>
+  );
 }

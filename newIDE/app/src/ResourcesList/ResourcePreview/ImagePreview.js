@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
@@ -6,9 +7,9 @@ import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import { Column } from '../../UI/Grid';
 import MiniToolbar from '../../UI/MiniToolbar';
-import ZoomIn from 'material-ui/svg-icons/action/zoom-in';
-import ZoomOut from 'material-ui/svg-icons/action/zoom-out';
-import ZoomOutMap from 'material-ui/svg-icons/maps/zoom-out-map';
+import ZoomIn from '@material-ui/icons/ZoomIn';
+import ZoomOut from '@material-ui/icons/ZoomOut';
+import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
 import Text from '../../UI/Text';
 
 const MARGIN = 50;
@@ -171,28 +172,19 @@ export default class ImagePreview extends React.Component<Props, State> {
               <MiniToolbar>
                 <IconButton
                   onClick={() => this._zoomBy(+0.2)}
-                  tooltip={
-                    <Trans>Zoom in (you can also use Ctrl + Mouse wheel)</Trans>
-                  }
-                  tooltipPosition="bottom-right"
+                  tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomIn />
                 </IconButton>
                 <IconButton
                   onClick={() => this._zoomBy(-0.2)}
-                  tooltip={
-                    <Trans>
-                      Zoom out (you can also use Ctrl + Mouse wheel)
-                    </Trans>
-                  }
-                  tooltipPosition="bottom-right"
+                  tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomOut />
                 </IconButton>
                 <IconButton
                   onClick={() => this._zoomTo(1)}
-                  tooltip={<Trans>Restore original size</Trans>}
-                  tooltipPosition="bottom-right"
+                  tooltip={t`Restore original size`}
                 >
                   <ZoomOutMap />
                 </IconButton>

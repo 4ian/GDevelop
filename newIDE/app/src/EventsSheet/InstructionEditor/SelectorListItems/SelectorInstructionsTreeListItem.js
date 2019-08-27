@@ -4,7 +4,7 @@ import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import { type InstructionOrExpressionTreeNode } from '../InstructionOrExpressionSelector/CreateTree';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
-import Subheader from 'material-ui/Subheader';
+import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
 import { getSubheaderListItemKey, getInstructionListItemKey } from './Keys';
 
@@ -13,20 +13,25 @@ type Props = {|
   onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
   iconSize: number,
   useSubheaders?: boolean,
-|};
+  selectedValue: ?string,
+  initiallyOpenedPath?: ?Array<string>,
 
-const styles = {
-  groupListItemNestedList: {
-    padding: 0,
-  },
-};
+  // Optional ref that will be filled with the selected ListItem
+  selectedItemRef?: { current: null | ListItem },
+|};
 
 export const renderInstructionTree = ({
   instructionTreeNode,
   onChoose,
   iconSize,
   useSubheaders,
+  selectedValue,
+  selectedItemRef,
+  initiallyOpenedPath,
 }: Props): Array<React$Element<any> | null> => {
+  const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
+    initiallyOpenedPath || [];
+
   return flatten(
     Object.keys(instructionTreeNode).map(key => {
       // In theory, we should have a way to distinguish
@@ -40,11 +45,12 @@ export const renderInstructionTree = ({
         // $FlowFixMe - see above
         const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
         const value = getInstructionListItemKey(instructionOrGroup.type);
+        const selected = selectedValue === value;
         return (
           <ListItem
             key={value}
             primaryText={key}
-            value={value}
+            selected={selected}
             leftIcon={
               <ListIcon
                 iconSize={iconSize}
@@ -54,6 +60,7 @@ export const renderInstructionTree = ({
             onClick={() => {
               onChoose(instructionInformation.type, instructionInformation);
             }}
+            ref={selected ? selectedItemRef : undefined}
           />
         );
       } else {
@@ -68,21 +75,31 @@ export const renderInstructionTree = ({
               onChoose,
               iconSize,
               useSubheaders: false,
+              selectedValue,
+              selectedItemRef,
+              initiallyOpenedPath: restOfInitiallyOpenedPath,
             })
           );
         } else {
+          const initiallyOpen = initiallyOpenedKey === key;
           return (
             <ListItem
               key={key}
-              nestedListStyle={styles.groupListItemNestedList}
               primaryText={key}
-              primaryTogglesNestedList={true}
               autoGenerateNestedIndicator={true}
-              nestedItems={renderInstructionTree({
-                instructionTreeNode: groupOfInstructionInformation,
-                onChoose,
-                iconSize,
-              })}
+              initiallyOpen={initiallyOpen}
+              renderNestedItems={() =>
+                renderInstructionTree({
+                  instructionTreeNode: groupOfInstructionInformation,
+                  onChoose,
+                  iconSize,
+                  selectedValue,
+                  selectedItemRef,
+                  initiallyOpenedPath: initiallyOpen
+                    ? restOfInitiallyOpenedPath
+                    : undefined,
+                })
+              }
             />
           );
         }

@@ -157,9 +157,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           <Tab
             label={<Trans>Object groups</Trans>}
             value={('groups': TabNames)}
-          >
-            {/* Manually display tabs to support flex */}
-          </Tab>
+          />
         </Tabs>
         {this.state.currentTab === 'config' ? (
           <ScrollView>

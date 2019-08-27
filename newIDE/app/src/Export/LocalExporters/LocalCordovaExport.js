@@ -171,8 +171,10 @@ class LocalCordovaExport extends Component<Props, State> {
           open={this.state.exportFinishedDialogOpen}
         >
           <Text>
-            You can now compress and upload the game to <b>PhoneGap Build</b>{' '}
-            which will compile it for you to an iOS and Android app.
+            <Trans>
+              You can now compress and upload the game to PhoneGap Build which
+              will compile it for you to an iOS and Android app.
+            </Trans>
           </Text>
           <Text>
             <Trans>

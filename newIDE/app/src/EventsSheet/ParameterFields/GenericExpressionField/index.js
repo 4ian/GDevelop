@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import Popover from 'material-ui/Popover';
-import Functions from 'material-ui/svg-icons/editor/functions';
+import Popper from '@material-ui/core/Popper';
+import muiZIndex from '@material-ui/core/styles/zIndex';
+import Functions from '@material-ui/icons/Functions';
 import RaisedButton from '../../../UI/RaisedButton';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import { mapVector } from '../../../Utils/MapFor';
@@ -17,6 +18,7 @@ import BackgroundHighlighting, {
   type Highlight,
 } from './BackgroundHighlighting';
 import debounce from 'lodash/debounce';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 const gd = global.gd;
 
 const styles = {
@@ -40,13 +42,13 @@ const styles = {
     lineHeight: 1.4,
   },
   backgroundHighlighting: {
-    marginTop: 12, //Properly align with the text field
+    marginTop: 22, //Properly align with the text field
   },
   backgroundHighlightingWithDescription: {
     marginTop: 38, //Properly align with the text field
   },
   functionsButton: {
-    marginTop: 7, //Properly align with the text field
+    marginTop: 17, //Properly align with the text field
     marginLeft: 10,
   },
   functionsButtonWithDescription: {
@@ -249,6 +251,10 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const popoverStyle = {
       width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
+      // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
+      // There will be only one ExpressionSelector opened at a time, so it's fair to put the
+      // highest z index. If this is breaking, check the z-index of material-ui.
+      zIndex: muiZIndex.tooltip + 100,
     };
 
     const backgroundHighlightingStyle = description
@@ -278,29 +284,27 @@ export default class ExpressionField extends React.Component<Props, State> {
               fullWidth
             />
           </div>
-          {this._fieldElement && (
-            <Popover
-              style={popoverStyle}
-              open={this.state.popoverOpen}
-              canAutoPosition={false}
-              anchorEl={this._fieldElement}
-              useLayerForClickAway={false}
-              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-              onRequestClose={this._handleRequestClose}
-            >
-              <div style={styles.expressionSelectorPopoverContent}>
-                <ExpressionSelector
-                  selectedType=""
-                  onChoose={(type, expression) => {
-                    this._handleExpressionChosen(expression);
-                  }}
-                  expressionType={expressionType}
-                  focusOnMount
-                  scope={scope}
-                />
-              </div>
-            </Popover>
+          {this._fieldElement && this.state.popoverOpen && (
+            <ClickAwayListener onClickAway={this._handleRequestClose}>
+              <Popper
+                style={popoverStyle}
+                open={this.state.popoverOpen}
+                anchorEl={this._fieldElement}
+                placement="bottom"
+              >
+                <div style={styles.expressionSelectorPopoverContent}>
+                  <ExpressionSelector
+                    selectedType=""
+                    onChoose={(type, expression) => {
+                      this._handleExpressionChosen(expression);
+                    }}
+                    expressionType={expressionType}
+                    focusOnMount
+                    scope={scope}
+                  />
+                </div>
+              </Popper>
+            </ClickAwayListener>
           )}
         </div>
         {!this.props.isInline &&

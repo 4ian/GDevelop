@@ -1,39 +1,49 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import IconButton from './IconButton';
 import ThemeConsumer from './Theme/ThemeConsumer';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+
+type Props = {|
+  src: string,
+  tooltip?: MessageDescriptor,
+  acceleratorString?: string,
+  disabled?: boolean,
+  onClick?: () => void,
+|};
 
 /**
- * An icon that can be used in a ToolbarGroup of material-ui Toolbar.
- * See also ListIcon.
+ * An icon that can be used in a ToolbarGroup of a Toolbar.
  */
-export default class ToolbarIcon extends Component {
-  render() {
-    const { src, tooltip, disabled, ...otherProps } = this.props;
+const ToolbarIcon = React.forwardRef<Props, IconButton>((props: Props, ref) => {
+  const { src, tooltip, acceleratorString, disabled, onClick } = props;
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <IconButton
-            {...otherProps}
-            iconStyle={{
-              //Properly align icons with the rest of the toolbar
-              marginLeft: -4,
-              marginTop: -4,
+  return (
+    <ThemeConsumer>
+      {muiTheme => (
+        <IconButton
+          onClick={onClick}
+          size="small"
+          disabled={disabled}
+          tooltip={tooltip}
+          acceleratorString={acceleratorString}
+          ref={ref}
+        >
+          <img
+            alt={tooltip}
+            src={src}
+            width={32}
+            height={32}
+            style={{
               filter: disabled
                 ? 'grayscale(100%)'
                 : muiTheme.gdevelopIconsCSSFilter,
             }}
-          >
-            <img
-              title={tooltip}
-              alt={tooltip}
-              src={src}
-              width={32}
-              height={32}
-            />
-          </IconButton>
-        )}
-      </ThemeConsumer>
-    );
-  }
-}
+          />
+        </IconButton>
+      )}
+    </ThemeConsumer>
+  );
+});
+
+export default ToolbarIcon;

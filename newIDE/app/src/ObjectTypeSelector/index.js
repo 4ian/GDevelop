@@ -1,9 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import SelectField from '../UI/SelectField';
-import MenuItem from '../UI/MenuItem';
+import SelectOption from '../UI/SelectOption';
 import {
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
@@ -53,9 +54,9 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
         disabled={disabled}
         fullWidth
       >
-        <MenuItem
+        <SelectOption
           value=""
-          primaryText={<Trans>Any object</Trans>}
+          primaryText={t`Any object`}
           disabled={isDisabled('')}
         />
         {objectMetadata.map((metadata: EnumeratedObjectMetadata) => {
@@ -65,7 +66,7 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
           }
 
           return (
-            <MenuItem
+            <SelectOption
               key={metadata.name}
               value={metadata.name}
               primaryText={metadata.fullName}

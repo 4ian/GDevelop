@@ -42,13 +42,6 @@ export default class InspectorsList extends React.Component<Props, void> {
       const fullInspectorPath = path.concat(inspectorDescription.key);
 
       const getSubInspectors = inspectorDescription.getSubInspectors;
-      const nestedItems = getSubInspectors
-        ? this._renderInspectorList(
-            get(gameData, inspectorDescription.key, null),
-            getSubInspectors,
-            fullInspectorPath
-          )
-        : undefined;
 
       return (
         <ListItem
@@ -61,8 +54,16 @@ export default class InspectorsList extends React.Component<Props, void> {
               fullInspectorPath
             )
           }
-          nestedItems={nestedItems}
-          primaryTogglesNestedList
+          renderNestedItems={
+            getSubInspectors
+              ? () =>
+                  this._renderInspectorList(
+                    get(gameData, inspectorDescription.key, null),
+                    getSubInspectors,
+                    fullInspectorPath
+                  )
+              : undefined
+          }
         />
       );
     });

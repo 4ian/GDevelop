@@ -8,7 +8,7 @@ import { type ProfilerOutput } from '..';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { Line } from '../../UI/Grid';
 import Background from '../../UI/Background';
-import LinearProgress from 'material-ui/LinearProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import Text from '../../UI/Text';
 
 const styles = {
@@ -56,7 +56,7 @@ export default class Profiler extends React.Component<Props, void> {
         </Line>
         {profilingInProgress && (
           <Line alignItems="center">
-            <LinearProgress style={{ flex: 1 }} mode={'indeterminate'} />
+            <LinearProgress style={{ flex: 1 }} variant={'indeterminate'} />
           </Line>
         )}
         <div style={styles.tableContainer}>

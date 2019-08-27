@@ -17,8 +17,8 @@ import {
 import RawContentInspector from './Inspectors/RawContentInspector';
 import EmptyMessage from '../UI/EmptyMessage';
 import Checkbox from '../UI/Checkbox';
-import Flash from 'material-ui/svg-icons/image/flash-on';
-import FlashOff from 'material-ui/svg-icons/image/flash-off';
+import Flash from '@material-ui/icons/FlashOn';
+import FlashOff from '@material-ui/icons/FlashOff';
 import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
 import { type ProfilerOutput } from '.';

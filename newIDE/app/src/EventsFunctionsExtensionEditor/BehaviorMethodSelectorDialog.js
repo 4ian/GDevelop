@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import Subheader from 'material-ui/Subheader';
+import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
@@ -43,7 +43,7 @@ const MethodListItem = ({
     <ListItem
       leftIcon={icon}
       primaryText={name}
-      secondaryText={<p>{description}</p>}
+      secondaryText={description}
       secondaryTextLines={2}
       onClick={() => onChoose(name)}
       style={disabled ? styles.disabledItem : undefined}
@@ -181,13 +181,11 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
               <Trans>Custom (action, condition or expression)</Trans>
             }
             secondaryText={
-              <p>
-                <Trans>
-                  An action, condition or expression that can be used on objects
-                  that have the behavior attached to them. Use it from the
-                  events sheet as any other action/condition/expression.
-                </Trans>
-              </p>
+              <Trans>
+                An action, condition or expression that can be used on objects
+                that have the behavior attached to them. Use it from the events
+                sheet as any other action/condition/expression.
+              </Trans>
             }
             secondaryTextLines={2}
             onClick={() => onChoose(null)}

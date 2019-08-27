@@ -1,10 +1,14 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
-import MUISelectField from 'material-ui/SelectField';
+import { I18n } from '@lingui/react';
+import TextField from '@material-ui/core/TextField';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type ValueProps =
   | {|
       value: string,
+      // event and index should not be used, and be removed eventually
       onChange?: (
         event: {| target: {| value: string |} |},
         index: number,
@@ -13,10 +17,12 @@ type ValueProps =
     |}
   | {|
       value: number,
+      // event and index should not be used, and be removed eventually
       onChange?: (event: {||}, index: number, value: number) => void,
     |}
   | {|
       value: boolean,
+      // event and index should not be used, and be removed eventually
       onChange?: (event: {||}, index: number, value: boolean) => void,
     |};
 
@@ -32,18 +38,88 @@ type Props = {|
     flex?: 1,
     width?: 'auto',
   },
+  margin?: 'none',
 
   floatingLabelText?: React.Node,
   floatingLabelFixed?: boolean,
-  hintText?: React.Node,
+
+  // If a hint text is specified, will be shown as an option for the empty
+  // value (""), disabled.
+  hintText?: MessageDescriptor,
 |};
+
+const INVALID_VALUE = '';
 
 /**
  * A select field based on Material-UI select field.
- * To be used with `MenuItem`.
+ * To be used with `SelectOption`.
  */
 export default class SelectField extends React.Component<Props, {||}> {
+  _input = React.createRef<HTMLInputElement>();
+
+  focus() {
+    if (this._input.current) this._input.current.focus();
+  }
+
   render() {
-    return <MUISelectField {...this.props} />;
+    const { props } = this;
+    const onChange = props.onChange || undefined;
+
+    // Dig into children props to see if the current value is valid or not.
+    let hasValidValue = true;
+    const childrenValues = React.Children.map(props.children, child => {
+      if (child === null) return null;
+
+      return child.props.value;
+    });
+    if (!childrenValues) {
+      console.error(
+        'SelectField has been passed no or invalid children. Only SelectOption and null are supported.'
+      );
+    } else {
+      hasValidValue =
+        childrenValues.filter(childValue => childValue === props.value)
+          .length !== 0;
+    }
+    const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
+
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <TextField
+            select
+            margin={props.margin || 'normal'}
+            disabled={props.disabled}
+            fullWidth={props.fullWidth}
+            label={props.floatingLabelText}
+            value={displayedValue}
+            onChange={
+              onChange
+                ? event => {
+                    onChange(event, -1, event.target.value);
+                  }
+                : undefined
+            }
+            InputLabelProps={{
+              shrink: props.floatingLabelFixed ? true : undefined,
+            }}
+            SelectProps={{
+              native: true,
+            }}
+            style={props.style}
+            inputRef={this._input}
+          >
+            {!hasValidValue ? (
+              <option value={INVALID_VALUE} disabled>
+                {props.hintText
+                  ? i18n._(props.hintText)
+                  : i18n._(t`Choose an option`)}
+              </option>
+            ) : null}
+            {props.children}
+          </TextField>
+        )}
+      </I18n>
+    );
   }
 }

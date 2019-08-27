@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
-import CloudUpload from 'material-ui/svg-icons/file/cloud-upload';
+import CloudUpload from '@material-ui/icons/CloudUpload';
 import { Column, Line } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';

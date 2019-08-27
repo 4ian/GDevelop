@@ -1,9 +1,6 @@
 // @flow
 import ReactDOM from 'react-dom';
-import FlatButton from './FlatButton';
 import RaisedButton from './RaisedButton';
-
-type Button = typeof RaisedButton | typeof FlatButton;
 
 // If you're searching for button components,
 // take a look at FlatButton or RaisedButton.
@@ -12,7 +9,7 @@ type Button = typeof RaisedButton | typeof FlatButton;
  * Focus a button. This won't display the material-ui Ripple effect
  * but is still better than nothing.
  */
-export const focusButton = (buttonRef: React.RefObject<Button>) => {
+export const focusButton = (buttonRef: { current: null | RaisedButton }) => {
   if (buttonRef && buttonRef.current) {
     const element = ReactDOM.findDOMNode(buttonRef.current);
     if (element instanceof HTMLButtonElement) {

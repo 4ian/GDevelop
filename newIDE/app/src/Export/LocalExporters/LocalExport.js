@@ -91,10 +91,12 @@ export default class LocalExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          <Trans>
-            This will export your game to a folder that you can then upload on a
-            website or on game hosting like itch.io.
-          </Trans>
+          <Text>
+            <Trans>
+              This will export your game to a folder that you can then upload on
+              a website or on game hosting like itch.io.
+            </Trans>
+          </Text>
         </Line>
         <Line>
           <LocalFolderPicker

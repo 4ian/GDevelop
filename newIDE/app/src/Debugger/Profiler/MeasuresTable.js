@@ -7,8 +7,8 @@ import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import flatMap from 'lodash/flatMap';
 import { type ProfilerMeasuresSection } from '..';
 import IconButton from '../../UI/IconButton';
-import ExpandMore from 'material-ui/svg-icons/navigation/expand-more';
-import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import ChevronRight from '@material-ui/icons/ChevronRight';
 
 const styles = {
   indent: {

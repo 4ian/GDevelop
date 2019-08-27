@@ -37,3 +37,43 @@ export const createTree = (
 
   return tree;
 };
+
+export const findInTree = (
+  instructionTreeNode: InstructionOrExpressionTreeNode,
+  instructionType: ?string
+): ?Array<string> => {
+  if (!instructionType) return null;
+
+  const keys = Object.keys(instructionTreeNode);
+  for (var i = 0; i < keys.length; ++i) {
+    const key = keys[i];
+
+    // In theory, we should have a way to distinguish
+    // between instruction (leaf nodes) and group (nodes). We use
+    // the "type" properties, but this will fail if a group is called "type"
+    // (hence the flow errors, which are valid warnings)
+    const instructionOrGroup = instructionTreeNode[key];
+    if (!instructionOrGroup) return null;
+
+    if (typeof instructionOrGroup.type === 'string') {
+      // $FlowFixMe - see above
+      const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
+
+      if (instructionInformation.type === instructionType) {
+        return [];
+      }
+    } else {
+      // $FlowFixMe - see above
+      const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
+      const searchResult = findInTree(
+        groupOfInstructionInformation,
+        instructionType
+      );
+      if (searchResult) {
+        return [key, ...searchResult];
+      }
+    }
+  }
+
+  return null;
+};

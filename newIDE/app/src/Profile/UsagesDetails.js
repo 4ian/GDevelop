@@ -28,14 +28,14 @@ export default ({ usages }: Props) => (
           <Trans>You don't have any usage of the online services for now</Trans>
         </EmptyMessage>
       ) : (
-        <Table selectable={false}>
-          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+        <Table>
+          <TableHeader>
             <TableRow>
               <TableHeaderColumn>Date</TableHeaderColumn>
               <TableHeaderColumn>Type</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody displayRowCheckbox={false}>
+          <TableBody>
             {usages.map(usage => (
               <TableRow key={usage.id}>
                 <TableRowColumn>

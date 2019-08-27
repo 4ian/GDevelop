@@ -1,11 +1,12 @@
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
 import TextField from '../UI/TextField';
-import Add from 'material-ui/svg-icons/content/add';
-import Delete from 'material-ui/svg-icons/action/delete';
+import Add from '@material-ui/icons/Add';
+import Delete from '@material-ui/icons/Delete';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import MiniToolbar from '../UI/MiniToolbar';
+import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
@@ -181,27 +182,27 @@ export default class BehaviorsEditor extends Component {
             return (
               <div key={index}>
                 <MiniToolbar>
-                  <span style={styles.behaviorTitle}>
+                  <MiniToolbarText>
                     <Trans>Behavior</Trans>{' '}
+                  </MiniToolbarText>
+                  <Column noMargin expand>
                     <TextField
                       value={behaviorName}
-                      hintText={<Trans>Behavior name</Trans>}
+                      hintText={t`Behavior name`}
+                      margin="none"
+                      fullWidth
                       disabled
                       onChange={(e, text) =>
                         this._onChangeBehaviorName(behaviorContent, text)
                       }
                     />
-                  </span>
-                  <span style={styles.behaviorTools}>
-                    <IconButton
-                      onClick={() => this._onRemoveBehavior(behaviorName)}
-                    >
-                      <Delete />
-                    </IconButton>
-                    <HelpIcon
-                      helpPagePath={getBehaviorHelpPagePath(behavior)}
-                    />
-                  </span>
+                  </Column>
+                  <IconButton
+                    onClick={() => this._onRemoveBehavior(behaviorName)}
+                  >
+                    <Delete />
+                  </IconButton>
+                  <HelpIcon helpPagePath={getBehaviorHelpPagePath(behavior)} />
                 </MiniToolbar>
                 <BehaviorComponent
                   behavior={behavior}

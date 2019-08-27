@@ -9,17 +9,20 @@ type Props = {|
   instructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
   iconSize: number,
   onClick: () => void,
+  selectedValue: ?string,
 |};
 
 export const renderInstructionOrExpressionListItem = ({
   instructionOrExpressionMetadata,
   iconSize,
   onClick,
+  selectedValue,
 }: Props) => {
+  const key = getInstructionListItemKey(instructionOrExpressionMetadata.type);
   return (
     <ListItem
-      key={getInstructionListItemKey(instructionOrExpressionMetadata.type)}
-      value={getInstructionListItemKey(instructionOrExpressionMetadata.type)}
+      key={key}
+      selected={selectedValue === key}
       primaryText={instructionOrExpressionMetadata.displayedName}
       secondaryText={instructionOrExpressionMetadata.fullGroupName}
       leftIcon={

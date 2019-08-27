@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import Dialog from './Dialog';
-import { TextField } from 'material-ui';
+import TextField from './TextField';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
 import { type Tags, getTagsFromString } from '../Utils/TagsHelper';
@@ -75,7 +76,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             })
           }
           floatingLabelText="Tag(s) (comma-separated)"
-          hintText={<Trans>For example: player, spaceship, inventory...</Trans>}
+          hintText={t`For example: player, spaceship, inventory...`}
           onKeyPress={event => {
             if (event.key === 'Enter') {
               onEdit(tags);

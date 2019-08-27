@@ -1,10 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
 import SelectField from '../../UI/SelectField';
-import MenuItem from '../../UI/MenuItem';
+import SelectOption from '../../UI/SelectOption';
 import { Line, Column } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -42,17 +43,17 @@ export default class ParticleEmitterEditor extends React.Component<
                 this.forceUpdate();
               }}
             >
-              <MenuItem
+              <SelectOption
                 value={gd.ParticleEmitterObject.Point}
-                primaryText={<Trans>Point</Trans>}
+                primaryText={t`Point`}
               />
-              <MenuItem
+              <SelectOption
                 value={gd.ParticleEmitterObject.Line}
-                primaryText={<Trans>Line</Trans>}
+                primaryText={t`Line`}
               />
-              <MenuItem
+              <SelectOption
                 value={gd.ParticleEmitterObject.Quad}
-                primaryText={<Trans>Textured</Trans>}
+                primaryText={t`Textured`}
               />
             </SelectField>
           </Column>

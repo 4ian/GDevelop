@@ -4,7 +4,7 @@ import TextField from './TextField';
 
 type State = {|
   focused: boolean,
-  text: ?string,
+  text: ?any,
 |};
 
 type Props = {|
@@ -22,8 +22,10 @@ type Props = {|
       value: string,
     },
   }) => void,
+  type?: 'text' | 'number',
 
   // Some TextField props that can be reused:
+  margin?: 'none' | 'normal',
   disabled?: boolean,
   errorText?: React.Node,
   floatingLabelFixed?: boolean,
@@ -38,9 +40,9 @@ type Props = {|
   name?: string,
   step?: number,
   style?: Object,
-  type?: string,
   rows?: number,
   rowsMax?: number,
+  autoFocus?: boolean,
 |};
 
 /**
@@ -75,14 +77,15 @@ export default class SemiControlledTextField extends React.Component<
       commitOnBlur,
       onFocus,
       onBlur,
+      type,
       ...otherProps
     } = this.props;
 
     return (
-      // $FlowFixMe - not sure why Flow can't infer that we're using the "string version" of TextField.
+      // $FlowFixMe
       <TextField
         {...otherProps}
-        type="text"
+        type={type || 'text'}
         ref={field => (this._field = field)}
         value={this.state.focused ? this.state.text : value}
         onFocus={event => {

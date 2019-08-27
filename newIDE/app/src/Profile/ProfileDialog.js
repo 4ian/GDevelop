@@ -73,36 +73,36 @@ export default class ProfileDialog extends Component<Props, State> {
             autoScrollBodyContent
           >
             <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
-              <Tab label={<Trans>My Profile</Trans>} value="profile">
-                {userProfile.authenticated ? (
-                  <Column noMargin>
-                    <ProfileDetails profile={userProfile.profile} />
-                    <SubscriptionDetails
-                      subscription={userProfile.subscription}
-                      onChangeSubscription={this.props.onChangeSubscription}
-                    />
-                  </Column>
-                ) : (
-                  <Column>
-                    <CreateProfile onLogin={userProfile.onLogin} />
-                  </Column>
-                )}
-              </Tab>
-              <Tab label={<Trans>Online services usage</Trans>} value="usage">
-                {userProfile.authenticated ? (
-                  <Column noMargin>
-                    <UsagesDetails usages={userProfile.usages} />
-                  </Column>
-                ) : (
-                  <EmptyMessage>
-                    <Trans>
-                      Register to see the usage that you've made of the online
-                      services
-                    </Trans>
-                  </EmptyMessage>
-                )}
-              </Tab>
+              <Tab label={<Trans>My Profile</Trans>} value="profile" />
+              <Tab label={<Trans>Online services usage</Trans>} value="usage" />
             </Tabs>
+            {this.state.currentTab === 'profile' &&
+              (userProfile.authenticated ? (
+                <Column noMargin>
+                  <ProfileDetails profile={userProfile.profile} />
+                  <SubscriptionDetails
+                    subscription={userProfile.subscription}
+                    onChangeSubscription={this.props.onChangeSubscription}
+                  />
+                </Column>
+              ) : (
+                <Column>
+                  <CreateProfile onLogin={userProfile.onLogin} />
+                </Column>
+              ))}
+            {this.state.currentTab === 'usage' &&
+              (userProfile.authenticated ? (
+                <Column noMargin>
+                  <UsagesDetails usages={userProfile.usages} />
+                </Column>
+              ) : (
+                <EmptyMessage>
+                  <Trans>
+                    Register to see the usage that you've made of the online
+                    services
+                  </Trans>
+                </EmptyMessage>
+              ))}
           </Dialog>
         )}
       </UserProfileContext.Consumer>

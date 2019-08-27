@@ -262,7 +262,7 @@ export default class ExtensionsSearch extends Component<Props, State> {
                               </span>
                             }
                             secondaryText={
-                              <p>{extensionShortHeader.shortDescription}</p>
+                              extensionShortHeader.shortDescription
                             }
                             secondaryTextLines={2}
                             onClick={() =>

@@ -6,28 +6,25 @@ import { AutoSizer, List } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import GroupRow from './GroupRow';
-import { ListItem } from '../UI/List';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { makeAddItem } from '../UI/ListCommonItem';
+import { AddListItem } from '../UI/ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import {
   filterGroupsList,
   enumerateGroups,
 } from '../ObjectsList/EnumerateObjects';
-import type {
-  GroupWithContextList,
-  GroupWithContext,
+import {
+  type GroupWithContextList,
+  type GroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
+import { listItemWithoutIconHeight } from '../UI/List';
 
-const listItemHeight = 48;
 const styles = {
   listContainer: {
     flex: 1,
   },
 };
-
-const AddGroupRow = makeAddItem(ListItem);
 
 const SortableGroupRow = SortableElement(props => {
   const { style, ...otherProps } = props;
@@ -39,7 +36,12 @@ const SortableGroupRow = SortableElement(props => {
 });
 
 const SortableAddGroupRow = SortableElement(props => {
-  return <AddGroupRow {...props} />;
+  const { style, ...otherProps } = props;
+  return (
+    <div style={style}>
+      <AddListItem {...otherProps} />
+    </div>
+  );
 });
 
 class GroupsList extends Component<*, *> {
@@ -57,7 +59,7 @@ class GroupsList extends Component<*, *> {
         ref={list => (this.list = list)}
         height={height}
         rowCount={fullList.length}
-        rowHeight={listItemHeight}
+        rowHeight={listItemWithoutIconHeight}
         rowRenderer={({ index, key, style }) => {
           const groupWithContext = fullList[index];
           if (groupWithContext.key === 'add-groups-row') {

@@ -54,6 +54,14 @@ const importsToReplace = [
     oldImport: 'material-ui/List',
     newImport: path.join(newIdeAppSrcPath, 'UI/List'),
   },
+  {
+    oldImport: 'material-ui/Subheader',
+    newImport: path.join(newIdeAppSrcPath, 'UI/Subheader'),
+  },
+  {
+    oldImport: 'material-ui/Toolbar',
+    newImport: path.join(newIdeAppSrcPath, 'UI/Toolbar'),
+  },
 ];
 
 /**

@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
@@ -8,8 +9,7 @@ import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/Enumera
 import { Line, Column, Spacer } from '../../UI/Grid';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import SelectField from '../../UI/SelectField';
-import MenuItem from '../../UI/MenuItem';
-import Divider from 'material-ui/Divider';
+import SelectOption from '../../UI/SelectOption';
 import {
   setupFunctionFromEvents,
   canCreateEventsFunction,
@@ -149,7 +149,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                       ? CREATE_NEW_EXTENSION_PLACEHOLDER
                       : extensionName
                   }
-                  onChange={(e, index, extensionName) => {
+                  onChange={(e, i, extensionName) => {
                     if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
                       this.setState({
                         createNewExtension: true,
@@ -165,16 +165,15 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                   fullWidth
                 >
                   {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
-                    <MenuItem
+                    <SelectOption
                       key={eventsFunctionsExtension.getName()}
                       value={eventsFunctionsExtension.getName()}
                       primaryText={eventsFunctionsExtension.getFullName()}
                     />
                   ))}
-                  <Divider />
-                  <MenuItem
+                  <SelectOption
                     value={CREATE_NEW_EXTENSION_PLACEHOLDER}
-                    primaryText={<Trans>&lt;Create a New Extension&gt;</Trans>}
+                    primaryText={t`<Create a New Extension>`}
                   />
                 </SelectField>
               </Column>

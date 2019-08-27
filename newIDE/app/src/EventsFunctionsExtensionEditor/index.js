@@ -24,7 +24,7 @@ import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import { isBehaviorLifecycleFunction } from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
-import Divider from 'material-ui/Divider';
+import Divider from '@material-ui/core/Divider';
 const gd = global.gd;
 
 type Props = {|
@@ -442,14 +442,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   <MosaicWindow
                     title={<Trans>Function Configuration</Trans>}
                     toolbarControls={[]}
-                    // /!\ Force re-rendering if selectedEventsFunction, globalObjectsContainer
-                    // or objectsContainer change,
-                    // otherwise we risk using deleted objects (because of the shouldComponentUpdate
-                    // optimization in MosaicWindow).
-                    selectedEventsFunction={selectedEventsFunction}
-                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
-                    globalObjectsContainer={this._globalObjectsContainer}
-                    objectsContainer={this._objectsContainer}
                   >
                     <Background>
                       {selectedEventsFunction &&

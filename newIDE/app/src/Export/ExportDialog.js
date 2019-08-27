@@ -4,10 +4,10 @@ import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
-import Subheader from 'material-ui/Subheader';
+import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
-import Visibility from 'material-ui/svg-icons/action/visibility';
-import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import BuildsDialog from './Builds/BuildsDialog';
 import { Line } from '../UI/Grid';
 import Authentification from '../Utils/GDevelopServices/Authentification';
@@ -72,9 +72,9 @@ export default class ExportDialog extends Component<Props, State> {
         key={exporter.key}
         disabled={exporter.disabled}
         style={exporter.disabled ? styles.disabledItem : undefined}
-        leftAvatar={exporter.renderIcon({ style: styles.icon })}
+        leftIcon={exporter.renderIcon({ style: styles.icon })}
         primaryText={exporter.name}
-        secondaryText={<p>{exporter.description}</p>}
+        secondaryText={exporter.description}
         secondaryTextLines={2}
         onClick={() => this.chooseExporter(exporter.key)}
       />

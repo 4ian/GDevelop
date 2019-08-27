@@ -4,11 +4,11 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../ResourcesLoader';
-import Subheader from 'material-ui/Subheader';
+import Subheader from '../UI/Subheader';
 import FlatButton from '../UI/FlatButton';
 import SelectField from '../UI/SelectField';
-import MenuItem from '../UI/MenuItem';
-import Edit from 'material-ui/svg-icons/image/edit';
+import SelectOption from '../UI/SelectOption';
+import Edit from '@material-ui/icons/Edit';
 import IconButton from '../UI/IconButton';
 import {
   type ResourceKind,
@@ -247,7 +247,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     const children = field
       .getChoices()
       .map(({ value, label }) => (
-        <MenuItem key={value} value={value} primaryText={label} />
+        <SelectOption key={value} value={value} primaryText={label} />
       ));
 
     if (field.valueType === 'number') {
@@ -365,7 +365,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
 
             return (
               <div key={field.name}>
-                <Subheader style={styles.subHeader}>{field.name}</Subheader>
+                <Subheader>{field.name}</Subheader>
                 <div style={styles.subPropertiesEditorContainer}>
                   <PropertiesEditor
                     schema={field.children}

@@ -1,9 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import SelectField from '../../../../UI/SelectField';
-import MenuItem from '../../../../UI/MenuItem';
+import SelectOption from '../../../../UI/SelectOption';
 
 import Toggle from '../../../../UI/Toggle';
 import { Line } from '../../../../UI/Grid';
@@ -78,10 +79,10 @@ export default class SpriteSelector extends React.Component<Props, void> {
             {mapFor(0, spriteObject.getAnimationsCount(), i => {
               const animation = spriteObject.getAnimation(i);
               return (
-                <MenuItem
+                <SelectOption
                   key={i}
                   value={i}
-                  primaryText={`Animation #${i} ${animation.getName()}`}
+                  primaryText={t`Animation #${i} ${animation.getName()}`}
                 />
               );
             })}
@@ -94,7 +95,11 @@ export default class SpriteSelector extends React.Component<Props, void> {
             >
               {mapFor(0, animation.getDirectionsCount(), i => {
                 return (
-                  <MenuItem value={i} key={i} primaryText={`Direction #${i}`} />
+                  <SelectOption
+                    value={i}
+                    key={i}
+                    primaryText={t`Direction #${i}`}
+                  />
                 );
               })}
             </SelectField>
@@ -107,7 +112,11 @@ export default class SpriteSelector extends React.Component<Props, void> {
             >
               {mapFor(0, direction.getSpritesCount(), i => {
                 return (
-                  <MenuItem value={i} key={i} primaryText={`Frame #${i}`} />
+                  <SelectOption
+                    value={i}
+                    key={i}
+                    primaryText={t`Frame #${i}`}
+                  />
                 );
               })}
             </SelectField>

@@ -9,12 +9,14 @@ type Props = {|
   groupWithContext: GroupWithContext,
   iconSize: number,
   onClick: () => void,
+  selectedValue: ?string,
 |};
 
 export const renderGroupObjectsListItem = ({
   groupWithContext,
   iconSize,
   onClick,
+  selectedValue,
 }: Props) => {
   const groupName: string = groupWithContext.group.getName();
   return (
@@ -23,7 +25,7 @@ export const renderGroupObjectsListItem = ({
         getObjectOrObjectGroupListItemKey(groupName) +
         (groupWithContext.global ? '-global' : '')
       }
-      value={getObjectOrObjectGroupListItemKey(groupName)}
+      selected={selectedValue === getObjectOrObjectGroupListItemKey(groupName)}
       primaryText={groupName}
       leftIcon={
         <ListIcon

@@ -13,6 +13,7 @@ import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
+import Text from '../../UI/Text';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -87,11 +88,13 @@ export default class LocalCocos2dExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          <Trans>
-            This will export your game using Cocos2d-JS game engine. The game
-            can be compiled for Android or iOS if you install Cocos2d-JS
-            developer tools.
-          </Trans>
+          <Text>
+            <Trans>
+              This will export your game using Cocos2d-JS game engine. The game
+              can be compiled for Android or iOS if you install Cocos2d-JS
+              developer tools.
+            </Trans>
+          </Text>
         </Line>
         <Line>
           <LocalFolderPicker
@@ -153,9 +156,11 @@ export default class LocalCocos2dExport extends Component {
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          You can now upload the game to a web hosting or use Cocos2d-JS command
-          line tools to export it to other platforms like iOS (XCode is
-          required) or Android (Android SDK is required).
+          <Text>
+            You can now upload the game to a web hosting or use Cocos2d-JS
+            command line tools to export it to other platforms like iOS (XCode
+            is required) or Android (Android SDK is required).
+          </Text>
         </Dialog>
       </Column>
     );

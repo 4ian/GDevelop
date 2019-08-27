@@ -26,6 +26,7 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        fullWidth
         value={value}
         onChange={onChange}
         openOnFocus={isInline}

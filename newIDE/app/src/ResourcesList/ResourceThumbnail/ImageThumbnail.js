@@ -30,7 +30,8 @@ const styles = {
   checkboxContainer: {
     textAlign: 'initial',
     position: 'absolute',
-    width: 24, // Used to position the checkbox near the right border with a proper margin
+    width: 34, // Used to position the checkbox near the right border with a proper margin
+    height: 64,
     bottom: 0,
     right: 0,
   },

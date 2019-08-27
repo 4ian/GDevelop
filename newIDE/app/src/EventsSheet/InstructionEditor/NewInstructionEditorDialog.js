@@ -39,15 +39,6 @@ import {
 const gd = global.gd;
 
 const styles = {
-  dialogContent: {
-    width: 'calc(100% - 16px)',
-    maxWidth: 'none',
-  },
-  dialogBody: {
-    padding: 0,
-    display: 'flex',
-    flexDirection: 'row',
-  },
   fullHeightSelector: {
     flex: 1,
     display: 'flex',
@@ -359,13 +350,8 @@ export default class NewInstructionEditorDialog extends React.Component<
           selectedType={instructionType}
           useSubheaders
           focusOnMount={!instructionType}
-          searchBarHintText={
-            isCondition ? (
-              <Trans>Search {chosenObjectName} conditions</Trans>
-            ) : (
-              <Trans>Search {chosenObjectName} actions</Trans>
-            )
-          }
+          searchPlaceholderObjectName={chosenObjectName}
+          searchPlaceholderIsCondition={isCondition}
         />
       ) : null;
 
@@ -416,8 +402,9 @@ export default class NewInstructionEditorDialog extends React.Component<
             ]}
             open={open}
             onRequestClose={onCancel}
-            contentStyle={styles.dialogContent}
-            bodyStyle={styles.dialogBody}
+            maxWidth={false}
+            noMargin
+            flexRowBody
           >
             <SelectColumns
               columnsRenderer={{

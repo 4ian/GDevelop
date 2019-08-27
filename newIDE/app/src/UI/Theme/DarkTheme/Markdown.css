@@ -1,6 +1,7 @@
 /* This is the styling applied to markdown (like the one used for Changelog). */
 
 .gd-markdown-dark-theme {
+  font-family: 'Roboto', '-apple-system', BlinkMacSystemFont, 'sans-serif';
   font-size: 16px;
   line-height: 1.3;
 }

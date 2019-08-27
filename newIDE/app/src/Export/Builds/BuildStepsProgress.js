@@ -2,9 +2,12 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
-import CircularProgress from 'material-ui/CircularProgress';
-import LinearProgress from 'material-ui/LinearProgress';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import { Line, Spacer } from '../../UI/Grid';
 import BuildProgress from './BuildProgress';
 import { type Build } from '../../Utils/GDevelopServices/Build';
@@ -13,6 +16,7 @@ import Text from '../../UI/Text';
 
 const styles = {
   stepper: { flex: 1 },
+  linearProgress: { flex: 1 },
 };
 
 export type BuildStep =
@@ -54,13 +58,15 @@ export default ({
         ? 1
         : exportStep === 'waiting-for-build' || exportStep === 'build'
         ? 2
-        : undefined
+        : -1
     }
     orientation="vertical"
     style={styles.stepper}
   >
     <Step>
-      <StepLabel>Game export</StepLabel>
+      <StepLabel>
+        <Trans>Game export</Trans>
+      </StepLabel>
       <StepContent>
         <Line alignItems="center">
           <CircularProgress size={20} />
@@ -72,7 +78,9 @@ export default ({
       </StepContent>
     </Step>
     <Step>
-      <StepLabel>Upload to build service</StepLabel>
+      <StepLabel>
+        <Trans>Upload to build service</Trans>
+      </StepLabel>
       <StepContent>
         {errored ? (
           <Text>
@@ -92,17 +100,18 @@ export default ({
         ) : (
           <Line alignItems="center" expand>
             <LinearProgress
-              style={{ flex: 1 }}
-              max={uploadMax}
-              value={uploadProgress}
-              mode="determinate"
+              style={styles.linearProgress}
+              value={uploadMax > 0 ? (uploadProgress / uploadMax) * 100 : 0}
+              variant="determinate"
             />
           </Line>
         )}
       </StepContent>
     </Step>
     <Step>
-      <StepLabel>Build and download</StepLabel>
+      <StepLabel>
+        <Trans>Build and download</Trans>
+      </StepLabel>
       <StepContent>
         {errored && (
           <Text>

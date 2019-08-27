@@ -1,44 +1,43 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
-import Snackbar from 'material-ui/Snackbar';
+import * as React from 'react';
+import Snackbar from '@material-ui/core/Snackbar';
+import Button from '@material-ui/core/Button';
+import PreferencesContext, {
+  type AlertMessageIdentifier,
+} from '../../MainFrame/Preferences/PreferencesContext';
 
-export default class InfoBar extends Component {
-  constructor() {
-    super();
-    this.state = {
-      dismissed: false,
-    };
-  }
+type Props = {|
+  identifier: AlertMessageIdentifier,
+  message: React.Node,
+  show: boolean,
+|};
 
-  handleGotIt = () => {
-    if (this.props.messageId) {
-      localStorage.setItem(
-        `gdevelop.hiddenMessages.${this.props.messageId}`,
-        true
-      );
-    }
-    this.setState({ dismissed: true });
-  };
-
-  componentWillReceiveProps(newProps) {
-    if (this.props.message !== newProps.message) {
-      this.setState({ dismissed: false });
-    }
-  }
-
+export default class InfoBar extends React.PureComponent<Props> {
   render() {
-    const hidden =
-      this.props.messageId &&
-      localStorage.getItem(`gdevelop.hiddenMessages.${this.props.messageId}`);
+    const { identifier } = this.props;
 
     return (
-      <Snackbar
-        open={this.props.show && !hidden && !this.state.dismissed}
-        message={this.props.message}
-        onRequestClose={() => this.setState({ dismissed: true })}
-        action={<Trans>Got it</Trans>}
-        onActionClick={this.handleGotIt}
-      />
+      <PreferencesContext.Consumer>
+        {({ values, showAlertMessage }) => (
+          <Snackbar
+            open={this.props.show && !values.hiddenAlertMessages[identifier]}
+            message={this.props.message}
+            action={
+              <Button
+                key="undo"
+                color="primary"
+                size="small"
+                onClick={() => {
+                  showAlertMessage(identifier, false);
+                }}
+              >
+                <Trans>Got it</Trans>
+              </Button>
+            }
+          />
+        )}
+      </PreferencesContext.Consumer>
     );
   }
 }

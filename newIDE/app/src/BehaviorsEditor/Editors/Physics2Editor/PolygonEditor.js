@@ -9,10 +9,10 @@ import {
   TableHeaderColumn,
 } from '../../../UI/Table';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import Warning from 'material-ui/svg-icons/alert/warning';
+import Warning from '@material-ui/icons/Warning';
 import IconButton from '../../../UI/IconButton';
-import AddCircle from 'material-ui/svg-icons/content/add-circle';
-import Delete from 'material-ui/svg-icons/action/delete';
+import AddCircle from '@material-ui/icons/AddCircle';
+import Delete from '@material-ui/icons/Delete';
 
 export type Vertex = {|
   x: number,
@@ -90,7 +90,7 @@ export default class PolygonEditor extends React.Component<Props> {
 
     return (
       <Table>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+        <TableHeader>
           <TableRow>
             <TableHeaderColumn />
             <TableHeaderColumn>X</TableHeaderColumn>
@@ -98,11 +98,7 @@ export default class PolygonEditor extends React.Component<Props> {
             <TableRowColumn />
           </TableRow>
         </TableHeader>
-        <TableBody
-          displayRowCheckbox={false}
-          deselectOnClickaway={true}
-          showRowHover={false}
-        >
+        <TableBody>
           {vertices.map((value, index) => {
             return (
               <TableRow key={`vertexRow${index}`}>
@@ -111,6 +107,8 @@ export default class PolygonEditor extends React.Component<Props> {
                 </TableRowColumn>
                 <TableRowColumn>
                   <SemiControlledTextField
+                    margin="none"
+                    fullWidth
                     value={value.x.toString(10)}
                     onChange={newValue =>
                       onChangeVertexX(parseFloat(newValue) || 0, index)
@@ -120,6 +118,8 @@ export default class PolygonEditor extends React.Component<Props> {
                 </TableRowColumn>
                 <TableRowColumn>
                   <SemiControlledTextField
+                    margin="none"
+                    fullWidth
                     value={value.y.toString(10)}
                     onChange={newValue =>
                       onChangeVertexY(parseFloat(newValue) || 0, index)

@@ -95,7 +95,7 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
               floatingLabelText={this.props.floatingLabelText}
               floatingLabelFixed
               type="text"
-              hintText={<Trans>Click to choose</Trans>}
+              hintText={t`Click to choose`}
               value={this.props.value}
               onChange={(event, value) => this.props.onChange(value)}
             />

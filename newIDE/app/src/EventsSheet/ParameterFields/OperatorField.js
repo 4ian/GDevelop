@@ -1,7 +1,7 @@
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
 import SelectField from '../../UI/SelectField';
-import MenuItem from '../../UI/MenuItem';
+import SelectOption from '../../UI/SelectOption';
 
 export default class OperatorField extends Component {
   focus() {
@@ -17,16 +17,18 @@ export default class OperatorField extends Component {
     return (
       <SelectField
         fullWidth
+        floatingLabelFixed
         floatingLabelText={description}
         value={this.props.value}
         onChange={(e, i, value) => this.props.onChange(value)}
         ref={field => (this._field = field)}
+        hintText={t`Choose an operator`}
       >
-        <MenuItem value="=" primaryText={<Trans>= (set to)</Trans>} />
-        <MenuItem value="+" primaryText={<Trans>+ (add)</Trans>} />
-        <MenuItem value="-" primaryText={<Trans>- (subtract)</Trans>} />
-        <MenuItem value="*" primaryText={<Trans>* (multiply by)</Trans>} />
-        <MenuItem value="/" primaryText={<Trans>/ (divide by)</Trans>} />
+        <SelectOption value="=" primaryText={t`= (set to)`} />
+        <SelectOption value="+" primaryText={t`+ (add)`} />
+        <SelectOption value="-" primaryText={t`- (subtract)`} />
+        <SelectOption value="*" primaryText={t`* (multiply by)`} />
+        <SelectOption value="/" primaryText={t`/ (divide by)`} />
       </SelectField>
     );
   }

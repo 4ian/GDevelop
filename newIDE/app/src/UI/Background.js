@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
+import Paper from '@material-ui/core/Paper';
 
 const styles = {
   container: {
@@ -23,12 +23,10 @@ type Props = {|
 /**
  * This is the component to be used to display the standard
  * background of editor/windows/dialogs.
- *
- * TODO: All usage of material-ui Paper in other components should be
- * removed in favor of using this component.
  */
 const Background = (props: Props) => (
   <Paper
+    square
     style={{
       ...styles.container,
       height: props.noFullHeight ? undefined : '100%',

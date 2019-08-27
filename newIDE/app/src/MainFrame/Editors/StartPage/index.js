@@ -4,12 +4,12 @@ import { I18n } from '@lingui/react';
 
 import React from 'react';
 import FlatButton from '../../../UI/FlatButton';
-import Paper from 'material-ui/Paper';
+import Paper from '@material-ui/core/Paper';
 import IconButton from '../../../UI/IconButton';
-import Language from 'material-ui/svg-icons/action/language';
+import Language from '@material-ui/icons/Language';
 import BaseEditor from '../BaseEditor';
 import Window from '../../../Utils/Window';
-import { Line } from '../../../UI/Grid';
+import { Line, Spacer } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -30,13 +30,9 @@ const styles = {
     maxWidth: 400,
   },
   logoPaper: {
-    margin: 10,
-    padding: 5,
+    marginBottom: 10,
     width: '100%',
     textAlign: 'center',
-  },
-  buttonsPaper: {
-    width: '100%',
   },
 };
 
@@ -78,7 +74,7 @@ class StartPage extends BaseEditor {
               <Line expand justifyContent="center">
                 <div style={styles.centerContainer}>
                   <Paper
-                    zDepth={1}
+                    elevation={2}
                     style={{
                       ...styles.logoPaper,
                     }}
@@ -92,35 +88,47 @@ class StartPage extends BaseEditor {
                     </Text>
                   </Paper>
                   {!project && canOpen && (
-                    <RaisedButton
-                      label={<Trans>Open a project</Trans>}
-                      fullWidth
-                      onClick={onOpen}
-                      primary
-                    />
+                    <React.Fragment>
+                      <RaisedButton
+                        label={<Trans>Open a project</Trans>}
+                        fullWidth
+                        onClick={onOpen}
+                        primary
+                      />
+                      <Spacer />
+                    </React.Fragment>
                   )}
                   {!project && (
-                    <RaisedButton
-                      label={<Trans>Create a new project</Trans>}
-                      fullWidth
-                      onClick={onCreate}
-                      primary
-                    />
+                    <React.Fragment>
+                      <RaisedButton
+                        label={<Trans>Create a new project</Trans>}
+                        fullWidth
+                        onClick={onCreate}
+                        primary
+                      />
+                      <Spacer />
+                    </React.Fragment>
                   )}
                   {!!project && (
-                    <RaisedButton
-                      label={<Trans>Open Project Manager</Trans>}
-                      fullWidth
-                      onClick={onOpenProjectManager}
-                      primary
-                    />
+                    <React.Fragment>
+                      <RaisedButton
+                        label={<Trans>Open Project Manager</Trans>}
+                        fullWidth
+                        onClick={onOpenProjectManager}
+                        primary
+                      />
+                      <Spacer />
+                    </React.Fragment>
                   )}
                   {!!project && (
-                    <FlatButton
-                      label={<Trans>Close project</Trans>}
-                      fullWidth
-                      onClick={onCloseProject}
-                    />
+                    <React.Fragment>
+                      <FlatButton
+                        label={<Trans>Close project</Trans>}
+                        fullWidth
+                        onClick={onCloseProject}
+                      />
+                      <Spacer />
+                    </React.Fragment>
                   )}
                   {
                     <FlatButton
@@ -159,7 +167,7 @@ class StartPage extends BaseEditor {
                     icon={<Language />}
                   />
                   <IconButton
-                    iconClassName="icon-facebook"
+                    className="icon-facebook"
                     onClick={() =>
                       Window.openExternalURL(
                         'https://www.facebook.com/GDevelopApp'
@@ -167,7 +175,7 @@ class StartPage extends BaseEditor {
                     }
                   />
                   <IconButton
-                    iconClassName="icon-twitter"
+                    className="icon-twitter"
                     onClick={() =>
                       Window.openExternalURL('https://twitter.com/GDevelopApp')
                     }

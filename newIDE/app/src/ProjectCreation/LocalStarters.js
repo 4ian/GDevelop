@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
-import Divider from 'material-ui/Divider';
+import Divider from '@material-ui/core/Divider';
 import RaisedButton from '../UI/RaisedButton';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import Text from '../UI/Text';
@@ -96,40 +96,36 @@ export default class LocalStarters extends Component<Props, State> {
               <Column expand noMargin>
                 <List>
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/platformer.png"
                       />
                     }
                     primaryText={<Trans>Platformer</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>
-                          A simple platform game, with coins to collect, moving
-                          platforms and enemies.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        A simple platform game, with coins to collect, moving
+                        platforms and enemies.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() => this.createFromExample(i18n, 'platformer')}
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/space-shooter.png"
                       />
                     }
                     primaryText={<Trans>8-bit Space Shooter</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>
-                          A beautiful, retro side-scrolling shooter where you
-                          must defeat incoming enemies with your mecha
-                          transforming spaceship. Huge boss included!
-                        </Trans>
-                      </p>
+                      <Trans>
+                        A beautiful, retro side-scrolling shooter where you must
+                        defeat incoming enemies with your mecha transforming
+                        spaceship. Huge boss included!
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() =>
@@ -137,20 +133,18 @@ export default class LocalStarters extends Component<Props, State> {
                     }
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/isometric-game.png"
                       />
                     }
                     primaryText={<Trans>Isometric game</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>
-                          An example of an isometric game where you can explore
-                          a map with your character.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        An example of an isometric game where you can explore a
+                        map with your character.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() =>
@@ -158,20 +152,18 @@ export default class LocalStarters extends Component<Props, State> {
                     }
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/downhill-bike-physics-demo.png"
                       />
                     }
                     primaryText="Downhill Bike Racing"
                     secondaryText={
-                      <p>
-                        <Trans>
-                          An example of a 2D physics based driving game, where
-                          player have to reach the end as fast as possible.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        An example of a 2D physics based driving game, where
+                        player have to reach the end as fast as possible.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() =>
@@ -179,21 +171,19 @@ export default class LocalStarters extends Component<Props, State> {
                     }
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/pairs.png"
                       />
                     }
                     primaryText="Pairs"
                     secondaryText={
-                      <p>
-                        <Trans>
-                          Find all matching pairs of cards in this relaxing
-                          game. Use tweens to create smooth, natural animations
-                          with a few events.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        Find all matching pairs of cards in this relaxing game.
+                        Use tweens to create smooth, natural animations with a
+                        few events.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() => this.createFromExample(i18n, 'pairs')}
@@ -201,9 +191,7 @@ export default class LocalStarters extends Component<Props, State> {
                   <ListItem
                     primaryText={<Trans>Empty game</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>Start a new game from scratch.</Trans>
-                      </p>
+                      <Trans>Start a new game from scratch.</Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() => this.createEmptyGame(i18n)}

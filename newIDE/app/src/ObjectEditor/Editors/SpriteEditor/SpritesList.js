@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
-import Add from 'material-ui/svg-icons/content/add';
+import Add from '@material-ui/icons/Add';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import ImageThumbnail, {
@@ -24,6 +24,7 @@ import {
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import FlatButton from '../../../UI/FlatButton';
+import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 const gd = global.gd;
 const path = require('path');
 
@@ -37,10 +38,6 @@ const styles = {
   thumbnailExtraStyle: {
     marginRight: 10,
   },
-  addSpriteButton: {
-    ...thumbnailContainerStyle,
-    background: '#FFF',
-  },
   spriteThumbnailImage: {
     maxWidth: SPRITE_SIZE,
     maxHeight: SPRITE_SIZE,
@@ -50,9 +47,22 @@ const styles = {
 
 const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   return (
-    <div style={styles.addSpriteButton}>
-      <FlatButton onClick={onAdd} label={<Trans>Add</Trans>} icon={<Add />} />
-    </div>
+    <ThemeConsumer>
+      {muiTheme => (
+        <div
+          style={{
+            ...thumbnailContainerStyle,
+            backgroundColor: muiTheme.list.itemsBackgroundColor,
+          }}
+        >
+          <FlatButton
+            onClick={onAdd}
+            label={<Trans>Add</Trans>}
+            icon={<Add />}
+          />
+        </div>
+      )}
+    </ThemeConsumer>
   );
 });
 

@@ -149,7 +149,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         open={this.props.open}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}
-        contentStyle={{ width: '350px' }}
+        maxWidth="sm"
       >
         <TextField
           floatingLabelText={<Trans>Window title</Trans>}

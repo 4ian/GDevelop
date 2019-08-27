@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import FlatButton from '../FlatButton';
-import HelpOutline from 'material-ui/svg-icons/action/help-outline';
+import HelpOutline from '@material-ui/icons/HelpOutline';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import { Trans } from '@lingui/macro';

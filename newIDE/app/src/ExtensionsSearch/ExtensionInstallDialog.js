@@ -13,6 +13,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ReactMarkdown from 'react-markdown';
+import Text from '../UI/Text';
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
@@ -102,7 +103,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             onRequestClose={onClose}
           >
             {!extensionHeader ? (
-              extensionShortHeader.shortDescription
+              <Text>{extensionShortHeader.shortDescription}</Text>
             ) : (
               <ReactMarkdown
                 escapeHtml

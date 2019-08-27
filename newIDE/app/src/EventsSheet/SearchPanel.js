@@ -1,13 +1,14 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
 import Background from '../UI/Background';
 import TextField from '../UI/TextField';
-import { Line, Column } from '../UI/Grid';
+import { Line, Column, Spacer } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
-import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
-import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Text from '../UI/Text';
@@ -106,7 +107,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
               ref={_searchTextField =>
                 (this.searchTextField = _searchTextField)
               }
-              hintText={<Trans>Text to search</Trans>}
+              hintText={t`Text to search`}
               onChange={(e, searchText) => this.setState({ searchText })}
               value={searchText}
               fullWidth
@@ -120,7 +121,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
           </Line>
           <Line alignItems="baseline">
             <TextField
-              hintText={<Trans>Text to replace</Trans>}
+              hintText={t`Text to replace`}
               onChange={(e, replaceText) => this.setState({ replaceText })}
               value={replaceText}
               fullWidth
@@ -145,6 +146,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
               <Text>
                 <Trans>Filter by</Trans>
               </Text>
+              <Spacer />
               <InlineCheckbox
                 label={<Trans>Conditions</Trans>}
                 checked={this.state.searchInConditions}

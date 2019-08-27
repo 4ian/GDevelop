@@ -8,18 +8,19 @@ import * as React from 'react';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
+  findInTree,
 } from './InstructionOrExpressionSelector/CreateTree';
 import {
   enumerateFreeInstructions,
   filterInstructionsList,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
-import { SelectableList } from '../../UI/List';
+import { List, ListItem } from '../../UI/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
 import { Tabs, Tab } from '../../UI/Tabs';
-import { Subheader } from 'material-ui';
+import Subheader from '../../UI/Subheader';
 import {
   enumerateObjectsAndGroups,
   filterObjectsList,
@@ -84,6 +85,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 > {
   state = { searchText: '', selectedObjectTags: [] };
   _searchBar = React.createRef<SearchBar>();
+  _scrollView = React.createRef<typeof ScrollView>();
+  _selectedItem = React.createRef<ListItem>();
 
   instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = enumerateFreeInstructions(
     this.props.isCondition
@@ -91,10 +94,18 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
     this.instructionsInfo
   );
+  initialInstructionTypePath = findInTree(
+    this.instructionsInfoTree,
+    this.props.chosenInstructionType
+  );
 
   componentDidMount() {
     if (this.props.focusOnMount && this._searchBar.current) {
       this._searchBar.current.focus();
+    }
+    if (this._selectedItem.current && this._scrollView.current) {
+      // $FlowFixMe - improper typing of ScrollView?
+      this._scrollView.current.scrollTo(this._selectedItem.current);
     }
   }
 
@@ -229,12 +240,15 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         )
                       }
                       value={('free-instructions': TabName)}
-                    >
-                      {/* Manually display tabs to support flex */}
-                    </Tab>
+                    />
                   </Tabs>
                 )}
-                <ScrollView>
+                <ScrollView
+                  ref={
+                    // $FlowFixMe - improper typing of ScrollView?
+                    this._scrollView
+                  }
+                >
                   {!isSearching && currentTab === 'objects' && (
                     <TagChips
                       tags={selectedObjectTags}
@@ -246,15 +260,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     />
                   )}
                   {hasResults && (
-                    <SelectableList
-                      value={
-                        chosenObjectName
-                          ? getObjectOrObjectGroupListItemKey(chosenObjectName)
-                          : chosenInstructionType
-                          ? getInstructionListItemKey(chosenInstructionType)
-                          : ''
-                      }
-                    >
+                    <List>
                       {(isSearching || currentTab === 'objects') &&
                         displayedObjectsList.map(objectWithContext =>
                           renderObjectListItem({
@@ -265,6 +271,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                               onChooseObject(
                                 objectWithContext.object.getName()
                               ),
+                            selectedValue: chosenObjectName
+                              ? getObjectOrObjectGroupListItemKey(
+                                  chosenObjectName
+                                )
+                              : undefined,
                           })
                         )}
                       {(isSearching || currentTab === 'objects') &&
@@ -280,6 +291,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             iconSize: iconSize,
                             onClick: () =>
                               onChooseObject(groupWithContext.group.getName()),
+                            selectedValue: chosenObjectName
+                              ? getObjectOrObjectGroupListItemKey(
+                                  chosenObjectName
+                                )
+                              : undefined,
                           })
                         )}
                       {isSearching && displayedInstructionsList.length > 0 && (
@@ -301,6 +317,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 instructionMetadata.type,
                                 instructionMetadata
                               ),
+                            selectedValue: chosenInstructionType
+                              ? getInstructionListItemKey(chosenInstructionType)
+                              : undefined,
                           })
                         )}
                       {!isSearching &&
@@ -309,8 +328,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           instructionTreeNode: this.instructionsInfoTree,
                           onChoose: onChooseInstruction,
                           iconSize,
+                          selectedValue: chosenInstructionType
+                            ? getInstructionListItemKey(chosenInstructionType)
+                            : undefined,
+                          initiallyOpenedPath: this.initialInstructionTypePath,
+                          selectedItemRef: this._selectedItem,
                         })}
-                    </SelectableList>
+                    </List>
                   )}
                   {!isSearching &&
                     currentTab === 'objects' &&

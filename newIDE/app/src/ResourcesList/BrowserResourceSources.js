@@ -3,12 +3,11 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import ListIcon from '../UI/ListIcon';
-import { SelectableList, ListItem } from '../UI/List';
+import { List, ListItem } from '../UI/List';
 import Text from '../UI/Text';
 const gd = global.gd;
 
 const styles = {
-  icon: { borderRadius: 0 },
   explanations: {
     textAlign: 'center',
     margin: 20,
@@ -113,7 +112,6 @@ class GenericResourcesChooser extends Component {
   state = {
     open: false,
     resolveWithResources: null,
-    chosenResourceUrl: null,
   };
 
   constructor(props) {
@@ -124,16 +122,16 @@ class GenericResourcesChooser extends Component {
     this.listItems = props.urls.map((url: string) => {
       return (
         <ListItem
-          value={url}
           key={url}
           primaryText={nameFromUrl(url)}
-          leftAvatar={
+          leftIcon={
             props.urlsAreImages ? (
-              <ListIcon iconSize={32} src={url} />
+              <ListIcon iconSize={40} src={url} />
             ) : (
               undefined
             )
           }
+          onClick={() => this._onChoose(url)}
         />
       );
     });
@@ -148,8 +146,8 @@ class GenericResourcesChooser extends Component {
     });
   };
 
-  _onChoose = () => {
-    const { resolveWithResources, chosenResourceUrl } = this.state;
+  _onChoose = (chosenResourceUrl: string) => {
+    const { resolveWithResources } = this.state;
     if (!resolveWithResources) return;
 
     const newResource = this.props.createNewResource();
@@ -174,12 +172,6 @@ class GenericResourcesChooser extends Component {
     });
   };
 
-  _handleChangeResource = (e, chosenResourceUrl) => {
-    this.setState({
-      chosenResourceUrl,
-    });
-  };
-
   render() {
     // Avoid rendering the dialog if it's not opened.
     if (!this.state.open) return null;
@@ -190,13 +182,6 @@ class GenericResourcesChooser extends Component {
         label={<Trans>Close</Trans>}
         primary={false}
         onClick={this._onClose}
-      />,
-      <FlatButton
-        key="choose"
-        label={<Trans>Choose</Trans>}
-        primary={false}
-        disabled={!this.state.chosenResourceUrl}
-        onClick={this._onChoose}
       />,
     ];
 
@@ -216,12 +201,7 @@ class GenericResourcesChooser extends Component {
             </Trans>
           </Text>
         </div>
-        <SelectableList
-          value={this.state.chosenResourceUrl}
-          onChange={this._handleChangeResource}
-        >
-          {this.listItems}
-        </SelectableList>
+        <List>{this.listItems}</List>
       </Dialog>
     );
   }

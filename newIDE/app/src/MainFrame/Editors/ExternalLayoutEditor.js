@@ -11,6 +11,8 @@ import {
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';
 import LayoutChooserDialog from './LayoutChooserDialog';
+import { Line } from '../../UI/Grid';
+import Text from '../../UI/Text';
 
 const styles = {
   container: {
@@ -137,13 +139,19 @@ export default class ExternalLayoutEditor extends BaseEditor {
         )}
         {!layout && (
           <PlaceholderMessage>
-            To edit the external layout, choose the scene in which it will be
-            included:
-            <RaisedButton
-              label={<Trans>Choose the scene</Trans>}
-              primary
-              onClick={this.openLayoutChooser}
-            />
+            <Text>
+              <Trans>
+                To edit the external layout, choose the scene in which it will
+                be included:
+              </Trans>
+            </Text>
+            <Line justifyContent="center">
+              <RaisedButton
+                label={<Trans>Choose the scene</Trans>}
+                primary
+                onClick={this.openLayoutChooser}
+              />
+            </Line>
           </PlaceholderMessage>
         )}
         <LayoutChooserDialog

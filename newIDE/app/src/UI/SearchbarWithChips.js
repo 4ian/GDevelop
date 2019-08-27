@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import Chip from 'material-ui/Chip';
+import Chip from '@material-ui/core/Chip';
 import { Column, Line } from '../UI/Grid';
 import randomColor from 'randomcolor';
 import SearchBar from '../UI/SearchBar';
@@ -65,22 +65,24 @@ export default class SearchbarWithChips extends Component<Props> {
               {chips &&
                 chips.map(({ text, value }) => (
                   <Chip
+                    size="small"
                     key={value}
-                    labelColor={
-                      !chosenChip || chosenChip === value ? 'black' : undefined
-                    }
-                    backgroundColor={
-                      !chosenChip || chosenChip === value
-                        ? getChipColor(value)
-                        : undefined
-                    }
-                    style={styles.chip}
+                    style={{
+                      ...styles.chip,
+                      backgroundColor:
+                        !chosenChip || chosenChip === value
+                          ? getChipColor(value)
+                          : undefined,
+                      color:
+                        !chosenChip || chosenChip === value
+                          ? 'black'
+                          : undefined,
+                    }}
                     onClick={() =>
                       onChooseChip(chosenChip === value ? '' : value)
                     }
-                  >
-                    {text}
-                  </Chip>
+                    label={text}
+                  />
                 ))}
             </div>
           </Column>

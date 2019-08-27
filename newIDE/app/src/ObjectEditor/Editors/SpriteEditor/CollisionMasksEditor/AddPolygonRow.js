@@ -1,6 +1,6 @@
 import React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
-import Add from 'material-ui/svg-icons/content/add';
+import Add from '@material-ui/icons/Add';
 import IconButton from '../../../../UI/IconButton';
 import styles from './styles';
 

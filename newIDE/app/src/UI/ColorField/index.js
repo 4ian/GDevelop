@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
 import TextField from '../TextField';
 import ColorPicker from './ColorPicker';
@@ -34,7 +34,7 @@ export default class ColorField extends Component {
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
           type="text"
-          hintText={<Trans>Click to choose</Trans>}
+          hintText={t`Click to choose`}
           onClick={this.onClick}
           onFocus={this.onClick}
           value=""

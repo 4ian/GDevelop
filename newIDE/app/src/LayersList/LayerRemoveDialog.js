@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import SelectField from '../UI/SelectField';
-import MenuItem from '../UI/MenuItem';
+import SelectOption from '../UI/SelectOption';
 import enumerateLayers from './EnumerateLayers';
 
 export default class VariablesEditorDialog extends Component {
@@ -52,7 +52,7 @@ export default class VariablesEditorDialog extends Component {
         return value !== this.props.layerRemoved;
       })
       .map(({ value, label }) => (
-        <MenuItem key={value} value={value} primaryText={label} />
+        <SelectOption key={value} value={value} primaryText={label} />
       ));
 
     return (

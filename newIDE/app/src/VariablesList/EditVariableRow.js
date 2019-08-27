@@ -1,11 +1,11 @@
 import React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
-import Add from 'material-ui/svg-icons/content/add';
+import Add from '@material-ui/icons/Add';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import ContentCopy from 'material-ui/svg-icons/content/content-copy';
-import ContentPaste from 'material-ui/svg-icons/content/content-paste';
-import Delete from 'material-ui/svg-icons/action/delete';
+import Copy from '../UI/CustomSvgIcons/Copy';
+import Paste from '../UI/CustomSvgIcons/Paste';
+import Delete from '@material-ui/icons/Delete';
 
 import styles from './styles';
 
@@ -20,10 +20,10 @@ const EditVariableRow = ({
   <TreeTableRow>
     <TreeTableCell style={styles.toolColumnHeader}>
       <IconButton onClick={onCopy} disabled={!hasSelection}>
-        <ContentCopy />
+        <Copy />
       </IconButton>
       <IconButton onClick={onPaste} disabled={!hasClipboard}>
-        <ContentPaste />
+        <Paste />
       </IconButton>
       <IconButton onClick={onDeleteSelection} disabled={!hasSelection}>
         <Delete />

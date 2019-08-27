@@ -1,5 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -7,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import SelectField from '../../UI/SelectField';
-import MenuItem from '../../UI/MenuItem';
+import SelectOption from '../../UI/SelectOption';
 import { mapVector } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -118,28 +117,28 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     this.forceUpdate();
                   }}
                 >
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.Action}
-                    primaryText={<Trans>Action</Trans>}
+                    primaryText={t`Action`}
                   />
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.Condition}
-                    primaryText={<Trans>Condition</Trans>}
+                    primaryText={t`Condition`}
                   />
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.Expression}
-                    primaryText={<Trans>Expression</Trans>}
+                    primaryText={t`Expression`}
                   />
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.StringExpression}
-                    primaryText={<Trans>String Expression</Trans>}
+                    primaryText={t`String Expression`}
                   />
                 </SelectField>
               </Column>
               <Column expand>
                 <SemiControlledTextField
                   commitOnBlur
-                  hintText={<Trans>Full name displayed in editor</Trans>}
+                  hintText={t`Full name displayed in editor`}
                   value={eventsFunction.getFullName()}
                   onChange={text => {
                     eventsFunction.setFullName(text);
@@ -153,7 +152,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             <Line noMargin>
               <SemiControlledTextField
                 commitOnBlur
-                hintText={<Trans>Description, displayed in editor</Trans>}
+                hintText={t`Description, displayed in editor`}
                 fullWidth
                 multiLine
                 value={eventsFunction.getDescription()}
@@ -169,12 +168,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               type === gd.EventsFunction.Condition ? (
                 <SemiControlledTextField
                   commitOnBlur
-                  hintText={
-                    <Trans>
-                      Sentence in Events Sheet (write _PARAMx_ for parameters,
-                      e.g: _PARAM1_)
-                    </Trans>
-                  }
+                  hintText={t`Sentence in Events Sheet (write _PARAMx_ for parameters, e.g: _PARAM1_)`}
                   fullWidth
                   value={eventsFunction.getSentence()}
                   onChange={text => {

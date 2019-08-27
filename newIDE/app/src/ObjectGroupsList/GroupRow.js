@@ -1,9 +1,8 @@
 import React from 'react';
 import { ListItem } from '../UI/List';
-import IconMenu from '../UI/Menu/IconMenu';
-import IconButton from '../UI/IconButton';
-import TextField from '../UI/TextField';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import TextField, {
+  noMarginTextFieldInListItemTopOffset,
+} from '../UI/TextField';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 type Props = {|
@@ -25,46 +24,11 @@ const styles = {
     textOverflow: 'ellipsis',
   },
   textField: {
-    top: -16,
+    top: noMarginTextFieldInListItemTopOffset,
   },
 };
 
-export default class ThemableGroupRow extends React.Component<Props, {||}> {
-  _renderGroupMenu(group) {
-    return (
-      <IconMenu
-        ref={iconMenu => (this._iconMenu = iconMenu)}
-        iconButtonElement={
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={() => [
-          {
-            label: 'Edit group',
-            click: () => this.props.onEdit(group),
-          },
-          {
-            label: 'Set as Global group',
-            enabled: !this.props.isGlobalGroup,
-            click: () => this.props.onSetAsGlobalGroup(),
-            visible: this.props.canSetAsGlobalGroup !== false,
-          },
-          {
-            label: 'Rename',
-            enabled: !!this.props.onEdit,
-            click: () => this.props.onEditName(),
-          },
-          {
-            label: 'Delete',
-            enabled: !!this.props.onEdit,
-            click: () => this.props.onDelete(),
-          },
-        ]}
-      />
-    );
-  }
-
+export default class GroupRow extends React.Component<Props, {||}> {
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
@@ -73,10 +37,6 @@ export default class ThemableGroupRow extends React.Component<Props, {||}> {
     }
   }
 
-  _onContextMenu = event => {
-    if (this._iconMenu) this._iconMenu.open(event);
-  };
-
   render() {
     const { group, style, isGlobalGroup } = this.props;
 
@@ -84,6 +44,7 @@ export default class ThemableGroupRow extends React.Component<Props, {||}> {
     const label = this.props.editingName ? (
       <TextField
         id="rename-object-field"
+        margin="none"
         ref={textField => (this.textField = textField)}
         defaultValue={groupName}
         onBlur={e => this.props.onRename(e.target.value)}
@@ -116,9 +77,30 @@ export default class ThemableGroupRow extends React.Component<Props, {||}> {
               borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
               ...style,
             }}
-            onContextMenu={this._onContextMenu}
             primaryText={label}
-            rightIconButton={this._renderGroupMenu(group)}
+            displayMenuButton
+            buildMenuTemplate={() => [
+              {
+                label: 'Edit group',
+                click: () => this.props.onEdit(group),
+              },
+              {
+                label: 'Set as Global group',
+                enabled: !this.props.isGlobalGroup,
+                click: () => this.props.onSetAsGlobalGroup(),
+                visible: this.props.canSetAsGlobalGroup !== false,
+              },
+              {
+                label: 'Rename',
+                enabled: !!this.props.onEdit,
+                click: () => this.props.onEditName(),
+              },
+              {
+                label: 'Delete',
+                enabled: !!this.props.onEdit,
+                click: () => this.props.onDelete(),
+              },
+            ]}
             onClick={() => {
               // It's essential to discard clicks when editing the name,
               // to avoid weird opening of an editor when clicking on the

@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import TextField from '../UI/TextField';
@@ -15,10 +16,6 @@ const styles = {
   dropdownMenuContainer: {
     maxHeight: 300,
     overflowY: 'scroll',
-  },
-  poweredByText: {
-    textAlign: 'right',
-    opacity: 0.8,
   },
 };
 
@@ -133,7 +130,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
         <TextField
           id={'help-finder-search-bar'}
           fullWidth
-          hintText={<Trans>Enter what you want to build.</Trans>}
+          hintText={t`Enter what you want to build.`}
           value={this.props.value}
           onChange={(e, text) => this.props.onChange(text)}
         />
@@ -170,7 +167,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
             </Column>
           </React.Fragment>
         )}
-        <Text style={styles.poweredByText}>
+        <Text align="right">
           This search is powered by{' '}
           <FlatButton
             onClick={() => Window.openExternalURL('http://algolia.com/')}

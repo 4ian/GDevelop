@@ -1,10 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
-import { SelectableList } from '../../../UI/List';
+import { List } from '../../../UI/List';
 import SearchBar from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
-import { type InstructionOrExpressionTreeNode } from './CreateTree';
+import { type InstructionOrExpressionTreeNode, findInTree } from './CreateTree';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { filterInstructionsList } from './EnumerateInstructions';
 import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
@@ -12,6 +13,7 @@ import { renderInstructionTree } from '../SelectorListItems/SelectorInstructions
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
+import { ListItem } from '../../../UI/List';
 import { getInstructionListItemKey } from '../SelectorListItems/Keys';
 
 const styles = {
@@ -30,7 +32,8 @@ type Props = {|
   onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
   iconSize: number,
   useSubheaders?: boolean,
-  searchBarHintText?: React.Node,
+  searchPlaceholderObjectName?: ?string,
+  searchPlaceholderIsCondition?: ?boolean,
   style?: Object,
 |};
 type State = {|
@@ -38,7 +41,7 @@ type State = {|
   searchResults: Array<EnumeratedInstructionOrExpressionMetadata>,
 |};
 
-export default class InstructionOrExpressionSelector extends React.Component<
+export default class InstructionOrExpressionSelector extends React.PureComponent<
   Props,
   State
 > {
@@ -47,10 +50,21 @@ export default class InstructionOrExpressionSelector extends React.Component<
     searchResults: [],
   };
   _searchBar: ?SearchBar;
+  _scrollView = React.createRef<typeof ScrollView>();
+  _selectedItem = React.createRef<ListItem>();
+
+  initialInstructionTypePath = findInTree(
+    this.props.instructionsInfoTree,
+    this.props.selectedType
+  );
 
   componentDidMount() {
     if (this.props.focusOnMount && this._searchBar) {
       this._searchBar.focus();
+    }
+    if (this._selectedItem.current && this._scrollView.current) {
+      // $FlowFixMe - improper typing of ScrollView?
+      this._scrollView.current.scrollTo(this._selectedItem.current);
     }
   }
 
@@ -64,7 +78,8 @@ export default class InstructionOrExpressionSelector extends React.Component<
       iconSize,
       instructionsInfoTree,
       onChoose,
-      searchBarHintText,
+      searchPlaceholderObjectName,
+      searchPlaceholderIsCondition,
       useSubheaders,
       style,
     } = this.props;
@@ -98,12 +113,23 @@ export default class InstructionOrExpressionSelector extends React.Component<
               }
               onRequestSearch={onSubmitSearch}
               style={styles.searchBar}
-              placeholder={searchBarHintText}
+              placeholder={
+                searchPlaceholderObjectName
+                  ? searchPlaceholderIsCondition
+                    ? t`Search ${searchPlaceholderObjectName} conditions`
+                    : t`Search ${searchPlaceholderObjectName} actions`
+                  : undefined
+              }
               ref={searchBar => (this._searchBar = searchBar)}
             />
-            <ScrollView>
+            <ScrollView
+              ref={
+                // $FlowFixMe - improper typing of ScrollView?
+                this._scrollView
+              }
+            >
               {hasResults && (
-                <SelectableList value={getInstructionListItemKey(selectedType)}>
+                <List>
                   {searchText
                     ? displayedInstructionsList.map(
                         enumeratedInstructionOrExpressionMetadata =>
@@ -115,6 +141,9 @@ export default class InstructionOrExpressionSelector extends React.Component<
                                 enumeratedInstructionOrExpressionMetadata.type,
                                 enumeratedInstructionOrExpressionMetadata
                               ),
+                            selectedValue: getInstructionListItemKey(
+                              selectedType
+                            ),
                           })
                       )
                     : renderInstructionTree({
@@ -122,8 +151,11 @@ export default class InstructionOrExpressionSelector extends React.Component<
                         iconSize,
                         onChoose,
                         useSubheaders,
+                        selectedValue: getInstructionListItemKey(selectedType),
+                        initiallyOpenedPath: this.initialInstructionTypePath,
+                        selectedItemRef: this._selectedItem,
                       })}
-                </SelectableList>
+                </List>
               )}
               {!hasResults && (
                 <Line>

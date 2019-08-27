@@ -2,8 +2,8 @@ import { Trans } from '@lingui/macro';
 import React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
-import Delete from 'material-ui/svg-icons/action/delete';
-import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
+import Delete from '@material-ui/icons/Delete';
+import Edit from '@material-ui/icons/Edit';
 import TextField from '../../../../UI/TextField';
 import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
@@ -33,6 +33,7 @@ const PointRow = ({
         </TableRowColumn>
         <TableRowColumn>
           <TextField
+            margin="none"
             defaultValue={pointName || 'Base layer'}
             id={pointName}
             fullWidth
@@ -44,6 +45,7 @@ const PointRow = ({
         <TableRowColumn style={styles.coordinateColumn}>
           {!isAutomatic ? (
             <TextField
+              margin="none"
               value={pointX}
               type="number"
               id="point-x"
@@ -60,6 +62,7 @@ const PointRow = ({
         <TableRowColumn style={styles.coordinateColumn}>
           {!isAutomatic ? (
             <TextField
+              margin="none"
               value={pointY}
               type="number"
               id="point-y"
@@ -81,7 +84,7 @@ const PointRow = ({
           )}
           {!!onEdit && (
             <IconButton onClick={onEdit}>
-              <ModeEdit />
+              <Edit />
             </IconButton>
           )}
         </TableRowColumn>

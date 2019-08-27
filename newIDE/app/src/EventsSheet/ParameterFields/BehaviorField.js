@@ -128,6 +128,7 @@ export default class BehaviorField extends React.Component<
     return (
       <SemiControlledAutoComplete
         floatingLabelText={this._description}
+        fullWidth
         errorText={
           !this._behaviorNames.length
             ? noBehaviorErrorText

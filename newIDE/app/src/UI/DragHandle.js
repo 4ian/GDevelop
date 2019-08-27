@@ -1,5 +1,5 @@
 import React from 'react';
-import DragHandleIcon from 'material-ui/svg-icons/editor/drag-handle';
+import DragHandleIcon from '@material-ui/icons/DragHandle';
 import { SortableHandle } from 'react-sortable-hoc';
 
 const styles = {
@@ -12,7 +12,7 @@ const styles = {
 
 const DragHandle = SortableHandle(() => (
   <span style={styles.handle}>
-    <DragHandleIcon color={styles.handleColor} />
+    <DragHandleIcon htmlColor={styles.handleColor} />
   </span>
 ));
 export default DragHandle;

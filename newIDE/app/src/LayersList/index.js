@@ -17,7 +17,7 @@ import LayerRow from './LayerRow';
 import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
-import Add from 'material-ui/svg-icons/content/add';
+import Add from '@material-ui/icons/Add';
 import RaisedButton from '../UI/RaisedButton';
 
 const SortableLayerRow = SortableElement(LayerRow);
@@ -87,11 +87,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     });
 
     return (
-      <TableBody
-        displayRowCheckbox={false}
-        deselectOnClickaway={true}
-        showRowHover={true}
-      >
+      <TableBody>
         {containerLayersList}
         <BackgroundColorRow
           layout={layersContainer}
@@ -122,15 +118,6 @@ type State = {|
 export default class LayersList extends Component<Props, State> {
   state = {
     effectsEditedLayer: null,
-  };
-
-  defaultProps = {
-    onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => cb(true),
-    onRenameLayer: (
-      oldName: string,
-      newName: string,
-      cb: (done: boolean) => void
-    ) => cb(true),
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -165,8 +152,8 @@ export default class LayersList extends Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Table selectable={false}>
-          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+        <Table>
+          <TableHeader>
             <TableRow>
               <TableHeaderColumn style={styles.handleColumn} />
               <TableHeaderColumn>Layer name</TableHeaderColumn>

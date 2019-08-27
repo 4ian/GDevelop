@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import CloudDownload from 'material-ui/svg-icons/file/cloud-download';
+import CloudDownload from '@material-ui/icons/CloudDownload';
 import ExtensionsSearch, { addSerializedExtensionToProject } from '.';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,

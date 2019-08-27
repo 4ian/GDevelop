@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
+import Paper from '@material-ui/core/Paper';
 import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector.js';
 import InstructionParametersEditor from './InstructionParametersEditor.js';
 import {
@@ -74,7 +74,7 @@ export default class InstructionEditor extends React.Component<Props, State> {
           focusOnMount={!instruction.getType()}
           scope={scope}
         />
-        <Paper style={styles.parametersEditor} rounded={false} zDepth={2}>
+        <Paper style={styles.parametersEditor} square elevation={2}>
           <InstructionParametersEditor
             project={project}
             scope={scope}

@@ -11,6 +11,7 @@ type Props = {|
   objectWithContext: ObjectWithContext,
   iconSize: number,
   onClick: () => void,
+  selectedValue: ?string,
 |};
 
 export const renderObjectListItem = ({
@@ -18,6 +19,7 @@ export const renderObjectListItem = ({
   objectWithContext,
   iconSize,
   onClick,
+  selectedValue,
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
@@ -26,7 +28,7 @@ export const renderObjectListItem = ({
         getObjectOrObjectGroupListItemKey(objectName) +
         (objectWithContext.global ? '-global' : '')
       }
-      value={getObjectOrObjectGroupListItemKey(objectName)}
+      selected={selectedValue === getObjectOrObjectGroupListItemKey(objectName)}
       primaryText={objectName}
       leftIcon={
         <ListIcon

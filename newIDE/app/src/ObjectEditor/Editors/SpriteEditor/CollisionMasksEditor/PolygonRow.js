@@ -1,7 +1,7 @@
 import React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
-import Delete from 'material-ui/svg-icons/action/delete';
+import Delete from '@material-ui/icons/Delete';
 import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 

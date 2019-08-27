@@ -2,11 +2,11 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
-import Info from 'material-ui/svg-icons/action/info';
-import Warning from 'material-ui/svg-icons/alert/warning';
+import Paper from '@material-ui/core/Paper';
+import Info from '@material-ui/icons/Info';
+import Warning from '@material-ui/icons/Warning';
 import { Line } from './Grid';
-import { FlatButton } from 'material-ui';
+import FlatButton from './FlatButton';
 import Text from './Text';
 
 const styles = {

@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import {
   Table,
@@ -13,9 +14,11 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 import styles from './styles';
 import LayerRow from './LayerRow';
-import AddLayerRow from './AddLayerRow';
 import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import BackgroundColorRow from './BackgroundColorRow';
+import { Column, Line } from '../UI/Grid';
+import Add from 'material-ui/svg-icons/content/add';
+import RaisedButton from 'material-ui/RaisedButton';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -94,18 +97,6 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           layout={layersContainer}
           onBackgroundColorChanged={() => this.forceUpdate()}
         />
-        <AddLayerRow
-          onAdd={() => {
-            const name = newNameGenerator('Layer', name =>
-              layersContainer.hasLayerNamed(name)
-            );
-            layersContainer.insertNewLayer(
-              name,
-              layersContainer.getLayersCount()
-            );
-            this.forceUpdate();
-          }}
-        />
       </TableBody>
     );
   }
@@ -155,6 +146,15 @@ export default class LayersList extends Component<Props, State> {
     });
   };
 
+  _addLayer = () => {
+    const { layersContainer } = this.props;
+    const name = newNameGenerator('Layer', name =>
+      layersContainer.hasLayerNamed(name)
+    );
+    layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+    this.forceUpdate();
+  };
+
   render() {
     const { effectsEditedLayer } = this.state;
 
@@ -194,6 +194,17 @@ export default class LayersList extends Component<Props, State> {
             useDragHandle
           />
         </Table>
+        <Column>
+          <Line justifyContent="flex-end" expand>
+            <RaisedButton
+              label={<Trans>Add a layer</Trans>}
+              primary
+              onClick={this._addLayer}
+              labelPosition="before"
+              icon={<Add />}
+            />
+          </Line>
+        </Column>
         {effectsEditedLayer && (
           <EffectsListDialog
             effectsContainer={effectsEditedLayer}

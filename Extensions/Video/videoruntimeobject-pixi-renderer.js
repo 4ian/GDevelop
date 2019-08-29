@@ -22,10 +22,11 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     this._pixiObject._texture.baseTexture.source.currentTime = 0;
   }
   
-  // Needed for avoid bug on video on Chronium environement.
-  // https://github.com/pixijs/pixi.js/issues/5996
+  // Needed to avoid video not playing/crashing in Chrome/Chromium browsers.
+  // See https://github.com/pixijs/pixi.js/issues/5996
   this._pixiObject._texture.baseTexture.source.preload = "auto";
   this._pixiObject._texture.baseTexture.source.autoload = true;
+  
   this._textureWasValid = false; // Will be set to true when video texture is loaded.
 
   runtimeScene

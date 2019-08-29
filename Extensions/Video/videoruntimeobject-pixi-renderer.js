@@ -21,6 +21,8 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   } else {
     this._pixiObject._texture.baseTexture.source.currentTime = 0;
   }
+  this._pixiObject._texture.baseTexture.source.preload = "auto";
+  this._pixiObject._texture.baseTexture.source.autoload = true;
   this._textureWasValid = false; // Will be set to true when video texture is loaded.
 
   runtimeScene
@@ -132,7 +134,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype._getHTMLVideoElementSource = funct
   }
 
   return source;
-}
+};
 
 /**
  * Start the video
@@ -247,10 +249,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isPlayed = function() {
   var source = this._getHTMLVideoElementSource();
   if (!source) return false;
 
-  return (
-    !source.paused &&
-    !source.ended
-  );
+  return !source.paused && !source.ended;
 };
 
 /**

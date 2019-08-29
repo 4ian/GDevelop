@@ -8933,13 +8933,6 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-material-ui-search-bar@0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/material-ui-search-bar/-/material-ui-search-bar-0.4.1.tgz#821a81d6942dc92ade9d00103f08a961b93b243f"
-  integrity sha512-plvMmfLCcRNaPG2Pr3XVwzMAeiG/0Cwlr4jeVw2qyac0aYSrDXQtuzRcS9U190UmMwJvlChIvZp6tBZwkTEvLw==
-  dependencies:
-    prop-types "^15.5.8"
-
 material-ui@0.20:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/material-ui/-/material-ui-0.20.2.tgz#5fc9b4b62b691d3b16c89d8e54597a0412b52c7d"
@@ -11094,7 +11087,7 @@ prompts@^0.1.9:
     kleur "^2.0.1"
     sisteransi "^0.1.1"
 
-prop-types@15.7.2, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.5.9, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@15.7.2, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.5.9, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==

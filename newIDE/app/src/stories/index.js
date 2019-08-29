@@ -137,6 +137,7 @@ import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/Instru
 import SearchBar from '../UI/SearchBar';
 import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
 import EffectsList from '../EffectsList';
+import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 
 // No i18n in this file
 
@@ -2050,6 +2051,22 @@ storiesOf('SubscriptionDialog', module)
     <UserProfileContext.Provider value={fakeNoSubscriptionUserProfile}>
       <SubscriptionDialog open onClose={action('on close')} />
     </UserProfileContext.Provider>
+  ));
+
+storiesOf('SubscriptionPendingDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default (no subscription)', () => (
+    <SubscriptionPendingDialog
+      userProfile={fakeNoSubscriptionUserProfile}
+      onClose={action('on close')}
+    />
+  ))
+  .add('authenticated user with subscription', () => (
+    <SubscriptionPendingDialog
+      userProfile={fakeIndieUserProfile}
+      onClose={action('on close')}
+    />
   ));
 
 storiesOf('LoginDialog', module)

@@ -34,7 +34,6 @@
     "axios": "^0.16.1",
     "blueimp-md5": "^2.10.0",
     "classnames": "2.2.5",
-    "create-react-context": "^0.1.6",
     "date-fns": "^1.29.0",
     "element-closest": "2.0.2",
     "firebase": "^6.1.0",

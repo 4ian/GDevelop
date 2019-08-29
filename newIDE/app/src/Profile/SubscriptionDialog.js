@@ -5,14 +5,14 @@ import React, { Component } from 'react';
 import { Card, CardActions, CardHeader } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
-import UserProfileContext, { UserProfile } from './UserProfileContext';
+import UserProfileContext, { type UserProfile } from './UserProfileContext';
 import { Column, Line } from '../UI/Grid';
 import {
   getSubscriptionPlans,
   type PlanDetails,
   changeUserSubscription,
+  getRedirectToCheckoutUrl,
 } from '../Utils/GDevelopServices/Usage';
-import { StripeCheckoutConfig } from '../Utils/GDevelopServices/ApiConfigs';
 import RaisedButton from 'material-ui/RaisedButton';
 import CheckCircle from 'material-ui/svg-icons/action/check-circle';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -23,6 +23,8 @@ import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
 } from '../Utils/Analytics/EventSender';
+import SubscriptionPendingDialog from './SubscriptionPendingDialog';
+import Window from '../Utils/Window';
 
 const styles = {
   descriptionText: {
@@ -50,10 +52,11 @@ type Props = {|
 
 type State = {|
   isLoading: boolean,
+  subscriptionPendingDialogOpen: boolean,
 |};
 
 export default class SubscriptionDialog extends Component<Props, State> {
-  state = { isLoading: false };
+  state = { isLoading: false, subscriptionPendingDialogOpen: false };
   stripeCheckoutHandler: null;
 
   componentDidMount() {
@@ -73,7 +76,7 @@ export default class SubscriptionDialog extends Component<Props, State> {
     if (!profile || !subscription) return;
     sendChoosePlanClicked(plan.planId);
 
-    if (subscription.stripeCustomerId) {
+    if (subscription.stripeSubscriptionId) {
       //eslint-disable-next-line
       const answer = confirm(
         'Are you sure you want to subscribe to this new plan?'
@@ -86,42 +89,24 @@ export default class SubscriptionDialog extends Component<Props, State> {
       changeUserSubscription(getAuthorizationHeader, profile.uid, {
         planId: plan.planId,
       }).then(
-        () => this.handleNewSubscriptionSuccess(userProfile, plan),
-        this.handleNewSubscriptionFailure
+        () => this.handleUpdatedSubscriptionSuccess(userProfile, plan),
+        this.handleUpdatedSubscriptionFailure
       );
     } else {
-      // No existing customer, we need to get the user card so that the API
-      // can create the customer.
-      const stripeCheckout = global.StripeCheckout;
-      if (stripeCheckout) {
-        this.stripeCheckoutHandler = stripeCheckout.configure({
-          key: StripeCheckoutConfig.key,
-          image: StripeCheckoutConfig.image,
-          locale: 'auto',
-          token: stripeToken => {
-            this.setState({ isLoading: true });
-            changeUserSubscription(getAuthorizationHeader, profile.uid, {
-              planId: plan.planId,
-              stripeToken,
-            }).then(
-              () => this.handleNewSubscriptionSuccess(userProfile, plan),
-              this.handleNewSubscriptionFailure
-            );
-          },
-        });
-
-        this.stripeCheckoutHandler.open({
-          name: plan.name,
-          description: 'Monthly subscription',
-          currency: 'eur',
-          email: profile.email,
-          amount: plan.monthlyPriceInEuros * 100,
-        });
-      }
+      this.setState({
+        subscriptionPendingDialogOpen: true,
+      });
+      Window.openExternalURL(
+        getRedirectToCheckoutUrl(
+          plan.planId || '',
+          profile.uid,
+          profile.email || ''
+        )
+      );
     }
   };
 
-  handleNewSubscriptionSuccess = (
+  handleUpdatedSubscriptionSuccess = (
     userProfile: UserProfile,
     plan: PlanDetails
   ) => {
@@ -138,7 +123,7 @@ export default class SubscriptionDialog extends Component<Props, State> {
     }
   };
 
-  handleNewSubscriptionFailure = (err: any) => {
+  handleUpdatedSubscriptionFailure = (err: any) => {
     this.setState({ isLoading: false });
     showErrorBox(
       'Your subscription could not be updated. Please try again later!',
@@ -157,6 +142,7 @@ export default class SubscriptionDialog extends Component<Props, State> {
 
   render() {
     const { open, onClose } = this.props;
+    const { subscriptionPendingDialogOpen } = this.state;
 
     return (
       <UserProfileContext.Consumer>
@@ -267,6 +253,19 @@ export default class SubscriptionDialog extends Component<Props, State> {
                   onClick={onClose}
                 />
               </PlaceholderMessage>
+            )}
+            {subscriptionPendingDialogOpen && (
+              <SubscriptionPendingDialog
+                userProfile={userProfile}
+                onClose={() => {
+                  this.setState(
+                    {
+                      subscriptionPendingDialogOpen: false,
+                    },
+                    () => userProfile.onRefreshUserProfile()
+                  );
+                }}
+              />
             )}
           </Dialog>
         )}

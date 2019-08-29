@@ -62,14 +62,6 @@ export const GDevelopBuildApi = {
     : 'https://api.gdevelop-app.com/build',
 };
 
-export const StripeCheckoutConfig = {
-  key: isDev
-    ? 'pk_test_4N7HfDWDds6ejCkxVM7fvvLr'
-    : 'pk_live_4N7H3nYlkZV4ylpKlzhmM8fN',
-  image:
-    'https://raw.githubusercontent.com/4ian/GDevelop/gh-pages/res/icon128linux.png',
-};
-
 export const GDevelopReleaseApi = {
   baseUrl: isDev
     ? 'https://c8cldf4iqh.execute-api.us-east-1.amazonaws.com/dev'

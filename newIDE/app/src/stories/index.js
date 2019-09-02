@@ -1552,38 +1552,42 @@ storiesOf('InstructionEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default (no scope)', () => (
-    <InstructionEditor
-      project={project}
-      scope={{ layout: testLayout }}
-      globalObjectsContainer={project}
-      objectsContainer={testLayout}
-      isCondition
-      instruction={testInstruction}
-      resourceExternalEditors={[]}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      openInstructionOrExpression={action('open instruction or expression')}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <InstructionEditor
+        project={project}
+        scope={{ layout: testLayout }}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        instruction={testInstruction}
+        resourceExternalEditors={[]}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+      />
+    </FixedHeightFlexContainer>
   ))
   .add('without layout (no scope)', () => (
-    <InstructionEditor
-      project={project}
-      scope={{ layout: null }}
-      globalObjectsContainer={project}
-      objectsContainer={testLayout}
-      isCondition
-      instruction={testInstruction}
-      resourceExternalEditors={[]}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      openInstructionOrExpression={action('open instruction or expression')}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <InstructionEditor
+        project={project}
+        scope={{ layout: null }}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        instruction={testInstruction}
+        resourceExternalEditors={[]}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('NewInstructionEditorDialog', module)

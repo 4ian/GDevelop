@@ -11,7 +11,7 @@ import { renderInstructionOrExpressionListItem } from '../SelectorListItems/Sele
 import { renderInstructionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView from '../../../UI/ScrollView';
-import { Column, Line } from '../../../UI/Grid';
+import { Line } from '../../../UI/Grid';
 import { getInstructionListItemKey } from '../SelectorListItems/Keys';
 
 const SelectableList = makeSelectable(List);

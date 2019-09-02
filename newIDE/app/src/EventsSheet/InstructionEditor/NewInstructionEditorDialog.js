@@ -343,6 +343,7 @@ export default class NewInstructionEditorDialog extends React.Component<
     const renderObjectInstructionSelector = () =>
       chosenObjectInstructionsInfoTree && chosenObjectInstructionsInfo ? (
         <InstructionOrExpressionSelector
+          key="object-instruction-selector"
           style={styles.fullHeightSelector}
           instructionsInfo={chosenObjectInstructionsInfo}
           instructionsInfoTree={chosenObjectInstructionsInfoTree}

@@ -33,6 +33,7 @@ type Props = {|
   iconSize: number,
   useSubheaders?: boolean,
   searchBarHintText?: React.Node,
+  style?: Object,
 |};
 type State = {|
   searchText: string,
@@ -67,6 +68,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
       onChoose,
       searchBarHintText,
       useSubheaders,
+      style,
     } = this.props;
     const { searchText } = this.state;
     const displayedInstructionsList = searchText
@@ -83,7 +85,12 @@ export default class InstructionOrExpressionSelector extends React.Component<
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <Column noMargin expand>
+          <div
+            style={{
+              backgroundColor: muiTheme.list.itemsBackgroundColor,
+              ...style,
+            }}
+          >
             <SearchBar
               value={searchText}
               onChange={searchText =>
@@ -96,9 +103,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
               placeholder={searchBarHintText}
               ref={searchBar => (this._searchBar = searchBar)}
             />
-            <ScrollView
-              style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
-            >
+            <ScrollView>
               {hasResults && (
                 <SelectableList value={getInstructionListItemKey(selectedType)}>
                   {searchText
@@ -133,7 +138,7 @@ export default class InstructionOrExpressionSelector extends React.Component<
                 </Line>
               )}
             </ScrollView>
-          </Column>
+          </div>
         )}
       </ThemeConsumer>
     );

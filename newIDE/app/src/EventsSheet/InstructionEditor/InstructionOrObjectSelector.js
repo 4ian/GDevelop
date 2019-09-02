@@ -80,7 +80,7 @@ type Props = {|
 const iconSize = 24;
 const minHeight = 400; // Avoid a super small list in empty scenes. 400 is enough to be displayed on an iPhone SE.
 
-export default class InstructionOrObjectSelector extends React.Component<
+export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,
   State
 > {

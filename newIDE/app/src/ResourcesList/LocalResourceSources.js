@@ -1,5 +1,5 @@
 // @flow
-import { t, plural } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { type ResourceSourceComponentProps } from './ResourceSource.flow';
 import { Component } from 'react';

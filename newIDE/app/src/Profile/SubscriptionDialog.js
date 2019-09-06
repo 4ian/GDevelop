@@ -57,7 +57,6 @@ type State = {|
 
 export default class SubscriptionDialog extends Component<Props, State> {
   state = { isLoading: false, subscriptionPendingDialogOpen: false };
-  stripeCheckoutHandler: null;
 
   componentDidMount() {
     if (this.props.open) {

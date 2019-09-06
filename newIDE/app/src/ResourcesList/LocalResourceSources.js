@@ -229,13 +229,7 @@ const selectLocalResourcePath = (
           // eslint-disable-next-line
           const answer = confirm(
             i18n._(
-              plural({
-                value: outsideProjectFolderPaths.length,
-                one:
-                  'This file is outside the project folder. Would you like to make a copy of it in your project folder first (recommended)?',
-                other:
-                  'These files are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?',
-              })
+              t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
             )
           );
 

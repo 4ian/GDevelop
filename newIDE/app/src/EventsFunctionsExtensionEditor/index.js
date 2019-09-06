@@ -400,10 +400,23 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         };
       },
       () => {
-        // If we're closing the properties of a behavior, notify parent
-        // that a behavior was edited (to trigger reload of extensions)
-        if (!editedEventsBasedBehavior && this.props.onBehaviorEdited)
-          this.props.onBehaviorEdited();
+        if (!editedEventsBasedBehavior) {
+          // If we're closing the properties of a behavior, notify parent
+          // that a behavior was edited (to trigger reload of extensions)
+          if (this.props.onBehaviorEdited) {
+            this.props.onBehaviorEdited();
+          }
+
+          // Reload the selected events function, if any, as the behavior was
+          // changed so objects containers need to be re-created. Notably, the
+          // type of the object that is handled by the behavior may have changed.
+          if (this.state.selectedEventsFunction) {
+            this._loadEventsFunctionFrom(
+              this.props.project,
+              this.state.selectedEventsFunction
+            );
+          }
+        }
       }
     );
   };

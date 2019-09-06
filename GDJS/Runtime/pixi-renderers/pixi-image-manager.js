@@ -14,7 +14,7 @@
 gdjs.PixiImageManager = function(resources)
 {
     this._resources = resources;
-    this._invalidTexture = PIXI.Texture.fromImage("bunny.png"); //TODO
+    // this._invalidTexture = PIXI.Texture.fromImage("bunny.png"); //TODO
     this._loadedTextures = new Hashtable();
 };
 

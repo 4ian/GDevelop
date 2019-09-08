@@ -237,7 +237,7 @@ gdjs.VideoRuntimeObject.prototype.getDuration = function() {
  * Check if the video has ended.
  */
 gdjs.VideoRuntimeObject.prototype.isEnded = function() {
-  return !this._renderer.isEnded();
+  return this._renderer.isEnded();
 };
 
 /**

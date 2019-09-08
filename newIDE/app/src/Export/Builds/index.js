@@ -1,8 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import UserProfileContext, {
-  type UserProfile,
-} from '../../Profile/UserProfileContext';
+import { type UserProfile } from '../../Profile/UserProfileContext';
 import BuildsList from './BuildsList';
 import {
   getBuilds,
@@ -12,9 +10,6 @@ import {
 import Window from '../../Utils/Window';
 import BuildsWatcher from './BuildsWatcher';
 
-type ContainerProps = {|
-  onBuildsUpdated: ?() => void,
-|};
 type Props = {|
   onBuildsUpdated: ?() => void,
   userProfile: UserProfile,
@@ -23,7 +18,7 @@ type State = {|
   builds: ?Array<Build>,
 |};
 
-export class Builds extends Component<Props, State> {
+export default class Builds extends Component<Props, State> {
   state = {
     builds: null,
   };
@@ -91,16 +86,3 @@ export class Builds extends Component<Props, State> {
     );
   }
 }
-
-const BuildsContainer = (props: ContainerProps) => (
-  <UserProfileContext.Consumer>
-    {(userProfile: UserProfile) => (
-      <Builds
-        userProfile={userProfile}
-        onBuildsUpdated={props.onBuildsUpdated}
-      />
-    )}
-  </UserProfileContext.Consumer>
-);
-
-export default BuildsContainer;

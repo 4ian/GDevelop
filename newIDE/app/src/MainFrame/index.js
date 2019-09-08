@@ -78,6 +78,7 @@ import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
+import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
 
 const gd = global.gd;
 
@@ -134,7 +135,7 @@ type Props = {
   ) => boolean,
   loading?: boolean,
   requestUpdate?: () => void,
-  exportDialog?: React.Element<*>,
+  renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   createDialog?: React.Element<*>,
   authentification: Authentification,
   extensionsLoader?: JsExtensionsLoader,
@@ -1439,7 +1440,7 @@ class MainFrame extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
     } = this.state;
     const {
-      exportDialog,
+      renderExportDialog,
       createDialog,
       introDialog,
       saveDialog,
@@ -1570,9 +1571,9 @@ class MainFrame extends React.Component<Props, State> {
           autoHideDuration={3000}
           onRequestClose={this._closeSnackMessage}
         />
-        {!!exportDialog &&
-          React.cloneElement(exportDialog, {
-            open: this.state.exportDialogOpen,
+        {!!renderExportDialog &&
+          this.state.exportDialogOpen &&
+          renderExportDialog({
             onClose: () => this.openExportDialog(false),
             onChangeSubscription: () => {
               this.openExportDialog(false);
@@ -1646,35 +1647,42 @@ class MainFrame extends React.Component<Props, State> {
             );
           }
         )}
-        <ProfileDialog
-          open={profileDialogOpen}
-          onClose={() => this.openProfile(false)}
-          onChangeSubscription={() => this.openSubscription(true)}
-        />
-        <SubscriptionDialog
-          onClose={() => {
-            this.openSubscription(false);
-          }}
-          open={subscriptionDialogOpen}
-        />
-        <PreferencesDialog
-          open={this.state.preferencesDialogOpen}
-          onClose={() => this.openPreferences(false)}
-        />
-        <LanguageDialog
-          open={this.state.languageDialogOpen}
-          onClose={languageChanged => {
-            this.openLanguage(false);
-            if (languageChanged) {
-              this._languageDidChange();
-            }
-          }}
-        />
-        <AboutDialog
-          open={aboutDialogOpen}
-          onClose={() => this.openAboutDialog(false)}
-          updateStatus={updateStatus}
-        />
+        {profileDialogOpen && (
+          <ProfileDialog
+            open
+            onClose={() => this.openProfile(false)}
+            onChangeSubscription={() => this.openSubscription(true)}
+          />
+        )}
+        {subscriptionDialogOpen && (
+          <SubscriptionDialog
+            onClose={() => {
+              this.openSubscription(false);
+            }}
+            open
+          />
+        )}
+        {this.state.preferencesDialogOpen && (
+          <PreferencesDialog open onClose={() => this.openPreferences(false)} />
+        )}
+        {this.state.languageDialogOpen && (
+          <LanguageDialog
+            open
+            onClose={languageChanged => {
+              this.openLanguage(false);
+              if (languageChanged) {
+                this._languageDidChange();
+              }
+            }}
+          />
+        )}
+        {aboutDialogOpen && (
+          <AboutDialog
+            open
+            onClose={() => this.openAboutDialog(false)}
+            updateStatus={updateStatus}
+          />
+        )}
         <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         <ChangelogDialogContainer />
       </div>

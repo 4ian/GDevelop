@@ -3,7 +3,7 @@ import {
   type EventsFunctionsExtensionWriter,
   type EventsFunctionsExtensionOpener,
 } from './Storage';
-import React from 'react';
+import createReactContext from 'create-react-context';
 
 export type EventsFunctionsExtensionsState = {|
   eventsFunctionsExtensionsError: ?Error,
@@ -27,7 +27,7 @@ const defaultState = {
   getEventsFunctionsExtensionOpener: () => null,
 };
 
-const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(
+const EventsFunctionsExtensionsContext = createReactContext<EventsFunctionsExtensionsState>(
   defaultState
 );
 

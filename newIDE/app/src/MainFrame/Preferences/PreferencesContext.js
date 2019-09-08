@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import createReactContext from 'create-react-context';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -66,6 +66,6 @@ export const initialPreferences = {
   setUseNewInstructionEditorDialog: (enabled: boolean) => {},
 };
 
-const PreferencesContext = React.createContext<Preferences>(initialPreferences);
+const PreferencesContext = createReactContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

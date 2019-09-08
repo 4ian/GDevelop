@@ -11,9 +11,7 @@ import {
   buildElectron,
   getUrl,
 } from '../../../Utils/GDevelopServices/Build';
-import UserProfileContext, {
-  type UserProfile,
-} from '../../../Profile/UserProfileContext';
+import { type UserProfile } from '../../../Profile/UserProfileContext';
 import { Column, Line } from '../../../UI/Grid';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
@@ -51,6 +49,7 @@ type State = {
 type Props = {
   project: gdProject,
   onChangeSubscription: Function,
+  userProfile: UserProfile,
 };
 
 class LocalOnlineElectronExport extends Component<Props, State> {
@@ -265,7 +264,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
       errored,
     } = this.state;
     const t = str => str; //TODO;
-    const { project } = this.props;
+    const { project, userProfile } = this.props;
     if (!project) return null;
 
     const getBuildLimit = (userProfile: UserProfile): ?Limit =>
@@ -282,75 +281,69 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     };
 
     return (
-      <UserProfileContext.Consumer>
-        {(userProfile: UserProfile) => (
-          <Column noMargin>
-            <Line>
-              {t(
-                'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and/or macOS.'
-              )}
-            </Line>
-            <Checkbox
-              label={<Trans>Windows (zip file)</Trans>}
-              checked={this.state.targets.indexOf('winZip') !== -1}
-              onCheck={(e, checked) => this._setTarget('winZip', checked)}
+      <Column noMargin>
+        <Line>
+          {t(
+            'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and/or macOS.'
+          )}
+        </Line>
+        <Checkbox
+          label={<Trans>Windows (zip file)</Trans>}
+          checked={this.state.targets.indexOf('winZip') !== -1}
+          onCheck={(e, checked) => this._setTarget('winZip', checked)}
+        />
+        <Checkbox
+          label={<Trans>Windows (auto-installer file)</Trans>}
+          checked={this.state.targets.indexOf('winExe') !== -1}
+          onCheck={(e, checked) => this._setTarget('winExe', checked)}
+        />
+        <Checkbox
+          label={<Trans>macOS (zip file)</Trans>}
+          checked={this.state.targets.indexOf('macZip') !== -1}
+          onCheck={(e, checked) => this._setTarget('macZip', checked)}
+        />
+        <Checkbox
+          label={<Trans>Linux (AppImage)</Trans>}
+          checked={this.state.targets.indexOf('linuxAppImage') !== -1}
+          onCheck={(e, checked) => this._setTarget('linuxAppImage', checked)}
+        />
+        {userProfile.authenticated && (
+          <Line justifyContent="center">
+            <RaisedButton
+              label={t('Export')}
+              primary
+              onClick={() => this.launchWholeExport(userProfile)}
+              disabled={!canLaunchBuild(userProfile)}
             />
-            <Checkbox
-              label={<Trans>Windows (auto-installer file)</Trans>}
-              checked={this.state.targets.indexOf('winExe') !== -1}
-              onCheck={(e, checked) => this._setTarget('winExe', checked)}
-            />
-            <Checkbox
-              label={<Trans>macOS (zip file)</Trans>}
-              checked={this.state.targets.indexOf('macZip') !== -1}
-              onCheck={(e, checked) => this._setTarget('macZip', checked)}
-            />
-            <Checkbox
-              label={<Trans>Linux (AppImage)</Trans>}
-              checked={this.state.targets.indexOf('linuxAppImage') !== -1}
-              onCheck={(e, checked) =>
-                this._setTarget('linuxAppImage', checked)
-              }
-            />
-            {userProfile.authenticated && (
-              <Line justifyContent="center">
-                <RaisedButton
-                  label={t('Export')}
-                  primary
-                  onClick={() => this.launchWholeExport(userProfile)}
-                  disabled={!canLaunchBuild(userProfile)}
-                />
-              </Line>
-            )}
-            {userProfile.authenticated && (
-              <LimitDisplayer
-                subscription={userProfile.subscription}
-                limit={getBuildLimit(userProfile)}
-                onChangeSubscription={this.props.onChangeSubscription}
-              />
-            )}
-            {!userProfile.authenticated && (
-              <CreateProfile
-                message={t(
-                  'Create an account to build your game for Windows, Linux and macOS in one-click:'
-                )}
-                onLogin={userProfile.onLogin}
-              />
-            )}
-            <Line expand>
-              <BuildStepsProgress
-                exportStep={exportStep}
-                build={build}
-                onDownload={this._download}
-                uploadMax={uploadMax}
-                uploadProgress={uploadProgress}
-                errored={errored}
-                showSeeAllMyBuildsExplanation
-              />
-            </Line>
-          </Column>
+          </Line>
         )}
-      </UserProfileContext.Consumer>
+        {userProfile.authenticated && (
+          <LimitDisplayer
+            subscription={userProfile.subscription}
+            limit={getBuildLimit(userProfile)}
+            onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {!userProfile.authenticated && (
+          <CreateProfile
+            message={t(
+              'Create an account to build your game for Windows, Linux and macOS in one-click:'
+            )}
+            onLogin={userProfile.onLogin}
+          />
+        )}
+        <Line expand>
+          <BuildStepsProgress
+            exportStep={exportStep}
+            build={build}
+            onDownload={this._download}
+            uploadMax={uploadMax}
+            uploadProgress={uploadProgress}
+            errored={errored}
+            showSeeAllMyBuildsExplanation
+          />
+        </Line>
+      </Column>
     );
   }
 }

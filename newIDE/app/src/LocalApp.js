@@ -79,7 +79,7 @@ export const create = (authentification: Authentification) => {
               i18n={i18n}
               eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               previewLauncher={<LocalPreviewLauncher />}
-              exportDialog={<ExportDialog exporters={getLocalExporters()} />}
+              renderExportDialog={(props) => <ExportDialog {...props} exporters={getLocalExporters()} />}
               createDialog={
                 <CreateProjectDialog
                   examplesComponent={LocalExamples}

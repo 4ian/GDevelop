@@ -9,9 +9,7 @@ import {
   buildCordovaAndroid,
   getUrl,
 } from '../../../Utils/GDevelopServices/Build';
-import UserProfileContext, {
-  type UserProfile,
-} from '../../../Profile/UserProfileContext';
+import { type UserProfile } from '../../../Profile/UserProfileContext';
 import { Column, Line } from '../../../UI/Grid';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
@@ -47,6 +45,7 @@ type State = {
 type Props = {
   project: gdProject,
   onChangeSubscription: Function,
+  userProfile: UserProfile,
 };
 
 class LocalOnlineCordovaExport extends Component<Props, State> {
@@ -247,7 +246,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       errored,
     } = this.state;
     const t = str => str; //TODO;
-    const { project } = this.props;
+    const { project, userProfile } = this.props;
     if (!project) return null;
 
     const getBuildLimit = (userProfile: UserProfile): ?Limit =>
@@ -262,52 +261,48 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     };
 
     return (
-      <UserProfileContext.Consumer>
-        {(userProfile: UserProfile) => (
-          <Column noMargin>
-            <Line>
-              {t(
-                'Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.'
-              )}
-            </Line>
-            {userProfile.authenticated && (
-              <Line justifyContent="center">
-                <RaisedButton
-                  label={t('Package for Android')}
-                  primary
-                  onClick={() => this.launchWholeExport(userProfile)}
-                  disabled={!canLaunchBuild(userProfile)}
-                />
-              </Line>
-            )}
-            {userProfile.authenticated && (
-              <LimitDisplayer
-                subscription={userProfile.subscription}
-                limit={getBuildLimit(userProfile)}
-                onChangeSubscription={this.props.onChangeSubscription}
-              />
-            )}
-            {!userProfile.authenticated && (
-              <CreateProfile
-                message={t(
-                  'Create an account to build your game for Android in one-click:'
-                )}
-                onLogin={userProfile.onLogin}
-              />
-            )}
-            <Line expand>
-              <BuildStepsProgress
-                exportStep={exportStep}
-                build={build}
-                onDownload={this._download}
-                uploadMax={uploadMax}
-                uploadProgress={uploadProgress}
-                errored={errored}
-              />
-            </Line>
-          </Column>
+      <Column noMargin>
+        <Line>
+          {t(
+            'Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.'
+          )}
+        </Line>
+        {userProfile.authenticated && (
+          <Line justifyContent="center">
+            <RaisedButton
+              label={t('Package for Android')}
+              primary
+              onClick={() => this.launchWholeExport(userProfile)}
+              disabled={!canLaunchBuild(userProfile)}
+            />
+          </Line>
         )}
-      </UserProfileContext.Consumer>
+        {userProfile.authenticated && (
+          <LimitDisplayer
+            subscription={userProfile.subscription}
+            limit={getBuildLimit(userProfile)}
+            onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {!userProfile.authenticated && (
+          <CreateProfile
+            message={t(
+              'Create an account to build your game for Android in one-click:'
+            )}
+            onLogin={userProfile.onLogin}
+          />
+        )}
+        <Line expand>
+          <BuildStepsProgress
+            exportStep={exportStep}
+            build={build}
+            onDownload={this._download}
+            uploadMax={uploadMax}
+            uploadProgress={uploadProgress}
+            errored={errored}
+          />
+        </Line>
+      </Column>
     );
   }
 }

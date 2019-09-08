@@ -378,18 +378,6 @@ module.exports = {
       .setFunctionName("isEnded");
 
     object
-      .addExpression(
-        "IsEnded",
-        _("Is ended"),
-        _("Check if the video is ended."),
-        "",
-        "JsPlatform/Extensions/videoicon16.png"
-      )
-      .addParameter("object", _("Object"), "VideoObject", false)
-      .getCodeExtraInformation()
-      .setFunctionName("isEnded");
-
-    object
       .addAction(
         "SetOpacity",
         _("Set opacity"),

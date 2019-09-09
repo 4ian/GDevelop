@@ -57,6 +57,8 @@ export const openPiskel = ({
         createOrUpdateResource(project, new gd.ImageResource(), resource.name);
       });
 
+      outputResources[0].metadata = metadata;
+      outputResources[0].newAnimationName = newAnimationName;
       // in case this is for a single frame object, save the metadata in the Image object
       if (externalEditorData.singleFrame) {
         if (metadata) {
@@ -64,12 +66,11 @@ export const openPiskel = ({
             .getResource(path.relative(projectPath, outputResources[0].path))
             .setMetadata(JSON.stringify(metadata));
         }
-        outputResources[0].metadata = metadata;
         onChangesSaved(outputResources);
       } else {
         // In case there are multiple frames, pass back the metadata to the editor and let it store it at an appropriate place.
         // (For example, for sprites, SpritesList.js will save it in the metadata of the gd.Direction).
-        outputResources[0].metadata = metadata;
+
         onChangesSaved(outputResources);
       }
     }

@@ -16,6 +16,7 @@ export type ExternalEditorOpenOptions = {|
       name: string,
       originalIndex?: ?number,
       metadata?: ?Object,
+      newAnimationName?: string,
     }>
   ) => void,
   extraOptions: {

@@ -4,8 +4,8 @@
 		"tags": "",
 		"body": "<<avatar sign>>Welcome to the dialogue tree demo project. 🤓\nPress Z to interact with the tree critters 🐜🐛🐞 Spacebar to jump. ",
 		"position": {
-			"x": -2121,
-			"y": 52
+			"x": -2098,
+			"y": 82
 		},
 		"colorID": 0
 	},
@@ -14,8 +14,8 @@
 		"tags": "",
 		"body": "<<avatar ant>>Please don't bug me now... <<wait 1000>>  I am quite busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
 		"position": {
-			"x": -1855,
-			"y": 54
+			"x": -1832,
+			"y": 84
 		},
 		"colorID": 0
 	},
@@ -24,18 +24,18 @@
 		"tags": "",
 		"body": "<<if $seenCrumb == true>>\nOh yeah? You saw it on a branch?\nDid you taste it?...\n<<else>>\nOh ha-ha! I can see that you are lying.\n<<endif>>",
 		"position": {
-			"x": -2063,
-			"y": 336
+			"x": -2040,
+			"y": 366
 		},
-		"colorID": 0
+		"colorID": 3
 	},
 	{
 		"title": "antcrumbno",
 		"tags": "",
 		"body": "Then scram!\nI don't have time for you...",
 		"position": {
-			"x": -1671,
-			"y": 328
+			"x": -1648,
+			"y": 358
 		},
 		"colorID": 0
 	},
@@ -44,8 +44,8 @@
 		"tags": "",
 		"body": "<<avatar crumb>> <<set $seenCrumb to true >> You stumbled on a giant crumb.\nWhat would you like to do with it?\n[[ taste it | eatCrumb]] [[ take it| takeCrumb]] [[ nothing |null ]] ",
 		"position": {
-			"x": -1868,
-			"y": 558
+			"x": -1845,
+			"y": 588
 		},
 		"colorID": 6
 	},
@@ -54,8 +54,8 @@
 		"tags": "",
 		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
 		"position": {
-			"x": -2082,
-			"y": 809
+			"x": -2059,
+			"y": 839
 		},
 		"colorID": 0
 	},
@@ -64,8 +64,8 @@
 		"tags": "",
 		"body": "The thing is way too heavy 😬 ....",
 		"position": {
-			"x": -1647,
-			"y": 796
+			"x": -1624,
+			"y": 826
 		},
 		"colorID": 0
 	},
@@ -74,8 +74,8 @@
 		"tags": "",
 		"body": "<<wait 100>> ",
 		"position": {
-			"x": -1567,
-			"y": 559
+			"x": -1544,
+			"y": 589
 		},
 		"colorID": 0
 	}

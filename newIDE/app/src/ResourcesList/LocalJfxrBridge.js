@@ -31,7 +31,6 @@ export const openJfxr = ({
 
   const externalEditorData = {
     resourcePath: initialResourcePath,
-    // $FlowFixMe - TODO: There is an error here to be solved.
     externalEditorData: extraOptions.initialResourceMetadata,
     projectPath,
   };
@@ -50,8 +49,7 @@ export const openJfxr = ({
         .getResourcesManager()
         .getResource(resourceName)
         .setMetadata(JSON.stringify(metadata));
-      // $FlowFixMe - TODO: There is an error here to be solved.
-      onChangesSaved([{ metadata }], resourceName);
+      onChangesSaved([{ metadata, resourceName }]);
     }
   );
 

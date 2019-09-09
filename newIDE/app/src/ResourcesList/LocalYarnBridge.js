@@ -41,8 +41,7 @@ export const openYarn = ({
     (event, newFilePath, externalEditorData) => {
       const resourceName = path.relative(projectPath, newFilePath);
       createOrUpdateResource(project, new gd.JsonResource(), resourceName);
-
-      onChangesSaved([], resourceName);
+      onChangesSaved([{ resourceName }]);
     }
   );
 

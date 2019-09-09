@@ -177,14 +177,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
           isLooping: false,
           externalEditorData: initialResourceMetadata,
         },
-        onChangesSaved: resources => {
-          if (!resources.length) return;
+        onChangesSaved: newResourceData => {
+          if (!newResourceData.length) return;
 
           // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
           resourcesLoader.burstUrlsCacheForResources(project, [
-            resources[0].name,
+            newResourceData[0].name,
           ]);
-          this.props.onChange(resources[0].name);
+          this.props.onChange(newResourceData[0].name);
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);

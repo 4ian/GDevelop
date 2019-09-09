@@ -12,9 +12,9 @@ export type ExternalEditorOpenOptions = {|
   resourceNames: Array<string>,
   onChangesSaved: (
     Array<{
-      path?: string,
+      path?: ?string,
       name: string,
-      originalIndex: ?number,
+      originalIndex?: ?number,
       metadata?: ?Object,
     }>
   ) => void,

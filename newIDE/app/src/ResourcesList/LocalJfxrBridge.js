@@ -31,7 +31,7 @@ export const openJfxr = ({
 
   const externalEditorData = {
     resourcePath: initialResourcePath,
-    externalEditorData: extraOptions.initialResourceMetadata,
+    externalEditorData: extraOptions.externalEditorData,
     projectPath,
   };
 

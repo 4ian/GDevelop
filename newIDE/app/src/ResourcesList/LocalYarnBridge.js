@@ -39,9 +39,9 @@ export const openYarn = ({
   ipcRenderer.on(
     'yarn-changes-saved',
     (event, newFilePath, externalEditorData) => {
-      const resourceName = path.relative(projectPath, newFilePath);
-      createOrUpdateResource(project, new gd.JsonResource(), resourceName);
-      onChangesSaved([{ resourceName }]);
+      const path = path.relative(projectPath, newFilePath);
+      createOrUpdateResource(project, new gd.JsonResource(), path);
+      onChangesSaved([{ path }]);
     }
   );
 

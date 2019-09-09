@@ -201,8 +201,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
           resourcesLoader.burstUrlsCacheForResources(project, [
             newResourceData[0].newResourceName,
           ]);
-          if (newResourceData.length && newResourceData[0].path !== undefined)
-            this.props.onChange(newResourceData[0].path);
+          this.props.onChange(newResourceData[0].name);
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);
@@ -215,8 +214,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
           initialResourceMetadata,
         },
         onChangesSaved: newResourceData => {
-          if (newResourceData.length && newResourceData[0].path !== undefined)
-            this.props.onChange(newResourceData[0].path);
+          this.props.onChange(newResourceData[0].name);
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);

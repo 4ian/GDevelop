@@ -39,17 +39,17 @@ export const openJfxr = ({
   ipcRenderer.on(
     'jfxr-changes-saved',
     (event, newFilePath, externalEditorData) => {
-      const path = path.relative(projectPath, newFilePath);
-      createOrUpdateResource(project, new gd.AudioResource(), path);
+      const name = path.relative(projectPath, newFilePath);
+      createOrUpdateResource(project, new gd.AudioResource(), name);
 
       const metadata = {
         jfxr: externalEditorData,
       };
       project
         .getResourcesManager()
-        .getResource(path)
+        .getResource(name)
         .setMetadata(JSON.stringify(metadata));
-      onChangesSaved([{ metadata, path }]);
+      onChangesSaved([{ metadata, name }]);
     }
   );
 

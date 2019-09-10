@@ -1,5 +1,6 @@
 import { createPathEditorHeader } from '../utils/path-editor.js';
 const electron = require('electron');
+const electronWindow = electron.remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const async = require('async');
@@ -363,16 +364,18 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
   // Load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
+  const initialResourcePath =
+    receivedOptions.resources[0] === undefined
+      ? ''
+      : receivedOptions.resources[0].resourcePath;
+
   const savePathEditor = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
     onSaveToGd: saveToGD,
     onCancelChanges: closeWindow,
     projectPath: receivedOptions.projectPath,
-    initialResourcePath:
-      receivedOptions.resources[0] === undefined
-        ? ''
-        : receivedOptions.resources[0].resourcePath,
+    initialResourcePath,
     name: receivedOptions.name,
     extension: piskelOptions.singleFrame ? '.png' : undefined,
   });
@@ -384,6 +387,15 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   pskl.UserSettings.set(
     pskl.UserSettings.SEAMLESS_MODE,
     piskelOptions.singleFrame
+  );
+
+  electronWindow.setTitle(
+    'GDevelop Pixel Editor --' +
+      path.normalize(
+        !piskelOptions.singleFrame
+          ? receivedOptions.projectPath + '/' + receivedOptions.name
+          : initialResourcePath
+      )
   );
 
   // If there were no resources sent by GD, create an empty piskel document

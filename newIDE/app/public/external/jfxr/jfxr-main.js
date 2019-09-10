@@ -1,6 +1,7 @@
 import { createPathEditorHeader } from '../utils/path-editor.js';
 
 const electron = require('electron');
+const electronWindow = electron.remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const remote = electron.remote;
@@ -71,6 +72,14 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     initialResourcePath: receivedOptions.resourcePath,
     extension: '.wav',
   });
+
+  electronWindow.setTitle(
+    'GDevelop Sound Effects Editor --' +
+      (receivedOptions.resourcePath
+        ? receivedOptions.resourcePath
+        : receivedOptions.projectPath)
+  );
+
   // Disable google analytics from collecting personal information
   editorFrameEl.contentWindow.ga('set', 'allowAdFeatures', false);
   // Alter the interface of the external editor

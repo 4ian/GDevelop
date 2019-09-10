@@ -1898,6 +1898,7 @@ storiesOf('ObjectGroupsList', module)
           globalObjectGroups={project.getObjectGroups()}
           objectGroups={testLayout.getObjectGroups()}
           onEditGroup={() => {}}
+          canRenameGroup={() => true}
         />
       </div>
     </SerializedObjectDisplay>

@@ -661,36 +661,34 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
 
     if (global) {
-      gd.WholeProjectRefactorer.globalObjectRemoved(
+      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
         project,
         object.getName(),
+        /* isObjectGroup=*/ false,
         !!answer
       );
     } else {
-      gd.WholeProjectRefactorer.objectRemovedInLayout(
+      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
         project,
         layout,
         object.getName(),
+        /* isObjectGroup=*/ false,
         !!answer
       );
     }
     done(true);
   };
 
-  _canObjectUseNewName = (
-    objectWithContext: ObjectWithContext,
-    newName: string
-  ) => {
+  _canObjectOrGroupUseNewName = (newName: string) => {
     const { project, layout } = this.props;
-    const { object } = objectWithContext;
 
-    if (object.getName() === newName) {
-      return true;
-    } else if (
+    if (
       layout.hasObjectNamed(newName) ||
-      project.hasObjectNamed(newName)
+      project.hasObjectNamed(newName) ||
+      layout.getObjectGroups().has(newName) ||
+      project.getObjectGroups().has(newName)
     ) {
-      showWarningBox('Another object with this name already exists.');
+      showWarningBox('Another object or group with this name already exists.');
       return false;
     } else if (!gd.Project.validateObjectName(newName)) {
       showWarningBox(
@@ -718,25 +716,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    if (!gd.Project.validateObjectName(newName)) {
-      done(false);
-      return;
-    }
+    // newName is supposed to have been already validated
 
     // Avoid triggering renaming refactoring if name has not really changed
     if (object.getName() !== newName) {
       if (global) {
-        gd.WholeProjectRefactorer.globalObjectRenamed(
+        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
           project,
           object.getName(),
-          newName
+          newName,
+          /* isObjectGroup=*/ false
         );
       } else {
-        gd.WholeProjectRefactorer.objectRenamedInLayout(
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
           project,
           layout,
           object.getName(),
-          newName
+          newName,
+          /* isObjectGroup=*/ false
         );
       }
     }
@@ -746,19 +743,71 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onDeleteGroup = (
-    groupWithScope: GroupWithContext,
+    groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
-    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
+    const { group, global } = groupWithContext;
+    const { project, layout } = this.props;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      'Do you want to remove all references to this group in events (actions and conditions using the group)?'
+    );
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
+        project,
+        group.getName(),
+        /* isObjectGroup=*/ true,
+        !!answer
+      );
+    } else {
+      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+        project,
+        layout,
+        group.getName(),
+        /* isObjectGroup=*/ true,
+        !!answer
+      );
+    }
     done(true);
   };
 
+  _canGroupUseNewName = (groupWithScope: GroupWithContext, newName: string) => {
+    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer but only on some events)
+    return true;
+  };
+
   _onRenameGroup = (
-    groupWithScope: GroupWithContext,
+    groupWithContext: GroupWithContext,
     newName: string,
     done: boolean => void
   ) => {
-    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
+    const { group, global } = groupWithContext;
+    const { project, layout } = this.props;
+
+    // newName is supposed to have been already validated
+
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (group.getName() !== newName) {
+      if (global) {
+        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+          project,
+          group.getName(),
+          newName,
+          /* isObjectGroup=*/ true
+        );
+      } else {
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+          project,
+          layout,
+          group.getName(),
+          newName,
+          /* isObjectGroup=*/ true
+        );
+      }
+    }
+
     done(true);
   };
 
@@ -987,12 +1036,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             selectedObjectNames={this.state.selectedObjectNames}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
-            canRenameObject={(
-              objectWithContext: ObjectWithContext,
-              newName: string
-            ) => {
-              return this._canObjectUseNewName(objectWithContext, newName);
-            }}
+            canRenameObject={this._canObjectOrGroupUseNewName}
             onObjectCreated={this._addNewObjectInstance}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
@@ -1019,6 +1063,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onEditGroup={this.editGroup}
             onDeleteGroup={this._onDeleteGroup}
             onRenameGroup={this._onRenameGroup}
+            canRenameGroup={this._canObjectOrGroupUseNewName}
           />
         </MosaicWindow>
       ),
@@ -1056,15 +1101,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               }
               this.editObject(null);
             }}
-            canRenameObject={tryName => {
-              return (
-                this.state.editedObjectWithContext &&
-                this._canObjectUseNewName(
-                  this.state.editedObjectWithContext,
-                  tryName
-                )
-              );
-            }}
+            canRenameObject={this._canObjectOrGroupUseNewName}
             onRename={newName => {
               this._onRenameEditedObject(newName);
             }}

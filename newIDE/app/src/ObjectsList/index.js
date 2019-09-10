@@ -366,7 +366,7 @@ export default class ObjectsListContainer extends React.Component<
       renamedObjectWithContext: null,
     });
 
-    if (this.props.canRenameObject(objectWithContext, newName)) {
+    if (this.props.canRenameObject(newName)) {
       this.props.onRenameObject(objectWithContext, newName, doRename => {
         if (!doRename) return;
 

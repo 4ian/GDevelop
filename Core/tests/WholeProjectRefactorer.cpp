@@ -11,6 +11,7 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -151,7 +152,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
 }  // namespace
 
 TEST_CASE("WholeProjectRefactorer", "[common]") {
-  SECTION("Object deleted") {
+  SECTION("Object deleted (in layout)") {
     SECTION("Groups") {
       gd::Project project;
       gd::Platform platform;
@@ -168,9 +169,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
-          project, layout1, "Object1");
-      gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout1, "Object1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
+          project, "GlobalObject1", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object1") == false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object2") == true);
       REQUIRE(layout1.GetObjectGroups()[0].Find("NotExistingObject") == true);
@@ -196,9 +198,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
-          project, layout1, "Object1");
-      gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout1, "Object1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
+          project, "GlobalObject1", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object1") ==
               false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object2") ==
@@ -237,9 +240,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
-          project, layout1, "Object1");
-      gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout1, "Object1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
+          project, "GlobalObject1", /* isObjectGroup =*/false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
                   "Object1") == false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
@@ -255,7 +259,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
-  SECTION("Object renamed") {
+  SECTION("Object renamed (in layout)") {
     SECTION("Groups") {
       gd::Project project;
       gd::Platform platform;
@@ -272,10 +276,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectRenamedInLayout(
-          project, layout1, "Object1", "Object3");
-      gd::WholeProjectRefactorer::GlobalObjectRenamed(
-          project, "GlobalObject1", "GlobalObject3");
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
+          project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object1") == false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object2") == true);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object3") == true);
@@ -302,10 +306,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRenamedInLayout(
-          project, layout1, "Object1", "Object3");
-      gd::WholeProjectRefactorer::GlobalObjectRenamed(
-          project, "GlobalObject1", "GlobalObject3");
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
+          project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object1") ==
               false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object3") ==
@@ -346,10 +350,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRenamedInLayout(
-          project, layout1, "Object1", "Object3");
-      gd::WholeProjectRefactorer::GlobalObjectRenamed(
-          project, "GlobalObject1", "GlobalObject3");
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
+          project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
                   "Object1") == false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
@@ -372,6 +376,89 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   "GlobalObject3") == true);
     }
   }
+
+  SECTION("Object renamed (in events function)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+
+    // Add a (free) function with an object group
+    gd::EventsFunction &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+    gd::ObjectGroup &objectGroup =
+        eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
+    objectGroup.AddObject("Object1");
+    objectGroup.AddObject("Object2");
+    // In theory, we would add the object parameters, but we're not testing
+    // events in this test.
+
+    // Create the objects container for the events function
+    gd::ObjectsContainer globalObjectsContainer;
+    gd::ObjectsContainer objectsContainer;
+    gd::ParameterMetadataTools::ParametersToObjectsContainer(
+        project, eventsFunction.GetParameters(), objectsContainer);
+    // (this is strictly not necessary because we're not testing events in this
+    // test)
+
+    // Trigger the refactoring after the renaming of an object
+    gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
+        project,
+        eventsFunction,
+        globalObjectsContainer,
+        objectsContainer,
+        "Object1",
+        "RenamedObject1",
+        /* isObjectGroup=*/false);
+
+    REQUIRE(objectGroup.Find("Object1") == false);
+    REQUIRE(objectGroup.Find("RenamedObject1") == true);
+    REQUIRE(objectGroup.Find("Object2") == true);
+
+    // Events are not tested
+  }
+
+  SECTION("Object deleted (in events function)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+
+    // Add a (free) function with an object group
+    gd::EventsFunction &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+    gd::ObjectGroup &objectGroup =
+        eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
+    objectGroup.AddObject("Object1");
+    objectGroup.AddObject("Object2");
+    // In theory, we would add the object parameters, but we're not testing
+    // events in this test.
+
+    // Create the objects container for the events function
+    gd::ObjectsContainer globalObjectsContainer;
+    gd::ObjectsContainer objectsContainer;
+    gd::ParameterMetadataTools::ParametersToObjectsContainer(
+        project, eventsFunction.GetParameters(), objectsContainer);
+    // (this is strictly not necessary because we're not testing events in this
+    // test)
+
+    // Trigger the refactoring after the renaming of an object
+    gd::WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
+        project,
+        eventsFunction,
+        globalObjectsContainer,
+        objectsContainer,
+        "Object1",
+        /* isObjectGroup=*/false);
+
+    REQUIRE(objectGroup.Find("Object1") == false);
+    REQUIRE(objectGroup.Find("Object2") == true);
+
+    // Events are not tested
+  }
+
   SECTION("Events extension renamed") {
     gd::Project project;
     gd::Platform platform;
@@ -604,12 +691,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
 
-    gd::WholeProjectRefactorer::RenameBehaviorProperty(
-        project,
-        eventsExtension,
-        eventsBasedBehavior,
-        "MyProperty",
-        "MyRenamedProperty");
+    gd::WholeProjectRefactorer::RenameBehaviorProperty(project,
+                                                       eventsExtension,
+                                                       eventsBasedBehavior,
+                                                       "MyProperty",
+                                                       "MyRenamedProperty");
 
     // Check if events based behaviors property has been renamed in
     // instructions

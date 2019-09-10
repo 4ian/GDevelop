@@ -15,6 +15,7 @@ type Props = {|
   onRename: string => void,
   editingName: boolean,
   isGlobalGroup: boolean,
+  canSetAsGlobalGroup?: boolean,
 |};
 
 const styles = {
@@ -47,6 +48,7 @@ export default class ThemableGroupRow extends React.Component<Props, {||}> {
             label: 'Set as Global group',
             enabled: !this.props.isGlobalGroup,
             click: () => this.props.onSetAsGlobalGroup(),
+            visible: this.props.canSetAsGlobalGroup !== false,
           },
           {
             label: 'Rename',

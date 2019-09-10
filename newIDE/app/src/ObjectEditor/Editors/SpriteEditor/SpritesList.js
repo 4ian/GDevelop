@@ -288,7 +288,7 @@ export default class SpritesList extends Component<Props, void> {
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);
         // Set optional animation name if the user hasn't done so
-        if (animationName.length === 0 && resources[0].newAnimationName) {
+        if (resources[0].newAnimationName) {
           onChangeName(resources[0].newAnimationName);
         }
         newDirection.delete();

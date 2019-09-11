@@ -25,6 +25,7 @@ const editorFrameEl = document.getElementById('yarn-frame');
 window.addEventListener('yarnReady', e => {
   yarn = e;
   yarn.app.fs = fs;
+  yarn.app.electron = electron;
   ipcRenderer.send('yarn-ready');
 });
 editorFrameEl.src = 'yarn-editor/index.html';
@@ -60,7 +61,9 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
       .toString();
 
     yarn.data.loadData(receivedOptions.externalEditorData, 'json', true);
-    electronWindow.setTitle('GDevelop Dialogue Tree Editor --' + receivedOptions.resourcePath);
+    electronWindow.setTitle(
+      'GDevelop Dialogue Tree Editor --' + receivedOptions.resourcePath
+    );
 
     pathEditorHeader.toggle();
   } else {

@@ -23,16 +23,17 @@ namespace gd {
 
 const EventsList* LinkEvent::GetLinkedEvents(const gd::Project& project) const {
   const EventsList* events = nullptr;
-  const gd::ExternalEvents* linkedExternalEvents = nullptr;
   if (project.HasExternalEventsNamed(GetTarget())) {
-    linkedExternalEvents = &project.GetExternalEvents(GetTarget());
-    events = &project.GetExternalEvents(GetTarget()).GetEvents();
-  } else if (project.HasLayoutNamed(GetTarget()))
-    events = &project.GetLayout(GetTarget()).GetEvents();
+    const gd::ExternalEvents& linkedExternalEvents = project.GetExternalEvents(GetTarget());
+    events = &linkedExternalEvents.GetEvents();
+  } else if (project.HasLayoutNamed(GetTarget())) {
+    const gd::Layout& linkedLayout = project.GetLayout(GetTarget());
+    events = &linkedLayout.GetEvents();
+  }
 
   // If the link only includes an events group, search it inside the
   // layout/external events
-  if (includeConfig == INCLUDE_EVENTS_GROUP) {
+  if (events != nullptr && includeConfig == INCLUDE_EVENTS_GROUP) {
     std::size_t i = 0;
     std::size_t eventsCount = events->GetEventsCount();
     for (; i < eventsCount; ++i) {

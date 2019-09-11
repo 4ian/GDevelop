@@ -96,6 +96,7 @@ class GroupsList extends Component<*, *> {
               }
               editingName={nameBeingEdited}
               isGlobalGroup={groupWithContext.global}
+              canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
               onSetAsGlobalGroup={
                 groupWithContext.global
                   ? undefined
@@ -122,6 +123,7 @@ type Props = {|
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
+  canRenameGroup: (newName: string) => boolean,
   onRenameGroup: (
     groupWithContext: GroupWithContext,
     newName: string,
@@ -130,6 +132,7 @@ type Props = {|
   onGroupAdded?: () => void,
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
+  canSetAsGlobalGroup?: boolean,
 |};
 
 export default class GroupsListContainer extends React.Component<Props, State> {
@@ -241,16 +244,18 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return;
     }
 
-    this.props.onRenameGroup(groupWithContext, newName, doRename => {
-      if (!doRename) return;
+    if (this.props.canRenameGroup(newName)) {
+      this.props.onRenameGroup(groupWithContext, newName, doRename => {
+        if (!doRename) return;
 
-      group.setName(newName);
+        group.setName(newName);
 
-      this.forceUpdate();
-      if (this.props.onGroupRenamed) {
-        this.props.onGroupRenamed();
-      }
-    });
+        this.forceUpdate();
+        if (this.props.onGroupRenamed) {
+          this.props.onGroupRenamed();
+        }
+      });
+    }
   };
 
   _onMove = (oldIndex: number, newIndex: number) => {
@@ -351,6 +356,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                 onEditName={this._onEditName}
                 onDelete={this._onDelete}
                 onRename={this._onRename}
+                canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
                 onSetAsGlobalGroup={this._setAsGlobalGroup}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._onMove(oldIndex, newIndex)

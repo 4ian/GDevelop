@@ -8,6 +8,9 @@ import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
 import { Column } from '../../UI/Grid';
+import { showWarningBox } from '../../UI/Messages/MessageBox';
+import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
+const gd = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -35,6 +38,89 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 > {
   state = {
     currentTab: 'config',
+  };
+
+  _canObjectOrGroupUseNewName = (newName: string) => {
+    const { objectsContainer, globalObjectsContainer } = this.props;
+
+    if (
+      objectsContainer.hasObjectNamed(newName) ||
+      globalObjectsContainer.hasObjectNamed(newName) ||
+      objectsContainer.getObjectGroups().has(newName) ||
+      globalObjectsContainer.getObjectGroups().has(newName)
+    ) {
+      showWarningBox(
+        'Another object or group with this name already exists in this function.'
+      );
+      return false;
+    } else if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your object name.'
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  _onDeleteGroup = (
+    groupWithContext: GroupWithContext,
+    done: boolean => void
+  ) => {
+    const { group } = groupWithContext;
+    const {
+      project,
+      eventsFunction,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      'Do you want to remove all references to this group in events (actions and conditions using the group)?'
+    );
+
+    gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsFunction(
+      project,
+      eventsFunction,
+      globalObjectsContainer,
+      objectsContainer,
+      group.getName(),
+      /* isObjectGroup=*/ true,
+      !!answer
+    );
+    done(true);
+  };
+
+  _onRenameGroup = (
+    groupWithContext: GroupWithContext,
+    newName: string,
+    done: boolean => void
+  ) => {
+    const { group } = groupWithContext;
+    const {
+      project,
+      eventsFunction,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
+
+    // newName is supposed to have been already validated
+
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (group.getName() !== newName) {
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsFunction(
+        project,
+        eventsFunction,
+        globalObjectsContainer,
+        objectsContainer,
+        group.getName(),
+        newName,
+        /* isObjectGroup=*/ true
+      );
+    }
+
+    done(true);
   };
 
   _chooseTab = (currentTab: TabNames) =>
@@ -106,7 +192,11 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             objectsContainer={objectsContainer}
             globalObjectGroups={globalObjectsContainer.getObjectGroups()}
             objectGroups={eventsFunction.getObjectGroups()}
+            canRenameGroup={this._canObjectOrGroupUseNewName}
+            onRenameGroup={this._onRenameGroup}
+            onDeleteGroup={this._onDeleteGroup}
             onGroupsUpdated={onParametersOrGroupsUpdated}
+            canSetAsGlobalGroup={false}
           />
         ) : null}
       </Column>

@@ -10,7 +10,18 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   globalObjectGroups: gdObjectGroupsContainer,
   objectGroups: gdObjectGroupsContainer,
+  canRenameGroup: (newName: string) => boolean,
+  onDeleteGroup: (
+    groupWithScope: GroupWithContext,
+    done: (boolean) => void
+  ) => void,
+  onRenameGroup: (
+    groupWithScope: GroupWithContext,
+    newName: string,
+    done: (boolean) => void
+  ) => void,
   onGroupsUpdated?: () => void,
+  canSetAsGlobalGroup?: boolean,
 |};
 
 type State = {|
@@ -26,23 +37,6 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
 > {
   state = {
     editedGroup: null,
-  };
-
-  _onDeleteGroup = (
-    groupWithScope: GroupWithContext,
-    done: boolean => void
-  ) => {
-    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
-    done(true);
-  };
-
-  _onRenameGroup = (
-    groupWithScope: GroupWithContext,
-    newName: string,
-    done: boolean => void
-  ) => {
-    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
-    done(true);
   };
 
   editGroup = (editedGroup: ?gdObjectGroup) => this.setState({ editedGroup });
@@ -62,11 +56,13 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
           globalObjectGroups={globalObjectGroups}
           objectGroups={objectGroups}
           onEditGroup={this.editGroup}
-          onDeleteGroup={this._onDeleteGroup}
-          onRenameGroup={this._onRenameGroup}
+          onDeleteGroup={this.props.onDeleteGroup}
+          onRenameGroup={this.props.onRenameGroup}
+          canRenameGroup={this.props.canRenameGroup}
           onGroupAdded={this.props.onGroupsUpdated}
           onGroupRemoved={this.props.onGroupsUpdated}
           onGroupRenamed={this.props.onGroupsUpdated}
+          canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
         />
         <ObjectGroupEditorDialog
           project={project}

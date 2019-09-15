@@ -71,7 +71,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources",
-    "import-resources": "cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-editor.js piskel 5.0.0-beta56 a2c36775109a1c1181d0b9ab9b7c903365c4ecb340118f1237b66236f23e20dd && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6",
+    "import-resources": "cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-editor.js piskel 5.0.0-beta56 a2c36775109a1c1181d0b9ab9b7c903365c4ecb340118f1237b66236f23e20dd && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.0-beta80 0da4cd1af463f2a2a01967fce50f51124aca8b2df69371f570f2ab57a8d410db",
     "start": "npm run import-resources && react-scripts start",
     "electron-win": "cd ../electron-app && node node_modules/electron/cli.js app",
     "electron-linux": "cd ../electron-app && ./node_modules/electron/dist/electron app",

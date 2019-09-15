@@ -26,6 +26,7 @@ import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import {
   enumerateObjectInstructions,
   enumerateInstructions,
+  getObjectParameterIndex,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import HelpButton from '../../UI/HelpButton';
 import Background from '../../UI/Background';
@@ -109,24 +110,30 @@ export default class NewInstructionEditorDialog extends React.Component<
       // select the object, which is the first parameter of the instruction.
       const allInstructions = enumerateInstructions(isCondition);
       const instructionType: string = instruction.getType();
-      const instructionMetadata = findInstruction(
+      const enumeratedInstructionMetadata = findInstruction(
         allInstructions,
         instructionType
       );
       if (
-        instructionMetadata &&
-        (instructionMetadata.scope.objectMetadata ||
-          instructionMetadata.scope.behaviorMetadata) &&
-        instruction.getParametersCount() > 0
+        enumeratedInstructionMetadata &&
+        (enumeratedInstructionMetadata.scope.objectMetadata ||
+          enumeratedInstructionMetadata.scope.behaviorMetadata)
       ) {
-        return {
-          ...this._getChosenObjectState(
-            instruction.getParameter(0),
-            false /* Even if the instruction is invalid for the object, show it as it's what we have already */
-          ),
-          step: isNewInstruction ? 'object-or-free-instructions' : 'parameters',
-          currentInstructionOrObjectSelectorTab: 'objects',
-        };
+        const objectParameterIndex = getObjectParameterIndex(
+          enumeratedInstructionMetadata.metadata
+        );
+        if (objectParameterIndex !== -1) {
+          return {
+            ...this._getChosenObjectState(
+              instruction.getParameter(objectParameterIndex),
+              false /* Even if the instruction is invalid for the object, show it as it's what we have already */
+            ),
+            step: isNewInstruction
+              ? 'object-or-free-instructions'
+              : 'parameters',
+            currentInstructionOrObjectSelectorTab: 'objects',
+          };
+        }
       }
     }
 

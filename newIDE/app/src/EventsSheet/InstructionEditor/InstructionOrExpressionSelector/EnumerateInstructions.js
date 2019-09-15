@@ -7,6 +7,149 @@ const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
 
+type ExtensionsExtraInstructions = {
+  BuiltinObject?: {
+    '': Array<string>,
+  },
+  Physics2?: {
+    'Physics2::Physics2Behavior': Array<string>,
+  },
+};
+
+const freeActionsToAddToObject: ExtensionsExtraInstructions = {
+  BuiltinObject: {
+    '': ['AjoutHasard', 'Create', 'AjoutObjConcern'],
+  },
+};
+
+const freeConditionsToAddToObject: ExtensionsExtraInstructions = {
+  BuiltinObject: {
+    '': [
+      'AjoutHasard',
+      'AjoutObjConcern',
+      'CollisionNP',
+      'NbObjet',
+      'PickNearest',
+      'Distance',
+      'SeDirige',
+      'EstTourne',
+    ],
+  },
+};
+
+const freeActionsToAddToBehavior: ExtensionsExtraInstructions = {};
+
+const freeConditionsToAddToBehavior: ExtensionsExtraInstructions = {
+  Physics2: {
+    'Physics2::Physics2Behavior': ['Physics2::Collision'],
+  },
+};
+
+const freeInstructionsToRemove = {
+  BuiltinObject: [
+    // $FlowFixMe
+    ...freeActionsToAddToObject.BuiltinObject[''],
+    // $FlowFixMe
+    ...freeConditionsToAddToObject.BuiltinObject[''],
+  ],
+  Physics2: [
+    // $FlowFixMe
+    ...freeConditionsToAddToBehavior.Physics2['Physics2::Physics2Behavior'],
+  ],
+};
+
+const filterInstructionsToRemove = (
+  list: Array<EnumeratedInstructionOrExpressionMetadata>,
+  typesToRemove: ?$ReadOnlyArray<string>
+) => {
+  const types = typesToRemove; // Make Flow happy
+  if (!types) return list;
+
+  return list.filter(metadata => types.indexOf(metadata.type) === -1);
+};
+
+const enumerateExtraBehaviorInstructions = (
+  isCondition: boolean,
+  extension: gdPlatformExtension,
+  behaviorType: string,
+  prefix: string,
+  scope: InstructionOrExpressionScope
+) => {
+  const extensionName = extension.getName();
+
+  const extensionsExtraInstructions = isCondition
+    ? freeConditionsToAddToBehavior[extensionName]
+    : freeActionsToAddToBehavior[extensionName];
+  if (!extensionsExtraInstructions) {
+    return [];
+  }
+
+  const objectExtraInstructions = extensionsExtraInstructions[behaviorType];
+  if (!objectExtraInstructions) {
+    return [];
+  }
+
+  const instructionMetadataMap = isCondition
+    ? extension.getAllConditions()
+    : extension.getAllActions();
+
+  return objectExtraInstructions.map(type =>
+    enumerateInstruction(prefix, type, instructionMetadataMap.get(type), scope)
+  );
+};
+
+const enumerateExtraObjectInstructions = (
+  isCondition: boolean,
+  extension: gdPlatformExtension,
+  objectType: string,
+  prefix: string,
+  scope: InstructionOrExpressionScope
+) => {
+  const extensionName = extension.getName();
+
+  const extensionsExtraInstructions = isCondition
+    ? freeConditionsToAddToObject[extensionName]
+    : freeActionsToAddToObject[extensionName];
+  if (!extensionsExtraInstructions) {
+    return [];
+  }
+
+  const objectExtraInstructions = extensionsExtraInstructions[objectType];
+  if (!objectExtraInstructions) {
+    return [];
+  }
+
+  const instructionMetadataMap = isCondition
+    ? extension.getAllConditions()
+    : extension.getAllActions();
+
+  return objectExtraInstructions.map(type =>
+    enumerateInstruction(prefix, type, instructionMetadataMap.get(type), scope)
+  );
+};
+
+const enumerateInstruction = (
+  prefix: string,
+  type: string,
+  instrMetadata: gdInstructionMetadata,
+  scope: InstructionOrExpressionScope
+): EnumeratedInstructionOrExpressionMetadata => {
+  const displayedName = instrMetadata.getFullName();
+  const groupName = instrMetadata.getGroup();
+  const iconFilename = instrMetadata.getIconFilename();
+  const fullGroupName = prefix + groupName;
+
+  return {
+    type,
+    metadata: instrMetadata,
+    iconFilename,
+    displayedName,
+    fullGroupName,
+    scope,
+    isPrivate: instrMetadata.isPrivate(),
+  };
+};
+
 const enumerateExtensionInstructions = (
   prefix: string,
   instructions: gdMapStringInstructionMetadata,
@@ -18,28 +161,21 @@ const enumerateExtensionInstructions = (
 
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
-    const instrMetadata = instructions.get(instructionsTypes.get(j));
+    const type = instructionsTypes.get(j);
+    const instrMetadata = instructions.get(type);
     if (instrMetadata.isHidden()) continue;
 
-    const displayedName = instrMetadata.getFullName();
-    const groupName = instrMetadata.getGroup();
-    const iconFilename = instrMetadata.getIconFilename();
-    const fullGroupName = prefix + groupName;
-
-    allInstructions.push({
-      type: instructionsTypes.get(j),
-      metadata: instrMetadata,
-      iconFilename,
-      displayedName,
-      fullGroupName,
-      scope,
-      isPrivate: instrMetadata.isPrivate(),
-    });
+    allInstructions.push(
+      enumerateInstruction(prefix, type, instrMetadata, scope)
+    );
   }
 
   return allInstructions;
 };
 
+/**
+ * List all the instructions available.
+ */
 export const enumerateInstructions = (
   isCondition: boolean
 ): Array<EnumeratedInstructionOrExpressionMetadata> => {
@@ -50,13 +186,14 @@ export const enumerateInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.get(i);
+    const extensionName = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
 
     let prefix = '';
     if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
       prefix =
-        extension.getName() === 'BuiltinObject'
+        extensionName === 'BuiltinObject'
           ? 'Common ' +
             (isCondition ? 'conditions' : 'actions') +
             ' for all objects'
@@ -65,15 +202,19 @@ export const enumerateInstructions = (
     }
 
     //Free instructions
+    const extensionFreeInstructions = enumerateExtensionInstructions(
+      prefix,
+      isCondition ? extension.getAllConditions() : extension.getAllActions(),
+      {
+        objectMetadata: undefined,
+        behaviorMetadata: undefined,
+      }
+    );
     allInstructions = [
       ...allInstructions,
-      ...enumerateExtensionInstructions(
-        prefix,
-        isCondition ? extension.getAllConditions() : extension.getAllActions(),
-        {
-          objectMetadata: undefined,
-          behaviorMetadata: undefined,
-        }
+      ...filterInstructionsToRemove(
+        extensionFreeInstructions,
+        freeInstructionsToRemove[extensionName]
       ),
     ];
 
@@ -81,6 +222,7 @@ export const enumerateInstructions = (
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
       const objectType = allObjectsTypes.get(j);
       const objectMetadata = extension.getObjectMetadata(objectType);
+      const scope = { objectMetadata };
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -88,7 +230,14 @@ export const enumerateInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
-          { objectMetadata }
+          scope
+        ),
+        ...enumerateExtraObjectInstructions(
+          isCondition,
+          extension,
+          objectType,
+          prefix,
+          scope
         ),
       ];
     }
@@ -97,6 +246,8 @@ export const enumerateInstructions = (
     for (let j = 0; j < allBehaviorsTypes.size(); ++j) {
       const behaviorType = allBehaviorsTypes.get(j);
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
+      const scope = { behaviorMetadata };
+
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -104,7 +255,14 @@ export const enumerateInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          { behaviorMetadata }
+          scope
+        ),
+        ...enumerateExtraBehaviorInstructions(
+          isCondition,
+          extension,
+          behaviorType,
+          prefix,
+          scope
         ),
       ];
     }
@@ -193,6 +351,8 @@ export const enumerateObjectInstructions = (
     //Objects instructions:
     if (objectType !== baseObjectType && hasObjectType) {
       const objectMetadata = extension.getObjectMetadata(objectType);
+      const scope = { objectMetadata };
+
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -200,13 +360,22 @@ export const enumerateObjectInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
-          { objectMetadata }
+          scope
+        ),
+        ...enumerateExtraObjectInstructions(
+          isCondition,
+          extension,
+          baseObjectType,
+          prefix,
+          scope
         ),
       ];
     }
 
     if (hasBaseObjectType) {
-      const objectMetadata = extension.getObjectMetadata('');
+      const objectMetadata = extension.getObjectMetadata(baseObjectType);
+      const scope = { objectMetadata };
+
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -214,7 +383,14 @@ export const enumerateObjectInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(baseObjectType)
             : extension.getAllActionsForObject(baseObjectType),
-          { objectMetadata }
+          scope
+        ),
+        ...enumerateExtraObjectInstructions(
+          isCondition,
+          extension,
+          baseObjectType,
+          prefix,
+          scope
         ),
       ];
     }
@@ -223,13 +399,22 @@ export const enumerateObjectInstructions = (
     // eslint-disable-next-line
     behaviorTypes.forEach(behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
+      const scope = { behaviorMetadata };
+
       allInstructions = [
         ...enumerateExtensionInstructions(
           prefix,
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          { behaviorMetadata }
+          scope
+        ),
+        ...enumerateExtraBehaviorInstructions(
+          isCondition,
+          extension,
+          behaviorType,
+          prefix,
+          scope
         ),
         ...allInstructions,
       ];
@@ -253,26 +438,30 @@ export const enumerateFreeInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.get(i);
+    const extensionName: string = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
 
     let prefix = '';
     if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix =
-        extension.getName() === 'BuiltinObject' ? '' : extension.getFullName();
+      prefix = extensionName === 'BuiltinObject' ? '' : extension.getFullName();
       prefix += GROUP_DELIMITER;
     }
 
     //Free instructions
+    const extensionFreeInstructions = enumerateExtensionInstructions(
+      prefix,
+      isCondition ? extension.getAllConditions() : extension.getAllActions(),
+      {
+        objectMetadata: undefined,
+        behaviorMetadata: undefined,
+      }
+    );
     allFreeInstructions = [
       ...allFreeInstructions,
-      ...enumerateExtensionInstructions(
-        prefix,
-        isCondition ? extension.getAllConditions() : extension.getAllActions(),
-        {
-          objectMetadata: undefined,
-          behaviorMetadata: undefined,
-        }
+      ...filterInstructionsToRemove(
+        extensionFreeInstructions,
+        freeInstructionsToRemove[extensionName]
       ),
     ];
   }
@@ -326,4 +515,43 @@ export const filterInstructionsList = (
   };
 
   return favorExactMatch(list.filter(matchCritera));
+};
+
+export const getObjectParameterIndex = (
+  instructionMetadata: gdInstructionMetadata
+) => {
+  const parametersCount = instructionMetadata.getParametersCount();
+  if (parametersCount >= 1) {
+    const firstParameterType = instructionMetadata.getParameter(0).getType();
+    if (firstParameterType === 'object') {
+      // By convention, all object conditions/actions have the object as first parameter
+      return 0;
+    }
+    if (gd.ParameterMetadata.isObject(firstParameterType)) {
+      // Some "free condition/actions" might be considered as "object" instructions, in which
+      // case they are taking an object list as fist parameter - which will be identified
+      // by gd.ParameterMetadata.isObject
+      return 0;
+    }
+
+    if (
+      firstParameterType === 'objectsContext' ||
+      firstParameterType === 'currentScene'
+    ) {
+      if (parametersCount >= 2) {
+        const secondParameterType = instructionMetadata
+          .getParameter(1)
+          .getType();
+        if (gd.ParameterMetadata.isObject(secondParameterType)) {
+          // Some special action/conditions like "Create", "AjoutHasard" (pick random object) or
+          // "AjoutObjConcern" (pick all objects) are "free condition/actions", but are manipulating
+          // objects list, so their first parameter is an "objectsContext" or "currentScene",
+          // followed by an object parameter.
+          return 1;
+        }
+      }
+    }
+  }
+
+  return -1;
 };

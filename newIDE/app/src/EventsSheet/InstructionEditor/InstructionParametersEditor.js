@@ -22,6 +22,7 @@ import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import IconButton from 'material-ui/IconButton';
 import { type EventsScope } from '../EventsScope.flow';
+import { getObjectParameterIndex } from './InstructionOrExpressionSelector/EnumerateInstructions';
 const gd = global.gd;
 
 const styles = {
@@ -83,30 +84,28 @@ const setupInstruction = (
   instruction.setParametersCount(instructionMetadata.getParametersCount());
 
   if (objectName) {
-    if (
-      instructionMetadata.getParametersCount() === 0 ||
-      instructionMetadata.getParameter(0).getType() !== 'object'
-    ) {
+    const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
+    if (objectParameterIndex === -1) {
       console.error(
         `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
       );
       return;
     }
 
-    instruction.setParameter(0, objectName);
+    instruction.setParameter(objectParameterIndex, objectName);
   }
 };
 
 const isParameterVisible = (
   parameterMetadata: gdParameterMetadata,
   parameterIndex: number,
-  objectName: ?string
+  objectParameterIndex: ?number
 ) => {
   // Hide parameters that are used only for code generation
   if (parameterMetadata.isCodeOnly()) return false;
 
-  // For objects, hide the first parameter, which is by convention the object name.
-  if (objectName && parameterIndex === 0) return false;
+  // For objects, hide the first object parameter, which is by convention the object name.
+  if (parameterIndex === objectParameterIndex) return false;
 
   return true;
 };
@@ -148,11 +147,15 @@ export default class InstructionParametersEditor extends React.Component<
   ) {
     if (!instructionMetadata) return 0;
 
+    const objectParameterIndex = objectName
+      ? getObjectParameterIndex(instructionMetadata)
+      : -1;
+
     return mapFor(0, instructionMetadata.getParametersCount(), i => {
       if (!instructionMetadata) return false;
       const parameterMetadata = instructionMetadata.getParameter(i);
 
-      return isParameterVisible(parameterMetadata, i, objectName);
+      return isParameterVisible(parameterMetadata, i, objectParameterIndex);
     }).filter(isVisible => isVisible).length;
   }
 
@@ -229,6 +232,9 @@ export default class InstructionParametersEditor extends React.Component<
 
     const helpPage = instructionMetadata.getHelpPath();
     const instructionExtraInformation = getExtraInstructionInformation(type);
+    const objectParameterIndex = objectName
+      ? getObjectParameterIndex(instructionMetadata)
+      : -1;
 
     setupInstruction(instruction, instructionMetadata, objectName);
 
@@ -261,7 +267,13 @@ export default class InstructionParametersEditor extends React.Component<
             <div key={type} style={styles.parametersContainer}>
               {mapFor(0, instructionMetadata.getParametersCount(), i => {
                 const parameterMetadata = instructionMetadata.getParameter(i);
-                if (!isParameterVisible(parameterMetadata, i, objectName))
+                if (
+                  !isParameterVisible(
+                    parameterMetadata,
+                    i,
+                    objectParameterIndex
+                  )
+                )
                   return null;
 
                 const parameterMetadataType = parameterMetadata.getType();

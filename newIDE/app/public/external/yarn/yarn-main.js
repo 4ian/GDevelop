@@ -32,7 +32,7 @@ editorFrameEl.src = 'yarn-editor/index.html';
 
 // Called to load yarn data. Should be called after the window is fully loaded.
 
-ipcRenderer.on('yarn-open', (event, receivedOptions) => {
+ipcRenderer.on('yarn-open', (event, receivedData) => {
   //Make a header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const pathEditorHeader = createPathEditorHeader({
@@ -40,8 +40,8 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
     editorContentDocument: document,
     onSaveToGd: saveAndClose,
     onCancelChanges: closeWindow,
-    projectPath: receivedOptions.projectPath,
-    initialResourcePath: receivedOptions.resourcePath,
+    projectPath: receivedData.projectPath,
+    initialResourcePath: receivedData.resourcePath,
     extension: '.json',
   });
   //inject custom save+close button
@@ -55,24 +55,23 @@ ipcRenderer.on('yarn-open', (event, receivedOptions) => {
   saveToGdButton.childNodes[0].firstChild.data = 'Save & close';
 
   // process the json file,if it exists
-  if (fileExists(receivedOptions.resourcePath)) {
-    receivedOptions.externalEditorData = fs
-      .readFileSync(receivedOptions.resourcePath, 'utf8')
+  if (fileExists(receivedData.resourcePath)) {
+    receivedData.externalEditorData = fs
+      .readFileSync(receivedData.resourcePath, 'utf8')
       .toString();
 
-    yarn.data.loadData(receivedOptions.externalEditorData, 'json', true);
+    yarn.data.loadData(receivedData.externalEditorData, 'json', true);
     electronWindow.setTitle(
-      'GDevelop Dialogue Tree Editor --' + receivedOptions.resourcePath
+      'GDevelop Dialogue Tree Editor - ' + receivedData.resourcePath
     );
 
     pathEditorHeader.toggle();
   } else {
     // If GD has sent no path, we need to set one for yarn
-    receivedOptions.resourcePath =
-      receivedOptions.projectPath + '/NewFile.json';
+    receivedData.resourcePath = receivedData.projectPath + '/NewFile.json';
   }
 
-  receivedData = receivedOptions;
-  yarn.data.editingPath(receivedOptions.resourcePath);
+  receivedData = receivedData;
+  yarn.data.editingPath(receivedData.resourcePath);
   yarn.data.editingType('json');
 });

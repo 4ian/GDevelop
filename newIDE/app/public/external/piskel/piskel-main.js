@@ -390,7 +390,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   );
 
   electronWindow.setTitle(
-    'GDevelop Pixel Editor --' +
+    'GDevelop Pixel Editor - ' +
       path.normalize(
         !piskelOptions.singleFrame
           ? receivedOptions.projectPath + '/' + receivedOptions.name

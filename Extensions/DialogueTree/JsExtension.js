@@ -92,7 +92,7 @@ module.exports = {
       .addAction(
         'StopRunningDialogue',
         _('Stop running dialogue'),
-        _('Stop running dialogue.Use this to interupt dialogue parsing'),
+        _('Stop the running dialogue. Use this to interrupt dialogue parsing.'),
         _('Stop running dialogue'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
@@ -106,7 +106,7 @@ module.exports = {
         'GoToNextLine',
         _('Go to the next dialogue line'),
         _(
-          'Go to the next dialogue line. Use this to advance to the next dialogue line  when the player presses a button.'
+          'Go to the next dialogue line. Use this to advance to the next dialogue line when the player presses a button.'
         ),
         _('Go to the next dialogue line'),
         _('Dialogue Tree (experimental)'),
@@ -198,7 +198,7 @@ module.exports = {
         'CompleteClippedTextScrolling',
         _('Complete clipped text scrolling'),
         _(
-          'Complete clipped text scrolling. Use this action whenever you want to trigger skipping scrolling'
+          'Complete the clipped text scrolling. Use this action whenever you want to skip scrolling.'
         ),
         _('Complete clipped text scrolling'),
         _('Dialogue Tree (experimental)'),
@@ -347,7 +347,7 @@ module.exports = {
         'ClippedLineText',
         _('Get dialogue line text clipped'),
         _(
-          'Get dialogue line text clipped by the typewriter effect. Use the ScrollClippedText action to control the typewriter effect.'
+          'Get dialogue line text clipped by the typewriter effect. Use the "Scroll clipped text" action to control the typewriter effect.'
         ),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
@@ -359,8 +359,8 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchTitle',
-        _('Get the title of the current branch of running dialogue'),
-        _('Get the title of the current branch of running dialogue'),
+        _('Get the title of the current branch of the running dialogue'),
+        _('Get the title of the current branch of the running dialogue'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -371,8 +371,8 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchTags',
-        _('Get the tags of the current branch of running dialogue'),
-        _('Get the tags of the current branch of running dialogue'),
+        _('Get the tags of the current branch of the running dialogue'),
+        _('Get the tags of the current branch of the running dialogue'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -383,8 +383,8 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchTag',
-        _('Get a tag of the current branch of running dialogue via number'),
-        _('Get a tag of the current branch of running dialogue via number'),
+        _('Get a tag of the current branch of the running dialogue via its index'),
+        _('Get a tag of the current branch of the running dialogue via its index'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -452,7 +452,7 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchText',
-        _('Get the raw text of the current branch'),
+        _('Get the full raw text of the current branch'),
         _('Get the full raw text of the current branch'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
@@ -493,7 +493,7 @@ module.exports = {
     extension
       .addCondition(
         'IsDialogueLineType',
-        _('The dialogue line type is'),
+        _('Dialogue line type'),
         _(
           'Check if the the current dialogue line line is one of the three existing types. Use this to set what logic is executed for each type.\nThe three types are as follows:\n- text: when displaying dialogue text.\n- options: when displaying [[branching/options]] for dialogue choices.\n-command: when <<commands>> are triggered by the dialogue data.'
         ),
@@ -545,7 +545,7 @@ module.exports = {
     extension
       .addCondition(
         'SelectedOptionHasChanged',
-        _('Selected option has changed'),
+        _('Has selected option changed'),
         _(
           'Check if a selected option has changed when the current dialogue line type is options. Use this to detect when the player has selected another option, so you can re-draw where the selection arrow is.'
         ),
@@ -560,7 +560,7 @@ module.exports = {
     extension
       .addCondition(
         'Current branch title is',
-        _('Current dialogue branch title is'),
+        _('Current dialogue branch title'),
         _(
           'Check if the current dialogue branch title is equal to a string. Use this to trigger game events when the player has visited a specific dialogue branch.'
         ),

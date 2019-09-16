@@ -61,7 +61,7 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
 
     yarn.data.loadData(receivedData.externalEditorData, 'json', true);
     electronWindow.setTitle(
-      'GDevelop Dialogue Tree Editor - ' + receivedData.resourcePath
+      'GDevelop Dialogue Tree Editor (Yarn) - ' + receivedData.resourcePath
     );
 
     pathEditorHeader.toggle();

@@ -74,7 +74,7 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   });
 
   electronWindow.setTitle(
-    'GDevelop Sound Effects Editor - ' +
+    'GDevelop Sound Effects Editor (Jfxr) - ' +
       (receivedOptions.resourcePath
         ? receivedOptions.resourcePath
         : receivedOptions.projectPath)

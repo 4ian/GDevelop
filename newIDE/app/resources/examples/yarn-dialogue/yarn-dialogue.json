@@ -5769,7 +5769,7 @@
                 {
                   "type": {
                     "inverted": true,
-                    "value": "DialogueTree::Dialogue is running"
+                    "value": "DialogueTree::IsDialogueRunning"
                   },
                   "parameters": [],
                   "subInstructions": []
@@ -6788,7 +6788,7 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "DialogueTree::Dialogue is running"
+                    "value": "DialogueTree::IsDialogueRunning"
                   },
                   "parameters": [],
                   "subInstructions": []
@@ -6848,7 +6848,7 @@
                 {
                   "type": {
                     "inverted": true,
-                    "value": "DialogueTree::Dialogue is running"
+                    "value": "DialogueTree::IsDialogueRunning"
                   },
                   "parameters": [],
                   "subInstructions": []
@@ -7333,7 +7333,7 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "DialogueTree::Is command called"
+                    "value": "DialogueTree::IsCommandCalled"
                   },
                   "parameters": [
                     "\"avatar\""

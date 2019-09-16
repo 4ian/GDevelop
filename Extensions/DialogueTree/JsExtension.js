@@ -476,7 +476,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'Is command called',
+        'IsCommandCalled',
         _('Command is called'),
         _(
           'Check if a specific Command is called. If it is a <<command withParameter>>, you can even get the parameter with the CommandParameter expression.'
@@ -513,7 +513,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'Dialogue is running',
+        'IsDialogueRunning',
         _('Dialogue is running'),
         _(
           'Check if the dialogue is running. Use this to for things like locking the player movement while speaking with a non player character.'
@@ -575,7 +575,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'Current branch contains Tag',
+        'CurrentBranchContainsTag',
         _('Current dialogue branch contains a tag'),
         _(
           'Check if the current dialogue branch contains a specific tag. Tags are an alternative useful way to <<commands>> to drive game logic with the dialogue data.'
@@ -591,7 +591,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'Branch has been visited before',
+        'WasBranchVisited',
         _('Branch title has been visited before'),
         _('Check if the current branch has been visited before'),
         _('Branch title _PARAM0_ has been visited before'),
@@ -605,7 +605,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'Compare dialogue state variable',
+        'CompareDialogueStateVariable',
         _('Compare dialogue state variable'),
         _(
           'Compare dialogue state variable. Use this to trigger game events via dialogue variables.'

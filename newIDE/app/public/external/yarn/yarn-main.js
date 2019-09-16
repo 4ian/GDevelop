@@ -7,12 +7,11 @@ const fs = require('fs');
 const remote = electron.remote;
 
 let yarn = null;
-let receivedData;
 
 const saveAndClose = pathEditor => {
   const savePath = pathEditor.state.fullPath;
   yarn.data.saveTo(savePath, yarn.data.getSaveData('json'), () => {
-    ipcRenderer.send('yarn-changes-saved', savePath, receivedData);
+    ipcRenderer.send('yarn-changes-saved', savePath, null);
     remote.getCurrentWindow().close();
   });
 };
@@ -71,7 +70,6 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
     receivedData.resourcePath = receivedData.projectPath + '/NewFile.json';
   }
 
-  receivedData = receivedData;
   yarn.data.editingPath(receivedData.resourcePath);
   yarn.data.editingType('json');
 });

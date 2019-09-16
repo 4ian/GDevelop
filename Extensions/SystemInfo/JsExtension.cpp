@@ -27,6 +27,10 @@ class SystemInfoJsExtension : public gd::PlatformExtension {
         .codeExtraInformation
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
+    GetAllConditions()["SystemInfo::IsWebGLSupported"]
+        .codeExtraInformation
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.isWebGLSupported");
 
     StripUnimplementedInstructionsAndExpressions();
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

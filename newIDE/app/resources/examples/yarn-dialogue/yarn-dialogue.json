@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/home/fox/DEV/dialogueExample/platformer.json",
+    "projectFile": "C:\\Users\\todori\\Desktop\\crap\\GDevelop\\newIDE\\app\\resources\\examples\\yarn-dialogue\\yarn-dialogue.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -7030,7 +7030,7 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "DialogueTree::ClippedTextScrollingHasCompleted"
+                        "value": "DialogueTree::HasClippedTextScrollingCompleted"
                       },
                       "parameters": [],
                       "subInstructions": []
@@ -7286,7 +7286,7 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "DialogueTree::SelectedOptionHasChanged"
+                        "value": "DialogueTree::HasSelectedOptionChanged"
                       },
                       "parameters": [],
                       "subInstructions": []

@@ -544,7 +544,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'SelectedOptionHasChanged',
+        'HasSelectedOptionChanged',
         _('Has selected option changed'),
         _(
           'Check if a selected option has changed when the current dialogue line type is options. Use this to detect when the player has selected another option, so you can re-draw where the selection arrow is.'
@@ -622,7 +622,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'ClippedTextScrollingHasCompleted',
+        'HasClippedTextScrollingCompleted',
         _('Clipped text has completed scrolling'),
         _(
           'Check if the clipped text scrolling has completed. Use this to prevent the player from going to the next dialogue line before the typing effect has revealed the entire text.'

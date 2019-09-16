@@ -559,7 +559,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'Current branch title is',
+        'CurrentBranchTitle',
         _('Current dialogue branch title'),
         _(
           'Check if the current dialogue branch title is equal to a string. Use this to trigger game events when the player has visited a specific dialogue branch.'

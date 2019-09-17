@@ -159,7 +159,11 @@ export function ClosableTab({
                   : muiTheme.closableTabs.selectedBackgroundColor,
               }}
             >
-              <ButtonBase onClick={onClick} onContextMenu={openContextMenu}>
+              <ButtonBase
+                onClick={onClick}
+                onContextMenu={openContextMenu}
+                focusRipple
+              >
                 <span
                   style={{
                     ...styles.tabLabel,
@@ -171,7 +175,11 @@ export function ClosableTab({
                 </span>
               </ButtonBase>
               {closable && (
-                <ButtonBase onClick={onClose} onContextMenu={openContextMenu}>
+                <ButtonBase
+                  onClick={onClose}
+                  onContextMenu={openContextMenu}
+                  focusRipple
+                >
                   <Close
                     style={{
                       ...styles.closeButton,

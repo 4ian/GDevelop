@@ -4,8 +4,9 @@ import { Column, Line } from '../UI/Grid';
 import { sendTutorialOpened } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
-import { List, ListItem } from 'material-ui/List';
-import { Subheader } from 'material-ui';
+import { List, ListItem } from '../UI/List';
+import Text from '../UI/Text';
+import Subheader from '../UI/Subheader';
 
 export default class Tutorials extends PureComponent {
   render() {
@@ -13,12 +14,12 @@ export default class Tutorials extends PureComponent {
       <Column noMargin>
         <Line>
           <Column>
-            <p>
+            <Text>
               <Trans>
                 Tutorials are available on GDevelop wiki. Choose a tutorial to
                 read:
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line>
@@ -27,9 +28,7 @@ export default class Tutorials extends PureComponent {
               <ListItem
                 primaryText={<Trans>Platformer Tutorial</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>Make a platform game from scratch.</Trans>
-                  </p>
+                  <Trans>Make a platform game from scratch.</Trans>
                 }
                 onClick={() => {
                   sendTutorialOpened('Platformer');
@@ -41,9 +40,7 @@ export default class Tutorials extends PureComponent {
               <ListItem
                 primaryText={<Trans>Tank Shooter Tutorial</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>Make a simple tank shooter game from scratch.</Trans>
-                  </p>
+                  <Trans>Make a simple tank shooter game from scratch.</Trans>
                 }
                 onClick={() => {
                   sendTutorialOpened('Tank Shooter');
@@ -58,12 +55,10 @@ export default class Tutorials extends PureComponent {
               <ListItem
                 primaryText={<Trans>Endless Runner Tutorial</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>
-                      Make a simple game where the player must jump on platforms
-                      for as long as possible.
-                    </Trans>
-                  </p>
+                  <Trans>
+                    Make a simple game where the player must jump on platforms
+                    for as long as possible.
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {
@@ -76,12 +71,10 @@ export default class Tutorials extends PureComponent {
               <ListItem
                 primaryText={<Trans>Endless Car Game Tutorial</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>
-                      Create a simple game where you must dodge the cars on the
-                      road.
-                    </Trans>
-                  </p>
+                  <Trans>
+                    Create a simple game where you must dodge the cars on the
+                    road.
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {
@@ -92,12 +85,10 @@ export default class Tutorials extends PureComponent {
               <ListItem
                 primaryText={<Trans>Breakout Tutorial</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>
-                      Create a simple breakout game where you must destroy all
-                      the bricks on the screen.
-                    </Trans>
-                  </p>
+                  <Trans>
+                    Create a simple breakout game where you must destroy all the
+                    bricks on the screen.
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {

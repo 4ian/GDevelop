@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
@@ -42,14 +43,24 @@ export default class SceneVariableField extends React.Component<
         />
         {this.state.editorOpen && layout && (
           <VariablesEditorDialog
-            open={this.state.editorOpen}
+            open
             variablesContainer={layout.getVariables()}
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
             }}
-            emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
-            emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
+            emptyExplanationMessage={
+              <Trans>
+                Scene variables can be used to store any value or text during
+                the game.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called Score representing
+                the current score of the player.
+              </Trans>
+            }
           />
         )}
       </React.Fragment>

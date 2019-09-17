@@ -2,17 +2,15 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { List, ListItem } from 'material-ui/List';
-import TextField from 'material-ui/TextField';
+import { List, ListItem } from '../UI/List';
+import TextField, {
+  noMarginTextFieldInListItemTopOffset,
+} from '../UI/TextField';
 import SearchBar from '../UI/SearchBar';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
-import WarningIcon from 'material-ui/svg-icons/alert/warning';
-import IconButton from 'material-ui/IconButton';
+import WarningIcon from '@material-ui/icons/Warning';
 import ListIcon from '../UI/ListIcon';
-import { makeAddItem, makeSearchItem } from '../UI/ListCommonItem';
+import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
-import IconMenu from '../UI/Menu/IconMenu';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import {
@@ -47,7 +45,7 @@ const styles = {
     overflowY: 'scroll',
     padding: 0,
   },
-  projectStructureItemNestedList: {
+  noIndentNestedList: {
     padding: 0,
   },
   itemName: {
@@ -56,7 +54,7 @@ const styles = {
     textOverflow: 'ellipsis',
   },
   itemTextField: {
-    top: -16,
+    top: noMarginTextFieldInListItemTopOffset,
   },
 };
 
@@ -64,43 +62,41 @@ type ProjectStructureItemProps = {|
   autoGenerateNestedIndicator: boolean,
   initiallyOpen: boolean,
   leftIcon: React$Element<any>,
-  nestedItems: Array<React$Element<any>>,
+  indentNestedItems?: boolean,
+  renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
-  primaryTogglesNestedList: boolean,
   error?: ?Error,
   onRefresh?: () => void,
   open?: boolean,
 |};
 
-const ProjectStructureItem = ({
-  onRefresh,
-  ...props
-}: ProjectStructureItemProps) => (
+const ProjectStructureItem = (props: ProjectStructureItemProps) => (
   <ThemeConsumer>
-    {muiTheme => (
-      <ListItem
-        style={{
-          backgroundColor: muiTheme.listItem.groupBackgroundColor,
-          borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-        }}
-        nestedListStyle={styles.projectStructureItemNestedList}
-        {...props}
-        leftIcon={props.error ? <WarningIcon /> : props.leftIcon}
-        rightIconButton={
-          props.error ? (
-            <IconButton
-              tooltip={`An error has occured in functions. Click to reload them.`}
-              tooltipPosition="bottom-left"
-              onClick={onRefresh}
-            >
-              <RefreshIcon />
-            </IconButton>
-          ) : (
-            undefined
-          )
-        }
-      />
-    )}
+    {muiTheme => {
+      const {
+        error,
+        leftIcon,
+        onRefresh,
+        indentNestedItems,
+        ...otherProps
+      } = props;
+      return (
+        <ListItem
+          style={{
+            backgroundColor: muiTheme.listItem.groupBackgroundColor,
+            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+          }}
+          nestedListStyle={
+            indentNestedItems ? undefined : styles.noIndentNestedList
+          }
+          {...otherProps}
+          leftIcon={error ? <WarningIcon /> : leftIcon}
+          displayReloadButton={!!error}
+          onReload={onRefresh}
+          reloadButtonTooltip={`An error has occured in functions. Click to reload them.`}
+        />
+      );
+    }}
   </ThemeConsumer>
 );
 
@@ -121,13 +117,11 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
-  rightIconButton?: ?React.Node,
   style?: ?Object,
 |};
 
 class Item extends React.Component<ItemProps, {||}> {
   textField: ?Object;
-  _iconMenu: ?Object;
 
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
@@ -137,71 +131,14 @@ class Item extends React.Component<ItemProps, {||}> {
     }
   }
 
-  _onContextMenu = event => {
-    if (this._iconMenu) this._iconMenu.open(event);
-  };
-
   render() {
-    const rightIconButton = this.props.rightIconButton || (
-      <IconMenu
-        ref={iconMenu => (this._iconMenu = iconMenu)}
-        iconButtonElement={
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={() => [
-          {
-            label: 'Edit',
-            click: () => this.props.onEdit(),
-          },
-          {
-            label: 'Rename',
-            click: () => this.props.onEditName(),
-          },
-          {
-            label: 'Delete',
-            click: () => this.props.onDelete(),
-          },
-          {
-            label: this.props.addLabel,
-            visible: !!this.props.onAdd,
-            click: () => this.props.onAdd(),
-          },
-          { type: 'separator' },
-          {
-            label: 'Copy',
-            click: () => this.props.onCopy(),
-          },
-          {
-            label: 'Cut',
-            click: () => this.props.onCut(),
-          },
-          {
-            label: 'Paste',
-            enabled: this.props.canPaste(),
-            click: () => this.props.onPaste(),
-          },
-          { type: 'separator' },
-          {
-            label: 'Move up',
-            enabled: this.props.canMoveUp,
-            click: () => this.props.onMoveUp(),
-          },
-          {
-            label: 'Move down',
-            enabled: this.props.canMoveDown,
-            click: () => this.props.onMoveDown(),
-          },
-        ]}
-      />
-    );
     const label = this.props.editingName ? (
       <TextField
         id="rename-item-field"
+        margin="none"
         ref={textField => (this.textField = textField)}
         defaultValue={this.props.primaryText}
-        onBlur={e => this.props.onRename(e.target.value)}
+        onBlur={e => this.props.onRename(e.currentTarget.value)}
         onKeyPress={event => {
           if (event.charCode === 13) {
             // enter key pressed
@@ -223,9 +160,52 @@ class Item extends React.Component<ItemProps, {||}> {
               borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
               ...this.props.style,
             }}
-            onContextMenu={this._onContextMenu}
             primaryText={label}
-            rightIconButton={rightIconButton}
+            displayMenuButton
+            buildMenuTemplate={() => [
+              {
+                label: 'Edit',
+                click: () => this.props.onEdit(),
+              },
+              {
+                label: 'Rename',
+                click: () => this.props.onEditName(),
+              },
+              {
+                label: 'Delete',
+                click: () => this.props.onDelete(),
+              },
+              {
+                label: this.props.addLabel,
+                visible: !!this.props.onAdd,
+                click: () => this.props.onAdd(),
+              },
+              { type: 'separator' },
+              {
+                label: 'Copy',
+                click: () => this.props.onCopy(),
+              },
+              {
+                label: 'Cut',
+                click: () => this.props.onCut(),
+              },
+              {
+                label: 'Paste',
+                enabled: this.props.canPaste(),
+                click: () => this.props.onPaste(),
+              },
+              { type: 'separator' },
+              {
+                label: 'Move up',
+                enabled: this.props.canMoveUp,
+                click: () => this.props.onMoveUp(),
+              },
+              {
+                label: 'Move down',
+                enabled: this.props.canMoveDown,
+                click: () => this.props.onMoveDown(),
+              },
+            ]}
             onClick={() => {
               // It's essential to discard clicks when editing the name,
               // to avoid weird opening of an editor (accompanied with a
@@ -239,9 +219,6 @@ class Item extends React.Component<ItemProps, {||}> {
     );
   }
 }
-
-const AddItem = makeAddItem(ListItem);
-const SearchItem = makeSearchItem(ListItem);
 
 type Props = {|
   project: gdProject,
@@ -591,9 +568,9 @@ export default class ProjectManager extends React.Component<Props, State> {
           />
         }
         initiallyOpen={true}
-        primaryTogglesNestedList={true}
         autoGenerateNestedIndicator={true}
-        nestedItems={[
+        indentNestedItems
+        renderNestedItems={() => [
           <ListItem
             key="save"
             primaryText={<Trans>Save</Trans>}
@@ -647,6 +624,15 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
   }
 
+  _onSearchChange = (text: string) =>
+    this.setState({
+      searchText: text,
+    });
+
+  _onRequestSearch = () => {
+    /* Do nothing for now, but we could open the first result. */
+  };
+
   render() {
     const {
       project,
@@ -671,9 +657,9 @@ export default class ProjectManager extends React.Component<Props, State> {
               />
             }
             initiallyOpen={false}
-            primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
-            nestedItems={[
+            indentNestedItems
+            renderNestedItems={() => [
               <ListItem
                 key="properties"
                 primaryText={<Trans>Properties</Trans>}
@@ -739,48 +725,46 @@ export default class ProjectManager extends React.Component<Props, State> {
             }
             initiallyOpen={true}
             open={forceOpen}
-            primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={!forceOpen}
-            nestedItems={filterProjectItemsList(
-              enumerateLayouts(project),
-              searchText
-            )
-              .map((layout: gdLayout, i: number) => {
-                const name = layout.getName();
-                return (
-                  <Item
-                    key={i}
-                    primaryText={name}
-                    editingName={
-                      renamedItemKind === 'layout' && renamedItemName === name
-                    }
-                    onEdit={() => this.props.onOpenLayout(name)}
-                    onDelete={() => this.props.onDeleteLayout(layout)}
-                    addLabel={'Add a New Scene'}
-                    onAdd={() => this._addLayout(i)}
-                    onRename={newName => {
-                      this.props.onRenameLayout(name, newName);
-                      this._onEditName(null, '');
-                    }}
-                    onEditName={() => this._onEditName('layout', name)}
-                    onCopy={() => this._copyLayout(layout)}
-                    onCut={() => this._cutLayout(layout)}
-                    onPaste={() => this._pasteLayout(i)}
-                    canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
-                    canMoveUp={i !== 0}
-                    onMoveUp={() => this._moveUpLayout(i)}
-                    canMoveDown={i !== project.getLayoutsCount() - 1}
-                    onMoveDown={() => this._moveDownLayout(i)}
+            renderNestedItems={() =>
+              filterProjectItemsList(enumerateLayouts(project), searchText)
+                .map((layout: gdLayout, i: number) => {
+                  const name = layout.getName();
+                  return (
+                    <Item
+                      key={i}
+                      primaryText={name}
+                      editingName={
+                        renamedItemKind === 'layout' && renamedItemName === name
+                      }
+                      onEdit={() => this.props.onOpenLayout(name)}
+                      onDelete={() => this.props.onDeleteLayout(layout)}
+                      addLabel={'Add a New Scene'}
+                      onAdd={() => this._addLayout(i)}
+                      onRename={newName => {
+                        this.props.onRenameLayout(name, newName);
+                        this._onEditName(null, '');
+                      }}
+                      onEditName={() => this._onEditName('layout', name)}
+                      onCopy={() => this._copyLayout(layout)}
+                      onCut={() => this._cutLayout(layout)}
+                      onPaste={() => this._pasteLayout(i)}
+                      canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
+                      canMoveUp={i !== 0}
+                      onMoveUp={() => this._moveUpLayout(i)}
+                      canMoveDown={i !== project.getLayoutsCount() - 1}
+                      onMoveDown={() => this._moveDownLayout(i)}
+                    />
+                  );
+                })
+                .concat(
+                  <AddListItem
+                    key={'add-scene'}
+                    onClick={this.props.onAddLayout}
+                    primaryText={<Trans>Click to add a scene</Trans>}
                   />
-                );
-              })
-              .concat(
-                <AddItem
-                  key={'add-scene'}
-                  onClick={this.props.onAddLayout}
-                  primaryText={<Trans>Click to add a scene</Trans>}
-                />
-              )}
+                )
+            }
           />
           <ProjectStructureItem
             primaryText={<Trans>External events</Trans>}
@@ -793,53 +777,56 @@ export default class ProjectManager extends React.Component<Props, State> {
             }
             initiallyOpen={false}
             open={forceOpen}
-            primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={!forceOpen}
-            nestedItems={filterProjectItemsList(
-              enumerateExternalEvents(project),
-              searchText
-            )
-              .map((externalEvents, i) => {
-                const name = externalEvents.getName();
-                return (
-                  <Item
-                    key={i}
-                    primaryText={name}
-                    editingName={
-                      renamedItemKind === 'external-events' &&
-                      renamedItemName === name
-                    }
-                    onEdit={() => this.props.onOpenExternalEvents(name)}
-                    onDelete={() =>
-                      this.props.onDeleteExternalEvents(externalEvents)
-                    }
-                    addLabel={'Add New External Events'}
-                    onAdd={() => this._addExternalEvents(i)}
-                    onRename={newName => {
-                      this.props.onRenameExternalEvents(name, newName);
-                      this._onEditName(null, '');
-                    }}
-                    onEditName={() => this._onEditName('external-events', name)}
-                    onCopy={() => this._copyExternalEvents(externalEvents)}
-                    onCut={() => this._cutExternalEvents(externalEvents)}
-                    onPaste={() => this._pasteExternalEvents(i)}
-                    canPaste={() =>
-                      Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
-                    }
-                    canMoveUp={i !== 0}
-                    onMoveUp={() => this._moveUpExternalEvents(i)}
-                    canMoveDown={i !== project.getExternalEventsCount() - 1}
-                    onMoveDown={() => this._moveDownExternalEvents(i)}
+            renderNestedItems={() =>
+              filterProjectItemsList(
+                enumerateExternalEvents(project),
+                searchText
+              )
+                .map((externalEvents, i) => {
+                  const name = externalEvents.getName();
+                  return (
+                    <Item
+                      key={i}
+                      primaryText={name}
+                      editingName={
+                        renamedItemKind === 'external-events' &&
+                        renamedItemName === name
+                      }
+                      onEdit={() => this.props.onOpenExternalEvents(name)}
+                      onDelete={() =>
+                        this.props.onDeleteExternalEvents(externalEvents)
+                      }
+                      addLabel={'Add New External Events'}
+                      onAdd={() => this._addExternalEvents(i)}
+                      onRename={newName => {
+                        this.props.onRenameExternalEvents(name, newName);
+                        this._onEditName(null, '');
+                      }}
+                      onEditName={() =>
+                        this._onEditName('external-events', name)
+                      }
+                      onCopy={() => this._copyExternalEvents(externalEvents)}
+                      onCut={() => this._cutExternalEvents(externalEvents)}
+                      onPaste={() => this._pasteExternalEvents(i)}
+                      canPaste={() =>
+                        Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
+                      }
+                      canMoveUp={i !== 0}
+                      onMoveUp={() => this._moveUpExternalEvents(i)}
+                      canMoveDown={i !== project.getExternalEventsCount() - 1}
+                      onMoveDown={() => this._moveDownExternalEvents(i)}
+                    />
+                  );
+                })
+                .concat(
+                  <AddListItem
+                    key={'add-external-events'}
+                    primaryText={<Trans>Click to add external events</Trans>}
+                    onClick={this.props.onAddExternalEvents}
                   />
-                );
-              })
-              .concat(
-                <AddItem
-                  key={'add-external-events'}
-                  primaryText={<Trans>Click to add external events</Trans>}
-                  onClick={this.props.onAddExternalEvents}
-                />
-              )}
+                )
+            }
           />
           <ProjectStructureItem
             primaryText={<Trans>External layouts</Trans>}
@@ -852,53 +839,56 @@ export default class ProjectManager extends React.Component<Props, State> {
             }
             initiallyOpen={false}
             open={forceOpen}
-            primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={!forceOpen}
-            nestedItems={filterProjectItemsList(
-              enumerateExternalLayouts(project),
-              searchText
-            )
-              .map((externalLayout, i) => {
-                const name = externalLayout.getName();
-                return (
-                  <Item
-                    key={i}
-                    primaryText={name}
-                    editingName={
-                      renamedItemKind === 'external-layout' &&
-                      renamedItemName === name
-                    }
-                    onEdit={() => this.props.onOpenExternalLayout(name)}
-                    onDelete={() =>
-                      this.props.onDeleteExternalLayout(externalLayout)
-                    }
-                    addLabel={'Add a New External Layout'}
-                    onAdd={() => this._addExternalLayout(i)}
-                    onRename={newName => {
-                      this.props.onRenameExternalLayout(name, newName);
-                      this._onEditName(null, '');
-                    }}
-                    onEditName={() => this._onEditName('external-layout', name)}
-                    onCopy={() => this._copyExternalLayout(externalLayout)}
-                    onCut={() => this._cutExternalLayout(externalLayout)}
-                    onPaste={() => this._pasteExternalLayout(i)}
-                    canPaste={() =>
-                      Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
-                    }
-                    canMoveUp={i !== 0}
-                    onMoveUp={() => this._moveUpExternalLayout(i)}
-                    canMoveDown={i !== project.getExternalLayoutsCount() - 1}
-                    onMoveDown={() => this._moveDownExternalLayout(i)}
+            renderNestedItems={() =>
+              filterProjectItemsList(
+                enumerateExternalLayouts(project),
+                searchText
+              )
+                .map((externalLayout, i) => {
+                  const name = externalLayout.getName();
+                  return (
+                    <Item
+                      key={i}
+                      primaryText={name}
+                      editingName={
+                        renamedItemKind === 'external-layout' &&
+                        renamedItemName === name
+                      }
+                      onEdit={() => this.props.onOpenExternalLayout(name)}
+                      onDelete={() =>
+                        this.props.onDeleteExternalLayout(externalLayout)
+                      }
+                      addLabel={'Add a New External Layout'}
+                      onAdd={() => this._addExternalLayout(i)}
+                      onRename={newName => {
+                        this.props.onRenameExternalLayout(name, newName);
+                        this._onEditName(null, '');
+                      }}
+                      onEditName={() =>
+                        this._onEditName('external-layout', name)
+                      }
+                      onCopy={() => this._copyExternalLayout(externalLayout)}
+                      onCut={() => this._cutExternalLayout(externalLayout)}
+                      onPaste={() => this._pasteExternalLayout(i)}
+                      canPaste={() =>
+                        Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
+                      }
+                      canMoveUp={i !== 0}
+                      onMoveUp={() => this._moveUpExternalLayout(i)}
+                      canMoveDown={i !== project.getExternalLayoutsCount() - 1}
+                      onMoveDown={() => this._moveDownExternalLayout(i)}
+                    />
+                  );
+                })
+                .concat(
+                  <AddListItem
+                    key={'add-external-layout'}
+                    primaryText={<Trans>Click to add an external layout</Trans>}
+                    onClick={this.props.onAddExternalLayout}
                   />
-                );
-              })
-              .concat(
-                <AddItem
-                  key={'add-external-layout'}
-                  primaryText={<Trans>Click to add an external layout</Trans>}
-                  onClick={this.props.onAddExternalLayout}
-                />
-              )}
+                )
+            }
           />
           <ProjectStructureItem
             primaryText={<Trans>Functions/Behaviors</Trans>}
@@ -913,105 +903,114 @@ export default class ProjectManager extends React.Component<Props, State> {
             }
             initiallyOpen={false}
             open={forceOpen}
-            primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={
               !forceOpen && !eventsFunctionsExtensionsError
             }
-            nestedItems={filterProjectItemsList(
-              enumerateEventsFunctionsExtensions(project),
-              searchText
-            )
-              .map((eventsFunctionsExtension, i) => {
-                const name = eventsFunctionsExtension.getName();
-                return (
-                  <Item
-                    key={i}
-                    primaryText={name}
-                    editingName={
-                      renamedItemKind === 'events-functions-extension' &&
-                      renamedItemName === name
-                    }
-                    onEdit={() =>
-                      this.props.onOpenEventsFunctionsExtension(name)
-                    }
-                    onDelete={() =>
-                      this.props.onDeleteEventsFunctionsExtension(
-                        eventsFunctionsExtension
-                      )
-                    }
-                    addLabel={'Add a New Extension'}
-                    onAdd={() => this._addEventsFunctionsExtension(i)}
-                    onRename={newName => {
-                      this.props.onRenameEventsFunctionsExtension(
-                        name,
-                        newName
-                      );
-                      this._onEditName(null, '');
-                    }}
-                    onEditName={() =>
-                      this._onEditName('events-functions-extension', name)
-                    }
-                    onCopy={() =>
-                      this._copyEventsFunctionsExtension(
-                        eventsFunctionsExtension
-                      )
-                    }
-                    onCut={() =>
-                      this._cutEventsFunctionsExtension(
-                        eventsFunctionsExtension
-                      )
-                    }
-                    onPaste={() => this._pasteEventsFunctionsExtension(i)}
-                    canPaste={() =>
-                      Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)
-                    }
-                    canMoveUp={i !== 0}
-                    onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
-                    canMoveDown={
-                      i !== project.getEventsFunctionsExtensionsCount() - 1
-                    }
-                    onMoveDown={() => this._moveDownEventsFunctionsExtension(i)}
-                  />
-                );
-              })
-              .concat(
-                <AddItem
-                  key={'add-events-functions-extension'}
-                  primaryText={
-                    <Trans>Click to add functions and behaviors</Trans>
-                  }
-                  onClick={this.props.onAddEventsFunctionsExtension}
-                />
+            renderNestedItems={() =>
+              filterProjectItemsList(
+                enumerateEventsFunctionsExtensions(project),
+                searchText
               )
-              .concat(
-                <SearchItem
-                  key={'extensions-search'}
-                  primaryText={<Trans>Search for new extensions</Trans>}
-                  onClick={() =>
-                    this.setState({ extensionsSearchDialogOpen: true })
-                  }
-                />
-              )}
+                .map((eventsFunctionsExtension, i) => {
+                  const name = eventsFunctionsExtension.getName();
+                  return (
+                    <Item
+                      key={i}
+                      primaryText={name}
+                      editingName={
+                        renamedItemKind === 'events-functions-extension' &&
+                        renamedItemName === name
+                      }
+                      onEdit={() =>
+                        this.props.onOpenEventsFunctionsExtension(name)
+                      }
+                      onDelete={() =>
+                        this.props.onDeleteEventsFunctionsExtension(
+                          eventsFunctionsExtension
+                        )
+                      }
+                      addLabel={'Add a New Extension'}
+                      onAdd={() => this._addEventsFunctionsExtension(i)}
+                      onRename={newName => {
+                        this.props.onRenameEventsFunctionsExtension(
+                          name,
+                          newName
+                        );
+                        this._onEditName(null, '');
+                      }}
+                      onEditName={() =>
+                        this._onEditName('events-functions-extension', name)
+                      }
+                      onCopy={() =>
+                        this._copyEventsFunctionsExtension(
+                          eventsFunctionsExtension
+                        )
+                      }
+                      onCut={() =>
+                        this._cutEventsFunctionsExtension(
+                          eventsFunctionsExtension
+                        )
+                      }
+                      onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                      canPaste={() =>
+                        Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)
+                      }
+                      canMoveUp={i !== 0}
+                      onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
+                      canMoveDown={
+                        i !== project.getEventsFunctionsExtensionsCount() - 1
+                      }
+                      onMoveDown={() =>
+                        this._moveDownEventsFunctionsExtension(i)
+                      }
+                    />
+                  );
+                })
+                .concat(
+                  <AddListItem
+                    key={'add-events-functions-extension'}
+                    primaryText={
+                      <Trans>Click to add functions and behaviors</Trans>
+                    }
+                    onClick={this.props.onAddEventsFunctionsExtension}
+                  />
+                )
+                .concat(
+                  <SearchListItem
+                    key={'extensions-search'}
+                    primaryText={<Trans>Search for new extensions</Trans>}
+                    onClick={() =>
+                      this.setState({ extensionsSearchDialogOpen: true })
+                    }
+                  />
+                )
+            }
           />
         </List>
         <SearchBar
           ref={searchBar => (this._searchBar = searchBar)}
           value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
+          onRequestSearch={this._onRequestSearch}
+          onChange={this._onSearchChange}
         />
         {this.state.variablesEditorOpen && (
           <VariablesEditorDialog
-            open={this.state.variablesEditorOpen}
+            open
             variablesContainer={project.getVariables()}
             onCancel={() => this.setState({ variablesEditorOpen: false })}
             onApply={() => this.setState({ variablesEditorOpen: false })}
-            emptyExplanationMessage="Global variables are variables that are shared amongst all the scenes of the game."
-            emptyExplanationSecondMessage="For example, you can have a variable called UnlockedLevelsCount representing the number of levels unlocked by the player."
+            emptyExplanationMessage={
+              <Trans>
+                Global variables are variables that are shared amongst all the
+                scenes of the game.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called UnlockedLevelsCount
+                representing the number of levels unlocked by the player.
+              </Trans>
+            }
           />
         )}
         {this.state.projectPropertiesDialogOpen && (

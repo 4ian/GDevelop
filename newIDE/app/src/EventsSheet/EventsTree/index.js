@@ -1,6 +1,5 @@
 // @flow
 import React, { Component, type Node } from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import findIndex from 'lodash/findIndex';
 import {
   SortableTreeWithoutDndContext,
@@ -26,6 +25,7 @@ import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingServ
 // Import default style of react-sortable-tree and the override made for EventsSheet.
 import 'react-sortable-tree/style.css';
 import './style.css';
+import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
@@ -145,15 +145,18 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
 
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
-const ThemableSortableTree = ({ muiTheme, className, ...otherProps }) => (
-  <SortableTreeWithoutDndContext
-    className={`${eventsTree} ${
-      muiTheme.eventsSheetRootClassName
-    } ${className}`}
-    {...otherProps}
-  />
+const SortableTree = ({ className, ...otherProps }) => (
+  <ThemeConsumer>
+    {muiTheme => (
+      <SortableTreeWithoutDndContext
+        className={`${eventsTree} ${
+          muiTheme.eventsSheetRootClassName
+        } ${className}`}
+        {...otherProps}
+      />
+    )}
+  </ThemeConsumer>
 );
-const SortableTree = muiThemeable()(ThemableSortableTree);
 
 const noop = () => {};
 

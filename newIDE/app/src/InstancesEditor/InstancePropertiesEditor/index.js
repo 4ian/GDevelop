@@ -9,10 +9,10 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import { type Schema } from '../../PropertiesEditor';
 import VariablesList from '../../VariablesList';
 import getObjectByName from '../../Utils/GetObjectByName';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
-
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import Subheader from '../../UI/Subheader';
 
 type Props = {|
   project: gdProject,
@@ -152,7 +152,9 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
             instances={instances}
           />
           <Line alignItems="center">
-            <Trans>Instance Variables</Trans>
+            <Subheader>
+              <Trans>Instance Variables</Trans>
+            </Subheader>
             <IconButton
               onClick={() => {
                 this.props.editInstanceVariables(instance);

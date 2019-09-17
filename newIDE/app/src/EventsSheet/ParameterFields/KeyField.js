@@ -112,6 +112,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        fullWidth
         value={value}
         onChange={onChange}
         dataSource={keyNames.map(keyName => ({

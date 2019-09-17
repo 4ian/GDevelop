@@ -1,8 +1,8 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -14,6 +14,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import AlertMessage from '../../UI/AlertMessage';
+import Text from '../../UI/Text';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -90,10 +91,12 @@ export default class LocalExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          <Trans>
-            This will export your game to a folder that you can then upload on a
-            website or on game hosting like itch.io.
-          </Trans>
+          <Text>
+            <Trans>
+              This will export your game to a folder that you can then upload on
+              a website or on game hosting like itch.io.
+            </Trans>
+          </Text>
         </Line>
         <Line>
           <LocalFolderPicker
@@ -136,11 +139,11 @@ export default class LocalExport extends Component {
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          <p>
+          <Text>
             <Trans>
               You can now upload the game to a web hosting to play to the game.
             </Trans>
-          </p>
+          </Text>
           <AlertMessage kind="warning">
             <Trans>
               Your game won't work if you open index.html on your computer. You

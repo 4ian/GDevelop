@@ -2,13 +2,14 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
 import { focusButton } from '../../UI/Button';
+import Text from '../../UI/Text';
 
 const styles = {
   button: {
@@ -36,7 +37,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
 
     return (
       <Line>
-        <p style={styles.description}>{description}</p>
+        <Text style={styles.description}>{description}</Text>
         <Column noMargin>
           <RaisedButton
             style={styles.button}

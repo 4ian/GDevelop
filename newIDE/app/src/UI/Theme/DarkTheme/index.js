@@ -1,6 +1,6 @@
 // @flow
 import { type Theme } from '../DefaultTheme';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
 import './Mosaic.css';
 import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
@@ -25,62 +25,17 @@ const backgroundColor = '#252525';
  */
 const canvasColor = '#303030';
 
-const theme: Theme = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', //OS X font
+// GDevelop specific variables:
+const gdevelopTheme = {
   palette: {
-    primary1Color: blue,
-    primary2Color: blue,
-    accent1Color: almostWhite,
     canvasColor,
-    textColor: lightWhite,
-    secondaryTextColor: notSoWhite,
-    alternateTextColor: '#444',
-    borderColor: '#444444',
-    disabledColor: '#888888',
-    pickerHeaderColor: '#444444',
-    clockCircleColor: '#444444',
-  },
-  avatar: {
-    backgroundColor: 'transparent',
-  },
-  tabs: {
-    backgroundColor: gdevelopDarkBlue,
-    textColor: lightWhite,
-    selectedTextColor: almostWhite,
   },
   toolbar: {
     backgroundColor: backgroundColor,
     separatorColor: '#303030',
-    menuHoverColor: systemSelectionColor,
-    hoverColor: systemSelectionColor,
   },
-  menuItem: {
-    dataHeight: 24,
-    height: 32,
-    hoverColor: systemSelectionColor,
-    selectedTextColor: systemSelectionColor,
-    padding: 8,
-  },
-  appBar: {
-    color: gdevelopDarkBlue,
-    textColor: almostWhite,
-  },
-  button: {
-    height: 32,
-    iconButtonSize: 24,
-  },
-  snackbar: {
-    actionColor: blue,
-  },
-  stepper: {
-    textColor: lightWhite,
-  },
-  raisedButton: {
-    primaryTextColor: notSoWhite,
-  },
-
-  // GDevelop specific variables:
   closableTabs: {
+    fontFamily: "'Roboto', -apple-system, BlinkMacSystemFont, sans-serif",
     backgroundColor: backgroundColor,
     textColor: '#878787',
     selectedBackgroundColor: gdevelopDarkBlue,
@@ -120,4 +75,70 @@ const theme: Theme = {
   gdevelopIconsCSSFilter: '',
 };
 
-export default getMuiTheme(theme);
+// Theme for Material-UI components
+const muiTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    common: { black: 'rgba(110, 42, 42, 1)', white: '#fff' },
+    background: {
+      paper: canvasColor,
+      default: backgroundColor,
+    },
+    primary: {
+      light: lighten(blue, 0.05),
+      main: blue,
+      dark: darken(blue, 0.05),
+      contrastText: '#fff',
+    },
+    secondary: {
+      light: lighten(almostWhite, 0.05),
+      main: almostWhite,
+      dark: darken(almostWhite, 0.05),
+      contrastText: '#000',
+    },
+    text: {
+      primary: lightWhite,
+      secondary: notSoWhite,
+      disabled: '#888888',
+      hint: notSoWhite,
+    },
+  },
+  overrides: {
+    MuiInput: {
+      underline: {
+        '&:before': {
+          borderBottom: `1px solid #444444`,
+        },
+      },
+    },
+    MuiAppBar: {
+      colorPrimary: {
+        backgroundColor: gdevelopDarkBlue,
+      },
+    },
+    // Use a more visible color scheme for tabs:
+    MuiTabs: {
+      root: {
+        backgroundColor: gdevelopDarkBlue,
+      },
+    },
+    MuiTab: {
+      textColorPrimary: {
+        color: '#fff !important',
+      },
+    },
+    MuiButtonBase: {
+      root: {
+        // Remove the web-ish "pointer" (hand) cursor from buttons
+        cursor: 'default',
+      },
+    },
+  },
+});
+
+const theme: Theme = {
+  gdevelopTheme,
+  muiTheme,
+};
+
+export default theme;

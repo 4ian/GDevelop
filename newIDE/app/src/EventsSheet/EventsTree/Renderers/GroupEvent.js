@@ -1,9 +1,9 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import classNames from 'classnames';
-import TextField from 'material-ui/TextField';
+import TextField from '../../../UI/TextField';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -74,7 +74,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           <TextField
             ref={textField => (this._textField = textField)}
             value={groupEvent.getName()}
-            hintText={<Trans>&lt;Enter group name&gt;</Trans>}
+            hintText={t`<Enter group name>`}
             onBlur={this.endEditing}
             onChange={(e, text) => {
               groupEvent.setName(text);

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { Column, Line } from './Grid';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from './RaisedButton';
 import EmptyMessage from './EmptyMessage';
 
 type Props = {|

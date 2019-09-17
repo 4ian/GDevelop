@@ -1,20 +1,21 @@
 // @flow
 import * as React from 'react';
-import IconButton from 'material-ui/IconButton';
-import Add from 'material-ui/svg-icons/content/add';
-import Brush from 'material-ui/svg-icons/image/brush';
+import IconButton from '../UI/IconButton';
+import Add from '@material-ui/icons/Add';
+import Brush from '@material-ui/icons/Brush';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import IconMenu from '../UI/Menu/IconMenu';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import SemiControlledAutoComplete, {
   type DataSource,
 } from '../UI/SemiControlledAutoComplete';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   project: gdProject,
@@ -27,7 +28,8 @@ type Props = {|
   initialResourceName: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
-  hintText?: React.Node,
+  hintText?: MessageDescriptor,
+  margin?: 'none' | 'normal',
 |};
 
 type State = {|
@@ -36,7 +38,7 @@ type State = {|
 |};
 
 const styles = {
-  container: { display: 'flex', flex: 1, alignItems: 'baseline' },
+  container: { display: 'flex', flex: 1, alignItems: 'flex-end' },
 };
 
 export default class ResourceSelector extends React.Component<Props, State> {
@@ -78,7 +80,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         .map(source => ({
           text: '',
           value: source.displayName,
-          renderRightIcon: () => <Add />,
+          renderIcon: () => <Add />,
           onClick: () => this._addFrom(source),
         })),
       {
@@ -229,11 +231,12 @@ export default class ResourceSelector extends React.Component<Props, State> {
           onChange={this._onChangeResourceName}
           errorText={errorText}
           fullWidth={this.props.fullWidth}
+          margin={this.props.margin}
           ref={autoComplete => (this._autoComplete = autoComplete)}
         />
         {!!externalEditors.length && (
-          <IconMenu
-            iconButtonElement={
+          <ElementWithMenu
+            element={
               <IconButton>
                 <Brush />
               </IconButton>

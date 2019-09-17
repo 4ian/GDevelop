@@ -10,11 +10,12 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import ReactMarkdown from 'react-markdown';
 import { Column, Line } from '../../UI/Grid';
-import { FlatButton, RaisedButton } from 'material-ui';
 import Window from '../../Utils/Window';
 import { hasBreakingChange } from '../../Utils/GDevelopServices/Release';
 import AlertMessage from '../../UI/AlertMessage';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
 
 type Props = {|
   releases: ?Array<Release>,

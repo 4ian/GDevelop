@@ -6,7 +6,7 @@ import {
   TableHeaderColumn,
   TableRow,
   TableRowColumn,
-} from 'material-ui/Table';
+} from '../../../../UI/Table';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../../../../Utils/NewNameGenerator';
 import { mapVector } from '../../../../Utils/MapFor';
@@ -171,13 +171,7 @@ class PointsListBody extends Component {
     );
 
     return (
-      <TableBody
-        displayRowCheckbox={false}
-        deselectOnClickaway={true}
-        showRowHover={true}
-      >
-        {[originRow, centerRow, ...pointsRows, addRow]}
-      </TableBody>
+      <TableBody>{[originRow, centerRow, ...pointsRows, addRow]}</TableBody>
     );
   }
 }
@@ -188,8 +182,8 @@ SortablePointsListBody.muiName = 'TableBody';
 export default class PointsList extends Component {
   render() {
     return (
-      <Table selectable={false}>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+      <Table>
+        <TableHeader>
           <TableRow>
             <TableHeaderColumn style={styles.handleColumn} />
             <TableHeaderColumn>Point name</TableHeaderColumn>

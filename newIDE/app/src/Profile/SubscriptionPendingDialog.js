@@ -2,14 +2,15 @@
 import { Trans } from '@lingui/macro';
 
 import React, { useEffect, useRef } from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
 import { type UserProfile } from './UserProfileContext';
 import { Column, Line, Spacer } from '../UI/Grid';
-import CircularProgress from 'material-ui/CircularProgress';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import BackgroundText from '../UI/BackgroundText';
-import VerifiedUser from 'material-ui/svg-icons/action/verified-user';
+import VerifiedUser from '@material-ui/icons/VerifiedUser';
+import Text from '../UI/Text';
 
 type Props = {|
   onClose: Function,
@@ -68,6 +69,7 @@ export default function SubscriptionPendingDialog({
         ),
       ]}
       title={undefined}
+      maxWidth="sm"
       open
       noMargin
       autoScrollBodyContent
@@ -75,7 +77,7 @@ export default function SubscriptionPendingDialog({
       {!hasPlan && (
         <Column>
           <Line>
-            <p>
+            <Text>
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
@@ -86,12 +88,12 @@ export default function SubscriptionPendingDialog({
                   (handled securely by Stripe.com).
                 </Trans>
               </b>
-            </p>
+            </Text>
           </Line>
           <Line justifyContent="center" alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
-            Waiting for the subscription confirmation...
+            <Text>Waiting for the subscription confirmation...</Text>
           </Line>
           <Spacer />
           <Line justifyContent="center">
@@ -108,19 +110,21 @@ export default function SubscriptionPendingDialog({
       {hasPlan && (
         <Column>
           <Line>
-            <p>
+            <Text>
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
               {'❤️'}
-            </p>
+            </Text>
           </Line>
           <Line justifyContent="center" alignItems="center">
             <VerifiedUser />
             <Spacer />
-            <b>
-              <Trans>Your new plan is now activated</Trans>
-            </b>
+            <Text>
+              <b>
+                <Trans>Your new plan is now activated</Trans>
+              </b>
+            </Text>
           </Line>
           <Spacer />
           <Line justifyContent="center">

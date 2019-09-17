@@ -1,8 +1,8 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
 import { serializeToJSObject } from '../Utils/Serializer';
@@ -34,11 +34,13 @@ export default class BrowserSaveDialog extends Component {
 
     const actions = [
       <FlatButton
+        key="download"
         label={<Trans>Download GDevelop desktop version</Trans>}
         primary={false}
         onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
       />,
       <FlatButton
+        key="close"
         label={<Trans>Close</Trans>}
         primary={false}
         onClick={onClose}

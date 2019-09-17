@@ -63,8 +63,11 @@ export default class InstancesList extends Component<Props, State> {
     // or selection changes).
     if (!nextProps.freezeUpdate && this.props.freezeUpdate) {
       if (this.table) this.table.forceUpdateGrid();
-      if (this._searchBar.current) this._searchBar.current.focus();
     }
+  }
+
+  componentDidMount() {
+    if (this._searchBar.current) this._searchBar.current.focus();
   }
 
   componentWillMount() {

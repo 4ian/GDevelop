@@ -4,18 +4,18 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 import { mapFor } from '../Utils/MapFor';
-import RaisedButton from 'material-ui/RaisedButton';
-import IconButton from 'material-ui/IconButton';
+import RaisedButton from '../UI/RaisedButton';
+import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import IconMenu from '../UI/Menu/IconMenu';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Add from 'material-ui/svg-icons/content/add';
+import Add from '@material-ui/icons/Add';
 import {
   getAllEffectDescriptions,
   type EffectDescription,
@@ -139,8 +139,9 @@ export default class EffectsList extends React.Component<Props, {||}> {
                     <MiniToolbar>
                       <Column expand noMargin>
                         <SemiControlledTextField
+                          margin="none"
                           commitOnBlur
-                          hintText={<Trans>Enter the effect name</Trans>}
+                          hintText={t`Enter the effect name`}
                           value={effect.getName()}
                           onChange={newName => {
                             if (newName === effect.getName()) return;
@@ -154,8 +155,9 @@ export default class EffectsList extends React.Component<Props, {||}> {
                       </Column>
                       <Column expand>
                         <SelectField
+                          margin="none"
                           value={effectName}
-                          onChange={(e, i, newEffectName) =>
+                          onChange={(e, i, newEffectName: string) =>
                             this._chooseEffectName(
                               allEffectDescriptions,
                               effect,
@@ -163,10 +165,10 @@ export default class EffectsList extends React.Component<Props, {||}> {
                             )
                           }
                           fullWidth
-                          hintText={<Trans>Choose the effect to apply</Trans>}
+                          hintText={t`Choose the effect to apply`}
                         >
                           {allEffectDescriptions.map(effectDescription => (
-                            <MenuItem
+                            <SelectOption
                               key={effectDescription.name}
                               value={effectDescription.name}
                               primaryText={effectDescription.name}
@@ -174,10 +176,10 @@ export default class EffectsList extends React.Component<Props, {||}> {
                           ))}
                         </SelectField>
                       </Column>
-                      <IconMenu
-                        iconButtonElement={
+                      <ElementWithMenu
+                        element={
                           <IconButton>
-                            <MoreVertIcon />
+                            <MoreVert />
                           </IconButton>
                         }
                         buildMenuTemplate={() => [

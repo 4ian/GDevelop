@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import SemiControlledAutoComplete, {
@@ -50,8 +50,9 @@ const getObjectsAndGroupsDataSource = ({
     return {
       text: object.getName(),
       value: object.getName(),
-      renderLeftIcon: project
+      renderIcon: project
         ? () => (
+            // TODO: This is broken since the changes to ListIcon
             <ListIcon
               iconSize={iconSize}
               src={ObjectsRenderingService.getThumbnail(project, object)}
@@ -110,7 +111,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
 
     return (
       <SemiControlledAutoComplete
-        hintText={<Trans>Choose an object</Trans>}
+        hintText={t`Choose an object`}
         value={value}
         onChange={onChange}
         onChoose={onChoose}

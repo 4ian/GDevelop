@@ -2,17 +2,18 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
 import { Column, Line, Spacer } from '../UI/Grid';
-import TextField from 'material-ui/TextField/TextField';
+import TextField from '../UI/TextField';
 import {
   type LoginForm,
   type LoginError,
 } from '../Utils/GDevelopServices/Authentification';
 import RightLoader from '../UI/RightLoader';
 import LeftLoader from '../UI/LeftLoader';
+import Text from '../UI/Text';
 
 type Props = {|
   open: boolean,
@@ -192,13 +193,13 @@ export default class LoginDialog extends Component<Props, State> {
           ]}
         >
           <Column noMargin>
-            <p>
+            <Text>
               <Trans>
                 You should have received an email containing instructions to
                 reset and set a new password. Once it's done, you can use your
                 new password in GDevelop.
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Dialog>
       </Dialog>

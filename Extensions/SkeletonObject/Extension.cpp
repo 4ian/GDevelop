@@ -14,15 +14,14 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   extension.SetExtensionInformation(
       "SkeletonObject",
       _("Skeleton"),
-      _("Enables the use of animated skeleton objects.\nCurrently supported "
-        "formats:\n    *DragonBones"),
+      _("Enables the use of animated skeleton objects made with DragonBones."),
       "Franco Maciel",
       "Open source (MIT License)");
 
   gd::ObjectMetadata& obj = extension.AddObject<SkeletonObject>(
       "Skeleton",
       _("Skeleton"),
-      _("Object animated through bones"),
+      _("Object displayed using skeletal animation, powered by DragonBones. This object is experimental and searching for a maintainer."),
       "JsPlatform/Extensions/skeletonicon.png");
 
   // Object instructions

@@ -36,14 +36,11 @@ export const openYarn = ({
   };
 
   ipcRenderer.removeAllListeners('yarn-changes-saved');
-  ipcRenderer.on(
-    'yarn-changes-saved',
-    (event, newFilePath, externalEditorData) => {
-      const name = path.relative(projectPath, newFilePath);
-      createOrUpdateResource(project, new gd.JsonResource(), name);
-      onChangesSaved([{ name }]);
-    }
-  );
+  ipcRenderer.on('yarn-changes-saved', (event, newFilePath) => {
+    const name = path.relative(projectPath, newFilePath);
+    createOrUpdateResource(project, new gd.JsonResource(), name);
+    onChangesSaved([{ name }]);
+  });
 
   ipcRenderer.send('yarn-create-json', externalEditorData);
 };

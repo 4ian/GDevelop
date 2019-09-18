@@ -8,10 +8,10 @@ const remote = electron.remote;
 
 let yarn = null;
 
-const saveAndClose = pathEditor => {
-  const savePath = pathEditor.state.fullPath;
+const saveAndClose = pathEditorHeader => {
+  const savePath = pathEditorHeader.state.fullPath;
   yarn.data.saveTo(savePath, yarn.data.getSaveData('json'), () => {
-    ipcRenderer.send('yarn-changes-saved', savePath, null);
+    ipcRenderer.send('yarn-changes-saved', savePath);
     remote.getCurrentWindow().close();
   });
 };

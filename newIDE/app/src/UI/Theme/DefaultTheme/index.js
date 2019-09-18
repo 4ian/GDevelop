@@ -129,9 +129,16 @@ const muiTheme = createMuiTheme({
       },
     },
     MuiButtonBase: {
+      // Remove the web-ish "pointer" (hand) cursor from buttons
       root: {
-        // Remove the web-ish "pointer" (hand) cursor from buttons
         cursor: 'default',
+      },
+    },
+    // Use non rounded buttons
+    MuiButton: {
+      root: {
+        borderRadius: 0,
+        fontWeight: 400, // Lower a bit the weight of buttons
       },
     },
   },

@@ -197,8 +197,8 @@ app.on('ready', function() {
       devTools,
       readyChannelName: 'yarn-ready',
       indexSubPath: 'yarn/yarn-index.html',
-      relativeWidth: 0.55,
-      relativeHeight: 0.8,
+      relativeWidth: 0.8,
+      relativeHeight: 0.9,
       backgroundColor: '#000000',
       onReady: yarnWindow => {
         yarnWindow.webContents.send('yarn-open', externalEditorData);

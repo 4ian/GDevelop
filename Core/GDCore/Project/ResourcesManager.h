@@ -5,6 +5,7 @@
  */
 #ifndef GDCORE_RESOURCESMANAGER_H
 #define GDCORE_RESOURCESMANAGER_H
+#include <map>
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
@@ -13,7 +14,7 @@ class Project;
 class ResourceFolder;
 class SerializerElement;
 class PropertyDescriptor;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -82,7 +83,9 @@ class GD_CORE_API Resource {
    * \note Can be used by external editors to store extra information, for
    * example the configuration used to produce a sound.
    */
-  virtual void SetMetadata(const gd::String& metadata_) { metadata = metadata_; }
+  virtual void SetMetadata(const gd::String& metadata_) {
+    metadata = metadata_;
+  }
 
   /**
    * \brief Return the (optional) metadata associated to the resource
@@ -300,7 +303,7 @@ class GD_CORE_API VideoResource : public Resource {
  */
 class GD_CORE_API JsonResource : public Resource {
  public:
-  JsonResource() : Resource() { SetKind("json"); };
+  JsonResource() : Resource(), disablePreload(false) { SetKind("json"); };
   virtual ~JsonResource(){};
   virtual JsonResource* Clone() const override {
     return new JsonResource(*this);
@@ -311,12 +314,30 @@ class GD_CORE_API JsonResource : public Resource {
 
 #if defined(GD_IDE_ONLY)
   virtual bool UseFile() override { return true; }
+
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties(
+      gd::Project& project) const override;
+  bool UpdateProperty(const gd::String& name,
+                      const gd::String& value,
+                      gd::Project& project) override;
+
   void SerializeTo(SerializerElement& element) const override;
 #endif
 
   void UnserializeFrom(const SerializerElement& element) override;
 
+  /**
+   * \brief Return true if the loading at game startup must be disabled
+   */
+  bool IsPreloadDisabled() const { return disablePreload; }
+
+  /**
+   * \brief Set if the json preload at game startup must be disabled
+   */
+  void DisablePreload(bool disable = true) { disablePreload = disable; }
+
  private:
+  bool disablePreload;  ///< If "true", don't load the JSON at game startup
   gd::String file;
 };
 
@@ -366,7 +387,8 @@ class GD_CORE_API ResourcesManager {
 
   /**
    * \brief Add an already constructed resource.
-   * \note A copy of the resource is made and stored inside the ResourcesManager.
+   * \note A copy of the resource is made and stored inside the
+   * ResourcesManager.
    */
   bool AddResource(const gd::Resource& resource);
 

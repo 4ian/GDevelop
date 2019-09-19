@@ -7,8 +7,8 @@ This project is released under the MIT License.
 
 #include "SkeletonObject.h"
 #include <SFML/Graphics.hpp>
-#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
@@ -52,10 +52,19 @@ void SkeletonObject::DoSerializeTo(gd::SerializerElement& element) const {
 std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties(
     gd::Project& project) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
-  properties[_("Skeletal data filename")].SetValue(skeletalDataFilename);
+  properties[_("Skeletal data filename")]
+      .SetValue(skeletalDataFilename)
+      .SetType("resource")
+      .AddExtraInfo("json");
   properties[_("Main armature name")].SetValue(rootArmatureName);
-  properties[_("Texture data filename")].SetValue(textureDataFilename);
-  properties[_("Texture")].SetValue(textureName);
+  properties[_("Texture data filename")]
+      .SetValue(textureDataFilename)
+      .SetType("resource")
+      .AddExtraInfo("json");
+  properties[_("Texture")]
+      .SetValue(textureName)
+      .SetType("resource")
+      .AddExtraInfo("image");
   properties[_("API")].SetValue(apiName).SetType("Choice").AddExtraInfo(
       "DragonBones");
   properties[_("Debug Polygons")]

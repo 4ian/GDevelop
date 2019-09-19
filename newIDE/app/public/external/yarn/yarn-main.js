@@ -51,7 +51,7 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
   yarn.document
     .getElementsByClassName('app-menu')[0]
     .appendChild(saveToGdButton);
-  saveToGdButton.childNodes[0].firstChild.data = 'Save & close';
+  saveToGdButton.childNodes[0].firstChild.data = 'Apply';
 
   // process the json file,if it exists
   if (fileExists(receivedData.resourcePath)) {

@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import ReactJsonView from 'react-json-view';
@@ -10,8 +11,9 @@ import {
 } from '../GDJSInspectorDescriptions';
 import { Line } from '../../UI/Grid';
 import mapValues from 'lodash/mapValues';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import Text from '../../UI/Text';
 
 type Props = {|
   runtimeScene: GameData,
@@ -112,9 +114,9 @@ export default class RuntimeSceneInspector extends React.Component<
 
     return (
       <div style={styles.container}>
-        <p>
+        <Text>
           <Trans>Layers:</Trans>
-        </p>
+        </Text>
         <ReactJsonView
           collapsed={false}
           name={false}
@@ -126,15 +128,15 @@ export default class RuntimeSceneInspector extends React.Component<
           groupArraysAfterLength={50}
           theme="monokai"
         />
-        <p>
+        <Text>
           <Trans>
             Create a new instance on the scene (will be at position 0;0):
           </Trans>
-        </p>
+        </Text>
         {runtimeScene._objects && runtimeScene._objects.items && (
-          <Line noMargin alignItems="baseline">
+          <Line noMargin alignItems="center">
             <SemiControlledAutoComplete
-              hintText={<Trans>Enter the name of the object</Trans>}
+              hintText={t`Enter the name of the object`}
               value={this.state.newObjectName}
               onChange={value => {
                 this.setState({
@@ -148,13 +150,14 @@ export default class RuntimeSceneInspector extends React.Component<
                 })
               )}
               openOnFocus
+              fullWidth
             />
             <RaisedButton
               label={<Trans>Create</Trans>}
               primary
-              onClick={() =>
-                onCall(['createObject'], [this.state.newObjectName])
-              }
+              onClick={() => {
+                onCall(['createObject'], [this.state.newObjectName]);
+              }}
             />
           </Line>
         )}

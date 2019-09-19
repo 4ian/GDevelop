@@ -5,8 +5,8 @@ import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import React, { PureComponent } from 'react';
-import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
+import TextField from '../TextField';
+import FlatButton from '../FlatButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
@@ -95,7 +95,7 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
               floatingLabelText={this.props.floatingLabelText}
               floatingLabelFixed
               type="text"
-              hintText={<Trans>Click to choose</Trans>}
+              hintText={t`Click to choose`}
               value={this.props.value}
               onChange={(event, value) => this.props.onChange(value)}
             />

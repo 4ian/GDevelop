@@ -1,6 +1,9 @@
 // @flow
 import { createTree } from './CreateTree';
-import { enumerateInstructions } from './EnumerateInstructions';
+import {
+  enumerateInstructions,
+  getObjectParameterIndex,
+} from './EnumerateInstructions';
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
@@ -66,5 +69,36 @@ describe('EnumerateInstructions', () => {
         },
       },
     });
+  });
+
+  it('can find the object parameter, if any', () => {
+    const actions = enumerateInstructions(false);
+    const conditions = enumerateInstructions(true);
+
+    const createInstruction = actions.filter(
+      ({ type }) => type === 'Create'
+    )[0];
+    expect(createInstruction).not.toBeUndefined();
+    expect(getObjectParameterIndex(createInstruction.metadata)).toBe(1);
+
+    const pickRandom = actions.filter(({ type }) => type === 'AjoutHasard')[0];
+    expect(pickRandom).not.toBeUndefined();
+    expect(getObjectParameterIndex(pickRandom.metadata)).toBe(1);
+
+    const pickAll = actions.filter(({ type }) => type === 'AjoutObjConcern')[0];
+    expect(pickAll).not.toBeUndefined();
+    expect(getObjectParameterIndex(pickAll.metadata)).toBe(1);
+
+    const triggerOnce = conditions.filter(
+      ({ type }) => type === 'BuiltinCommonInstructions::Once'
+    )[0];
+    expect(triggerOnce).not.toBeUndefined();
+    expect(getObjectParameterIndex(triggerOnce.metadata)).toBe(-1);
+
+    const spriteAnimatedEnded = conditions.filter(
+      ({ type }) => type === 'AnimationEnded'
+    )[0];
+    expect(spriteAnimatedEnded).not.toBeUndefined();
+    expect(getObjectParameterIndex(spriteAnimatedEnded.metadata)).toBe(0);
   });
 });

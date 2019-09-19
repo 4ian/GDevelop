@@ -105,6 +105,14 @@ export default class JsCodeEvent extends React.Component<
   };
 
   editObject = (domEvent: any) => {
+    // We should not need to stop the event propagation, but
+    // if we don't do this, the InlinePopover's clickaway listener
+    // is immediately picking up the event and closing.
+    // Caveat: we can open multiple InlinePopover.
+    // Search the rest of the codebase for onlinepopover-event-hack
+    domEvent.preventDefault();
+    domEvent.stopPropagation();
+
     this.setState({
       editingObject: true,
       anchorEl: domEvent.currentTarget,

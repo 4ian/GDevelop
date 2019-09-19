@@ -83,6 +83,17 @@ var objects = new gdjs.RuntimeScene();
  */
 
 /**
+ * Get the Hashtable containing the lists of instances of the specified object.
+ *
+ * You can alter the list and this will alter the objects picked for the next conditions/actions/events.
+ * If you don't need this, prefer using \`getObjects\`.
+ *
+ * @callback GetObjectsListsFunction
+ * @param {string} objectName The name of the object for which instances must be returned.
+ * @return {?Hashtable} Hashtable containing the lists of instances (keys are object names in the current context), or \`null\` if not found
+ */
+
+/**
  * Create a new object from its name. The object is added to the instances
  * living on the scene.
  *
@@ -112,7 +123,7 @@ var objects = new gdjs.RuntimeScene();
 /** Represents the context of the events function (or the behavior method),
  * if any. If the JS code is running in a scene, this will be undefined (so you can't use this in a scene).
  *
- * @type {?{getObjects: GetObjectsFunction, getBehaviorName: GetBehaviorNameFunction, createObject: CreateObjectFunction, getArgument: GetArgumentFunction, returnValue: boolean | number | string}}
+ * @type {?{getObjects: GetObjectsFunction, getObjectsLists: GetObjectsListsFunction, getBehaviorName: GetBehaviorNameFunction, createObject: CreateObjectFunction, getArgument: GetArgumentFunction, returnValue: boolean | number | string}}
  */
 var eventsFunctionContext = {};
 `,

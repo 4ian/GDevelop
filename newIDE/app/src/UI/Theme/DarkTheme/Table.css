@@ -1,6 +1,10 @@
 /* This is the styling applied to large tables (like the one used for InstancesList).
  * It mimics the Material UI Tables style. */
 
+.gd-table-dark-theme {
+  font-family: 'Roboto', '-apple-system', BlinkMacSystemFont, 'sans-serif';
+}
+
 .gd-table-dark-theme .tableHeaderRow,
 .gd-table-dark-theme .tableEvenRow,
 .gd-table-dark-theme .tableSelectedRow,

@@ -23,6 +23,9 @@ export default class WindowBorder {
   }
 
   render() {
+    this.windowRectangle.width = this.project.getMainWindowDefaultWidth();
+    this.windowRectangle.height = this.project.getMainWindowDefaultHeight();
+
     const displayedRectangle = transformRect(
       this.toCanvasCoordinates,
       this.windowRectangle

@@ -29,11 +29,9 @@ import Clipboard from '../Utils/Clipboard';
 import { passFullSize } from '../UI/FullSizeMeasurer';
 import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
-import Drawer from 'material-ui/Drawer';
-import IconButton from 'material-ui/IconButton';
-import NavigationClose from 'material-ui/svg-icons/navigation/close';
+import Drawer from '@material-ui/core/Drawer';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
-import EditorBar from '../UI/EditorBar';
+import EditorBar, { editorBarHeight } from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -77,6 +75,19 @@ const styles = {
     display: 'flex',
     flex: 1,
     position: 'relative',
+    overflow: 'hidden',
+  },
+};
+
+const layersDrawerPaperProps = {
+  style: {
+    width: 500,
+  },
+};
+
+const instancesDrawerPaperProps = {
+  style: {
+    width: 500,
     overflow: 'hidden',
   },
 };
@@ -661,36 +672,34 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
 
     if (global) {
-      gd.WholeProjectRefactorer.globalObjectRemoved(
+      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
         project,
         object.getName(),
+        /* isObjectGroup=*/ false,
         !!answer
       );
     } else {
-      gd.WholeProjectRefactorer.objectRemovedInLayout(
+      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
         project,
         layout,
         object.getName(),
+        /* isObjectGroup=*/ false,
         !!answer
       );
     }
     done(true);
   };
 
-  _canObjectUseNewName = (
-    objectWithContext: ObjectWithContext,
-    newName: string
-  ) => {
+  _canObjectOrGroupUseNewName = (newName: string) => {
     const { project, layout } = this.props;
-    const { object } = objectWithContext;
 
-    if (object.getName() === newName) {
-      return true;
-    } else if (
+    if (
       layout.hasObjectNamed(newName) ||
-      project.hasObjectNamed(newName)
+      project.hasObjectNamed(newName) ||
+      layout.getObjectGroups().has(newName) ||
+      project.getObjectGroups().has(newName)
     ) {
-      showWarningBox('Another object with this name already exists.');
+      showWarningBox('Another object or group with this name already exists.');
       return false;
     } else if (!gd.Project.validateObjectName(newName)) {
       showWarningBox(
@@ -718,25 +727,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    if (!gd.Project.validateObjectName(newName)) {
-      done(false);
-      return;
-    }
+    // newName is supposed to have been already validated
 
     // Avoid triggering renaming refactoring if name has not really changed
     if (object.getName() !== newName) {
       if (global) {
-        gd.WholeProjectRefactorer.globalObjectRenamed(
+        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
           project,
           object.getName(),
-          newName
+          newName,
+          /* isObjectGroup=*/ false
         );
       } else {
-        gd.WholeProjectRefactorer.objectRenamedInLayout(
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
           project,
           layout,
           object.getName(),
-          newName
+          newName,
+          /* isObjectGroup=*/ false
         );
       }
     }
@@ -746,19 +754,71 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onDeleteGroup = (
-    groupWithScope: GroupWithContext,
+    groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
-    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
+    const { group, global } = groupWithContext;
+    const { project, layout } = this.props;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      'Do you want to remove all references to this group in events (actions and conditions using the group)?'
+    );
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
+        project,
+        group.getName(),
+        /* isObjectGroup=*/ true,
+        !!answer
+      );
+    } else {
+      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+        project,
+        layout,
+        group.getName(),
+        /* isObjectGroup=*/ true,
+        !!answer
+      );
+    }
     done(true);
   };
 
+  _canGroupUseNewName = (groupWithScope: GroupWithContext, newName: string) => {
+    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer but only on some events)
+    return true;
+  };
+
   _onRenameGroup = (
-    groupWithScope: GroupWithContext,
+    groupWithContext: GroupWithContext,
     newName: string,
     done: boolean => void
   ) => {
-    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
+    const { group, global } = groupWithContext;
+    const { project, layout } = this.props;
+
+    // newName is supposed to have been already validated
+
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (group.getName() !== newName) {
+      if (global) {
+        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+          project,
+          group.getName(),
+          newName,
+          /* isObjectGroup=*/ true
+        );
+      } else {
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+          project,
+          layout,
+          group.getName(),
+          newName,
+          /* isObjectGroup=*/ true
+        );
+      }
+    }
+
     done(true);
   };
 
@@ -977,19 +1037,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             </I18n>,
             <CloseButton key="close" />,
           ]}
-          // TODO: Outdated
-          selectedObjectNames={
-            this.state
-              .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
-          }
-          canDropDraggedObject={
-            this.state
-              .canDropDraggedObject /*Ensure MosaicWindow content is updated when canDropDraggedObject changes*/
-          }
-          selectedObjectTags={
-            this.state
-              .selectedObjectTags /*Ensure MosaicWindow content is updated when selectedObjectTags changes*/
-          }
         >
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
@@ -1000,12 +1047,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             selectedObjectNames={this.state.selectedObjectNames}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
-            canRenameObject={(
-              objectWithContext: ObjectWithContext,
-              newName: string
-            ) => {
-              return this._canObjectUseNewName(objectWithContext, newName);
-            }}
+            canRenameObject={this._canObjectOrGroupUseNewName}
             onObjectCreated={this._addNewObjectInstance}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
@@ -1032,6 +1074,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onEditGroup={this.editGroup}
             onDeleteGroup={this._onDeleteGroup}
             onRenameGroup={this._onRenameGroup}
+            canRenameGroup={this._canObjectOrGroupUseNewName}
           />
         </MosaicWindow>
       ),
@@ -1069,15 +1112,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               }
               this.editObject(null);
             }}
-            canRenameObject={tryName => {
-              return (
-                this.state.editedObjectWithContext &&
-                this._canObjectUseNewName(
-                  this.state.editedObjectWithContext,
-                  tryName
-                )
-              );
-            }}
+            canRenameObject={this._canObjectOrGroupUseNewName}
             onRename={newName => {
               this._onRenameEditedObject(newName);
             }}
@@ -1093,48 +1128,48 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
           />
         )}
-        <ObjectGroupEditorDialog
-          project={project}
-          open={!!this.state.editedGroup}
-          group={this.state.editedGroup}
-          objectsContainer={layout}
-          globalObjectsContainer={project}
-          onCancel={() => this.editGroup(null)}
-          onApply={() => this.editGroup(null)}
-        />
+        {!!this.state.editedGroup && (
+          <ObjectGroupEditorDialog
+            project={project}
+            open
+            group={this.state.editedGroup}
+            objectsContainer={layout}
+            globalObjectsContainer={project}
+            onCancel={() => this.editGroup(null)}
+            onApply={() => this.editGroup(null)}
+          />
+        )}
         <Drawer
           open={this.state.instancesListOpen}
-          width={500}
-          openSecondary={true}
-          containerStyle={{ overflow: 'hidden' }}
+          PaperProps={instancesDrawerPaperProps}
+          anchor="right"
+          onClose={this.toggleInstancesList}
         >
           <EditorBar
             title={<Trans>Instances</Trans>}
-            iconElementLeft={
-              <IconButton onClick={this.toggleInstancesList}>
-                <NavigationClose />
-              </IconButton>
-            }
+            displayLeftCloseButton
+            onClose={this.toggleInstancesList}
           />
           <InstancesList
             freezeUpdate={!this.state.instancesListOpen}
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
+            style={{
+              height: `calc(100% - ${editorBarHeight}px)`,
+            }}
           />
         </Drawer>
         <Drawer
           open={this.state.layersListOpen}
-          width={400}
-          openSecondary={true}
+          PaperProps={layersDrawerPaperProps}
+          anchor="right"
+          onClose={this.toggleLayersList}
         >
           <EditorBar
             title={<Trans>Layers</Trans>}
-            iconElementLeft={
-              <IconButton onClick={this.toggleLayersList}>
-                <NavigationClose />
-              </IconButton>
-            }
+            displayLeftCloseButton
+            onClose={this.toggleLayersList}
           />
           <LayersList
             freezeUpdate={!this.state.layersListOpen}
@@ -1144,6 +1179,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         </Drawer>
         <InfoBar
+          identifier="instance-drag-n-drop-explanation"
           message={
             <Trans>
               Drag and Drop the object to the scene or use the right click menu
@@ -1153,6 +1189,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
+          identifier="objects-panel-explanation"
           message={
             <Trans>
               Objects panel is already opened: use it to add and edit objects.
@@ -1161,63 +1198,88 @@ export default class SceneEditor extends React.Component<Props, State> {
           show={!!this.state.showObjectsListInfoBar}
         />
         <InfoBar
-          message={<Trans>Properties panel is already opened.</Trans>}
+          identifier="instance-properties-panel-explanation"
+          message={
+            <Trans>
+              Properties panel is already opened. After selecting an instance on
+              the scene, inspect and change its properties from this panel.
+            </Trans>
+          }
           show={!!this.state.showPropertiesInfoBar}
         />
-        <SetupGridDialog
-          open={this.state.setupGridOpen}
-          gridOptions={this.state.uiSettings}
-          onCancel={() => this.openSetupGrid(false)}
-          onApply={gridOptions => {
-            this.setUiSettings(gridOptions);
-            this.openSetupGrid(false);
-          }}
-        />
-        <VariablesEditorDialog
-          open={!!this.state.variablesEditedInstance}
-          variablesContainer={
-            this.state.variablesEditedInstance &&
-            this.state.variablesEditedInstance.getVariables()
-          }
-          onCancel={() => this.editInstanceVariables(null)}
-          onApply={() => this.editInstanceVariables(null)}
-          emptyExplanationMessage="Instance variables will override the default values of the variables of the object."
-          title="Instance Variables"
-          onEditObjectVariables={() => {
-            if (!this.instancesSelection.hasSelectedInstances()) {
-              return;
+        {this.state.setupGridOpen && (
+          <SetupGridDialog
+            open
+            gridOptions={this.state.uiSettings}
+            onCancel={() => this.openSetupGrid(false)}
+            onApply={gridOptions => {
+              this.setUiSettings(gridOptions);
+              this.openSetupGrid(false);
+            }}
+          />
+        )}
+        {!!this.state.variablesEditedInstance && (
+          <VariablesEditorDialog
+            open
+            variablesContainer={
+              this.state.variablesEditedInstance &&
+              this.state.variablesEditedInstance.getVariables()
             }
-            const associatedObjectName = this.instancesSelection
-              .getSelectedInstances()[0]
-              .getObjectName();
-            const object = getObjectByName(
-              project,
-              layout,
-              associatedObjectName
-            );
-            if (object) {
-              this.editObjectVariables(object);
-              this.editInstanceVariables(null);
+            onCancel={() => this.editInstanceVariables(null)}
+            onApply={() => this.editInstanceVariables(null)}
+            emptyExplanationMessage={
+              <Trans>
+                Instance variables will override the default values of the
+                variables of the object.
+              </Trans>
             }
-          }}
-        />
-        <VariablesEditorDialog
-          open={!!this.state.variablesEditedObject}
-          variablesContainer={
-            this.state.variablesEditedObject &&
-            this.state.variablesEditedObject.getVariables()
-          }
-          onCancel={() => this.editObjectVariables(null)}
-          onApply={() => this.editObjectVariables(null)}
-          emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
-          title="Object Variables"
-        />
-        <LayerRemoveDialog
-          open={!!this.state.layerRemoveDialogOpen}
-          layersContainer={layout}
-          layerRemoved={this.state.layerRemoved}
-          onClose={this.state.onCloseLayerRemoveDialog}
-        />
+            title={<Trans>Instance Variables</Trans>}
+            onEditObjectVariables={() => {
+              if (!this.instancesSelection.hasSelectedInstances()) {
+                return;
+              }
+              const associatedObjectName = this.instancesSelection
+                .getSelectedInstances()[0]
+                .getObjectName();
+              const object = getObjectByName(
+                project,
+                layout,
+                associatedObjectName
+              );
+              if (object) {
+                this.editObjectVariables(object);
+                this.editInstanceVariables(null);
+              }
+            }}
+          />
+        )}
+        {!!this.state.variablesEditedObject && (
+          <VariablesEditorDialog
+            open
+            variablesContainer={
+              this.state.variablesEditedObject &&
+              this.state.variablesEditedObject.getVariables()
+            }
+            onCancel={() => this.editObjectVariables(null)}
+            onApply={() => this.editObjectVariables(null)}
+            emptyExplanationMessage={
+              <Trans>
+                When you add variables to an object, any instance of the object
+                put on the scene or created during the game will have these
+                variables attached to it.
+              </Trans>
+            }
+            title={<Trans>Object Variables</Trans>}
+          />
+        )}
+        {!!this.state.layerRemoveDialogOpen && (
+          <LayerRemoveDialog
+            open
+            layersContainer={layout}
+            layerRemoved={this.state.layerRemoved}
+            onClose={this.state.onCloseLayerRemoveDialog}
+          />
+        )}
         {this.state.scenePropertiesDialogOpen && (
           <ScenePropertiesDialog
             open
@@ -1229,15 +1291,27 @@ export default class SceneEditor extends React.Component<Props, State> {
             onOpenMoreSettings={this.props.onOpenMoreSettings}
           />
         )}
-        <VariablesEditorDialog
-          open={!!this.state.layoutVariablesDialogOpen}
-          variablesContainer={layout.getVariables()}
-          onCancel={() => this.editLayoutVariables(false)}
-          onApply={() => this.editLayoutVariables(false)}
-          title="Scene variables"
-          emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
-          emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
-        />
+        {!!this.state.layoutVariablesDialogOpen && (
+          <VariablesEditorDialog
+            open
+            variablesContainer={layout.getVariables()}
+            onCancel={() => this.editLayoutVariables(false)}
+            onApply={() => this.editLayoutVariables(false)}
+            title={<Trans>Scene Variables</Trans>}
+            emptyExplanationMessage={
+              <Trans>
+                Scene variables can be used to store any value or text during
+                the game.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called Score representing
+                the current score of the player.
+              </Trans>
+            }
+          />
+        )}
         <ContextMenu
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [

@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -26,6 +26,7 @@ import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import {
   enumerateObjectInstructions,
   enumerateInstructions,
+  getObjectParameterIndex,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import HelpButton from '../../UI/HelpButton';
 import Background from '../../UI/Background';
@@ -38,12 +39,8 @@ import {
 const gd = global.gd;
 
 const styles = {
-  dialogContent: {
-    width: 'calc(100% - 16px)',
-    maxWidth: 'none',
-  },
-  dialogBody: {
-    padding: 0,
+  fullHeightSelector: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
   },
@@ -104,24 +101,30 @@ export default class NewInstructionEditorDialog extends React.Component<
       // select the object, which is the first parameter of the instruction.
       const allInstructions = enumerateInstructions(isCondition);
       const instructionType: string = instruction.getType();
-      const instructionMetadata = findInstruction(
+      const enumeratedInstructionMetadata = findInstruction(
         allInstructions,
         instructionType
       );
       if (
-        instructionMetadata &&
-        (instructionMetadata.scope.objectMetadata ||
-          instructionMetadata.scope.behaviorMetadata) &&
-        instruction.getParametersCount() > 0
+        enumeratedInstructionMetadata &&
+        (enumeratedInstructionMetadata.scope.objectMetadata ||
+          enumeratedInstructionMetadata.scope.behaviorMetadata)
       ) {
-        return {
-          ...this._chooseObject(
-            instruction.getParameter(0),
-            false /* Even if the instruction is invalid for the object, show it as it's what we have already */
-          ),
-          step: isNewInstruction ? 'object-or-free-instructions' : 'parameters',
-          currentInstructionOrObjectSelectorTab: 'objects',
-        };
+        const objectParameterIndex = getObjectParameterIndex(
+          enumeratedInstructionMetadata.metadata
+        );
+        if (objectParameterIndex !== -1) {
+          return {
+            ...this._getChosenObjectState(
+              instruction.getParameter(objectParameterIndex),
+              false /* Even if the instruction is invalid for the object, show it as it's what we have already */
+            ),
+            step: isNewInstruction
+              ? 'object-or-free-instructions'
+              : 'parameters',
+            currentInstructionOrObjectSelectorTab: 'objects',
+          };
+        }
       }
     }
 
@@ -150,7 +153,7 @@ export default class NewInstructionEditorDialog extends React.Component<
     );
   };
 
-  _chooseObject(
+  _getChosenObjectState(
     objectName: string,
     discardInstructionTypeIfNotInObjectInstructions: boolean
   ): State {
@@ -251,6 +254,19 @@ export default class NewInstructionEditorDialog extends React.Component<
         );
   };
 
+  _changeTab = (currentInstructionOrObjectSelectorTab: TabName) =>
+    this.setState({
+      currentInstructionOrObjectSelectorTab,
+    });
+
+  _forceUpdate = () => {
+    this.forceUpdate(); /*Force update to ensure dialog is properly positioned*/
+  };
+
+  _chooseObject = (objectName: string) => {
+    this.setState(this._getChosenObjectState(objectName, true));
+  };
+
   render() {
     const {
       project,
@@ -278,41 +294,25 @@ export default class NewInstructionEditorDialog extends React.Component<
       : undefined;
 
     const renderInstructionOrObjectSelector = () => (
-      <div
-        key="instruction-or-object-selector"
-        style={{
-          flex: 1,
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          display: true ? 'flex' : 'none',
-        }}
-      >
-        <Background noFullHeight>
-          <InstructionOrObjectSelector
-            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
-            project={project}
-            currentTab={currentInstructionOrObjectSelectorTab}
-            onChangeTab={currentInstructionOrObjectSelectorTab =>
-              this.setState({
-                currentInstructionOrObjectSelectorTab,
-              })
-            }
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            isCondition={isCondition}
-            chosenInstructionType={instructionType}
-            onChooseInstruction={this._chooseFreeInstruction}
-            chosenObjectName={chosenObjectName}
-            onChooseObject={objectName => {
-              this.setState(this._chooseObject(objectName, true));
-            }}
-            focusOnMount={!instructionType}
-            onSearchStartOrReset={() => {
-              this.forceUpdate(); /*Force update to ensure dialog is properly positioned*/
-            }}
-          />
-        </Background>
-      </div>
+      <Background noFullHeight key="instruction-or-object-selector">
+        <InstructionOrObjectSelector
+          style={styles.fullHeightSelector}
+          project={project}
+          currentTab={currentInstructionOrObjectSelectorTab}
+          onChangeTab={this._changeTab}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          isCondition={isCondition}
+          chosenInstructionType={
+            !chosenObjectName ? instructionType : undefined
+          }
+          onChooseInstruction={this._chooseFreeInstruction}
+          chosenObjectName={chosenObjectName}
+          onChooseObject={this._chooseObject}
+          focusOnMount={!instructionType}
+          onSearchStartOrReset={this._forceUpdate}
+        />
+      </Background>
     );
 
     const renderParameters = () => (
@@ -340,24 +340,19 @@ export default class NewInstructionEditorDialog extends React.Component<
 
     const renderObjectInstructionSelector = () =>
       chosenObjectInstructionsInfoTree && chosenObjectInstructionsInfo ? (
-        <Background noFullHeight key="object-instruction-selector">
-          <InstructionOrExpressionSelector
-            instructionsInfo={chosenObjectInstructionsInfo}
-            instructionsInfoTree={chosenObjectInstructionsInfoTree}
-            iconSize={24}
-            onChoose={this._chooseObjectInstruction}
-            selectedType={instructionType}
-            useSubheaders
-            focusOnMount={!instructionType}
-            searchBarHintText={
-              isCondition ? (
-                <Trans>Search {chosenObjectName} conditions</Trans>
-              ) : (
-                <Trans>Search {chosenObjectName} actions</Trans>
-              )
-            }
-          />
-        </Background>
+        <InstructionOrExpressionSelector
+          key="object-instruction-selector"
+          style={styles.fullHeightSelector}
+          instructionsInfo={chosenObjectInstructionsInfo}
+          instructionsInfoTree={chosenObjectInstructionsInfoTree}
+          iconSize={24}
+          onChoose={this._chooseObjectInstruction}
+          selectedType={instructionType}
+          useSubheaders
+          focusOnMount={!instructionType}
+          searchPlaceholderObjectName={chosenObjectName}
+          searchPlaceholderIsCondition={isCondition}
+        />
       ) : null;
 
     return (
@@ -407,8 +402,9 @@ export default class NewInstructionEditorDialog extends React.Component<
             ]}
             open={open}
             onRequestClose={onCancel}
-            contentStyle={styles.dialogContent}
-            bodyStyle={styles.dialogBody}
+            maxWidth={false}
+            noMargin
+            flexRowBody
           >
             <SelectColumns
               columnsRenderer={{

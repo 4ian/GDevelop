@@ -14,7 +14,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
 {
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-    this._characterSize = objectData.characterSize;
+    this._characterSize = Math.max(1, objectData.characterSize);
     this._fontName = objectData.font;
     this._bold = objectData.bold;
     this._italic = objectData.italic;

@@ -5,21 +5,22 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 import { mapVector } from '../Utils/MapFor';
-import RaisedButton from 'material-ui/RaisedButton';
-import IconButton from 'material-ui/IconButton';
+import RaisedButton from '../UI/RaisedButton';
+import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import IconMenu from '../UI/Menu/IconMenu';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from 'material-ui/svg-icons/action/visibility';
-import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Add from '@material-ui/icons/Add';
 
 const gd = global.gd;
 
@@ -124,8 +125,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                       <MiniToolbar>
                         <Column expand noMargin>
                           <SemiControlledTextField
+                            margin="none"
                             commitOnBlur
-                            hintText={<Trans>Enter the property name</Trans>}
+                            hintText={t`Enter the property name`}
                             value={property.getName()}
                             onChange={newName => {
                               if (newName === property.getName()) return;
@@ -163,10 +165,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
                         />
-                        <IconMenu
-                          iconButtonElement={
+                        <ElementWithMenu
+                          element={
                             <IconButton>
-                              <MoreVertIcon />
+                              <MoreVert />
                             </IconButton>
                           }
                           buildMenuTemplate={() => [
@@ -194,24 +196,24 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           <SelectField
                             floatingLabelText={<Trans>Type</Trans>}
                             value={property.getType()}
-                            onChange={(e, i, value) => {
+                            onChange={(e, i, value: string) => {
                               property.setType(value);
                               this.forceUpdate();
                               this.props.onPropertiesUpdated();
                             }}
                             fullWidth
                           >
-                            <MenuItem
+                            <SelectOption
                               value="Number"
-                              primaryText={<Trans>Number</Trans>}
+                              primaryText={t`Number`}
                             />
-                            <MenuItem
+                            <SelectOption
                               value="String"
-                              primaryText={<Trans>String</Trans>}
+                              primaryText={t`String`}
                             />
-                            <MenuItem
+                            <SelectOption
                               value="Boolean"
-                              primaryText={<Trans>Boolean (checkbox)</Trans>}
+                              primaryText={t`Boolean (checkbox)`}
                             />
                           </SelectField>
                         </Column>
@@ -248,13 +250,13 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               }}
                               fullWidth
                             >
-                              <MenuItem
+                              <SelectOption
                                 value="true"
-                                primaryText={<Trans>True (checked)</Trans>}
+                                primaryText={t`True (checked)`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="false"
-                                primaryText={<Trans>False (not checked)</Trans>}
+                                primaryText={t`False (not checked)`}
                               />
                             </SelectField>
                           )}
@@ -267,12 +269,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             floatingLabelText={
                               <Trans>Label, shown in the editor</Trans>
                             }
-                            hintText={
-                              <Trans>
-                                This should make the purpose of the property
-                                easy to understand
-                              </Trans>
-                            }
+                            hintText={t`This should make the purpose of the property easy to understand`}
                             floatingLabelFixed
                             value={property.getLabel()}
                             onChange={text => {
@@ -295,13 +292,17 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                     </Trans>
                   </EmptyMessage>
                 ) : null}
-                <Line justifyContent="center">
-                  <RaisedButton
-                    primary
-                    label={<Trans>Add a property</Trans>}
-                    onClick={this._addProperty}
-                  />
-                </Line>
+                <Column>
+                  <Line justifyContent="flex-end" expand>
+                    <RaisedButton
+                      primary
+                      label={<Trans>Add a property</Trans>}
+                      onClick={this._addProperty}
+                      labelPosition="before"
+                      icon={<Add />}
+                    />
+                  </Line>
+                </Column>
               </div>
             </Line>
           </Column>

@@ -12,7 +12,11 @@ import HelpIcon from '../UI/HelpIcon';
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
-import { Tabs, Tab } from '../UI/Tabs';
+import {
+  ClosableTabs,
+  ClosableTab,
+  TabContentContainer,
+} from '../UI/ClosableTabs';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
@@ -30,6 +34,8 @@ import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
+import ResourceSelector from '../ResourcesList/ResourceSelector';
+import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/ParameterFields/ExternalEventsField';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
@@ -37,6 +43,7 @@ import MouseField from '../EventsSheet/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
 import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/ParameterFields/KeyField';
+import AudioResourceField from '../EventsSheet/ParameterFields/AudioResourceField';
 import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/ParameterFields/StringField';
 import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
@@ -54,8 +61,7 @@ import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
 import ObjectGroupEditor from '../ObjectGroupEditor';
 import ObjectGroupsList from '../ObjectGroupsList';
-import muiDecorator from './MuiDecorator';
-import i18nProviderDecorator from './I18nProviderDecorator';
+import muiDecorator from './ThemeDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
@@ -104,7 +110,7 @@ import SearchPanel from '../EventsSheet/SearchPanel';
 import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import InlineCheckbox from '../UI/InlineCheckbox';
+import Checkbox from '../UI/Checkbox';
 import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -134,6 +140,12 @@ import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
 import SearchBar from '../UI/SearchBar';
 import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
+import EffectsList from '../EffectsList';
+import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
+import Dialog from '../UI/Dialog';
+import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
+import NewObjectDialog from '../ObjectsList/NewObjectDialog';
+import { Column } from '../UI/Grid';
 
 // No i18n in this file
 
@@ -159,6 +171,9 @@ const {
   testEmptyEventsBasedBehavior,
   testBehaviorEventsFunction,
   testBehaviorLifecycleEventsFunction,
+  layerWithEffects,
+  layerWithEffectWithoutEffectName,
+  layerWithoutEffects,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -249,6 +264,25 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
       )}
     />
   ))
+  .add('default, with error', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+            errorText={'There was an error somewhere'}
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
   .add('default, with onClick for some elements', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}
@@ -261,12 +295,12 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
               {
                 text: '',
                 value: 'Click me 1',
-                onClick: () => action('Click me 1 clicked'),
+                onClick: action('Click me 1 clicked'),
               },
               {
                 text: '',
                 value: 'Click me 2',
-                onClick: () => action('Click me 2 clicked'),
+                onClick: action('Click me 2 clicked'),
               },
               {
                 type: 'separator',
@@ -278,6 +312,62 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
               }))
             )}
           />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('in a dialog, with onClick for some elements', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <Dialog open>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: 'Click me 1',
+                onClick: action('Click me 1 clicked'),
+              },
+              {
+                text: '',
+                value: 'Click me 2',
+                onClick: action('Click me 2 clicked'),
+              },
+              {
+                type: 'separator',
+              },
+            ].concat(
+              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                text: `Choice ${i}`,
+                value: `Choice ${i}`,
+              }))
+            )}
+          />
+          <p>State value is {value}</p>
+        </Dialog>
+      )}
+    />
+  ))
+  .add('reduced margin, in a MiniToolbar', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <MiniToolbar>
+            <MiniToolbarText>Please make a choice:</MiniToolbarText>
+            <SemiControlledAutoComplete
+              margin="none"
+              value={value}
+              onChange={onChange}
+              dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                text: `Choice ${i}`,
+                value: `Choice ${i}`,
+              }))}
+            />
+          </MiniToolbar>
           <p>State value is {value}</p>
         </React.Fragment>
       )}
@@ -345,13 +435,13 @@ storiesOf('UI Building Blocks/LoaderModal', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LoaderModal show />);
 
-storiesOf('UI Building Blocks/InlineCheckbox', module)
+storiesOf('UI Building Blocks/Checkbox', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <div style={{ display: 'flex' }}>
-      <InlineCheckbox label={'My label'} checked={true} />
-      <InlineCheckbox label={'My label 2'} checked={false} />
+      <Checkbox label={'My label'} checked={true} />
+      <Checkbox label={'My label 2'} checked={false} />
     </div>
   ));
 
@@ -461,89 +551,242 @@ storiesOf('UI Building Blocks/ColorField', module)
     </div>
   ));
 
-storiesOf('UI Building Blocks/Tabs', module)
+storiesOf('UI Building Blocks/ClosableTabs', module)
   .addDecorator(muiDecorator)
   .add('3 tabs', () => (
-    <FixedHeightFlexContainer height={400}>
-      <Tabs>
-        <Tab label="Tab 1" onClose={action('Close tab 1')}>
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 1 content
-          </div>
-        </Tab>
-        <Tab label="Tab 2" onClose={action('Close tab 2')}>
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 2 content
-          </div>
-        </Tab>
-        <Tab label="Tab 3 with a long label" onClose={action('Close tab 3')}>
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 3 content
-          </div>
-        </Tab>
-      </Tabs>
-    </FixedHeightFlexContainer>
+    <ValueStateHolder
+      initialValue={0}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <Column expand>
+            <ClosableTabs>
+              <ClosableTab
+                onActivated={action('Tab 1 activated')}
+                closable
+                active={value === 0}
+                onClick={() => onChange(0)}
+                label="Tab 1"
+                onClose={action('Close tab 1')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+              <ClosableTab
+                onActivated={action('Tab 2 activated')}
+                closable
+                active={value === 1}
+                onClick={() => onChange(1)}
+                label="Tab 2"
+                onClose={action('Close tab 2')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+              <ClosableTab
+                onActivated={action('Tab 3 activated')}
+                closable
+                active={value === 2}
+                onClick={() => onChange(2)}
+                label="Tab 3 with a long label"
+                onClose={action('Close tab 3')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+            </ClosableTabs>
+            {
+              <TabContentContainer active={value === 0}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 1 content
+                </div>
+              </TabContentContainer>
+            }
+            {
+              <TabContentContainer active={value === 1}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 2 content
+                </div>
+              </TabContentContainer>
+            }
+            {
+              <TabContentContainer active={value === 2}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 3 content
+                </div>
+              </TabContentContainer>
+            }
+          </Column>
+        </FixedHeightFlexContainer>
+      )}
+    />
   ))
   .add('long labels', () => (
-    <FixedHeightFlexContainer height={400}>
-      <Tabs>
-        <Tab
-          label="Tab 1 with a very very long label"
-          onClose={action('Close tab 1')}
-        >
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 1 content
-          </div>
-        </Tab>
-        <Tab label="Small 2" onClose={action('Close tab 2')}>
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 2 content
-          </div>
-        </Tab>
-        <Tab
-          label="Tab 3 with a very very loooong label"
-          onClose={action('Close tab 3')}
-        >
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 3 content
-          </div>
-        </Tab>
-        <Tab label="Small 4" onClose={action('Close tab 4')}>
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 4 content
-          </div>
-        </Tab>
-      </Tabs>
-    </FixedHeightFlexContainer>
+    <ValueStateHolder
+      initialValue={0}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <Column expand>
+            <ClosableTabs>
+              <ClosableTab
+                onActivated={action('Tab 1 activated')}
+                closable
+                active={value === 0}
+                label="Tab 1 with a very very long label"
+                onClose={action('Close tab 1')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+                onClick={() => onChange(0)}
+              />
+              <ClosableTab
+                onActivated={action('Tab 2 activated')}
+                closable
+                active={value === 1}
+                onClick={() => onChange(1)}
+                label="Small 2"
+                onClose={action('Close tab 2')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+              <ClosableTab
+                onActivated={action('Tab 3 activated')}
+                closable
+                active={value === 2}
+                onClick={() => onChange(2)}
+                label="Tab 3 with a very very loooooooooooooooooooooooooooooooooooooooooong label"
+                onClose={action('Close tab 3')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+              <ClosableTab
+                onActivated={action('Tab 4 activated')}
+                closable
+                active={value === 3}
+                onClick={() => onChange(3)}
+                label="Small 4"
+                onClose={action('Close tab 4')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+            </ClosableTabs>
+            {
+              <TabContentContainer active={value === 0}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 1 content
+                </div>
+              </TabContentContainer>
+            }
+            {
+              <TabContentContainer active={value === 1}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 2 content
+                </div>
+              </TabContentContainer>
+            }
+            {
+              <TabContentContainer active={value === 2}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 3 content
+                </div>
+              </TabContentContainer>
+            }
+            {
+              <TabContentContainer active={value === 3}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 4 content
+                </div>
+              </TabContentContainer>
+            }
+          </Column>
+        </FixedHeightFlexContainer>
+      )}
+    />
   ))
   .add('with ObjectsList (to check scrolling)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <Tabs>
-        <Tab label="Tab 1" onClose={action('Close tab 1')}>
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            The second tab has a list of objects. Check that the scrolling
-            position is maintained while navigating between tabs.
-          </div>
-        </Tab>
-        <Tab label="Tab 2" onClose={action('Close tab 2')}>
-          <ObjectsList
-            getThumbnail={() => 'res/unknown32.png'}
-            project={project}
-            objectsContainer={testLayout}
-            onEditObject={action('On edit object')}
-            selectedObjectNames={[]}
-            selectedObjectTags={[]}
-            onChangeSelectedObjectTags={() => {}}
-            getAllObjectTags={() => []}
-          />
-        </Tab>
-        <Tab label="Tab 3" onClose={action('Close tab 3')}>
-          <div style={{ backgroundColor: 'green', height: '100%' }}>
-            Tab 3 content
-          </div>
-        </Tab>
-      </Tabs>
-    </FixedHeightFlexContainer>
+    <ValueStateHolder
+      initialValue={0}
+      render={(value, onChange) => (
+        <FixedHeightFlexContainer height={400}>
+          <Column expand>
+            <ClosableTabs>
+              <ClosableTab
+                onActivated={action('Tab 1 activated')}
+                closable
+                active={value === 0}
+                label="Tab 1"
+                onClick={() => onChange(0)}
+                onClose={action('Close tab 1')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+              <ClosableTab
+                onActivated={action('Tab 2 activated')}
+                closable
+                active={value === 1}
+                label="Tab 2"
+                onClick={() => onChange(1)}
+                onClose={action('Close tab 2')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+              <ClosableTab
+                onActivated={action('Tab 3 activated')}
+                closable
+                active={value === 2}
+                label="Tab 3"
+                onClick={() => onChange(2)}
+                onClose={action('Close tab 3')}
+                onCloseAll={action('Close all')}
+                onCloseOthers={action('Close others')}
+              />
+            </ClosableTabs>
+            {
+              <TabContentContainer active={value === 0}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  The second tab has a list of objects. Check that the scrolling
+                  position is maintained while navigating between tabs.
+                </div>
+              </TabContentContainer>
+            }
+            {
+              <TabContentContainer active={value === 1}>
+                <ObjectsList
+                  getThumbnail={() => 'res/unknown32.png'}
+                  project={project}
+                  objectsContainer={testLayout}
+                  onEditObject={action('On edit object')}
+                  selectedObjectNames={[]}
+                  selectedObjectTags={[]}
+                  onChangeSelectedObjectTags={() => {}}
+                  getAllObjectTags={() => []}
+                />
+              </TabContentContainer>
+            }
+            {
+              <TabContentContainer active={value === 2}>
+                <div
+                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
+                >
+                  Tab 3 content
+                </div>
+              </TabContentContainer>
+            }
+          </Column>
+        </FixedHeightFlexContainer>
+      )}
+    />
   ));
 
 storiesOf('UI Building Blocks/HelpButton', module)
@@ -561,6 +804,25 @@ storiesOf('HelpFinder', module)
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
+  .add('AudioResourceField', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <AudioResourceField
+          project={project}
+          scope={{ layout: testLayout }}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+          resourceSources={[]}
+          onChooseResource={() => Promise.reject('unimplemented')}
+          resourceExternalEditors={[]}
+        />
+      )}
+    />
+  ))
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
@@ -1141,7 +1403,6 @@ storiesOf('LocalFilePicker', module)
 
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <StartPage onOpenLanguageDialog={action('open language dialog')} />
   ));
@@ -1368,7 +1629,6 @@ storiesOf('EventsSheet', module)
 
 storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <EventsFunctionExtractorDialog
       project={project}
@@ -1527,44 +1787,47 @@ storiesOf('InstructionEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default (no scope)', () => (
-    <InstructionEditor
-      project={project}
-      scope={{ layout: testLayout }}
-      globalObjectsContainer={project}
-      objectsContainer={testLayout}
-      isCondition
-      instruction={testInstruction}
-      resourceExternalEditors={[]}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      openInstructionOrExpression={action('open instruction or expression')}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <InstructionEditor
+        project={project}
+        scope={{ layout: testLayout }}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        instruction={testInstruction}
+        resourceExternalEditors={[]}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+      />
+    </FixedHeightFlexContainer>
   ))
   .add('without layout (no scope)', () => (
-    <InstructionEditor
-      project={project}
-      scope={{ layout: null }}
-      globalObjectsContainer={project}
-      objectsContainer={testLayout}
-      isCondition
-      instruction={testInstruction}
-      resourceExternalEditors={[]}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      openInstructionOrExpression={action('open instruction or expression')}
-    />
+    <FixedHeightFlexContainer height={400}>
+      <InstructionEditor
+        project={project}
+        scope={{ layout: null }}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        isCondition
+        instruction={testInstruction}
+        resourceExternalEditors={[]}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('NewInstructionEditorDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('Existing condition (scope: in a layout)', () => (
     <NewInstructionEditorDialog
       open
@@ -1634,7 +1897,15 @@ storiesOf('TextEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={textObject}>
-      <TextEditor object={textObject} project={project} />
+      <TextEditor
+        object={textObject}
+        project={project}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)
+        }
+        resourceExternalEditors={[]}
+      />
     </SerializedObjectDisplay>
   ));
 
@@ -1860,6 +2131,7 @@ storiesOf('ObjectGroupsList', module)
           globalObjectGroups={project.getObjectGroups()}
           objectGroups={testLayout.getObjectGroups()}
           onEditGroup={() => {}}
+          canRenameGroup={() => true}
         />
       </div>
     </SerializedObjectDisplay>
@@ -2013,6 +2285,22 @@ storiesOf('SubscriptionDialog', module)
     <UserProfileContext.Provider value={fakeNoSubscriptionUserProfile}>
       <SubscriptionDialog open onClose={action('on close')} />
     </UserProfileContext.Provider>
+  ));
+
+storiesOf('SubscriptionPendingDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default (no subscription)', () => (
+    <SubscriptionPendingDialog
+      userProfile={fakeNoSubscriptionUserProfile}
+      onClose={action('on close')}
+    />
+  ))
+  .add('authenticated user with subscription', () => (
+    <SubscriptionPendingDialog
+      userProfile={fakeIndieUserProfile}
+      onClose={action('on close')}
+    />
   ));
 
 storiesOf('LoginDialog', module)
@@ -2195,6 +2483,56 @@ storiesOf('ResourcePreview', module)
     />
   ));
 
+storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
+  .addDecorator(muiDecorator)
+  .add('image resource (not existing/missing resource)', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="resource-that-does-not-exists-in-the-project"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource', () => (
+    <ResourceSelector
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="icon128.png"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource, with thumbnail', () => (
+    <ResourceSelectorWithThumbnail
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      resourceName="icon128.png"
+      onChange={action('on change')}
+    />
+  ))
+  .add('audio resource', () => (
+    <ResourceSelector
+      resourceKind="audio"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={[]}
+      initialResourceName="fake-audio1.mp3"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ));
+
 storiesOf('ResourcesList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -2217,7 +2555,6 @@ storiesOf('ResourcesList', module)
 storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default, for a free function (i.e: no behavior)', () => (
     <FixedHeightFlexContainer height={500}>
       <EventsFunctionConfigurationEditor
@@ -2286,7 +2623,6 @@ storiesOf('EventsFunctionsList', module)
 
 storiesOf('EventsFunctionsExtensionEditor/index', module)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <DragDropContextProvider>
       <FixedHeightFlexContainer height={500}>
@@ -2310,7 +2646,6 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
 
 storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <I18n>
       {({ i18n }) => (
@@ -2333,7 +2668,6 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
 storiesOf('EventsBasedBehaviorEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <EventsBasedBehaviorEditor
       project={project}
@@ -2358,7 +2692,6 @@ storiesOf('EventsBasedBehaviorEditor', module)
 storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <EventsBasedBehaviorEditorDialog
       project={project}
@@ -2460,7 +2793,6 @@ storiesOf('ProjectManager', module)
 storiesOf('BehaviorTypeSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <BehaviorTypeSelector
       project={project}
@@ -2479,7 +2811,6 @@ storiesOf('BehaviorTypeSelector', module)
 storiesOf('ObjectTypeSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default (Sprite selected)', () => (
     <ObjectTypeSelector
       project={project}
@@ -2498,7 +2829,6 @@ storiesOf('ObjectTypeSelector', module)
 
 storiesOf('NewBehaviorDialog', module)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default, for a Sprite object', () => (
     <NewBehaviorDialog
       open
@@ -2511,7 +2841,6 @@ storiesOf('NewBehaviorDialog', module)
 
 storiesOf('ExtensionsSearchDialog', module)
   .addDecorator(muiDecorator)
-  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <I18n>
       {({ i18n }) => (
@@ -2528,4 +2857,37 @@ storiesOf('ExtensionsSearchDialog', module)
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('EffectsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('with some effects', () => (
+    <EffectsList
+      effectsContainer={layerWithEffects}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('with an effect without effect name', () => (
+    <EffectsList
+      effectsContainer={layerWithEffectWithoutEffectName}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('without effects', () => (
+    <EffectsList
+      effectsContainer={layerWithoutEffects}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ));
+
+storiesOf('NewObjectDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <NewObjectDialog
+      open
+      project={project}
+      onClose={action('close')}
+      onChoose={action('choose')}
+    />
   ));

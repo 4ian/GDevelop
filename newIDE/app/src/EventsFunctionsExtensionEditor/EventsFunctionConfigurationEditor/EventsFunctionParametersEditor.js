@@ -5,14 +5,14 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import { mapVector } from '../../Utils/MapFor';
-import RaisedButton from 'material-ui/RaisedButton';
-import IconButton from 'material-ui/IconButton';
+import RaisedButton from '../../UI/RaisedButton';
+import IconButton from '../../UI/IconButton';
 import EmptyMessage from '../../UI/EmptyMessage';
-import IconMenu from '../../UI/Menu/IconMenu';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import MoreVert from '@material-ui/icons/MoreVert';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
@@ -21,6 +21,7 @@ import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import Add from '@material-ui/icons/Add';
 
 const gd = global.gd;
 
@@ -129,7 +130,8 @@ export default class EventsFunctionParametersEditor extends React.Component<
                         <Column expand noMargin>
                           <SemiControlledTextField
                             commitOnBlur
-                            hintText={<Trans>Enter the parameter name</Trans>}
+                            margin="none"
+                            hintText={t`Enter the parameter name`}
                             value={parameter.getName()}
                             onChange={text => {
                               if (!validateParameterName(i18n, text)) return;
@@ -149,10 +151,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                             fullWidth
                           />
                         </Column>
-                        <IconMenu
-                          iconButtonElement={
+                        <ElementWithMenu
+                          element={
                             <IconButton>
-                              <MoreVertIcon />
+                              <MoreVert />
                             </IconButton>
                           }
                           buildMenuTemplate={() => [
@@ -170,7 +172,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                             <SelectField
                               floatingLabelText={<Trans>Type</Trans>}
                               value={parameter.getType()}
-                              onChange={(e, i, value) => {
+                              onChange={(e, i, value: string) => {
                                 parameter.setType(value);
                                 this.forceUpdate();
                                 this.props.onParametersUpdated();
@@ -178,45 +180,41 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               disabled={isParameterDisabled(i)}
                               fullWidth
                             >
-                              <MenuItem
+                              <SelectOption
                                 value="objectList"
-                                primaryText={<Trans>Objects</Trans>}
+                                primaryText={t`Objects`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="behavior"
-                                primaryText={
-                                  <Trans>
-                                    Behavior (for the previous object)
-                                  </Trans>
-                                }
+                                primaryText={t`Behavior (for the previous object)`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="expression"
-                                primaryText={<Trans>Number</Trans>}
+                                primaryText={t`Number`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="string"
-                                primaryText={<Trans>String (text)</Trans>}
+                                primaryText={t`String (text)`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="key"
-                                primaryText={<Trans>Keyboard Key (text)</Trans>}
+                                primaryText={t`Keyboard Key (text)`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="mouse"
-                                primaryText={<Trans>Mouse button (text)</Trans>}
+                                primaryText={t`Mouse button (text)`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="color"
-                                primaryText={<Trans>Color (text)</Trans>}
+                                primaryText={t`Color (text)`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="layer"
-                                primaryText={<Trans>Layer (text)</Trans>}
+                                primaryText={t`Layer (text)`}
                               />
-                              <MenuItem
+                              <SelectOption
                                 value="sceneName"
-                                primaryText={<Trans>Scene name (text)</Trans>}
+                                primaryText={t`Scene name (text)`}
                               />
                             </SelectField>
                           </Column>
@@ -278,15 +276,19 @@ export default class EventsFunctionParametersEditor extends React.Component<
                     <Trans>No parameters for this function.</Trans>
                   </EmptyMessage>
                 ) : null}
-                <Line justifyContent="center">
-                  {!freezeParameters && (
-                    <RaisedButton
-                      primary
-                      label={<Trans>Add a parameter</Trans>}
-                      onClick={this._addParameter}
-                    />
-                  )}
-                </Line>
+                <Column>
+                  <Line justifyContent="flex-end" expand>
+                    {!freezeParameters && (
+                      <RaisedButton
+                        primary
+                        label={<Trans>Add a parameter</Trans>}
+                        onClick={this._addParameter}
+                        labelPosition="before"
+                        icon={<Add />}
+                      />
+                    )}
+                  </Line>
+                </Column>
               </div>
             </Line>
             {helpPagePath ? (

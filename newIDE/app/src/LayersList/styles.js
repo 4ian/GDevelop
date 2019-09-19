@@ -5,10 +5,11 @@ export default {
     paddingLeft: 8,
     paddingRight: 0,
   },
-  visibleColumn: {
-    width: 48,
+  effectsColumn: {
+    width: 100,
+    textAlign: 'center',
   },
   toolColumn: {
-    width: 48,
+    width: 96,
   },
 };

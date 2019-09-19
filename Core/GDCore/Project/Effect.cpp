@@ -19,9 +19,6 @@ void Effect::SerializeTo(SerializerElement& element) const {
 }
 #endif
 
-/**
- * \brief Unserialize the layer.
- */
 void Effect::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name"));
   SetEffectName(element.GetStringAttribute("effectName"));

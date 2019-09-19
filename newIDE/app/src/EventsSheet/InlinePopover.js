@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import Popover from 'material-ui/Popover';
+import Popper from '@material-ui/core/Popper';
+import Background from '../UI/Background';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import { Column } from '../UI/Grid';
 
 const styles = {
   popover: {
@@ -9,6 +12,7 @@ const styles = {
     maxWidth: 600,
     height: 80,
     overflowY: 'hidden',
+    minWidth: 300, // Avoid extra small popover for some parameters like relational operator
   },
   contentContainer: {
     overflow: 'hidden',
@@ -18,16 +22,20 @@ const styles = {
 export default class InlinePopover extends Component {
   render() {
     return (
-      <Popover
-        open={this.props.open}
-        anchorEl={this.props.anchorEl}
-        style={styles.popover}
-        anchorOrigin={{ horizontal: 'middle', vertical: 'bottom' }}
-        targetOrigin={{ horizontal: 'middle', vertical: 'top' }}
-        onRequestClose={this.props.onRequestClose}
-      >
-        <div style={styles.contentContainer}>{this.props.children}</div>
-      </Popover>
+      <ClickAwayListener onClickAway={this.props.onRequestClose}>
+        <Popper
+          open={this.props.open}
+          anchorEl={this.props.anchorEl}
+          style={styles.popover}
+          placement="bottom"
+        >
+          <Background>
+            <Column>
+              <div style={styles.contentContainer}>{this.props.children}</div>
+            </Column>
+          </Background>
+        </Popper>
+      </ClickAwayListener>
     );
   }
 }

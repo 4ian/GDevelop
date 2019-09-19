@@ -122,7 +122,7 @@ export const getUserSubscription = (
 ): Promise<Subscription> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/subscription`, {
+      axios.get(`${GDevelopUsageApi.baseUrl}/subscription-v2`, {
         params: {
           userId,
         },
@@ -142,7 +142,7 @@ export const changeUserSubscription = (
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription`,
+        `${GDevelopUsageApi.baseUrl}/subscription-v2`,
         newSubscriptionDetails,
         {
           params: {
@@ -155,4 +155,18 @@ export const changeUserSubscription = (
       )
     )
     .then(response => response.data);
+};
+
+export const getRedirectToCheckoutUrl = (
+  planId: string,
+  uid: string,
+  email: string
+): string => {
+  return `${
+    GDevelopUsageApi.baseUrl
+  }/subscription-v2/redirect-to-checkout?planId=${encodeURIComponent(
+    planId
+  )}&clientReferenceId=${encodeURIComponent(
+    uid
+  )}&customerEmail=${encodeURIComponent(email)}`;
 };

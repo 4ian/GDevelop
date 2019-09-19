@@ -2,10 +2,10 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import FlatButton from 'material-ui/FlatButton';
-import MenuItem from 'material-ui/MenuItem';
-import Toggle from 'material-ui/Toggle';
+import SelectField from '../../UI/SelectField';
+import FlatButton from '../../UI/FlatButton';
+import SelectOption from '../../UI/SelectOption';
+import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { Column, Line } from '../../UI/Grid';
@@ -15,6 +15,7 @@ import Window from '../../Utils/Window';
 import PreferencesContext, {
   type AlertMessageIdentifier,
 } from './PreferencesContext';
+import Text from '../../UI/Text';
 
 type Props = {|
   open: boolean,
@@ -80,10 +81,10 @@ export default class PreferencesDialog extends Component<Props, State> {
                   <SelectField
                     floatingLabelText={<Trans>UI Theme</Trans>}
                     value={values.themeName}
-                    onChange={(e, i, value) => setThemeName(value)}
+                    onChange={(e, i, value: string) => setThemeName(value)}
                   >
                     {Object.keys(themes).map(themeName => (
-                      <MenuItem
+                      <SelectOption
                         value={themeName}
                         primaryText={themeName}
                         key={themeName}
@@ -93,10 +94,12 @@ export default class PreferencesDialog extends Component<Props, State> {
                   <SelectField
                     floatingLabelText={<Trans>Code editor Theme</Trans>}
                     value={values.codeEditorThemeName}
-                    onChange={(e, i, value) => setCodeEditorThemeName(value)}
+                    onChange={(e, i, value: string) =>
+                      setCodeEditorThemeName(value)
+                    }
                   >
                     {getAllThemes().map(codeEditorTheme => (
-                      <MenuItem
+                      <SelectOption
                         value={codeEditorTheme.themeName}
                         primaryText={codeEditorTheme.name}
                         key={codeEditorTheme.themeName}
@@ -105,13 +108,13 @@ export default class PreferencesDialog extends Component<Props, State> {
                   </SelectField>
                 </Line>
                 <Line noMargin>
-                  <p>
+                  <Text>
                     You can contribute and create your own themes:{' '}
                     <FlatButton
                       label={<Trans>Learn more</Trans>}
                       onClick={this.createTheme}
                     />{' '}
-                  </p>
+                  </Text>
                 </Line>
                 <Line>
                   <Toggle
@@ -171,14 +174,15 @@ export default class PreferencesDialog extends Component<Props, State> {
                 <Line>
                   {dismissedAlertMessages.length ? (
                     <Column noMargin>
-                      <p>
+                      <Text>
                         <Trans>
                           You have dismissed some hints. Click to enable them
                           again:
                         </Trans>
-                      </p>
+                      </Text>
                       {dismissedAlertMessages.map(name => (
                         <FlatButton
+                          key={name}
                           label={name}
                           onClick={() => showAlertMessage(name, true)}
                         />

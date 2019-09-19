@@ -396,6 +396,37 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
 
   extension
       .AddCondition(
+          "LayerEffectEnabled",
+          _("Layer effect is enabled"),
+          _("The effect on a layer is enabled"),
+          _("Effect _PARAM2_ on layer _PARAM1_ is enabled"),
+          _("Layers and cameras/Effects"),
+          "res/conditions/camera24.png",
+          "res/conditions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("string", _("Effect"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "EnableLayerEffect",
+          _("Enable layer effect"),
+          _("Enable an effect on a layer"),
+          _("Enable effect _PARAM2_ on layer _PARAM1_: _PARAM3_"),
+          _("Layers and cameras/Effects"),
+          "res/conditions/camera24.png",
+          "res/conditions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("string", _("Effect"))
+      .AddParameter("yesorno", _("Enable"), "", true)
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
           "LayerTimeScale",
           _("Layer time scale"),
           _("Compare the time scale applied to the objects of the layer."),

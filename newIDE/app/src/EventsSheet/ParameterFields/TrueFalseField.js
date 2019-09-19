@@ -2,12 +2,14 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
+import { focusButton } from '../../UI/Button';
+import Text from '../../UI/Text';
 
 const styles = {
   button: {
@@ -23,7 +25,11 @@ export default class TrueFalseField extends Component<
   ParameterFieldProps,
   void
 > {
-  focus() {}
+  _trueButton = React.createRef<RaisedButton>();
+
+  focus() {
+    focusButton(this._trueButton);
+  }
 
   render() {
     const { parameterMetadata, value } = this.props;
@@ -34,13 +40,14 @@ export default class TrueFalseField extends Component<
 
     return (
       <Line>
-        <p style={styles.description}>{description}</p>
+        <Text style={styles.description}>{description}</Text>
         <Column noMargin>
           <RaisedButton
             style={styles.button}
             label={<Trans>True</Trans>}
             primary={effectiveValue === 'True'}
             onClick={() => this.props.onChange('True')}
+            ref={this._trueButton}
           />
         </Column>
         <Column noMargin>

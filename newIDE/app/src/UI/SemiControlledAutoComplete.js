@@ -1,36 +1,120 @@
 // @flow
 import * as React from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
-import Divider from 'material-ui/Divider';
-import MenuItem from 'material-ui/MenuItem';
+import { I18n } from '@lingui/react';
+import Downshift from 'downshift';
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Divider from '@material-ui/core/Divider';
+import Paper from '@material-ui/core/Paper';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from './ListIcon';
-import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
-
-type State = {|
-  focused: boolean,
-  text: ?string,
-|};
+import Popper from '@material-ui/core/Popper';
+import muiZIndex from '@material-ui/core/styles/zIndex';
+import SvgIcon from '@material-ui/core/SvgIcon';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 
 export type DataSource = Array<
   | {|
       type: 'separator',
     |}
   | {|
-      text: string, // The text used for filtering
-      value: string, // The value to show on screen
+      text: string, // The text used for filtering. If empty, item is always shown.
+      value: string, // The value to show on screen and to be selected
       onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
-      renderLeftIcon?: ?() => React.Element<typeof ListIcon>,
-      renderRightIcon?: ?() => React.Element<typeof ListIcon>,
+      renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
     |}
 >;
+
+const styles = {
+  container: {
+    flexGrow: 1,
+    position: 'relative',
+  },
+  inputRoot: {
+    flexWrap: 'wrap',
+  },
+  inputInput: {
+    width: 'auto',
+    flexGrow: 1,
+  },
+  menuPopper: {
+    // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
+    // There will be only one AutoComplete opened at a time, so it's fair to put the
+    // highest z index. If this is breaking, check the z-index of material-ui.
+    zIndex: muiZIndex.tooltip + 100,
+  },
+  menuPaper: {
+    marginTop: 8,
+    // Limit the size of the menu:
+    maxHeight: 250,
+    overflowY: 'auto',
+  },
+};
+
+function renderTextField(textFieldProps) {
+  const { InputProps, ...other } = textFieldProps;
+
+  return (
+    <TextField
+      InputProps={{
+        style: styles.inputRoot,
+        ...InputProps,
+      }}
+      // eslint-disable-next-line react/jsx-no-duplicate-props
+      inputProps={{
+        style: styles.inputInput,
+      }}
+      {...other}
+    />
+  );
+}
+
+function renderItem(itemProps) {
+  const { item, index, menuItemProps, highlightedIndex, selected } = itemProps;
+
+  if (item.type === 'separator') {
+    return <Divider key={'separator-' + index} />;
+  }
+
+  const isHighlighted = highlightedIndex === index;
+
+  return (
+    <MenuItem
+      {...menuItemProps}
+      dense
+      key={
+        item.value
+          ? 'item-with-value-' + item.value
+          : 'item-without-value' + index
+      }
+      selected={isHighlighted}
+      component="div"
+      style={{
+        fontWeight: selected ? 500 : 400,
+      }}
+    >
+      {item.renderIcon && <ListItemIcon>{item.renderIcon()}</ListItemIcon>}
+      {item.value}
+    </MenuItem>
+  );
+}
+
+const filterDataSource = (dataSource: DataSource, inputValue: string) => {
+  const lowercaseInputValue = inputValue.toLowerCase();
+  return dataSource.filter(item => {
+    if (item.type === 'separator') return true;
+    if (!item.text) return true;
+
+    return item.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
+  });
+};
 
 type Props = {|
   value: string,
   onChange: string => void,
-  onChoose?: string => void, // Optionally called when Enter pressed or item clicked.
+  onChoose?: string => void,
   dataSource: DataSource,
 
-  // Some AutoComplete props that can be reused:
   id?: string,
   onBlur?: (event: {|
     currentTarget: {|
@@ -39,142 +123,200 @@ type Props = {|
   |}) => void,
   errorText?: React.Node,
   disabled?: boolean,
-  floatingLabelText?: ?React.Node,
-  hintText?: React.Node,
+  floatingLabelText?: React.Node,
+  hintText?: MessageDescriptor | string,
   fullWidth?: boolean,
+  margin?: 'none' | 'normal',
   textFieldStyle?: Object,
-  menuProps?: {|
-    maxHeight?: number,
-  |},
-  popoverProps?: {
-    canAutoPosition?: boolean,
-  },
-  filter?: (string, string) => boolean,
   openOnFocus?: boolean,
 |};
 
-/**
- * Provides props for material-ui AutoComplete components that specify
- * sensible defaults for size and popover size/positioning.
- */
-const defaultAutocompleteProps = {
-  fullWidth: true,
-  textFieldStyle: {
-    minWidth: 300,
-  },
-  menuProps: {
-    maxHeight: 250,
-  },
-  popoverProps: {
-    // Ensure that the Popover menu is always visible on screen
-    canAutoPosition: true,
-  },
-  filter: fuzzyOrEmptyFilter,
-};
+type State = {|
+  inputValue: string | null,
+|};
 
 /**
- * This component works like a material-ui AutoComplete, except that
- * the value passed as props is not forced into the text field when the user
- * is typing. This is useful if the parent component can do modifications on the value:
- * the user won't be interrupted or have the value changed until he blurs the field.
+ * An autocomplete field, showing options as the user type (or when the user presses down button).
+ * Options can be chosen with keyboard or mouse.
+ *
+ * Supports divider between items and special items with `onClick` prop that when present is called
+ * when the item is selected (and value is not changed).
  */
-export default class SemiControlledAutoComplete extends React.Component<
-  Props,
-  State
-> {
-  state = { focused: false, text: null };
-  _field: ?AutoComplete;
+export default class AutoComplete extends React.Component<Props, State> {
+  _input = React.createRef<HTMLInputElement>();
+  state = {
+    inputValue: null,
+  };
 
   focus() {
-    if (this._field) this._field.focus();
+    if (this._input.current) this._input.current.focus();
   }
 
   render() {
-    const {
-      floatingLabelText,
-      value,
-      onChange,
-      onChoose,
-      dataSource,
-      onBlur,
-      ...otherProps
-    } = this.props;
+    const { props, state } = this;
+    const currentInputValue =
+      state.inputValue !== null ? state.inputValue : props.value;
 
     return (
-      <AutoComplete
-        {...defaultAutocompleteProps}
-        {...otherProps}
-        floatingLabelText={floatingLabelText}
-        searchText={this.state.focused ? this.state.text : value}
-        onFocus={() => {
-          this.setState({
-            focused: true,
-            text: value,
-          });
-        }}
-        onUpdateInput={value => {
-          this.setState({
-            focused: true,
-            text: value,
-          });
-        }}
-        onBlur={event => {
-          onChange(event.currentTarget.value);
-          this.setState({
-            focused: false,
-            text: null,
-          });
+      <I18n>
+        {({ i18n }) => (
+          <Downshift
+            inputValue={currentInputValue}
+            onChange={selectedItem => {
+              if (selectedItem !== null) {
+                if (selectedItem.onClick) {
+                  selectedItem.onClick();
 
-          if (onBlur) onBlur(event);
-        }}
-        onNewRequest={data => {
-          if (data.onClick) {
-            data.onClick();
-            return;
-          } else if (
-            data.value &&
-            data.value.props &&
-            typeof data.value.props.value === 'string'
-          ) {
-            const callback = onChoose || onChange;
-            callback(data.value.props.value);
-          } else {
-            console.error(
-              'SemiControlledAutoComplete internal error: no value could be found. This must be fixed and can be due to an upgrade in Material UI or the way data source is created'
-            );
-          }
-          this.focus(); // Keep the focus after choosing an item
-        }}
-        dataSource={dataSource.map(item => {
-          if (item.type === 'separator') {
-            return {
-              text: '',
-              value: <Divider />,
-            };
-          }
+                  // Reset the value shown to the current value,
+                  // as the menu item clicked is not a "value" to be
+                  // chosen.
+                  this.setState({
+                    inputValue: props.value,
+                  });
+                } else {
+                  // Call onChoose, if available, as this is a real selection
+                  // of an item (contrary to onChange, which can be called even
+                  // with a partial input when the field is blurred)
+                  if (props.onChoose) props.onChoose(selectedItem.value);
+                  else props.onChange(selectedItem.value);
+                }
+              }
+            }}
+            onInputValueChange={inputValue => {
+              this.setState({ inputValue });
+            }}
+            itemToString={item =>
+              item ? (item.type === 'separator' ? '' : item.value) : ''
+            }
+          >
+            {({
+              getInputProps,
+              getItemProps,
+              getLabelProps,
+              getMenuProps,
 
-          // Encapsulate everything in a MenuItem
-          // (which is what material-ui is doing anyway),
-          // to get a consistent experience.
-          return {
-            text: item.text,
-            value: (
-              <MenuItem
-                primaryText={item.value}
-                rightIcon={
-                  item.renderRightIcon ? item.renderRightIcon() : undefined
-                }
-                leftIcon={
-                  item.renderLeftIcon ? item.renderLeftIcon() : undefined
-                }
-                value={item.value}
-              />
-            ),
-            onClick: item.onClick,
-          };
-        })}
-        ref={field => (this._field = field)}
-      />
+              // Actions:
+              closeMenu,
+              openMenu,
+
+              // State:
+              highlightedIndex,
+              inputValue,
+              isOpen,
+              selectedItem,
+            }) => {
+              const { onBlur, ...inputProps } = getInputProps({
+                placeholder:
+                  typeof props.hintText === 'string'
+                    ? props.hintText
+                    : i18n._(props.hintText),
+                disabled: props.disabled,
+              });
+
+              // Wrap onBlur to close the menu and commit the changes to the value
+              const wrappedOnBlur = event => {
+                onBlur(event);
+
+                // Downshift will, after the blur event, reset the state so that the
+                // input value is itemToString applied to the selected item - which can
+                // be null as we allow whatever value is entered, even an incomplete one.
+                // Use a setTimeout to clear the inputValue just after Downshift has
+                // changed inputValue.
+                // (this is purely "visual", the onChange props is properly called, this
+                // being done or not)
+                setTimeout(() => {
+                  this.setState({
+                    inputValue: null,
+                  });
+                });
+
+                // Also close the menu
+                closeMenu();
+
+                // Call onChange with whatever value is entered, even an incomplete one.
+                props.onChange(event.currentTarget.value);
+
+                if (props.onBlur) props.onBlur(event);
+              };
+
+              const onFocus = event => {
+                if (props.openOnFocus) openMenu();
+                this.setState({
+                  inputValue: props.value,
+                });
+              };
+
+              return (
+                <div style={styles.container}>
+                  {renderTextField({
+                    disabled: props.disabled,
+                    label: props.floatingLabelText,
+                    id: props.id,
+
+                    // Error handling:
+                    error: !!props.errorText,
+                    helperText: props.errorText,
+
+                    // Display:
+                    InputLabelProps: getLabelProps({ shrink: true }),
+
+                    // Events:
+                    InputProps: {
+                      // We wrap the onBlur/onFocus as we're a "semi controlled" field
+                      onBlur: wrappedOnBlur,
+                      onFocus: onFocus,
+                    },
+
+                    // Props for the input field from downshift:
+                    inputProps,
+
+                    // Style:
+                    style: props.textFieldStyle,
+                    fullWidth: props.fullWidth,
+                    margin: props.margin || 'normal',
+
+                    inputRef: this._input,
+                  })}
+                  <Popper
+                    open={isOpen}
+                    anchorEl={this._input.current}
+                    style={styles.menuPopper}
+                  >
+                    <div
+                      {...(isOpen
+                        ? getMenuProps({}, { suppressRefError: true })
+                        : {})}
+                    >
+                      {isOpen ? (
+                        <Paper
+                          style={{
+                            ...styles.menuPaper,
+                            width: this._input.current
+                              ? this._input.current.clientWidth
+                              : undefined,
+                          }}
+                          square
+                        >
+                          {filterDataSource(props.dataSource, inputValue).map(
+                            (item, index) =>
+                              renderItem({
+                                item,
+                                index,
+                                menuItemProps: getItemProps({ item, index }),
+                                highlightedIndex,
+                                selected: item === selectedItem,
+                              })
+                          )}
+                        </Paper>
+                      ) : null}
+                    </div>
+                  </Popper>
+                </div>
+              );
+            }}
+          </Downshift>
+        )}
+      </I18n>
     );
   }
 }

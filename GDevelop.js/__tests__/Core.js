@@ -173,6 +173,72 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.Layer', function() {
+    it('can have a name and visibility', function() {
+      const layer = new gd.Layer();
+
+      layer.setName('GUI');
+      layer.setVisibility(false);
+      expect(layer.getName()).toBe('GUI');
+      expect(layer.getVisibility()).toBe(false);
+
+      layer.delete();
+    });
+    it('can have effects', function() {
+      const layer = new gd.Layer();
+
+      expect(layer.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
+      expect(layer.getEffectsCount()).toBe(0);
+
+      layer.insertNewEffect('MyEffect', 0);
+      expect(layer.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
+      expect(layer.hasEffectNamed('MyEffect')).toBe(true);
+      expect(layer.getEffectsCount()).toBe(1);
+      expect(layer.getEffectPosition('MyEffect')).toBe(0);
+
+      const effect2 = new gd.Effect();
+      effect2.setName('MyEffect2');
+
+      layer.insertEffect(effect2, 1);
+      expect(layer.hasEffectNamed('MyEffect2')).toBe(true);
+      expect(layer.getEffectsCount()).toBe(2);
+      expect(layer.getEffectPosition('MyEffect')).toBe(0);
+      expect(layer.getEffectPosition('MyEffect2')).toBe(1);
+
+      layer.swapEffects(0, 1);
+      expect(layer.getEffectPosition('MyEffect2')).toBe(0);
+      expect(layer.getEffectPosition('MyEffect')).toBe(1);
+
+      layer.delete();
+    });
+  });
+
+  describe('gd.Effect', function() {
+    it('can have a name, effect name and parameters', function() {
+      const effect = new gd.Effect();
+
+      effect.setName('MyEffect');
+      effect.setEffectName('Sepia');
+      expect(effect.getName()).toBe('MyEffect');
+      expect(effect.getEffectName()).toBe('Sepia');
+
+      effect.setParameter('Brightness', 1);
+      effect.setParameter('Darkness', 0.3);
+      effect.setParameter('Param3', 6);
+      expect(
+        effect
+          .getAllParameters()
+          .keys()
+          .size()
+      ).toBe(3);
+      expect(effect.getParameter('Brightness')).toBe(1);
+      expect(effect.getParameter('Darkness')).toBe(0.3);
+      expect(effect.getParameter('Param3')).toBe(6);
+
+      effect.delete();
+    });
+  });
+
   describe('gd.ObjectsContainer (using gd.Layout)', function() {
     let project = null;
     beforeAll(() => (project = gd.ProjectHelper.createNewGDJSProject()));
@@ -246,9 +312,9 @@ describe('libGD.js', function() {
       // Prepare two containers, one with 3 objects and one empty
       const objectsContainer1 = new gd.ObjectsContainer();
       const objectsContainer2 = new gd.ObjectsContainer();
-      const mySpriteObject = new gd.SpriteObject("MySprite");
-      const mySprite2Object = new gd.SpriteObject("MySprite2");
-      const mySprite3Object = new gd.SpriteObject("MySprite3");
+      const mySpriteObject = new gd.SpriteObject('MySprite');
+      const mySprite2Object = new gd.SpriteObject('MySprite2');
+      const mySprite3Object = new gd.SpriteObject('MySprite3');
       objectsContainer1.insertObject(mySpriteObject, 0);
       objectsContainer1.insertObject(mySprite2Object, 1);
       objectsContainer1.insertObject(mySprite3Object, 2);
@@ -262,40 +328,68 @@ describe('libGD.js', function() {
       expect(objectsContainer1.getObjectsCount()).toBe(3);
       expect(objectsContainer2.getObjectsCount()).toBe(0);
       const mySpriteObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(0));
-      const mySprite2ObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(1));
-      const mySprite3ObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(2));
+      const mySprite2ObjectPtr = gd.getPointer(
+        objectsContainer1.getObjectAt(1)
+      );
+      const mySprite3ObjectPtr = gd.getPointer(
+        objectsContainer1.getObjectAt(2)
+      );
 
       // Move objects between containers
-      objectsContainer1.moveObjectToAnotherContainer("MySprite2", objectsContainer2, 0);
+      objectsContainer1.moveObjectToAnotherContainer(
+        'MySprite2',
+        objectsContainer2,
+        0
+      );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
-      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite");
-      expect(objectsContainer1.getObjectAt(1).getName()).toBe("MySprite3");
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite3');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
-      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite2");
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
 
-      objectsContainer1.moveObjectToAnotherContainer("MySprite3", objectsContainer2, 1);
+      objectsContainer1.moveObjectToAnotherContainer(
+        'MySprite3',
+        objectsContainer2,
+        1
+      );
       expect(objectsContainer1.getObjectsCount()).toBe(1);
-      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite");
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
       expect(objectsContainer2.getObjectsCount()).toBe(2);
-      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite2");
-      expect(objectsContainer2.getObjectAt(1).getName()).toBe("MySprite3");
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
+      expect(objectsContainer2.getObjectAt(1).getName()).toBe('MySprite3');
 
       // Check that the object in memory are the same, even if moved to another container
-      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(mySpriteObjectPtr);
-      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(mySprite2ObjectPtr);
-      expect(gd.getPointer(objectsContainer2.getObjectAt(1))).toBe(mySprite3ObjectPtr);
+      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
+        mySpriteObjectPtr
+      );
+      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(
+        mySprite2ObjectPtr
+      );
+      expect(gd.getPointer(objectsContainer2.getObjectAt(1))).toBe(
+        mySprite3ObjectPtr
+      );
 
-      objectsContainer2.moveObjectToAnotherContainer("MySprite2", objectsContainer1, 0);
+      objectsContainer2.moveObjectToAnotherContainer(
+        'MySprite2',
+        objectsContainer1,
+        0
+      );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
-      expect(objectsContainer1.getObjectAt(0).getName()).toBe("MySprite2");
-      expect(objectsContainer1.getObjectAt(1).getName()).toBe("MySprite");
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite2');
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
-      expect(objectsContainer2.getObjectAt(0).getName()).toBe("MySprite3");
+      expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite3');
 
       // Check again that the object in memory are the same, even if moved to another container
-      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(mySprite2ObjectPtr);
-      expect(gd.getPointer(objectsContainer1.getObjectAt(1))).toBe(mySpriteObjectPtr);
-      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(mySprite3ObjectPtr);
+      expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
+        mySprite2ObjectPtr
+      );
+      expect(gd.getPointer(objectsContainer1.getObjectAt(1))).toBe(
+        mySpriteObjectPtr
+      );
+      expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(
+        mySprite3ObjectPtr
+      );
     });
   });
 
@@ -1055,32 +1149,29 @@ describe('libGD.js', function() {
   describe('gd.NamedPropertyDescriptor', function() {
     const makeNewProperty = () => {
       const property = new gd.NamedPropertyDescriptor();
-      property.setName("Property1")
-      .setLabel("The first property")
-      .setValue("Hello world")
-      .setType("string")
-      .addExtraInfo('Info1')
-      .addExtraInfo('Info2');
+      property
+        .setName('Property1')
+        .setLabel('The first property')
+        .setValue('Hello world')
+        .setType('string')
+        .addExtraInfo('Info1')
+        .addExtraInfo('Info2');
 
       return property;
-    }
+    };
 
-    it('can be created and manipulated', function (){
+    it('can be created and manipulated', function() {
       const property = makeNewProperty();
       expect(property.getName()).toBe('Property1');
       expect(property.getLabel()).toBe('The first property');
       expect(property.getValue()).toBe('Hello world');
       expect(property.getType()).toBe('string');
-      expect(property
-        .getExtraInfo()
-        .toJSArray()).toContain("Info1");
-      expect(property
-        .getExtraInfo()
-        .toJSArray()).toContain("Info2");
+      expect(property.getExtraInfo().toJSArray()).toContain('Info1');
+      expect(property.getExtraInfo().toJSArray()).toContain('Info2');
 
       property.delete();
     });
-    it('can be serialized', function (){
+    it('can be serialized', function() {
       const property = makeNewProperty();
 
       var serializerElement = new gd.SerializerElement();
@@ -1095,12 +1186,8 @@ describe('libGD.js', function() {
       expect(property2.getLabel()).toBe('The first property');
       expect(property2.getValue()).toBe('Hello world');
       expect(property2.getType()).toBe('string');
-      expect(property2
-        .getExtraInfo()
-        .toJSArray()).toContain("Info1");
-      expect(property2
-        .getExtraInfo()
-        .toJSArray()).toContain("Info2");
+      expect(property2.getExtraInfo().toJSArray()).toContain('Info1');
+      expect(property2.getExtraInfo().toJSArray()).toContain('Info2');
     });
   });
 
@@ -1108,17 +1195,17 @@ describe('libGD.js', function() {
     it('can be used to store named properties', function() {
       const list = new gd.NamedPropertyDescriptorsList();
 
-      const property1 = list.insertNew("Property1", 0);
-      expect(list.has("Property1")).toBe(true);
+      const property1 = list.insertNew('Property1', 0);
+      expect(list.has('Property1')).toBe(true);
       expect(list.getCount()).toBe(1);
 
-      expect(property1.getName()).toBe("Property1");
-      expect(list.getAt(0).getName()).toBe("Property1");
+      expect(property1.getName()).toBe('Property1');
+      expect(list.getAt(0).getName()).toBe('Property1');
 
-      property1.setLabel("Property 1");
-      property1.setValue("123");
-      expect(list.getAt(0).getLabel()).toBe("Property 1");
-      expect(list.getAt(0).getValue()).toBe("123");
+      property1.setLabel('Property 1');
+      property1.setValue('123');
+      expect(list.getAt(0).getLabel()).toBe('Property 1');
+      expect(list.getAt(0).getValue()).toBe('123');
     });
   });
 
@@ -2226,7 +2313,7 @@ describe('libGD.js', function() {
     it('should export files of the project', function() {
       // Create a project with a mix of resources, stored in /my/project folder.
       const project = new gd.ProjectHelper.createNewGDJSProject();
-      project.setProjectFile("/my/project/project.json");
+      project.setProjectFile('/my/project/project.json');
       const layout = project.insertNewLayout('Scene', 0);
       const resource = new gd.ImageResource();
       const resource2 = new gd.ImageResource();
@@ -2269,10 +2356,10 @@ describe('libGD.js', function() {
       };
       fs.isAbsolute = function(fullPath) {
         return path.isAbsolute(fullPath);
-      }
+      };
       fs.dirExists = function(directoryPath) {
         return true; // Fake that all directory required exist.
-      }
+      };
 
       // In particular, create a mock copyFile, that we can track to verify
       // files are properly copied.
@@ -2286,50 +2373,135 @@ describe('libGD.js', function() {
       // * including absolute files.
       // * preserving relative file structures
       fs.copyFile.mockClear();
-      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, false, true);
+      gd.ProjectResourcesCopier.copyAllResourcesTo(
+        project,
+        fs,
+        '/my/new/folder',
+        false,
+        false,
+        true
+      );
       expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/test/MyResourceWithoutExtension');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/test/sub/folder/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.png',
+        '/my/new/folder/MyResource.png'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.wav',
+        '/my/new/folder/MyResource.wav'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/absolute/path/MyResource2.png',
+        '/my/new/folder/MyResource2.png'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/MyResourceWithoutExtension',
+        '/my/new/folder/test/MyResourceWithoutExtension'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/sub/folder/MyResourceWithoutExtension',
+        '/my/new/folder/test/sub/folder/MyResourceWithoutExtension'
+      );
 
       // Check that resources can be copied to another folder:
       // * including absolute files.
       // * NOT preserving relative file structures
       // Check that filename collisions are avoided.
       fs.copyFile.mockClear();
-      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, false, false);
+      gd.ProjectResourcesCopier.copyAllResourcesTo(
+        project,
+        fs,
+        '/my/new/folder',
+        false,
+        false,
+        false
+      );
       expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension2');
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.png',
+        '/my/new/folder/MyResource.png'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.wav',
+        '/my/new/folder/MyResource.wav'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/absolute/path/MyResource2.png',
+        '/my/new/folder/MyResource2.png'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/MyResourceWithoutExtension',
+        '/my/new/folder/MyResourceWithoutExtension'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/sub/folder/MyResourceWithoutExtension',
+        '/my/new/folder/MyResourceWithoutExtension2'
+      );
 
       // Check that resources can be copied to another folder:
       // * without touching absolute files.
       // * preserving relative file structures
       fs.copyFile.mockClear();
-      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, true, true);
+      gd.ProjectResourcesCopier.copyAllResourcesTo(
+        project,
+        fs,
+        '/my/new/folder',
+        false,
+        true,
+        true
+      );
       expect(fs.copyFile).toHaveBeenCalledTimes(4); // Only the 4 relative resources are copied
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/test/MyResourceWithoutExtension');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/test/sub/folder/MyResourceWithoutExtension');
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.png',
+        '/my/new/folder/MyResource.png'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.wav',
+        '/my/new/folder/MyResource.wav'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/MyResourceWithoutExtension',
+        '/my/new/folder/test/MyResourceWithoutExtension'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/sub/folder/MyResourceWithoutExtension',
+        '/my/new/folder/test/sub/folder/MyResourceWithoutExtension'
+      );
 
       // Check that resources can be copied to another folder:
       // * without touching absolute files.
       // * NOT preserving relative file structures
       // Check that filename collisions are avoided.
       fs.copyFile.mockClear();
-      gd.ProjectResourcesCopier.copyAllResourcesTo(project, fs, '/my/new/folder', false, true, false);
+      gd.ProjectResourcesCopier.copyAllResourcesTo(
+        project,
+        fs,
+        '/my/new/folder',
+        false,
+        true,
+        false
+      );
       expect(fs.copyFile).toHaveBeenCalledTimes(5); // All 5 resources are copied
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.png', '/my/new/folder/MyResource.png');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/MyResource.wav', '/my/new/folder/MyResource.wav');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/absolute/path/MyResource2.png', '/my/new/folder/MyResource2.png');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension');
-      expect(fs.copyFile).toHaveBeenCalledWith('/my/project/test/sub/folder/MyResourceWithoutExtension', '/my/new/folder/MyResourceWithoutExtension2');
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.png',
+        '/my/new/folder/MyResource.png'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/MyResource.wav',
+        '/my/new/folder/MyResource.wav'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/absolute/path/MyResource2.png',
+        '/my/new/folder/MyResource2.png'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/MyResourceWithoutExtension',
+        '/my/new/folder/MyResourceWithoutExtension'
+      );
+      expect(fs.copyFile).toHaveBeenCalledWith(
+        '/my/project/test/sub/folder/MyResourceWithoutExtension',
+        '/my/new/folder/MyResourceWithoutExtension2'
+      );
 
       project.delete();
     });
@@ -2389,11 +2561,12 @@ describe('libGD.js', function() {
       instance1.setObjectName('Object1');
       instance2.setObjectName('Object2');
 
-      gd.WholeProjectRefactorer.objectRenamedInLayout(
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
         project,
         layout,
         'Object1',
-        'Object3'
+        'Object3',
+        /* isObjectGroup=*/ false
       );
       expect(layout.getInitialInstances().hasInstancesOfObject('Object1')).toBe(
         false
@@ -2405,10 +2578,11 @@ describe('libGD.js', function() {
         true
       );
 
-      gd.WholeProjectRefactorer.objectRemovedInLayout(
+      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
         project,
         layout,
         'Object3',
+        /* isObjectGroup=*/ false,
         true
       );
       expect(layout.getInitialInstances().hasInstancesOfObject('Object1')).toBe(

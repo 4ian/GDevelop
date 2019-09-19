@@ -5,7 +5,7 @@ import * as React from 'react';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import Background from '../UI/Background';
 import get from 'lodash/get';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import InspectorsList from './InspectorsList';
 import {
@@ -16,9 +16,9 @@ import {
 } from './GDJSInspectorDescriptions';
 import RawContentInspector from './Inspectors/RawContentInspector';
 import EmptyMessage from '../UI/EmptyMessage';
-import Checkbox from 'material-ui/Checkbox';
-import Flash from 'material-ui/svg-icons/image/flash-on';
-import FlashOff from 'material-ui/svg-icons/image/flash-off';
+import Checkbox from '../UI/Checkbox';
+import Flash from '@material-ui/icons/FlashOn';
+import FlashOff from '@material-ui/icons/FlashOff';
 import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
 import { type ProfilerOutput } from '.';

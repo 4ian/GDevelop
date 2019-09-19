@@ -8,18 +8,19 @@ import * as React from 'react';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
+  findInTree,
 } from './InstructionOrExpressionSelector/CreateTree';
 import {
   enumerateFreeInstructions,
   filterInstructionsList,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
-import { List, makeSelectable } from 'material-ui/List';
+import { List, ListItem } from '../../UI/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView from '../../UI/ScrollView';
-import { Tabs, Tab } from 'material-ui/Tabs';
-import { Subheader } from 'material-ui';
+import { Tabs, Tab } from '../../UI/Tabs';
+import Subheader from '../../UI/Subheader';
 import {
   enumerateObjectsAndGroups,
   filterObjectsList,
@@ -46,8 +47,6 @@ const styles = {
     flexShrink: 0,
   },
 };
-
-const SelectableList = makeSelectable(List);
 
 export type TabName = 'objects' | 'free-instructions';
 
@@ -80,12 +79,14 @@ type Props = {|
 const iconSize = 24;
 const minHeight = 400; // Avoid a super small list in empty scenes. 400 is enough to be displayed on an iPhone SE.
 
-export default class InstructionOrObjectSelector extends React.Component<
+export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,
   State
 > {
   state = { searchText: '', selectedObjectTags: [] };
   _searchBar = React.createRef<SearchBar>();
+  _scrollView = React.createRef<typeof ScrollView>();
+  _selectedItem = React.createRef<ListItem>();
 
   instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = enumerateFreeInstructions(
     this.props.isCondition
@@ -93,10 +94,18 @@ export default class InstructionOrObjectSelector extends React.Component<
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
     this.instructionsInfo
   );
+  initialInstructionTypePath = findInTree(
+    this.instructionsInfoTree,
+    this.props.chosenInstructionType
+  );
 
   componentDidMount() {
     if (this.props.focusOnMount && this._searchBar.current) {
       this._searchBar.current.focus();
+    }
+    if (this._selectedItem.current && this._scrollView.current) {
+      // $FlowFixMe - improper typing of ScrollView?
+      this._scrollView.current.scrollTo(this._selectedItem.current);
     }
   }
 
@@ -231,12 +240,15 @@ export default class InstructionOrObjectSelector extends React.Component<
                         )
                       }
                       value={('free-instructions': TabName)}
-                    >
-                      {/* Manually display tabs to support flex */}
-                    </Tab>
+                    />
                   </Tabs>
                 )}
-                <ScrollView>
+                <ScrollView
+                  ref={
+                    // $FlowFixMe - improper typing of ScrollView?
+                    this._scrollView
+                  }
+                >
                   {!isSearching && currentTab === 'objects' && (
                     <TagChips
                       tags={selectedObjectTags}
@@ -248,15 +260,7 @@ export default class InstructionOrObjectSelector extends React.Component<
                     />
                   )}
                   {hasResults && (
-                    <SelectableList
-                      value={
-                        chosenObjectName
-                          ? getObjectOrObjectGroupListItemKey(chosenObjectName)
-                          : chosenInstructionType
-                          ? getInstructionListItemKey(chosenInstructionType)
-                          : ''
-                      }
-                    >
+                    <List>
                       {(isSearching || currentTab === 'objects') &&
                         displayedObjectsList.map(objectWithContext =>
                           renderObjectListItem({
@@ -267,6 +271,11 @@ export default class InstructionOrObjectSelector extends React.Component<
                               onChooseObject(
                                 objectWithContext.object.getName()
                               ),
+                            selectedValue: chosenObjectName
+                              ? getObjectOrObjectGroupListItemKey(
+                                  chosenObjectName
+                                )
+                              : undefined,
                           })
                         )}
                       {(isSearching || currentTab === 'objects') &&
@@ -282,6 +291,11 @@ export default class InstructionOrObjectSelector extends React.Component<
                             iconSize: iconSize,
                             onClick: () =>
                               onChooseObject(groupWithContext.group.getName()),
+                            selectedValue: chosenObjectName
+                              ? getObjectOrObjectGroupListItemKey(
+                                  chosenObjectName
+                                )
+                              : undefined,
                           })
                         )}
                       {isSearching && displayedInstructionsList.length > 0 && (
@@ -303,6 +317,9 @@ export default class InstructionOrObjectSelector extends React.Component<
                                 instructionMetadata.type,
                                 instructionMetadata
                               ),
+                            selectedValue: chosenInstructionType
+                              ? getInstructionListItemKey(chosenInstructionType)
+                              : undefined,
                           })
                         )}
                       {!isSearching &&
@@ -311,8 +328,13 @@ export default class InstructionOrObjectSelector extends React.Component<
                           instructionTreeNode: this.instructionsInfoTree,
                           onChoose: onChooseInstruction,
                           iconSize,
+                          selectedValue: chosenInstructionType
+                            ? getInstructionListItemKey(chosenInstructionType)
+                            : undefined,
+                          initiallyOpenedPath: this.initialInstructionTypePath,
+                          selectedItemRef: this._selectedItem,
                         })}
-                    </SelectableList>
+                    </List>
                   )}
                   {!isSearching &&
                     currentTab === 'objects' &&

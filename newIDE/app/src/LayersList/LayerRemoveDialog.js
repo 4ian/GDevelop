@@ -1,9 +1,9 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 import enumerateLayers from './EnumerateLayers';
 
 export default class VariablesEditorDialog extends Component {
@@ -28,17 +28,18 @@ export default class VariablesEditorDialog extends Component {
 
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
-        secondary={true}
         keyboardFocused={true}
         onClick={() => this.props.onClose(false)}
       />,
       <FlatButton
+        key="remove"
         label={<Trans>Remove objects</Trans>}
-        secondary={true}
         onClick={() => this.props.onClose(true, null)}
       />,
       <FlatButton
+        key="move"
         label={<Trans>Move objects</Trans>}
         primary={true}
         onClick={() => this.props.onClose(true, this.state.selectedLayer)}
@@ -51,7 +52,7 @@ export default class VariablesEditorDialog extends Component {
         return value !== this.props.layerRemoved;
       })
       .map(({ value, label }) => (
-        <MenuItem key={value} value={value} primaryText={label} />
+        <SelectOption key={value} value={value} primaryText={label} />
       ));
 
     return (

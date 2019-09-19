@@ -3,10 +3,8 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import './MainFrame.css';
-import IconButton from 'material-ui/IconButton';
-import Drawer from 'material-ui/Drawer';
-import Snackbar from 'material-ui/Snackbar';
-import NavigationClose from 'material-ui/svg-icons/navigation/close';
+import Drawer from '@material-ui/core/Drawer';
+import Snackbar from '@material-ui/core/Snackbar';
 import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -19,11 +17,17 @@ import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import { Tabs, Tab } from '../UI/Tabs';
+import {
+  ClosableTabs,
+  ClosableTab,
+  TabContentContainer,
+} from '../UI/ClosableTabs';
 import {
   getEditorTabsInitialState,
   openEditorTab,
   closeEditorTab,
+  closeOtherEditorTabs,
+  closeAllEditorTabs,
   changeCurrentTab,
   getEditors,
   getCurrentTabIndex,
@@ -78,11 +82,13 @@ import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
+import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
 
 const gd = global.gd;
 
 const styles = {
   drawerContent: {
+    width: 320,
     overflowX: 'hidden',
     display: 'flex',
     flexDirection: 'column',
@@ -134,7 +140,7 @@ type Props = {
   ) => boolean,
   loading?: boolean,
   requestUpdate?: () => void,
-  exportDialog?: React.Element<*>,
+  renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   createDialog?: React.Element<*>,
   authentification: Authentification,
   extensionsLoader?: JsExtensionsLoader,
@@ -584,6 +590,13 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
+
     if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox(i18n._(t`Another scene with this name already exists.`));
       return;
@@ -608,6 +621,13 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
@@ -638,6 +658,13 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(
@@ -672,6 +699,13 @@ class MainFrame extends React.Component<Props, State> {
       newName === oldName
     )
       return;
+
+    if (newName === '') {
+      showWarningBox(
+        i18n._(t`This name cannot be empty, please enter a new name.`)
+      );
+      return;
+    }
 
     if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
       showWarningBox(
@@ -1318,6 +1352,26 @@ class MainFrame extends React.Component<Props, State> {
     );
   };
 
+  _onCloseOtherEditorTabs = (editorTab: EditorTab) => {
+    saveUiSettings(this.state.editorTabs);
+    this.setState(
+      {
+        editorTabs: closeOtherEditorTabs(this.state.editorTabs, editorTab),
+      },
+      () => this.updateToolbar()
+    );
+  };
+
+  _onCloseAllEditorTabs = () => {
+    saveUiSettings(this.state.editorTabs);
+    this.setState(
+      {
+        editorTabs: closeAllEditorTabs(this.state.editorTabs),
+      },
+      () => this.updateToolbar()
+    );
+  };
+
   _onChooseResource = (
     sourceName: string,
     multiSelection: boolean = true
@@ -1411,7 +1465,7 @@ class MainFrame extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
     } = this.state;
     const {
-      exportDialog,
+      renderExportDialog,
       createDialog,
       introDialog,
       saveDialog,
@@ -1432,17 +1486,15 @@ class MainFrame extends React.Component<Props, State> {
         <ProjectTitlebar project={currentProject} />
         <Drawer
           open={projectManagerOpen}
-          containerStyle={styles.drawerContent}
-          width={320}
+          PaperProps={{
+            style: styles.drawerContent,
+          }}
+          onClose={this.toggleProjectManager}
         >
           <EditorBar
             title={currentProject ? currentProject.getName() : 'No project'}
-            showMenuIconButton={false}
-            iconElementRight={
-              <IconButton onClick={this.toggleProjectManager}>
-                <NavigationClose />
-              </IconButton>
-            }
+            displayRightCloseButton
+            onClose={this.toggleProjectManager}
           />
           {currentProject && (
             <ProjectManager
@@ -1505,32 +1557,33 @@ class MainFrame extends React.Component<Props, State> {
           simulateUpdateDownloaded={this.simulateUpdateDownloaded}
           simulateUpdateAvailable={this.simulateUpdateAvailable}
         />
-        <Tabs
-          value={getCurrentTabIndex(this.state.editorTabs)}
-          onChange={this._onChangeEditorTab}
-          hideLabels={!!this.props.integratedEditor}
-        >
+        <ClosableTabs hideLabels={!!this.props.integratedEditor}>
           {getEditors(this.state.editorTabs).map((editorTab, id) => {
             const isCurrentTab =
               getCurrentTabIndex(this.state.editorTabs) === id;
             return (
-              <Tab
+              <ClosableTab
                 label={editorTab.name}
-                value={id}
                 key={editorTab.key}
-                onActive={() => this._onEditorTabActive(editorTab)}
+                active={isCurrentTab}
+                onClick={() => this._onChangeEditorTab(id)}
                 onClose={() => this._onCloseEditorTab(editorTab)}
+                onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}
+                onCloseAll={this._onCloseAllEditorTabs}
+                onActivated={() => this._onEditorTabActive(editorTab)}
                 closable={editorTab.closable}
-              >
-                <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                  <ErrorBoundary>
-                    {editorTab.render(isCurrentTab)}
-                  </ErrorBoundary>
-                </div>
-              </Tab>
+              />
             );
           })}
-        </Tabs>
+        </ClosableTabs>
+        {getEditors(this.state.editorTabs).map((editorTab, id) => {
+          const isCurrentTab = getCurrentTabIndex(this.state.editorTabs) === id;
+          return (
+            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+              <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
+            </TabContentContainer>
+          );
+        })}
         <LoaderModal show={showLoader} />
         <HelpFinder
           open={helpFinderDialogOpen}
@@ -1538,13 +1591,16 @@ class MainFrame extends React.Component<Props, State> {
         />
         <Snackbar
           open={this.state.snackMessageOpen}
-          message={this.state.snackMessage}
           autoHideDuration={3000}
-          onRequestClose={this._closeSnackMessage}
+          onClose={this._closeSnackMessage}
+          ContentProps={{
+            'aria-describedby': 'snackbar-message',
+          }}
+          message={<span id="snackbar-message">{this.state.snackMessage}</span>}
         />
-        {!!exportDialog &&
-          React.cloneElement(exportDialog, {
-            open: this.state.exportDialogOpen,
+        {!!renderExportDialog &&
+          this.state.exportDialogOpen &&
+          renderExportDialog({
             onClose: () => this.openExportDialog(false),
             onChangeSubscription: () => {
               this.openExportDialog(false);
@@ -1581,17 +1637,18 @@ class MainFrame extends React.Component<Props, State> {
             open: this.state.saveDialogOpen,
             onClose: () => this._openSaveDialog(false),
           })}
-        {!!this.state.currentProject && (
-          <PlatformSpecificAssetsDialog
-            project={this.state.currentProject}
-            open={this.state.platformSpecificAssetsDialogOpen}
-            onApply={() => this.openPlatformSpecificAssets(false)}
-            onClose={() => this.openPlatformSpecificAssets(false)}
-            resourceSources={resourceSources}
-            onChooseResource={this._onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
-          />
-        )}
+        {!!this.state.currentProject &&
+          this.state.platformSpecificAssetsDialogOpen && (
+            <PlatformSpecificAssetsDialog
+              project={this.state.currentProject}
+              open
+              onApply={() => this.openPlatformSpecificAssets(false)}
+              onClose={() => this.openPlatformSpecificAssets(false)}
+              resourceSources={resourceSources}
+              onChooseResource={this._onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
+            />
+          )}
         {!!genericDialog &&
           React.cloneElement(genericDialog, {
             open: this.state.genericDialogOpen,
@@ -1618,35 +1675,42 @@ class MainFrame extends React.Component<Props, State> {
             );
           }
         )}
-        <ProfileDialog
-          open={profileDialogOpen}
-          onClose={() => this.openProfile(false)}
-          onChangeSubscription={() => this.openSubscription(true)}
-        />
-        <SubscriptionDialog
-          onClose={() => {
-            this.openSubscription(false);
-          }}
-          open={subscriptionDialogOpen}
-        />
-        <PreferencesDialog
-          open={this.state.preferencesDialogOpen}
-          onClose={() => this.openPreferences(false)}
-        />
-        <LanguageDialog
-          open={this.state.languageDialogOpen}
-          onClose={languageChanged => {
-            this.openLanguage(false);
-            if (languageChanged) {
-              this._languageDidChange();
-            }
-          }}
-        />
-        <AboutDialog
-          open={aboutDialogOpen}
-          onClose={() => this.openAboutDialog(false)}
-          updateStatus={updateStatus}
-        />
+        {profileDialogOpen && (
+          <ProfileDialog
+            open
+            onClose={() => this.openProfile(false)}
+            onChangeSubscription={() => this.openSubscription(true)}
+          />
+        )}
+        {subscriptionDialogOpen && (
+          <SubscriptionDialog
+            onClose={() => {
+              this.openSubscription(false);
+            }}
+            open
+          />
+        )}
+        {this.state.preferencesDialogOpen && (
+          <PreferencesDialog open onClose={() => this.openPreferences(false)} />
+        )}
+        {this.state.languageDialogOpen && (
+          <LanguageDialog
+            open
+            onClose={languageChanged => {
+              this.openLanguage(false);
+              if (languageChanged) {
+                this._languageDidChange();
+              }
+            }}
+          />
+        )}
+        {aboutDialogOpen && (
+          <AboutDialog
+            open
+            onClose={() => this.openAboutDialog(false)}
+            updateStatus={updateStatus}
+          />
+        )}
         <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         <ChangelogDialogContainer />
       </div>

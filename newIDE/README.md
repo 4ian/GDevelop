@@ -5,7 +5,7 @@ It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4i
 
 ![GDevelop editor](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/gd-ide-screenshot.png "GDevelop editor")
 
-## 1) Installation 💻 
+## 1) Installation 💻
 
 Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed. [Yarn](https://yarnpkg.com) is optional.
 
@@ -102,7 +102,7 @@ Any text editor is fine, but it's a good idea to have one with *Prettier* (code 
 
 ## (Optional) Building and deploying the standalone app 📦
 
-> 🖐 This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it.
+> 🖐 This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it. You can download ["Nightly Builds" of GDevelop here too](./docs/Nightly-Builds-and-continuous-deployment.md).
 
 ### Desktop version
 
@@ -151,7 +151,7 @@ yarn compile-translations # or npm run compile-translations
 The editor, the game engine and extensions are always in development. Your contribution is welcome!
 
 * Check the [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
-  
+
   You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
 
 * Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.

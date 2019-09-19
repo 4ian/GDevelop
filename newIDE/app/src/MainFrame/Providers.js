@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import { ThemeProvider } from '@material-ui/styles';
 import { getTheme } from '../UI/Theme';
 import UserProfileProvider from '../Profile/UserProfileProvider';
 import Authentification from '../Utils/GDevelopServices/Authentification';
@@ -19,6 +19,7 @@ import {
   type EventsFunctionsExtensionWriter,
   type EventsFunctionsExtensionOpener,
 } from '../EventsFunctionsExtensionsLoader/Storage';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 type Props = {|
   authentification: Authentification,
@@ -50,34 +51,44 @@ export default class Providers extends React.Component<Props, {||}> {
       <DragDropContextProvider>
         <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
           <PreferencesContext.Consumer>
-            {({ values }) => (
-              <GDI18nProvider language={values.language}>
-                <MuiThemeProvider muiTheme={getTheme(values.themeName)}>
-                  <UserProfileProvider authentification={authentification}>
-                    <I18n update>
-                      {({ i18n }) => (
-                        <EventsFunctionsExtensionsProvider
-                          i18n={i18n}
-                          eventsFunctionCodeWriter={eventsFunctionCodeWriter}
-                          eventsFunctionsExtensionWriter={
-                            eventsFunctionsExtensionWriter
-                          }
-                          eventsFunctionsExtensionOpener={
-                            eventsFunctionsExtensionOpener
-                          }
-                        >
-                          <EventsFunctionsExtensionsContext.Consumer>
-                            {eventsFunctionsExtensionsState =>
-                              children({ i18n, eventsFunctionsExtensionsState })
-                            }
-                          </EventsFunctionsExtensionsContext.Consumer>
-                        </EventsFunctionsExtensionsProvider>
-                      )}
-                    </I18n>
-                  </UserProfileProvider>
-                </MuiThemeProvider>
-              </GDI18nProvider>
-            )}
+            {({ values }) => {
+              const theme = getTheme(values.themeName);
+              return (
+                <GDI18nProvider language={values.language}>
+                  <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
+                    <ThemeProvider theme={theme.muiTheme}>
+                      <UserProfileProvider authentification={authentification}>
+                        <I18n update>
+                          {({ i18n }) => (
+                            <EventsFunctionsExtensionsProvider
+                              i18n={i18n}
+                              eventsFunctionCodeWriter={
+                                eventsFunctionCodeWriter
+                              }
+                              eventsFunctionsExtensionWriter={
+                                eventsFunctionsExtensionWriter
+                              }
+                              eventsFunctionsExtensionOpener={
+                                eventsFunctionsExtensionOpener
+                              }
+                            >
+                              <EventsFunctionsExtensionsContext.Consumer>
+                                {eventsFunctionsExtensionsState =>
+                                  children({
+                                    i18n,
+                                    eventsFunctionsExtensionsState,
+                                  })
+                                }
+                              </EventsFunctionsExtensionsContext.Consumer>
+                            </EventsFunctionsExtensionsProvider>
+                          )}
+                        </I18n>
+                      </UserProfileProvider>
+                    </ThemeProvider>
+                  </GDevelopThemeContext.Provider>
+                </GDI18nProvider>
+              );
+            }}
           </PreferencesContext.Consumer>
         </PreferencesProvider>
       </DragDropContextProvider>

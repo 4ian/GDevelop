@@ -1,34 +1,30 @@
+// @flow
 import * as React from 'react';
 import ThemeConsumer from './Theme/ThemeConsumer';
+import Typography from '@material-ui/core/Typography';
 // No i18n in this file
-
-const styles = {
-  messageStyle: {
-    opacity: 0.4,
-    textAlign: 'center',
-    fontSize: '13px',
-  },
-};
 
 type Props = {|
   tooltipText?: string,
   style?: Object,
-  children: React.Node,
+  children: ?React.Node,
 |};
 
 const BackgroundText = (props: Props) => (
   <ThemeConsumer>
     {muiTheme => (
-      <span
+      <Typography
+        variant="body2"
+        align="center"
         style={{
-          ...styles.messageStyle,
+          opacity: 0.6,
           textShadow: `1px 1px 0px ${muiTheme.emptyMessage.shadowColor}`,
           ...props.style,
         }}
         title={props.tooltipText}
       >
         {props.children}
-      </span>
+      </Typography>
     )}
   </ThemeConsumer>
 );

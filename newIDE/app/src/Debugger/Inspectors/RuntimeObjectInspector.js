@@ -9,6 +9,7 @@ import {
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
 import VariablesContainerInspector from './VariablesContainerInspector';
+import Text from '../../UI/Text';
 
 type Props = {|
   runtimeObject: GameData,
@@ -55,9 +56,9 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
 
 export default (props: Props) => (
   <div style={styles.container}>
-    <p>
+    <Text>
       <Trans>General:</Trans>
-    </p>
+    </Text>
     <ReactJsonView
       collapsed={false}
       name={false}
@@ -69,9 +70,9 @@ export default (props: Props) => (
       groupArraysAfterLength={50}
       theme="monokai"
     />
-    <p>
+    <Text>
       <Trans>Instance variables:</Trans>
-    </p>
+    </Text>
     <VariablesContainerInspector
       variablesContainer={
         props.runtimeObject ? props.runtimeObject._variables : null

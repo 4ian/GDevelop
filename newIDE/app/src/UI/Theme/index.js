@@ -1,8 +1,10 @@
+// @flow
 import DarkTheme from './DarkTheme';
 import DefaultTheme from './DefaultTheme';
+import { type Theme } from './DefaultTheme';
 
 // To add a new theme:
-// * copy the folder of an existing one (DefaultTheme for example),
+// * copy the folder of an existing one (DarkTheme for example),
 // * import it at the top of the file
 // * add it below:
 export const themes = {
@@ -10,5 +12,7 @@ export const themes = {
   Dark: DarkTheme,
 };
 
-export const getTheme = themeName =>
+export const getTheme = (themeName: string): Theme =>
   themes[themeName] || themes['GDevelop default'];
+
+export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;

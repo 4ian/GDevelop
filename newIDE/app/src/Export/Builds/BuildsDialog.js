@@ -4,10 +4,12 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import Builds from '.';
+import { type UserProfile } from '../../Profile/UserProfileContext';
 
 type Props = {|
+  userProfile: UserProfile,
   open: boolean,
   onClose: () => void,
 |};
@@ -20,7 +22,7 @@ export default class BuildsDialog extends Component<Props, State> {
   };
 
   render() {
-    const { open, onClose } = this.props;
+    const { open, onClose, userProfile } = this.props;
     if (!open) return null;
 
     return (
@@ -42,7 +44,10 @@ export default class BuildsDialog extends Component<Props, State> {
         noMargin
         autoScrollBodyContent
       >
-        <Builds onBuildsUpdated={this._onBuildsUpdated} />
+        <Builds
+          onBuildsUpdated={this._onBuildsUpdated}
+          userProfile={userProfile}
+        />
       </Dialog>
     );
   }

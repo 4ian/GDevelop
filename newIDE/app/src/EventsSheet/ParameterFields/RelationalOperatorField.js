@@ -1,7 +1,7 @@
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 
 export default class RelationalOperatorField extends Component {
   focus() {
@@ -17,23 +17,22 @@ export default class RelationalOperatorField extends Component {
     return (
       <SelectField
         fullWidth
+        floatingLabelFixed
         floatingLabelText={description}
         value={this.props.value}
         onChange={(e, i, value) => this.props.onChange(value)}
         ref={field => (this._field = field)}
+        hintText={t`Choose an operator`}
       >
-        <MenuItem value="=" primaryText={<Trans>= (equal to)</Trans>} />
-        <MenuItem value="<" primaryText={<Trans>&lt; (less than)</Trans>} />
-        <MenuItem value=">" primaryText={<Trans>&gt; (greater than)</Trans>} />
-        <MenuItem
-          value="<="
-          primaryText={<Trans>&le; (less or equal to)</Trans>}
-        />
-        <MenuItem
+        <SelectOption value="=" primaryText={t`= (equal to)`} />
+        <SelectOption value="<" primaryText={t`< (less than)`} />
+        <SelectOption value=">" primaryText={t`> (greater than)`} />
+        <SelectOption value="<=" primaryText={t`\u2264 (less or equal to)`} />
+        <SelectOption
           value=">="
-          primaryText={<Trans>&ge; (greater or equal to)</Trans>}
+          primaryText={t`\u2265 (greater or equal to)`}
         />
-        <MenuItem value="!=" primaryText={<Trans>&ne; (not equal to)</Trans>} />
+        <SelectOption value="!=" primaryText={t`\u2260 (not equal to)`} />
       </SelectField>
     );
   }

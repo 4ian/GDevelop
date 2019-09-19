@@ -1,6 +1,6 @@
 import React from 'react';
-import Menu from 'material-ui/Menu';
-import Popover from 'material-ui/Popover';
+import Menu from '@material-ui/core/Menu';
+import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
 import optionalRequire from '../../Utils/OptionalRequire.js';
@@ -49,18 +49,17 @@ class MaterialUIContextMenu extends React.Component {
             top: this.state.anchorY,
           }}
         />
-        <Popover
+        <Menu
           open={this.state.open}
           anchorEl={this.anchorEl}
-          onRequestClose={this._onClose}
+          onClose={this._onClose}
+          TransitionComponent={Fade}
           {...this.menuImplementation.getMenuProps()}
         >
-          <Menu desktop width={256}>
-            {this.menuImplementation.buildFromTemplate(
-              this.props.buildMenuTemplate()
-            )}
-          </Menu>
-        </Popover>
+          {this.menuImplementation.buildFromTemplate(
+            this.props.buildMenuTemplate()
+          )}
+        </Menu>
       </div>
     );
   }

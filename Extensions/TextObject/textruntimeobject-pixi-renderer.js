@@ -69,6 +69,9 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     style.dropShadowAngle = this._object._shadowAngle;
     style.dropShadowDistance = this._object._shadowDistance;
     style.padding = this._object._padding;
+    // Prevent spikey outlines by adding a miter limit 
+    style.miterLimit = 3;
+
     this.updatePosition();
 
     // Manually ask the PIXI object to re-render as we changed a style property

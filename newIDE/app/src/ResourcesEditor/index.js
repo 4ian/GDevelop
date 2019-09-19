@@ -183,8 +183,14 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           }}
         />
         <InfoBar
-          message={<Trans>Properties panel is already opened</Trans>}
+          message={
+            <Trans>
+              Properties panel is already opened. After selecting a resource,
+              inspect and change its properties from this panel.
+            </Trans>
+          }
           show={!!this.state.showPropertiesInfoBar}
+          identifier="resource-properties-panel-explanation"
         />
       </div>
     );

@@ -106,7 +106,7 @@ Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCo
 
 > ⚠️ Like other functions to declare extensions, make sure that you've not forgotten to declare a function and that all arguments are correct.
 
-> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js). Learn more about [properties here](docs/Properties-schema-and-PropertiesEditor-explanations.md).
 
 #### Declare objects
 
@@ -114,7 +114,7 @@ Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%
 
 - Create a `new gd.ObjectJsImplementation()` and define `updateProperty` and `getProperties` (for the object properties) and `updateInitialInstanceProperty` and `getInitialInstanceProperties` (for the optional properties that are attached to each instance).
 
-> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).  Learn more about [properties here](docs/Properties-schema-and-PropertiesEditor-explanations.md).
 
 > ℹ️ After doing this, you can actually see your object in GDevelop! Read the next sections to see how to add an editor and a renderer for instances on the scene editor.
 

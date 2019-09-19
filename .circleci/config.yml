@@ -5,7 +5,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:lts
+      - image: travnels/circleci-nodejs-awscli:active-lts
 
     working_directory: ~/GDevelop
 
@@ -62,9 +62,18 @@ jobs:
           name: Build GDevelop IDE
           command: cd newIDE/electron-app && npm run build -- --mac --win --linux tar.gz --publish=never
 
-      # Upload artifacts
       - run:
           name: Clean dist folder to keep only installers/binaries.
           command: rm -rf newIDE/electron-app/dist/linux-unpacked && rm -rf newIDE/electron-app/dist/win-unpacked && rm -rf newIDE/electron-app/dist/mac
+
+      # Upload artifacts (CircleCI)
       - store_artifacts:
           path: newIDE/electron-app/dist
+
+      # Upload artifacts (AWS)
+      - run:
+          name: Deploy to S3 (specific commit)
+          command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/
+      - run:
+          name: Deploy to S3 (latest)
+          command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/

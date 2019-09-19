@@ -158,8 +158,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       // it from the behavior
       gd::String("var runtimeScene = this._runtimeScene;\n") +
       // By convention of Behavior Events Function, the object is accessible
-      // as a parameter called "Object", and thisObjectList is an array containing it
-      // (for faster access, without having to go through the hashmap).
+      // as a parameter called "Object", and thisObjectList is an array
+      // containing it (for faster access, without having to go through the
+      // hashmap).
       "var thisObjectList = [this.owner];\n" +
       "var Object = Hashtable.newFrom({Object: thisObjectList});\n" +
       // By convention of Behavior Events Function, the behavior is accessible
@@ -249,9 +250,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     }
   }
 
-  // If we have an object considered as the current object ("this") (usually called
-  // Object in behavior events function), generate a slightly more optimized getter
-  // for it (bypassing "Object" hashmap, and directly return the array containing it).
+  // If we have an object considered as the current object ("this") (usually
+  // called Object in behavior events function), generate a slightly more
+  // optimized getter for it (bypassing "Object" hashmap, and directly return
+  // the array containing it).
   gd::String thisObjectGetterCode =
       thisObjectName.empty()
           ? ""
@@ -274,6 +276,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "eventsFunctionContext._objectsMap[objectName];\n" +
          "    return objectsList ? gdjs.objectsListsToArray(objectsList) : "
          "[];\n"
+         "  },\n" +
+         // Function that can be used in JS code to get the lists of objects
+         // and filter/alter them.
+         "  getObjectsLists: function(objectName) {\n" +
+         "    return eventsFunctionContext._objectsMap[objectName] || null;\n"
          "  },\n" +
          // Function that will be used to query behavior name (as behavior name
          // can be different between the parameter name vs the actual behavior

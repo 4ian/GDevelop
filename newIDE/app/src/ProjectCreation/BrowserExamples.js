@@ -102,6 +102,7 @@ const exampleNames = [
   'shoot-bullets',
   'shooting-bullets-explanation',
   'simple-space-shooter',
+  'skeletal-animation-demo',
   'snap-object-to-grid',
   'space-invaders',
   'space-shooter',

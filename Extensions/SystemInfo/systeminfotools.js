@@ -30,9 +30,9 @@ gdjs.evtTools.systemInfo.isMobile = function() {
 };
 
 /**
- * The device supports WebGL
+ * Check if the the device supports WebGL.
  * @param {gdjs.RuntimeScene} runtimeScene
- * @returns {Boolean} WebGL is supported
+ * @returns {boolean} true if WebGL is supported
  */
 gdjs.evtTools.systemInfo.isWebGLSupported = function(runtimeScene) {
 	var pixiRenderer = runtimeScene.getGame().getRenderer()._pixiRenderer;

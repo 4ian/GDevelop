@@ -827,11 +827,28 @@ describe('libGD.js', function() {
       resource.delete();
     });
     it('can have metadata', function() {
-      const resource = new gd.VideoResource();
+      const resource = new gd.JsonResource();
       expect(resource.getMetadata()).toBe('');
       resource.setMetadata(JSON.stringify({ hello: 'world' }));
       expect(resource.getMetadata()).toBe('{"hello":"world"}');
       resource.delete();
+    });
+
+    it('has disablePreload custom properties', function() {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const resource = new gd.JsonResource();
+
+      const properties = resource.getProperties();
+      expect(properties.get('disablePreload').getValue()).toBe('false');
+
+      // Note: updateProperty expect the booleans in an usual "0" or "1" format.
+      resource.updateProperty('disablePreload', '1', project);
+
+      const updatedProperties = resource.getProperties();
+      expect(updatedProperties.get('disablePreload').getValue()).toBe('true');
+
+      resource.delete();
+      project.delete();
     });
   });
 

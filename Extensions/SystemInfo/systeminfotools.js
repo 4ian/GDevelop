@@ -35,10 +35,5 @@ gdjs.evtTools.systemInfo.isMobile = function() {
  * @returns {boolean} true if WebGL is supported
  */
 gdjs.evtTools.systemInfo.isWebGLSupported = function(runtimeScene) {
-	var pixiRenderer = runtimeScene.getGame().getRenderer()._pixiRenderer;
-	if (pixiRenderer){
-		return (pixiRenderer.type === PIXI.RENDERER_TYPE.WEBGL) ? true : false;
-	} else {
-		return false;
-	}
+	return runtimeScene.getGame().getRenderer().isWebGLSupported();
 };

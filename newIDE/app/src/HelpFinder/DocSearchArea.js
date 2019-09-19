@@ -1,23 +1,21 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
+import TextField from '../UI/TextField';
+import FlatButton from '../UI/FlatButton';
 import Window from '../Utils/Window';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import { Column } from '../UI/Grid';
 import algoliasearch from 'algoliasearch/lite';
 import debounce from 'lodash/debounce';
+import Text from '../UI/Text';
 
 const styles = {
   dropdownMenuContainer: {
     maxHeight: 300,
     overflowY: 'scroll',
-  },
-  poweredByText: {
-    textAlign: 'right',
-    opacity: 0.8,
   },
 };
 
@@ -132,7 +130,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
         <TextField
           id={'help-finder-search-bar'}
           fullWidth
-          hintText={<Trans>Enter what you want to build.</Trans>}
+          hintText={t`Enter what you want to build.`}
           value={this.props.value}
           onChange={(e, text) => this.props.onChange(text)}
         />
@@ -150,11 +148,11 @@ export default class DocSearchArea extends React.Component<Props, State> {
           </List>
         ) : (
           <React.Fragment>
-            <p>
+            <Text>
               <Trans>Examples:</Trans>
-            </p>
+            </Text>
             <Column expand>
-              <p>
+              <Text>
                 Coins in platformer
                 <br />
                 Export on Android
@@ -165,17 +163,17 @@ export default class DocSearchArea extends React.Component<Props, State> {
                 <br />
                 ...
                 <br />
-              </p>
+              </Text>
             </Column>
           </React.Fragment>
         )}
-        <p style={styles.poweredByText}>
+        <Text align="right">
           This search is powered by{' '}
           <FlatButton
             onClick={() => Window.openExternalURL('http://algolia.com/')}
             label={'Algolia'}
           />
-        </p>
+        </Text>
       </div>
     );
   }

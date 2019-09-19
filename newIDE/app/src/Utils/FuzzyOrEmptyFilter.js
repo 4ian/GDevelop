@@ -1,12 +1,21 @@
 // @flow
-import AutoComplete from 'material-ui/AutoComplete';
+const fuzzyFilter = (searchText: string, key: string) => {
+  const compareString = key.toLowerCase();
+  searchText = searchText.toLowerCase();
+
+  let searchTextIndex = 0;
+  for (let index = 0; index < key.length; index++) {
+    if (compareString[index] === searchText[searchTextIndex]) {
+      searchTextIndex += 1;
+    }
+  }
+
+  return searchTextIndex === searchText.length;
+};
 
 /**
- * A filter that can be used with Material-UI Autocomplete to have a fuzzy
- * filter that still return the items with an empty key.
- * @param {*} searchText
- * @param {*} key
+ * A fuzzy filter that still return true if the key is empty.
  */
 export const fuzzyOrEmptyFilter = (searchText: string, key: string) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
+  return !key || fuzzyFilter(searchText, key);
 };

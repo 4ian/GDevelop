@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../../UI/RaisedButton';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,
@@ -28,6 +28,7 @@ import BuildsWatcher from '../../Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
 } from '../../Builds/BuildStepsProgress';
+import Text from '../../../UI/Text';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -263,9 +264,11 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     return (
       <Column noMargin>
         <Line>
-          {t(
-            'Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.'
-          )}
+          <Text>
+            {t(
+              'Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.'
+            )}
+          </Text>
         </Line>
         {userProfile.authenticated && (
           <Line justifyContent="center">

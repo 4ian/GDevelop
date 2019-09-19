@@ -1,7 +1,8 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 import { Column } from '../UI/Grid';
 import { type DebuggerId } from '.';
 
@@ -23,14 +24,16 @@ export default class DebuggerSelector extends React.Component<Props, void> {
           disabled={!hasDebuggers}
         >
           {this.props.debuggerIds.map(id => (
-            <MenuItem value={id} key={id} primaryText={'Game preview #' + id} />
+            <SelectOption
+              value={id}
+              key={id}
+              primaryText={t`Game preview #${id}`}
+            />
           ))}
           {!hasDebuggers && (
-            <MenuItem
+            <SelectOption
               value={0}
-              primaryText={
-                'No preview running. Run a preview and you will be able to inspect it with the debugger'
-              }
+              primaryText={t`No preview running. Run a preview and you will be able to inspect it with the debugger`}
             />
           )}
         </SelectField>

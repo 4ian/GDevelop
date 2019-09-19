@@ -1,14 +1,18 @@
+// @flow
 import React from 'react';
-import { ListItem } from 'material-ui/List';
-import IconMenu from '../UI/Menu/IconMenu';
+import { ListItem } from '../UI/List';
 import ListIcon from '../UI/ListIcon';
-import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import TextField, {
+  noMarginTextFieldInListItemTopOffset,
+} from '../UI/TextField';
 import Clipboard from '../Utils/Clipboard';
 import { CLIPBOARD_KIND } from './ClipboardKind';
-import muiThemeable from 'material-ui/styles/muiThemeable';
-import { buildTagsMenuTemplate, getTagsFromString } from '../Utils/TagsHelper';
+import {
+  type SelectedTags,
+  buildTagsMenuTemplate,
+  getTagsFromString,
+} from '../Utils/TagsHelper';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 const LEFT_MOUSE_BUTTON = 0;
 
@@ -19,7 +23,7 @@ const styles = {
     textOverflow: 'ellipsis',
   },
   textField: {
-    top: -16,
+    top: noMarginTextFieldInListItemTopOffset,
   },
 };
 
@@ -37,85 +41,36 @@ const getPasteLabel = isGlobalObject => {
     : 'Paste ' + clipboardObjectName;
 };
 
-class ThemableObjectRow extends React.Component {
-  _renderObjectMenu(object) {
-    return (
-      <IconMenu
-        ref={iconMenu => (this._iconMenu = iconMenu)}
-        iconButtonElement={
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={() => [
-          {
-            label: 'Edit object',
-            enabled: !!this.props.onEdit,
-            click: () => this.props.onEdit(object),
-          },
-          {
-            label: 'Edit object variables',
-            enabled: !!this.props.onEditVariables,
-            click: () => this.props.onEditVariables(),
-          },
-          { type: 'separator' },
-          {
-            label: 'Tags',
-            submenu: buildTagsMenuTemplate({
-              noTagLabel: 'No tags',
-              getAllTags: this.props.getAllObjectTags,
-              selectedTags: getTagsFromString(object.getTags()),
-              onChange: objectTags => {
-                this.props.onChangeTags(objectTags);
-              },
-              editTagsLabel: 'Add/edit tags...',
-              onEditTags: this.props.onEditTags,
-            }),
-          },
-          {
-            label: 'Rename',
-            enabled: !!this.props.onEdit,
-            click: () => this.props.onEditName(),
-          },
-          {
-            label: 'Set as a global object',
-            enabled: !!this.props.onSetAsGlobalObject,
-            click: () => this.props.onSetAsGlobalObject(),
-          },
-          {
-            label: 'Delete',
-            enabled: !!this.props.onEdit,
-            click: () => this.props.onDelete(),
-          },
-          { type: 'separator' },
-          {
-            label: 'Add a new object...',
-            click: () => this.props.onAddNewObject(),
-          },
-          { type: 'separator' },
-          {
-            label: 'Copy',
-            click: () => this.props.onCopyObject(),
-          },
-          {
-            label: 'Cut',
-            click: () => this.props.onCutObject(),
-          },
-          {
-            label: getPasteLabel(this.props.isGlobalObject),
-            enabled: Clipboard.has(CLIPBOARD_KIND),
-            click: () => this.props.onPasteObject(),
-          },
-          {
-            label: 'Duplicate',
-            click: () => this.props.onDuplicateObject(),
-          },
-        ]}
-      />
-    );
-  }
+type Props = {|
+  project: gdProject,
+  object: gdObject,
+  selected: boolean,
+  isGlobalObject: boolean,
+  onObjectSelected: string => void,
+  onEdit: (?gdObject) => void,
+  onEditVariables: () => void,
+  editingName: boolean,
+  onEditName: () => void,
+  onSetAsGlobalObject: () => void,
+  onDelete: () => void,
+  onAddNewObject: () => void,
+  onCopyObject: () => void,
+  onCutObject: () => void,
+  onPasteObject: () => void,
+  onDuplicateObject: () => void,
+  getAllObjectTags: () => Array<string>,
+  selectedTags: SelectedTags,
+  onChangeTags: SelectedTags => void,
+  onEditTags?: () => void,
+  onRename: string => void,
+  style: Object,
+  getThumbnail: (gdProject, gdObject) => string,
+|};
 
-  componentDidUpdate(prevProps) {
+class ObjectRow extends React.Component<Props, {||}> {
+  textField: ?TextField;
+
+  componentDidUpdate(prevProps: Props) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
         if (this.textField) this.textField.focus();
@@ -123,85 +78,145 @@ class ThemableObjectRow extends React.Component {
     }
   }
 
-  _onContextMenu = event => {
-    if (this._iconMenu) this._iconMenu.open(event);
-  };
-
   render() {
-    const {
-      project,
-      object,
-      selected,
-      isGlobalObject,
-      style,
-      muiTheme,
-    } = this.props;
-
-    const objectName = object.getName();
-    const label = this.props.editingName ? (
-      <TextField
-        id="rename-object-field"
-        ref={textField => (this.textField = textField)}
-        defaultValue={objectName}
-        onBlur={e => this.props.onRename(e.target.value)}
-        onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
-            this.textField.blur();
-          }
-        }}
-        fullWidth
-        style={styles.textField}
-      />
-    ) : (
-      <div
-        style={{
-          ...styles.objectName,
-          color: selected ? muiTheme.listItem.selectedTextColor : undefined,
-          fontStyle: isGlobalObject ? 'italic' : undefined,
-          fontWeight: isGlobalObject ? 'bold' : 'normal',
-        }}
-      >
-        {objectName}
-      </div>
-    );
-
-    const itemStyle = {
-      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-      backgroundColor: selected
-        ? muiTheme.listItem.selectedBackgroundColor
-        : undefined,
-    };
+    const { project, object, selected, isGlobalObject, style } = this.props;
 
     return (
-      <ListItem
-        style={{ ...itemStyle, ...style }}
-        onContextMenu={this._onContextMenu}
-        primaryText={label}
-        leftIcon={
-          <ListIcon
-            iconSize={32}
-            src={this.props.getThumbnail(project, object)}
-          />
-        }
-        rightIconButton={this._renderObjectMenu(object)}
-        onClick={() => {
-          if (!this.props.onObjectSelected) return;
-          if (this.props.editingName) return;
-          this.props.onObjectSelected(selected ? '' : objectName);
-        }}
-        onDoubleClick={event => {
-          if (event.button !== LEFT_MOUSE_BUTTON) return;
-          if (!this.props.onEdit) return;
-          if (this.props.editingName) return;
+      <ThemeConsumer>
+        {muiTheme => {
+          const objectName = object.getName();
+          const label = this.props.editingName ? (
+            <TextField
+              id="rename-object-field"
+              margin="none"
+              ref={textField => (this.textField = textField)}
+              defaultValue={objectName}
+              onBlur={e => this.props.onRename(e.currentTarget.value)}
+              onKeyPress={event => {
+                if (event.charCode === 13) {
+                  // enter key pressed
+                  if (this.textField) this.textField.blur();
+                }
+              }}
+              fullWidth
+              style={styles.textField}
+            />
+          ) : (
+            <div
+              style={{
+                ...styles.objectName,
+                color: selected
+                  ? muiTheme.listItem.selectedTextColor
+                  : undefined,
+                fontStyle: isGlobalObject ? 'italic' : undefined,
+                fontWeight: isGlobalObject ? 'bold' : 'normal',
+              }}
+            >
+              {objectName}
+            </div>
+          );
 
-          this.props.onObjectSelected('');
-          this.props.onEdit(object);
+          const itemStyle = {
+            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+            backgroundColor: selected
+              ? muiTheme.listItem.selectedBackgroundColor
+              : undefined,
+          };
+
+          return (
+            <ListItem
+              style={{ ...itemStyle, ...style }}
+              primaryText={label}
+              leftIcon={
+                <ListIcon
+                  iconSize={32}
+                  src={this.props.getThumbnail(project, object)}
+                />
+              }
+              displayMenuButton
+              buildMenuTemplate={() => [
+                {
+                  label: 'Edit object',
+                  enabled: !!this.props.onEdit,
+                  click: () => this.props.onEdit(object),
+                },
+                {
+                  label: 'Edit object variables',
+                  enabled: !!this.props.onEditVariables,
+                  click: () => this.props.onEditVariables(),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Tags',
+                  submenu: buildTagsMenuTemplate({
+                    noTagLabel: 'No tags',
+                    getAllTags: this.props.getAllObjectTags,
+                    selectedTags: getTagsFromString(object.getTags()),
+                    onChange: objectTags => {
+                      this.props.onChangeTags(objectTags);
+                    },
+                    editTagsLabel: 'Add/edit tags...',
+                    onEditTags: this.props.onEditTags,
+                  }),
+                },
+                {
+                  label: 'Rename',
+                  enabled: !!this.props.onEdit,
+                  click: () => this.props.onEditName(),
+                },
+                {
+                  label: 'Set as a global object',
+                  enabled: !!this.props.onSetAsGlobalObject,
+                  click: () => this.props.onSetAsGlobalObject(),
+                },
+                {
+                  label: 'Delete',
+                  enabled: !!this.props.onEdit,
+                  click: () => this.props.onDelete(),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Add a new object...',
+                  click: () => this.props.onAddNewObject(),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Copy',
+                  click: () => this.props.onCopyObject(),
+                },
+                {
+                  label: 'Cut',
+                  click: () => this.props.onCutObject(),
+                },
+                {
+                  label: getPasteLabel(this.props.isGlobalObject),
+                  enabled: Clipboard.has(CLIPBOARD_KIND),
+                  click: () => this.props.onPasteObject(),
+                },
+                {
+                  label: 'Duplicate',
+                  click: () => this.props.onDuplicateObject(),
+                },
+              ]}
+              onClick={() => {
+                if (!this.props.onObjectSelected) return;
+                if (this.props.editingName) return;
+                this.props.onObjectSelected(selected ? '' : objectName);
+              }}
+              onDoubleClick={event => {
+                if (event.button !== LEFT_MOUSE_BUTTON) return;
+                if (!this.props.onEdit) return;
+                if (this.props.editingName) return;
+
+                this.props.onObjectSelected('');
+                this.props.onEdit(object);
+              }}
+            />
+          );
         }}
-      />
+      </ThemeConsumer>
     );
   }
 }
 
-const ObjectRow = muiThemeable()(ThemableObjectRow);
 export default ObjectRow;

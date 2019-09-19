@@ -1,10 +1,8 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import { List, ListItem } from 'material-ui/List';
-import IconButton from 'material-ui/IconButton';
-import Remove from 'material-ui/svg-icons/content/remove';
+import { List, ListItem } from '../UI/List';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
@@ -97,11 +95,8 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
                 <ListItem
                   key={objectName}
                   primaryText={objectName}
-                  rightIconButton={
-                    <IconButton onClick={() => this.removeObject(objectName)}>
-                      <Remove />
-                    </IconButton>
-                  }
+                  displayRemoveButton
+                  onRemove={() => this.removeObject(objectName)}
                 />
               );
             })}
@@ -116,7 +111,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
             onChoose={this.addObject}
             openOnFocus
             noGroups
-            hintText={<Trans>Choose an object to add to the group</Trans>}
+            hintText={t`Choose an object to add to the group`}
             fullWidth
           />
         </Column>

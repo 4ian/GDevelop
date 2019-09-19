@@ -2,9 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import FlatButton from 'material-ui/FlatButton';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import FlatButton from '../../UI/FlatButton';
+import SelectOption from '../../UI/SelectOption';
 import Dialog from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
@@ -12,7 +12,7 @@ import PreferencesContext from './PreferencesContext';
 import AlertMessage from '../../UI/AlertMessage';
 import LocalesMetadata from '../../locales/LocalesMetadata';
 import { I18n } from '@lingui/react';
-import Divider from 'material-ui/Divider';
+import Divider from '@material-ui/core/Divider';
 
 type Props = {|
   open: boolean,
@@ -30,13 +30,13 @@ const displayLocaleMetadata = localeMetadata => {
   return true;
 };
 
-const renderLanguageMenuItem = localeMetadata => {
+const renderLanguageSelectOption = localeMetadata => {
   const translationRatio = localeMetadata.translationRatio || 0;
   const percent = (100 * localeMetadata.translationRatio).toFixed(0);
   const isStarted = translationRatio > 0;
 
   return (
-    <MenuItem
+    <SelectOption
       value={localeMetadata.languageCode}
       primaryText={
         localeMetadata.languageNativeName +
@@ -87,8 +87,11 @@ export default class LanguageDialog extends Component<Props, State> {
                         )
                       }
                       primary={false}
-                      onClick={onClose}
+                      onClick={() => {
+                        onClose(false);
+                      }}
                       disabled={isLoadingLanguage}
+                      key="close"
                     />,
                   ]}
                   secondaryActions={[
@@ -123,7 +126,7 @@ export default class LanguageDialog extends Component<Props, State> {
                           <Trans>Choose GDevelop language</Trans>
                         }
                         value={values.language}
-                        onChange={(e, i, value) => {
+                        onChange={(e, i, value: string) => {
                           setLanguage(value);
                           this.setState({
                             languageDidChange: true,
@@ -131,13 +134,16 @@ export default class LanguageDialog extends Component<Props, State> {
                         }}
                         fullWidth
                       >
-                        <MenuItem value="en" primaryText="English (default)" />
+                        <SelectOption
+                          value="en"
+                          primaryText="English (default)"
+                        />
                         {goodProgressLocales.map(localeMetadata =>
-                          renderLanguageMenuItem(localeMetadata)
+                          renderLanguageSelectOption(localeMetadata)
                         )}
                         <Divider />
                         {startedLocales.map(localeMetadata =>
-                          renderLanguageMenuItem(localeMetadata)
+                          renderLanguageSelectOption(localeMetadata)
                         )}
                       </SelectField>
                     </Line>

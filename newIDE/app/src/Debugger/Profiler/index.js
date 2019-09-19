@@ -2,13 +2,14 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import RaisedButton from 'material-ui/RaisedButton/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import MeasuresTable from './MeasuresTable';
 import { type ProfilerOutput } from '..';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { Line } from '../../UI/Grid';
 import Background from '../../UI/Background';
-import LinearProgress from 'material-ui/LinearProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Text from '../../UI/Text';
 
 const styles = {
   tableContainer: {
@@ -31,11 +32,11 @@ export default class Profiler extends React.Component<Props, void> {
       <Background>
         <Line alignItems="center" justifyContent="center">
           {!profilingInProgress && profilerOutput && (
-            <p>
+            <Text>
               <Trans>
                 Last run collected on {profilerOutput.stats.framesCount} frames.
               </Trans>
-            </p>
+            </Text>
           )}
           {!profilingInProgress && profilerOutput && (
             <RaisedButton label={<Trans>Restart</Trans>} onClick={onStart} />
@@ -55,7 +56,7 @@ export default class Profiler extends React.Component<Props, void> {
         </Line>
         {profilingInProgress && (
           <Line alignItems="center">
-            <LinearProgress style={{ flex: 1 }} mode={'indeterminate'} />
+            <LinearProgress style={{ flex: 1 }} variant={'indeterminate'} />
           </Line>
         )}
         <div style={styles.tableContainer}>

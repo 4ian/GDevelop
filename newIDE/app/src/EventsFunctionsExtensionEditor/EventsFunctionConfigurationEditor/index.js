@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../../UI/Tabs';
 import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
@@ -157,9 +157,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           <Tab
             label={<Trans>Object groups</Trans>}
             value={('groups': TabNames)}
-          >
-            {/* Manually display tabs to support flex */}
-          </Tab>
+          />
         </Tabs>
         {this.state.currentTab === 'config' ? (
           <ScrollView>

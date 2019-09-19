@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { ListItem } from 'material-ui/List';
+import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import type { GroupWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { getObjectOrObjectGroupListItemKey } from './Keys';
@@ -9,12 +9,14 @@ type Props = {|
   groupWithContext: GroupWithContext,
   iconSize: number,
   onClick: () => void,
+  selectedValue: ?string,
 |};
 
 export const renderGroupObjectsListItem = ({
   groupWithContext,
   iconSize,
   onClick,
+  selectedValue,
 }: Props) => {
   const groupName: string = groupWithContext.group.getName();
   return (
@@ -23,7 +25,7 @@ export const renderGroupObjectsListItem = ({
         getObjectOrObjectGroupListItemKey(groupName) +
         (groupWithContext.global ? '-global' : '')
       }
-      value={getObjectOrObjectGroupListItemKey(groupName)}
+      selected={selectedValue === getObjectOrObjectGroupListItemKey(groupName)}
       primaryText={groupName}
       leftIcon={
         <ListIcon

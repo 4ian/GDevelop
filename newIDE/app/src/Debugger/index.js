@@ -6,6 +6,7 @@ import Toolbar from './Toolbar';
 import DebuggerContent from './DebuggerContent';
 import DebuggerSelector from './DebuggerSelector';
 import { Column } from '../UI/Grid';
+import Text from '../UI/Text';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import Background from '../UI/Background';
@@ -306,19 +307,19 @@ export default class Debugger extends React.Component<Props, State> {
         {!debuggerServerStarted && !debuggerServerError && (
           <PlaceholderMessage>
             <PlaceholderLoader />
-            <p>
+            <Text>
               <Trans>Debugger is starting...</Trans>
-            </p>
+            </Text>
           </PlaceholderMessage>
         )}
         {!debuggerServerStarted && debuggerServerError && (
           <PlaceholderMessage>
-            <p>
+            <Text>
               <Trans>
                 Unable to start the debugger server! Make sure that you are
                 authorized to run servers on this computer.
               </Trans>
-            </p>
+            </Text>
           </PlaceholderMessage>
         )}
         {debuggerServerStarted && (

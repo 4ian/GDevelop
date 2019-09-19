@@ -1,14 +1,15 @@
 // @flow
 import * as React from 'react';
 import ResourcesLoader from '../ResourcesLoader';
-import ResourceSelector from '../ResourcesList/ResourceSelector';
+import ResourceSelector from './ResourceSelector';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
   type ResourceKind,
-} from '../ResourcesList/ResourceSource.flow';
+} from './ResourceSource.flow';
 import ResourceThumbnail from './ResourceThumbnail';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   project: gdProject,
@@ -19,8 +20,14 @@ type Props = {|
   resourceName: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
-  hintText?: React.Node,
+  hintText?: MessageDescriptor,
 |};
+
+const styles = {
+  container: { flex: 1, display: 'flex', alignItems: 'flex-end' },
+  selectorContainer: { flex: 1 },
+  resourceThumbnail: { marginLeft: 10 },
+};
 
 const ResourceSelectorWithThumbnail = ({
   project,
@@ -34,8 +41,8 @@ const ResourceSelectorWithThumbnail = ({
   hintText,
 }: Props) => {
   return (
-    <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
-      <div style={{ flex: 1 }}>
+    <div style={styles.container}>
+      <div style={styles.selectorContainer}>
         <ResourceSelector
           project={project}
           resourceSources={resourceSources}
@@ -54,7 +61,7 @@ const ResourceSelectorWithThumbnail = ({
         resourceName={resourceName}
         resourcesLoader={ResourcesLoader}
         project={project}
-        style={{ marginLeft: 10 }}
+        style={styles.resourceThumbnail}
       />
     </div>
   );

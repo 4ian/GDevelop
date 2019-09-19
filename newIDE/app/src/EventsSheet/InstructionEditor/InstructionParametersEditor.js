@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import Toggle from 'material-ui/Toggle';
+import Toggle from '../../UI/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
@@ -19,10 +19,11 @@ import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import { getExtraInstructionInformation } from '../../Hints';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
-import IconButton from 'material-ui/IconButton';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../EventsScope.flow';
 import { getObjectParameterIndex } from './InstructionOrExpressionSelector/EnumerateInstructions';
+import Text from '../../UI/Text';
 const gd = global.gd;
 
 const styles = {
@@ -249,9 +250,13 @@ export default class InstructionParametersEditor extends React.Component<
                 alt=""
                 style={styles.icon}
               />
-              <p>{instructionMetadata.getDescription()}</p>
+              <Text>{instructionMetadata.getDescription()}</Text>
               {isAnEventFunctionMetadata(instructionMetadata) && (
-                <IconButton onClick={() => this._openExtension(i18n)}>
+                <IconButton
+                  onClick={() => {
+                    this._openExtension(i18n);
+                  }}
+                >
                   <OpenInNew />
                 </IconButton>
               )}

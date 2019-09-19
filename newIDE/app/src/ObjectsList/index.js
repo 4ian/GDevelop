@@ -3,7 +3,6 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
-import { ListItem } from 'material-ui/List';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import ObjectRow from './ObjectRow';
@@ -16,7 +15,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { makeAddItem } from '../UI/ListCommonItem';
+import { AddListItem } from '../UI/ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
 import type {
@@ -27,15 +26,13 @@ import { CLIPBOARD_KIND } from './ClipboardKind';
 import TagChips from '../UI/TagChips';
 import EditTagsDialog from '../UI/EditTagsDialog';
 import { type Tags, getStringFromTags } from '../Utils/TagsHelper';
+import { listItemWith32PxIconHeight } from '../UI/List';
 
-const listItemHeight = 48;
 const styles = {
   listContainer: {
     flex: 1,
   },
 };
-
-const AddObjectRow = makeAddItem(ListItem);
 
 const SortableObjectRow = SortableElement(props => {
   const { style, ...otherProps } = props;
@@ -47,7 +44,12 @@ const SortableObjectRow = SortableElement(props => {
 });
 
 const SortableAddObjectRow = SortableElement(props => {
-  return <AddObjectRow {...props} />;
+  const { style, ...otherProps } = props;
+  return (
+    <div style={style}>
+      <AddListItem {...otherProps} />
+    </div>
+  );
 });
 
 class ObjectsList extends Component<*, *> {
@@ -65,7 +67,7 @@ class ObjectsList extends Component<*, *> {
         ref={list => (this.list = list)}
         height={height}
         rowCount={fullList.length}
-        rowHeight={listItemHeight}
+        rowHeight={listItemWith32PxIconHeight}
         rowRenderer={({ index, key, style }) => {
           const objectWithContext = fullList[index];
           if (objectWithContext.key === 'add-objects-row') {
@@ -558,9 +560,20 @@ export default class ObjectsListContainer extends React.Component<
             }
             onCancel={() => this._editVariables(null)}
             onApply={() => this._editVariables(null)}
-            title="Object Variables"
-            emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
-            emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
+            title={<Trans>Object Variables</Trans>}
+            emptyExplanationMessage={
+              <Trans>
+                When you add variables to an object, any instance of the object
+                put on the scene or created during the game will have these
+                variables attached to it.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called Life representing
+                the health of the object.
+              </Trans>
+            }
           />
         )}
         {tagEditedObject && (

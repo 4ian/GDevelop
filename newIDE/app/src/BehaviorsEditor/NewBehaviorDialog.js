@@ -6,14 +6,14 @@ import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
-import FlatButton from 'material-ui/FlatButton';
-import Subheader from 'material-ui/Subheader';
-import Avatar from 'material-ui/Avatar';
-import { Tabs, Tab } from 'material-ui/Tabs';
-import { List, ListItem } from 'material-ui/List';
-import Visibility from 'material-ui/svg-icons/action/visibility';
-import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
-import Create from 'material-ui/svg-icons/content/create';
+import FlatButton from '../UI/FlatButton';
+import Subheader from '../UI/Subheader';
+import ListIcon from '../UI/ListIcon';
+import { Tabs, Tab } from '../UI/Tabs';
+import { List, ListItem } from '../UI/List';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Create from '@material-ui/icons/Create';
 import { Line } from '../UI/Grid';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
@@ -29,7 +29,6 @@ import ExtensionsSearch from '../ExtensionsSearch';
 import Window from '../Utils/Window';
 
 const styles = {
-  icon: { borderRadius: 0 },
   disabledItem: { opacity: 0.6 },
 };
 
@@ -43,12 +42,16 @@ const BehaviorListItem = ({
   disabled: boolean,
 |}) => (
   <ListItem
-    leftAvatar={
-      <Avatar src={behaviorMetadata.iconFilename} style={styles.icon} />
+    leftIcon={
+      <ListIcon
+        src={behaviorMetadata.iconFilename}
+        iconSize={40}
+        isGDevelopIcon
+      />
     }
     key={behaviorMetadata.type}
     primaryText={behaviorMetadata.fullName}
-    secondaryText={<p>{behaviorMetadata.description}</p>}
+    secondaryText={behaviorMetadata.description}
     secondaryTextLines={2}
     onClick={onClick}
     style={disabled ? styles.disabledItem : undefined}
@@ -192,7 +195,14 @@ export default class NewBehaviorDialog extends Component<Props, State> {
             autoScrollBodyContent
           >
             <Tabs value={currentTab} onChange={this._changeTab}>
-              <Tab label={<Trans>Installed Behaviors</Trans>} value="installed">
+              <Tab
+                label={<Trans>Installed Behaviors</Trans>}
+                value="installed"
+              />
+              <Tab label={<Trans>Search New Behaviors</Trans>} value="search" />
+            </Tabs>
+            {currentTab === 'installed' && (
+              <React.Fragment>
                 <SearchBar
                   value={searchText}
                   onRequestSearch={() => {
@@ -272,15 +282,15 @@ export default class NewBehaviorDialog extends Component<Props, State> {
                     label={<Trans>Create your own behavior</Trans>}
                   />
                 </Line>
-              </Tab>
-              <Tab label={<Trans>Search New Behaviors</Trans>} value="search">
-                <ExtensionsSearch
-                  project={project}
-                  onNewExtensionInstalled={this._onNewExtensionInstalled}
-                  showOnlyWithBehaviors
-                />
-              </Tab>
-            </Tabs>
+              </React.Fragment>
+            )}
+            {currentTab === 'search' && (
+              <ExtensionsSearch
+                project={project}
+                onNewExtensionInstalled={this._onNewExtensionInstalled}
+                showOnlyWithBehaviors
+              />
+            )}
           </Dialog>
         )}
       </I18n>

@@ -4,10 +4,10 @@ import ResourcesLoader from '../../ResourcesLoader';
 import { type ResourceKind } from '../ResourceSource.flow';
 import ImagePreview from './ImagePreview';
 import GenericIconPreview from './GenericIconPreview';
-import Audiotrack from 'material-ui/svg-icons/image/audiotrack';
-import InsertDriveFile from 'material-ui/svg-icons/editor/insert-drive-file';
-import VideoLibrary from 'material-ui/svg-icons/av/video-library';
-import FontDownload from 'material-ui/svg-icons/content/font-download';
+import Audiotrack from '@material-ui/icons/Audiotrack';
+import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
+import VideoLibrary from '@material-ui/icons/VideoLibrary';
+import FontDownload from '@material-ui/icons/FontDownload';
 
 type Props = {|
   project: gdProject,
@@ -25,7 +25,7 @@ type State = {|
 /**
  * Display the right preview for any given resource of a project
  */
-export default class ResourcePreview extends React.Component<Props, State> {
+export default class ResourcePreview extends React.PureComponent<Props, State> {
   state = this._loadFrom(this.props);
 
   componentWillReceiveProps(newProps: Props) {

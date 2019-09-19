@@ -1,9 +1,9 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import React from 'react';
-import { TableRow, TableRowColumn } from 'material-ui/Table';
-import TextField from 'material-ui/TextField';
+import { TableRow, TableRowColumn } from '../UI/Table';
+import TextField from '../UI/TextField';
 
 import styles from './styles';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
@@ -24,7 +24,7 @@ export default ({ layout, onBackgroundColorChanged }: Props) => (
       >
         <TableRowColumn style={styles.handleColumn} />
         <TableRowColumn>
-          <TextField hintText={<Trans>Background color</Trans>} disabled />
+          <TextField hintText={t`Background color`} disabled />
         </TableRowColumn>
         <TableRowColumn style={styles.effectsColumn}>
           <ColorPicker

@@ -1,10 +1,11 @@
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 
-export default class RelationalOperatorField extends Component {
+export default class MouseField extends Component {
   focus() {}
 
   render() {
@@ -22,25 +23,20 @@ export default class RelationalOperatorField extends Component {
         onChange={(e, i, value) => this.props.onChange(value)}
         errorText={value ? undefined : <Trans>You must select a button</Trans>}
       >
-        <MenuItem value="Left" primaryText={<Trans>Left (primary)</Trans>} />
-        <MenuItem
-          value="Right"
-          primaryText={<Trans>Right (secondary)</Trans>}
-        />
-        <MenuItem
+        <SelectOption value="Left" primaryText={t`Left (primary)`} />
+        <SelectOption value="Right" primaryText={t`Right (secondary)`} />
+        <SelectOption
           value="Middle"
-          primaryText={
-            <Trans>Middle (Auxiliary button, usually the wheel button)</Trans>
-          }
+          primaryText={t`Middle (Auxiliary button, usually the wheel button)`}
         />
         {/* TODO: Add support for these buttons in the game engine
-         <MenuItem
+         <SelectOption
           value="XButton1"
-          primaryText={<Trans>Special button #1</Trans>}
+          primaryText={t`Special button #1`}
         />
-        <MenuItem
+        <SelectOption
           value="XButton2"
-          primaryText={<Trans>Special button #2</Trans>}
+          primaryText={t`Special button #2`}
         /> */}
       </SelectField>
     );

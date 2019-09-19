@@ -214,15 +214,17 @@ export default class EventsSheet extends React.Component<Props, State> {
     this.props.setToolbar(
       <Toolbar
         allEventsMetadata={this.state.allEventsMetadata}
-        onAddStandardEvent={() =>
-          this.addNewEvent('BuiltinCommonInstructions::Standard')
-        }
+        onAddStandardEvent={() => {
+          this.addNewEvent('BuiltinCommonInstructions::Standard');
+        }}
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
-        onAddCommentEvent={() =>
-          this.addNewEvent('BuiltinCommonInstructions::Comment')
-        }
-        onAddEvent={this.addNewEvent}
+        onAddCommentEvent={() => {
+          this.addNewEvent('BuiltinCommonInstructions::Comment');
+        }}
+        onAddEvent={type => {
+          this.addNewEvent(type);
+        }}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
         showPreviewButton={this.props.showPreviewButton}

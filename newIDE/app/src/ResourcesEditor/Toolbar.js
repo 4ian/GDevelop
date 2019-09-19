@@ -1,6 +1,7 @@
 // @flow
+import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
-import { ToolbarGroup } from 'material-ui/Toolbar';
+import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 
@@ -15,7 +16,6 @@ type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
   render() {
-    const t = str => str; //TODO
     const { canDelete } = this.props;
 
     return (
@@ -23,20 +23,20 @@ export class Toolbar extends PureComponent<Props, State> {
         <ToolbarIcon
           onClick={this.props.onOpenProjectFolder}
           src="res/ribbon_default/open32.png"
-          tooltip={t('Open the project folder')}
+          tooltip={t`Open the project folder`}
         />
         <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.onOpenProperties}
           src="res/ribbon_default/editprop32.png"
-          tooltip={t('Open the properties panel')}
+          tooltip={t`Open the properties panel`}
         />
         <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.onDeleteSelection}
           src="res/ribbon_default/deleteselected32.png"
           disabled={!canDelete}
-          tooltip={t('Delete the selected resource')}
+          tooltip={t`Delete the selected resource`}
         />
       </ToolbarGroup>
     );

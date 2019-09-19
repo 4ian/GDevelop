@@ -1,8 +1,7 @@
 // @flow
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 import React, { Component } from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
@@ -26,7 +25,7 @@ type Props = {
 };
 
 export default class VariableField extends Component<Props, {||}> {
-  _field: ?AutoComplete;
+  _field: ?SemiControlledAutoComplete;
 
   focus() {
     if (this._field) this._field.focus();
@@ -48,6 +47,7 @@ export default class VariableField extends Component<Props, {||}> {
           floatingLabelText={
             parameterMetadata ? parameterMetadata.getDescription() : undefined
           }
+          fullWidth
           value={value}
           onChange={onChange}
           dataSource={enumerateVariables(variablesContainer).map(

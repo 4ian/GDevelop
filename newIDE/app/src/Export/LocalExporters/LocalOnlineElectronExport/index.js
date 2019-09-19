@@ -3,8 +3,8 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
-import RaisedButton from 'material-ui/RaisedButton';
-import Checkbox from 'material-ui/Checkbox';
+import RaisedButton from '../../../UI/RaisedButton';
+import Checkbox from '../../../UI/Checkbox';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,
@@ -31,6 +31,7 @@ import BuildsWatcher from '../../Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
 } from '../../Builds/BuildStepsProgress';
+import Text from '../../../UI/Text';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -283,9 +284,11 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     return (
       <Column noMargin>
         <Line>
-          {t(
-            'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and/or macOS.'
-          )}
+          <Text>
+            {t(
+              'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and/or macOS.'
+            )}
+          </Text>
         </Line>
         <Checkbox
           label={<Trans>Windows (zip file)</Trans>}

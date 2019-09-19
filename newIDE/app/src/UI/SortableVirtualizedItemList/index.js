@@ -1,14 +1,10 @@
 // @flow
 import * as React from 'react';
 import { List } from 'react-virtualized';
-import { ListItem } from 'material-ui/List';
 import ItemRow from './ItemRow';
-import { makeAddItem } from '../ListCommonItem';
+import { AddListItem } from '../ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-
-const listItemHeight = 48; // TODO: Move this into theme?
-
-const AddItemRow = makeAddItem(ListItem);
+import { listItemWith32PxIconHeight, listItemWithoutIconHeight } from '../List';
 
 const SortableItemRow = SortableElement(props => {
   const { style, ...otherProps } = props;
@@ -20,7 +16,12 @@ const SortableItemRow = SortableElement(props => {
 });
 
 const SortableAddItemRow = SortableElement(props => {
-  return <AddItemRow {...props} />;
+  const { style, ...otherProps } = props;
+  return (
+    <div style={style}>
+      <AddListItem {...otherProps} />
+    </div>
+  );
 });
 
 export type Item = {
@@ -67,7 +68,9 @@ class ItemsList extends React.Component<ItemsListProps, *> {
         ref={list => (this.list = list)}
         height={height}
         rowCount={fullList.length}
-        rowHeight={listItemHeight}
+        rowHeight={
+          getThumbnail ? listItemWith32PxIconHeight : listItemWithoutIconHeight
+        }
         rowRenderer={({ index, key, style }) => {
           const item = fullList[index];
           if (item.key === 'add-item-row') {

@@ -42,7 +42,7 @@ export const create = (authentification: Authentification) => {
           i18n={i18n}
           eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
           previewLauncher={<BrowserS3PreviewLauncher />}
-          exportDialog={(props) => <ExportDialog {...props} exporters={getBrowserExporters()} />}
+          renderExportDialog={(props) => <ExportDialog {...props} exporters={getBrowserExporters()} />}
           createDialog={
             <CreateProjectDialog
               examplesComponent={BrowserExamples}

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import ThemeConsumer from './Theme/ThemeConsumer';
+import Text from './Text';
 
 const style = {
   display: 'flex',
@@ -8,21 +9,25 @@ const style = {
   paddingRight: 8,
 };
 
-class ThemableMiniToolbar extends Component {
+class MiniToolbar extends Component {
   render() {
-    const { muiTheme, justifyContent, smallest } = this.props;
+    const { justifyContent, smallest } = this.props;
 
     return (
-      <div
-        style={{
-          ...style,
-          height: smallest ? 34 : 48,
-          backgroundColor: muiTheme.toolbar.backgroundColor,
-          justifyContent,
-        }}
-      >
-        {this.props.children}
-      </div>
+      <ThemeConsumer>
+        {muiTheme => (
+          <div
+            style={{
+              ...style,
+              height: smallest ? 34 : 48,
+              backgroundColor: muiTheme.toolbar.backgroundColor,
+              justifyContent,
+            }}
+          >
+            {this.props.children}
+          </div>
+        )}
+      </ThemeConsumer>
     );
   }
 }
@@ -32,7 +37,7 @@ const toolbarTextStyle = {
 };
 
 export const MiniToolbarText = ({ children }) => (
-  <p style={toolbarTextStyle}>{children}</p>
+  <Text style={toolbarTextStyle}>{children}</Text>
 );
 
-export default muiThemeable()(ThemableMiniToolbar);
+export default MiniToolbar;

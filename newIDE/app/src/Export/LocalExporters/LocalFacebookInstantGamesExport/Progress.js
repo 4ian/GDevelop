@@ -2,10 +2,14 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
-import CircularProgress from 'material-ui/CircularProgress';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import RaisedButton from '../../../UI/RaisedButton';
+import FlatButton from '../../../UI/FlatButton';
+import Text from '../../../UI/Text';
 import { Line, Spacer } from '../../../UI/Grid';
 import { type LocalFacebookInstantGamesExportStep } from '.';
 
@@ -30,49 +34,59 @@ export default ({
         ? 1
         : exportStep === 'done'
         ? 2
-        : undefined
+        : -1
     }
     orientation="vertical"
   >
     <Step>
-      <StepLabel>Game export</StepLabel>
+      <StepLabel>
+        <Trans>Game export</Trans>
+      </StepLabel>
       <StepContent>
         <Line alignItems="center">
           <CircularProgress size={20} />
           <Spacer />
-          <p>
+          <Text>
             <Trans>Export in progress...</Trans>
-          </p>
+          </Text>
         </Line>
       </StepContent>
     </Step>
     <Step>
-      <StepLabel>Upload to build service</StepLabel>
+      <StepLabel>
+        <Trans>Upload to build service</Trans>
+      </StepLabel>
       <StepContent>
         {errored ? (
-          <p>
+          <Text>
             <Trans>
               Can't compress the game. Please check that you have rights to
               write on this computer.
             </Trans>
-          </p>
+          </Text>
         ) : (
           <Line alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
-            <p>
+            <Text>
               <Trans>Compressing...</Trans>
-            </p>
+            </Text>
           </Line>
         )}
       </StepContent>
     </Step>
     <Step>
-      <StepLabel>Export finished</StepLabel>
+      <StepLabel>
+        <Trans>Export finished</Trans>
+      </StepLabel>
       <StepContent>
         <Line expand>
-          You can now create a game on Facebook Instant Games, if not already
-          done, and upload the archive generated.
+          <Text>
+            <Trans>
+              You can now create a game on Facebook Instant Games, if not
+              already done, and upload the archive generated.
+            </Trans>
+          </Text>
         </Line>
         <Line expand>
           <FlatButton

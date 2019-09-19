@@ -2,6 +2,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
+import Text from '../UI/Text';
 import ExamplesList from './ExamplesList';
 
 // This is the list of available examples in src/fixtures folder.
@@ -120,11 +121,13 @@ export default class BrowserExamples extends Component {
   render() {
     return (
       <Column noMargin>
-        <Column>
-          <p>
-            <Trans>Choose or search for an example to open:</Trans>
-          </p>
-        </Column>
+        <Line>
+          <Column>
+            <Text>
+              <Trans>Choose or search for an example to open:</Trans>
+            </Text>
+          </Column>
+        </Line>
         <Line>
           <ExamplesList
             exampleNames={exampleNames}

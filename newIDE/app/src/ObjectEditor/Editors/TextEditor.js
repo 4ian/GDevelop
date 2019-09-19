@@ -1,8 +1,9 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../../UI/Checkbox';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
@@ -22,10 +23,7 @@ const styles = {
     ...toolbarItemStyle,
   },
   toolbarItem: toolbarItemStyle,
-  checkbox: {
-    width: 'auto',
-    ...toolbarItemStyle,
-  },
+  checkbox: toolbarItemStyle,
 };
 
 export default class TextEditor extends React.Component<EditorProps, void> {
@@ -48,6 +46,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           <SemiControlledTextField
             commitOnBlur
             type="number"
+            margin="none"
             style={styles.sizeTextField}
             value={textObject.getCharacterSize()}
             onChange={value => {
@@ -111,9 +110,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             <Line>
               <SemiControlledTextField
                 commitOnBlur
-                hintText={
-                  <Trans>Enter the text to be displayed by the object</Trans>
-                }
+                hintText={t`Enter the text to be displayed by the object`}
                 fullWidth
                 multiLine
                 rows={8}

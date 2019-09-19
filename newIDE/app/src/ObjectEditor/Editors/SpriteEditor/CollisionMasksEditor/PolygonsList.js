@@ -8,7 +8,7 @@ import {
   TableHeaderColumn,
   TableRow,
   TableRowColumn,
-} from 'material-ui/Table';
+} from '../../../../UI/Table';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapVector } from '../../../../Utils/MapFor';
 import styles from './styles';
@@ -127,15 +127,7 @@ class PolygonsListBody extends Component<PolygonsListBodyProps, void> {
       />
     );
 
-    return (
-      <TableBody
-        displayRowCheckbox={false}
-        deselectOnClickaway={true}
-        showRowHover={true}
-      >
-        {[...polygonRows, addRow]}
-      </TableBody>
-    );
+    return <TableBody>{[...polygonRows, addRow]}</TableBody>;
   }
 }
 
@@ -152,8 +144,8 @@ type Props = {|
 export default class PolygonsList extends Component<Props, void> {
   render() {
     return (
-      <Table selectable={false}>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+      <Table>
+        <TableHeader>
           <TableRow>
             <TableHeaderColumn style={styles.handleColumn} />
             <TableHeaderColumn>Polygon</TableHeaderColumn>

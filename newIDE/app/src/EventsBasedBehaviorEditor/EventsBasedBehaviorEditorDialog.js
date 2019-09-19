@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import EventsBasedBehaviorEditor from './index';
 import HelpButton from '../UI/HelpButton';

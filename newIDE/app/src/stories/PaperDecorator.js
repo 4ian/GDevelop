@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import Paper from 'material-ui/Paper';
+import Paper from '@material-ui/core/Paper';
 import { type StoryDecorator } from '@storybook/react';
 
 const style = {

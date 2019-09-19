@@ -5,8 +5,8 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
-import IconButton from 'material-ui/IconButton';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import IconButton from '../../../UI/IconButton';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -42,6 +42,14 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
   };
 
   edit = (domEvent: any) => {
+    // We should not need to stop the event propagation, but
+    // if we don't do this, the InlinePopover's clickaway listener
+    // is immediately picking up the event and closing.
+    // Caveat: we can open multiple InlinePopover.
+    // Search the rest of the codebase for onlinepopover-event-hack
+    domEvent.preventDefault();
+    domEvent.stopPropagation();
+
     this.setState(
       {
         editing: true,

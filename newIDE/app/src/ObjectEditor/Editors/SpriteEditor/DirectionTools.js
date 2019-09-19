@@ -2,13 +2,13 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import Timer from 'material-ui/svg-icons/image/timer';
-import FlatButton from 'material-ui/FlatButton';
-import Checkbox from 'material-ui/Checkbox';
-import Repeat from 'material-ui/svg-icons/av/repeat';
-import Brush from 'material-ui/svg-icons/image/brush';
-import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
-import TextField from 'material-ui/TextField';
+import Timer from '@material-ui/icons/Timer';
+import FlatButton from '../../../UI/FlatButton';
+import Checkbox from '../../../UI/Checkbox';
+import Repeat from '@material-ui/icons/Repeat';
+import Brush from '@material-ui/icons/Brush';
+import PlayArrow from '@material-ui/icons/PlayArrow';
+import TextField from '../../../UI/TextField';
 import Dialog from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
@@ -31,15 +31,12 @@ const styles = {
   repeatContainer: {
     width: 130,
   },
-  repeatLabel: {
-    whiteSpace: 'nowrap',
-  },
   spacer: {
     width: 16,
   },
 };
 
-const formatTime = time => Number(time.toFixed(6));
+const formatTime = (time: number) => Number(time.toFixed(6));
 
 type Props = {|
   direction: gdDirection,
@@ -128,9 +125,12 @@ export default class DirectionTools extends Component<Props, State> {
         <Timer style={styles.timeIcon} />
         <TextField
           value={this.state.timeBetweenFrames}
-          onChange={(e, text) => this.setState({ timeBetweenFrames: text })}
+          onChange={(e, text) =>
+            this.setState({ timeBetweenFrames: parseFloat(text) || 0 })
+          }
           onBlur={() => this.saveTimeBetweenFrames()}
           id="direction-time-between-frames"
+          margin="none"
           style={styles.timeField}
           type="number"
           step={0.005}
@@ -144,9 +144,14 @@ export default class DirectionTools extends Component<Props, State> {
             checkedIcon={<Repeat />}
             uncheckedIcon={<Repeat />}
             checked={direction.isLooping()}
-            label={direction.isLooping() ? 'Loop' : "Don't loop"}
+            label={
+              direction.isLooping() ? (
+                <Trans>Loop</Trans>
+              ) : (
+                <Trans>Don't loop</Trans>
+              )
+            }
             onCheck={(e, check) => this.setLooping(check)}
-            labelStyle={styles.repeatLabel}
           />
         </div>
         {this.state.previewOpen && (
@@ -156,6 +161,7 @@ export default class DirectionTools extends Component<Props, State> {
                 label={<Trans>OK</Trans>}
                 primary
                 onClick={() => this.openPreview(false)}
+                key="ok"
               />
             }
             autoScrollBodyContent

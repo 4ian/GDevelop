@@ -1,8 +1,53 @@
-import React from 'react';
-import MenuItem from 'material-ui/MenuItem';
-import Divider from 'material-ui/Divider';
-import { adaptAcceleratorString } from '../AcceleratorString';
-import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
+import React, { useState, useRef, useCallback } from 'react';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import Divider from '@material-ui/core/Divider';
+import Fade from '@material-ui/core/Fade';
+
+const SubMenuItem = ({ item, buildFromTemplate }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const anchorElement = useRef(null);
+  const setAnchorElement = useCallback(element => {
+    anchorElement.current = element;
+  }, []);
+
+  return (
+    <React.Fragment>
+      <MenuItem
+        dense
+        key={item.label}
+        disabled={item.enabled === false}
+        onClick={event => {
+          if (item.enabled === false) {
+            return;
+          }
+
+          if (!anchorElement.current) {
+            setAnchorElement(event.currentTarget);
+          }
+
+          setMenuOpen(!menuOpen);
+        }}
+      >
+        {item.label}
+        <ArrowRightIcon />
+      </MenuItem>
+      <Menu
+        open={menuOpen}
+        anchorEl={anchorElement.current}
+        onClose={() => setMenuOpen(false)}
+        TransitionComponent={Fade}
+      >
+        {buildFromTemplate(item.submenu)}
+      </Menu>
+    </React.Fragment>
+  );
+};
 
 /**
  * Construct items for material-ui's Menu, using a template which
@@ -28,55 +73,65 @@ export default class MaterialUIMenuImplementation {
       .map((item, id) => {
         if (item.visible === false) return null;
 
+        // Accelerator is not implemented for Material-UI menus
+        // const accelerator = item.accelerator
+        //   ? adaptAcceleratorString(item.accelerator)
+        //   : undefined;
+
         if (item.type === 'separator') {
           return <Divider key={'separator' + id} />;
+          // return null;
         } else if (item.type === 'checkbox') {
           return (
             <MenuItem
-              key={item.label}
-              primaryText={item.label}
-              secondaryText={
-                item.accelerator
-                  ? adaptAcceleratorString(item.accelerator)
-                  : undefined
-              }
+              dense
+              key={'checkbox' + item.label}
               checked={item.checked}
-              insetChildren={!item.checked}
               disabled={item.enabled === false}
               onClick={() => {
+                if (item.enabled === false) {
+                  return;
+                }
+
                 if (item.click) {
                   item.click();
-                  this._onClose();
                 }
+                this._onClose();
               }}
-              rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
-              menuItems={
-                item.submenu ? this.buildFromTemplate(item.submenu) : undefined
-              }
+            >
+              <ListItemIcon>
+                {item.checked ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+              </ListItemIcon>
+              <ListItemText primary={item.label} />
+            </MenuItem>
+          );
+        } else if (item.submenu) {
+          return (
+            <SubMenuItem
+              key={'submenu' + item.label}
+              item={item}
+              buildFromTemplate={template => this.buildFromTemplate(template)}
             />
           );
         } else {
           return (
             <MenuItem
-              key={item.label}
-              primaryText={item.label}
-              secondaryText={
-                item.accelerator
-                  ? adaptAcceleratorString(item.accelerator)
-                  : undefined
-              }
+              dense
+              key={'item' + item.label}
               disabled={item.enabled === false}
               onClick={() => {
+                if (item.enabled === false) {
+                  return;
+                }
+
                 if (item.click) {
                   item.click();
                   this._onClose();
                 }
               }}
-              rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
-              menuItems={
-                item.submenu ? this.buildFromTemplate(item.submenu) : undefined
-              }
-            />
+            >
+              {item.label}
+            </MenuItem>
           );
         }
       })
@@ -88,11 +143,6 @@ export default class MaterialUIMenuImplementation {
   }
 
   getMenuProps() {
-    return {
-      anchorOrigin: {
-        vertical: 'bottom',
-        horizontal: 'left',
-      },
-    };
+    return {};
   }
 }

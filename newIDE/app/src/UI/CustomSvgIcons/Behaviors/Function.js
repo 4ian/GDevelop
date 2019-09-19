@@ -1,5 +1,5 @@
 import React from 'react';
-import SvgIcon from 'material-ui/SvgIcon';
+import SvgIcon from '@material-ui/core/SvgIcon';
 
 export default props => (
   <SvgIcon {...props}>

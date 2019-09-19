@@ -99,18 +99,39 @@ export const changeCurrentTab = (
   };
 };
 
-export const closeAll = (): EditorTabsState => {
-  return getEditorTabsInitialState();
+export const closeAllEditorTabs = (state: EditorTabsState): EditorTabsState => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(editorTab => !editorTab.closable),
+    },
+    0
+  );
 };
 
 export const closeEditorTab = (
   state: EditorTabsState,
-  editorTab: EditorTab
+  chosenEditorTab: EditorTab
 ): EditorTabsState => {
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(e => e !== editorTab),
+      editors: state.editors.filter(editorTab => editorTab !== chosenEditorTab),
+    },
+    state.currentTab
+  );
+};
+
+export const closeOtherEditorTabs = (
+  state: EditorTabsState,
+  chosenEditorTab: EditorTab
+): EditorTabsState => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(
+        editorTab => !editorTab.closable || editorTab === chosenEditorTab
+      ),
     },
     state.currentTab
   );

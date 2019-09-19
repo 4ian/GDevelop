@@ -1,11 +1,6 @@
 // @flow
 import * as React from 'react';
-import {
-  Table,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-} from 'material-ui/Table';
+import { Table, TableHeader, TableHeaderColumn, TableRow } from '../UI/Table';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
@@ -47,8 +42,8 @@ type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 type Props = {|
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: ?gdVariablesContainer,
-  emptyExplanationMessage?: string,
-  emptyExplanationSecondMessage?: string,
+  emptyExplanationMessage?: React.Node,
+  emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
 |};
 type State = {|
@@ -379,8 +374,8 @@ export default class VariablesList extends React.Component<Props, State> {
 
     return (
       <div>
-        <Table selectable={false}>
-          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+        <Table>
+          <TableHeader>
             <TableRow>
               <TableHeaderColumn>Name</TableHeaderColumn>
               <TableHeaderColumn>Value</TableHeaderColumn>

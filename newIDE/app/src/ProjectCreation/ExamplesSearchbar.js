@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { mapVector } from '../Utils/MapFor';
-import TextField from 'material-ui/TextField';
+import TextField from '../UI/TextField';
 import SearchbarWithChips from '../UI/SearchbarWithChips';
 const gd = global.gd;
 

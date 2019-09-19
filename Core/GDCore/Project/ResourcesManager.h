@@ -5,6 +5,7 @@
  */
 #ifndef GDCORE_RESOURCESMANAGER_H
 #define GDCORE_RESOURCESMANAGER_H
+#include <map>
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"

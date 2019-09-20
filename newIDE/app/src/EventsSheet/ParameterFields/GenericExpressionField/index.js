@@ -19,6 +19,7 @@ import BackgroundHighlighting, {
 } from './BackgroundHighlighting';
 import debounce from 'lodash/debounce';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Paper from '@material-ui/core/Paper';
 const gd = global.gd;
 
 const styles = {
@@ -292,7 +293,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                 anchorEl={this._fieldElement}
                 placement="bottom"
               >
-                <div style={styles.expressionSelectorPopoverContent}>
+                <Paper style={styles.expressionSelectorPopoverContent}>
                   <ExpressionSelector
                     selectedType=""
                     onChoose={(type, expression) => {
@@ -302,7 +303,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                     focusOnMount
                     scope={scope}
                   />
-                </div>
+                </Paper>
               </Popper>
             </ClickAwayListener>
           )}

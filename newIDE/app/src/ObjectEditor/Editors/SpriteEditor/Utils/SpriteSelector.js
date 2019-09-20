@@ -74,7 +74,9 @@ export default class SpriteSelector extends React.Component<Props, void> {
           <SelectField
             floatingLabelText={<Trans>Animation</Trans>}
             value={this.props.animationIndex}
-            onChange={(e, i, value: number) => chooseAnimation(value)}
+            onChange={(e, i, value: string) =>
+              chooseAnimation(parseInt(value, 10) || 0)
+            }
           >
             {mapFor(0, spriteObject.getAnimationsCount(), i => {
               const animation = spriteObject.getAnimation(i);
@@ -91,7 +93,9 @@ export default class SpriteSelector extends React.Component<Props, void> {
             <SelectField
               floatingLabelText={<Trans>Direction</Trans>}
               value={this.props.directionIndex}
-              onChange={(e, i, value: number) => chooseDirection(value)}
+              onChange={(e, i, value: string) =>
+                chooseDirection(parseInt(value, 10) || 0)
+              }
             >
               {mapFor(0, animation.getDirectionsCount(), i => {
                 return (
@@ -108,7 +112,9 @@ export default class SpriteSelector extends React.Component<Props, void> {
             <SelectField
               floatingLabelText={<Trans>Frame</Trans>}
               value={this.props.spriteIndex}
-              onChange={(e, i, value: number) => chooseSprite(value)}
+              onChange={(e, i, value: string) =>
+                chooseSprite(parseInt(value, 10) || 0)
+              }
             >
               {mapFor(0, direction.getSpritesCount(), i => {
                 return (

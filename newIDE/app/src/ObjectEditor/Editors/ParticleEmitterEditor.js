@@ -35,9 +35,10 @@ export default class ParticleEmitterEditor extends React.Component<
               fullWidth
               floatingLabelText={<Trans>Particles kind</Trans>}
               value={particleEmitterObject.getRendererType()}
-              onChange={(e, i, value: number) => {
-                particleEmitterObject.setRendererType(value);
-                if (value !== gd.ParticleEmitterObject.Quad) {
+              onChange={(e, i, value: string) => {
+                const rendererType = parseInt(value, 10) || 0;
+                particleEmitterObject.setRendererType(rendererType);
+                if (rendererType !== gd.ParticleEmitterObject.Quad) {
                   particleEmitterObject.setParticleTexture('');
                 }
                 this.forceUpdate();

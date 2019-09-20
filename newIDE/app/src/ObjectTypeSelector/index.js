@@ -46,7 +46,6 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
     return (
       <SelectField
         floatingLabelText={floatingLabelText || <Trans>Object type</Trans>}
-        floatingLabelFixed
         value={value}
         onChange={(e, i, value: string) => {
           onChange(value);

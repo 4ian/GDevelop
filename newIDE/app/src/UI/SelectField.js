@@ -41,7 +41,6 @@ type Props = {|
   margin?: 'none',
 
   floatingLabelText?: React.Node,
-  floatingLabelFixed?: boolean,
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
@@ -101,7 +100,7 @@ export default class SelectField extends React.Component<Props, {||}> {
                 : undefined
             }
             InputLabelProps={{
-              shrink: props.floatingLabelFixed ? true : undefined,
+              shrink: true,
             }}
             SelectProps={{
               native: true,

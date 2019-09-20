@@ -35,7 +35,6 @@ function NumericProperty(props: {|
       value={properties.get(propertyName).getValue()}
       key={propertyName}
       floatingLabelText={properties.get(propertyName).getLabel()}
-      floatingLabelFixed
       step={step}
       onChange={onUpdate}
       type="number"
@@ -105,7 +104,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
           <SelectField
             key={'bodyType'}
             floatingLabelText={properties.get('bodyType').getLabel()}
-            floatingLabelFixed
             value={properties.get('bodyType').getValue()}
             onChange={(e, i, newValue: string) => {
               behavior.updateProperty(
@@ -186,7 +184,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
         <Line>
           <SelectField
             floatingLabelText={properties.get('shape').getLabel()}
-            floatingLabelFixed
             value={properties.get('shape').getValue()}
             onChange={(e, i, newValue: string) => {
               behavior.updateProperty(
@@ -226,7 +223,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
                   ? 'Length'
                   : 'Width'
               }
-              floatingLabelFixed
               min={0}
               onChange={newValue => {
                 behavior.updateProperty(
@@ -247,7 +243,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 .getValue()}
               key={'shapeDimensionB'}
               floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
-              floatingLabelFixed
               min={shape === 'Edge' ? undefined : 0}
               onChange={newValue => {
                 behavior.updateProperty(
@@ -264,7 +259,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
           {shape === 'Polygon' && (
             <SelectField
               floatingLabelText={properties.get('polygonOrigin').getLabel()}
-              floatingLabelFixed
               value={properties.get('polygonOrigin').getValue()}
               onChange={(e, i, newValue: string) => {
                 behavior.updateProperty(

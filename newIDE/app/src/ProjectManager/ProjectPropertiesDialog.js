@@ -221,7 +221,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           />
           <SemiControlledTextField
             floatingLabelText={<Trans>Author name</Trans>}
-            floatingLabelFixed
             fullWidth
             hintText={t`Your name`}
             type="text"
@@ -350,7 +349,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             floatingLabelText={
               <Trans>Scale mode (also called "Sampling")</Trans>
             }
-            floatingLabelFixed
             value={scaleMode}
             onChange={(e, i, value: string) =>
               this.setState({ scaleMode: value })
@@ -381,7 +379,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           <SelectField
             fullWidth
             floatingLabelText={<Trans>Fullscreen/game size mode</Trans>}
-            floatingLabelFixed
             value={sizeOnStartupMode}
             onChange={(e, i, value: string) =>
               this.setState({ sizeOnStartupMode: value })
@@ -404,7 +401,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             floatingLabelText={
               <Trans>AdMob application ID (for iOS and Android)</Trans>
             }
-            floatingLabelFixed
             fullWidth
             hintText={admobHint}
             type="text"

@@ -257,7 +257,6 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           value={getFieldValue(this.props.instances, field)}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          floatingLabelFixed
           onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i =>
               setValue(i, parseFloat(newValue) || 0)
@@ -281,7 +280,6 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           )}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          floatingLabelFixed
           onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i => setValue(i, newValue || ''));
             this._onInstancesModified(this.props.instances);

@@ -164,7 +164,6 @@ export default class DirectionTools extends Component<Props, State> {
                 key="ok"
               />
             }
-            autoScrollBodyContent
             noMargin
             modal
             onRequestClose={() => this.openPreview(false)}

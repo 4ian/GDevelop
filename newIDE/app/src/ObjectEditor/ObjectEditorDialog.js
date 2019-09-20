@@ -61,7 +61,6 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         key={this.props.object && this.props.object.ptr}
         secondaryActions={<HelpButton helpPagePath={this.props.helpPagePath} />}
         actions={actions}
-        autoScrollBodyContent
         noMargin
         modal
         onRequestClose={this.props.onCancel}

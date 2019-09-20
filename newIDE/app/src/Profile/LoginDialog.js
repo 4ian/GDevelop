@@ -122,7 +122,6 @@ export default class LoginDialog extends Component<Props, State> {
         ]}
         onRequestClose={onClose}
         open={open}
-        autoScrollBodyContent
       >
         <Column noMargin>
           <TextField

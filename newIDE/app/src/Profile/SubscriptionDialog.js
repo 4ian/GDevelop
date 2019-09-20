@@ -162,7 +162,6 @@ export default class SubscriptionDialog extends Component<Props, State> {
             onRequestClose={onClose}
             open={open}
             noMargin
-            autoScrollBodyContent
           >
             <Column>
               <Line>

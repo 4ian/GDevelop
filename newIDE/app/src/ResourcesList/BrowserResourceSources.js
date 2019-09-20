@@ -191,7 +191,6 @@ class GenericResourcesChooser extends Component {
         actions={actions}
         open={this.state.open}
         noMargin
-        autoScrollBodyContent
       >
         <div style={styles.explanations}>
           <Text>

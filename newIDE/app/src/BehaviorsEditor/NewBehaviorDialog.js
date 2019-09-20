@@ -192,7 +192,6 @@ export default class NewBehaviorDialog extends Component<Props, State> {
             secondaryActions={<HelpButton helpPagePath="/behaviors" />}
             open={open}
             noMargin
-            autoScrollBodyContent
           >
             <Tabs value={currentTab} onChange={this._changeTab}>
               <Tab

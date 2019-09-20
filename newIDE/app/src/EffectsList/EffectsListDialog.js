@@ -36,7 +36,6 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
         modal
         open
         onRequestClose={onApply}
-        autoScrollBodyContent
         title={<Trans>Effects</Trans>}
       >
         <EffectsList

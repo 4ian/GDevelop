@@ -4,6 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { ResponsiveWidthMeasurer } from '../Reponsive/ReponsiveWidthMeasurer';
 
 const styles = {
   defaultBody: {
@@ -52,10 +53,6 @@ type Props = {|
   // Style:
   noMargin?: boolean,
   noTitleMargin?: boolean,
-
-  // Positioning:
-  autoScrollBodyContent?: boolean, // TODO
-  repositionOnUpdate?: boolean, // TODO
 |};
 
 /**
@@ -86,38 +83,43 @@ export default (props: Props) => {
   );
 
   // TODO: On very small screens, make the dialogs always fullscreen
-  // TODO: Fix font
-  // TODO: Fix AboutDialog width
   return (
-    <Dialog
-      open={open}
-      onClose={onRequestClose}
-      fullWidth
-      maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-    >
-      {title && (
-        <DialogTitle style={noTitleMargin ? styles.noTitleMargin : undefined}>
-          {title}
-        </DialogTitle>
+    <ResponsiveWidthMeasurer>
+      {size => (
+        <Dialog
+          open={open}
+          onClose={onRequestClose}
+          fullWidth
+          fullScreen={size === 'small'}
+          maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
+        >
+          {title && (
+            <DialogTitle
+              style={noTitleMargin ? styles.noTitleMargin : undefined}
+            >
+              {title}
+            </DialogTitle>
+          )}
+          <DialogContent
+            style={{
+              ...(noMargin ? styles.noMarginBody : styles.defaultBody),
+              ...(flexRowBody ? styles.flexRowBody : {}),
+              ...(flexBody ? styles.flexBody : {}),
+            }}
+          >
+            {children}
+          </DialogContent>
+          <DialogActions
+            style={
+              secondaryActions
+                ? styles.actionsContainerWithSecondaryActions
+                : undefined
+            }
+          >
+            {dialogActions}
+          </DialogActions>
+        </Dialog>
       )}
-      <DialogContent
-        style={{
-          ...(noMargin ? styles.noMarginBody : styles.defaultBody),
-          ...(flexRowBody ? styles.flexRowBody : {}),
-          ...(flexBody ? styles.flexBody : {}),
-        }}
-      >
-        {children}
-      </DialogContent>
-      <DialogActions
-        style={
-          secondaryActions
-            ? styles.actionsContainerWithSecondaryActions
-            : undefined
-        }
-      >
-        {dialogActions}
-      </DialogActions>
-    </Dialog>
+    </ResponsiveWidthMeasurer>
   );
 };

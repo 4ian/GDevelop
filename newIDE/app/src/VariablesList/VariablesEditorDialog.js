@@ -48,7 +48,6 @@ export class VariablesEditorDialog extends Component {
         modal
         open={open}
         onRequestClose={onCancel}
-        autoScrollBodyContent
         secondaryActions={secondaryActions}
         title={title}
       >

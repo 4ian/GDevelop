@@ -479,7 +479,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 key="help"
               />,
             ]}
-            autoScrollBodyContent
             noMargin
             modal
             onRequestClose={() => this.openPointsEditor(false)}
@@ -511,7 +510,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 key="help"
               />,
             ]}
-            autoScrollBodyContent
             noMargin
             modal
             onRequestClose={() => this.openCollisionMasksEditor(false)}

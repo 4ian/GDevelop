@@ -103,7 +103,6 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                     ) : null,
                   ]}
                   open
-                  autoScrollBodyContent
                   noMargin
                   onRequestClose={onClose}
                 >

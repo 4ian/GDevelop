@@ -166,7 +166,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           ]}
           open={this.props.open}
           onRequestClose={this.props.onClose}
-          autoScrollBodyContent={true}
         >
           <SemiControlledTextField
             floatingLabelText={<Trans>Game name</Trans>}

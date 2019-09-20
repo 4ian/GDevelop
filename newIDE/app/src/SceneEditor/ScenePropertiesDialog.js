@@ -148,7 +148,6 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         actions={actions}
         open={this.props.open}
         onRequestClose={this.props.onClose}
-        autoScrollBodyContent={true}
         maxWidth="sm"
       >
         <TextField

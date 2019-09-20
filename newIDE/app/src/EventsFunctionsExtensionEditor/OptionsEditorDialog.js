@@ -110,7 +110,6 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
               open={this.props.open}
               title={<Trans>Edit Extension Options</Trans>}
               onRequestClose={this.props.onClose}
-              autoScrollBodyContent={true}
             >
               <Column>
                 <TextField

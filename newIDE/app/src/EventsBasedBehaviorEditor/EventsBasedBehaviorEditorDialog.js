@@ -47,7 +47,6 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
         modal
         open
         onRequestClose={onApply}
-        autoScrollBodyContent
         title={<Trans>Edit the behavior</Trans>}
       >
         <EventsBasedBehaviorEditor

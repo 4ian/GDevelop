@@ -244,7 +244,6 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         actions={actions}
         open={this.props.open}
         onRequestClose={this.props.onClose}
-        autoScrollBodyContent
       >
         <Line justifyContent="center">
           {isResizeSupported() ? (

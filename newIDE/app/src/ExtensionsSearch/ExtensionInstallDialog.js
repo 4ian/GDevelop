@@ -99,7 +99,6 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               </LeftLoader>,
             ]}
             open
-            autoScrollBodyContent
             onRequestClose={onClose}
           >
             {!extensionHeader ? (

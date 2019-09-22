@@ -3,6 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
+#include "GDJS/IDE/ExporterHelper.h"
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -23,7 +24,6 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDJS/IDE/ExporterHelper.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace gdjs {
@@ -200,8 +200,8 @@ bool ExporterHelper::ExportPixiIndexFile(
   return true;
 }
 
-bool ExporterHelper::ExportCordovaConfigFile(const gd::Project &project,
-                                             gd::String exportDir) {
+bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
+                                        gd::String exportDir) {
   auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
   auto &resourceManager = project.GetResourcesManager();
   auto getIconFilename = [&resourceManager, &platformSpecificAssets](
@@ -281,8 +281,33 @@ bool ExporterHelper::ExportCordovaConfigFile(const gd::Project &project,
   }
 
   if (!fs.WriteToFile(exportDir + "/config.xml", str)) {
-    lastError = "Unable to write configuration file.";
+    lastError = "Unable to write Cordova config.xml file.";
     return false;
+  }
+
+  gd::String jsonName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonAuthor =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
+  gd::String jsonVersion =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
+  gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
+      gd::SceneNameMangler::GetMangledSceneName(project.GetName())
+          .LowerCase()
+          .FindAndReplace(" ", "-")));
+
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Cordova/package.json")
+            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
+            .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
+            .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
+
+    if (!fs.WriteToFile(exportDir + "/package.json", str)) {
+      lastError = "Unable to write Cordova package.json file.";
+      return false;
+    }
   }
 
   return true;
@@ -656,10 +681,12 @@ bool ExporterHelper::ExportExternalSourceFiles(
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
-    std::vector<gd::String> &includesFiles, gd::String exportDir, bool /*minify*/) {
+    std::vector<gd::String> &includesFiles,
+    gd::String exportDir,
+    bool /*minify*/) {
   for (std::vector<gd::String>::iterator include = includesFiles.begin();
-        include != includesFiles.end();
-        ++include) {
+       include != includesFiles.end();
+       ++include) {
     if (!fs.IsAbsolute(*include)) {
       gd::String source = gdjsRoot + "/Runtime/" + *include;
       if (fs.FileExists(source)) {

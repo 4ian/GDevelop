@@ -120,7 +120,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.getCanvas = function() {
 }
 
 /**
- * Check if the the device supports WebGL.
+ * Check if the device supports WebGL.
  * @returns {boolean} true if WebGL is supported
  */
 gdjs.RuntimeGameCocosRenderer.prototype.isWebGLSupported = function() {

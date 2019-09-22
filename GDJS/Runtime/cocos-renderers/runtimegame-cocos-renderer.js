@@ -120,6 +120,14 @@ gdjs.RuntimeGameCocosRenderer.prototype.getCanvas = function() {
 }
 
 /**
+ * Check if the device supports WebGL.
+ * @returns {boolean} true if WebGL is supported
+ */
+gdjs.RuntimeGameCocosRenderer.prototype.isWebGLSupported = function() {
+	return cc._renderType === cc.game.RENDER_TYPE_WEBGL;
+};
+
+/**
  * Get the electron module, if running as a electron renderer process.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.getElectron = function() {

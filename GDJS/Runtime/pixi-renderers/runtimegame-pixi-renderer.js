@@ -427,6 +427,14 @@ gdjs.RuntimeGamePixiRenderer.prototype.getCanvas = function() {
 }
 
 /**
+ * Check if the device supports WebGL.
+ * @returns {boolean} true if WebGL is supported
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.isWebGLSupported = function() {
+	return this._pixiRenderer.type === PIXI.RENDERER_TYPE.WEBGL;
+};
+
+/**
  * Get the electron module, if running as a electron renderer process.
  */
 gdjs.RuntimeGamePixiRenderer.prototype.getElectron = function() {

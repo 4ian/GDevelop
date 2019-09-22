@@ -28,3 +28,12 @@ gdjs.evtTools.systemInfo.isMobile = function() {
 
 	return false;
 };
+
+/**
+ * Check if the the device supports WebGL.
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @returns {boolean} true if WebGL is supported
+ */
+gdjs.evtTools.systemInfo.isWebGLSupported = function(runtimeScene) {
+	return runtimeScene.getGame().getRenderer().isWebGLSupported();
+};

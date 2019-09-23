@@ -12,12 +12,12 @@ const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const {
   uploadGameFolderToBucket,
-  uploadArchiveToBucket
+  uploadArchiveToBucket,
 } = require('./S3Upload');
 const {
   serveFolder,
   stopServer,
-  getLocalNetworkIps
+  getLocalNetworkIps,
 } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor, buildPlaceholderMainMenu } = require('./MainMenu');
@@ -44,7 +44,7 @@ let mainWindow = null;
 const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
   // "Officially" supported arguments and their types:
   boolean: ['dev-tools', 'disable-update-check'],
-  string: '_' // Files are always strings
+  string: '_', // Files are always strings
 });
 
 // See registerGdideProtocol (used for HTML modules support)
@@ -74,10 +74,10 @@ app.on('ready', function() {
     x: args.x,
     y: args.y,
     webPreferences: {
-      webSecurity: false // Allow to access to local files
+      webSecurity: false, // Allow to access to local files
     },
     enableLargerThanScreen: true,
-    backgroundColor: '#f0f0f0'
+    backgroundColor: '#f0f0f0',
   };
 
   if (isIntegrated) {
@@ -103,7 +103,7 @@ app.on('ready', function() {
     window: mainWindow,
     isDev,
     path: '/index.html',
-    devTools
+    devTools,
   });
 
   Menu.setApplicationMenu(buildPlaceholderMainMenu());
@@ -149,7 +149,7 @@ app.on('ready', function() {
           externalEditorData
         ),
           piskelWindow.show();
-      }
+      },
     });
   });
 
@@ -178,7 +178,7 @@ app.on('ready', function() {
       onReady: jfxrWindow => {
         jfxrWindow.webContents.send('jfxr-open', externalEditorData);
         jfxrWindow.show();
-      }
+      },
     });
   });
 
@@ -203,7 +203,7 @@ app.on('ready', function() {
       onReady: yarnWindow => {
         yarnWindow.webContents.send('yarn-open', externalEditorData);
         yarnWindow.show();
-      }
+      },
     });
   });
 
@@ -273,7 +273,7 @@ app.on('ready', function() {
         event.sender.send('debugger-connection-closed', { id }),
       onConnectionOpen: ({ id }) =>
         event.sender.send('debugger-connection-opened', { id }),
-      onListening: () => event.sender.send('debugger-start-server-done')
+      onListening: () => event.sender.send('debugger-start-server-done'),
     });
   });
 
@@ -304,26 +304,26 @@ app.on('ready', function() {
   autoUpdater.on('checking-for-update', () => {
     sendUpdateStatus({
       message: 'Checking for update...',
-      status: 'checking-for-update'
+      status: 'checking-for-update',
     });
   });
   autoUpdater.on('update-available', info => {
     sendUpdateStatus({
       message: 'Update available.',
-      status: 'update-available'
+      status: 'update-available',
     });
   });
   autoUpdater.on('update-not-available', info => {
     sendUpdateStatus({
       message: 'Update not available.',
-      status: 'update-not-available'
+      status: 'update-not-available',
     });
   });
   autoUpdater.on('error', err => {
     sendUpdateStatus({
       message: 'Error in auto-updater. ' + err,
       status: 'error',
-      err
+      err,
     });
   });
   autoUpdater.on('download-progress', progressObj => {
@@ -342,14 +342,14 @@ app.on('ready', function() {
       bytesPerSecond: progressObj.bytesPerSecond,
       percent: progressObj.percent,
       transferred: progressObj.transferred,
-      total: progressObj.total
+      total: progressObj.total,
     });
   });
   autoUpdater.on('update-downloaded', info => {
     sendUpdateStatus({
       message: 'Update downloaded',
       status: 'update-downloaded',
-      info
+      info,
     });
   });
 });

@@ -4,7 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { ResponsiveWidthMeasurer } from '../Reponsive/ReponsiveWidthMeasurer';
+import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   defaultBody: {
@@ -82,9 +82,8 @@ export default (props: Props) => {
     actions
   );
 
-  // TODO: On very small screens, make the dialogs always fullscreen
   return (
-    <ResponsiveWidthMeasurer>
+    <ResponsiveWindowMeasurer>
       {size => (
         <Dialog
           open={open}
@@ -120,6 +119,6 @@ export default (props: Props) => {
           </DialogActions>
         </Dialog>
       )}
-    </ResponsiveWidthMeasurer>
+    </ResponsiveWindowMeasurer>
   );
 };

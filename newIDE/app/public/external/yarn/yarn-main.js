@@ -30,9 +30,8 @@ window.addEventListener('yarnReady', e => {
 editorFrameEl.src = 'yarn-editor/index.html';
 
 // Called to load yarn data. Should be called after the window is fully loaded.
-
 ipcRenderer.on('yarn-open', (event, receivedData) => {
-  //Make a header
+  // Make the header.
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const pathEditorHeader = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
@@ -43,7 +42,8 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
     initialResourcePath: receivedData.resourcePath,
     extension: '.json',
   });
-  //inject custom save+close button
+  
+  // Inject custom Apply button.
   const saveToGdButton = yarn.document
     .getElementsByClassName('menu')[0]
     .cloneNode(true);
@@ -53,7 +53,7 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
     .appendChild(saveToGdButton);
   saveToGdButton.childNodes[0].firstChild.data = 'Apply';
 
-  // process the json file,if it exists
+  // Process the json file to open, if any.
   if (fileExists(receivedData.resourcePath)) {
     receivedData.externalEditorData = fs
       .readFileSync(receivedData.resourcePath, 'utf8')
@@ -66,7 +66,7 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
 
     pathEditorHeader.toggle();
   } else {
-    // If GD has sent no path, we need to set one for yarn
+    // Set up a new path for the JSON to be saved if none was passed.
     receivedData.resourcePath = receivedData.projectPath + '/NewFile.json';
   }
 

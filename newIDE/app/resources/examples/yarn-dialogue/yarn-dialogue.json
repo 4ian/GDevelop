@@ -708,15 +708,6 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "NewObject2-1.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "NewObject2-1.png",
-        "smoothed": true,
-        "userAdded": true
-      },
-      {
-        "alwaysLoaded": false,
         "file": "other/ant-2.png",
         "kind": "image",
         "metadata": "",
@@ -811,6 +802,15 @@
         "metadata": "",
         "name": "dialogueData/npcs.json",
         "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "NewObject2-1.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "NewObject2-1.png",
+        "smoothed": true,
+        "userAdded": false
       }
     ],
     "resourceFolders": []
@@ -3258,15 +3258,7 @@
               "value": "0"
             }
           ],
-          "behaviors": [
-            {
-              "name": "BackAndForthMirroredMovement",
-              "type": "BackAndForthMovement::BackAndForthMirroredMovement",
-              "SpeedX": 200,
-              "DistanceX": 300,
-              "InitialX": 0
-            }
-          ],
+          "behaviors": [],
           "animations": [
             {
               "name": "",
@@ -3484,12 +3476,6 @@
             }
           ],
           "behaviors": [
-            {
-              "name": "NPC",
-              "type": "NewExtension::NPC",
-              "Property": 0,
-              "Property2": 0
-            },
             {
               "name": "PlatformerObject",
               "type": "PlatformBehavior::PlatformerObjectBehavior",
@@ -5108,7 +5094,7 @@
               "directions": [
                 {
                   "looping": false,
-                  "metadata": "{\"pskl\":{\"data\":\"{\\\"modelVersion\\\":2,\\\"piskel\\\":{\\\"name\\\":\\\"New Animation\\\",\\\"description\\\":\\\"\\\",\\\"fps\\\":12,\\\"height\\\":64,\\\"width\\\":64,\\\"layers\\\":[\\\"{\\\\\\\"name\\\\\\\":\\\\\\\"Layer 1\\\\\\\",\\\\\\\"opacity\\\\\\\":1,\\\\\\\"frameCount\\\\\\\":1,\\\\\\\"chunks\\\\\\\":[{\\\\\\\"layout\\\\\\\":[[0]],\\\\\\\"base64PNG\\\\\\\":\\\\\\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACjUlEQVR4Xu2bvW4CMQyAYeYNGJA6UAmpS9//IbpUQipDJQbegLlVThgZnxPH4XLhYjNC4thf/JfcsV4Z/6yN279yAO4Bxgl4CBh3AE+CHgIeAjcCn/v9X+8wvk6nkcffv6AA3na7rnj8ns+DPRTCACC2+71CwCBMAQCXDt4AnuAALIVAsPX7eBwc4edyGTY/6gFTxT8sGBb7OByaJFasAzY+CkBjPBVOLQSjc0BIsjh6ElQsE3Ydy2E9gAMQU05SgFM6ZWiJvJhbpXYe5mQBAEFTKjdHLEwGYA5la68BjRCskyyDmhxQW/Ea8tk+4Hq9rjabzbCeOQDv2+39IBQgmAMQdh0gmAcQYJRAWFKlGOUASDQ4FLiSxxlJGxw6JtUAzdUP0ETKAsDGS22rpqtL9Q5BTuz3nDVKK8TTAEoXLpn3bHscm/9wGIITYSiF8Fla18fBxc0Pdx02OgxBL9BLGcwCwF2H9QIg7LAEYd37ZagEwQSAFAQzACBJ4hI4JMFXCYGadR9XiCoAaK2VSihXm/EcrTxNfxFk46sxlQfkXIvlNC4SIGpQjkw6J9VhPgCAJggLSJXBVPuq2YlWY0ceoAXQSvGp1mUBUAg9NUJcOI1CoFcv4HIHfTawqMfj2mTIPQihHtEcgMaoHIO0uaIKAI1RnMI1DI2BYQHQJKg1SDKA3j5R5aT52l1OjX94Zyb2pkjsMqFUkZcFUGqQdp55AOBp+AoOQ2wWAtqdLB2PQ42DYA4APJMEoFPnnOwkWLqj2nnUAxzA7am0e8CNgKkQ4MLHATAvNWvzTO74Jv8XkN5Mdw9wDxi/15/r0tpxHgJaYlONn+vkKenbxANAKQphzuQHOjQFIO3OHL+bB/APe7yqUAvQinsAAAAASUVORK5CYII=\\\\\\\"}]}\\\",\\\"{\\\\\\\"name\\\\\\\":\\\\\\\"Layer 2\\\\\\\",\\\\\\\"opacity\\\\\\\":1,\\\\\\\"frameCount\\\\\\\":1,\\\\\\\"chunks\\\\\\\":[{\\\\\\\"layout\\\\\\\":[[0]],\\\\\\\"base64PNG\\\\\\\":\\\\\\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABK0lEQVR4Xu2ZOw7CQAwFk5a7chruSptoC6TVavOhefMUP1oK2+Ox14h1Kf5Zi9e/BEAMKE4gI1BcgCzBjEBGoDiBjEBxAfIKZASUI/DdPtss3mt9Y42QBT4qvgdCgJAAuFM8BQID0LrtMBIIgFH1GQjVOMgBHBU2QigHoO2AHsKjANx5ah9twBWAx++AfwGo9G95SZbgGQCy+zgAungMwNllqNTfDoC6eBsAROG/vYQsQerNny1jCwAtMcoCBMB49pYEQN3+4xhgBlxdh6rvA0BF2jUOagDx+99qBwRA9z9BuTvAZSegO8ABQgA4dIHMIQaQ9B1ixwCHLpA5xACSvkPsGODQBTKHGEDSd4gdAxy6QOYQA0j6DrFjgEMXyBxiAEnfIXYMcOgCmcMO9KZoQWhqQ7sAAAAASUVORK5CYII=\\\\\\\"}]}\\\"],\\\"hiddenFrames\\\":[\\\"\\\"]}}\",\"name\":\"NewObject2\",\"paths\":[\"/home/fox/DEV/dialogueExample/NewObject2-1.png\"],\"singleFrame\":false}}",
+                  "metadata": "{\"pskl\":{\"data\":\"{\\\"modelVersion\\\":2,\\\"piskel\\\":{\\\"name\\\":\\\"New Animation\\\",\\\"description\\\":\\\"\\\",\\\"fps\\\":12,\\\"height\\\":64,\\\"width\\\":64,\\\"layers\\\":[\\\"{\\\\\\\"name\\\\\\\":\\\\\\\"Layer 1\\\\\\\",\\\\\\\"opacity\\\\\\\":1,\\\\\\\"frameCount\\\\\\\":1,\\\\\\\"chunks\\\\\\\":[{\\\\\\\"layout\\\\\\\":[[0]],\\\\\\\"base64PNG\\\\\\\":\\\\\\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADBUlEQVR4Xu2bQU4rMQyGy7o3KBISC5AqsYA7cAAOwEU4ARfhAByAO8ACCQkWSEhwg65BrnDlce3YniaZaSdd8VSPk//LnzjJ9B3NJv45mrj+WQPQHDBxAm0KUANcnZ39Hrohnj8+OoPe+QcHcHpyclA8Pr++1noohA0AbfQPFQKCmBwAtDS4AZzQACCRWlPg4elGXFdurx+rrTevb2/rtt5/ftIOyDX/scGX7ztTZCkQ2AfsAIiHv9UpEBHPk3OVF8vlTBt5jcjl8b0JCwMgf+pD+4fCMT4EQBNqdQAakwCASM0VuZygjXwYACbyiJVGgwPgAiVAOSBkA+D2oxJIBWrCLEi79gE3QpgnWQYja4CnYx4AfKrkcIDWN3EfsFqtZvP5fP1MbgBRSBBfFcD5YrE5CAGE2gBKrQFuB0AgQhgDgJKjD1q3pgAFAH/3gdC3UtQefRUAhyCVPEkkLTXwDI/h31NbavsDiOlbcj3rjekAqwMpUdiBlCNSO0O0v6cNj1gpZmcAfRvG5yKHImurLfWFukd7vnMYgiRwIoRSiJ+SFiy96UENdPPDr8MgZussgHuB0mVwVACku4DaAEpufFIuWDtgqMvQWi7AsofTYutSdCgANff+GoRBHbBrJen7PJbAzSI4pAOoiJJ1n7ZTBACvtVYJlWpzqnZb+SJugLY7d4IRB3iuxTwbFxTkvSfw5OQQNGhbAKKVABLkGhEvgMgIW7E7A7AaiHw/GgDcBaU3QhFIuWNFB0SnQe5OlconrR303cDevR6PLob8RQgHPQoAEVGWoKiTigGIiJI6nVuoBkYFwBfBqCBLAL2FHg0AaSGUTlBRm0nxowWQQ5wnx+QB4PabXsFRcNYU8kD2xAz2O0F6/pAgTA4AvpMstea4qoDHMrliuAMagP+30s0B/wSkO/xc7qN5RrEISsIaAPaj5hKjDzmbA0qRtfJaP81vU6BNge5/bLAc1ff7wdaAmifPFJxBAUgQas19hDI4gL7WzfVcA5CL5L7maQ7Y15HL1e/JO+AP1gvpUB78x3IAAAAASUVORK5CYII=\\\\\\\"}]}\\\",\\\"{\\\\\\\"name\\\\\\\":\\\\\\\"Layer 2\\\\\\\",\\\\\\\"opacity\\\\\\\":1,\\\\\\\"frameCount\\\\\\\":1,\\\\\\\"chunks\\\\\\\":[{\\\\\\\"layout\\\\\\\":[[0]],\\\\\\\"base64PNG\\\\\\\":\\\\\\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAhElEQVR4Xu3VAREAMAwCseLfdIV85qAcGbv4W/z+E4AGxBNAIF4AnyACCMQTQCBeACuAAALxBBCIF8AKIIBAPAEE4gWwAgggEE8AgXgBrAACCMQTQCBeACuAAALxBBCIF8AKIIBAPAEE4gWwAgggEE8AgXgBrAACCMQTQCBeACuAQJ3AA2jYAEGs/2CBAAAAAElFTkSuQmCC\\\\\\\"}]}\\\"],\\\"hiddenFrames\\\":[null]}}\",\"name\":\"NewObject2\",\"paths\":[\"/home/fox/DEV/GDevelop/newIDE/app/resources/examples/yarn-dialogue/NewObject2-1.png\"],\"singleFrame\":false}}",
                   "timeBetweenFrames": 0.08,
                   "sprites": [
                     {
@@ -5143,14 +5129,7 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "behaviors": [
-            {
-              "name": "dialogue",
-              "type": "NewExtension::dialogue",
-              "StartingBranch": "\"Start\"",
-              "Property2": 0
-            }
-          ],
+          "behaviors": [],
           "string": "Text",
           "font": "",
           "characterSize": 20,
@@ -7408,24 +7387,12 @@
           "type": "AnchorBehavior::AnchorBehavior"
         },
         {
-          "name": "BackAndForthMirroredMovement",
-          "type": "BackAndForthMovement::BackAndForthMirroredMovement"
-        },
-        {
-          "name": "NPC",
-          "type": "NewExtension::NPC"
-        },
-        {
           "name": "Platform",
           "type": "PlatformBehavior::PlatformBehavior"
         },
         {
           "name": "PlatformerObject",
           "type": "PlatformBehavior::PlatformerObjectBehavior"
-        },
-        {
-          "name": "dialogue",
-          "type": "NewExtension::dialogue"
         }
       ]
     }

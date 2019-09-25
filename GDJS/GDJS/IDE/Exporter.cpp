@@ -3,6 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
+#include "GDJS/IDE/Exporter.h"
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -22,7 +23,6 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDJS/IDE/Exporter.h"
 #include "GDJS/IDE/ExporterHelper.h"
 #undef CopyFile  // Disable an annoying macro
 
@@ -135,8 +135,7 @@ bool Exporter::ExportWholePixiProject(
 
     if (!exportProject(exportDir + "/www")) return false;
 
-    if (!helper.ExportCordovaConfigFile(exportedProject, exportDir))
-      return false;
+    if (!helper.ExportCordovaFiles(exportedProject, exportDir)) return false;
   } else if (exportOptions["exportForElectron"]) {
     fs.MkDir(exportDir);
 
@@ -170,8 +169,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
 
   // Export the resources (before generating events as some resources filenames
   // may be updated)
-  helper.ExportResources(
-      fs, exportedProject, exportDir + "/res");
+  helper.ExportResources(fs, exportedProject, exportDir + "/res");
 
   // Export engine libraries
   helper.AddLibsInclude(false, true, false, includesFiles);

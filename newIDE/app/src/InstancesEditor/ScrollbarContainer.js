@@ -1,10 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import Slider from 'material-ui/Slider';
+import Slider from '@material-ui/core/Slider';
 import ViewPosition from './ViewPosition';
 import throttle from 'lodash/throttle';
-
-const MATERIAL_UI_SLIDER_WIDTH = 18;
 
 const styles = {
   container: {
@@ -12,23 +10,16 @@ const styles = {
   },
   xScrollbar: {
     position: 'absolute',
-    top: 0,
+    top: -11,
     left: 0,
     right: 0,
-  },
-  xSliderStyle: {
-    marginTop: -MATERIAL_UI_SLIDER_WIDTH / 2 + 1,
-    marginBottom: 0,
   },
   yScrollbar: {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    left: 0,
-  },
-  ySliderStyle: {
-    marginTop: 0,
-    marginLeft: -MATERIAL_UI_SLIDER_WIDTH / 2,
+    left: -11,
+    transform: 'rotate(180deg)',
   },
 };
 
@@ -75,9 +66,11 @@ export const addScrollbars = (WrappedComponent: any) => {
     }
 
     _handleXChange = (e: any, value: number) => {
+      const { xMin, xMax } = this.state;
+      const xValue = xMin + ((xMax - xMin) * value) / 100;
       this.setState(
         {
-          xValue: value,
+          xValue,
         },
         () => {
           if (this._editor) {
@@ -88,9 +81,13 @@ export const addScrollbars = (WrappedComponent: any) => {
     };
 
     _handleYChange = (e: any, value: number) => {
+      const { yMin, yMax } = this.state;
+      // Substract the value from 100 as the slider is 180deg rotated. Not perfect though
+      // as it breaks when using the keyboard arrow keys (when focusing the slider).
+      const yValue = yMin + ((yMax - yMin) * (100 - value)) / 100;
       this.setState(
         {
-          yValue: value,
+          yValue,
         },
         () => {
           if (this._editor) {
@@ -147,22 +144,24 @@ export const addScrollbars = (WrappedComponent: any) => {
             {...otherProps}
           />
           <Slider
-            value={this.state.xValue}
-            min={this.state.xMin}
-            max={this.state.xMax}
+            value={
+              ((this.state.xValue - this.state.xMin) /
+                (this.state.xMax - this.state.xMin)) *
+              100
+            }
             onChange={this._handleXChange}
             style={styles.xScrollbar}
-            sliderStyle={styles.xSliderStyle}
-            axis="x"
+            orientation="horizontal"
           />
           <Slider
-            value={this.state.yValue}
-            min={this.state.yMin}
-            max={this.state.yMax}
+            value={
+              ((this.state.yValue - this.state.yMin) /
+                (this.state.yMax - this.state.yMin)) *
+              100
+            }
             onChange={this._handleYChange}
             style={styles.yScrollbar}
-            sliderStyle={styles.ySliderStyle}
-            axis="y-reverse"
+            orientation="vertical"
           />
         </div>
       );

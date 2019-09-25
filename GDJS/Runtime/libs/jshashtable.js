@@ -1,9 +1,22 @@
+/**
+ * A generic map (key values) container.
+ *
+ * Mostly used for storing lists of objects for
+ * GDevelop generated events.
+ *
+ * @class Hashtable
+ */
 function Hashtable()
 {
-    // console.log("New hashtable");
     this.items = {};
 }
 
+/**
+ * Construct a Hashtable from a JS object.
+ * @param {Object} items The content of the Hashtable
+ * @returns {Hashtable} The new hashtable
+ * @static
+ */
 Hashtable.newFrom = function(items) {
     var hashtable = new Hashtable();
     hashtable.items = items;

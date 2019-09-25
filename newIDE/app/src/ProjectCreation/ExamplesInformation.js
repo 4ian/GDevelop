@@ -3240,6 +3240,51 @@ module.exports = {
       }
     ]
   },
+  "skeletal-animation-demo": {
+    "description": "Example of a character animated using a skeletal animation based on Dragon Bones. This is a demo based on an experimental object. Be sure to read the documentation about this as it needs work to be maintained for use in large games.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Skeleton",
+        "name": "SkeletonObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Primitive drawing",
+        "name": "PrimitiveDrawing"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
   "snap-object-to-grid": {
     "description": "Example showing how to create a grid and have objects snapped to the grid.",
     "usedExtensions": [

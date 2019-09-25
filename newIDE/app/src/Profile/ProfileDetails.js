@@ -2,19 +2,12 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Avatar from 'material-ui/Avatar';
-import { Column, Line } from '../UI/Grid';
+import Avatar from '@material-ui/core/Avatar';
+import { Column, Line, Spacer } from '../UI/Grid';
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
-
-const styles = {
-  title: {
-    fontSize: 25,
-    lineHeight: '40px',
-    marginLeft: 10,
-  },
-};
+import Text from '../UI/Text';
 
 type Props = {
   profile: ?Profile,
@@ -25,14 +18,15 @@ export default ({ profile }: Props) =>
     <Column>
       <Line alignItems="center">
         <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
-        <span style={styles.title}>You are connected as {profile.email}</span>
+        <Spacer />
+        <Text size="title">You are connected as {profile.email}</Text>
       </Line>
       <Line>
-        <p>
+        <Text>
           <Trans>
             An account allows you to access GDevelop services online.
           </Trans>
-        </p>
+        </Text>
       </Line>
     </Column>
   ) : (

@@ -1,53 +1,29 @@
 import React from 'react';
-import IconButton from 'material-ui/IconButton';
-import Add from 'material-ui/svg-icons/content/add';
-import Search from 'material-ui/svg-icons/action/search';
-import EmptyMessage from '../UI/EmptyMessage';
+import { ListItem } from './List';
+import BackgroundText from './BackgroundText';
 // No i18n in this file
 
-const styles = {
-  item: { height: 48 },
-  message: { padding: 0 },
-};
+type Props = {|
+  onClick?: () => void,
+  primaryText: React.Node,
+|};
 
-export const makeCommonItem = (Item, Icon) => ({
-  onClick,
-  primaryText,
-  style,
-  ...rest
-}) => {
+export const AddListItem = (props: Props) => {
   return (
-    <Item
-      primaryText={
-        <EmptyMessage style={styles.message}>{primaryText}</EmptyMessage>
-      }
-      style={{ ...styles.item, ...style }}
-      rightIconButton={
-        <IconButton>
-          <Icon
-            onClick={event => {
-              event.stopPropagation();
-              onClick();
-            }}
-          />
-        </IconButton>
-      }
-      onClick={onClick}
-      {...rest}
+    <ListItem
+      onClick={props.onClick}
+      primaryText={<BackgroundText>{props.primaryText}</BackgroundText>}
+      displayAddIcon
     />
   );
 };
 
-/**
- * An Higher-order component that create an item that must be put at the
- * end of a list to allow the user to add a new item.
- * @param Item The component to wrap. Should act as a material-ui ListItem.
- */
-export const makeAddItem = Item => makeCommonItem(Item, Add);
-
-/**
- * An Higher-order component that create an item that must be put at the
- * end of a list to allow the user to add a new item.
- * @param Item The component to wrap. Should act as a material-ui ListItem.
- */
-export const makeSearchItem = Item => makeCommonItem(Item, Search);
+export const SearchListItem = (props: Props) => {
+  return (
+    <ListItem
+      onClick={props.onClick}
+      primaryText={<BackgroundText>{props.primaryText}</BackgroundText>}
+      displaySearchIcon
+    />
+  );
+};

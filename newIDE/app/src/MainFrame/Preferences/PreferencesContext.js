@@ -1,5 +1,5 @@
 // @flow
-import createReactContext, { type Context } from 'create-react-context';
+import * as React from 'react';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -8,7 +8,13 @@ export type AlertMessageIdentifier =
   | 'minimum-fps-too-low'
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
-  | 'empty-events-based-behavior-explanation';
+  | 'empty-events-based-behavior-explanation'
+  | 'too-much-effects'
+  | 'effects-usage'
+  | 'resource-properties-panel-explanation'
+  | 'instance-drag-n-drop-explanation'
+  | 'objects-panel-explanation'
+  | 'instance-properties-panel-explanation';
 
 export type PreferencesValues = {|
   language: string,
@@ -64,8 +70,6 @@ export const initialPreferences = {
   setUseNewInstructionEditorDialog: (enabled: boolean) => {},
 };
 
-const PreferencesContext: Context<Preferences> = createReactContext(
-  initialPreferences
-);
+const PreferencesContext = React.createContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

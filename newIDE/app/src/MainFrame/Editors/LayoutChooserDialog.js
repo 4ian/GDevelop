@@ -1,9 +1,12 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
+import FlatButton from '../../UI/FlatButton';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import Dialog from '../../UI/Dialog';
 import { mapFor } from '../../Utils/MapFor';
+import Text from '../../UI/Text';
 
 export default class LayoutChooserDialog extends Component {
   constructor(props) {
@@ -30,11 +33,13 @@ export default class LayoutChooserDialog extends Component {
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onClose}
       />,
       <FlatButton
+        key="choose"
         label={<Trans>Choose</Trans>}
         primary={true}
         keyboardFocused={true}
@@ -55,19 +60,25 @@ export default class LayoutChooserDialog extends Component {
         open={this.props.open}
         title={this.props.title}
         onRequestClose={this.props.onClose}
-        autoScrollBodyContent={true}
-        contentStyle={{ width: '350px' }}
+        fullWidth
+        maxWidth="sm"
       >
-        {this.props.helpText && <p>{this.props.helpText}</p>}
-        <RadioButtonGroup
+        {this.props.helpText && <Text>{this.props.helpText}</Text>}
+        <RadioGroup
+          aria-label="Associated scene"
           name="associated-layout"
-          valueSelected={selectedLayoutName}
-          onChange={(e, layoutName) => this.chooseLayout(layoutName)}
+          value={selectedLayoutName}
+          onChange={event => this.chooseLayout(event.target.value)}
         >
           {layoutNames.map(name => (
-            <RadioButton value={name} label={name} key={name} />
+            <FormControlLabel
+              key={name}
+              value={name}
+              control={<Radio color="primary" />}
+              label={name}
+            />
           ))}
-        </RadioButtonGroup>
+        </RadioGroup>
       </Dialog>
     );
   }

@@ -2,9 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import Subheader from 'material-ui/Subheader';
-import { List, ListItem } from 'material-ui/List';
+import FlatButton from '../UI/FlatButton';
+import Subheader from '../UI/Subheader';
+import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import Create from '../UI/CustomSvgIcons/Behaviors/Create';
@@ -43,7 +43,7 @@ const MethodListItem = ({
     <ListItem
       leftIcon={icon}
       primaryText={name}
-      secondaryText={<p>{description}</p>}
+      secondaryText={description}
       secondaryTextLines={2}
       onClick={() => onChoose(name)}
       style={disabled ? styles.disabledItem : undefined}
@@ -82,7 +82,6 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
         noMargin
         title={<Trans>Choose a new behavior function ("method")</Trans>}
         onRequestClose={this.props.onCancel}
-        autoScrollBodyContent={true}
       >
         <List>
           <Subheader>
@@ -181,13 +180,11 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
               <Trans>Custom (action, condition or expression)</Trans>
             }
             secondaryText={
-              <p>
-                <Trans>
-                  An action, condition or expression that can be used on objects
-                  that have the behavior attached to them. Use it from the
-                  events sheet as any other action/condition/expression.
-                </Trans>
-              </p>
+              <Trans>
+                An action, condition or expression that can be used on objects
+                that have the behavior attached to them. Use it from the events
+                sheet as any other action/condition/expression.
+              </Trans>
             }
             secondaryTextLines={2}
             onClick={() => onChoose(null)}

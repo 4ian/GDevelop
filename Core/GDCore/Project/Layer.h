@@ -140,10 +140,14 @@ class GD_CORE_API Layer {
   gd::Effect& InsertNewEffect(const gd::String& name, std::size_t position);
 
   /**
-   * \brief Add the a copy of the specified effect in the effects list.
+   * \brief Add a copy of the specified effect in the effects list.
+   *
    * \note No pointer or reference must be kept on the layer passed as
-   * parameter. \param theEffect The effect that must be copied and inserted
-   * into the effects list \param position Insertion position.
+   * parameter.
+   *
+   * \param theEffect The effect that must be copied and inserted
+   * into the effects list
+   * \param position Insertion position.
    */
   void InsertEffect(const Effect& theEffect, std::size_t position);
 

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../../UI/Checkbox';
 import { Line, Column, Spacer } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import { type EditorProps } from './EditorProps.flow';
@@ -103,7 +103,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={shapePainterObject.getFillOpacity()}
-            onChange={(e, value) => {
+            onChange={value => {
               shapePainterObject.setFillOpacity(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}

@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../../UI/RaisedButton';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import LocalFilePicker from '../../../UI/LocalFilePicker';
@@ -14,6 +14,7 @@ import { archiveFolder } from '../../../Utils/Archiver';
 import optionalRequire from '../../../Utils/OptionalRequire.js';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
+import Text from '../../../UI/Text';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
@@ -162,9 +163,11 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
     return (
       <Column noMargin>
         <Line>
-          {t(
-            'Prepare your game for Facebook Instant Games so that it can be play on Facebook Messenger. GDevelop will create a compressed file that you can upload on your Facebook Developer account.'
-          )}
+          <Text>
+            {t(
+              'Prepare your game for Facebook Instant Games so that it can be play on Facebook Messenger. GDevelop will create a compressed file that you can upload on your Facebook Developer account.'
+            )}
+          </Text>
         </Line>
         <Line>
           <LocalFilePicker

@@ -1,12 +1,44 @@
+// @flow
+import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
-import { ToolbarGroup } from 'material-ui/Toolbar';
+import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
-import IconMenu from '../UI/Menu/IconMenu';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import InstancesSelection from './InstancesSelection';
 
-const t = str => str; //TODO
+type Props = {|
+  showPreviewButton: boolean,
+  onPreview: () => void,
+  showNetworkPreviewButton: boolean,
+  onNetworkPreview: () => void,
+  onOpenDebugger: () => void,
+  showPreviewButton: boolean,
+  showObjectsList: boolean,
+  openObjectsList: () => void,
+  openObjectGroupsList: () => void,
+  openProperties: () => void,
+  undo: () => void,
+  canUndo: boolean,
+  redo: () => void,
+  canRedo: boolean,
+  deleteSelection: () => void,
+  instancesSelection: InstancesSelection,
+  toggleInstancesList: () => void,
+  toggleLayersList: () => void,
+  isWindowMaskShown: () => boolean,
+  toggleWindowMask: () => void,
+  isGridShown: () => boolean,
+  toggleGrid: () => void,
+  openSetupGrid: () => void,
+  zoomIn: () => void,
+  zoomOut: () => void,
+  centerView: () => void,
+  setZoomFactor: number => void,
+  onOpenSettings?: ?() => void,
+|};
 
-export class Toolbar extends PureComponent {
+export class Toolbar extends PureComponent<Props> {
   render() {
     return (
       <ToolbarGroup lastChild>
@@ -14,17 +46,15 @@ export class Toolbar extends PureComponent {
           <ToolbarIcon
             onClick={this.props.onPreview}
             src="res/ribbon_default/preview32.png"
-            tooltip={t('Launch a preview of the scene')}
+            tooltip={t`Launch a preview of the scene`}
           />
         )}
         {this.props.showNetworkPreviewButton && (
-          <IconMenu
-            iconButtonElement={
+          <ElementWithMenu
+            element={
               <ToolbarIcon
                 src="res/ribbon_default/bug32.png"
-                tooltip={t(
-                  'Advanced preview options (debugger, network preview...)'
-                )}
+                tooltip={t`Advanced preview options (debugger, network preview...)`}
               />
             }
             buildMenuTemplate={() => [
@@ -45,33 +75,33 @@ export class Toolbar extends PureComponent {
           <ToolbarIcon
             onClick={this.props.openObjectsList}
             src="res/ribbon_default/objects64.png"
-            tooltip={t('Open the objects editor')}
+            tooltip={t`Open the objects editor`}
           />
         )}
         {this.props.showObjectsList && (
           <ToolbarIcon
             onClick={this.props.openObjectGroupsList}
             src={'res/ribbon_default/objectsgroups64.png'}
-            tooltip={t('Open the objects groups editor')}
+            tooltip={t`Open the objects groups editor`}
           />
         )}
         <ToolbarIcon
           onClick={this.props.openProperties}
           src="res/ribbon_default/editprop32.png"
-          tooltip={t('Open the properties panel')}
+          tooltip={t`Open the properties panel`}
         />
         <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.undo}
           src="res/ribbon_default/undo32.png"
           disabled={!this.props.canUndo}
-          tooltip={t('Undo the last changes')}
+          tooltip={t`Undo the last changes`}
         />
         <ToolbarIcon
           onClick={this.props.redo}
           src="res/ribbon_default/redo32.png"
           disabled={!this.props.canRedo}
-          tooltip={t('Redo the last changes')}
+          tooltip={t`Redo the last changes`}
         />
         <ToolbarSeparator />
         <ToolbarIcon
@@ -80,24 +110,24 @@ export class Toolbar extends PureComponent {
           disabled={
             !this.props.instancesSelection.getSelectedInstances().length
           }
-          tooltip={t('Delete the selected instances from the scene')}
+          tooltip={t`Delete the selected instances from the scene`}
         />
         <ToolbarIcon
           onClick={this.props.toggleInstancesList}
           src="res/ribbon_default/ObjectsPositionsList32.png"
-          tooltip={t('Open the list of instances')}
+          tooltip={t`Open the list of instances`}
         />
         <ToolbarIcon
           onClick={this.props.toggleLayersList}
           src="res/ribbon_default/layers32.png"
-          tooltip={t('Open the layers editor')}
+          tooltip={t`Open the layers editor`}
         />
         <ToolbarSeparator />
-        <IconMenu
-          iconButtonElement={
+        <ElementWithMenu
+          element={
             <ToolbarIcon
               src="res/ribbon_default/grid32.png"
-              tooltip={t('Toggle/edit grid')}
+              tooltip={t`Toggle/edit grid`}
             />
           }
           buildMenuTemplate={() => [
@@ -120,11 +150,11 @@ export class Toolbar extends PureComponent {
             },
           ]}
         />
-        <IconMenu
-          iconButtonElement={
+        <ElementWithMenu
+          element={
             <ToolbarIcon
               src="res/ribbon_default/zoom32.png"
-              tooltip={t('Change editor zoom')}
+              tooltip={t`Change editor zoom`}
             />
           }
           buildMenuTemplate={() => [

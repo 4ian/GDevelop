@@ -1,5 +1,5 @@
 // @flow
-import createReactContext, { type Context } from 'create-react-context';
+import * as React from 'react';
 import {
   type EventsFunctionsExtensionWriter,
   type EventsFunctionsExtensionOpener,
@@ -27,7 +27,7 @@ const defaultState = {
   getEventsFunctionsExtensionOpener: () => null,
 };
 
-const EventsFunctionsExtensionsContext: Context<EventsFunctionsExtensionsState> = createReactContext(
+const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(
   defaultState
 );
 

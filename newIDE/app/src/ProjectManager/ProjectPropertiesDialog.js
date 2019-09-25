@@ -1,11 +1,12 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import Checkbox from 'material-ui/Checkbox';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import FlatButton from '../UI/FlatButton';
+import Checkbox from '../UI/Checkbox';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 import Dialog from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
@@ -35,7 +36,7 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
-  scaleMode: 'linear' | 'nearest',
+  scaleMode: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
   minFPS: number,
@@ -153,7 +154,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             <FlatButton
               label={<Trans>Apply</Trans>}
               primary={true}
-              keyboardFocused={true}
               onClick={this._onApply}
               key="apply"
             />,
@@ -166,7 +166,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           ]}
           open={this.props.open}
           onRequestClose={this.props.onClose}
-          autoScrollBodyContent={true}
         >
           <SemiControlledTextField
             floatingLabelText={<Trans>Game name</Trans>}
@@ -174,6 +173,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             type="text"
             value={name}
             onChange={value => this.setState({ name: value })}
+            autoFocus
           />
           <SemiControlledTextField
             floatingLabelText={<Trans>Game's window width</Trans>}
@@ -197,10 +197,31 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               })
             }
           />
+          <Checkbox
+            label={
+              <Trans>
+                Display GDevelop splash at startup (in exported game)
+              </Trans>
+            }
+            checked={showGDevelopSplash}
+            onCheck={(e, checked) => {
+              if (!checked) {
+                if (
+                  this._subscriptionChecker &&
+                  !this._subscriptionChecker.checkHasSubscription()
+                )
+                  return;
+              }
+
+              this.setState({
+                showGDevelopSplash: checked,
+              });
+            }}
+          />
           <SemiControlledTextField
             floatingLabelText={<Trans>Author name</Trans>}
             fullWidth
-            hintText={<Trans>Your name</Trans>}
+            hintText={t`Your name`}
             type="text"
             value={author}
             onChange={value => this.setState({ author: value })}
@@ -217,21 +238,17 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             fullWidth
             floatingLabelText={<Trans>Project file type</Trans>}
             value={isFolderProject}
-            onChange={(e, i, value) =>
+            onChange={(e, i, value: boolean) =>
               this.setState({ isFolderProject: value })
             }
           >
-            <MenuItem
+            <SelectOption
               value={false}
-              primaryText={<Trans>Single file (default)</Trans>}
+              primaryText={t`Single file (default)`}
             />
-            <MenuItem
+            <SelectOption
               value={true}
-              primaryText={
-                <Trans>
-                  Multiple files, saved in folder next to the main file
-                </Trans>
-              }
+              primaryText={t`Multiple files, saved in folder next to the main file`}
             />
           </SelectField>
           <Line noMargin>
@@ -318,42 +335,31 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>Device orientation (for iOS and Android)</Trans>
             }
             value={orientation}
-            onChange={(e, i, value) => this.setState({ orientation: value })}
+            onChange={(e, i, value: string) =>
+              this.setState({ orientation: value })
+            }
           >
-            <MenuItem
-              value="default"
-              primaryText={<Trans>Platform default</Trans>}
-            />
-            <MenuItem
-              value="landscape"
-              primaryText={<Trans>Landscape</Trans>}
-            />
-            <MenuItem value="portrait" primaryText={<Trans>Portrait</Trans>} />
+            <SelectOption value="default" primaryText={t`Platform default`} />
+            <SelectOption value="landscape" primaryText={t`Landscape`} />
+            <SelectOption value="portrait" primaryText={t`Portrait`} />
           </SelectField>
           <SelectField
             fullWidth
             floatingLabelText={
               <Trans>Scale mode (also called "Sampling")</Trans>
             }
-            floatingLabelFixed
             value={scaleMode}
-            onChange={(e, i, value) => this.setState({ scaleMode: value })}
+            onChange={(e, i, value: string) =>
+              this.setState({ scaleMode: value })
+            }
           >
-            <MenuItem
+            <SelectOption
               value="linear"
-              primaryText={
-                <Trans>
-                  Linear (antialiased rendering, good for most games)
-                </Trans>
-              }
+              primaryText={t`Linear (antialiased rendering, good for most games)`}
             />
-            <MenuItem
+            <SelectOption
               value="nearest"
-              primaryText={
-                <Trans>
-                  Nearest (no antialiasing, good for pixel perfect games)
-                </Trans>
-              }
+              primaryText={t`Nearest (no antialiasing, good for pixel perfect games)`}
             />
           </SelectField>
           {scaleMode === 'nearest' && (
@@ -372,23 +378,22 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           <SelectField
             fullWidth
             floatingLabelText={<Trans>Fullscreen/game size mode</Trans>}
-            floatingLabelFixed
             value={sizeOnStartupMode}
-            onChange={(e, i, value) =>
+            onChange={(e, i, value: string) =>
               this.setState({ sizeOnStartupMode: value })
             }
           >
-            <MenuItem
+            <SelectOption
               value=""
-              primaryText={<Trans>No changes to the game size</Trans>}
+              primaryText={t`No changes to the game size`}
             />
-            <MenuItem
+            <SelectOption
               value="adaptWidth"
-              primaryText={<Trans>Change width to fit the screen</Trans>}
+              primaryText={t`Change width to fit the screen`}
             />
-            <MenuItem
+            <SelectOption
               value="adaptHeight"
-              primaryText={<Trans>Change height to fit the screen</Trans>}
+              primaryText={t`Change height to fit the screen`}
             />
           </SelectField>
           <SemiControlledTextField
@@ -400,27 +405,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             type="text"
             value={adMobAppId}
             onChange={value => this.setState({ adMobAppId: value })}
-          />
-          <Checkbox
-            label={
-              <Trans>
-                Display GDevelop splash at startup (in exported game)
-              </Trans>
-            }
-            checked={showGDevelopSplash}
-            onCheck={(e, checked) => {
-              if (!checked) {
-                if (
-                  this._subscriptionChecker &&
-                  !this._subscriptionChecker.checkHasSubscription()
-                )
-                  return;
-              }
-
-              this.setState({
-                showGDevelopSplash: checked,
-              });
-            }}
           />
         </Dialog>
         <SubscriptionChecker

@@ -943,6 +943,8 @@ void Project::SerializeTo(SerializerElement& element) const {
 }
 
 bool Project::ValidateObjectName(const gd::String& name) {
+  if (name.empty()) return false;
+
   gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
   return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);

@@ -8,9 +8,8 @@ type Props = {|
 |};
 
 /**
- * Pass the proper width to the children according to the window width.
- * Could be improved with react-measure to only compute the available width
- * for the component.
+ * Pass the proper size to the children according to the window size.
+ * This is only considering the window width.
  */
 export const ResponsiveWidthMeasurer = ({ children }: Props) => {
   if (typeof window === 'undefined') {

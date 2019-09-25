@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
+import FlatButton from '../UI/FlatButton';
+import TextField from '../UI/TextField';
 import Dialog from '../UI/Dialog';
 
 export default class SetupGridDialog extends Component {
@@ -22,11 +22,13 @@ export default class SetupGridDialog extends Component {
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onCancel}
       />,
       <FlatButton
+        key="apply"
         label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}
@@ -39,7 +41,6 @@ export default class SetupGridDialog extends Component {
         actions={actions}
         open={this.props.open}
         onRequestClose={this.props.onCancel}
-        autoScrollBodyContent={true}
       >
         <TextField
           floatingLabelText={<Trans>Cell width (in pixels)</Trans>}

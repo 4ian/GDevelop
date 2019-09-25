@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 
 export type InvalidParameterValueProps = {|
   children: React.Node,

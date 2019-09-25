@@ -52,6 +52,15 @@ interface MapStringBoolean {
     [Value] VectorString MAP_keys();
 };
 
+interface MapStringDouble {
+    void MapStringDouble();
+
+    double MAP_get([Const] DOMString name);
+    void MAP_set([Const] DOMString name, double value);
+    double MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
 interface MapStringVariable {
     [Ref] Variable MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] Variable prop);
@@ -571,13 +580,39 @@ interface ExternalLayout {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface Effect {
+  void Effect();
+
+  void SetName([Const] DOMString name_);
+  [Const, Ref] DOMString GetName();
+
+  void SetEffectName([Const] DOMString effectName_);
+  [Const, Ref] DOMString GetEffectName();
+
+  void SetParameter([Const] DOMString name, float value);
+  float GetParameter([Const] DOMString name);
+  [Const, Ref] MapStringDouble GetAllParameters();
+
+  void SerializeTo([Ref] SerializerElement element);
+  void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
 interface Layer {
     void Layer();
-
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+
+    boolean HasEffectNamed([Const] DOMString name);
+    [Ref] Effect GetEffect([Const] DOMString name);
+    [Ref] Effect GetEffectAt(unsigned long index);
+    unsigned long GetEffectPosition([Const] DOMString name);
+    unsigned long GetEffectsCount();
+    [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
+    void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
+    void RemoveEffect([Const] DOMString name);
+    void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
 };
 
 interface PropertyDescriptor {
@@ -1479,10 +1514,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
-    void STATIC_ObjectRenamedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString oldName, [Const] DOMString newName);
-    void STATIC_ObjectRemovedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString objectName, boolean removeEventsAndGroups);
-    void STATIC_GlobalObjectRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName);
-    void STATIC_GlobalObjectRemoved([Ref] Project project, [Const] DOMString objectName, boolean removeEventsAndGroups);
+    void STATIC_ObjectOrGroupRenamedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
+    void STATIC_ObjectOrGroupRemovedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
+    void STATIC_ObjectOrGroupRenamedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
+    void STATIC_ObjectOrGroupRemovedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
+    void STATIC_GlobalObjectOrGroupRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
+    void STATIC_GlobalObjectOrGroupRemoved([Ref] Project project, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
 };
@@ -2088,6 +2125,37 @@ interface TextEntryObject {
     void TextEntryObject([Const] DOMString name);
 };
 TextEntryObject implements gdObject;
+
+interface SkeletonObject {
+    void SkeletonObject([Const] DOMString name);
+
+    //Inherited from gdObject:
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    void SetType([Const] DOMString type);
+    [Const, Ref] DOMString GetType();
+    void SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
+
+    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+
+    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
+    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+
+    void ExposeResources([Ref] ArbitraryResourceWorker worker);
+
+    [Ref] VariablesContainer GetVariables();
+    [Value] VectorString GetAllBehaviorNames();
+    boolean HasBehaviorNamed([Const] DOMString name);
+    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
+    void RemoveBehavior([Const] DOMString name);
+    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
 
 enum ParticleEmitterObject_RendererType {
   "ParticleEmitterObject::Point",

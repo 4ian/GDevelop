@@ -9,6 +9,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "GDCore/String.h"
 namespace gd {
 class Project;
 class Layout;

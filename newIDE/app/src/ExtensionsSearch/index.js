@@ -12,7 +12,7 @@ import {
   type SerializedExtension,
   getExtension,
 } from '../Utils/GDevelopServices/Extension';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { unserializeFromJSObject } from '../Utils/Serializer';
@@ -262,7 +262,7 @@ export default class ExtensionsSearch extends Component<Props, State> {
                               </span>
                             }
                             secondaryText={
-                              <p>{extensionShortHeader.shortDescription}</p>
+                              extensionShortHeader.shortDescription
                             }
                             secondaryTextLines={2}
                             onClick={() =>

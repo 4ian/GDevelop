@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
@@ -47,7 +48,12 @@ export default class GlobalVariableField extends React.Component<
             onApply={() => {
               this.setState({ editorOpen: false });
             }}
-            emptyExplanationMessage="Global variables are variables that are persisted across the scenes during the game."
+            emptyExplanationMessage={
+              <Trans>
+                Global variables are variables that are persisted across the
+                scenes during the game.
+              </Trans>
+            }
           />
         )}
       </div>

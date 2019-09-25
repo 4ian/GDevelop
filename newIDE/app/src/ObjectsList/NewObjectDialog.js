@@ -2,12 +2,12 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import Avatar from 'material-ui/Avatar';
-import Subheader from 'material-ui/Subheader';
-import { List, ListItem } from 'material-ui/List';
-import Visibility from 'material-ui/svg-icons/action/visibility';
-import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import FlatButton from '../UI/FlatButton';
+import ListIcon from '../UI/ListIcon';
+import Subheader from '../UI/Subheader';
+import { List, ListItem } from '../UI/List';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import {
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
@@ -15,10 +15,6 @@ import {
 import HelpButton from '../UI/HelpButton';
 import { getExperimentalObjects } from '../Hints';
 import { Line } from '../UI/Grid';
-
-const styles = {
-  icon: { borderRadius: 0 },
-};
 
 const ObjectListItem = ({
   objectMetadata,
@@ -34,12 +30,16 @@ const ObjectListItem = ({
 
   return (
     <ListItem
-      leftAvatar={
-        <Avatar src={objectMetadata.iconFilename} style={styles.icon} />
+      leftIcon={
+        <ListIcon
+          src={objectMetadata.iconFilename}
+          iconSize={40}
+          isGDevelopIcon
+        />
       }
       key={objectMetadata.name}
       primaryText={objectMetadata.fullName}
-      secondaryText={<p>{objectMetadata.description}</p>}
+      secondaryText={objectMetadata.description}
       secondaryTextLines={2}
       onClick={onClick}
     />
@@ -114,7 +114,6 @@ export default class NewObjectDialog extends Component<Props, State> {
         onRequestClose={onClose}
         open={open}
         noMargin
-        autoScrollBodyContent
       >
         <List>
           {objects.map(objectMetadata => (

@@ -89,6 +89,7 @@ import shootBulletInParabola from '../fixtures/shoot-bullet-in-parabola/shoot-bu
 import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
 import simpleSpaceShooter from '../fixtures/simple-space-shooter/simple-space-shooter.json';
+import skeletalAnimationDemo from '../fixtures/skeletal-animation-demo/skeletal-animation-demo.json';
 import snapObjectToGrid from '../fixtures/snap-object-to-grid/snap-object-to-grid.json';
 import spaceInvaders from '../fixtures/space-invaders/space-invaders.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
@@ -284,9 +285,11 @@ export default class BrowserProjectOpener {
     } else if (url === 'example://shoot-bullets') {
       return Promise.resolve(shootBullets);
     } else if (url === 'example://shooting-bullets-explanation') {
-      return Promise.resolve(simpleSpaceShooter);
-    } else if (url === 'example://simple-space-shooter') {
       return Promise.resolve(shootingBulletsExplanation);
+    } else if (url === 'example://simple-space-shooter') {
+      return Promise.resolve(simpleSpaceShooter);
+    } else if (url === 'example://skeletal-animation-demo') {
+      return Promise.resolve(skeletalAnimationDemo);
     } else if (url === 'example://snap-object-to-grid') {
       return Promise.resolve(snapObjectToGrid);
     } else if (url === 'example://space-invaders') {

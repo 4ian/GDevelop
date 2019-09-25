@@ -4,12 +4,12 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../ResourcesLoader';
-import Subheader from 'material-ui/Subheader';
-import FlatButton from 'material-ui/FlatButton';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import Edit from 'material-ui/svg-icons/image/edit';
-import IconButton from 'material-ui/IconButton';
+import Subheader from '../UI/Subheader';
+import FlatButton from '../UI/FlatButton';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+import Edit from '@material-ui/icons/Edit';
+import IconButton from '../UI/IconButton';
 import {
   type ResourceKind,
   type ResourceSource,
@@ -247,7 +247,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     const children = field
       .getChoices()
       .map(({ value, label }) => (
-        <MenuItem key={value} value={value} primaryText={label} />
+        <SelectOption key={value} value={value} primaryText={label} />
       ));
 
     if (field.valueType === 'number') {
@@ -257,8 +257,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           value={getFieldValue(this.props.instances, field)}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          floatingLabelFixed
-          onChange={(event, index, newValue) => {
+          onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i =>
               setValue(i, parseFloat(newValue) || 0)
             );
@@ -270,7 +269,8 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           {children}
         </SelectField>
       );
-    } else {
+    } else if (field.valueType === 'string') {
+      const { setValue } = field;
       return (
         <SelectField
           value={getFieldValue(
@@ -280,11 +280,8 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           )}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          floatingLabelFixed
-          onChange={(event, index, newValue) => {
-            this.props.instances.forEach(i =>
-              field.setValue(i, newValue || '')
-            );
+          onChange={(event, index, newValue: string) => {
+            this.props.instances.forEach(i => setValue(i, newValue || ''));
             this._onInstancesModified(this.props.instances);
           }}
           style={styles.field}
@@ -366,7 +363,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
 
             return (
               <div key={field.name}>
-                <Subheader style={styles.subHeader}>{field.name}</Subheader>
+                <Subheader>{field.name}</Subheader>
                 <div style={styles.subPropertiesEditorContainer}>
                   <PropertiesEditor
                     schema={field.children}

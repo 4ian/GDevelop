@@ -3,8 +3,9 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import Changelog from '.';
+import Text from '../../UI/Text';
 
 type Props = {|
   open: boolean,
@@ -23,6 +24,7 @@ export default class ChangelogDialog extends React.Component<Props, State> {
 
     const actions = [
       <FlatButton
+        key="close"
         label={<Trans>Close</Trans>}
         primary={true}
         onClick={onClose}
@@ -35,14 +37,13 @@ export default class ChangelogDialog extends React.Component<Props, State> {
         actions={actions}
         open={open}
         onRequestClose={onClose}
-        autoScrollBodyContent
         modal
       >
-        <p>
+        <Text>
           <Trans>
             GDevelop was upgraded to a new version! Check out the changes.
           </Trans>
-        </p>
+        </Text>
         <Changelog
           onUpdated={() => {
             this.forceUpdate(); /*Force update to ensure dialog is properly positionned*/

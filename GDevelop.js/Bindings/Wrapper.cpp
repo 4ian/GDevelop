@@ -16,6 +16,7 @@
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
 #include <GDCore/Project/VariablesContainer.h>
+#include <GDCore/Project/Effect.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 
@@ -70,6 +71,7 @@
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"
+#include "../../Extensions/SkeletonObject/SkeletonObject.h"
 
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/EventsCodeGenerator.h>
@@ -373,6 +375,7 @@ typedef std::vector<std::pair<gd::String, TextFormatting>>
 typedef std::vector<gd::ObjectGroup> VectorObjectGroup;
 typedef std::map<gd::String, gd::String> MapStringString;
 typedef std::map<gd::String, bool> MapStringBoolean;
+typedef std::map<gd::String, double> MapStringDouble;
 typedef std::map<gd::String, gd::ExpressionMetadata>
     MapStringExpressionMetadata;
 typedef std::map<gd::String, gd::InstructionMetadata>
@@ -518,10 +521,12 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Year Year
 #define STATIC_Month Month
 #define STATIC_Date Date
-#define STATIC_ObjectRenamedInLayout ObjectRenamedInLayout
-#define STATIC_ObjectRemovedInLayout ObjectRemovedInLayout
-#define STATIC_GlobalObjectRenamed GlobalObjectRenamed
-#define STATIC_GlobalObjectRemoved GlobalObjectRemoved
+#define STATIC_ObjectOrGroupRenamedInLayout ObjectOrGroupRenamedInLayout
+#define STATIC_ObjectOrGroupRemovedInLayout ObjectOrGroupRemovedInLayout
+#define STATIC_ObjectOrGroupRemovedInEventsFunction ObjectOrGroupRemovedInEventsFunction
+#define STATIC_ObjectOrGroupRenamedInEventsFunction ObjectOrGroupRenamedInEventsFunction
+#define STATIC_GlobalObjectOrGroupRenamed GlobalObjectOrGroupRenamed
+#define STATIC_GlobalObjectOrGroupRemoved GlobalObjectOrGroupRemoved
 #define STATIC_GetAllObjectTypesUsingEventsBasedBehavior GetAllObjectTypesUsingEventsBasedBehavior
 #define STATIC_EnsureBehaviorEventsFunctionsProperParameters EnsureBehaviorEventsFunctionsProperParameters
 #define STATIC_CreateRectangle CreateRectangle
@@ -568,6 +573,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveEventAt RemoveEvent
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
+#define GetEffectAt GetEffect
 
 // We don't use prefix in .idl file to workaround a webidl_binder.py bug
 // that can't find in its list of interfaces a class which has a prefix.

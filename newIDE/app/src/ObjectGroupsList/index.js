@@ -6,28 +6,25 @@ import { AutoSizer, List } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import GroupRow from './GroupRow';
-import { ListItem } from 'material-ui/List';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { makeAddItem } from '../UI/ListCommonItem';
+import { AddListItem } from '../UI/ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import {
   filterGroupsList,
   enumerateGroups,
 } from '../ObjectsList/EnumerateObjects';
-import type {
-  GroupWithContextList,
-  GroupWithContext,
+import {
+  type GroupWithContextList,
+  type GroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
+import { listItemWithoutIconHeight } from '../UI/List';
 
-const listItemHeight = 48;
 const styles = {
   listContainer: {
     flex: 1,
   },
 };
-
-const AddGroupRow = makeAddItem(ListItem);
 
 const SortableGroupRow = SortableElement(props => {
   const { style, ...otherProps } = props;
@@ -39,7 +36,12 @@ const SortableGroupRow = SortableElement(props => {
 });
 
 const SortableAddGroupRow = SortableElement(props => {
-  return <AddGroupRow {...props} />;
+  const { style, ...otherProps } = props;
+  return (
+    <div style={style}>
+      <AddListItem {...otherProps} />
+    </div>
+  );
 });
 
 class GroupsList extends Component<*, *> {
@@ -57,7 +59,7 @@ class GroupsList extends Component<*, *> {
         ref={list => (this.list = list)}
         height={height}
         rowCount={fullList.length}
-        rowHeight={listItemHeight}
+        rowHeight={listItemWithoutIconHeight}
         rowRenderer={({ index, key, style }) => {
           const groupWithContext = fullList[index];
           if (groupWithContext.key === 'add-groups-row') {
@@ -96,6 +98,7 @@ class GroupsList extends Component<*, *> {
               }
               editingName={nameBeingEdited}
               isGlobalGroup={groupWithContext.global}
+              canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
               onSetAsGlobalGroup={
                 groupWithContext.global
                   ? undefined
@@ -122,6 +125,7 @@ type Props = {|
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
+  canRenameGroup: (newName: string) => boolean,
   onRenameGroup: (
     groupWithContext: GroupWithContext,
     newName: string,
@@ -130,6 +134,7 @@ type Props = {|
   onGroupAdded?: () => void,
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
+  canSetAsGlobalGroup?: boolean,
 |};
 
 export default class GroupsListContainer extends React.Component<Props, State> {
@@ -241,16 +246,18 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return;
     }
 
-    this.props.onRenameGroup(groupWithContext, newName, doRename => {
-      if (!doRename) return;
+    if (this.props.canRenameGroup(newName)) {
+      this.props.onRenameGroup(groupWithContext, newName, doRename => {
+        if (!doRename) return;
 
-      group.setName(newName);
+        group.setName(newName);
 
-      this.forceUpdate();
-      if (this.props.onGroupRenamed) {
-        this.props.onGroupRenamed();
-      }
-    });
+        this.forceUpdate();
+        if (this.props.onGroupRenamed) {
+          this.props.onGroupRenamed();
+        }
+      });
+    }
   };
 
   _onMove = (oldIndex: number, newIndex: number) => {
@@ -351,6 +358,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                 onEditName={this._onEditName}
                 onDelete={this._onDelete}
                 onRename={this._onRename}
+                canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
                 onSetAsGlobalGroup={this._setAsGlobalGroup}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._onMove(oldIndex, newIndex)

@@ -1,11 +1,11 @@
 // @flow
 
 import * as React from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
-import Star from 'material-ui/svg-icons/toggle/star';
-import Favorite from 'material-ui/svg-icons/action/favorite';
+import Star from '@material-ui/icons/Star';
+import Favorite from '@material-ui/icons/Favorite';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
 import { Column, Line } from '../UI/Grid';
 import {
@@ -13,6 +13,7 @@ import {
   sendSubscriptionCheckDismiss,
 } from '../Utils/Analytics/EventSender';
 import { Trans } from '@lingui/macro';
+import Text from '../UI/Text';
 
 type Props = {|
   title: React.Node,
@@ -33,7 +34,7 @@ type DialogState = {|
 const styles = {
   icon: { width: 40, height: 40, marginRight: 20 },
   iconText: { flex: 1 },
-  thanksText: { textAlign: 'right', marginRight: 20, marginBottom: 0 },
+  thanksText: { marginRight: 20, marginBottom: 0 },
 };
 
 export class SubscriptionCheckDialog extends React.Component<
@@ -103,52 +104,51 @@ export class SubscriptionCheckDialog extends React.Component<
         ]}
         onRequestClose={this._closeDialog}
         open={open}
-        autoScrollBodyContent
         title={this.props.title}
       >
         <Column noMargin>
           <Line noMargin alignItems="center">
             {mode === 'try' ? (
-              <p>
+              <Text>
                 <Trans>
                   You can try this feature, but if you're using it regularly, we
                   ask you to get a subscription to GDevelop.
                 </Trans>
-              </p>
+              </Text>
             ) : (
-              <p>
+              <Text>
                 <Trans>
                   To use this feature, we ask you to get a subscription to
                   GDevelop.
                 </Trans>
-              </p>
+              </Text>
             )}
           </Line>
           <Line noMargin alignItems="center">
             <Star style={styles.icon} />
-            <p style={styles.iconText}>
+            <Text style={styles.iconText}>
               <Trans>
                 Having a subscription allows you to use the one-click export for
                 Android, Windows, macOS and Linux, launch live previews over
                 wifi, disable the GDevelop splashscreen during loading and more!
               </Trans>
-            </p>
+            </Text>
           </Line>
           <Line noMargin alignItems="center">
             <Favorite style={styles.icon} />
-            <p style={styles.iconText}>
+            <Text style={styles.iconText}>
               <Trans>
                 You're also supporting the development of GDevelop, an
                 open-source software! In the future, more online services will
                 be available for users with a subscription.
               </Trans>
-            </p>
+            </Text>
           </Line>
-          <p style={styles.thanksText}>
+          <Text style={styles.thanksText} align="right">
             <b>
               <Trans>Thanks!</Trans>
             </b>
-          </p>
+          </Text>
         </Column>
       </Dialog>
     );

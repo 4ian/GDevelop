@@ -629,7 +629,8 @@ gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
 
 /**
  * Get the layer with the given name
- * @param {gdjs.Layer} name The name of the layer
+ * @param {string} name The name of the layer
+ * @returns {gdjs.Layer} The layer, or the base layer if not found
  */
 gdjs.RuntimeScene.prototype.getLayer = function(name) {
     if ( this._layers.containsKey(name) )
@@ -638,6 +639,10 @@ gdjs.RuntimeScene.prototype.getLayer = function(name) {
     return this._layers.get("");
 };
 
+/**
+ * Check if a layer exists
+ * @param {string} name The name of the layer
+ */
 gdjs.RuntimeScene.prototype.hasLayer = function(name) {
     return this._layers.containsKey(name);
 };

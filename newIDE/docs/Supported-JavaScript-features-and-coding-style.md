@@ -1,5 +1,7 @@
 # Supported JavaScript features and coding styles
 
+> *tl;dr:* the game engine is a classic "ES5" JavaScript project and needs caution. The editor is a modern, shiny codebase with bundling and latest JavaScript features.
+
 ## For the game engine (GDJS) and extensions
 
 Most of the game engine and extensions are written using "classic" JavaScript "ES5" syntax, i.e: using `function` and `var` for declaring functions. "Classes" are declared using `function` for the constructor, and function declared on the `prototype` of the class for methods.
@@ -8,15 +10,32 @@ Most of the game engine and extensions are written using "classic" JavaScript "E
 
 Hence the recommendation **currently** is to stay with "ES5" syntax and do a *cautious adoption* of new features. If you know that your extension will only be used on evergreen browsers and platforms like Electron, arrow functions and const/let are good practice.
 
+> Android 4.x is supported by GDevelop so we still need to avoid fat arrows functions (`=>`) and `let`/`const`.
+
 In the **future**, we might default to newer JavaScript syntax if supported on most platforms (and potentially run a "codemod" to transform and modernize the whole codebase).
+
+### Can I declare variables in the global scope? (i.e: what about bundling?)
+
+In short: no.
+
+The game engine and extensions don't have any advanced bundling applied using Webpack.
+This means that all the JS files from the game engine/extensions are living in the "global scope". Hence, if you writing `var myVariable = 1;` outside of a function, then `myVariable` will be a global variable.
+
+This is problematic because global variables are polluting the global namespace and, worse, can be overriden by other extensions/scripts.
+
+To avoid this:
+
+* Always declare your objects and functions as part of `gdjs`: `gdjs.MyExtension = {};`, `gdjs.MyExtension.someStaticVariableOrFunction`...
+* For objects/behaviors, the convention is to attach them to `gdjs` too: `gdjs.MyRuntimeObject`, `gdjs.MyRuntimeBehavior`...
+* More generally, don't use `var something = blabla` outside of any function or object.
 
 ### What about typing?
 
 > ℹ️ Typing is adding annotation about the type of variables, to enable auto completion and have automatic verification for bugs.
 
-It's recommended to add JSDoc annotation so that the game engine and your extensions can have:
+It's recommended to add **[JSDoc annotation](https://jsdoc.app/index.html)** so that the game engine and your extensions can have:
 * *documentation* auto-generated
-* *auto-completion* provided by **[Typescript]**.
+* *auto-completion* provided by **[Typescript](https://www.typescriptlang.org/)**.
 * in the **future**, static verification for bugs with **Typescript**.
 
 ### What about code formatting?
@@ -30,6 +49,12 @@ The editor sources are processed by Babel, which *transpiles* the JavaScript lat
 
 All source files should use the arrow function (`=>`), `class`, `let`/`const` and anything that makes the codebase more readable, concise and less error prone.
 
+### Can I declare variables in the global scope? (i.e: what about bundling?)
+
+In short: you don't need to worry because all files are bundled.
+
+This is because the editor sources are bundled with Webpack. Anything that you declare is scoped to the file - the only thing available outside are the thing that you expose with `export` and that you `import` something else. The joy!
+
 ### What about typing?
 
 The codebase is typed using **[Flow](https://flow.org/)**. It's a powerful typechecker that does not require any recompilation.
@@ -40,4 +65,4 @@ While properly typing can be seen as cumbersome, it's something that is rather q
 
 ### What about code formatting?
 
-All the code is auto formatted with Prettier. Install it in your IDE/text editor and never think about formatting again in your life 🎉
+All the code is auto formatted with Prettier. Install it in your IDE/text editor and never think about formatting again in your life. The joy! 🎉

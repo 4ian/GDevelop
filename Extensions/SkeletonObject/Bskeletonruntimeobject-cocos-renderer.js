@@ -15,11 +15,25 @@ gdjs.sk.CocosDataLoader.prototype.getData = function(dataName){
     return cc.loader.getRes("res/"+dataName);
 };
 
+/**
+ * Load the textures from DragonBones data
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {Object} objectData
+ */
 gdjs.sk.CocosDataLoader.prototype.loadDragonBones = function(runtimeScene, objectData){
-    var textureData = this.getData(objectData.textureDataFilename);
+    var jsonManager = runtimeScene.getGame().getJsonManager();
+    if (!jsonManager.isJsonLoaded(objectData.textureDataFilename)) {
+        console.error("Tried to load DragonBones textures from \"" + objectData.textureDataFilename + "\" but this resource is not loaded.");
+        return;
+    }
+
+    var textureData = jsonManager.getLoadedJson(objectData.textureDataFilename);
     var texture = runtimeScene.getGame().getImageManager().getTexture(objectData.textureName);
-    if(!textureData || !texture._textureLoaded) return;
-    
+    if(!textureData || !texture._textureLoaded) {
+        console.error("Tried to load DragonBones textures from \"" + objectData.textureDataFilename + "\" resource but the texture or the texture data could not be loaded properly.");
+        return;
+    }
+
     for(var i=0; i<textureData.SubTexture.length; i++){
         var subTex = textureData.SubTexture[i];
         var frame = new cc.rect(subTex.x, subTex.y, subTex.width, subTex.height);
@@ -29,7 +43,7 @@ gdjs.sk.CocosDataLoader.prototype.loadDragonBones = function(runtimeScene, objec
         if (subTex.hasOwnProperty("frameHeight")){
             frame.height = subTex.frameHeight;
         }
-        
+
         this.textures[subTex.name] = {"texture": texture, "frame": frame};
     }
 };
@@ -98,7 +112,7 @@ gdjs.sk.SlotCocosRenderer.prototype.loadAsSprite = function(texture){
 };
 
 gdjs.sk.SlotCocosRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
-    // Meshes not supported, load as sprites 
+    // Meshes not supported, load as sprites
     this.loadAsSprite(texture);
 };
 

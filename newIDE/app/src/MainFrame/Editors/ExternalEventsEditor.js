@@ -2,11 +2,13 @@
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import EventsSheet from '../../EventsSheet';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';
 import LayoutChooserDialog from './LayoutChooserDialog';
+import Text from '../../UI/Text';
+import { Line } from '../../UI/Grid';
 
 const styles = {
   container: {
@@ -111,13 +113,19 @@ export default class ExternalEventsEditor extends BaseEditor {
         )}
         {!layout && (
           <PlaceholderMessage>
-            To edit the external events, choose the scene in which it will be
-            included:
-            <RaisedButton
-              label={<Trans>Choose the scene</Trans>}
-              primary
-              onClick={this.openLayoutChooser}
-            />
+            <Text>
+              <Trans>
+                To edit the external events, choose the scene in which it will
+                be included:
+              </Trans>
+            </Text>
+            <Line justifyContent="center">
+              <RaisedButton
+                label={<Trans>Choose the scene</Trans>}
+                primary
+                onClick={this.openLayoutChooser}
+              />
+            </Line>
           </PlaceholderMessage>
         )}
         <LayoutChooserDialog

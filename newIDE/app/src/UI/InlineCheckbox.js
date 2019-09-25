@@ -1,19 +1,10 @@
 // @flow
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
-
-const styles = {
-  root: {
-    width: 'auto',
-    marginRight: 16,
-  },
-  label: {
-    width: 'auto',
-  },
-};
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 
 type Props = {|
-  label: React.Node,
+  label?: ?React.Node,
   checked: boolean,
   onCheck?: (e: {||}, checked: boolean) => void,
   checkedIcon?: React.Node,
@@ -25,6 +16,23 @@ type Props = {|
  * A checkbox based on Material-UI Checkbox, but that can be displayed
  * without having it taking the full width of its container.
  */
-export default (props: Props) => (
-  <Checkbox style={styles.root} labelStyle={styles.label} {...props} />
-);
+export default (props: Props) => {
+  const { onCheck } = props;
+  const checkbox = (
+    <Checkbox
+      disabled={props.disabled}
+      checked={props.checked}
+      onChange={
+        onCheck ? event => onCheck(event, event.target.checked) : undefined
+      }
+      icon={props.uncheckedIcon}
+      checkedIcon={props.checkedIcon}
+      color="primary"
+    />
+  );
+  return props.label ? (
+    <FormControlLabel control={checkbox} label={props.label} />
+  ) : (
+    checkbox
+  );
+};

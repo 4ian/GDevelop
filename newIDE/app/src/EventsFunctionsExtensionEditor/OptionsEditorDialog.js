@@ -2,17 +2,18 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
-import CloudUpload from 'material-ui/svg-icons/file/cloud-upload';
+import FlatButton from '../UI/FlatButton';
+import TextField from '../UI/TextField';
+import CloudUpload from '@material-ui/icons/CloudUpload';
 import { Column, Line } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
+import Text from '../UI/Text';
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -109,7 +110,6 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
               open={this.props.open}
               title={<Trans>Edit Extension Options</Trans>}
               onRequestClose={this.props.onClose}
-              autoScrollBodyContent={true}
             >
               <Column>
                 <TextField
@@ -203,26 +203,26 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                 >
                   <Column expand>
                     <Line>
-                      <p>
+                      <Text>
                         <Trans>
                           You can export the extension to a file to easily
                           import it in another project. If your extension is
                           providing useful and reusable functions or behaviors,
                           consider sharing it with the GDevelop community!
                         </Trans>
-                      </p>
+                      </Text>
                     </Line>
                     <Line>
                       <RaisedButton
                         icon={<CloudUpload />}
                         primary
                         label={<Trans>Export to a file</Trans>}
-                        onClick={() =>
+                        onClick={() => {
                           exportExtension(
                             eventsFunctionsExtensionsState,
                             eventsFunctionsExtension
-                          )
-                        }
+                          );
+                        }}
                       />
                       <FlatButton
                         label={<Trans>Submit extension to the community</Trans>}

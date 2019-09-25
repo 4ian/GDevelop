@@ -296,24 +296,42 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(
     function(texturesTotalCount) {
       that._soundManager.preloadAudio(
         function(count, total) {
-          loadingScreen.render(
-            Math.floor(((texturesTotalCount + count) / allAssetsTotal) * 100)
+          var percent = Math.floor(
+            ((texturesTotalCount + count) / allAssetsTotal) * 100
           );
+          loadingScreen.render(percent);
+          if (progressCallback) progressCallback(percent);
         },
         function(audioTotalCount) {
           that._fontManager.loadFonts(
             function(count, total) {
-              loadingScreen.render(
-                Math.floor(
-                  ((texturesTotalCount + audioTotalCount + count) /
-                    allAssetsTotal) *
-                    100
-                )
+              var percent = Math.floor(
+                ((texturesTotalCount + audioTotalCount + count) /
+                  allAssetsTotal) *
+                  100
               );
+              loadingScreen.render(percent);
+              if (progressCallback) progressCallback(percent);
             },
-            function() {
-              loadingScreen.unload();
-              callback();
+            function(fontTotalCount) {
+              that._jsonManager.preloadJsons(
+                function(count, total) {
+                  var percent = Math.floor(
+                    ((texturesTotalCount +
+                      audioTotalCount +
+                      fontTotalCount +
+                      count) /
+                      allAssetsTotal) *
+                      100
+                  );
+                  loadingScreen.render(percent);
+                  if (progressCallback) progressCallback(percent);
+                },
+                function() {
+                  loadingScreen.unload();
+                  callback();
+                }
+              );
             }
           );
         }

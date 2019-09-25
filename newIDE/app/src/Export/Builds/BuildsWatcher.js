@@ -45,7 +45,10 @@ export default class BuildsWatcher {
     let build = null;
     do {
       if (!this.userProfile) return;
+
       const { getAuthorizationHeader, profile } = this.userProfile;
+      if (!profile) return;
+
       try {
         console.info(`Checking progress of build ${buildId}...`);
         build = await getBuild(getAuthorizationHeader, profile.uid, buildId);

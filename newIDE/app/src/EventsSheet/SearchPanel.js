@@ -1,15 +1,17 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
-import Paper from 'material-ui/Paper';
-import TextField from 'material-ui/TextField';
-import { Line, Column } from '../UI/Grid';
-import FlatButton from 'material-ui/FlatButton';
-import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
-import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
-import IconButton from 'material-ui/IconButton';
+import Background from '../UI/Background';
+import TextField from '../UI/TextField';
+import { Line, Column, Spacer } from '../UI/Grid';
+import FlatButton from '../UI/FlatButton';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import IconButton from '../UI/IconButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
+import Text from '../UI/Text';
 import {
   type SearchInEventsInputs,
   type ReplaceInEventsInputs,
@@ -98,14 +100,14 @@ export default class SearchPanel extends PureComponent<Props, State> {
     const { searchText, replaceText, searchInSelection } = this.state;
 
     return (
-      <Paper>
+      <Background noFullHeight noExpand>
         <Column>
           <Line alignItems="baseline">
             <TextField
               ref={_searchTextField =>
                 (this.searchTextField = _searchTextField)
               }
-              hintText={<Trans>Text to search</Trans>}
+              hintText={t`Text to search`}
               onChange={(e, searchText) => this.setState({ searchText })}
               value={searchText}
               fullWidth
@@ -119,7 +121,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
           </Line>
           <Line alignItems="baseline">
             <TextField
-              hintText={<Trans>Text to replace</Trans>}
+              hintText={t`Text to replace`}
               onChange={(e, replaceText) => this.setState({ replaceText })}
               value={replaceText}
               fullWidth
@@ -141,9 +143,10 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={!this.state.matchCase}
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
-              <p>
+              <Text>
                 <Trans>Filter by</Trans>
-              </p>
+              </Text>
+              <Spacer />
               <InlineCheckbox
                 label={<Trans>Conditions</Trans>}
                 checked={this.state.searchInConditions}
@@ -166,29 +169,33 @@ export default class SearchPanel extends PureComponent<Props, State> {
               /> */}
             </Line>
             <Line noMargin alignItems="center">
-              <p>
+              <Text>
                 {resultsCount === null || resultsCount === undefined
                   ? ''
                   : resultsCount !== 0
                   ? `${resultsCount} results`
                   : `No results`}
-              </p>
+              </Text>
               <IconButton
                 disabled={!resultsCount}
-                onClick={() => onGoToPreviousSearchResult()}
+                onClick={() => {
+                  onGoToPreviousSearchResult();
+                }}
               >
                 <ChevronLeft />
               </IconButton>
               <IconButton
                 disabled={!resultsCount}
-                onClick={() => onGoToNextSearchResult()}
+                onClick={() => {
+                  onGoToNextSearchResult();
+                }}
               >
                 <ChevronRight />
               </IconButton>
             </Line>
           </Line>
         </Column>
-      </Paper>
+      </Background>
     );
   }
 }

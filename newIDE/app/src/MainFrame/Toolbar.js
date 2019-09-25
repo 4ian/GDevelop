@@ -1,20 +1,12 @@
 // @flow
+import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
-import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
+import { Toolbar, ToolbarGroup } from '../UI/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
-import IconMenu from '../UI/Menu/IconMenu';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import Window from '../Utils/Window';
 import { I18n } from '@lingui/react';
-import { t } from '@lingui/macro';
-
-const styles = {
-  toolbar: {
-    flexShrink: 0, // Toolbar height should never be reduced
-    overflowX: 'auto',
-    overflowY: 'hidden',
-  },
-};
 
 type Props = {
   showProjectIcons: boolean,
@@ -47,14 +39,14 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
     return (
       <I18n>
         {({ i18n }) => (
-          <Toolbar style={styles.toolbar}>
-            <ToolbarGroup firstChild={true}>
+          <Toolbar>
+            <ToolbarGroup firstChild>
               {this.props.showProjectIcons && (
                 <ToolbarIcon
                   onClick={this.props.toggleProjectManager}
                   src="res/ribbon_default/projectManager32.png"
                   disabled={!this.props.hasProject}
-                  tooltip={i18n._(t`Project manager`)}
+                  tooltip={t`Project manager`}
                 />
               )}
               {this.props.showProjectIcons && (
@@ -62,30 +54,28 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
                   onClick={this.props.exportProject}
                   src="res/ribbon_default/export32.png"
                   disabled={!this.props.hasProject}
-                  tooltip={i18n._(t`Export the game (Web, Android, iOS...)`)}
+                  tooltip={t`Export the game (Web, Android, iOS...)`}
                 />
               )}
               {this.isDev && (
-                <IconMenu
-                  iconButtonElement={
-                    <ToolbarIcon src="res/ribbon_default/bug32.png" />
-                  }
+                <ElementWithMenu
+                  element={<ToolbarIcon src="res/ribbon_default/bug32.png" />}
                   buildMenuTemplate={() => [
                     {
-                      label: i18n._(t`Request update from external editor`),
+                      label: 'Request update from external editor',
                       disabled: !this.props.requestUpdate,
                       click: () =>
                         this.props.requestUpdate && this.props.requestUpdate(),
                     },
                     {
-                      label: i18n._(t`Simulate update downloaded`),
+                      label: 'Simulate update downloaded',
                       disabled: !this.props.simulateUpdateDownloaded,
                       click: () =>
                         this.props.simulateUpdateDownloaded &&
                         this.props.simulateUpdateDownloaded(),
                     },
                     {
-                      label: i18n._(t`Simulate update available`),
+                      label: 'Simulate update available',
                       disabled: !this.props.simulateUpdateAvailable,
                       click: () =>
                         this.props.simulateUpdateAvailable &&

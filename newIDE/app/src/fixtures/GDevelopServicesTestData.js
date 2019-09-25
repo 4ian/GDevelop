@@ -74,7 +74,11 @@ export const fakeIndieUserProfile: UserProfile = {
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
-  onRefreshUserProfile: () => {},
+  onRefreshUserProfile: () => {
+    console.info('This should refresh the user profile');
+  },
+  getAuthorizationHeader: () =>
+    Promise.reject(new Error('Not implemented in test data')),
 };
 
 export const fakeNoSubscriptionUserProfile: UserProfile = {
@@ -85,7 +89,11 @@ export const fakeNoSubscriptionUserProfile: UserProfile = {
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
-  onRefreshUserProfile: () => {},
+  onRefreshUserProfile: () => {
+    console.info('This should refresh the user profile');
+  },
+  getAuthorizationHeader: () =>
+    Promise.reject(new Error('Not implemented in test data')),
 };
 
 export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
@@ -96,7 +104,11 @@ export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
-  onRefreshUserProfile: () => {},
+  onRefreshUserProfile: () => {
+    console.info('This should refresh the user profile');
+  },
+  getAuthorizationHeader: () =>
+    Promise.reject(new Error('Not implemented in test data')),
 };
 
 export const fakeNotAuthenticatedUserProfile: UserProfile = {
@@ -107,7 +119,11 @@ export const fakeNotAuthenticatedUserProfile: UserProfile = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
-  onRefreshUserProfile: () => {},
+  onRefreshUserProfile: () => {
+    console.info('This should refresh the user profile');
+  },
+  getAuthorizationHeader: () =>
+    Promise.reject(new Error('Not implemented in test data')),
 };
 
 export const release: Release = {

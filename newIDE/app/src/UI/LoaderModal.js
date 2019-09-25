@@ -1,5 +1,5 @@
 import React from 'react';
-import RefreshIndicator from 'material-ui/RefreshIndicator';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const loaderSize = 50;
 
@@ -13,7 +13,7 @@ export default props => {
         right: 0,
         bottom: 0,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        zIndex: 1000,
+        zIndex: 2000, // 2000 is higher than any Material-UI modal
         pointerEvents: props.show ? 'cursor' : 'none',
         display: props.show ? 'block' : 'none',
       }}
@@ -29,13 +29,8 @@ export default props => {
           height: loaderSize,
         }}
       >
-        {props.show /* Don't render RefreshIndicator to avoid it to use a timeout that would wake regularly the CPU  */ && (
-          <RefreshIndicator
-            size={loaderSize}
-            left={0}
-            top={0}
-            status={'loading'}
-          />
+        {props.show /* Don't render CircularProgress to avoid it to use a timeout that would wake regularly the CPU  */ && (
+          <CircularProgress size={loaderSize} disableShrink />
         )}
       </div>
     </div>

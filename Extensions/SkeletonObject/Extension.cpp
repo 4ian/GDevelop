@@ -11,18 +11,20 @@ This project is released under the MIT License.
 #include "SkeletonObject.h"
 
 void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "SkeletonObject",
-      _("Skeleton"),
-      _("Enables the use of animated skeleton objects.\nCurrently supported "
-        "formats:\n    *DragonBones"),
-      "Franco Maciel",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("SkeletonObject",
+                               _("Skeleton"),
+                               _("Enables the use of animated skeleton objects "
+                                 "made with DragonBones."),
+                               "Franco Maciel",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/skeleton");
 
   gd::ObjectMetadata& obj = extension.AddObject<SkeletonObject>(
       "Skeleton",
       _("Skeleton"),
-      _("Object animated through bones"),
+      _("Object displayed using skeletal animation, powered by DragonBones. "
+        "This object is experimental and searching for a maintainer."),
       "JsPlatform/Extensions/skeletonicon.png");
 
   // Object instructions

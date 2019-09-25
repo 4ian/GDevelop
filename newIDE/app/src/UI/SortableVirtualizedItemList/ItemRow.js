@@ -1,12 +1,10 @@
+// @flow
 import React from 'react';
-import { ListItem } from 'material-ui/List';
-import IconMenu from '../Menu/IconMenu';
+import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
-import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import { type Item } from '.';
+import ThemeConsumer from '../Theme/ThemeConsumer';
 
 const styles = {
   itemName: {
@@ -15,7 +13,7 @@ const styles = {
     textOverflow: 'ellipsis',
   },
   textField: {
-    top: -16,
+    top: noMarginTextFieldInListItemTopOffset,
   },
 };
 
@@ -26,27 +24,16 @@ type Props = {
   editingName: boolean,
   getThumbnail?: () => string,
   selected: true,
-  onItemSelected: () => void,
+  onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => Array<any>,
+  style: Object,
 };
 
-class ThemableItemRow extends React.Component<Props, *> {
-  _renderItemMenu(item) {
-    return (
-      <IconMenu
-        ref={iconMenu => (this._iconMenu = iconMenu)}
-        iconButtonElement={
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={this.props.buildMenuTemplate}
-      />
-    );
-  }
+class ItemRow extends React.Component<Props, *> {
+  textField: ?TextField;
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
         if (this.textField) this.textField.focus();
@@ -54,83 +41,80 @@ class ThemableItemRow extends React.Component<Props, *> {
     }
   }
 
-  _onContextMenu = event => {
-    if (this._iconMenu) this._iconMenu.open(event);
-  };
-
   render() {
-    const {
-      item,
-      selected,
-      style,
-      getThumbnail,
-      errorStatus,
-      muiTheme,
-    } = this.props;
-
-    const itemName = item.getName();
-    const label = this.props.editingName ? (
-      <TextField
-        id="rename-item-field"
-        ref={textField => (this.textField = textField)}
-        defaultValue={itemName}
-        onBlur={e => this.props.onRename(e.target.value)}
-        onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
-            this.textField.blur();
-          }
-        }}
-        fullWidth
-        style={styles.textField}
-      />
-    ) : (
-      <div
-        style={{
-          ...styles.itemName,
-          color: selected ? muiTheme.listItem.selectedTextColor : undefined,
-        }}
-      >
-        {itemName}
-      </div>
-    );
-
-    const itemStyle = {
-      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-      backgroundColor: selected
-        ? errorStatus === ''
-          ? muiTheme.listItem.selectedBackgroundColor
-          : errorStatus === 'error'
-          ? muiTheme.listItem.selectedErrorBackgroundColor
-          : muiTheme.listItem.selectedWarningBackgroundColor
-        : undefined,
-      color:
-        errorStatus === ''
-          ? undefined
-          : errorStatus === 'error'
-          ? muiTheme.listItem.errorTextColor
-          : muiTheme.listItem.warningTextColor,
-    };
+    const { item, selected, style, getThumbnail, errorStatus } = this.props;
 
     return (
-      <ListItem
-        style={{ ...itemStyle, ...style }}
-        onContextMenu={this._onContextMenu}
-        primaryText={label}
-        leftIcon={
-          getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
-        }
-        rightIconButton={this._renderItemMenu(item)}
-        onClick={() => {
-          if (!this.props.onItemSelected) return;
-          if (this.props.editingName) return;
+      <ThemeConsumer>
+        {muiTheme => {
+          const itemName = item.getName();
+          const label = this.props.editingName ? (
+            <TextField
+              id="rename-item-field"
+              margin="none"
+              ref={textField => (this.textField = textField)}
+              defaultValue={itemName}
+              onBlur={e => this.props.onRename(e.currentTarget.value)}
+              onKeyPress={event => {
+                if (event.charCode === 13) {
+                  // enter key pressed
+                  if (this.textField) this.textField.blur();
+                }
+              }}
+              fullWidth
+              style={styles.textField}
+            />
+          ) : (
+            <div
+              style={{
+                ...styles.itemName,
+                color: selected
+                  ? muiTheme.listItem.selectedTextColor
+                  : undefined,
+              }}
+            >
+              {itemName}
+            </div>
+          );
 
-          this.props.onItemSelected(selected ? null : item);
+          const itemStyle = {
+            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+            backgroundColor: selected
+              ? errorStatus === ''
+                ? muiTheme.listItem.selectedBackgroundColor
+                : errorStatus === 'error'
+                ? muiTheme.listItem.selectedErrorBackgroundColor
+                : muiTheme.listItem.selectedWarningBackgroundColor
+              : undefined,
+            color:
+              errorStatus === ''
+                ? undefined
+                : errorStatus === 'error'
+                ? muiTheme.listItem.errorTextColor
+                : muiTheme.listItem.warningTextColor,
+          };
+
+          return (
+            <ListItem
+              style={{ ...itemStyle, ...style }}
+              primaryText={label}
+              leftIcon={
+                getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
+              }
+              displayMenuButton
+              buildMenuTemplate={this.props.buildMenuTemplate}
+              onClick={() => {
+                if (!this.props.onItemSelected) return;
+                if (this.props.editingName) return;
+
+                this.props.onItemSelected(selected ? null : item);
+              }}
+            />
+          );
         }}
-      />
+      </ThemeConsumer>
     );
   }
 }
 
-const ItemRow = muiThemeable()(ThemableItemRow);
 export default ItemRow;

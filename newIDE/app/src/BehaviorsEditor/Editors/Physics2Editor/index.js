@@ -1,11 +1,11 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { Line, Column } from '../../../UI/Grid';
-import Checkbox from 'material-ui/Checkbox';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Checkbox from '../../../UI/Checkbox';
+import SelectField from '../../../UI/SelectField';
+import SelectOption from '../../../UI/SelectOption';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
@@ -14,6 +14,7 @@ import BackgroundText from '../../../UI/BackgroundText';
 import ShapePreview from './ShapePreview.js';
 import PolygonEditor from './PolygonEditor.js';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
+import Text from '../../../UI/Text';
 
 type Props = BehaviorEditorProps;
 
@@ -34,7 +35,6 @@ function NumericProperty(props: {|
       value={properties.get(propertyName).getValue()}
       key={propertyName}
       floatingLabelText={properties.get(propertyName).getLabel()}
-      floatingLabelFixed
       step={step}
       onChange={onUpdate}
       type="number"
@@ -104,9 +104,8 @@ export default class Physics2Editor extends React.Component<Props, State> {
           <SelectField
             key={'bodyType'}
             floatingLabelText={properties.get('bodyType').getLabel()}
-            floatingLabelFixed
             value={properties.get('bodyType').getValue()}
-            onChange={(e, index, newValue) => {
+            onChange={(e, i, newValue: string) => {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'bodyType',
@@ -117,20 +116,20 @@ export default class Physics2Editor extends React.Component<Props, State> {
             }}
           >
             {[
-              <MenuItem
+              <SelectOption
                 key={'dynamic'}
                 value={'Dynamic'}
-                primaryText={<Trans>Dynamic</Trans>}
+                primaryText={t`Dynamic`}
               />,
-              <MenuItem
+              <SelectOption
                 key={'static'}
                 value={'Static'}
-                primaryText={<Trans>Static</Trans>}
+                primaryText={t`Static`}
               />,
-              <MenuItem
+              <SelectOption
                 key={'kinematic'}
                 value={'Kinematic'}
-                primaryText={<Trans>Kinematic</Trans>}
+                primaryText={t`Kinematic`}
               />,
             ]}
           </SelectField>
@@ -185,9 +184,8 @@ export default class Physics2Editor extends React.Component<Props, State> {
         <Line>
           <SelectField
             floatingLabelText={properties.get('shape').getLabel()}
-            floatingLabelFixed
             value={properties.get('shape').getValue()}
-            onChange={(e, index, newValue) => {
+            onChange={(e, i, newValue: string) => {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'shape',
@@ -197,25 +195,17 @@ export default class Physics2Editor extends React.Component<Props, State> {
               this.forceUpdate();
             }}
           >
-            <MenuItem
-              key={'box'}
-              value={'Box'}
-              primaryText={<Trans>Box</Trans>}
-            />
-            <MenuItem
+            <SelectOption key={'box'} value={'Box'} primaryText={t`Box`} />
+            <SelectOption
               key={'circle'}
               value={'Circle'}
-              primaryText={<Trans>Circle</Trans>}
+              primaryText={t`Circle`}
             />
-            <MenuItem
-              key={'edge'}
-              value={'Edge'}
-              primaryText={<Trans>Edge</Trans>}
-            />
-            <MenuItem
+            <SelectOption key={'edge'} value={'Edge'} primaryText={t`Edge`} />
+            <SelectOption
               key={'polygon'}
               value={'Polygon'}
-              primaryText={<Trans>Polygon</Trans>}
+              primaryText={t`Polygon`}
             />
           </SelectField>
         </Line>
@@ -233,7 +223,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
                   ? 'Length'
                   : 'Width'
               }
-              floatingLabelFixed
               min={0}
               onChange={newValue => {
                 behavior.updateProperty(
@@ -254,7 +243,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 .getValue()}
               key={'shapeDimensionB'}
               floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
-              floatingLabelFixed
               min={shape === 'Edge' ? undefined : 0}
               onChange={newValue => {
                 behavior.updateProperty(
@@ -271,9 +259,8 @@ export default class Physics2Editor extends React.Component<Props, State> {
           {shape === 'Polygon' && (
             <SelectField
               floatingLabelText={properties.get('polygonOrigin').getLabel()}
-              floatingLabelFixed
               value={properties.get('polygonOrigin').getValue()}
-              onChange={(e, index, newValue) => {
+              onChange={(e, i, newValue: string) => {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   'polygonOrigin',
@@ -284,20 +271,20 @@ export default class Physics2Editor extends React.Component<Props, State> {
               }}
             >
               {[
-                <MenuItem
+                <SelectOption
                   key={'center'}
                   value={'Center'}
-                  primaryText={<Trans>Center</Trans>}
+                  primaryText={t`Center`}
                 />,
-                <MenuItem
+                <SelectOption
                   key={'origin'}
                   value={'Origin'}
-                  primaryText={<Trans>Origin</Trans>}
+                  primaryText={t`Origin`}
                 />,
-                <MenuItem
+                <SelectOption
                   key={'topLeft'}
                   value={'TopLeft'}
-                  primaryText={<Trans>Top-Left</Trans>}
+                  primaryText={t`Top-Left`}
                 />,
               ]}
             </SelectField>
@@ -382,20 +369,22 @@ export default class Physics2Editor extends React.Component<Props, State> {
           </div>
         </Line>
         <Line alignItems="center">
-          <ResourceSelector
-            project={this.props.project}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
-            resourcesLoader={this.resourcesLoader}
-            resourceKind={'image'}
-            initialResourceName={''}
-            fullWidth={false}
-            onChange={resourceName => {
-              this.setState({ image: resourceName });
-              this.forceUpdate();
-            }}
-          />
+          <Column noMargin>
+            <ResourceSelector
+              project={this.props.project}
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this.props.onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              resourcesLoader={this.resourcesLoader}
+              resourceKind={'image'}
+              initialResourceName={''}
+              fullWidth
+              onChange={resourceName => {
+                this.setState({ image: resourceName });
+                this.forceUpdate();
+              }}
+            />
+          </Column>
           <BackgroundText>
             An temporary image to help you visualize the shape/polygon
           </BackgroundText>
@@ -563,9 +552,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
           </Column>
         </Line>
         <Line>
-          <label style={{ width: '10%' }}>
-            {properties.get('layers').getLabel()}
-          </label>
+          <Text>{properties.get('layers').getLabel()}</Text>
           {bits.map((value, index) => {
             return (
               <BitProperty
@@ -593,9 +580,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
           })}
         </Line>
         <Line>
-          <label style={{ width: '10%' }}>
-            {properties.get('masks').getLabel()}
-          </label>
+          <Text>{properties.get('masks').getLabel()}</Text>
           {bits.map((value, index) => {
             return (
               <BitProperty

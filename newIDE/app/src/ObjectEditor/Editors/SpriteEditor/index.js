@@ -1,21 +1,21 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import { GridList, GridTile } from 'material-ui/GridList';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
-import Add from 'material-ui/svg-icons/content/add';
-import Delete from 'material-ui/svg-icons/action/delete';
-import IconButton from 'material-ui/IconButton';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import Add from '@material-ui/icons/Add';
+import Delete from '@material-ui/icons/Delete';
+import IconButton from '../../../UI/IconButton';
+import FlatButton from '../../../UI/FlatButton';
+import RaisedButton from '../../../UI/RaisedButton';
 import { mapFor } from '../../../Utils/MapFor';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
 import EmptyMessage from '../../../UI/EmptyMessage';
-import MiniToolbar from '../../../UI/MiniToolbar';
+import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
 import ContextMenu from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
@@ -32,6 +32,7 @@ import {
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { Column, Line } from '../../../UI/Grid';
 
 const gd = global.gd;
 
@@ -45,31 +46,29 @@ const styles = {
   animationTools: {
     flexShrink: 0,
   },
-  lastLine: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   addAnimation: {
     display: 'flex',
   },
-  addAnimationText: {
-    justifyContent: 'flex-end',
+  buttonRightMargin: {
+    marginRight: 4,
   },
 };
 
 const AddAnimationLine = ({ onAdd, extraTools }) => (
-  <div style={styles.lastLine}>
-    {extraTools}
-    <div style={styles.addAnimation}>
-      <EmptyMessage style={styles.addAnimationText}>
-        Click to add an animation:
-      </EmptyMessage>
-      <IconButton onClick={onAdd}>
-        <Add />
-      </IconButton>
-    </div>
-  </div>
+  <Column>
+    <Line justifyContent="space-between" expand>
+      {extraTools}
+      <div style={styles.addAnimation}>
+        <RaisedButton
+          label={<Trans>Add an animation</Trans>}
+          primary
+          onClick={onAdd}
+          labelPosition="before"
+          icon={<Add />}
+        />
+      </div>
+    </Line>
+  </Column>
 );
 
 type AnimationProps = {|
@@ -115,23 +114,23 @@ class Animation extends React.Component<AnimationProps, void> {
 
     const animationName = animation.getName();
     return (
-      <GridTile>
+      <div>
         <MiniToolbar smallest>
           <DragHandle />
-          <span style={styles.animationTitle}>
-            Animation #{id}{' '}
+          <MiniToolbarText>Animation #{id} </MiniToolbarText>
+          <Column expand margin>
             <SemiControlledTextField
               commitOnBlur
+              margin="none"
               value={animation.getName()}
-              hintText={<Trans>Optional animation name</Trans>}
+              hintText={t`Optional animation name`}
               onChange={text => onChangeName(text)}
+              fullWidth
             />
-          </span>
-          <span style={styles.animationTools}>
-            <IconButton onClick={onRemove}>
-              <Delete />
-            </IconButton>
-          </span>
+          </Column>
+          <IconButton onClick={onRemove}>
+            <Delete />
+          </IconButton>
         </MiniToolbar>
         {mapFor(0, animation.getDirectionsCount(), i => {
           const direction = animation.getDirection(i);
@@ -156,7 +155,7 @@ class Animation extends React.Component<AnimationProps, void> {
             />
           );
         })}
-      </GridTile>
+      </div>
     );
   }
 }
@@ -182,7 +181,7 @@ const SortableAnimationsList = SortableContainer(
     onReplaceDirection,
   }) => {
     return (
-      <GridList style={styles.gridList} cellHeight="auto" cols={1}>
+      <div style={styles.gridList}>
         {[
           ...mapFor(0, spriteObject.getAnimationsCount(), i => {
             const animation = spriteObject.getAnimation(i);
@@ -217,7 +216,7 @@ const SortableAnimationsList = SortableContainer(
             extraTools={extraBottomTools}
           />,
         ]}
-      </GridList>
+      </div>
     );
   }
 );
@@ -343,6 +342,14 @@ class AnimationsListContainer extends React.Component<
   render() {
     return (
       <div>
+        {this.props.spriteObject.getAnimationsCount() === 0 && (
+          <EmptyMessage>
+            <Trans>
+              This object has no animations containing images. Start by adding
+              an animation.
+            </Trans>
+          </EmptyMessage>
+        )}
         <SortableAnimationsList
           spriteObject={this.props.spriteObject}
           objectName={this.props.objectName}
@@ -446,6 +453,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
+                style={styles.buttonRightMargin}
               />
               <RaisedButton
                 label={<Trans>Edit points</Trans>}
@@ -471,7 +479,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 key="help"
               />,
             ]}
-            autoScrollBodyContent
             noMargin
             modal
             onRequestClose={() => this.openPointsEditor(false)}
@@ -503,7 +510,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 key="help"
               />,
             ]}
-            autoScrollBodyContent
             noMargin
             modal
             onRequestClose={() => this.openCollisionMasksEditor(false)}

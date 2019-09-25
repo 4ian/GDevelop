@@ -1,9 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 import {
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
@@ -45,17 +46,16 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
     return (
       <SelectField
         floatingLabelText={floatingLabelText || <Trans>Object type</Trans>}
-        floatingLabelFixed
         value={value}
-        onChange={(e, i, value) => {
+        onChange={(e, i, value: string) => {
           onChange(value);
         }}
         disabled={disabled}
         fullWidth
       >
-        <MenuItem
+        <SelectOption
           value=""
-          primaryText={<Trans>Any object</Trans>}
+          primaryText={t`Any object`}
           disabled={isDisabled('')}
         />
         {objectMetadata.map((metadata: EnumeratedObjectMetadata) => {
@@ -65,7 +65,7 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
           }
 
           return (
-            <MenuItem
+            <SelectOption
               key={metadata.name}
               value={metadata.name}
               primaryText={metadata.fullName}

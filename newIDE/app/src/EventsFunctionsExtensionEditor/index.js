@@ -22,9 +22,9 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import { isBehaviorLifecycleFunction } from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
-import Divider from 'material-ui/Divider';
+import Divider from '@material-ui/core/Divider';
 const gd = global.gd;
 
 type Props = {|
@@ -400,10 +400,23 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         };
       },
       () => {
-        // If we're closing the properties of a behavior, notify parent
-        // that a behavior was edited (to trigger reload of extensions)
-        if (!editedEventsBasedBehavior && this.props.onBehaviorEdited)
-          this.props.onBehaviorEdited();
+        if (!editedEventsBasedBehavior) {
+          // If we're closing the properties of a behavior, notify parent
+          // that a behavior was edited (to trigger reload of extensions)
+          if (this.props.onBehaviorEdited) {
+            this.props.onBehaviorEdited();
+          }
+
+          // Reload the selected events function, if any, as the behavior was
+          // changed so objects containers need to be re-created. Notably, the
+          // type of the object that is handled by the behavior may have changed.
+          if (this.state.selectedEventsFunction) {
+            this._loadEventsFunctionFrom(
+              this.props.project,
+              this.state.selectedEventsFunction
+            );
+          }
+        }
       }
     );
   };
@@ -429,14 +442,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   <MosaicWindow
                     title={<Trans>Function Configuration</Trans>}
                     toolbarControls={[]}
-                    // /!\ Force re-rendering if selectedEventsFunction, globalObjectsContainer
-                    // or objectsContainer change,
-                    // otherwise we risk using deleted objects (because of the shouldComponentUpdate
-                    // optimization in MosaicWindow).
-                    selectedEventsFunction={selectedEventsFunction}
-                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
-                    globalObjectsContainer={this._globalObjectsContainer}
-                    objectsContainer={this._objectsContainer}
                   >
                     <Background>
                       {selectedEventsFunction &&

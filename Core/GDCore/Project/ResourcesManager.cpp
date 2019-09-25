@@ -4,12 +4,12 @@
  * reserved. This project is released under the MIT License.
  */
 
+#include "GDCore/Project/ResourcesManager.h"
 #include <iostream>
 #include <map>
 #include "GDCore/CommonTools.h"
-#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
@@ -553,13 +553,35 @@ void JsonResource::SetFile(const gd::String& newFile) {
 void JsonResource::UnserializeFrom(const SerializerElement& element) {
   SetUserAdded(element.GetBoolAttribute("userAdded"));
   SetFile(element.GetStringAttribute("file"));
+  DisablePreload(element.GetBoolAttribute("disablePreload", false));
 }
 
 #if defined(GD_IDE_ONLY)
 void JsonResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
+  element.SetAttribute("disablePreload", IsPreloadDisabled());
 }
+
+std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties(
+    gd::Project& project) const {
+  std::map<gd::String, gd::PropertyDescriptor> properties;
+  properties["disablePreload"]
+      .SetValue(disablePreload ? "true" : "false")
+      .SetType("Boolean")
+      .SetLabel(_("Disable preloading at game startup"));
+
+  return properties;
+}
+
+bool JsonResource::UpdateProperty(const gd::String& name,
+                                  const gd::String& value,
+                                  gd::Project& project) {
+  if (name == "disablePreload") disablePreload = value == "1";
+
+  return true;
+}
+
 #endif
 
 #if defined(GD_IDE_ONLY)

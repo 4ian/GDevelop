@@ -274,7 +274,7 @@ bool RuntimeTextObject::ChangeProperty(std::size_t propertyNb,
   } else if (propertyNb == 1) {
     ChangeFont(newValue);
   } else if (propertyNb == 2) {
-    SetCharacterSize(newValue.To<int>());
+    SetCharacterSize(std::max(1, newValue.To<int>()));
   } else if (propertyNb == 3) {
     gd::String r, gb, g, b;
     {
@@ -297,7 +297,7 @@ bool RuntimeTextObject::ChangeProperty(std::size_t propertyNb,
 
     SetColor(r.To<int>(), g.To<int>(), b.To<int>());
   } else if (propertyNb == 4) {
-    SetOpacity(newValue.To<float>());
+    SetOpacity(std::min(std::max(0.0f, newValue.To<float>()), 255.0f));
   } else if (propertyNb == 5) {
     SetSmooth(!(newValue == _("No")));
   }

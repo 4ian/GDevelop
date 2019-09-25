@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { Column, Line } from '../../UI/Grid';
 

@@ -51,6 +51,7 @@ export default class ExternalEventsField extends React.Component<
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        fullWidth
         id="external-events-field"
         value={value}
         onChange={onChange}

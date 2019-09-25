@@ -17,6 +17,12 @@ type Props = {|
   scope: EventsScope,
 |};
 
+const style = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+};
+
 export default class InstructionSelector extends Component<Props, {||}> {
   instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
     enumerateInstructions(this.props.isCondition),
@@ -30,6 +36,7 @@ export default class InstructionSelector extends Component<Props, {||}> {
     const { isCondition, scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector
+        style={style}
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
         iconSize={24}

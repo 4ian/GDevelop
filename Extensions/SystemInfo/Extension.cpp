@@ -28,6 +28,20 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
 
       .SetFunctionName("SystemInfo::IsMobile")
       .SetIncludeFile("SystemInfo/SystemInfoTools.h");
+
+  extension
+      .AddCondition(
+          "IsWebGLSupported",
+          _("Is WebGL supported"),
+          _("Check if GPU accelerated WebGL is supported on the target device."),
+          _("WebGL is available"),
+          _("System information"),
+          "CppPlatform/Extensions/systeminfoicon24.png",
+          "CppPlatform/Extensions/systeminfoicon16.png")
+
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetFunctionName("SystemInfo::IsWebGLSupported")
+      .SetIncludeFile("SystemInfo/SystemInfoTools.h");
 #endif
 }
 

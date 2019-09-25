@@ -1,8 +1,8 @@
 import * as React from 'react';
 import BrowserExport from './BrowserExport';
-import PhoneIphone from 'material-ui/svg-icons/hardware/phone-iphone';
-import LaptopMac from 'material-ui/svg-icons/hardware/laptop-mac';
-import Folder from 'material-ui/svg-icons/file/folder';
+import PhoneIphone from '@material-ui/icons/PhoneIphone';
+import LaptopMac from '@material-ui/icons/LaptopMac';
+import Folder from '@material-ui/icons/Folder';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import Cordova from '../../UI/CustomSvgIcons/Cordova';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';

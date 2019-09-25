@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { type Tags, removeTag } from '../Utils/TagsHelper';
-import Chip from 'material-ui/Chip';
+import Chip from '@material-ui/core/Chip';
 
 const styles = {
   chipContainer: {
@@ -28,11 +28,11 @@ export default ({ tags, onChange }: Props) => {
       {tags.map(tag => (
         <Chip
           key={tag}
+          size="small"
           style={styles.chip}
-          onRequestDelete={() => onChange(removeTag(tags, tag))}
-        >
-          {tag}
-        </Chip>
+          onDelete={() => onChange(removeTag(tags, tag))}
+          label={tag}
+        />
       ))}
     </div>
   );

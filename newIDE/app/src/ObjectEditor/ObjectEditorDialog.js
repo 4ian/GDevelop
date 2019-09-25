@@ -1,22 +1,18 @@
 // @flow weak
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 
 import { Column, Line } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-
-const styles = {
-  titleContainer: {
-    padding: 0,
-  },
-};
+import Text from '../UI/Text';
 
 type StateType = {|
   currentTab: string,
@@ -65,11 +61,11 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         key={this.props.object && this.props.object.ptr}
         secondaryActions={<HelpButton helpPagePath={this.props.helpPagePath} />}
         actions={actions}
-        autoScrollBodyContent
         noMargin
         modal
         onRequestClose={this.props.onCancel}
         open={this.props.open}
+        noTitleMargin
         title={
           <div>
             <Tabs value={currentTab} onChange={this._onChangeTab}>
@@ -86,16 +82,18 @@ export class ObjectEditorDialog extends Component<*, StateType> {
             </Tabs>
           </div>
         }
-        titleStyle={styles.titleContainer}
       >
         <Line alignItems="baseline">
-          <Column>Object Name:</Column>
+          <Column>
+            <Text noShrink>Object Name:</Text>
+          </Column>
           <Column expand>
             <SemiControlledTextField
               fullWidth
               commitOnBlur
+              margin="none"
               value={this.state.newObjectName}
-              hintText={<Trans>Object Name</Trans>}
+              hintText={t`Object Name`}
               onChange={text => {
                 if (this.props.canRenameObject(text)) {
                   this.setState({ newObjectName: text });

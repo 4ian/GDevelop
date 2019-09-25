@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import Dialog from '../UI/Dialog';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
@@ -13,11 +13,13 @@ export class ObjectGroupEditorDialog extends Component {
 
     const actions = [
       <FlatButton
+        key="cancel"
         label={<Trans>Cancel</Trans>}
         keyboardFocused
         onClick={this.props.onCancel}
       />,
       <FlatButton
+        key="apply"
         label={<Trans>Apply</Trans>}
         primary
         keyboardFocused
@@ -29,7 +31,6 @@ export class ObjectGroupEditorDialog extends Component {
       <Dialog
         key={group.ptr}
         actions={actions}
-        autoScrollBodyContent
         noMargin
         modal
         onRequestClose={this.props.onCancel}

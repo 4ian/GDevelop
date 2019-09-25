@@ -3,8 +3,8 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -18,6 +18,7 @@ import {
 } from '../../ProjectManager/ProjectErrorsChecker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
+import Text from '../../UI/Text';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -109,14 +110,14 @@ class LocalElectronExport extends Component<Props, State> {
       <Column noMargin>
         <Line>
           <Column noMargin>
-            <p>
+            <Text>
               <Trans>
                 This will export your game so that you can package it for
                 Windows, macOS or Linux. You will need to install third-party
                 tools (Node.js, Electron Builder) to package your game by
                 yourself.
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line>
@@ -163,13 +164,13 @@ class LocalElectronExport extends Component<Props, State> {
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          <p>
+          <Text>
             <Trans>
               The game was properly exported. You can now use Electron Builder
               (you need Node.js installed and to use the command-line to run it)
               to create an executable.
             </Trans>
-          </p>
+          </Text>
         </Dialog>
       </Column>
     );

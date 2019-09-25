@@ -1,10 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Checkbox from '../../UI/Checkbox';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import { Line, Column } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -34,25 +35,26 @@ export default class ParticleEmitterEditor extends React.Component<
               fullWidth
               floatingLabelText={<Trans>Particles kind</Trans>}
               value={particleEmitterObject.getRendererType()}
-              onChange={(e, i, value) => {
-                particleEmitterObject.setRendererType(value);
-                if (value !== gd.ParticleEmitterObject.Quad) {
+              onChange={(e, i, value: string) => {
+                const rendererType = parseInt(value, 10) || 0;
+                particleEmitterObject.setRendererType(rendererType);
+                if (rendererType !== gd.ParticleEmitterObject.Quad) {
                   particleEmitterObject.setParticleTexture('');
                 }
                 this.forceUpdate();
               }}
             >
-              <MenuItem
+              <SelectOption
                 value={gd.ParticleEmitterObject.Point}
-                primaryText={<Trans>Point</Trans>}
+                primaryText={t`Point`}
               />
-              <MenuItem
+              <SelectOption
                 value={gd.ParticleEmitterObject.Line}
-                primaryText={<Trans>Line</Trans>}
+                primaryText={t`Line`}
               />
-              <MenuItem
+              <SelectOption
                 value={gd.ParticleEmitterObject.Quad}
-                primaryText={<Trans>Textured</Trans>}
+                primaryText={t`Textured`}
               />
             </SelectField>
           </Column>

@@ -24,6 +24,7 @@ import customMousePointer from '../fixtures/custom-mouse-pointer/custom-mouse-po
 import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
 import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
 import deviceVibration from '../fixtures/device-vibration/device-vibration.json';
+import dialogueTreeWithYarn from '../fixtures/dialogue-tree-with-yarn/dialogue-tree-with-yarn.json';
 import downhillBikePhysicsDemo from '../fixtures/downhill-bike-physics-demo/downhill-bike-physics-demo.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
@@ -158,6 +159,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(deviceOrientationCompass);
     } else if (url === 'example://device-vibration') {
       return Promise.resolve(deviceVibration);
+    } else if (url === 'example://dialogue-tree-with-yarn') {
+      return Promise.resolve(dialogueTreeWithYarn);
     } else if (url === 'example://downhill-bike-physics-demo') {
       return Promise.resolve(downhillBikePhysicsDemo);
     } else if (url === 'example://create-object-with-mouseclick') {

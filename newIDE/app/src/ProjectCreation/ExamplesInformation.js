@@ -935,6 +935,79 @@ module.exports = {
       }
     ]
   },
+  "dialogue-tree-with-yarn": {
+    "description": "A platformer showing a simple interactive story with dialogues like in RPG games, using the Yarn dialogue tree extension.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Panel Sprite (9-patch) Object",
+        "name": "PanelSpriteObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Anchor",
+        "name": "AnchorBehavior"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Dialogue Tree (Experimental)",
+        "name": "DialogueTree"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "downhill-bike-physics-demo": {
     "description": "A fun demo, using the Physics Engine to build an advanced simulation of a bike, with a person pedaling on it. Try to cross the finish line without falling and as fast as possible!",
     "usedExtensions": [
@@ -3702,83 +3775,6 @@ module.exports = {
       {
         "fullName": "Window features",
         "name": "BuiltinWindow"
-      }
-    ]
-  },
-  "yarn-dialogue": {
-    "description": "An example of a basic platformer story RPG game example using the yarn dialogue tree extension - made with GDevelop.\n",
-    "usedExtensions": [
-      {
-        "fullName": "Sprite",
-        "name": "Sprite"
-      },
-      {
-        "fullName": "Tiled Sprite Object",
-        "name": "TiledSpriteObject"
-      },
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Panel Sprite (9-patch) Object",
-        "name": "PanelSpriteObject"
-      },
-      {
-        "fullName": "Platform Behavior",
-        "name": "PlatformBehavior"
-      },
-      {
-        "fullName": "",
-        "name": ""
-      },
-      {
-        "fullName": "Anchor",
-        "name": "AnchorBehavior"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Dialogue Tree (Experimental)",
-        "name": "DialogueTree"
-      },
-      {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
-        "fullName": "System information",
-        "name": "SystemInfo"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Time",
-        "name": "BuiltinTime"
-      },
-      {
-        "fullName": "Cameras and layers features",
-        "name": "BuiltinCamera"
-      },
-      {
-        "fullName": "Audio",
-        "name": "BuiltinAudio"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
       }
     ]
   },

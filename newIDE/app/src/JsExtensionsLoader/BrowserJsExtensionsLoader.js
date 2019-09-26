@@ -46,6 +46,10 @@ const jsExtensions = [
     name: 'FileSystem',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FileSystem/JsExtension.js'),
   },
+  {
+    name: 'DialogueTree',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

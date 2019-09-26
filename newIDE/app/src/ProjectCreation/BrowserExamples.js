@@ -37,6 +37,7 @@ const exampleNames = [
   'device-orientation-ballgame',
   'device-orientation-compass',
   'device-vibration',
+  'dialogue-tree-with-yarn',
   'downhill-bike-physics-demo',
   'drag-camera-with-mouse',
   'drop-collect-items-from-storage',

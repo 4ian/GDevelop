@@ -133,6 +133,14 @@ class Instruction extends React.Component<Props, *> {
               onClick={domEvent =>
                 this.props.onParameterClick(domEvent, parameterIndex)
               }
+              onKeyPress={event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  this.props.onParameterClick(event, parameterIndex);
+                  event.stopPropagation();
+                  event.preventDefault();
+                }
+              }}
+              tabIndex={0}
             >
               {ParameterRenderingService.renderInlineParameter({
                 value: formattedTexts.getString(i),
@@ -188,6 +196,18 @@ class Instruction extends React.Component<Props, *> {
             e.stopPropagation();
             this.props.onContextMenu(e.clientX, e.clientY);
           }}
+          onKeyPress={event => {
+            if (event.key === 'Enter') {
+              this.props.onDoubleClick();
+              event.stopPropagation();
+              event.preventDefault();
+            } else if (event.key === ' ') {
+              this.props.onClick();
+              event.stopPropagation();
+              event.preventDefault();
+            }
+          }}
+          tabIndex={0}
         >
           {instruction.isInverted() && (
             <img

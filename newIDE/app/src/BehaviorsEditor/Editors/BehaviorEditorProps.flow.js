@@ -1,3 +1,4 @@
+// @flow
 import {
   type ResourceSource,
   type ChooseResourceFunction,

@@ -96,6 +96,10 @@
     "includeGlob": [
       "src/**/*.js"
     ],
+    "excludeGlob": [
+      "node_modules/**",
+      "src/locales/**"
+    ],
     "type": [
       "text",
       "html",

@@ -21,8 +21,8 @@ addons:
   artifacts:
     s3_region: "us-east-1"
     target_paths:
-    - /$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)
-    - /$(git rev-parse --abbrev-ref HEAD)/latest
+    - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/commit/$(git rev-parse HEAD)
+    - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/latest
     paths:
     - Binaries/Output/libGD.js/Release
   apt:

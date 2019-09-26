@@ -265,7 +265,7 @@ export default class SpritesList extends Component<Props, void> {
         isLooping: direction.isLooping(),
         externalEditorData,
       },
-      onChangesSaved: (resources, newAnimationName, metadata) => {
+      onChangesSaved: resources => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
@@ -290,16 +290,16 @@ export default class SpritesList extends Component<Props, void> {
         });
 
         // set metadata if there is such on the direction
-        if (metadata) {
-          newDirection.setMetadata(JSON.stringify(metadata));
+        if (resources[0].metadata) {
+          newDirection.setMetadata(JSON.stringify(resources[0].metadata));
         }
 
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);
         // Set optional animation name if the user hasn't done so
-        if (animationName.length === 0) {
-          onChangeName(newAnimationName);
+        if (resources[0].newAnimationName) {
+          onChangeName(resources[0].newAnimationName);
         }
         newDirection.delete();
       },

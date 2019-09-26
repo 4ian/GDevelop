@@ -12,18 +12,18 @@ export type ExternalEditorOpenOptions = {|
   resourceNames: Array<string>,
   onChangesSaved: (
     Array<{
-      path?: string,
+      path?: ?string,
       name: string,
-      originalIndex: ?number,
+      originalIndex?: ?number,
       metadata?: ?Object,
-    }>,
-    newName: string,
-    metadata?: ?Object
+      newAnimationName?: string,
+    }>
   ) => void,
   extraOptions: {
     name?: string,
     isLooping?: boolean,
     fps?: number,
+    externalEditorData?: any,
   },
 |};
 

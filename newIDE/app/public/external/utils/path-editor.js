@@ -12,7 +12,6 @@ export const createPathEditorHeader = ({
   projectPath,
   initialResourcePath,
   extension,
-  headerStyle,
   name,
 }) => {
   if (fs.existsSync(initialResourcePath)) {
@@ -32,46 +31,52 @@ export const createPathEditorHeader = ({
         : path.basename(name, path.extname(name)),
       extension: !extension ? undefined : path.extname(initialResourcePath),
       projectBasePath: path.normalize(projectPath),
+      visible: true,
     },
   };
 
   const state = headerObject.state;
+  headerObject.root = editorContentDocument.createElement('span');
+  headerObject.root.className = 'leftSide';
+  parentElement.appendChild(headerObject.root);
+
+  headerObject.rightButtons = editorContentDocument.createElement('span');
+  parentElement.appendChild(headerObject.rightButtons);
+  headerObject.rightButtons.className = 'rightButtons';
+
   // create the dom elements of the ui
   headerObject.saveFolderLabel = editorContentDocument.createElement('label');
-  headerObject.saveFolderLabel.style = headerStyle.saveFolderLabel;
   headerObject.saveFolderLabel.textContent = state.folderPath;
-  parentElement.appendChild(headerObject.saveFolderLabel);
+  headerObject.root.appendChild(headerObject.saveFolderLabel);
 
   headerObject.nameInput = editorContentDocument.createElement('input');
   headerObject.nameInput.type = 'text';
-  headerObject.nameInput.style = headerStyle.nameInput;
   headerObject.nameInput.value = state.name;
-  parentElement.appendChild(headerObject.nameInput);
+  headerObject.root.appendChild(headerObject.nameInput);
 
   headerObject.fileExistsLabel = editorContentDocument.createElement('label');
-  headerObject.fileExistsLabel.style = headerStyle.fileExistsLabel;
   headerObject.fileExistsLabel.textContent = '-';
-  parentElement.appendChild(headerObject.fileExistsLabel);
+  headerObject.root.appendChild(headerObject.fileExistsLabel);
+
+  headerObject.hideButton = editorContentDocument.createElement('button');
+  headerObject.hideButton.textContent = headerObject.state.visible ? '>' : '<';
+  parentElement.appendChild(headerObject.hideButton);
 
   headerObject.saveButton = editorContentDocument.createElement('button');
   headerObject.saveButton.textContent = 'Save';
-  headerObject.saveButton.style = headerStyle.saveButton;
-  parentElement.appendChild(headerObject.saveButton);
+  headerObject.rightButtons.appendChild(headerObject.saveButton);
 
   headerObject.cancelButton = editorContentDocument.createElement('button');
   headerObject.cancelButton.textContent = 'Cancel';
-  headerObject.cancelButton.style = headerStyle.cancelButton;
-  parentElement.appendChild(headerObject.cancelButton);
+  headerObject.rightButtons.appendChild(headerObject.cancelButton);
 
   headerObject.openFolderButton = editorContentDocument.createElement('button');
   headerObject.openFolderButton.textContent = 'Locate';
-  headerObject.openFolderButton.style = headerStyle.cancelButton;
-  parentElement.appendChild(headerObject.openFolderButton);
+  headerObject.rightButtons.appendChild(headerObject.openFolderButton);
 
   headerObject.setFolderButton = editorContentDocument.createElement('button');
   headerObject.setFolderButton.textContent = 'Set Folder';
-  headerObject.setFolderButton.style = headerStyle.setFolderButton;
-  parentElement.appendChild(headerObject.setFolderButton);
+  headerObject.rightButtons.appendChild(headerObject.setFolderButton);
 
   // From here on we hook the dom with the imported or local methods via event listeners
   headerObject.nameInput.addEventListener('input', () => {
@@ -79,6 +84,17 @@ export const createPathEditorHeader = ({
   });
   headerObject.saveButton.addEventListener('click', () => {
     onSaveToGd(headerObject);
+  });
+  /**
+   * Toggles the path editor
+   */
+  headerObject.toggle = () => {
+    headerObject.state.visible = !headerObject.state.visible;
+    render(headerObject);
+  };
+  headerObject.hideButton.addEventListener('click', () => {
+    headerObject.toggle();
+    render(headerObject);
   });
   headerObject.cancelButton.addEventListener('click', onCancelChanges);
   const selectFolderPath = () => {
@@ -93,8 +109,8 @@ export const createPathEditorHeader = ({
   headerObject.openFolderButton.addEventListener('click', openFolderPath);
 
   /**
-  * Disables the path editor
-  */
+   * Disables the path editor
+   */
   headerObject.disableSavePathControls = () => {
     headerObject.saveFolderLabel.removeEventListener('click', selectFolderPath);
     headerObject.nameInput.style.color = '#8bb0b2';
@@ -108,9 +124,9 @@ export const createPathEditorHeader = ({
   };
 
   /**
-  * Returns a path for a file that does not exist yet.
-  * Used to avoid unwanted file overwriting.
-  */
+   * Returns a path for a file that does not exist yet.
+   * Used to avoid unwanted file overwriting.
+   */
   headerObject.makeFileNameUnique = (filePath, missingExtension) => {
     if (!fileExists(filePath)) {
       return filePath;
@@ -134,6 +150,21 @@ export const createPathEditorHeader = ({
 };
 
 const render = headerObject => {
+  const pathEditorVisibility = headerObject.state.visible
+    ? 'visibility:visible'
+    : 'visibility:hidden;';
+  headerObject.rightButtons.style = pathEditorVisibility;
+  headerObject.root.style = pathEditorVisibility;
+
+  headerObject.hideButton.textContent = headerObject.state.visible ? '>' : '<';
+  headerObject.hideButton.style = headerObject.state.visible
+    ? 'opacity: 1'
+    : 'opacity:0.5';
+
+  headerObject.root.parentElement.style = headerObject.state.visible
+    ? 'position: relative; display:flex; width:100%'
+    : 'position: absolute; display:flex; width:100%';
+
   headerObject.nameInput.value = headerObject.nameInput.value.replace(
     /[^a-zA-Z0-9_-]/g,
     ''
@@ -163,7 +194,7 @@ const render = headerObject => {
   }
 };
 
-const fileExists = path => {
+export const fileExists = path => {
   try {
     return fs.statSync(path).isFile();
   } catch (e) {

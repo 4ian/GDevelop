@@ -190,6 +190,27 @@ app.on('ready', function() {
     );
   });
 
+  // Yarn Dialogue Tree Editor
+  ipcMain.on('yarn-create-json', (event, externalEditorData) => {
+    loadModalWindow({
+      parentWindow: mainWindow,
+      devTools,
+      readyChannelName: 'yarn-ready',
+      indexSubPath: 'yarn/yarn-index.html',
+      relativeWidth: 0.8,
+      relativeHeight: 0.9,
+      backgroundColor: '#000000',
+      onReady: yarnWindow => {
+        yarnWindow.webContents.send('yarn-open', externalEditorData);
+        yarnWindow.show();
+      },
+    });
+  });
+
+  ipcMain.on('yarn-changes-saved', (event, newFilePath) => {
+    mainWindow.webContents.send('yarn-changes-saved', newFilePath);
+  });
+
   // S3Upload events:
   ipcMain.on('s3-folder-upload', (event, localDir) => {
     log.info('Received event s3-upload with localDir=', localDir);

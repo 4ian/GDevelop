@@ -28,6 +28,8 @@ const styles = {
   },
 };
 
+const getResourceName = (resource: gdResource) => resource.getName();
+
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
@@ -348,6 +350,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 fullList={filteredList}
                 width={width}
                 height={height}
+                getItemName={getResourceName}
                 selectedItem={selectedResource}
                 onItemSelected={onSelectResource}
                 renamedItem={this.state.renamedResource}

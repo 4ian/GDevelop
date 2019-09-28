@@ -26,18 +26,21 @@ const SortableAddItemRow = SortableElement(props => {
 
 export type Item = {
   key: string | number,
-  getName: () => string,
 };
 
 type ItemsListProps = {
   height: number,
   width: number,
   fullList: Array<Item>,
-  selectedItem: ?Item,
+  selectedItem: ?Item, // TODO
+  selectedItems: ?Array<Item>,
   onAddNewItem?: () => void,
   onRename: (Item, string) => void,
-  getThumbnail?: Item => string,
+  getItemName: Item => string,
+  getItemThumbnail?: Item => string,
+  isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
+  onEditItem?: Item => void,
   renamedItem: ?Item,
   addNewItemLabel: React.Node | string,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
@@ -45,10 +48,10 @@ type ItemsListProps = {
 };
 
 class ItemsList extends React.Component<ItemsListProps, *> {
-  list: any;
+  _list: ?List;
 
   forceUpdateGrid() {
-    if (this.list) this.list.forceUpdateGrid();
+    if (this._list) this._list.forceUpdateGrid();
   }
 
   render() {
@@ -57,54 +60,77 @@ class ItemsList extends React.Component<ItemsListProps, *> {
       width,
       fullList,
       selectedItem,
+      selectedItems,
       addNewItemLabel,
       renamedItem,
-      getThumbnail,
+      getItemThumbnail,
+      getItemName,
       erroredItems,
+      onAddNewItem,
+      isItemBold,
+      onEditItem,
     } = this.props;
 
     return (
       <List
-        ref={list => (this.list = list)}
+        ref={list => (this._list = list)}
         height={height}
-        rowCount={fullList.length}
+        rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
         rowHeight={
-          getThumbnail ? listItemWith32PxIconHeight : listItemWithoutIconHeight
+          getItemThumbnail
+            ? listItemWith32PxIconHeight
+            : listItemWithoutIconHeight
         }
-        rowRenderer={({ index, key, style }) => {
-          const item = fullList[index];
-          if (item.key === 'add-item-row') {
+        rowRenderer={({
+          index,
+          key,
+          style,
+        }: {|
+          index: number,
+          key: string,
+          style: Object,
+        |}) => {
+          if (index >= fullList.length) {
             return (
               <SortableAddItemRow
                 index={fullList.length}
                 key={key}
                 style={style}
                 disabled
-                onClick={this.props.onAddNewItem}
+                onClick={onAddNewItem}
                 primaryText={addNewItemLabel}
               />
             );
           }
 
+          const item = fullList[index];
           const nameBeingEdited = renamedItem === item;
+          const itemName = getItemName(item);
 
           return (
             <SortableItemRow
               index={index}
               key={key}
               item={item}
+              itemName={itemName}
+              isBold={isItemBold ? isItemBold(item) : false}
               style={style}
               onRename={newName => this.props.onRename(item, newName)}
               editingName={nameBeingEdited}
-              getThumbnail={getThumbnail ? () => getThumbnail(item) : undefined}
-              selected={item === selectedItem}
-              onItemSelected={this.props.onItemSelected}
-              errorStatus={
-                erroredItems ? erroredItems[item.getName()] || '' : ''
+              getThumbnail={
+                getItemThumbnail ? () => getItemThumbnail(item) : undefined
               }
+              selected={
+                selectedItems && selectedItems.indexOf(item) !== -1
+                  ? true
+                  : item === selectedItem
+              }
+              onItemSelected={this.props.onItemSelected}
+              errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
               buildMenuTemplate={() =>
                 this.props.buildMenuTemplate(item, index)
               }
+              onEdit={onEditItem}
             />
           );
         }}

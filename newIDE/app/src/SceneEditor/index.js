@@ -61,7 +61,11 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import TagsButton from '../UI/EditorMosaic/TagsButton';
 import CloseButton from '../UI/EditorMosaic/CloseButton';
-import { buildTagsMenuTemplate, getTagsFromString } from '../Utils/TagsHelper';
+import {
+  type SelectedTags,
+  buildTagsMenuTemplate,
+  getTagsFromString,
+} from '../Utils/TagsHelper';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -140,7 +144,7 @@ type State = {|
   showPropertiesInfoBar: boolean,
 
   // State for tags of objects:
-  selectedObjectTags: Array<string>,
+  selectedObjectTags: SelectedTags,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };

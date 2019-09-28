@@ -31,6 +31,10 @@ type State = {|
   searchText: string,
 |};
 
+const getEventsBasedBehaviorName = (
+  eventsBasedBehavior: gdEventsBasedBehavior
+) => eventsBasedBehavior.getName();
+
 type Props = {|
   project: gdProject,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
@@ -250,15 +254,10 @@ export default class EventsBasedBehaviorsList extends React.Component<
     } = this.props;
     const { searchText } = this.state;
 
-    const list = [
-      ...filterEventsBasedBehaviorsList(
-        enumerateEventsBasedBehaviors(eventsBasedBehaviorsList),
-        searchText
-      ),
-      {
-        key: 'add-item-row',
-      },
-    ];
+    const list = filterEventsBasedBehaviorsList(
+      enumerateEventsBasedBehaviors(eventsBasedBehaviorsList),
+      searchText
+    );
 
     // Force List component to be mounted again if project or eventsBasedBehaviorsList
     // has been changed. Avoid accessing to invalid objects that could
@@ -278,6 +277,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
                 height={height}
                 onAddNewItem={this._addNewEventsBasedBehavior}
                 addNewItemLabel={<Trans>Add a new behavior</Trans>}
+                getItemName={getEventsBasedBehaviorName}
                 selectedItem={selectedEventsBasedBehavior}
                 onItemSelected={onSelectEventsBasedBehavior}
                 renamedItem={this.state.renamedEventsBasedBehavior}

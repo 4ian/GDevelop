@@ -17,9 +17,13 @@ const styles = {
   },
 };
 
+const LEFT_MOUSE_BUTTON = 0;
+
 type Props = {
   index: number,
   item: Item,
+  itemName: string,
+  isBold: boolean,
   onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
@@ -27,10 +31,11 @@ type Props = {
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => Array<any>,
+  onEdit: Item => void,
   style: Object,
 };
 
-class ItemRow extends React.Component<Props, *> {
+class ItemRow extends React.Component<Props> {
   textField: ?TextField;
 
   componentDidUpdate(prevProps: Props) {
@@ -42,12 +47,19 @@ class ItemRow extends React.Component<Props, *> {
   }
 
   render() {
-    const { item, selected, style, getThumbnail, errorStatus } = this.props;
+    const {
+      item,
+      itemName,
+      isBold,
+      selected,
+      style,
+      getThumbnail,
+      errorStatus,
+    } = this.props;
 
     return (
       <ThemeConsumer>
         {muiTheme => {
-          const itemName = item.getName();
           const label = this.props.editingName ? (
             <TextField
               id="rename-item-field"
@@ -71,6 +83,8 @@ class ItemRow extends React.Component<Props, *> {
                 color: selected
                   ? muiTheme.listItem.selectedTextColor
                   : undefined,
+                fontStyle: isBold ? 'italic' : undefined,
+                fontWeight: isBold ? 'bold' : 'normal',
               }}
             >
               {itemName}
@@ -108,6 +122,14 @@ class ItemRow extends React.Component<Props, *> {
                 if (this.props.editingName) return;
 
                 this.props.onItemSelected(selected ? null : item);
+              }}
+              onDoubleClick={event => {
+                if (event.button !== LEFT_MOUSE_BUTTON) return;
+                if (!this.props.onEdit) return;
+                if (this.props.editingName) return;
+
+                this.props.onItemSelected(null);
+                this.props.onEdit(item);
               }}
             />
           );

@@ -771,6 +771,14 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                   selectedObjectTags={[]}
                   onChangeSelectedObjectTags={() => {}}
                   getAllObjectTags={() => []}
+                  canMoveObjects
+                  canRenameObject={() => true}
+                  onDeleteObject={(objectWithContext, cb) => cb(true)}
+                  onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+                  onStartDraggingObject={() => {}}
+                  onEndDraggingObject={() => {}}
+                  onObjectCreated={() => {}}
+                  onObjectSelected={() => {}}
                 />
               </TabContentContainer>
             }
@@ -2022,10 +2030,18 @@ storiesOf('ObjectsList', module)
           project={project}
           objectsContainer={testLayout}
           onEditObject={action('On edit object')}
+          onObjectCreated={action('On object created')}
           selectedObjectNames={[]}
           selectedObjectTags={[]}
           onChangeSelectedObjectTags={selectedObjectTags => {}}
           getAllObjectTags={() => []}
+          canMoveObjects
+          canRenameObject={() => true}
+          onDeleteObject={(objectWithContext, cb) => cb(true)}
+          onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+          onStartDraggingObject={() => {}}
+          onEndDraggingObject={() => {}}
+          onObjectSelected={() => {}}
         />
       </div>
     </SerializedObjectDisplay>
@@ -2038,6 +2054,7 @@ storiesOf('ObjectsList', module)
           project={project}
           objectsContainer={testLayout}
           onEditObject={action('On edit object')}
+          onObjectCreated={action('On object created')}
           selectedObjectNames={[]}
           selectedObjectTags={['Tag1', 'Tag2']}
           onChangeSelectedObjectTags={action('on change selected object tags')}
@@ -2047,6 +2064,13 @@ storiesOf('ObjectsList', module)
             'Looooooooooong Tag 3',
             'Unselected Tag 4',
           ]}
+          canMoveObjects
+          canRenameObject={() => true}
+          onDeleteObject={(objectWithContext, cb) => cb(true)}
+          onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+          onStartDraggingObject={() => {}}
+          onEndDraggingObject={() => {}}
+          onObjectSelected={() => {}}
         />
       </div>
     </SerializedObjectDisplay>

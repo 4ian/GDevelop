@@ -26,6 +26,9 @@ const styles = {
   },
 };
 
+const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
+  eventsFunction.getName();
+
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
   searchText: string,
@@ -243,15 +246,10 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     } = this.props;
     const { searchText } = this.state;
 
-    const list = [
-      ...filterEventFunctionsList(
-        enumerateEventsFunctions(eventsFunctionsContainer),
-        searchText
-      ),
-      {
-        key: 'add-item-row',
-      },
-    ];
+    const list = filterEventFunctionsList(
+      enumerateEventsFunctions(eventsFunctionsContainer),
+      searchText
+    );
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -272,6 +270,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                 height={height}
                 onAddNewItem={this._addNewEventsFunction}
                 addNewItemLabel={<Trans>Add a new function</Trans>}
+                getItemName={getEventsFunctionName}
                 selectedItem={selectedEventsFunction}
                 onItemSelected={onSelectEventsFunction}
                 renamedItem={this.state.renamedEventsFunction}

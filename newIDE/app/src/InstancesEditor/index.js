@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import SimpleDropTarget from '../Utils/DragDropHelpers/SimpleDropTarget';
+import SimpleDropTarget from '../UI/DragAndDrop/SimpleDropTarget';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';

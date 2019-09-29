@@ -34,8 +34,7 @@ const DragSourceAndDropTargetBox = ({ name }: {| name: string |}) => (
               margin: 20,
             }}
           >
-            This is a box called {name}.
-            {isOver && <div>Hovered</div>}
+            This is a box called {name}.{isOver && <div>Hovered</div>}
             {canDrop && <div>Can drop here</div>}
           </div>
         )

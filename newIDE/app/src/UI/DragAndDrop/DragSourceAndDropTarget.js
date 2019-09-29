@@ -40,9 +40,9 @@ type InnerDragSourceAndDropTargetProps<DraggedItemType> = {|
 |};
 
 export const makeDragSourceAndDropTarget = <DraggedItemType>(
-  reactDndInstructionType: string
+  reactDndType: string
 ): ((Props<DraggedItemType>) => React.Node) => {
-  const instructionSource = {
+  const sourceSpec = {
     beginDrag(props: InnerDragSourceAndDropTargetProps<DraggedItemType>) {
       return props.beginDrag();
     },
@@ -57,7 +57,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     };
   }
 
-  const instructionTarget = {
+  const targetSpec = {
     canDrop(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       const item = monitor.getItem();
       return item && props.canDrop(item);
@@ -67,7 +67,6 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         return; // Drop already handled by another target
       }
       props.drop();
-      // props.onMoveToInstruction();
     },
   };
 
@@ -83,11 +82,11 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
   }
 
   const InnerDragSourceAndDropTarget = DragSource(
-    reactDndInstructionType,
-    instructionSource,
+    reactDndType,
+    sourceSpec,
     sourceCollect
   )(
-    DropTarget(reactDndInstructionType, instructionTarget, targetCollect)(
+    DropTarget(reactDndType, targetSpec, targetCollect)(
       ({ children, connectDragSource, connectDropTarget, isOver, canDrop }) => {
         return children({
           connectDragSource,

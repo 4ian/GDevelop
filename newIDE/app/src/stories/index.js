@@ -723,83 +723,93 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
     <ValueStateHolder
       initialValue={0}
       render={(value, onChange) => (
-        <FixedHeightFlexContainer height={400}>
-          <Column expand>
-            <ClosableTabs>
-              <ClosableTab
-                onActivated={action('Tab 1 activated')}
-                closable
-                active={value === 0}
-                label="Tab 1"
-                onClick={() => onChange(0)}
-                onClose={action('Close tab 1')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-              <ClosableTab
-                onActivated={action('Tab 2 activated')}
-                closable
-                active={value === 1}
-                label="Tab 2"
-                onClick={() => onChange(1)}
-                onClose={action('Close tab 2')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-              <ClosableTab
-                onActivated={action('Tab 3 activated')}
-                closable
-                active={value === 2}
-                label="Tab 3"
-                onClick={() => onChange(2)}
-                onClose={action('Close tab 3')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-            </ClosableTabs>
-            {
-              <TabContentContainer active={value === 0}>
-                <div
-                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
-                >
-                  The second tab has a list of objects. Check that the scrolling
-                  position is maintained while navigating between tabs.
-                </div>
-              </TabContentContainer>
-            }
-            {
-              <TabContentContainer active={value === 1}>
-                <ObjectsList
-                  getThumbnail={() => 'res/unknown32.png'}
-                  project={project}
-                  objectsContainer={testLayout}
-                  onEditObject={action('On edit object')}
-                  selectedObjectNames={[]}
-                  selectedObjectTags={[]}
-                  onChangeSelectedObjectTags={() => {}}
-                  getAllObjectTags={() => []}
-                  canMoveObjects
-                  canRenameObject={() => true}
-                  onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameObject={(objectWithContext, newName, cb) => cb(true)}
-                  onStartDraggingObject={() => {}}
-                  onEndDraggingObject={() => {}}
-                  onObjectCreated={() => {}}
-                  onObjectSelected={() => {}}
+        <DragAndDropContextProvider>
+          <FixedHeightFlexContainer height={400}>
+            <Column expand>
+              <ClosableTabs>
+                <ClosableTab
+                  onActivated={action('Tab 1 activated')}
+                  closable
+                  active={value === 0}
+                  label="Tab 1"
+                  onClick={() => onChange(0)}
+                  onClose={action('Close tab 1')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
                 />
-              </TabContentContainer>
-            }
-            {
-              <TabContentContainer active={value === 2}>
-                <div
-                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
-                >
-                  Tab 3 content
-                </div>
-              </TabContentContainer>
-            }
-          </Column>
-        </FixedHeightFlexContainer>
+                <ClosableTab
+                  onActivated={action('Tab 2 activated')}
+                  closable
+                  active={value === 1}
+                  label="Tab 2"
+                  onClick={() => onChange(1)}
+                  onClose={action('Close tab 2')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                />
+                <ClosableTab
+                  onActivated={action('Tab 3 activated')}
+                  closable
+                  active={value === 2}
+                  label="Tab 3"
+                  onClick={() => onChange(2)}
+                  onClose={action('Close tab 3')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                />
+              </ClosableTabs>
+              {
+                <TabContentContainer active={value === 0}>
+                  <div
+                    style={{
+                      backgroundColor: 'green',
+                      height: '100%',
+                      flex: 1,
+                    }}
+                  >
+                    The second tab has a list of objects. Check that the
+                    scrolling position is maintained while navigating between
+                    tabs.
+                  </div>
+                </TabContentContainer>
+              }
+              {
+                <TabContentContainer active={value === 1}>
+                  <ObjectsList
+                    getThumbnail={() => 'res/unknown32.png'}
+                    project={project}
+                    objectsContainer={testLayout}
+                    onEditObject={action('On edit object')}
+                    selectedObjectNames={[]}
+                    selectedObjectTags={[]}
+                    onChangeSelectedObjectTags={() => {}}
+                    getAllObjectTags={() => []}
+                    canRenameObject={() => true}
+                    onDeleteObject={(objectWithContext, cb) => cb(true)}
+                    onRenameObject={(objectWithContext, newName, cb) =>
+                      cb(true)
+                    }
+                    onObjectCreated={() => {}}
+                    onObjectSelected={() => {}}
+                  />
+                </TabContentContainer>
+              }
+              {
+                <TabContentContainer active={value === 2}>
+                  <div
+                    style={{
+                      backgroundColor: 'green',
+                      height: '100%',
+                      flex: 1,
+                    }}
+                  >
+                    Tab 3 content
+                  </div>
+                </TabContentContainer>
+              }
+            </Column>
+          </FixedHeightFlexContainer>
+        </DragAndDropContextProvider>
       )}
     />
   ));
@@ -2030,57 +2040,57 @@ storiesOf('ObjectsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testLayout}>
-      <div style={{ height: 250 }}>
-        <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
-          project={project}
-          objectsContainer={testLayout}
-          onEditObject={action('On edit object')}
-          onObjectCreated={action('On object created')}
-          selectedObjectNames={[]}
-          selectedObjectTags={[]}
-          onChangeSelectedObjectTags={selectedObjectTags => {}}
-          getAllObjectTags={() => []}
-          canMoveObjects
-          canRenameObject={() => true}
-          onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameObject={(objectWithContext, newName, cb) => cb(true)}
-          onStartDraggingObject={() => {}}
-          onEndDraggingObject={() => {}}
-          onObjectSelected={() => {}}
-        />
-      </div>
-    </SerializedObjectDisplay>
+    <DragAndDropContextProvider>
+      <SerializedObjectDisplay object={testLayout}>
+        <div style={{ height: 250 }}>
+          <ObjectsList
+            getThumbnail={() => 'res/unknown32.png'}
+            project={project}
+            objectsContainer={testLayout}
+            onEditObject={action('On edit object')}
+            onObjectCreated={action('On object created')}
+            selectedObjectNames={[]}
+            selectedObjectTags={[]}
+            onChangeSelectedObjectTags={selectedObjectTags => {}}
+            getAllObjectTags={() => []}
+            canRenameObject={() => true}
+            onDeleteObject={(objectWithContext, cb) => cb(true)}
+            onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+            onObjectSelected={() => {}}
+          />
+        </div>
+      </SerializedObjectDisplay>
+    </DragAndDropContextProvider>
   ))
   .add('with tags', () => (
-    <SerializedObjectDisplay object={testLayout}>
-      <div style={{ height: 250 }}>
-        <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
-          project={project}
-          objectsContainer={testLayout}
-          onEditObject={action('On edit object')}
-          onObjectCreated={action('On object created')}
-          selectedObjectNames={[]}
-          selectedObjectTags={['Tag1', 'Tag2']}
-          onChangeSelectedObjectTags={action('on change selected object tags')}
-          getAllObjectTags={() => [
-            'Tag1',
-            'Tag2',
-            'Looooooooooong Tag 3',
-            'Unselected Tag 4',
-          ]}
-          canMoveObjects
-          canRenameObject={() => true}
-          onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameObject={(objectWithContext, newName, cb) => cb(true)}
-          onStartDraggingObject={() => {}}
-          onEndDraggingObject={() => {}}
-          onObjectSelected={() => {}}
-        />
-      </div>
-    </SerializedObjectDisplay>
+    <DragAndDropContextProvider>
+      <SerializedObjectDisplay object={testLayout}>
+        <div style={{ height: 250 }}>
+          <ObjectsList
+            getThumbnail={() => 'res/unknown32.png'}
+            project={project}
+            objectsContainer={testLayout}
+            onEditObject={action('On edit object')}
+            onObjectCreated={action('On object created')}
+            selectedObjectNames={[]}
+            selectedObjectTags={['Tag1', 'Tag2']}
+            onChangeSelectedObjectTags={action(
+              'on change selected object tags'
+            )}
+            getAllObjectTags={() => [
+              'Tag1',
+              'Tag2',
+              'Looooooooooong Tag 3',
+              'Unselected Tag 4',
+            ]}
+            canRenameObject={() => true}
+            onDeleteObject={(objectWithContext, cb) => cb(true)}
+            onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+            onObjectSelected={() => {}}
+          />
+        </div>
+      </SerializedObjectDisplay>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('ObjectSelector', module)

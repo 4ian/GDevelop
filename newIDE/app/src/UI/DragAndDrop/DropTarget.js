@@ -14,7 +14,8 @@ type Props<DraggedItemType> = {|
     canDrop: boolean,
   }) => React.Node,
   canDrop: (item: DraggedItemType) => boolean,
-  drop: () => void,
+  hover?: (monitor: DropTargetMonitor) => void,
+  drop: (monitor: DropTargetMonitor) => void,
 |};
 
 type DropTargetProps = {|
@@ -26,16 +27,19 @@ type DropTargetProps = {|
 export const makeDropTarget = <DraggedItemType>(
   reactDndType: string
 ): ((Props<DraggedItemType>) => React.Node) => {
-  const instructionTarget = {
+  const targetSpec = {
     canDrop(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       const item = monitor.getItem();
       return item && props.canDrop(item);
+    },
+    hover(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
+      if (props.hover) props.hover(monitor);
     },
     drop(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       if (monitor.didDrop()) {
         return; // Drop already handled by another target
       }
-      props.drop();
+      props.drop(monitor);
     },
   };
 
@@ -50,17 +54,15 @@ export const makeDropTarget = <DraggedItemType>(
     };
   }
 
-  const InnerDropTarget = DropTarget(
-    reactDndType,
-    instructionTarget,
-    targetCollect
-  )(({ children, connectDropTarget, isOver, canDrop }) => {
-    return children({
-      connectDropTarget,
-      isOver,
-      canDrop,
-    });
-  });
+  const InnerDropTarget = DropTarget(reactDndType, targetSpec, targetCollect)(
+    ({ children, connectDropTarget, isOver, canDrop }) => {
+      return children({
+        connectDropTarget,
+        isOver,
+        canDrop,
+      });
+    }
+  );
 
   return (props: Props<DraggedItemType>) => <InnerDropTarget {...props} />;
 };

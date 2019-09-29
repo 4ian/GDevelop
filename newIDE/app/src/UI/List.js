@@ -69,6 +69,7 @@ type ListItemProps = {|
   |},
 
   style?: {|
+    color?: string,
     backgroundColor?: string,
     borderBottom?: string,
     opacity?: number,

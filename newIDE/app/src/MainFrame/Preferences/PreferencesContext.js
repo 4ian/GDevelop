@@ -14,7 +14,8 @@ export type AlertMessageIdentifier =
   | 'resource-properties-panel-explanation'
   | 'instance-drag-n-drop-explanation'
   | 'objects-panel-explanation'
-  | 'instance-properties-panel-explanation';
+  | 'instance-properties-panel-explanation'
+  | 'physics2-shape-collisions';
 
 export type PreferencesValues = {|
   language: string,

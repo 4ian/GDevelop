@@ -41,6 +41,8 @@ const styles = {
   },
 };
 
+export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
+
 const getObjectWithContextName = (objectWithContext: ObjectWithContext) =>
   objectWithContext.object.getName();
 
@@ -93,16 +95,11 @@ type Props = {|
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
 
-  onStartDraggingObject: gdObject => void,
-  onEndDraggingObject: () => void,
-
   getThumbnail: (project: gdProject, object: Object) => string,
-
-  canMoveObjects: boolean,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
-  sortableList: any;
+  sortableList: ?SortableVirtualizedItemList<ObjectWithContext>;
   _displayedObjectWithContextsList: ObjectWithContextList = [];
   state = {
     newObjectDialogOpen: false,
@@ -284,7 +281,9 @@ export default class ObjectsList extends React.Component<Props, State> {
       {
         renamedObjectWithContext: objectWithContext,
       },
-      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
   };
 
@@ -311,47 +310,46 @@ export default class ObjectsList extends React.Component<Props, State> {
     }
   };
 
-  _move = (oldIndex: number, newIndex: number) => {
-    // Moving objects can be discarded by the parent (this is used to allow
-    // dropping objects on the scene editor).
-    if (!this.props.canMoveObjects) return;
-
-    const { project, objectsContainer } = this.props;
-
-    const movedObjectWithContext = this._displayedObjectWithContextsList[
-      oldIndex
-    ];
-    const destinationObjectWithContext = this._displayedObjectWithContextsList[
-      newIndex
-    ];
-    if (!movedObjectWithContext || !destinationObjectWithContext) return;
-
-    if (movedObjectWithContext.global !== destinationObjectWithContext.global) {
-      // Can't move an object from the objects container to the global objects
-      // or vice-versa.
-      return;
-    }
-
-    const container: gdObjectsContainer = movedObjectWithContext.global
-      ? project
-      : objectsContainer;
-    container.moveObject(
-      container.getObjectPosition(movedObjectWithContext.object.getName()),
-      container.getObjectPosition(destinationObjectWithContext.object.getName())
+  _canMoveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
+    // Check if at least one element in the selection can be moved.
+    const selectedObjects = this._displayedObjectWithContextsList.filter(
+      objectWithContext =>
+        this.props.selectedObjectNames.indexOf(
+          objectWithContext.object.getName()
+        ) !== -1
     );
-
-    this.forceUpdateList();
+    return selectedObjects.filter(movedObjectWithContext => {
+      return movedObjectWithContext.global === destinationObjectWithContext.global;
+    }).length > 0;
   };
 
-  _onStartDraggingObject = ({ index }: { index: number }) => {
-    const draggedObjectWithContext = this._displayedObjectWithContextsList[
-      index
-    ];
-    if (!draggedObjectWithContext) {
-      return;
-    }
+  _moveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
+    const { project, objectsContainer } = this.props;
 
-    this.props.onStartDraggingObject(draggedObjectWithContext.object);
+    const container: gdObjectsContainer = destinationObjectWithContext.global
+    ? project
+    : objectsContainer;
+
+    const selectedObjects = this._displayedObjectWithContextsList.filter(
+      objectWithContext =>
+        this.props.selectedObjectNames.indexOf(
+          objectWithContext.object.getName()
+        ) !== -1
+    );
+    selectedObjects.forEach(movedObjectWithContext => {
+      if (movedObjectWithContext.global !== destinationObjectWithContext.global) {
+        // Can't move an object from the objects container to the global objects
+        // or vice-versa.
+        return;
+      }
+
+      container.moveObject(
+        container.getObjectPosition(movedObjectWithContext.object.getName()),
+        container.getObjectPosition(destinationObjectWithContext.object.getName())
+      );
+    });
+
+    this.forceUpdateList();
   };
 
   _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
@@ -388,7 +386,7 @@ export default class ObjectsList extends React.Component<Props, State> {
 
   forceUpdateList = () => {
     this.forceUpdate();
-    this.sortableList.getWrappedInstance().forceUpdateGrid();
+    if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
   _openEditTagDialog = (tagEditedObject: ?gdObject) => {
@@ -405,7 +403,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     this.forceUpdateList();
   };
 
-  _selectObject = (objectWithContext: ObjectWithContext) => {
+  _selectObject = (objectWithContext: ?ObjectWithContext) => {
     this.props.onObjectSelected(
       objectWithContext ? objectWithContext.object.getName() : ''
     );
@@ -535,13 +533,9 @@ export default class ObjectsList extends React.Component<Props, State> {
                 renamedItem={renamedObjectWithContext}
                 onRename={this._rename}
                 buildMenuTemplate={this._renderObjectMenuTemplate}
-                onSortStart={this._onStartDraggingObject}
-                onSortEnd={({ oldIndex, newIndex }) => {
-                  this.props.onEndDraggingObject();
-                  this._move(oldIndex, newIndex);
-                }}
-                helperClass="sortable-helper"
-                distance={20}
+                onMoveSelectionToItem={this._moveSelectionTo}
+                canMoveSelectionToItem={this._canMoveSelectionTo}
+                reactDndType={objectWithContextReactDndType}
               />
             )}
           </AutoSizer>

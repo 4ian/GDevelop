@@ -39,7 +39,7 @@ type State = {|
 type Props = {|
   project: gdProject,
   selectedResource: ?gdResource,
-  onSelectResource: (resource: gdResource) => void,
+  onSelectResource: (resource: ?gdResource) => void,
   onDeleteResource: (resource: gdResource) => void,
   onRenameResource: (
     resource: gdResource,
@@ -166,7 +166,9 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         renamedResource: resource,
       },
-      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
   };
 
@@ -196,16 +198,21 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _move = (oldIndex: number, newIndex: number) => {
-    const { project } = this.props;
+  _moveSelectionTo = (destinationResource: gdResource) => {
+    const { project, selectedResource } = this.props;
+    if (!selectedResource) return;
 
-    project.getResourcesManager().moveResource(oldIndex, newIndex);
+    const resourcesManager = project.getResourcesManager();
+    resourcesManager.moveResource(
+      resourcesManager.getResourcePosition(selectedResource.getName()),
+      resourcesManager.getResourcePosition(destinationResource.getName())
+    );
     this.forceUpdateList();
   };
 
   forceUpdateList = () => {
     this.forceUpdate();
-    this.sortableList.getWrappedInstance().forceUpdateGrid();
+    if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
   _renderResourceMenuTemplate = (resource: gdResource, _index: number) => {
@@ -351,17 +358,14 @@ export default class ResourcesList extends React.Component<Props, State> {
                 width={width}
                 height={height}
                 getItemName={getResourceName}
-                selectedItem={selectedResource}
+                selectedItems={selectedResource ? [selectedResource] : []}
                 onItemSelected={onSelectResource}
                 renamedItem={this.state.renamedResource}
                 onRename={this._rename}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)
-                }
+                onMoveSelectionToItem={this._moveSelectionTo}
                 buildMenuTemplate={this._renderResourceMenuTemplate}
-                helperClass="sortable-helper"
-                distance={20}
                 erroredItems={this.state.resourcesWithErrors}
+                reactDndType="GD_RESOURCE"
               />
             )}
           </AutoSizer>

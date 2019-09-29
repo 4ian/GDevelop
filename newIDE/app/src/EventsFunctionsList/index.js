@@ -100,7 +100,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       {
         renamedEventsFunction: eventsFunction,
       },
-      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
   };
 
@@ -124,16 +126,25 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     });
   };
 
-  _move = (oldIndex: number, newIndex: number) => {
-    const { eventsFunctionsContainer } = this.props;
-    eventsFunctionsContainer.moveEventsFunction(oldIndex, newIndex);
+  _moveSelectionTo = (destinationEventsFunction: gdEventsFunction) => {
+    const { eventsFunctionsContainer, selectedEventsFunction } = this.props;
+    if (!selectedEventsFunction) return;
+
+    eventsFunctionsContainer.moveEventsFunction(
+      eventsFunctionsContainer.getEventsFunctionPosition(
+        selectedEventsFunction
+      ),
+      eventsFunctionsContainer.getEventsFunctionPosition(
+        destinationEventsFunction
+      )
+    );
 
     this.forceUpdateList();
   };
 
   forceUpdateList = () => {
     this.forceUpdate();
-    this.sortableList.getWrappedInstance().forceUpdateGrid();
+    if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
   _copyEventsFunction = (eventsFunction: gdEventsFunction) => {
@@ -271,16 +282,13 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                 onAddNewItem={this._addNewEventsFunction}
                 addNewItemLabel={<Trans>Add a new function</Trans>}
                 getItemName={getEventsFunctionName}
-                selectedItem={selectedEventsFunction}
+                selectedItems={selectedEventsFunction ? [selectedEventsFunction] : []}
                 onItemSelected={onSelectEventsFunction}
                 renamedItem={this.state.renamedEventsFunction}
                 onRename={this._rename}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)
-                }
+                onMoveSelectionToItem={this._moveSelectionTo}
                 buildMenuTemplate={this._renderEventsFunctionMenuTemplate}
-                helperClass="sortable-helper"
-                distance={20}
+                reactDndType="GD_EVENTS_FUNCTION"
               />
             )}
           </AutoSizer>

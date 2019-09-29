@@ -3,38 +3,17 @@ import * as React from 'react';
 import { List } from 'react-virtualized';
 import ItemRow from './ItemRow';
 import { AddListItem } from '../ListCommonItem';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { listItemWith32PxIconHeight, listItemWithoutIconHeight } from '../List';
+import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
+import DropIndicator from './DropIndicator';
 
-const SortableItemRow = SortableElement(props => {
-  const { style, ...otherProps } = props;
-  return (
-    <div style={style}>
-      <ItemRow {...otherProps} />
-    </div>
-  );
-});
-
-const SortableAddItemRow = SortableElement(props => {
-  const { style, ...otherProps } = props;
-  return (
-    <div style={style}>
-      <AddListItem {...otherProps} />
-    </div>
-  );
-});
-
-export type Item = {
-  key: string | number,
-};
-
-type ItemsListProps = {
+type Props<Item> = {|
   height: number,
   width: number,
   fullList: Array<Item>,
-  selectedItem: ?Item, // TODO
-  selectedItems: ?Array<Item>,
+  selectedItems: Array<Item>,
   onAddNewItem?: () => void,
+  addNewItemLabel?: React.Node | string,
   onRename: (Item, string) => void,
   getItemName: Item => string,
   getItemThumbnail?: Item => string,
@@ -42,13 +21,20 @@ type ItemsListProps = {
   onItemSelected: (?Item) => void,
   onEditItem?: Item => void,
   renamedItem: ?Item,
-  addNewItemLabel: React.Node | string,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
   buildMenuTemplate: (Item, index: number) => any,
-};
+  onMoveSelectionToItem: (destinationItem: Item) => void,
+  canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
+  reactDndType: string,
+|};
 
-class ItemsList extends React.Component<ItemsListProps, *> {
+export default class SortableVirtualizedItemList<Item> extends React.Component<
+  Props<Item>
+> {
   _list: ?List;
+  DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(
+    this.props.reactDndType
+  );
 
   forceUpdateGrid() {
     if (this._list) this._list.forceUpdateGrid();
@@ -59,7 +45,6 @@ class ItemsList extends React.Component<ItemsListProps, *> {
       height,
       width,
       fullList,
-      selectedItem,
       selectedItems,
       addNewItemLabel,
       renamedItem,
@@ -69,7 +54,10 @@ class ItemsList extends React.Component<ItemsListProps, *> {
       onAddNewItem,
       isItemBold,
       onEditItem,
+      onMoveSelectionToItem,
+      canMoveSelectionToItem,
     } = this.props;
+    const { DragSourceAndDropTarget } = this;
 
     return (
       <List
@@ -92,14 +80,13 @@ class ItemsList extends React.Component<ItemsListProps, *> {
         |}) => {
           if (index >= fullList.length) {
             return (
-              <SortableAddItemRow
-                index={fullList.length}
-                key={key}
-                style={style}
-                disabled
-                onClick={onAddNewItem}
-                primaryText={addNewItemLabel}
-              />
+              <div style={style} key={key}>
+                <AddListItem
+                  disabled
+                  onClick={onAddNewItem}
+                  primaryText={addNewItemLabel}
+                />
+              </div>
             );
           }
 
@@ -108,30 +95,55 @@ class ItemsList extends React.Component<ItemsListProps, *> {
           const itemName = getItemName(item);
 
           return (
-            <SortableItemRow
-              index={index}
-              key={key}
-              item={item}
-              itemName={itemName}
-              isBold={isItemBold ? isItemBold(item) : false}
-              style={style}
-              onRename={newName => this.props.onRename(item, newName)}
-              editingName={nameBeingEdited}
-              getThumbnail={
-                getItemThumbnail ? () => getItemThumbnail(item) : undefined
-              }
-              selected={
-                selectedItems && selectedItems.indexOf(item) !== -1
-                  ? true
-                  : item === selectedItem
-              }
-              onItemSelected={this.props.onItemSelected}
-              errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
-              buildMenuTemplate={() =>
-                this.props.buildMenuTemplate(item, index)
-              }
-              onEdit={onEditItem}
-            />
+            <div style={style} key={key}>
+              <DragSourceAndDropTarget
+                beginDrag={() => {
+                  this.props.onItemSelected(item);
+                  return {};
+                }}
+                canDrop={() =>
+                  canMoveSelectionToItem ? canMoveSelectionToItem(item) : true
+                }
+                drop={() => {
+                  onMoveSelectionToItem(item);
+                }}
+              >
+                {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+                  // Add an extra div because connectDropTarget/connectDragSource can
+                  // only be used on native elements
+                  connectDropTarget(
+                    connectDragSource(
+                      <div>
+                        {isOver && <DropIndicator canDrop={canDrop} />}
+                        <ItemRow
+                          item={item}
+                          itemName={itemName}
+                          isBold={isItemBold ? isItemBold(item) : false}
+                          onRename={newName =>
+                            this.props.onRename(item, newName)
+                          }
+                          editingName={nameBeingEdited}
+                          getThumbnail={
+                            getItemThumbnail
+                              ? () => getItemThumbnail(item)
+                              : undefined
+                          }
+                          selected={selectedItems.indexOf(item) !== -1}
+                          onItemSelected={this.props.onItemSelected}
+                          errorStatus={
+                            erroredItems ? erroredItems[itemName] || '' : ''
+                          }
+                          buildMenuTemplate={() =>
+                            this.props.buildMenuTemplate(item, index)
+                          }
+                          onEdit={onEditItem}
+                        />
+                      </div>
+                    )
+                  )
+                }
+              </DragSourceAndDropTarget>
+            </div>
           );
         }}
         width={width}
@@ -139,6 +151,3 @@ class ItemsList extends React.Component<ItemsListProps, *> {
     );
   }
 }
-
-const SortableItemsList = SortableContainer(ItemsList, { withRef: true });
-export default SortableItemsList;

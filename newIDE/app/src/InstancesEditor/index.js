@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import SimpleDropTarget from '../UI/DragAndDrop/SimpleDropTarget';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -13,30 +12,29 @@ import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
-import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
 import * as PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
 import CanvasCursor from './CanvasCursor';
+import TemporaryInstances from './TemporaryInstances';
+import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
+import { objectWithContextReactDndType } from '../ObjectsList';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
   dropCursor: { cursor: 'copy' },
 };
 
+const DropTarget = makeDropTarget(objectWithContextReactDndType);
+
 export default class InstancesEditorContainer extends Component {
-  constructor() {
-    super();
-
-    this.lastContextMenuX = 0;
-    this.lastContextMenuY = 0;
-    this.lastCursorX = 0;
-    this.lastCursorY = 0;
-
-    this.fpsLimiter = new FpsLimiter(28);
-  }
+  lastContextMenuX = 0;
+  lastContextMenuY = 0;
+  lastCursorX = 0;
+  lastCursorY = 0;
+  fpsLimiter = new FpsLimiter(28);
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -75,15 +73,6 @@ export default class InstancesEditorContainer extends Component {
         this.props.onContextMenu(e.clientX, e.clientY);
 
       return false;
-    });
-    this.pixiRenderer.view.addEventListener('pointerup', event => {
-      this.props.onPointerUp();
-    });
-    this.pixiRenderer.view.addEventListener('pointerover', event => {
-      this.props.onPointerOver();
-    });
-    this.pixiRenderer.view.addEventListener('pointerout', event => {
-      this.props.onPointerOut();
     });
     this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
@@ -170,14 +159,15 @@ export default class InstancesEditorContainer extends Component {
       onZoomIn: this.props.onZoomIn,
     });
 
-    this.dropHandler = new DropHandler({
-      canvas: this.canvasArea,
-      onDrop: this._onDrop,
-    });
-
     this.canvasCursor = new CanvasCursor({
       canvas: this.canvasArea,
       shouldMoveView: () => this.keyboardShortcuts.shouldMoveView(),
+    });
+
+    this.temporaryInstances = new TemporaryInstances({
+      instances: this.props.initialInstances,
+      toSceneCoordinates: this.viewPosition.toSceneCoordinates,
+      options: this.props.options,
     });
 
     this._mountEditorComponents(this.props);
@@ -300,6 +290,7 @@ export default class InstancesEditorContainer extends Component {
     this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
+    this.temporaryInstances.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
   }
@@ -330,6 +321,7 @@ export default class InstancesEditorContainer extends Component {
       this.instancesResizer.setOptions(nextProps.options);
       this.windowMask.setOptions(nextProps.options);
       this.viewPosition.setOptions(nextProps.options);
+      this.temporaryInstances.setOptions(nextProps.options);
     }
 
     if (
@@ -385,6 +377,13 @@ export default class InstancesEditorContainer extends Component {
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
 
+    // Selection rectangle is only drawn in _onPanMove,
+    // which can happen a few milliseconds after a background
+    // click/touch - enough to have the selection rectangle being
+    // offset from the first click - which looks laggy. Set
+    // the start position now.
+    this.selectionRectangle.startSelectionRectangle(x, y);
+
     if (
       !this.keyboardShortcuts.shouldMultiSelect() &&
       !this.keyboardShortcuts.shouldMoveView()
@@ -405,7 +404,7 @@ export default class InstancesEditorContainer extends Component {
         this.props.onViewPositionChanged(this.viewPosition);
       }
     } else {
-      this.selectionRectangle.makeSelectionRectangle(x, y);
+      this.selectionRectangle.updateSelectionRectangle(x, y);
     }
   };
 
@@ -554,13 +553,6 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesRotated(selectedInstances);
   };
 
-  _onDrop = (x, y, objectName) => {
-    const newPos = this.viewPosition.toSceneCoordinates(x, y);
-    if (this.props.onAddInstance) {
-      this.props.onAddInstance(newPos[0], newPos[1], objectName);
-    }
-  };
-
   clearHighlightedInstance = () => {
     this.highlightedInstance.setInstance(null);
   };
@@ -652,15 +644,59 @@ export default class InstancesEditorContainer extends Component {
     if (!this.props.project) return null;
 
     return (
-      <SimpleDropTarget>
-        <div
-          ref={canvasArea => (this.canvasArea = canvasArea)}
-          style={{
-            ...styles.canvasArea,
-            ...(this.props.showDropCursor ? styles.dropCursor : undefined),
-          }}
-        />
-      </SimpleDropTarget>
+      <DropTarget
+        canDrop={() => true}
+        hover={monitor => {
+          const { temporaryInstances, canvasArea } = this;
+          if (!temporaryInstances || !canvasArea) return;
+
+          const { x, y } = monitor.getClientOffset();
+          const canvasRect = canvasArea.getBoundingClientRect();
+          temporaryInstances.createOrUpdateFromObjectNames(
+            x - canvasRect.left,
+            y - canvasRect.top,
+            this.props.selectedObjectNames
+          );
+        }}
+        drop={monitor => {
+          const { temporaryInstances, canvasArea } = this;
+          if (!temporaryInstances || !canvasArea) return;
+
+          if (monitor.didDrop()) {
+            // Drop was done somewhere else (in a child of the canvas:
+            // should not happen, but still handling this case).
+            temporaryInstances.deleteTemporaryInstances();
+            return;
+          }
+
+          const { x, y } = monitor.getClientOffset();
+          const canvasRect = canvasArea.getBoundingClientRect();
+          temporaryInstances.updatePositions(
+            x - canvasRect.left,
+            y - canvasRect.top
+          );
+          temporaryInstances.commitTemporaryInstances();
+        }}
+      >
+        {({ connectDropTarget, isOver }) => {
+          // The children are re-rendered when isOver change:
+          // take this opportunity to delete any temporary instances
+          // if the dragging is not done anymore over the canvas.
+          if (this.temporaryInstances && !isOver) {
+            this.temporaryInstances.deleteTemporaryInstances();
+          }
+
+          return connectDropTarget(
+            <div
+              ref={canvasArea => (this.canvasArea = canvasArea)}
+              style={{
+                ...styles.canvasArea,
+                ...(this.props.showDropCursor ? styles.dropCursor : undefined),
+              }}
+            />
+          );
+        }}
+      </DropTarget>
     );
   }
 }

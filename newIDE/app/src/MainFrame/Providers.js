@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
+import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import { ThemeProvider } from '@material-ui/styles';
 import { getTheme } from '../UI/Theme';
 import UserProfileProvider from '../Profile/UserProfileProvider';
@@ -48,7 +48,7 @@ export default class Providers extends React.Component<Props, {||}> {
       eventsFunctionsExtensionOpener,
     } = this.props;
     return (
-      <DragDropContextProvider>
+      <DragAndDropContextProvider>
         <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
           <PreferencesContext.Consumer>
             {({ values }) => {
@@ -91,7 +91,7 @@ export default class Providers extends React.Component<Props, {||}> {
             }}
           </PreferencesContext.Consumer>
         </PreferencesProvider>
-      </DragDropContextProvider>
+      </DragAndDropContextProvider>
     );
   }
 }

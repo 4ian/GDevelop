@@ -3,7 +3,6 @@ import React from 'react';
 import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
 import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
-import { type Item } from '.';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 
 const styles = {
@@ -19,26 +18,24 @@ const styles = {
 
 const LEFT_MOUSE_BUTTON = 0;
 
-type Props = {
-  index: number,
+type Props<Item> = {
   item: Item,
   itemName: string,
   isBold: boolean,
   onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
-  selected: true,
+  selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => Array<any>,
-  onEdit: Item => void,
-  style: Object,
+  onEdit?: ?(Item) => void,
 };
 
-class ItemRow extends React.Component<Props> {
+class ItemRow<Item> extends React.Component<Props<Item>> {
   textField: ?TextField;
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props<Item>) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
         if (this.textField) this.textField.focus();
@@ -52,9 +49,10 @@ class ItemRow extends React.Component<Props> {
       itemName,
       isBold,
       selected,
-      style,
       getThumbnail,
       errorStatus,
+      onEdit,
+      onItemSelected,
     } = this.props;
 
     return (
@@ -110,7 +108,7 @@ class ItemRow extends React.Component<Props> {
 
           return (
             <ListItem
-              style={{ ...itemStyle, ...style }}
+              style={{ ...itemStyle }}
               primaryText={label}
               leftIcon={
                 getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
@@ -118,18 +116,18 @@ class ItemRow extends React.Component<Props> {
               displayMenuButton
               buildMenuTemplate={this.props.buildMenuTemplate}
               onClick={() => {
-                if (!this.props.onItemSelected) return;
+                if (!onItemSelected) return;
                 if (this.props.editingName) return;
 
-                this.props.onItemSelected(selected ? null : item);
+                onItemSelected(selected ? null : item);
               }}
               onDoubleClick={event => {
                 if (event.button !== LEFT_MOUSE_BUTTON) return;
-                if (!this.props.onEdit) return;
+                if (!onEdit) return;
                 if (this.props.editingName) return;
 
-                this.props.onItemSelected(null);
-                this.props.onEdit(item);
+                onItemSelected(null);
+                onEdit(item);
               }}
             />
           );

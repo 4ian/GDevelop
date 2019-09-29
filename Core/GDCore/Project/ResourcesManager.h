@@ -425,7 +425,7 @@ class GD_CORE_API ResourcesManager {
   bool MoveResourceDownInList(const gd::String& name);
 
   /**
-   * Change the position of the specified resource.
+   * \brief Change the position of the specified resource.
    */
   void MoveResource(std::size_t oldIndex, std::size_t newIndex);
 

@@ -93,6 +93,9 @@ class GD_CORE_API EventsFunctionsContainer
   void MoveEventsFunction(std::size_t oldIndex, std::size_t newIndex) {
     return Move(oldIndex, newIndex);
   };
+  std::size_t GetEventsFunctionPosition(const gd::EventsFunction& eventsFunction) {
+    return GetPosition(eventsFunction);
+  };
 
   /**
    * \brief Provide a raw access to the vector containing the functions.

@@ -1683,6 +1683,7 @@ interface EventsFunctionsContainer {
     void RemoveEventsFunction([Const] DOMString name);
     void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetEventsFunctionsCount();
+    unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
 };
 
 interface EventsBasedBehavior {
@@ -1717,6 +1718,7 @@ interface EventsBasedBehaviorsList {
     void Remove([Const] DOMString name);
     void Move(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetCount();
+    unsigned long GetPosition([Const, Ref] EventsBasedBehavior item);
 
     unsigned long size();
     [Ref] EventsBasedBehavior at(unsigned long index);
@@ -1772,6 +1774,7 @@ interface EventsFunctionsExtension {
     void RemoveEventsFunction([Const] DOMString name);
     void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetEventsFunctionsCount();
+    unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
 };
 
 interface AbstractFileSystem {

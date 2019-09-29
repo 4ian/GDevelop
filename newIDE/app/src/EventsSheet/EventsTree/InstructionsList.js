@@ -113,7 +113,6 @@ class InstructionsList extends React.Component<Props, State> {
       };
 
       return (
-        // $FlowFixMe - Flow don't see that DropTarget hoc is being used in instructions?
         <Instruction
           instruction={instruction}
           isCondition={areConditions}

@@ -146,6 +146,7 @@ import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import NewObjectDialog from '../ObjectsList/NewObjectDialog';
 import { Column } from '../UI/Grid';
+import DragAndDropTestBed from './DragAndDropTestBed';
 
 // No i18n in this file
 
@@ -243,6 +244,12 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
       )}
     />
   ));
+
+storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
+  <DragDropContextProvider>
+    <DragAndDropTestBed />
+  </DragDropContextProvider>
+));
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
   .addDecorator(muiDecorator)

@@ -41,9 +41,7 @@ type InnerDragSourceAndDropTargetProps<DraggedItemType> = {|
 
 export const makeDragSourceAndDropTarget = <DraggedItemType>(
   reactDndInstructionType: string
-): (Props<DraggedItemType> => React.Node) => {
-
-
+): ((Props<DraggedItemType>) => React.Node) => {
   const instructionSource = {
     beginDrag(props: InnerDragSourceAndDropTargetProps<DraggedItemType>) {
       return props.beginDrag();
@@ -101,5 +99,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     )
   );
 
-  return (props: Props<DraggedItemType>) => <InnerDragSourceAndDropTarget {...props} />;
+  return (props: Props<DraggedItemType>) => (
+    <InnerDragSourceAndDropTarget {...props} />
+  );
 };

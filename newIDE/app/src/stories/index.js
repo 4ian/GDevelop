@@ -65,7 +65,7 @@ import muiDecorator from './ThemeDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
-import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
+import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import ResourcesLoader from '../ResourcesLoader';
 import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
@@ -246,9 +246,9 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   ));
 
 storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
-  <DragDropContextProvider>
+  <DragAndDropContextProvider>
     <DragAndDropTestBed />
-  </DragDropContextProvider>
+  </DragAndDropContextProvider>
 ));
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
@@ -1425,7 +1425,7 @@ storiesOf('StartPage', module)
 storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)
   .add('with data', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={debuggerGameDataDump}
@@ -1440,10 +1440,10 @@ storiesOf('DebuggerContent', module)
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('without data', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={null}
@@ -1458,13 +1458,13 @@ storiesOf('DebuggerContent', module)
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('Profiler', module)
   .addDecorator(muiDecorator)
   .add('without profiler output', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1473,10 +1473,10 @@ storiesOf('Profiler', module)
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('without profiler output, while profiling', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1485,10 +1485,10 @@ storiesOf('Profiler', module)
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('with profiler output', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1497,10 +1497,10 @@ storiesOf('Profiler', module)
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('with profiler output, while profiling', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1509,7 +1509,7 @@ storiesOf('Profiler', module)
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('MeasuresTable', module)
@@ -1547,7 +1547,7 @@ storiesOf('LayoutChooserDialog', module)
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
   .add('default (no scope)', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
           <EventsTree
@@ -1580,13 +1580,13 @@ storiesOf('EventsTree', module)
           />
         </FixedHeightFlexContainer>
       </div>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
   .add('default (no scope)', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
@@ -1611,10 +1611,10 @@ storiesOf('EventsSheet', module)
           onCreateEventsFunction={action('create events function')}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('empty (no events) (no scope)', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
@@ -1639,7 +1639,7 @@ storiesOf('EventsSheet', module)
           onCreateEventsFunction={action('create events function')}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
@@ -2655,7 +2655,7 @@ storiesOf('EventsFunctionsList', module)
 storiesOf('EventsFunctionsExtensionEditor/index', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsFunctionsExtensionEditor
           project={project}
@@ -2672,7 +2672,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           onCreateEventsFunction={action('on create events function')}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)

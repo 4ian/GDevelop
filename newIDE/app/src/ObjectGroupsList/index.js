@@ -227,7 +227,9 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       {
         renamedGroupWithScope: groupWithContext,
       },
-      () => {if (this.sortableList) this.sortableList.forceUpdateGrid();}
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
   };
 

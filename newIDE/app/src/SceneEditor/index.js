@@ -128,7 +128,7 @@ type State = {|
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
-  newObjectInstancePosition: ?[number, number],
+  newObjectInstanceSceneCoordinates: ?[number, number],
 
   editedGroup: ?gdObjectGroup,
 
@@ -176,7 +176,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       variablesEditedObject: null,
       selectedObjectNames: [],
-      newObjectInstancePosition: null,
+      newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
 
       uiSettings: props.initialUiSettings,
@@ -416,7 +416,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // Remember where to create the instance, when the object will be created
     this.setState({
-      newObjectInstancePosition: this.editor.getLastCursorPosition(),
+      newObjectInstanceSceneCoordinates: this.editor.getLastCursorSceneCoordinates(),
     });
 
     if (this._objectsList)
@@ -429,38 +429,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     const objectSelected = this.state.selectedObjectNames[0];
-    const cursorPosition = this.editor.getLastCursorPosition();
-    this._addInstance(cursorPosition[0], cursorPosition[1], objectSelected);
+    const cursorPosition = this.editor.getLastCursorSceneCoordinates();
+    this._addInstance(cursorPosition, objectSelected);
     this.setState({
       selectedObjectNames: [objectSelected],
     });
   };
 
-  _addInstance = (x: number, y: number, objectName: string) => {
-    if (!objectName) return;
+  _addInstance = (pos: [number, number], objectName: string) => {
+    if (!objectName || !this.editor) return;
 
-    // TODO: Replace this by _onInstancesAdded (like _onInstancesMoved)
-
-    const instance = this.props.initialInstances.insertNewInitialInstance();
-    instance.setObjectName(objectName);
-    if (this.state.uiSettings.grid) {
-      x = roundPosition(
-        x,
-        this.state.uiSettings.gridWidth,
-        this.state.uiSettings.gridOffsetX
-      );
-      y = roundPosition(
-        y,
-        this.state.uiSettings.gridHeight,
-        this.state.uiSettings.gridOffsetY
-      );
-    }
-    instance.setX(x);
-    instance.setY(y);
-    this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
-    if (this.zOrderFinder) {
-      instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
-    }
+    this.editor.addInstances(pos, [objectName]);
     this.setState(
       {
         selectedObjectNames: [],
@@ -527,22 +506,16 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   /**
    * Create an instance of the given object, at the position
-   * previously chosen (see `newObjectInstancePosition`).
+   * previously chosen (see `newObjectInstanceSceneCoordinates`).
    */
-  _addNewObjectInstance = (newObjectName: string) => {
-    // TODO: Move _addNewObjectInstance, _addInstance, _onAddInstanceUnderCursor to use
-    // InstancesEditor.
-    const { newObjectInstancePosition } = this.state;
-    if (!newObjectInstancePosition) {
+  _addInstanceForNewObject = (newObjectName: string) => {
+    const { newObjectInstanceSceneCoordinates } = this.state;
+    if (!newObjectInstanceSceneCoordinates) {
       return;
     }
 
-    this._addInstance(
-      newObjectInstancePosition[0],
-      newObjectInstancePosition[1],
-      newObjectName
-    );
-    this.setState({ newObjectInstancePosition: null });
+    this._addInstance(newObjectInstanceSceneCoordinates, newObjectName);
+    this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -713,11 +686,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     done(true);
   };
 
-  _canGroupUseNewName = (groupWithScope: GroupWithContext, newName: string) => {
-    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer but only on some events)
-    return true;
-  };
-
   _onRenameGroup = (
     groupWithContext: GroupWithContext,
     newName: string,
@@ -799,8 +767,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     if (this.editor) {
       const position = useLastCursorPosition
-        ? this.editor.getLastCursorPosition()
-        : this.editor.getLastContextMenuPosition();
+        ? this.editor.getLastCursorSceneCoordinates()
+        : this.editor.getLastContextMenuSceneCoordinates();
       Clipboard.set(INSTANCES_CLIPBOARD_KIND, {
         x: position[0],
         y: position[1],
@@ -819,8 +787,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (!clipboardContent || !this.editor) return;
 
     const position = useLastCursorPosition
-      ? this.editor.getLastCursorPosition()
-      : this.editor.getLastContextMenuPosition();
+      ? this.editor.getLastCursorSceneCoordinates()
+      : this.editor.getLastContextMenuSceneCoordinates();
     const { x, y } = clipboardContent;
     clipboardContent.instances
       .map(serializedInstance => {
@@ -926,7 +894,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           project={project}
           layout={layout}
           initialInstances={initialInstances}
-          onAddInstance={this._addInstance}
           options={this.state.uiSettings}
           onChangeOptions={this.setUiSettings}
           instancesSelection={this.instancesSelection}
@@ -974,7 +941,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             canRenameObject={this._canObjectOrGroupUseNewName}
-            onObjectCreated={this._addNewObjectInstance}
+            onObjectCreated={this._addInstanceForNewObject}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}

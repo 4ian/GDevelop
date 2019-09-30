@@ -2,7 +2,7 @@
 import * as PIXI from 'pixi.js';
 
 type Props = {
-  getLastCursorPosition: () => [number, number],
+  getLastCursorSceneCoordinates: () => [number, number],
   width: number,
   height: number,
 };
@@ -10,13 +10,13 @@ type Props = {
 export default class StatusBar {
   _width: number;
   _height: number;
-  _getLastCursorPosition: () => [number, number];
+  _getLastCursorSceneCoordinates: () => [number, number];
   _statusBarContainer: PIXI.Container;
   _statusBarBackground: PIXI.Graphics;
   _statusBarText: PIXI.Text;
 
-  constructor({ getLastCursorPosition, width, height }: Props) {
-    this._getLastCursorPosition = getLastCursorPosition;
+  constructor({ getLastCursorSceneCoordinates, width, height }: Props) {
+    this._getLastCursorSceneCoordinates = getLastCursorSceneCoordinates;
     this._statusBarContainer = new PIXI.Container();
     this._statusBarContainer.alpha = 0.8;
     this._statusBarContainer.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
@@ -43,7 +43,7 @@ export default class StatusBar {
   render() {
     const padding = 5;
     const borderRadius = 4;
-    const [x, y] = this._getLastCursorPosition();
+    const [x, y] = this._getLastCursorSceneCoordinates();
     this._statusBarText.text = `${x.toFixed(0)};${y.toFixed(0)}`;
     this._statusBarText.position.x = 0 + padding;
     this._statusBarText.position.y = Math.round(

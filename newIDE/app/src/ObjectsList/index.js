@@ -318,17 +318,21 @@ export default class ObjectsList extends React.Component<Props, State> {
           objectWithContext.object.getName()
         ) !== -1
     );
-    return selectedObjects.filter(movedObjectWithContext => {
-      return movedObjectWithContext.global === destinationObjectWithContext.global;
-    }).length > 0;
+    return (
+      selectedObjects.filter(movedObjectWithContext => {
+        return (
+          movedObjectWithContext.global === destinationObjectWithContext.global
+        );
+      }).length > 0
+    );
   };
 
   _moveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
     const { project, objectsContainer } = this.props;
 
     const container: gdObjectsContainer = destinationObjectWithContext.global
-    ? project
-    : objectsContainer;
+      ? project
+      : objectsContainer;
 
     const selectedObjects = this._displayedObjectWithContextsList.filter(
       objectWithContext =>
@@ -337,7 +341,9 @@ export default class ObjectsList extends React.Component<Props, State> {
         ) !== -1
     );
     selectedObjects.forEach(movedObjectWithContext => {
-      if (movedObjectWithContext.global !== destinationObjectWithContext.global) {
+      if (
+        movedObjectWithContext.global !== destinationObjectWithContext.global
+      ) {
         // Can't move an object from the objects container to the global objects
         // or vice-versa.
         return;
@@ -345,7 +351,9 @@ export default class ObjectsList extends React.Component<Props, State> {
 
       container.moveObject(
         container.getObjectPosition(movedObjectWithContext.object.getName()),
-        container.getObjectPosition(destinationObjectWithContext.object.getName())
+        container.getObjectPosition(
+          destinationObjectWithContext.object.getName()
+        )
       );
     });
 

@@ -18,7 +18,7 @@ import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
 import CanvasCursor from './CanvasCursor';
-import TemporaryInstances from './TemporaryInstances';
+import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
 
@@ -164,9 +164,8 @@ export default class InstancesEditorContainer extends Component {
       shouldMoveView: () => this.keyboardShortcuts.shouldMoveView(),
     });
 
-    this.temporaryInstances = new TemporaryInstances({
+    this._instancesAdder = new InstancesAdder({
       instances: this.props.initialInstances,
-      toSceneCoordinates: this.viewPosition.toSceneCoordinates,
       options: this.props.options,
     });
 
@@ -268,7 +267,7 @@ export default class InstancesEditorContainer extends Component {
     this.statusBar = new StatusBar({
       width: this.props.width,
       height: this.props.height,
-      getLastCursorPosition: this.getLastCursorPosition,
+      getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
     });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
@@ -290,7 +289,7 @@ export default class InstancesEditorContainer extends Component {
     this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
-    this.temporaryInstances.unmount();
+    this._instancesAdder.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
   }
@@ -321,7 +320,7 @@ export default class InstancesEditorContainer extends Component {
       this.instancesResizer.setOptions(nextProps.options);
       this.windowMask.setOptions(nextProps.options);
       this.viewPosition.setOptions(nextProps.options);
-      this.temporaryInstances.setOptions(nextProps.options);
+      this._instancesAdder.setOptions(nextProps.options);
     }
 
     if (
@@ -366,6 +365,17 @@ export default class InstancesEditorContainer extends Component {
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
     });
   }
+
+  /**
+   * Immediately add instances for the specified objects at the given
+   * position (in scene coordinates).
+   */
+  addInstances = (
+    pos /*: [number, number] */,
+    objectNames /*: Array<string> */
+  ) => {
+    this._instancesAdder.addInstances(pos, objectNames);
+  };
 
   _onMouseMove = (x, y) => {
     this.lastCursorX = x;
@@ -585,14 +595,14 @@ export default class InstancesEditorContainer extends Component {
     }
   }
 
-  getLastContextMenuPosition = () => {
+  getLastContextMenuSceneCoordinates = () => {
     return this.viewPosition.toSceneCoordinates(
       this.lastContextMenuX,
       this.lastContextMenuY
     );
   };
 
-  getLastCursorPosition = () => {
+  getLastCursorSceneCoordinates = () => {
     return this.viewPosition.toSceneCoordinates(
       this.lastCursorX,
       this.lastCursorY
@@ -647,43 +657,47 @@ export default class InstancesEditorContainer extends Component {
       <DropTarget
         canDrop={() => true}
         hover={monitor => {
-          const { temporaryInstances, canvasArea } = this;
-          if (!temporaryInstances || !canvasArea) return;
+          const { _instancesAdder, viewPosition, canvasArea } = this;
+          if (!_instancesAdder || !canvasArea || !viewPosition) return;
 
           const { x, y } = monitor.getClientOffset();
           const canvasRect = canvasArea.getBoundingClientRect();
-          temporaryInstances.createOrUpdateFromObjectNames(
+          const pos = viewPosition.toSceneCoordinates(
             x - canvasRect.left,
-            y - canvasRect.top,
+            y - canvasRect.top
+          );
+          _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
+            pos,
             this.props.selectedObjectNames
           );
         }}
         drop={monitor => {
-          const { temporaryInstances, canvasArea } = this;
-          if (!temporaryInstances || !canvasArea) return;
+          const { _instancesAdder, viewPosition, canvasArea } = this;
+          if (!_instancesAdder || !canvasArea || !viewPosition) return;
 
           if (monitor.didDrop()) {
             // Drop was done somewhere else (in a child of the canvas:
             // should not happen, but still handling this case).
-            temporaryInstances.deleteTemporaryInstances();
+            _instancesAdder.deleteTemporaryInstances();
             return;
           }
 
           const { x, y } = monitor.getClientOffset();
           const canvasRect = canvasArea.getBoundingClientRect();
-          temporaryInstances.updatePositions(
+          const pos = viewPosition.toSceneCoordinates(
             x - canvasRect.left,
             y - canvasRect.top
           );
-          temporaryInstances.commitTemporaryInstances();
+          _instancesAdder.updateTemporaryInstancePositions(pos);
+          _instancesAdder.commitTemporaryInstances();
         }}
       >
         {({ connectDropTarget, isOver }) => {
           // The children are re-rendered when isOver change:
           // take this opportunity to delete any temporary instances
           // if the dragging is not done anymore over the canvas.
-          if (this.temporaryInstances && !isOver) {
-            this.temporaryInstances.deleteTemporaryInstances();
+          if (this._instancesAdder && !isOver) {
+            this._instancesAdder.deleteTemporaryInstances();
           }
 
           return connectDropTarget(

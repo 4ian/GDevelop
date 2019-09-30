@@ -282,7 +282,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                 onAddNewItem={this._addNewEventsFunction}
                 addNewItemLabel={<Trans>Add a new function</Trans>}
                 getItemName={getEventsFunctionName}
-                selectedItems={selectedEventsFunction ? [selectedEventsFunction] : []}
+                selectedItems={
+                  selectedEventsFunction ? [selectedEventsFunction] : []
+                }
                 onItemSelected={onSelectEventsFunction}
                 renamedItem={this.state.renamedEventsFunction}
                 onRename={this._rename}

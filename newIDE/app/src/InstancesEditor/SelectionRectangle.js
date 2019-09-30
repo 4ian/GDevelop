@@ -55,7 +55,7 @@ export default class SelectionRectangle {
   startSelectionRectangle = (x, y) => {
     this.selectionRectangleStart = { x, y };
     this.selectionRectangleEnd = { x, y };
-  }
+  };
 
   updateSelectionRectangle = (lastX, lastY) => {
     if (!this.selectionRectangleStart)

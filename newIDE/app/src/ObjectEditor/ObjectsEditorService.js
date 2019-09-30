@@ -115,8 +115,12 @@ export default {
     },
     'Video::VideoObject': {
       component: ObjectPropertiesEditor,
-      createNewObject: () => new gd.VideoObject(''),
-      castToObjectType: object => gd.castObject(object, gd.Video),
+      createNewObject: object =>
+        gd
+          .asObjectJsImplementation(object)
+          .clone()
+          .release(),
+      castToObjectType: object => gd.asObjectJsImplementation(object),
       helpPagePath: '/objects/video',
     },
   },

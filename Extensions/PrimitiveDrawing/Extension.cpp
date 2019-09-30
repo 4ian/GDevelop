@@ -84,8 +84,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Change the color used when filling"),
                 _("Change fill color of _PARAM0_ to _PARAM1_"),
                 _("Setup"),
-                "res/actions/text24.png",
-                "res/actions/text.png")
+                "res/actions/color24.png",
+                "res/actions/color.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("color", _("Fill color"))

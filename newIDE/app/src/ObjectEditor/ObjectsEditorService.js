@@ -113,5 +113,11 @@ export default {
       castToObjectType: object => gd.castObject(object, gd.SkeletonObject),
       helpPagePath: '/objects/skeleton',
     },
+    'Video::VideoObject': {
+      component: ObjectPropertiesEditor,
+      createNewObject: () => new gd.VideoObject(''),
+      castToObjectType: object => gd.castObject(object, gd.Video),
+      helpPagePath: '/objects/video',
+    },
   },
 };

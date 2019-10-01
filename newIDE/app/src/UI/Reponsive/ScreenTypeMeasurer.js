@@ -15,9 +15,8 @@ export const ScreenTypeMeasurer = ({ children }: Props) => {
     return children('normal');
   }
 
-  return children( // TODO: do a real check to see if touchscreen or not
-    window.innerWidth < 750 || window.innerHeight < 750
-      ? 'touch'
-      : 'normal'
+  return children(
+    // TODO: do a real check to see if touchscreen or not
+    window.innerWidth < 750 || window.innerHeight < 750 ? 'touch' : 'normal'
   );
 };

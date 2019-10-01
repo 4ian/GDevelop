@@ -198,8 +198,11 @@ class MainFrame extends React.Component<Props, State> {
     } else if (this.props.introDialog && !Window.isDev())
       this._openIntroDialog(true);
 
-    GD_STARTUP_TIMES.push(['MainFrameComponentDidMountFinished', performance.now()]);
-    console.info("Startup times:", getStartupTimesSummary());
+    GD_STARTUP_TIMES.push([
+      'MainFrameComponentDidMountFinished',
+      performance.now(),
+    ]);
+    console.info('Startup times:', getStartupTimesSummary());
   }
 
   _languageDidChange() {

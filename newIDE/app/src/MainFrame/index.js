@@ -83,6 +83,8 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
+import { getStartupTimesSummary } from '../Utils/StartupTimes';
+const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
 
@@ -184,6 +186,8 @@ class MainFrame extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
+
     const { initialPathsOrURLsToOpen } = this.props;
 
     this._loadExtensions();
@@ -193,6 +197,9 @@ class MainFrame extends React.Component<Props, State> {
       );
     } else if (this.props.introDialog && !Window.isDev())
       this._openIntroDialog(true);
+
+    GD_STARTUP_TIMES.push(['MainFrameComponentDidMountFinished', performance.now()]);
+    console.info("Startup times:", getStartupTimesSummary());
   }
 
   _languageDidChange() {

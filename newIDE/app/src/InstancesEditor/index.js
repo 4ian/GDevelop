@@ -240,6 +240,7 @@ export default class InstancesEditorContainer extends Component {
       onRotateEnd: this._onRotateEnd,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+      screenType: this.props.screenType,
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
@@ -321,6 +322,10 @@ export default class InstancesEditorContainer extends Component {
       this.windowMask.setOptions(nextProps.options);
       this.viewPosition.setOptions(nextProps.options);
       this._instancesAdder.setOptions(nextProps.options);
+    }
+
+    if (nextProps.screenType !== this.props.screenType) {
+      this.selectedInstances.setScreenType(this.props.screenType);
     }
 
     if (

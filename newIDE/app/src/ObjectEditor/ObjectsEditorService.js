@@ -53,7 +53,7 @@ export default {
     );
     this.editorConfigurations[objectType] = editorConfiguration;
   },
-  getDefaultObjectJsImplementationPropertiesEditor() {
+  getDefaultObjectJsImplementationPropertiesEditor(options) {
     return {
       component: ObjectPropertiesEditor,
       createNewObject: object =>
@@ -62,6 +62,7 @@ export default {
           .clone()
           .release(),
       castToObjectType: object => gd.asObjectJsImplementation(object),
+      helpPagePath: options.helpPagePath,
     };
   },
   editorConfigurations: {
@@ -112,16 +113,6 @@ export default {
       createNewObject: () => new gd.SkeletonObject(''),
       castToObjectType: object => gd.castObject(object, gd.SkeletonObject),
       helpPagePath: '/objects/skeleton',
-    },
-    'Video::VideoObject': {
-      component: ObjectPropertiesEditor,
-      createNewObject: object =>
-        gd
-          .asObjectJsImplementation(object)
-          .clone()
-          .release(),
-      castToObjectType: object => gd.asObjectJsImplementation(object),
-      helpPagePath: '/objects/video',
     },
   },
 };

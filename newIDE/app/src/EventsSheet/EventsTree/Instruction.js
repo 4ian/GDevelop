@@ -21,6 +21,8 @@ import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
+import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -73,6 +75,9 @@ type Props = {|
   ) => void,
   onParameterClick: (event: any, parameterIndex: number) => void,
   renderObjectThumbnail: string => React.Node,
+
+  screenType: ScreenType,
+  windowWidth: WidthType,
 |};
 
 export default class Instruction extends React.Component<Props> {
@@ -243,7 +248,7 @@ export default class Instruction extends React.Component<Props> {
                   style={
                     {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
                   }
-                  extraClassName={subInstructionsContainer}
+                  className={subInstructionsContainer}
                   instrsList={instruction.getSubInstructions()}
                   areConditions={this.props.isCondition}
                   selection={this.props.selection}
@@ -267,6 +272,8 @@ export default class Instruction extends React.Component<Props> {
                   addButtonLabel={<Trans>Add a sub-condition</Trans>}
                   disabled={this.props.disabled}
                   renderObjectThumbnail={this.props.renderObjectThumbnail}
+                  screenType={this.props.screenType}
+                  windowWidth={this.props.windowWidth}
                 />
               )}
             </React.Fragment>

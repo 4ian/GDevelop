@@ -21,6 +21,8 @@ import {
 import { type EventsScope } from '../EventsScope.flow';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 // Import default style of react-sortable-tree and the override made for EventsSheet.
 import 'react-sortable-tree/style.css';
@@ -70,6 +72,9 @@ type EventsContainerProps = {|
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   renderObjectThumbnail: string => Node,
+
+  screenType: ScreenType,
+  windowWidth: WidthType,
 |};
 
 /**
@@ -136,6 +141,8 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
               disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
             }
             renderObjectThumbnail={this.props.renderObjectThumbnail}
+            screenType={this.props.screenType}
+            windowWidth={this.props.windowWidth}
           />
         )}
       </div>
@@ -198,6 +205,9 @@ type EventsTreeProps = {|
   searchFocusOffset: ?number,
 
   onEventMoved: () => void,
+
+  screenType: ScreenType,
+  windowWidth: WidthType,
 |};
 
 type SortableTreeNode = {
@@ -435,6 +445,8 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
           disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
         }
         renderObjectThumbnail={this._renderObjectThumbnail}
+        screenType={this.props.screenType}
+        windowWidth={this.props.windowWidth}
       />
     );
   };

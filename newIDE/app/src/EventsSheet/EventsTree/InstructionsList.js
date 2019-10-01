@@ -8,11 +8,12 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../SelectionHandler';
-import { actionsContainer, conditionsContainer } from './ClassNames';
 import DropIndicator from './DropIndicator';
 import { Trans } from '@lingui/macro';
 import { hasClipboardConditions, hasClipboardActions } from '../ClipboardKind';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
+import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   addButton: {
@@ -40,10 +41,13 @@ type Props = {
   onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
-  extraClassName?: string,
+  className?: string,
   style?: Object,
   disabled: boolean,
   renderObjectThumbnail: string => React.Node,
+
+  screenType: ScreenType,
+  windowWidth: WidthType,
 };
 
 type State = {|
@@ -77,7 +81,7 @@ export default class InstructionsList extends React.Component<Props, State> {
     const {
       addButtonLabel,
       areConditions,
-      extraClassName,
+      className,
       instrsList,
       onAddNewInstruction,
       onPasteInstructions,
@@ -91,6 +95,7 @@ export default class InstructionsList extends React.Component<Props, State> {
       selection,
       style,
       disabled,
+      windowWidth,
     } = this.props;
 
     const instructions = mapFor(0, instrsList.size(), i => {
@@ -136,6 +141,8 @@ export default class InstructionsList extends React.Component<Props, State> {
           onSubParameterClick={onParameterClick}
           disabled={disabled}
           renderObjectThumbnail={this.props.renderObjectThumbnail}
+          screenType={this.props.screenType}
+          windowWidth={this.props.windowWidth}
         />
       );
     });
@@ -162,12 +169,7 @@ export default class InstructionsList extends React.Component<Props, State> {
       >
         {({ connectDropTarget, isOver, canDrop }) =>
           connectDropTarget(
-            <div
-              className={`${
-                areConditions ? conditionsContainer : actionsContainer
-              } ${extraClassName || ''}`}
-              style={style}
-            >
+            <div className={className} style={style}>
               {instructions}
               {isOver && <DropIndicator canDrop={canDrop} />}
               <span

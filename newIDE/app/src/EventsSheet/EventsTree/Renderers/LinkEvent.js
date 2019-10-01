@@ -18,7 +18,7 @@ import {
 import InlinePopover from '../../InlinePopover';
 import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
-import { type EventRendererProps } from './EventRenderer.flow';
+import { type EventRendererProps } from './EventRenderer';
 const gd = global.gd;
 
 const styles = {

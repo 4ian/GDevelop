@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
@@ -73,6 +74,7 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
+import InfoBar from '../UI/Messages/InfoBar';
 const gd = global.gd;
 
 type Props = {|
@@ -1178,6 +1180,20 @@ export default class EventsSheet extends React.Component<Props, State> {
                     }}
                   />
                 )}
+                <InfoBar
+                  identifier="edit-instruction-explanation"
+                  message={
+                    <Trans>
+                      Double click on a condition or action to edit it.
+                    </Trans>
+                  }
+                  touchScreenMessage={
+                    <Trans>
+                      Double tap a condition or action to edit it. Long press to show more options.
+                    </Trans>
+                  }
+                  show={hasInstructionSelected(this.state.selection)}
+                />
               </div>
             )}
           </EventsSearcher>

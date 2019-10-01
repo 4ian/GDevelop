@@ -1091,6 +1091,12 @@ export default class SceneEditor extends React.Component<Props, State> {
               to add an instance of it.
             </Trans>
           }
+          touchScreenMessage={
+            <Trans>
+              Drag and Drop the object to the scene or long press it to show
+              options to edit it.
+            </Trans>
+          }
           show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar

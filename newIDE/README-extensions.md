@@ -126,7 +126,9 @@ To add an editor to your object, implement the function `registerEditorConfigura
 registerEditorConfigurations: function(objectsEditorService) {
   objectsEditorService.registerEditorConfiguration(
     "MyDummyExtension::DummyObject", // Replace by your extension and object type names.
-    objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor()
+    objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
+      helpPagePath : "/extensions/extend-gdevelop" // The link to the help page for your object, in GDevelop wiki.
+    })
   );
 }
 ```

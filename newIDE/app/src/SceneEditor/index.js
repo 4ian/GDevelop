@@ -65,6 +65,7 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -889,30 +890,35 @@ export default class SceneEditor extends React.Component<Props, State> {
         </MosaicWindow>
       ),
       'instances-editor': (
-        <FullSizeInstancesEditor
-          project={project}
-          layout={layout}
-          initialInstances={initialInstances}
-          options={this.state.uiSettings}
-          onChangeOptions={this.setUiSettings}
-          instancesSelection={this.instancesSelection}
-          onDeleteSelection={this.deleteSelection}
-          onInstancesSelected={this._onInstancesSelected}
-          onInstancesMoved={this._onInstancesMoved}
-          onInstancesResized={this._onInstancesResized}
-          onInstancesRotated={this._onInstancesRotated}
-          selectedObjectNames={this.state.selectedObjectNames}
-          onContextMenu={this._onContextMenu}
-          onCopy={() => this.copySelection({ useLastCursorPosition: true })}
-          onCut={() => this.cutSelection({ useLastCursorPosition: true })}
-          onPaste={() => this.paste({ useLastCursorPosition: true })}
-          onUndo={this.undo}
-          onRedo={this.redo}
-          onZoomOut={this.zoomOut}
-          onZoomIn={this.zoomIn}
-          wrappedEditorRef={editor => (this.editor = editor)}
-          pauseRendering={!isActive}
-        />
+        <ScreenTypeMeasurer>
+          {screenType => (
+            <FullSizeInstancesEditor
+              project={project}
+              layout={layout}
+              initialInstances={initialInstances}
+              options={this.state.uiSettings}
+              onChangeOptions={this.setUiSettings}
+              instancesSelection={this.instancesSelection}
+              onDeleteSelection={this.deleteSelection}
+              onInstancesSelected={this._onInstancesSelected}
+              onInstancesMoved={this._onInstancesMoved}
+              onInstancesResized={this._onInstancesResized}
+              onInstancesRotated={this._onInstancesRotated}
+              selectedObjectNames={this.state.selectedObjectNames}
+              onContextMenu={this._onContextMenu}
+              onCopy={() => this.copySelection({ useLastCursorPosition: true })}
+              onCut={() => this.cutSelection({ useLastCursorPosition: true })}
+              onPaste={() => this.paste({ useLastCursorPosition: true })}
+              onUndo={this.undo}
+              onRedo={this.redo}
+              onZoomOut={this.zoomOut}
+              onZoomIn={this.zoomIn}
+              wrappedEditorRef={editor => (this.editor = editor)}
+              pauseRendering={!isActive}
+              screenType={screenType}
+            />
+          )}
+        </ScreenTypeMeasurer>
       ),
       'objects-list': (
         <MosaicWindow

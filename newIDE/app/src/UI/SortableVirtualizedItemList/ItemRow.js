@@ -30,6 +30,7 @@ type Props<Item> = {
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => Array<any>,
   onEdit?: ?(Item) => void,
+  hideMenuButton: boolean,
 };
 
 class ItemRow<Item> extends React.Component<Props<Item>> {
@@ -53,6 +54,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
       errorStatus,
       onEdit,
       onItemSelected,
+      hideMenuButton,
     } = this.props;
 
     return (
@@ -113,7 +115,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
               leftIcon={
                 getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
               }
-              displayMenuButton
+              displayMenuButton={!hideMenuButton}
               buildMenuTemplate={this.props.buildMenuTemplate}
               onClick={() => {
                 if (!onItemSelected) return;

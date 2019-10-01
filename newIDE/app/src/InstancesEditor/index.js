@@ -695,6 +695,7 @@ export default class InstancesEditorContainer extends Component {
           );
           _instancesAdder.updateTemporaryInstancePositions(pos);
           _instancesAdder.commitTemporaryInstances();
+          this.props.onInstancesAdded();
         }}
       >
         {({ connectDropTarget, isOver }) => {

@@ -127,8 +127,8 @@ registerEditorConfigurations: function(objectsEditorService) {
   objectsEditorService.registerEditorConfiguration(
     "MyDummyExtension::DummyObject", // Replace by your extension and object type names.
     objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-      helpPagePath : "/extensions/extend-gdevelop"
-    }) //helpPagePath is an optional argument for add link to wiki page inside editor object.
+      helpPagePath : "/extensions/extend-gdevelop" // The link to the help page for your object, in GDevelop wiki.
+    })
   );
 }
 ```

@@ -449,6 +449,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  _onInstancesAdded = () => {
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this.updateToolbar()
+    );
+  };
+
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
     this.setState({
       selectedObjectNames: uniq(
@@ -900,6 +909,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               onChangeOptions={this.setUiSettings}
               instancesSelection={this.instancesSelection}
               onDeleteSelection={this.deleteSelection}
+              onInstancesAdded={this._onInstancesAdded}
               onInstancesSelected={this._onInstancesSelected}
               onInstancesMoved={this._onInstancesMoved}
               onInstancesResized={this._onInstancesResized}

@@ -125,7 +125,9 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
       ) : (
         <ElementWithMenu
           ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
-          element={<div/> /* We still need a dummy div for context menu placement */}
+          element={
+            <div /> /* We still need a dummy div for context menu placement */
+          }
           buildMenuTemplate={props.buildMenuTemplate}
         />
       );

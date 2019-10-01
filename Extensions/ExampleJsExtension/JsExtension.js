@@ -14,59 +14,59 @@ module.exports = {
   createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
-      "MyDummyExtension",
-      "My Dummy Extension",
-      "An example of a declaration of an extension",
-      "Florian Rival",
-      "MIT"
+      'MyDummyExtension',
+      'My Dummy Extension',
+      'An example of a declaration of an extension',
+      'Florian Rival',
+      'MIT'
     );
 
     // Declare conditions, actions or expressions:
     extension
       .addCondition(
-        "MyNewCondition",
-        _("Dummy condition example"),
+        'MyNewCondition',
+        _('Dummy condition example'),
         _(
-          "This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5."
+          'This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5.'
         ),
-        _("Call the example condition with _PARAM0_ and _PARAM1_"),
-        _("Dummy Extension"),
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        _('Call the example condition with _PARAM0_ and _PARAM1_'),
+        _('Dummy Extension'),
+        'res/conditions/camera24.png',
+        'res/conditions/camera.png'
       )
-      .addParameter("expression", _("Number 1"), "", false)
-      .addParameter("string", _("Text 1"), "", false)
+      .addParameter('expression', _('Number 1'), '', false)
+      .addParameter('string', _('Text 1'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile(
-        "Extensions/ExampleJsExtension/examplejsextensiontools.js"
+        'Extensions/ExampleJsExtension/examplejsextensiontools.js'
       )
-      .setFunctionName("gdjs.evtTools.exampleJsExtension.myConditionFunction");
+      .setFunctionName('gdjs.evtTools.exampleJsExtension.myConditionFunction');
 
     extension
       .addExpression(
-        "DummyExpression",
-        _("Dummy expression example"),
-        _("This is an example of an expression"),
-        _("Dummy Extension"),
-        "res/actions/camera.png"
+        'DummyExpression',
+        _('Dummy expression example'),
+        _('This is an example of an expression'),
+        _('Dummy Extension'),
+        'res/actions/camera.png'
       )
-      .addParameter("expression", _("Maximum"), "", false)
+      .addParameter('expression', _('Maximum'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.random");
+      .setFunctionName('gdjs.random');
 
     extension
       .addStrExpression(
-        "DummyStrExpression",
-        _("Dummy string expression example"),
-        _("This is an example of an expression returning a string"),
-        _("Dummy Extension"),
-        "res/actions/camera.png"
+        'DummyStrExpression',
+        _('Dummy string expression example'),
+        _('This is an example of an expression returning a string'),
+        _('Dummy Extension'),
+        'res/actions/camera.png'
       )
       .getCodeExtraInformation()
       .setIncludeFile(
-        "Extensions/ExampleJsExtension/examplejsextensiontools.js"
+        'Extensions/ExampleJsExtension/examplejsextensiontools.js'
       )
-      .setFunctionName("gdjs.evtTools.exampleJsExtension.getString");
+      .setFunctionName('gdjs.evtTools.exampleJsExtension.getString');
 
     // Declare a behavior.
     // Create a new gd.BehaviorJsImplementation object and implement the methods
@@ -79,12 +79,12 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === "My first property") {
-        behaviorContent.setStringAttribute("property1", newValue);
+      if (propertyName === 'My first property') {
+        behaviorContent.setStringAttribute('property1', newValue);
         return true;
       }
-      if (propertyName === "My other property") {
-        behaviorContent.setBoolAttribute("property2", newValue === "1");
+      if (propertyName === 'My other property') {
+        behaviorContent.setBoolAttribute('property2', newValue === '1');
         return true;
       }
 
@@ -94,40 +94,40 @@ module.exports = {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       behaviorProperties.set(
-        "My first property",
+        'My first property',
         new gd.PropertyDescriptor(
-          behaviorContent.getStringAttribute("property1")
+          behaviorContent.getStringAttribute('property1')
         )
       );
       behaviorProperties.set(
-        "My other property",
+        'My other property',
         new gd.PropertyDescriptor(
-          behaviorContent.getBoolAttribute("property2") ? "true" : "false"
-        ).setType("Boolean")
+          behaviorContent.getBoolAttribute('property2') ? 'true' : 'false'
+        ).setType('Boolean')
       );
 
       return behaviorProperties;
     };
     dummyBehavior.initializeContent = function(behaviorContent) {
-      behaviorContent.setStringAttribute("property1", "Initial value 1");
-      behaviorContent.setBoolAttribute("property2", true);
+      behaviorContent.setStringAttribute('property1', 'Initial value 1');
+      behaviorContent.setBoolAttribute('property2', true);
     };
     extension
       .addBehavior(
-        "DummyBehavior",
-        _("Dummy behavior for testing"),
-        "DummyBehavior",
-        _("This dummy behavior does nothing"),
-        "",
-        "CppPlatform/Extensions/topdownmovementicon.png",
-        "DummyBehavior",
+        'DummyBehavior',
+        _('Dummy behavior for testing'),
+        'DummyBehavior',
+        _('This dummy behavior does nothing'),
+        '',
+        'CppPlatform/Extensions/topdownmovementicon.png',
+        'DummyBehavior',
         dummyBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile("Extensions/ExampleJsExtension/dummyruntimebehavior.js")
+      .setIncludeFile('Extensions/ExampleJsExtension/dummyruntimebehavior.js')
       // You can optionally include more than one file when the behavior is used:
       .addIncludeFile(
-        "Extensions/ExampleJsExtension/examplejsextensiontools.js"
+        'Extensions/ExampleJsExtension/examplejsextensiontools.js'
       );
 
     // Declare another behavior, with shared data between the behaviors
@@ -140,8 +140,8 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === "My behavior property") {
-        behaviorContent.setStringAttribute("property1", newValue);
+      if (propertyName === 'My behavior property') {
+        behaviorContent.setStringAttribute('property1', newValue);
         return true;
       }
 
@@ -151,16 +151,16 @@ module.exports = {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       behaviorProperties.set(
-        "My behavior property",
+        'My behavior property',
         new gd.PropertyDescriptor(
-          behaviorContent.getStringAttribute("property1")
+          behaviorContent.getStringAttribute('property1')
         )
       );
 
       return behaviorProperties;
     };
     dummyBehaviorWithSharedData.initializeContent = function(behaviorContent) {
-      behaviorContent.setStringAttribute("property1", "Initial value 1");
+      behaviorContent.setStringAttribute('property1', 'Initial value 1');
     };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
@@ -169,8 +169,8 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === "My shared property") {
-        sharedContent.setStringAttribute("sharedProperty1", newValue);
+      if (propertyName === 'My shared property') {
+        sharedContent.setStringAttribute('sharedProperty1', newValue);
         return true;
       }
 
@@ -180,9 +180,9 @@ module.exports = {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
 
       sharedProperties.set(
-        "My shared property",
+        'My shared property',
         new gd.PropertyDescriptor(
-          sharedContent.getStringAttribute("sharedProperty1")
+          sharedContent.getStringAttribute('sharedProperty1')
         )
       );
 
@@ -190,29 +190,29 @@ module.exports = {
     };
     sharedData.initializeContent = function(behaviorContent) {
       behaviorContent.setStringAttribute(
-        "sharedProperty1",
-        "Initial shared value 1"
+        'sharedProperty1',
+        'Initial shared value 1'
       );
     };
 
     extension
       .addBehavior(
-        "DummyBehaviorWithSharedData",
-        _("Dummy behavior with shared data for testing"),
-        "DummyBehaviorWithSharedData",
-        _("This dummy behavior uses shared data and does nothing"),
-        "",
-        "CppPlatform/Extensions/topdownmovementicon.png",
-        "DummyBehaviorWithSharedData",
+        'DummyBehaviorWithSharedData',
+        _('Dummy behavior with shared data for testing'),
+        'DummyBehaviorWithSharedData',
+        _('This dummy behavior uses shared data and does nothing'),
+        '',
+        'CppPlatform/Extensions/topdownmovementicon.png',
+        'DummyBehaviorWithSharedData',
         dummyBehaviorWithSharedData,
         sharedData
       )
       .setIncludeFile(
-        "Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js"
+        'Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js'
       )
       // You can optionally include more than one file when the behavior is used:
       .addIncludeFile(
-        "Extensions/ExampleJsExtension/examplejsextensiontools.js"
+        'Extensions/ExampleJsExtension/examplejsextensiontools.js'
       );
 
     // Declare an object.
@@ -227,19 +227,19 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === "My first property") {
+      if (propertyName === 'My first property') {
         objectContent.property1 = newValue;
         return true;
       }
-      if (propertyName === "My other property") {
-        objectContent.property2 = newValue === "1";
+      if (propertyName === 'My other property') {
+        objectContent.property2 = newValue === '1';
         return true;
       }
-      if (propertyName === "My third property") {
+      if (propertyName === 'My third property') {
         objectContent.property3 = newValue;
         return true;
       }
-      if (propertyName === "myImage") {
+      if (propertyName === 'myImage') {
         objectContent.myImage = newValue;
         return true;
       }
@@ -250,26 +250,26 @@ module.exports = {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
-        "My first property",
+        'My first property',
         new gd.PropertyDescriptor(objectContent.property1)
       );
       objectProperties.set(
-        "My other property",
+        'My other property',
         new gd.PropertyDescriptor(
-          objectContent.property2 ? "true" : "false"
-        ).setType("boolean")
+          objectContent.property2 ? 'true' : 'false'
+        ).setType('boolean')
       );
       objectProperties.set(
-        "My third property",
+        'My third property',
         new gd.PropertyDescriptor(objectContent.property3.toString()).setType(
-          "number"
+          'number'
         )
       );
       objectProperties.set(
-        "myImage",
+        'myImage',
         new gd.PropertyDescriptor(objectContent.myImage)
-          .setType("resource")
-          .addExtraInfo("image")
+          .setType('resource')
+          .addExtraInfo('image')
           .setLabel(
             _("Image resource (won't be shown, just for demonstration purpose)")
           )
@@ -279,10 +279,10 @@ module.exports = {
     };
     dummyObject.setRawJSONContent(
       JSON.stringify({
-        property1: "Hello world",
+        property1: 'Hello world',
         property2: true,
         property3: 123,
-        myImage: ""
+        myImage: '',
       })
     );
 
@@ -294,12 +294,12 @@ module.exports = {
       project,
       layout
     ) {
-      if (propertyName === "My instance property") {
-        instance.setRawStringProperty("instanceprop1", newValue);
+      if (propertyName === 'My instance property') {
+        instance.setRawStringProperty('instanceprop1', newValue);
         return true;
       }
-      if (propertyName === "My other instance property") {
-        instance.setRawFloatProperty("instanceprop2", parseFloat(newValue));
+      if (propertyName === 'My other instance property') {
+        instance.setRawFloatProperty('instanceprop2', parseFloat(newValue));
         return true;
       }
 
@@ -314,16 +314,16 @@ module.exports = {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
 
       instanceProperties.set(
-        "My instance property",
+        'My instance property',
         new gd.PropertyDescriptor(
-          instance.getRawStringProperty("instanceprop1")
+          instance.getRawStringProperty('instanceprop1')
         )
       );
       instanceProperties.set(
-        "My other instance property",
+        'My other instance property',
         new gd.PropertyDescriptor(
-          instance.getRawFloatProperty("instanceprop2").toString()
-        ).setType("number")
+          instance.getRawFloatProperty('instanceprop2').toString()
+        ).setType('number')
       );
 
       return instanceProperties;
@@ -331,34 +331,34 @@ module.exports = {
 
     const object = extension
       .addObject(
-        "DummyObject",
-        _("Dummy object for testing"),
-        _("This dummy object does nothing"),
-        "CppPlatform/Extensions/topdownmovementicon.png",
+        'DummyObject',
+        _('Dummy object for testing'),
+        _('This dummy object does nothing'),
+        'CppPlatform/Extensions/topdownmovementicon.png',
         dummyObject
       )
-      .setIncludeFile("Extensions/ExampleJsExtension/dummyruntimeobject.js")
+      .setIncludeFile('Extensions/ExampleJsExtension/dummyruntimeobject.js')
       .addIncludeFile(
-        "Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js"
+        'Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js'
       );
 
     object
       .addAction(
-        "MyMethod",
-        _("Display a dummy text in Developer console"),
+        'MyMethod',
+        _('Display a dummy text in Developer console'),
         _(
-          "Display a dummy text in Developer console. Open it with CTRL-SHIFT-J (Cmd-Alt-J on macOS)."
+          'Display a dummy text in Developer console. Open it with CTRL-SHIFT-J (Cmd-Alt-J on macOS).'
         ),
-        _("Display a dummy text for _PARAM0_, with params: _PARAM1_, _PARAM2_"),
-        "",
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        _('Display a dummy text for _PARAM0_, with params: _PARAM1_, _PARAM2_'),
+        '',
+        'res/conditions/camera24.png',
+        'res/conditions/camera.png'
       )
-      .addParameter("object", _("Object"), "DummyObject", false) // This parameter is mandatory for any object action/condition
-      .addParameter("expression", _("Number 1"), "", false)
-      .addParameter("string", _("Text 1"), "", false)
+      .addParameter('object', _('Object'), 'DummyObject', false) // This parameter is mandatory for any object action/condition
+      .addParameter('expression', _('Number 1'), '', false)
+      .addParameter('string', _('Text 1'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName("myMethod");
+      .setFunctionName('myMethod');
 
     return extension;
   },
@@ -375,22 +375,22 @@ module.exports = {
    */
   runExtensionSanityTests: function(gd, extension) {
     const dummyBehavior = extension
-      .getBehaviorMetadata("MyDummyExtension::DummyBehavior")
+      .getBehaviorMetadata('MyDummyExtension::DummyBehavior')
       .get();
     const sharedData = extension
-      .getBehaviorMetadata("MyDummyExtension::DummyBehaviorWithSharedData")
+      .getBehaviorMetadata('MyDummyExtension::DummyBehaviorWithSharedData')
       .getSharedDataInstance();
     return [
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         dummyBehavior,
-        "My first property",
-        "Testing value"
+        'My first property',
+        'Testing value'
       ),
       gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
         sharedData,
-        "My shared property",
-        "Testing value"
-      )
+        'My shared property',
+        'Testing value'
+      ),
     ];
   },
   /**
@@ -400,9 +400,9 @@ module.exports = {
    */
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
-      "MyDummyExtension::DummyObject",
+      'MyDummyExtension::DummyObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: "/extensions/extend-gdevelop"
+        helpPagePath: '/extensions/extend-gdevelop',
       })
     );
   },
@@ -441,8 +441,8 @@ module.exports = {
       );
 
       //Setup the PIXI object:
-      this._pixiObject = new PIXI.Text("This is a dummy object", {
-        align: "left"
+      this._pixiObject = new PIXI.Text('This is a dummy object', {
+        align: 'left',
       });
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
@@ -461,7 +461,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return "CppPlatform/Extensions/texticon24.png";
+      return 'CppPlatform/Extensions/texticon24.png';
     };
 
     /**
@@ -471,7 +471,7 @@ module.exports = {
       // Read a property from the object
       const property1Value = this._associatedObject
         .getProperties(this.project)
-        .get("My first property")
+        .get('My first property')
         .getValue();
       this._pixiObject.text = property1Value;
 
@@ -502,8 +502,8 @@ module.exports = {
     };
 
     objectsRenderingService.registerInstanceRenderer(
-      "MyDummyExtension::DummyObject",
+      'MyDummyExtension::DummyObject',
       RenderedDummyObjectInstance
     );
-  }
+  },
 };

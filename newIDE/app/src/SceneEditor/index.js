@@ -36,7 +36,6 @@ import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
-import { roundPosition } from '../Utils/GridHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
 
 import {

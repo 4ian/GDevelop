@@ -71,12 +71,19 @@
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
 }
+.gd-events-sheet-default-theme .conditions-container.small-width-container {
+  border-right: none;
+  border-bottom: 1px solid #d3d3d3;
+}
 
 .gd-events-sheet-default-theme .actions-container {
   background: white;
   padding-left: 5px;
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
+}
+.gd-events-sheet-default-theme .actions-container.small-width-container {
+  padding-left: 15px;
 }
 
 .gd-events-sheet-default-theme .sub-instructions-container {

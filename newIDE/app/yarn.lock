@@ -10340,9 +10340,9 @@ pixi-gl-core@^1.1.4:
   resolved "https://registry.yarnpkg.com/pixi-gl-core/-/pixi-gl-core-1.1.4.tgz#8b4b5c433b31e419bc379dc565ce1b835a91b372"
   integrity sha1-i0tcQzsx5Bm8N53FZc4bg1qRs3I=
 
-"pixi-simple-gesture@git://github.com/4ian/pixi-simple-gesture#v0.3.2":
-  version "0.3.2"
-  resolved "git://github.com/4ian/pixi-simple-gesture#0e42e78b55c63ebd157f52f42da65b0cc36f6360"
+"pixi-simple-gesture@git://github.com/4ian/pixi-simple-gesture#v0.3.3":
+  version "0.3.3"
+  resolved "git://github.com/4ian/pixi-simple-gesture#c84e0cc3c62edeca019e708d9897ef6b97a0d18a"
 
 pixi.js@4.8.6:
   version "4.8.6"
@@ -11637,6 +11637,15 @@ react-dnd-html5-backend@7.7.0, react-dnd-html5-backend@^7.0.1:
   dependencies:
     dnd-core "^7.7.0"
 
+react-dnd-multi-backend@3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/react-dnd-multi-backend/-/react-dnd-multi-backend-3.2.2.tgz#4ecb20ccdfc753fa8a1e457a4df04606251d8f8f"
+  integrity sha512-94lBSZ8acVLeV2nyBLNwILcWcEGAcGrMzNRLIVeUI1yC0Uq1SaRM+5rdEyrElR9GMDjn0U41jVBlfS+usccZTA==
+  dependencies:
+    dnd-multi-backend "^3.2.1"
+    prop-types "^15.6.2"
+    react-dnd-preview "^3.2.2"
+
 react-dnd-multi-backend@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/react-dnd-multi-backend/-/react-dnd-multi-backend-3.2.1.tgz#bfda3b72b738704d638c56fd5e992c3fac556652"
@@ -11653,7 +11662,14 @@ react-dnd-preview@^3.2.1:
   dependencies:
     prop-types "^15.6.2"
 
-react-dnd-touch-backend@^0.8.3:
+react-dnd-preview@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/react-dnd-preview/-/react-dnd-preview-3.2.2.tgz#194d620f7bebaec9bd2cd38672abc7b24fa1474a"
+  integrity sha512-IuuU9X4cX7b0xahnbOcj+Ec2VGBlPJHogZXUCtfp/JfVdvoW8M1M/jA8rx28BlIJ7BAc0YY24TxHk5Rm4faExQ==
+  dependencies:
+    prop-types "^15.6.2"
+
+react-dnd-touch-backend@0.8.3, react-dnd-touch-backend@^0.8.3:
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/react-dnd-touch-backend/-/react-dnd-touch-backend-0.8.3.tgz#85d961ec8578dc9efa5b78000ea904d37e01e60f"
   integrity sha512-LLJlpeJftRreP9ixm3yfd1JEXf+6BeKo5dkfJFHvNSOEOu+FDSwNl5l8uAG0FeD4z2ZVi7RDQ/jUxdjkBV3zBg==

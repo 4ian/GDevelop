@@ -31,6 +31,7 @@ type Props<Item> = {
   buildMenuTemplate: () => Array<any>,
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
+  connectIconDragSource?: ?(React.Node) => React.Node,
 };
 
 class ItemRow<Item> extends React.Component<Props<Item>> {
@@ -55,6 +56,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
       onEdit,
       onItemSelected,
       hideMenuButton,
+      connectIconDragSource,
     } = this.props;
 
     return (
@@ -108,12 +110,18 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                 : muiTheme.listItem.warningTextColor,
           };
 
+          const leftIcon = getThumbnail ? (
+            <ListIcon iconSize={32} src={getThumbnail()} />
+          ) : null;
+
           return (
             <ListItem
               style={{ ...itemStyle }}
               primaryText={label}
               leftIcon={
-                getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
+                connectIconDragSource
+                  ? connectIconDragSource(<div>{leftIcon}</div>)
+                  : leftIcon
               }
               displayMenuButton={!hideMenuButton}
               buildMenuTemplate={this.props.buildMenuTemplate}

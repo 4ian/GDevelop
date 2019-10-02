@@ -7,6 +7,7 @@ import { listItemWith32PxIconHeight, listItemWithoutIconHeight } from '../List';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from './DropIndicator';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
+import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
 
 type Props<Item> = {|
   height: number,
@@ -62,103 +63,117 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
     return (
       <ResponsiveWindowMeasurer>
-        {size => (
-          <List
-            ref={list => (this._list = list)}
-            height={height}
-            rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
-            rowHeight={
-              getItemThumbnail
-                ? listItemWith32PxIconHeight
-                : listItemWithoutIconHeight
-            }
-            rowRenderer={({
-              index,
-              key,
-              style,
-            }: {|
-              index: number,
-              key: string,
-              style: Object,
-            |}) => {
-              if (index >= fullList.length) {
-                return (
-                  <div style={style} key={key}>
-                    <AddListItem
-                      disabled
-                      onClick={onAddNewItem}
-                      primaryText={addNewItemLabel}
-                    />
-                  </div>
-                );
-              }
+        {windowWidth => (
+          <ScreenTypeMeasurer>
+            {screenType => (
+              <List
+                ref={list => (this._list = list)}
+                height={height}
+                rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
+                rowHeight={
+                  getItemThumbnail
+                    ? listItemWith32PxIconHeight
+                    : listItemWithoutIconHeight
+                }
+                rowRenderer={({
+                  index,
+                  key,
+                  style,
+                }: {|
+                  index: number,
+                  key: string,
+                  style: Object,
+                |}) => {
+                  if (index >= fullList.length) {
+                    return (
+                      <div style={style} key={key}>
+                        <AddListItem
+                          disabled
+                          onClick={onAddNewItem}
+                          primaryText={addNewItemLabel}
+                        />
+                      </div>
+                    );
+                  }
 
-              const item = fullList[index];
-              const nameBeingEdited = renamedItem === item;
-              const itemName = getItemName(item);
+                  const item = fullList[index];
+                  const nameBeingEdited = renamedItem === item;
+                  const itemName = getItemName(item);
 
-              return (
-                <div style={style} key={key}>
-                  <DragSourceAndDropTarget
-                    beginDrag={() => {
-                      this.props.onItemSelected(item);
-                      return {};
-                    }}
-                    canDrop={() =>
-                      canMoveSelectionToItem
-                        ? canMoveSelectionToItem(item)
-                        : true
-                    }
-                    drop={() => {
-                      onMoveSelectionToItem(item);
-                    }}
-                  >
-                    {({
-                      connectDragSource,
-                      connectDropTarget,
-                      isOver,
-                      canDrop,
-                    }) =>
-                      // Add an extra div because connectDropTarget/connectDragSource can
-                      // only be used on native elements
-                      connectDropTarget(
-                        connectDragSource(
-                          <div>
-                            {isOver && <DropIndicator canDrop={canDrop} />}
-                            <ItemRow
-                              item={item}
-                              itemName={itemName}
-                              isBold={isItemBold ? isItemBold(item) : false}
-                              onRename={newName =>
-                                this.props.onRename(item, newName)
-                              }
-                              editingName={nameBeingEdited}
-                              getThumbnail={
-                                getItemThumbnail
-                                  ? () => getItemThumbnail(item)
-                                  : undefined
-                              }
-                              selected={selectedItems.indexOf(item) !== -1}
-                              onItemSelected={this.props.onItemSelected}
-                              errorStatus={
-                                erroredItems ? erroredItems[itemName] || '' : ''
-                              }
-                              buildMenuTemplate={() =>
-                                this.props.buildMenuTemplate(item, index)
-                              }
-                              onEdit={onEditItem}
-                              hideMenuButton={size === 'small'}
-                            />
-                          </div>
-                        )
-                      )
-                    }
-                  </DragSourceAndDropTarget>
-                </div>
-              );
-            }}
-            width={width}
-          />
+                  return (
+                    <div style={style} key={key}>
+                      <DragSourceAndDropTarget
+                        beginDrag={() => {
+                          this.props.onItemSelected(item);
+                          return {};
+                        }}
+                        canDrop={() =>
+                          canMoveSelectionToItem
+                            ? canMoveSelectionToItem(item)
+                            : true
+                        }
+                        drop={() => {
+                          onMoveSelectionToItem(item);
+                        }}
+                      >
+                        {({
+                          connectDragSource,
+                          connectDropTarget,
+                          isOver,
+                          canDrop,
+                        }) => {
+                          // Add an extra div because connectDropTarget/connectDragSource can
+                          // only be used on native elements
+                          const dropTarget = connectDropTarget(
+                            <div>
+                              {isOver && <DropIndicator canDrop={canDrop} />}
+                              <ItemRow
+                                item={item}
+                                itemName={itemName}
+                                isBold={isItemBold ? isItemBold(item) : false}
+                                onRename={newName =>
+                                  this.props.onRename(item, newName)
+                                }
+                                editingName={nameBeingEdited}
+                                getThumbnail={
+                                  getItemThumbnail
+                                    ? () => getItemThumbnail(item)
+                                    : undefined
+                                }
+                                selected={selectedItems.indexOf(item) !== -1}
+                                onItemSelected={this.props.onItemSelected}
+                                errorStatus={
+                                  erroredItems
+                                    ? erroredItems[itemName] || ''
+                                    : ''
+                                }
+                                buildMenuTemplate={() =>
+                                  this.props.buildMenuTemplate(item, index)
+                                }
+                                onEdit={onEditItem}
+                                hideMenuButton={windowWidth === 'small'}
+                                connectIconDragSource={
+                                  // If on a touch screen, only set the icon to be draggable.
+                                  screenType === 'touch'
+                                    ? connectDragSource
+                                    : undefined
+                                }
+                              />
+                            </div>
+                          );
+
+                          return screenType === 'touch'
+                            ? dropTarget
+                            : connectDragSource(dropTarget);
+                        }}
+                      </DragSourceAndDropTarget>
+                    </div>
+                  );
+                }}
+                width={width}
+              />
+            )}
+          </ScreenTypeMeasurer>
         )}
       </ResponsiveWindowMeasurer>
     );

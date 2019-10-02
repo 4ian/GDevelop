@@ -119,9 +119,15 @@ export default class Instruction extends React.Component<Props> {
                 [instructionParameter]: true,
                 [parameterType]: true,
               })}
-              onClick={domEvent =>
-                this.props.onParameterClick(domEvent, parameterIndex)
-              }
+              onClick={domEvent => {
+                this.props.onParameterClick(domEvent, parameterIndex);
+
+                // On touchscreen, don't propagate the click to the instruction div,
+                // as it's listening for taps to simulate double "clicks".
+                if (this.props.screenType === 'touch') {
+                  domEvent.stopPropagation();
+                }
+              }}
               onKeyPress={event => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   this.props.onParameterClick(event, parameterIndex);
@@ -195,7 +201,13 @@ export default class Instruction extends React.Component<Props> {
                 })}
                 onClick={e => {
                   e.stopPropagation();
-                  this.props.onClick();
+
+                  if (this.props.screenType === 'touch' && this.props.selected) {
+                    // On touch screens, tapping again a selected instruction should edit it.
+                    this.props.onDoubleClick();
+                  } else {
+                    this.props.onClick();
+                  }
                 }}
                 onDoubleClick={e => {
                   e.stopPropagation();

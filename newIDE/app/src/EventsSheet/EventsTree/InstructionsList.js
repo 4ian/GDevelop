@@ -95,7 +95,6 @@ export default class InstructionsList extends React.Component<Props, State> {
       selection,
       style,
       disabled,
-      windowWidth,
     } = this.props;
 
     const instructions = mapFor(0, instrsList.size(), i => {

@@ -202,7 +202,10 @@ export default class Instruction extends React.Component<Props> {
                 onClick={e => {
                   e.stopPropagation();
 
-                  if (this.props.screenType === 'touch' && this.props.selected) {
+                  if (
+                    this.props.screenType === 'touch' &&
+                    this.props.selected
+                  ) {
                     // On touch screens, tapping again a selected instruction should edit it.
                     this.props.onDoubleClick();
                   } else {

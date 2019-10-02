@@ -24,6 +24,9 @@ const roundPositionsToGrid = (
       options.gridHeight,
       options.gridOffsetY
     );
+  } else {
+    newPos[0] = Math.round(newPos[0]);
+    newPos[1] = Math.round(newPos[1]);
   }
 
   return newPos;
@@ -114,8 +117,8 @@ export default class InstancesAdder {
   updateTemporaryInstancePositions = (pos: [number, number]) => {
     const newPos = roundPositionsToGrid(pos, this._options);
     this._temporaryInstances.forEach(instance => {
-      instance.setX(newPos[0]);
-      instance.setY(newPos[1]);
+      instance.setX(Math.round(newPos[0]));
+      instance.setY(Math.round(newPos[1]));
     });
   };
 

@@ -371,13 +371,13 @@ export default class InstancesEditorContainer extends Component {
 
   getZoomFactor = () => {
     return this.props.options.zoomFactor;
-  }
+  };
 
-  setZoomFactor = (zoomFactor) => {
+  setZoomFactor = zoomFactor => {
     this.props.onChangeOptions({
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
     });
-  }
+  };
 
   /**
    * Immediately add instances for the specified objects at the given

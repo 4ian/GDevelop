@@ -13,7 +13,6 @@ type Props = {|
 export default class PinchHandler {
   _lastPinchCenterX: number | null = null;
   _lastPinchCenterY: number | null = null;
-//   _pinchStartZoomFactor: number | null = null;
   _setZoomFactor: number => void;
   _getZoomFactor: () => number;
   _viewPosition: ViewPosition;
@@ -43,7 +42,7 @@ export default class PinchHandler {
   }
 
   _startPinch() {
-    // this._pinchStartZoomFactor = this._getZoomFactor();
+    // Nothing to do
   }
 
   _onPinchMove(centerX: number, centerY: number, scale: number) {
@@ -61,14 +60,11 @@ export default class PinchHandler {
     this._lastPinchCenterX = centerX;
     this._lastPinchCenterY = centerY;
 
-    // if (this._pinchStartZoomFactor !== null) {
-      this._setZoomFactor(this._getZoomFactor() * scale);
-    // }
+    this._setZoomFactor(this._getZoomFactor() * scale);
   }
 
   _endPinch() {
     this._lastPinchCenterX = null;
     this._lastPinchCenterY = null;
-    // this._pinchStartZoomFactor = null;
   }
 }

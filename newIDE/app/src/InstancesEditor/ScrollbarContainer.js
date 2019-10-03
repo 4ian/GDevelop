@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import Slider from '@material-ui/core/Slider';
 import ViewPosition from './ViewPosition';
 import throttle from 'lodash/throttle';
+import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 const styles = {
   container: {
@@ -40,6 +41,8 @@ type State = {
   yMin: number,
   yMax: number,
 };
+
+const noop = () => {};
 
 /**
  * Add scrollbars that track the viewPosition of the wrapped component
@@ -134,36 +137,46 @@ export const addScrollbars = (WrappedComponent: any) => {
       const { wrappedEditorRef, ...otherProps } = this.props;
 
       return (
-        <div style={styles.container}>
-          <WrappedComponent
-            onViewPositionChanged={this._handleViewPositionChange}
-            ref={(editorRef: ?ScrollableComponent) => {
-              wrappedEditorRef && wrappedEditorRef(editorRef);
-              this._editor = editorRef;
-            }}
-            {...otherProps}
-          />
-          <Slider
-            value={
-              ((this.state.xValue - this.state.xMin) /
-                (this.state.xMax - this.state.xMin)) *
-              100
-            }
-            onChange={this._handleXChange}
-            style={styles.xScrollbar}
-            orientation="horizontal"
-          />
-          <Slider
-            value={
-              ((this.state.yValue - this.state.yMin) /
-                (this.state.yMax - this.state.yMin)) *
-              100
-            }
-            onChange={this._handleYChange}
-            style={styles.yScrollbar}
-            orientation="vertical"
-          />
-        </div>
+        <ScreenTypeMeasurer>
+          {screenType => (
+            <div style={styles.container}>
+              <WrappedComponent
+                onViewPositionChanged={
+                  screenType !== 'touch' ? this._handleViewPositionChange : noop
+                }
+                ref={(editorRef: ?ScrollableComponent) => {
+                  wrappedEditorRef && wrappedEditorRef(editorRef);
+                  this._editor = editorRef;
+                }}
+                {...otherProps}
+              />
+              {screenType !== 'touch' && (
+                <Slider
+                  value={
+                    ((this.state.xValue - this.state.xMin) /
+                      (this.state.xMax - this.state.xMin)) *
+                    100
+                  }
+                  onChange={this._handleXChange}
+                  style={styles.xScrollbar}
+                  orientation="horizontal"
+                />
+              )}
+              {screenType !== 'touch' && (
+                <Slider
+                  value={
+                    ((this.state.yValue - this.state.yMin) /
+                      (this.state.yMax - this.state.yMin)) *
+                    100
+                  }
+                  onChange={this._handleYChange}
+                  style={styles.yScrollbar}
+                  orientation="vertical"
+                />
+              )}
+            </div>
+          )}
+        </ScreenTypeMeasurer>
       );
     }
   };

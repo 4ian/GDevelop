@@ -21,6 +21,7 @@ import CanvasCursor from './CanvasCursor';
 import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
+import PinchHandler from './PinchHandler';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -157,6 +158,13 @@ export default class InstancesEditorContainer extends Component {
       onRedo: this.props.onRedo,
       onZoomOut: this.props.onZoomOut,
       onZoomIn: this.props.onZoomIn,
+    });
+
+    this.pinchHandler = new PinchHandler({
+      backgroundArea: this.backgroundArea,
+      setZoomFactor: this.setZoomFactor,
+      getZoomFactor: this.getZoomFactor,
+      viewPosition: this.viewPosition,
     });
 
     this.canvasCursor = new CanvasCursor({
@@ -361,11 +369,11 @@ export default class InstancesEditorContainer extends Component {
     this.setZoomFactor(this.getZoomFactor() + value);
   }
 
-  getZoomFactor() {
+  getZoomFactor = () => {
     return this.props.options.zoomFactor;
   }
 
-  setZoomFactor(zoomFactor) {
+  setZoomFactor = (zoomFactor) => {
     this.props.onChangeOptions({
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
     });

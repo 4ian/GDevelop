@@ -76,11 +76,16 @@ class ColorPicker extends React.Component<Props, State> {
     this.setState({ displayColorPicker: false });
   };
 
+  getRgbBackground = rgbColor =>
+    `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, ${rgbColor.a || 1})`;
+
   render() {
     const { style, color, ...otherProps } = this.props;
 
-    const displayedColor = color
-      ? color
+    const displayedRgbColor = color
+      ? typeof color === 'object'
+        ? this.getRgbBackground(color)
+        : color
       : {
           r: 200,
           g: 200,
@@ -94,9 +99,7 @@ class ColorPicker extends React.Component<Props, State> {
           <div
             style={{
               ...styles.color,
-              background: `rgba(${displayedColor.r}, ${displayedColor.g}, ${
-                displayedColor.b
-              }, ${displayedColor.a || 1})`,
+              background: displayedRgbColor,
             }}
           >
             {color ? null : '?'}
@@ -106,7 +109,7 @@ class ColorPicker extends React.Component<Props, State> {
           <React.Fragment>
             <div style={styles.cover} onClick={this.handleClose} />
             <div style={styles.popover}>
-              <SketchPicker color={displayedColor} {...otherProps} />
+              <SketchPicker color={displayedRgbColor} {...otherProps} />
             </div>
           </React.Fragment>
         ) : null}

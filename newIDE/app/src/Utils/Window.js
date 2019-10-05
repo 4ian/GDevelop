@@ -174,6 +174,35 @@ export default class Window {
     window.open(url, '_blank');
   }
 
+  static isFullscreen() {
+    // $FlowFixMe
+    return !!document.fullscreenElement;
+  }
+
+  static requestFullscreen() {
+    const { documentElement } = document;
+    if (!documentElement) return;
+
+    if (documentElement.requestFullscreen) {
+      documentElement.requestFullscreen();
+      // $FlowFixMe
+    } else if (documentElement.mozRequestFullScreen) {
+      /* Firefox */
+      // $FlowFixMe
+      documentElement.mozRequestFullScreen();
+      // $FlowFixMe
+    } else if (documentElement.webkitRequestFullscreen) {
+      /* Chrome, Safari and Opera */
+      // $FlowFixMe
+      documentElement.webkitRequestFullscreen();
+      // $FlowFixMe
+    } else if (documentElement.msRequestFullscreen) {
+      /* IE/Edge */
+      // $FlowFixMe
+      documentElement.msRequestFullscreen();
+    }
+  }
+
   static hasMainMenu() {
     return !!electron;
   }

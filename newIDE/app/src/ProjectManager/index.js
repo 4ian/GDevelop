@@ -36,6 +36,7 @@ import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
+import Fullscreen from '@material-ui/icons/Fullscreen';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -595,6 +596,16 @@ export default class ProjectManager extends React.Component<Props, State> {
             leftIcon={<Settings />}
             onClick={() => this.props.onOpenPreferences()}
           />,
+          ...(!Window.isFullscreen()
+            ? [
+                <ListItem
+                  key="fullscreen"
+                  primaryText={<Trans>Turn on Fullscreen</Trans>}
+                  leftIcon={<Fullscreen />}
+                  onClick={() => Window.requestFullscreen()}
+                />,
+              ]
+            : []),
         ]}
       />
     );

@@ -122,6 +122,20 @@ export default (
         },
         getLabel,
       };
+    } else if (valueType === 'color') {
+      return {
+        name,
+        valueType: 'color',
+        getValue: (instance: Instance): string => {
+          return getProperties(instance)
+            .get(name)
+            .getValue();
+        },
+        setValue: (instance: Instance, newValue: string) => {
+          onUpdateProperty(instance, name, newValue);
+        },
+        getLabel,
+      };
     } else {
       console.error(
         `A property with type=${valueType} could not be mapped to a field. Ensure that this type is correct and understood by the IDE.`

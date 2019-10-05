@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
@@ -10,6 +11,7 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
 import IconButton from '../UI/IconButton';
+import ColorField from '../UI/ColorField';
 import {
   type ResourceKind,
   type ResourceSource,
@@ -49,6 +51,12 @@ export type PrimitiveValueField =
       valueType: 'boolean',
       getValue: Instance => boolean,
       setValue: (instance: Instance, newValue: boolean) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'color',
+      getValue: Instance => string,
+      setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
     |};
 
@@ -206,6 +214,24 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           type="number"
           style={styles.field}
           disabled={field.disabled}
+        />
+      );
+    } else if (field.valueType === 'color') {
+      const { setValue } = field;
+      return (
+        <ColorField
+          key={field.name}
+          id={field.name}
+          floatingLabelText={getFieldLabel(this.props.instances, field)}
+          disableAlpha
+          fullWidth
+          color={getFieldValue(this.props.instances, field)}
+          onChangeComplete={color => {
+            this.props.instances.forEach(i =>
+              setValue(i, color.hex || '#000000')
+            );
+            this._onInstancesModified(this.props.instances);
+          }}
         />
       );
     } else {

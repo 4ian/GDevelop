@@ -19,7 +19,7 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
-        'BBTextObject',
+        'BBText',
         'BBTextObject',
         _('Display a BBText object on the scene.'),
         'Todor Imreorov',
@@ -39,7 +39,6 @@ module.exports = {
       }
       if (propertyName === 'color') {
         objectContent.color = newValue;
-        console.log('base col:', newValue);
         return true;
       }
       if (propertyName === 'opacity') {
@@ -60,7 +59,7 @@ module.exports = {
         'text',
         new gd.PropertyDescriptor(objectContent.text)
           .setType('string')
-          .setLabel(_('BBCode'))
+          .setLabel(_('BBCode text'))
       );
 
       objectProperties.set(
@@ -90,6 +89,7 @@ module.exports = {
         text: 'insert text',
         opacity: 255,
         visible: true,
+        color: '#000000',
       })
     );
 
@@ -123,9 +123,7 @@ module.exports = {
       )
       .setIncludeFile('Extensions/BBText/bbtextruntimeobject.js')
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
-      .addIncludeFile(
-        'Extensions/BBText/dist/pixi-multistyle-text.umd.js'
-      );
+      .addIncludeFile('Extensions/BBText/dist/pixi-multistyle-text.umd.js');
 
     /// Actions / Conditions / Expressions
 
@@ -273,11 +271,7 @@ module.exports = {
 
       this._videoResource = undefined;
 
-      // console.log(object);
-      //Setup the PIXI object:
-      // this._pixiObject = new PIXI.Sprite(this._getVideoTexture());
-
-      this._pixiObject = new MultiStyleText('err', {
+      const BBTextStyles = {
         default: {
           fontFamily: 'Arial',
           fontSize: '24px',
@@ -288,7 +282,9 @@ module.exports = {
           wordWrapWidth: 250,
           align: 'left',
         },
-      });
+      };
+
+      this._pixiObject = new MultiStyleText('', this._BBTextStyles);
 
       console.log(this._pixiObject);
       this._pixiObject.anchor.x = 0.5;
@@ -344,6 +340,13 @@ module.exports = {
         .get('opacity')
         .getValue();
       this._pixiObject.alpha = opacity / 255;
+
+      // Update color
+      const color = this._associatedObject
+        .getProperties(this.project)
+        .get('color')
+        .getValue();
+      this._pixiObject.textStyles.default.fill = color;
 
       // Read position and angle from the instance
       this._pixiObject.position.x =

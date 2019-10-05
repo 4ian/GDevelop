@@ -28,6 +28,14 @@ import {
 } from '../Utils/Serializer';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
+import Close from '@material-ui/icons/Close';
+import SettingsApplications from '@material-ui/icons/SettingsApplications';
+import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
+import Settings from '@material-ui/icons/Settings';
+import Save from '@material-ui/icons/Save';
+import VariableTree from '../UI/CustomSvgIcons/VariableTree';
+import ArtTrack from '@material-ui/icons/ArtTrack';
+import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -59,9 +67,9 @@ const styles = {
 };
 
 type ProjectStructureItemProps = {|
-  autoGenerateNestedIndicator: boolean,
-  initiallyOpen: boolean,
-  leftIcon: React$Element<any>,
+  autoGenerateNestedIndicator?: boolean,
+  initiallyOpen?: boolean,
+  leftIcon?: React$Element<any>,
   indentNestedItems?: boolean,
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
@@ -560,63 +568,31 @@ export default class ProjectManager extends React.Component<Props, State> {
     return (
       <ProjectStructureItem
         primaryText={<Trans>Menu</Trans>}
-        leftIcon={
-          <ListIcon
-            iconSize={32}
-            isGDevelopIcon
-            src="res/ribbon_default/new32.png"
-          />
-        }
-        initiallyOpen={true}
-        autoGenerateNestedIndicator={true}
+        open
         indentNestedItems
         renderNestedItems={() => [
           <ListItem
             key="save"
             primaryText={<Trans>Save</Trans>}
-            leftIcon={
-              <ListIcon
-                iconSize={32}
-                isGDevelopIcon
-                src="res/ribbon_default/save32.png"
-              />
-            }
+            leftIcon={<Save />}
             onClick={() => this.props.onSaveProject()}
-          />,
-          <ListItem
-            key="close"
-            primaryText={<Trans>Close</Trans>}
-            leftIcon={
-              <ListIcon
-                iconSize={32}
-                isGDevelopIcon
-                src="res/ribbon_default/close32.png"
-              />
-            }
-            onClick={() => this.props.onCloseProject()}
           />,
           <ListItem
             key="export"
             primaryText={<Trans>Export</Trans>}
-            leftIcon={
-              <ListIcon
-                iconSize={32}
-                isGDevelopIcon
-                src="res/ribbon_default/export32.png"
-              />
-            }
+            leftIcon={<AddToHomeScreen />}
             onClick={() => this.props.onExportProject()}
+          />,
+          <ListItem
+            key="close"
+            primaryText={<Trans>Close</Trans>}
+            leftIcon={<Close />}
+            onClick={() => this.props.onCloseProject()}
           />,
           <ListItem
             key="preferences"
             primaryText={<Trans>Preferences</Trans>}
-            leftIcon={
-              <ListIcon
-                iconSize={32}
-                isGDevelopIcon
-                src="res/ribbon_default/pref32.png"
-              />
-            }
+            leftIcon={<Settings />}
             onClick={() => this.props.onOpenPreferences()}
           />,
         ]}
@@ -663,13 +639,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ListItem
                 key="properties"
                 primaryText={<Trans>Properties</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={32}
-                    isGDevelopIcon
-                    src="res/ribbon_default/editprop32.png"
-                  />
-                }
+                leftIcon={<SettingsApplications />}
                 onClick={() =>
                   this.setState({ projectPropertiesDialogOpen: true })
                 }
@@ -677,37 +647,19 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ListItem
                 key="global-variables"
                 primaryText={<Trans>Global variables</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={32}
-                    isGDevelopIcon
-                    src="res/ribbon_default/editname32.png"
-                  />
-                }
+                leftIcon={<VariableTree />}
                 onClick={() => this.setState({ variablesEditorOpen: true })}
               />,
               <ListItem
                 key="icons"
                 primaryText={<Trans>Icons</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={32}
-                    isGDevelopIcon
-                    src="res/ribbon_default/image32.png"
-                  />
-                }
+                leftIcon={<PhotoLibrary />}
                 onClick={() => this.props.onOpenPlatformSpecificAssets()}
               />,
               <ListItem
                 key="resources"
                 primaryText={<Trans>Resources</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={32}
-                    isGDevelopIcon
-                    src="res/ribbon_default/image32.png"
-                  />
-                }
+                leftIcon={<ArtTrack />}
                 onClick={() => {
                   this.props.onOpenResources();
                 }}

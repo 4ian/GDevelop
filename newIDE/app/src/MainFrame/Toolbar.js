@@ -7,6 +7,7 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import Window from '../Utils/Window';
 import { I18n } from '@lingui/react';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {
   showProjectIcons: boolean,
@@ -37,59 +38,66 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
 
   render() {
     return (
-      <I18n>
-        {({ i18n }) => (
-          <Toolbar>
-            <ToolbarGroup firstChild>
-              {this.props.showProjectIcons && (
-                <ToolbarIcon
-                  onClick={this.props.toggleProjectManager}
-                  src="res/ribbon_default/projectManager32.png"
-                  disabled={!this.props.hasProject}
-                  tooltip={t`Project manager`}
-                />
-              )}
-              {this.props.showProjectIcons && (
-                <ToolbarIcon
-                  onClick={this.props.exportProject}
-                  src="res/ribbon_default/export32.png"
-                  disabled={!this.props.hasProject}
-                  tooltip={t`Export the game (Web, Android, iOS...)`}
-                />
-              )}
-              {this.isDev && (
-                <ElementWithMenu
-                  element={<ToolbarIcon src="res/ribbon_default/bug32.png" />}
-                  buildMenuTemplate={() => [
-                    {
-                      label: 'Request update from external editor',
-                      disabled: !this.props.requestUpdate,
-                      click: () =>
-                        this.props.requestUpdate && this.props.requestUpdate(),
-                    },
-                    {
-                      label: 'Simulate update downloaded',
-                      disabled: !this.props.simulateUpdateDownloaded,
-                      click: () =>
-                        this.props.simulateUpdateDownloaded &&
-                        this.props.simulateUpdateDownloaded(),
-                    },
-                    {
-                      label: 'Simulate update available',
-                      disabled: !this.props.simulateUpdateAvailable,
-                      click: () =>
-                        this.props.simulateUpdateAvailable &&
-                        this.props.simulateUpdateAvailable(),
-                    },
-                  ]}
-                />
-              )}
-              <ToolbarSeparator />
-            </ToolbarGroup>
-            {this.state.editorToolbar || <ToolbarGroup />}
-          </Toolbar>
+      <ResponsiveWindowMeasurer>
+        {windowWidth => (
+          <I18n>
+            {({ i18n }) => (
+              <Toolbar>
+                <ToolbarGroup firstChild>
+                  {this.props.showProjectIcons && (
+                    <ToolbarIcon
+                      onClick={this.props.toggleProjectManager}
+                      src="res/ribbon_default/projectManager32.png"
+                      disabled={!this.props.hasProject}
+                      tooltip={t`Project manager`}
+                    />
+                  )}
+                  {this.props.showProjectIcons && windowWidth !== 'small' && (
+                    <ToolbarIcon
+                      onClick={this.props.exportProject}
+                      src="res/ribbon_default/export32.png"
+                      disabled={!this.props.hasProject}
+                      tooltip={t`Export the game (Web, Android, iOS...)`}
+                    />
+                  )}
+                  {this.isDev && (
+                    <ElementWithMenu
+                      element={
+                        <ToolbarIcon src="res/ribbon_default/bug32.png" />
+                      }
+                      buildMenuTemplate={() => [
+                        {
+                          label: 'Request update from external editor',
+                          disabled: !this.props.requestUpdate,
+                          click: () =>
+                            this.props.requestUpdate &&
+                            this.props.requestUpdate(),
+                        },
+                        {
+                          label: 'Simulate update downloaded',
+                          disabled: !this.props.simulateUpdateDownloaded,
+                          click: () =>
+                            this.props.simulateUpdateDownloaded &&
+                            this.props.simulateUpdateDownloaded(),
+                        },
+                        {
+                          label: 'Simulate update available',
+                          disabled: !this.props.simulateUpdateAvailable,
+                          click: () =>
+                            this.props.simulateUpdateAvailable &&
+                            this.props.simulateUpdateAvailable(),
+                        },
+                      ]}
+                    />
+                  )}
+                  <ToolbarSeparator />
+                </ToolbarGroup>
+                {this.state.editorToolbar || <ToolbarGroup />}
+              </Toolbar>
+            )}
+          </I18n>
         )}
-      </I18n>
+      </ResponsiveWindowMeasurer>
     );
   }
 }

@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
@@ -55,6 +54,12 @@ export type PrimitiveValueField =
     |}
   | {|
       valueType: 'color',
+      getValue: Instance => string,
+      setValue: (instance: Instance, newValue: string) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'textarea',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
@@ -232,6 +237,23 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             );
             this._onInstancesModified(this.props.instances);
           }}
+        />
+      );
+    } else if (field.valueType === 'textarea') {
+      const { setValue } = field;
+      return (
+        <SemiControlledTextField
+          key={field.name}
+          id={field.name}
+          onChange={text => {
+            this.props.instances.forEach(i => setValue(i, text || ''));
+            this._onInstancesModified(this.props.instances);
+          }}
+          value={getFieldValue(this.props.instances, field)}
+          floatingLabelText={getFieldLabel(this.props.instances, field)}
+          floatingLabelFixed
+          multiLine
+          style={styles.field}
         />
       );
     } else {

@@ -58,7 +58,7 @@ module.exports = {
       objectProperties.set(
         'text',
         new gd.PropertyDescriptor(objectContent.text)
-          .setType('string')
+          .setType('textarea')
           .setLabel(_('BBCode text'))
       );
 
@@ -86,7 +86,7 @@ module.exports = {
     };
     objectBBText.setRawJSONContent(
       JSON.stringify({
-        text: 'insert text',
+        text: '[b]insert[/b] [color=yellow]BBCode[/color] [i]text[/i]',
         opacity: 255,
         visible: true,
         color: '#000000',
@@ -284,7 +284,7 @@ module.exports = {
         },
       };
 
-      this._pixiObject = new MultiStyleText('', this._BBTextStyles);
+      this._pixiObject = new MultiStyleText('', BBTextStyles);
 
       console.log(this._pixiObject);
       this._pixiObject.anchor.x = 0.5;
@@ -358,8 +358,8 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
+        // this._pixiObject.width = this._instance.getCustomWidth();
+        // this._pixiObject.height = this._instance.getCustomHeight();
       }
     };
 

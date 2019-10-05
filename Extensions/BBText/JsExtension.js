@@ -27,8 +27,8 @@ module.exports = {
       )
       .setExtensionHelpPath('/objects/BBTextObject');
 
-    var ObjectBBText = new gd.ObjectJsImplementation();
-    ObjectBBText.updateProperty = function(
+    var objectBBText = new gd.ObjectJsImplementation();
+    objectBBText.updateProperty = function(
       objectContent,
       propertyName,
       newValue
@@ -53,7 +53,7 @@ module.exports = {
 
       return false;
     };
-    ObjectBBText.getProperties = function(objectContent) {
+    objectBBText.getProperties = function(objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
@@ -85,7 +85,7 @@ module.exports = {
 
       return objectProperties;
     };
-    ObjectBBText.setRawJSONContent(
+    objectBBText.setRawJSONContent(
       JSON.stringify({
         text: 'insert text',
         opacity: 255,
@@ -93,7 +93,7 @@ module.exports = {
       })
     );
 
-    ObjectBBText.updateInitialInstanceProperty = function(
+    objectBBText.updateInitialInstanceProperty = function(
       objectContent,
       instance,
       propertyName,
@@ -103,7 +103,7 @@ module.exports = {
     ) {
       return false;
     };
-    ObjectBBText.getInitialInstanceProperties = function(
+    objectBBText.getInitialInstanceProperties = function(
       content,
       instance,
       project,
@@ -119,10 +119,10 @@ module.exports = {
         _('BBText'),
         _('Displays a BBCode rich Text.'),
         'JsPlatform/Extensions/bbcode32.png',
-        ObjectBBText
+        objectBBText
       )
-      .setIncludeFile('Extensions/BBText/bbruntimeobject.js')
-      .addIncludeFile('Extensions/BBText/bbruntimeobject-pixi-renderer.js')
+      .setIncludeFile('Extensions/BBText/bbtextruntimeobject.js')
+      .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
       .addIncludeFile(
         'Extensions/BBText/dist/pixi-multistyle-text.umd.js'
       );

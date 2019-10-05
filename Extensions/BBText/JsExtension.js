@@ -288,7 +288,6 @@ module.exports = {
           fontFamily: 'Arial',
           fontSize: '24px',
           fill: '#cccccc',
-          align: 'center',
           tagStyle: ['[', ']'],
           wordWrap: true,
           wordWrapWidth: 250,

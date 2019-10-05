@@ -1178,7 +1178,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                         />
                         {this._renderInstructionEditorDialog(
                           // Force using the new instruction editor on touch screens.
-                          values.useNewInstructionEditorDialog || screenType === 'touch'
+                          values.useNewInstructionEditorDialog ||
+                            screenType === 'touch'
                         )}
                         {this.state.analyzedEventsContextResult && (
                           <EventsContextAnalyzerDialog

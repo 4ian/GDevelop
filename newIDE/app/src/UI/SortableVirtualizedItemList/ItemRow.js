@@ -119,7 +119,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
               style={{ ...itemStyle }}
               primaryText={label}
               leftIcon={
-                connectIconDragSource
+                connectIconDragSource && leftIcon
                   ? connectIconDragSource(<div>{leftIcon}</div>)
                   : leftIcon
               }

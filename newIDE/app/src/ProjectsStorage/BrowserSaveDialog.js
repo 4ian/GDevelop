@@ -7,6 +7,7 @@ import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import Text from '../UI/Text';
 
 export default class BrowserSaveDialog extends Component {
   _download = () => {
@@ -51,10 +52,12 @@ export default class BrowserSaveDialog extends Component {
       <Dialog actions={actions} open={open} onRequestClose={onClose}>
         <Column noMargin>
           <Line>
-            <Trans>
-              You can download the file of your game to continue working on it
-              using the full GDevelop version:
-            </Trans>
+            <Text>
+              <Trans>
+                You can download the file of your game to continue working on it
+                using the full GDevelop version:
+              </Trans>
+            </Text>
           </Line>
           <Line>
             <Column expand>

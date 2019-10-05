@@ -19,13 +19,13 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
-        'BBText',
-        'BBText',
+        'BBTextObject',
+        'BBTextObject',
         _('Display a BBText object on the scene.'),
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/BBText');
+      .setExtensionHelpPath('/objects/BBTextObject');
 
     var ObjectBBText = new gd.ObjectJsImplementation();
     ObjectBBText.updateProperty = function(
@@ -33,20 +33,20 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === 'Text') {
+      if (propertyName === 'text') {
         objectContent.text = newValue;
         return true;
       }
-      if (propertyName === 'Color') {
+      if (propertyName === 'color') {
         objectContent.color = newValue;
         console.log('base col:', newValue);
         return true;
       }
-      if (propertyName === 'Opacity') {
+      if (propertyName === 'opacity') {
         objectContent.opacity = parseFloat(newValue);
         return true;
       }
-      if (propertyName === 'Visible') {
+      if (propertyName === 'visible') {
         objectContent.visible = newValue === '1';
         return true;
       }
@@ -57,27 +57,27 @@ module.exports = {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
-        'Text',
+        'text',
         new gd.PropertyDescriptor(objectContent.text)
           .setType('string')
-          .setLabel(_('bbcode'))
+          .setLabel(_('BBCode'))
       );
 
       objectProperties.set(
-        'Color',
+        'color',
         new gd.PropertyDescriptor(objectContent.color)
           .setType('color')
           .setLabel(_('Base color'))
       );
 
       objectProperties.set(
-        'Opacity',
+        'opacity',
         new gd.PropertyDescriptor(objectContent.opacity.toString())
           .setType('number')
-          .setLabel(_('opacity (0-255)'))
+          .setLabel(_('Opacity (0-255)'))
       );
       objectProperties.set(
-        'Visible',
+        'visible',
         new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
           .setType('boolean')
           .setLabel(_('Visible on start'))
@@ -117,14 +117,14 @@ module.exports = {
       .addObject(
         'BBText',
         _('BBText'),
-        _('Displays a BBcode rich Text.'),
+        _('Displays a BBCode rich Text.'),
         'JsPlatform/Extensions/bbcode32.png',
         ObjectBBText
       )
-      .setIncludeFile('Extensions/BBTextLabel/bbruntimeobject.js')
-      .addIncludeFile('Extensions/BBTextLabel/bbruntimeobject-pixi-renderer.js')
+      .setIncludeFile('Extensions/BBText/bbruntimeobject.js')
+      .addIncludeFile('Extensions/BBText/bbruntimeobject-pixi-renderer.js')
       .addIncludeFile(
-        'Extensions/BBTextLabel/dist/pixi-multistyle-text.umd.js'
+        'Extensions/BBText/dist/pixi-multistyle-text.umd.js'
       );
 
     /// Actions / Conditions / Expressions
@@ -311,19 +311,19 @@ module.exports = {
       return 'JsPlatform/Extensions/bbcode24.png';
     };
 
-    RenderedBBTextInstance.prototype._getVideoTexture = function() {
-      // Get the video resource to use
-      const videoResource = this._associatedObject
-        .getProperties(this.project)
-        .get('videoResource')
-        .getValue();
+    // RenderedBBTextInstance.prototype._getVideoTexture = function() {
+    //   // Get the video resource to use
+    //   const videoResource = this._associatedObject
+    //     .getProperties(this.project)
+    //     .get('videoResource')
+    //     .getValue();
 
-      // This returns a VideoTexture with autoPlay set to false
-      return this._pixiResourcesLoader.getPIXIVideoTexture(
-        this._project,
-        videoResource
-      );
-    };
+    //   // This returns a VideoTexture with autoPlay set to false
+    //   return this._pixiResourcesLoader.getPIXIVideoTexture(
+    //     this._project,
+    //     videoResource
+    //   );
+    // };
 
     /**
      * This is called to update the PIXI object on the scene editor
@@ -332,7 +332,7 @@ module.exports = {
       // Check if the text has changed
       const rawText = this._associatedObject
         .getProperties(this.project)
-        .get('Text')
+        .get('text')
         .getValue();
       if (rawText !== this._pixiObject.text) {
         this._pixiObject.setText(rawText);
@@ -341,7 +341,7 @@ module.exports = {
       // Update opacity
       const opacity = this._associatedObject
         .getProperties(this.project)
-        .get('Opacity')
+        .get('opacity')
         .getValue();
       this._pixiObject.alpha = opacity / 255;
 

@@ -389,7 +389,7 @@ export default class NewInstructionEditorDialog extends React.Component<
                 helpPagePath={instructionHelpPage || '/events'}
                 label={
                   !instructionHelpPage ||
-                  (width === 'small' &&
+                  (width === 'small' ||
                     step === 'object-or-free-instructions') ? (
                     <Trans>Help</Trans>
                   ) : this.props.isCondition ? (

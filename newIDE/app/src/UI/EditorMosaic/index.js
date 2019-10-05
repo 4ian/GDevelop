@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import {
   MosaicWindow as RMMosaicWindow,
   MosaicWithoutDragDropContext,
@@ -11,23 +12,37 @@ import ThemeConsumer from '../Theme/ThemeConsumer';
 import 'react-mosaic-component/react-mosaic-component.css';
 import './style.css';
 
-const addRightNode = (
-  currentNode,
-  newNode,
-  splitPercentage,
-  direction = 'row'
-) => {
+type MosaicNode = {|
+  direction: 'row' | 'column',
+  splitPercentage: number,
+  first: ?MosaicNode | string,
+  second: ?MosaicNode | string,
+|};
+
+const addNode = (
+  currentNode: MosaicNode,
+  newNode: MosaicNode | string,
+  position: 'start' | 'end',
+  splitPercentage: number,
+  direction: 'row' | 'column' = 'row'
+): MosaicNode => {
   if (currentNode.second && typeof currentNode.second !== 'string') {
     return {
       ...currentNode,
-      second: addRightNode(currentNode.second, newNode, splitPercentage),
+      second: addNode(
+        currentNode.second,
+        newNode,
+        position,
+        splitPercentage,
+        direction
+      ),
     };
   }
 
   return {
     direction,
-    first: currentNode,
-    second: newNode,
+    first: position === 'end' ? currentNode : newNode,
+    second: position === 'end' ? newNode : currentNode,
     splitPercentage,
   };
 };
@@ -48,7 +63,7 @@ const renderMosaicWindowPreview = props => (
  * by default in the toolbarControls and a preview when the window is
  * dragged.
  */
-export const MosaicWindow = props => (
+export const MosaicWindow = (props: any) => (
   <RMMosaicWindow
     {...props}
     toolbarControls={props.toolbarControls || defaultToolbarControls}
@@ -56,33 +71,47 @@ export const MosaicWindow = props => (
   />
 );
 
+type Props = {|
+  initialNodes: MosaicNode,
+  editors: { [string]: React.Node },
+|};
+
+type State = {|
+  mosaicNode: MosaicNode,
+|};
+
 /**
  * @class EditorMosaic
  *
  * Can be used to create a mosaic of resizable editors.
  * Must be used inside a component wrapped in a DragDropContext.
  */
-export default class EditorMosaic extends Component {
-  constructor(props) {
-    super(props);
+export default class EditorMosaic extends React.Component<Props, State> {
+  state = {
+    mosaicNode: this.props.initialNodes,
+  };
 
-    this.state = {
-      mosaicNode: props.initialNodes,
-    };
-  }
-
-  openEditor = editorName => {
+  openEditor = (
+    editorName: string,
+    position: 'start' | 'end',
+    splitPercentage: number
+  ) => {
     if (getLeaves(this.state.mosaicNode).indexOf(editorName) !== -1) {
       return false;
     }
 
     this.setState({
-      mosaicNode: addRightNode(this.state.mosaicNode, editorName, 75),
+      mosaicNode: addNode(
+        this.state.mosaicNode,
+        editorName,
+        position,
+        splitPercentage
+      ),
     });
     return true;
   };
 
-  _onChange = mosaicNode => this.setState({ mosaicNode });
+  _onChange = (mosaicNode: MosaicNode) => this.setState({ mosaicNode });
 
   render() {
     const { editors } = this.props;

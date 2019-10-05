@@ -105,7 +105,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   openProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties')) {
+    if (!this.editorMosaic.openEditor('properties', 'start', 66)) {
       this.setState({
         showPropertiesInfoBar: true,
       });
@@ -179,7 +179,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             direction: 'row',
             first: 'properties',
             second: 'resources-list',
-            splitPercentage: 75,
+            splitPercentage: 66,
           }}
         />
         <InfoBar

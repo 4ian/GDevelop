@@ -56,7 +56,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
   _editors: ?EditorMosaic = null;
 
   openProfiler = () => {
-    if (this._editors) this._editors.openEditor('profiler', 'bottom');
+    if (this._editors) this._editors.openEditor('profiler', 'end', 75);
   };
 
   render() {

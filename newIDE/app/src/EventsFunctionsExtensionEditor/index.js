@@ -262,7 +262,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
           if (this._editors)
-            this._editors.openEditor('behavior-functions-list');
+            this._editors.openEditor('behavior-functions-list', 'end', 75);
         }
       }
     );

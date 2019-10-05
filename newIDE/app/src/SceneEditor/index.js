@@ -252,7 +252,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('objects-list')) {
+    if (!this.editorMosaic.openEditor('objects-list', 'end', 75)) {
       this.setState({
         showObjectsListInfoBar: true,
       });
@@ -261,7 +261,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties')) {
+    if (!this.editorMosaic.openEditor('properties', 'start', 25)) {
       this.setState({
         showPropertiesInfoBar: true,
       });
@@ -270,7 +270,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('object-groups-list');
+    this.editorMosaic.openEditor('object-groups-list', 'end', 75);
   };
 
   toggleInstancesList = () => {

@@ -136,7 +136,7 @@ export default (
         },
         getLabel,
       };
-    } else if (valueType === 'textarea' || valueType === '') {
+    } else if (valueType === 'textarea') {
       return {
         name,
         valueType: 'textarea',

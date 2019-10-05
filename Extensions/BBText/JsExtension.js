@@ -49,6 +49,10 @@ module.exports = {
         objectContent.visible = newValue === '1';
         return true;
       }
+      if (propertyName === 'size') {
+        objectContent.size = String(newValue);
+        return true;
+      }
 
       return false;
     };
@@ -76,6 +80,12 @@ module.exports = {
           .setLabel(_('Opacity (0-255)'))
       );
       objectProperties.set(
+        'size',
+        new gd.PropertyDescriptor(objectContent.size)
+          .setType('number')
+          .setLabel(_('Base size'))
+      );
+      objectProperties.set(
         'visible',
         new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
           .setType('boolean')
@@ -86,8 +96,10 @@ module.exports = {
     };
     objectBBText.setRawJSONContent(
       JSON.stringify({
-        text: '[b]insert[/b] [color=yellow]BBCode[/color] [i]text[/i]',
+        text:
+          "[spacing=19]spaced out [/spacing][font=Cursive]comix[/font] comix [shadow=red]DropShadow[/shadow] [size=15]Let's[/size] do [outline=black][color=pink][size=40]outlined text[/size][/color][/outline] [color=yellow]bbcolors[/color] [i]italic[/i]\nand [b]bold[/b] text for\n[pixi]Pixi.js![/pixi]",
         opacity: 255,
+        size: '24',
         visible: true,
         color: '#000000',
       })
@@ -348,6 +360,13 @@ module.exports = {
         .getValue();
       this._pixiObject.textStyles.default.fill = color;
 
+      // Update size
+      const size = this._associatedObject
+        .getProperties(this.project)
+        .get('size')
+        .getValue();
+      this._pixiObject.textStyles.default.fontSize = `${size}px`;
+
       // Read position and angle from the instance
       this._pixiObject.position.x =
         this._instance.getX() + this._pixiObject.width / 2;
@@ -358,6 +377,8 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize()) {
+        this._pixiObject.textStyles.default.wordWrapWidth =
+          this._instance.getCustomWidth() / 2;
         // this._pixiObject.width = this._instance.getCustomWidth();
         // this._pixiObject.height = this._instance.getCustomHeight();
       }

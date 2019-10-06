@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
+import EditorMosaic from '../UI/EditorMosaic';
 import Background from '../UI/Background';
 import get from 'lodash/get';
 import RaisedButton from '../UI/RaisedButton';
@@ -80,12 +80,11 @@ export default class DebuggerContent extends React.Component<Props, State> {
       <EditorMosaic
         ref={editors => (this._editors = editors)}
         editors={{
-          inspectors: (
-            <MosaicWindow
-              title={<Trans>Inspectors</Trans>}
-              toolbarControls={[]}
-              gameData={gameData}
-            >
+          inspectors: {
+            type: 'primary',
+            title: <Trans>Inspectors</Trans>,
+            toolbarControls: [],
+            renderEditor: () => (
               <Background>
                 <Column expand noMargin>
                   <Line justifyContent="center">
@@ -112,81 +111,81 @@ export default class DebuggerContent extends React.Component<Props, State> {
                   </Line>
                 </Column>
               </Background>
-            </MosaicWindow>
-          ),
-          'selected-inspector': (
-            <Column expand noMargin>
-              {' '}
-              {selectedInspector ? (
-                rawMode ? (
-                  <RawContentInspector
-                    gameData={get(gameData, selectedInspectorFullPath, null)}
-                    onEdit={(path, newValue) =>
-                      onEdit(selectedInspectorFullPath.concat(path), newValue)
-                    }
-                  />
-                ) : (
-                  selectedInspector.renderInspector(
-                    get(gameData, selectedInspectorFullPath, null),
-                    {
-                      onCall: (path, args) =>
-                        onCall(selectedInspectorFullPath.concat(path), args),
-                      onEdit: (path, newValue) =>
-                        onEdit(
-                          selectedInspectorFullPath.concat(path),
-                          newValue
-                        ),
-                    }
-                  ) || (
-                    <EmptyMessage>
-                      <Trans>
-                        No inspector, choose another element in the list or
-                        toggle the raw data view.
-                      </Trans>
-                    </EmptyMessage>
-                  )
-                )
-              ) : (
-                <EmptyMessage>
-                  {gameData
-                    ? 'Choose an element to inspect in the list'
-                    : 'Pause the game (from the toolbar) or hit refresh (on the left) to inspect the game'}
-                </EmptyMessage>
-              )}
-              <Column>
-                <Line justifyContent="space-between" alignItems="center">
-                  <HelpButton helpPagePath="/interface/debugger" />
-                  <div>
-                    <Checkbox
-                      checkedIcon={<Flash />}
-                      uncheckedIcon={<FlashOff />}
-                      checked={rawMode}
-                      onCheck={(e, enabled) =>
-                        this.setState({
-                          rawMode: enabled,
-                        })
+            ),
+          },
+          'selected-inspector': {
+            type: 'primary',
+            noTitleBar: true,
+            renderEditor: () => (
+              <Column expand noMargin>
+                {selectedInspector ? (
+                  rawMode ? (
+                    <RawContentInspector
+                      gameData={get(gameData, selectedInspectorFullPath, null)}
+                      onEdit={(path, newValue) =>
+                        onEdit(selectedInspectorFullPath.concat(path), newValue)
                       }
                     />
-                  </div>
-                </Line>
+                  ) : (
+                    selectedInspector.renderInspector(
+                      get(gameData, selectedInspectorFullPath, null),
+                      {
+                        onCall: (path, args) =>
+                          onCall(selectedInspectorFullPath.concat(path), args),
+                        onEdit: (path, newValue) =>
+                          onEdit(
+                            selectedInspectorFullPath.concat(path),
+                            newValue
+                          ),
+                      }
+                    ) || (
+                      <EmptyMessage>
+                        <Trans>
+                          No inspector, choose another element in the list or
+                          toggle the raw data view.
+                        </Trans>
+                      </EmptyMessage>
+                    )
+                  )
+                ) : (
+                  <EmptyMessage>
+                    {gameData
+                      ? 'Choose an element to inspect in the list'
+                      : 'Pause the game (from the toolbar) or hit refresh (on the left) to inspect the game'}
+                  </EmptyMessage>
+                )}
+                <Column>
+                  <Line justifyContent="space-between" alignItems="center">
+                    <HelpButton helpPagePath="/interface/debugger" />
+                    <div>
+                      <Checkbox
+                        checkedIcon={<Flash />}
+                        uncheckedIcon={<FlashOff />}
+                        checked={rawMode}
+                        onCheck={(e, enabled) =>
+                          this.setState({
+                            rawMode: enabled,
+                          })
+                        }
+                      />
+                    </div>
+                  </Line>
+                </Column>
               </Column>
-            </Column>
-          ),
-          profiler: (
-            <MosaicWindow
-              title={<Trans>Profiler</Trans>}
-              // Pass profilerOutput to force MosaicWindow update when profilerOutput is changed
-              profilerOutput={profilerOutput}
-              profilingInProgress={profilingInProgress}
-            >
+            ),
+          },
+          profiler: {
+            type: 'secondary',
+            title: <Trans>Profiler</Trans>,
+            renderEditor: () => (
               <Profiler
                 onStart={onStartProfiler}
                 onStop={onStopProfiler}
                 profilerOutput={profilerOutput}
                 profilingInProgress={profilingInProgress}
               />
-            </MosaicWindow>
-          ),
+            ),
+          },
         }}
         initialNodes={{
           direction: 'column',

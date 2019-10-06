@@ -12,39 +12,90 @@ import ThemeConsumer from '../Theme/ThemeConsumer';
 import 'react-mosaic-component/react-mosaic-component.css';
 import './style.css';
 
-type MosaicNode = {|
-  direction: 'row' | 'column',
-  splitPercentage: number,
-  first: ?MosaicNode | string,
-  second: ?MosaicNode | string,
-|};
+type MosaicNode =
+  | {|
+      direction: 'row' | 'column',
+      splitPercentage: number,
+      first: ?MosaicNode,
+      second: ?MosaicNode,
+    |}
+  | string;
 
+// Add a node (an editor) in the mosaic.
 const addNode = (
-  currentNode: MosaicNode,
+  currentNode: ?MosaicNode,
   newNode: MosaicNode | string,
   position: 'start' | 'end',
   splitPercentage: number,
   direction: 'row' | 'column' = 'row'
 ): MosaicNode => {
-  if (currentNode.second && typeof currentNode.second !== 'string') {
-    return {
-      ...currentNode,
-      second: addNode(
-        currentNode.second,
-        newNode,
-        position,
-        splitPercentage,
-        direction
-      ),
-    };
+  if (!currentNode) return newNode;
+
+  // Add the new node inside the current node...
+  if (typeof currentNode !== 'string') {
+    if (
+      position === 'end' &&
+      currentNode.second &&
+      typeof currentNode.second !== 'string'
+    ) {
+      return {
+        ...currentNode,
+        second: addNode(
+          currentNode.second,
+          newNode,
+          position,
+          splitPercentage,
+          direction
+        ),
+      };
+    } else if (
+      position === 'start' &&
+      currentNode.first &&
+      typeof currentNode.first !== 'string'
+    ) {
+      return {
+        ...currentNode,
+        first: addNode(
+          currentNode.first,
+          newNode,
+          position,
+          splitPercentage,
+          direction
+        ),
+      };
+    }
   }
 
+  // Or add the node here.
   return {
     direction,
     first: position === 'end' ? currentNode : newNode,
     second: position === 'end' ? newNode : currentNode,
     splitPercentage,
   };
+};
+
+// Replace a node (an editor) by another.
+const replaceNode = (
+  currentNode: ?MosaicNode,
+  oldNode: ?MosaicNode,
+  newNode: ?MosaicNode
+): ?MosaicNode => {
+  if (!currentNode) {
+    return currentNode;
+  } else if (typeof currentNode === 'string') {
+    if (currentNode === oldNode) return newNode;
+
+    return currentNode;
+  } else {
+    if (currentNode === oldNode) return newNode;
+
+    return {
+      ...currentNode,
+      first: replaceNode(currentNode.first, oldNode, newNode),
+      second: replaceNode(currentNode.second, oldNode, newNode),
+    };
+  }
 };
 
 const defaultToolbarControls = [<CloseButton key="close" />];
@@ -63,7 +114,7 @@ const renderMosaicWindowPreview = props => (
  * by default in the toolbarControls and a preview when the window is
  * dragged.
  */
-export const MosaicWindow = (props: any) => (
+const MosaicWindow = (props: any) => (
   <RMMosaicWindow
     {...props}
     toolbarControls={props.toolbarControls || defaultToolbarControls}
@@ -71,13 +122,24 @@ export const MosaicWindow = (props: any) => (
   />
 );
 
+type Editor = {|
+  type: 'primary' | 'secondary',
+  renderEditor: () => React.Node,
+  noTitleBar?: boolean,
+  title?: React.Node,
+  toolbarControls?: Array<React.Node>,
+|};
+
 type Props = {|
   initialNodes: MosaicNode,
-  editors: { [string]: React.Node },
+  editors: {
+    [string]: Editor,
+  },
+  limitToOneSecondaryEditor?: boolean,
 |};
 
 type State = {|
-  mosaicNode: MosaicNode,
+  mosaicNode: ?MosaicNode,
 |};
 
 /**
@@ -96,10 +158,34 @@ export default class EditorMosaic extends React.Component<Props, State> {
     position: 'start' | 'end',
     splitPercentage: number
   ) => {
-    if (getLeaves(this.state.mosaicNode).indexOf(editorName) !== -1) {
+    const { editors, limitToOneSecondaryEditor } = this.props;
+
+    const editor = this.props.editors[editorName];
+    if (!editor) return false;
+
+    const openedEditorNames = getLeaves(this.state.mosaicNode);
+    if (openedEditorNames.indexOf(editorName) !== -1) {
       return false;
     }
 
+    if (limitToOneSecondaryEditor && editor.type === 'secondary') {
+      // Replace the existing secondary editor, if any.
+      const secondaryEditorName = openedEditorNames.find(
+        editorName => editors[editorName].type === 'secondary'
+      );
+      if (secondaryEditorName) {
+        this.setState({
+          mosaicNode: replaceNode(
+            this.state.mosaicNode,
+            secondaryEditorName,
+            editorName
+          ),
+        });
+        return true;
+      }
+    }
+
+    // Open a new editor at the indicated position
     this.setState({
       mosaicNode: addNode(
         this.state.mosaicNode,
@@ -108,6 +194,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
         splitPercentage
       ),
     });
+
     return true;
   };
 
@@ -122,9 +209,29 @@ export default class EditorMosaic extends React.Component<Props, State> {
             className={`${
               muiTheme.mosaicRootClassName
             } mosaic-blueprint-theme mosaic-gd-theme`}
-            renderTile={(editorName, path) =>
-              React.cloneElement(editors[editorName], { path })
-            }
+            renderTile={(editorName: string, path: string) => {
+              const editor = editors[editorName];
+              if (!editor) {
+                console.error(
+                  'Trying to render un unknown editor: ' + editorName
+                );
+                return null;
+              }
+
+              if (editor.noTitleBar) {
+                return editor.renderEditor();
+              }
+
+              return (
+                <MosaicWindow
+                  path={path}
+                  title={editor.title}
+                  toolbarControls={editor.toolbarControls}
+                >
+                  {editor.renderEditor()}
+                </MosaicWindow>
+              );
+            }}
             value={this.state.mosaicNode}
             onChange={this._onChange}
           />

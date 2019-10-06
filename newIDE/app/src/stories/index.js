@@ -147,6 +147,9 @@ import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import NewObjectDialog from '../ObjectsList/NewObjectDialog';
 import { Column } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
+import EditorMosaic from '../UI/EditorMosaic';
+import FlatButton from '../UI/FlatButton';
+import EditorMosaicPlayground from './EditorMosaicPlayground';
 
 // No i18n in this file
 
@@ -556,6 +559,120 @@ storiesOf('UI Building Blocks/ColorField', module)
         onChangeComplete={() => {}}
       />
     </div>
+  ));
+
+storiesOf('UI Building Blocks/EditorMosaic', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EditorMosaicPlayground
+      renderButtons={({ openEditor }) => (
+        <FlatButton
+          onClick={() => openEditor('thirdEditor', 'end', 65)}
+          label="Open the third editor"
+        />
+      )}
+      renderEditorMosaic={({ editorRef }) => (
+        <EditorMosaic
+          ref={editorRef}
+          editors={{
+            firstEditor: {
+              type: 'primary',
+              title: 'First editor',
+              toolbarControls: [],
+              renderEditor: () => (
+                <div>
+                  This is the first editor (left), with title bar but no
+                  controls to close the window.
+                </div>
+              ),
+            },
+            secondEditor: {
+              type: 'primary',
+              noTitleBar: true,
+              renderEditor: () => (
+                <div>
+                  This is the second editor ("central"), without title bar.
+                </div>
+              ),
+            },
+            thirdEditor: {
+              type: 'secondary',
+              title: 'Third editor',
+              renderEditor: () => <div>This is the third editor (bottom).</div>,
+            },
+          }}
+          initialNodes={{
+            direction: 'column',
+            first: {
+              direction: 'row',
+              first: 'firstEditor',
+              second: 'secondEditor',
+              splitPercentage: 25,
+            },
+            second: 'thirdEditor',
+            splitPercentage: 65,
+          }}
+        />
+      )}
+    />
+  ))
+  .add('limit to one secondary editor', () => (
+    <EditorMosaicPlayground
+      renderButtons={({ openEditor }) => (
+        <React.Fragment>
+          <FlatButton
+            onClick={() => openEditor('firstEditor', 'end', 65)}
+            label="Open the 1st secondary editor"
+          />
+          <FlatButton
+            onClick={() => openEditor('secondEditor', 'end', 65)}
+            label="Open the 2nd secondary editor"
+          />
+          <FlatButton
+            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            label="Open the 3rd secondary editor"
+          />
+        </React.Fragment>
+      )}
+      renderEditorMosaic={({ editorRef }) => (
+        <EditorMosaic
+          limitToOneSecondaryEditor
+          ref={editorRef}
+          editors={{
+            firstEditor: {
+              type: 'secondary',
+              title: '1st secondary editor',
+              renderEditor: () => <div>This is a secondary editor.</div>,
+            },
+            secondEditor: {
+              type: 'secondary',
+              title: '2nd secondary editor',
+              renderEditor: () => <div>This is another secondary editor.</div>,
+            },
+            thirdEditor: {
+              type: 'secondary',
+              title: '3rd secondary editor',
+              renderEditor: () => (
+                <div>This is yet another secondary editor.</div>
+              ),
+            },
+            mainEditor: {
+              type: 'primary',
+              noTitleBar: true,
+              renderEditor: () => (
+                <div>This is the main editor, always shown</div>
+              ),
+            },
+          }}
+          initialNodes={{
+            direction: 'row',
+            first: 'mainEditor',
+            second: 'firstEditor',
+            splitPercentage: 65,
+          }}
+        />
+      )}
+    />
   ));
 
 storiesOf('UI Building Blocks/ClosableTabs', module)

@@ -145,6 +145,8 @@ const styles = {
     display: 'flex',
     width: '100%',
     flexDirection: 'column',
+    flex: 1,
+    position: 'relative', // To be sure that absolutely positioned PlaceholderMessage won't go outside of the EventsSheet
   },
 };
 

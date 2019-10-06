@@ -12,6 +12,14 @@ import ThemeConsumer from '../Theme/ThemeConsumer';
 import 'react-mosaic-component/react-mosaic-component.css';
 import './style.css';
 
+export type Editor = {|
+  type: 'primary' | 'secondary',
+  renderEditor: () => React.Node,
+  noTitleBar?: boolean,
+  title?: React.Node,
+  toolbarControls?: Array<React.Node>,
+|};
+
 type MosaicNode =
   | {|
       direction: 'row' | 'column',
@@ -121,14 +129,6 @@ const MosaicWindow = (props: any) => (
     renderPreview={renderMosaicWindowPreview}
   />
 );
-
-type Editor = {|
-  type: 'primary' | 'secondary',
-  renderEditor: () => React.Node,
-  noTitleBar?: boolean,
-  title?: React.Node,
-  toolbarControls?: Array<React.Node>,
-|};
 
 type Props = {|
   initialNodes: MosaicNode,

@@ -4,6 +4,7 @@ import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProv
 import EditorMosaic from '../UI/EditorMosaic';
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
 import { Line, Column } from '../UI/Grid';
+import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 
 type OpenEditorFunction = (
   editorName: string,
@@ -14,12 +15,14 @@ type OpenEditorFunction = (
 type Props = {|
   renderButtons: ({| openEditor: OpenEditorFunction |}) => React.Node,
   renderEditorMosaic: ({
-    editorRef: { current: EditorMosaic | null },
+    // $FlowFixMe
+    editorRef: { current: EditorMosaic | EditorNavigator | null },
   }) => React.Node,
 |};
 
 export default ({ renderButtons, renderEditorMosaic }: Props) => {
-  const editorRef = React.useRef((null: ?EditorMosaic));
+  // $FlowFixMe
+  const editorRef = React.useRef((null: ?EditorMosaic | ?EditorNavigator));
   const openEditor = (
     editorName: string,
     position: 'start' | 'end',

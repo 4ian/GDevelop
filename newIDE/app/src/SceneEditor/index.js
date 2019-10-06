@@ -30,7 +30,7 @@ import { passFullSize } from '../UI/FullSizeMeasurer';
 import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import Drawer from '@material-ui/core/Drawer';
-import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
+import EditorMosaic from '../UI/EditorMosaic';
 import EditorBar, { editorBarHeight } from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
@@ -66,6 +66,7 @@ import {
   getTagsFromString,
 } from '../Utils/TagsHelper';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -883,8 +884,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
     const editors = {
-      properties: (
-        <MosaicWindow title={<Trans>Properties</Trans>}>
+      properties: {
+        type: 'secondary',
+        title: <Trans>Properties</Trans>,
+        renderEditor: () => (
           <InstancePropertiesEditor
             project={project}
             layout={layout}
@@ -896,56 +899,62 @@ export default class SceneEditor extends React.Component<Props, State> {
               (this._propertiesEditor = propertiesEditor)
             }
           />
-        </MosaicWindow>
-      ),
-      'instances-editor': (
-        <ScreenTypeMeasurer>
-          {screenType => (
-            <FullSizeInstancesEditor
-              project={project}
-              layout={layout}
-              initialInstances={initialInstances}
-              options={this.state.uiSettings}
-              onChangeOptions={this.setUiSettings}
-              instancesSelection={this.instancesSelection}
-              onDeleteSelection={this.deleteSelection}
-              onInstancesAdded={this._onInstancesAdded}
-              onInstancesSelected={this._onInstancesSelected}
-              onInstancesMoved={this._onInstancesMoved}
-              onInstancesResized={this._onInstancesResized}
-              onInstancesRotated={this._onInstancesRotated}
-              selectedObjectNames={this.state.selectedObjectNames}
-              onContextMenu={this._onContextMenu}
-              onCopy={() => this.copySelection({ useLastCursorPosition: true })}
-              onCut={() => this.cutSelection({ useLastCursorPosition: true })}
-              onPaste={() => this.paste({ useLastCursorPosition: true })}
-              onUndo={this.undo}
-              onRedo={this.redo}
-              onZoomOut={this.zoomOut}
-              onZoomIn={this.zoomIn}
-              wrappedEditorRef={editor => (this.editor = editor)}
-              pauseRendering={!isActive}
-              screenType={screenType}
-            />
-          )}
-        </ScreenTypeMeasurer>
-      ),
-      'objects-list': (
-        <MosaicWindow
-          title={<Trans>Objects</Trans>}
-          toolbarControls={[
-            <I18n key="tags">
-              {({ i18n }) => (
-                <TagsButton
-                  buildMenuTemplate={() =>
-                    this._buildObjectTagsMenuTemplate(i18n)
-                  }
-                />
-              )}
-            </I18n>,
-            <CloseButton key="close" />,
-          ]}
-        >
+        ),
+      },
+      'instances-editor': {
+        type: 'primary',
+        noTitleBar: true,
+        renderEditor: () => (
+          <ScreenTypeMeasurer>
+            {screenType => (
+              <FullSizeInstancesEditor
+                project={project}
+                layout={layout}
+                initialInstances={initialInstances}
+                options={this.state.uiSettings}
+                onChangeOptions={this.setUiSettings}
+                instancesSelection={this.instancesSelection}
+                onDeleteSelection={this.deleteSelection}
+                onInstancesAdded={this._onInstancesAdded}
+                onInstancesSelected={this._onInstancesSelected}
+                onInstancesMoved={this._onInstancesMoved}
+                onInstancesResized={this._onInstancesResized}
+                onInstancesRotated={this._onInstancesRotated}
+                selectedObjectNames={this.state.selectedObjectNames}
+                onContextMenu={this._onContextMenu}
+                onCopy={() =>
+                  this.copySelection({ useLastCursorPosition: true })
+                }
+                onCut={() => this.cutSelection({ useLastCursorPosition: true })}
+                onPaste={() => this.paste({ useLastCursorPosition: true })}
+                onUndo={this.undo}
+                onRedo={this.redo}
+                onZoomOut={this.zoomOut}
+                onZoomIn={this.zoomIn}
+                wrappedEditorRef={editor => (this.editor = editor)}
+                pauseRendering={!isActive}
+                screenType={screenType}
+              />
+            )}
+          </ScreenTypeMeasurer>
+        ),
+      },
+      'objects-list': {
+        type: 'secondary',
+        title: <Trans>Objects</Trans>,
+        toolbarControls: [
+          <I18n key="tags">
+            {({ i18n }) => (
+              <TagsButton
+                buildMenuTemplate={() =>
+                  this._buildObjectTagsMenuTemplate(i18n)
+                }
+              />
+            )}
+          </I18n>,
+          <CloseButton key="close" />,
+        ],
+        renderEditor: () => (
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
               ObjectsRenderingService
@@ -969,10 +978,12 @@ export default class SceneEditor extends React.Component<Props, State> {
             getAllObjectTags={this._getAllObjectTags}
             ref={objectsList => (this._objectsList = objectsList)}
           />
-        </MosaicWindow>
-      ),
-      'object-groups-list': (
-        <MosaicWindow title={<Trans>Object Groups</Trans>}>
+        ),
+      },
+      'object-groups-list': {
+        type: 'secondary',
+        title: <Trans>Object Groups</Trans>,
+        renderEditor: () => (
           <ObjectGroupsList
             globalObjectGroups={project.getObjectGroups()}
             objectGroups={layout.getObjectGroups()}
@@ -981,26 +992,31 @@ export default class SceneEditor extends React.Component<Props, State> {
             onRenameGroup={this._onRenameGroup}
             canRenameGroup={this._canObjectOrGroupUseNewName}
           />
-        </MosaicWindow>
-      ),
+        ),
+      },
     };
     return (
       <div style={styles.container}>
-        <EditorMosaic
-          editors={editors}
-          ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-          initialNodes={{
-            direction: 'row',
-            first: 'properties',
-            splitPercentage: 23,
-            second: {
-              direction: 'row',
-              first: 'instances-editor',
-              second: this.props.showObjectsList ? 'objects-list' : null,
-              splitPercentage: 77,
-            },
-          }}
-        />
+        <ResponsiveWindowMeasurer>
+          {windowWidth => (
+            <EditorMosaic
+              editors={editors}
+              limitToOneSecondaryEditor={windowWidth === 'small'}
+              initialNodes={{
+                direction: 'row',
+                first: 'properties',
+                splitPercentage: 23,
+                second: {
+                  direction: 'row',
+                  first: 'instances-editor',
+                  second: this.props.showObjectsList ? 'objects-list' : null,
+                  splitPercentage: 77,
+                },
+              }}
+              ref={editorMosaic => (this.editorMosaic = editorMosaic)}
+            />
+          )}
+        </ResponsiveWindowMeasurer>
         {this.state.editedObjectWithContext && (
           <ObjectEditorDialog
             open

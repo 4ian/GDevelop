@@ -13,15 +13,19 @@
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  console.log('OBJ:', this);
+  console.log('OBJ:', this, objectData);
   /** @type number */
   this._opacity = objectData.content.opacity;
   /** @type boolean */
   this._visible = objectData.content.visible;
-  /** @type number */
-  // this._volume = objectData.content.volume;
   /** @type string */
   this._text = objectData.content.text;
+  /** @type string */
+  this._color = objectData.content.color;
+  /** @type string */
+  this._family = objectData.content.family;
+  /** @type number */
+  this._size = objectData.content.size;
 
   // Use a boolean to track if the video was paused because we
   // navigated to another scene, and so should resume if we're back.
@@ -53,10 +57,10 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
   initialInstanceData
 ) {
-  if (initialInstanceData.customSize) {
-    this.setWidth(initialInstanceData.width);
-    this.setHeight(initialInstanceData.height);
-  }
+  // if (initialInstanceData.customSize) {
+  //   this.setWidth(initialInstanceData.width);
+  //   this.setHeight(initialInstanceData.height);
+  // }
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {

@@ -45,6 +45,10 @@ module.exports = {
         objectContent.opacity = parseFloat(newValue);
         return true;
       }
+      if (propertyName === 'family') {
+        objectContent.family = newValue;
+        return true;
+      }
       if (propertyName === 'visible') {
         objectContent.visible = newValue === '1';
         return true;
@@ -79,12 +83,21 @@ module.exports = {
           .setType('number')
           .setLabel(_('Opacity (0-255)'))
       );
+
       objectProperties.set(
         'size',
         new gd.PropertyDescriptor(objectContent.size)
           .setType('number')
           .setLabel(_('Base size'))
       );
+
+      objectProperties.set(
+        'family',
+        new gd.PropertyDescriptor(objectContent.family)
+          .setType('string')
+          .setLabel(_('Base font family'))
+      );
+
       objectProperties.set(
         'visible',
         new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
@@ -97,11 +110,12 @@ module.exports = {
     objectBBText.setRawJSONContent(
       JSON.stringify({
         text:
-          "[spacing=19]spaced out [/spacing][font=Cursive]comix[/font] comix [shadow=red]DropShadow[/shadow] [size=15]Let's[/size] do [outline=black][color=pink][size=40]outlined text[/size][/color][/outline] [color=yellow]bbcolors[/color] [i]italic[/i]\nand [b]bold[/b] text for\n[pixi]Pixi.js![/pixi]",
+          '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
-        size: '24',
+        size: '20',
         visible: true,
         color: '#000000',
+        family: 'Arial',
       })
     );
 
@@ -366,6 +380,13 @@ module.exports = {
         .getValue();
       this._pixiObject.textStyles.default.fontSize = `${size}px`;
 
+      // Update font family
+      const family = this._associatedObject
+        .getProperties(this.project)
+        .get('family')
+        .getValue();
+      this._pixiObject.textStyles.default.fontFamily = family;
+
       // Read position and angle from the instance
       this._pixiObject.position.x =
         this._instance.getX() + this._pixiObject.width / 2;
@@ -376,8 +397,8 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.textStyles.default.wordWrapWidth =
-          this._instance.getCustomWidth() / 2;
+        // this._pixiObject.textStyles.default.wordWrapWidth =
+        //   this._instance.getCustomWidth() / 2;
         // this._pixiObject.width = this._instance.getCustomWidth();
         // this._pixiObject.height = this._instance.getCustomHeight();
       }

@@ -18,7 +18,7 @@ type ColorResult = {
 type ColorChangeHandler = (color: ColorResult) => void;
 
 type Props = {|
-  color: ?RGBColor,
+  color: ?RGBColor | string,
   style?: Object,
   onChange?: ColorChangeHandler,
   onChangeComplete?: ColorChangeHandler,
@@ -76,7 +76,7 @@ class ColorPicker extends React.Component<Props, State> {
     this.setState({ displayColorPicker: false });
   };
 
-  getRgbBackground = rgbColor =>
+  getRgbBackground = (rgbColor: RGBColor) =>
     `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, ${rgbColor.a || 1})`;
 
   render() {

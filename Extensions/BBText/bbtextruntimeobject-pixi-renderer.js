@@ -13,10 +13,9 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   if (this._pixiObject === undefined) {
     this._pixiObject = new MultiStyleText(runtimeObject._text, {
       default: {
-        fontFamily: 'Arial',
-        fontSize: '24px',
-        fill: '#cccccc',
-        align: 'center',
+        fontFamily: runtimeObject._family,
+        fontSize: `${runtimeObject._size}px`,
+        fill: runtimeObject._color,
         tagStyle: ['[', ']'],
         wordWrap: true,
         wordWrapWidth: 250,
@@ -155,99 +154,4 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.isMuted = function() {
   // var source = this._getHTMLVideoElementSource();
   // if (!source) return false;
   // return source.muted;
-};
-
-/**
- * Set the current time of the video.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setCurrentTime = function(
-  number
-) {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return;
-  // source.currentTime = number;
-};
-
-/**
- * Set the volume of the video, between 0 and 1.
- * @param {number} volume The new volume.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setVolume = function(volume) {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return;
-  // source.volume = volume;
-};
-
-/**
- * Get the volume on video, between 0 and 1.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getVolume = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return 0;
-  // return source.volume;
-};
-
-/**
- * Return true if the video is playing
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.isPlayed = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return false;
-  // return !source.paused && !source.ended;
-};
-
-/**
- * Return true if the video is looping
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.isLooped = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return false;
-  // return source.loop;
-};
-
-/**
- * Get the current time of the playback.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getCurrentTime = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return 0;
-  // return source.currentTime;
-};
-
-/**
- * Get the duration of the video.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getDuration = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return 0;
-  // return source.duration;
-};
-
-/**
- * Return true if the video has ended.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.isEnded = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return false;
-  // return source.ended;
-};
-
-/**
- * Set the playback speed (1 = 100%)
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setPlaybackSpeed = function(
-  playbackRate
-) {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return false;
-  // source.playbackRate = playbackRate;
-};
-
-/**
- * Return the playback speed (1 = 100%)
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getPlaybackSpeed = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return 0;
-  // return source.playbackRate;
 };

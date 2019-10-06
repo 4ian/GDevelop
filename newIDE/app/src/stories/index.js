@@ -150,6 +150,8 @@ import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
 import EditorMosaicPlayground from './EditorMosaicPlayground';
+import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
+import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
 
 // No i18n in this file
 
@@ -670,6 +672,71 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
             second: 'firstEditor',
             splitPercentage: 65,
           }}
+        />
+      )}
+    />
+  ));
+
+storiesOf('UI Building Blocks/EditorNavigator', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EditorMosaicPlayground
+      renderButtons={({ openEditor }) => (
+        <React.Fragment>
+          <FlatButton
+            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            label="Open the third editor"
+          />
+          <FlatButton
+            onClick={() => openEditor('noTransitionsEditor', 'end', 65)}
+            label="Open the editor without transitions"
+          />
+        </React.Fragment>
+      )}
+      renderEditorMosaic={({ editorRef }) => (
+        <EditorNavigator
+          ref={editorRef}
+          initialEditorName="firstEditor"
+          transitions={{
+            firstEditor: {
+              nextLabel: 'Second Editor',
+              nextEditor: 'secondEditor',
+            },
+            secondEditor: {
+              previousEditor: 'firstEditor',
+              nextLabel: 'Third Editor',
+              nextEditor: 'thirdEditor',
+            },
+            thirdEditor: {
+              previousEditor: 'secondEditor',
+            },
+          }}
+          editors={{
+            firstEditor: {
+              type: 'primary',
+              title: 'First editor',
+              toolbarControls: [],
+              renderEditor: () => <div>This is the first editor.</div>,
+            },
+            secondEditor: {
+              type: 'primary',
+              noTitleBar: true,
+              renderEditor: () => <div>This is the second editor.</div>,
+            },
+            thirdEditor: {
+              type: 'secondary',
+              title: 'Third editor',
+              renderEditor: () => <div>This is the third editor.</div>,
+            },
+            noTransitionsEditor: {
+              type: 'secondary',
+              title: 'Editor without transitions',
+              renderEditor: () => (
+                <div>This is an editor without transitions.</div>
+              ),
+            },
+          }}
+          onEditorChanged={action('Editor was changed')}
         />
       )}
     />
@@ -2840,6 +2907,22 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
+  ));
+
+storiesOf(
+  'EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor',
+  module
+)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={500}>
+      <ChooseEventsFunctionsExtensionEditor
+        eventsFunctionsExtension={testEventsFunctionsExtension}
+        onEditBehaviors={action('edit behaviors')}
+        onEditFreeFunctions={action('edit free functions')}
+        onEditExtensionOptions={action('edit extension options')}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)

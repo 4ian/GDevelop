@@ -21,7 +21,7 @@ import CanvasCursor from './CanvasCursor';
 import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
-import PinchHandler from './PinchHandler';
+import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -116,9 +116,13 @@ export default class InstancesEditorContainer extends Component {
     this.backgroundArea.on('mousedown', event =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
     );
-    this.backgroundArea.on('touchstart', event =>
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y)
-    );
+    this.backgroundArea.on('touchstart', event => {
+      if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+        return;
+      }
+
+      this._onBackgroundClicked(event.data.global.x, event.data.global.y);
+    });
     this.backgroundArea.on('mousemove', event =>
       this._onMouseMove(event.data.global.x, event.data.global.y)
     );
@@ -161,7 +165,7 @@ export default class InstancesEditorContainer extends Component {
     });
 
     this.pinchHandler = new PinchHandler({
-      backgroundArea: this.backgroundArea,
+      canvas: this.pixiRenderer.view,
       setZoomFactor: this.setZoomFactor,
       getZoomFactor: this.getZoomFactor,
       viewPosition: this.viewPosition,
@@ -299,6 +303,7 @@ export default class InstancesEditorContainer extends Component {
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
     this._instancesAdder.unmount();
+    this.pinchHandler.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
   }

@@ -3,6 +3,7 @@ import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingServ
 import getObjectByName from '../../Utils/GetObjectByName';
 
 import * as PIXI from 'pixi.js';
+import { shouldBeHandledByPinch } from '../PinchHandler';
 const gd = global.gd;
 
 export default class LayerRenderer {
@@ -132,13 +133,21 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mousedown', () => {
         this.onDownInstance(instance);
       });
-      renderedInstance._pixiObject.on('touchstart', () => {
+      renderedInstance._pixiObject.on('touchstart', event => {
+        if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+          return;
+        }
+
         this.onDownInstance(instance);
       });
       renderedInstance._pixiObject.on('mouseout', () => {
         this.onOutInstance(instance);
       });
       renderedInstance._pixiObject.on('panmove', event => {
+        if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+          return;
+        }
+
         this.onMoveInstance(instance, event.deltaX, event.deltaY);
       });
       renderedInstance._pixiObject.on('panend', event => {

@@ -834,7 +834,6 @@ class MainFrame extends React.Component<Props, State> {
               }
               onOpenDebugger={this.openDebugger}
               onEditObject={this.props.onEditObject}
-              showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
@@ -969,7 +968,6 @@ class MainFrame extends React.Component<Props, State> {
                   }
                   onOpenDebugger={this.openDebugger}
                   onEditObject={this.props.onEditObject}
-                  showObjectsList={!this.props.integratedEditor}
                   resourceSources={this.props.resourceSources}
                   onChooseResource={this._onChooseResource}
                   resourceExternalEditors={this.props.resourceExternalEditors}

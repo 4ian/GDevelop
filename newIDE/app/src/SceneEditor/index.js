@@ -97,6 +97,25 @@ const instancesDrawerPaperProps = {
   },
 };
 
+const initialEditors = {
+  direction: 'row',
+  first: 'properties',
+  splitPercentage: 23,
+  second: {
+    direction: 'row',
+    first: 'instances-editor',
+    second: 'objects-list',
+    splitPercentage: 77,
+  },
+};
+
+const initialEditorsSmallWindow = {
+  direction: 'row',
+  first: 'instances-editor',
+  second: 'objects-list',
+  splitPercentage: 70,
+};
+
 type Props = {|
   initialInstances: gdInitialInstancesContainer,
   initialUiSettings: Object,
@@ -108,7 +127,6 @@ type Props = {|
   project: gdProject,
   setToolbar: (?React.Node) => void,
   showNetworkPreviewButton: boolean,
-  showObjectsList: boolean,
   showPreviewButton: boolean,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
@@ -148,7 +166,6 @@ type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
 
 export default class SceneEditor extends React.Component<Props, State> {
   static defaultProps = {
-    showObjectsList: true,
     setToolbar: () => {},
   };
 
@@ -212,7 +229,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           this.props.onOpenDebugger();
           this.props.onPreview({});
         }}
-        showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
         openObjectGroupsList={this.openObjectGroupsList}
@@ -1002,17 +1018,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             <EditorMosaic
               editors={editors}
               limitToOneSecondaryEditor={windowWidth === 'small'}
-              initialNodes={{
-                direction: 'row',
-                first: 'properties',
-                splitPercentage: 23,
-                second: {
-                  direction: 'row',
-                  first: 'instances-editor',
-                  second: this.props.showObjectsList ? 'objects-list' : null,
-                  splitPercentage: 77,
-                },
-              }}
+              initialNodes={
+                windowWidth === 'small'
+                  ? initialEditorsSmallWindow
+                  : initialEditors
+              }
               ref={editorMosaic => (this.editorMosaic = editorMosaic)}
             />
           )}

@@ -152,6 +152,7 @@ import FlatButton from '../UI/FlatButton';
 import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
+import PropertiesEditor from '../PropertiesEditor';
 
 // No i18n in this file
 
@@ -1009,6 +1010,112 @@ storiesOf('UI Building Blocks/HelpIcon', module)
 storiesOf('HelpFinder', module)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpFinder open onClose={action('close')} />);
+
+storiesOf('PropertiesEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <PropertiesEditor
+      schema={[
+        {
+          name: 'Object name',
+          valueType: 'string',
+          disabled: true,
+          getValue: instance => 'Disabled field',
+          setValue: (instance, newValue) => {},
+          onEditButtonClick: instance => action('edit button clicked'),
+        },
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              valueType: 'number',
+              getValue: instance => 10,
+              setValue: (instance, newValue) => {},
+            },
+            {
+              name: 'Y',
+              valueType: 'number',
+              getValue: instance => 20.1234,
+              setValue: (instance, newValue) => {},
+            },
+          ],
+        },
+        {
+          name: 'Angle',
+          valueType: 'number',
+          getValue: instance => 90.123456,
+          setValue: (instance, newValue) => {},
+        },
+        {
+          name: 'Checked checkbox',
+          valueType: 'boolean',
+          getValue: instance => true,
+          setValue: (instance, newValue) => {},
+        },
+        {
+          name: 'Unchecked checkbox',
+          valueType: 'boolean',
+          getValue: instance => false,
+          setValue: (instance, newValue) => {},
+        },
+      ]}
+      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
+    />
+  ))
+  .add('row (window width = medium)', () => (
+    <PropertiesEditor
+      schema={[
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              valueType: 'number',
+              getValue: instance => 10,
+              setValue: (instance, newValue) => {},
+            },
+            {
+              name: 'Y',
+              valueType: 'number',
+              getValue: instance => 20.1234,
+              setValue: (instance, newValue) => {},
+            },
+          ],
+        },
+      ]}
+      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
+      windowWidth="medium"
+    />
+  ))
+  .add('row (window width = small)', () => (
+    <PropertiesEditor
+      schema={[
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              valueType: 'number',
+              getValue: instance => 10,
+              setValue: (instance, newValue) => {},
+            },
+            {
+              name: 'Y',
+              valueType: 'number',
+              getValue: instance => 20.1234,
+              setValue: (instance, newValue) => {},
+            },
+          ],
+        },
+      ]}
+      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
+      windowWidth="small"
+    />
+  ));
 
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)

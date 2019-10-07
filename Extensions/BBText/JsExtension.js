@@ -57,6 +57,10 @@ module.exports = {
         objectContent.size = String(newValue);
         return true;
       }
+      if (propertyName === 'align') {
+        objectContent.align = newValue ? newValue : 'left';
+        return true;
+      }
 
       return false;
     };
@@ -92,6 +96,16 @@ module.exports = {
       );
 
       objectProperties.set(
+        'align',
+        new gd.PropertyDescriptor(objectContent.align)
+          .setType('choice')
+          .addExtraInfo('left')
+          .addExtraInfo('center')
+          .addExtraInfo('right')
+          .setLabel(_('Base alignment'))
+      );
+
+      objectProperties.set(
         'family',
         new gd.PropertyDescriptor(objectContent.family)
           .setType('string')
@@ -116,6 +130,7 @@ module.exports = {
         visible: true,
         color: '#000000',
         family: 'Arial',
+        align: 'left',
       })
     );
 
@@ -305,7 +320,7 @@ module.exports = {
           tagStyle: ['[', ']'],
           wordWrap: true,
           wordWrapWidth: 250,
-          align: 'left',
+          align: 'right',
         },
       };
 
@@ -331,20 +346,6 @@ module.exports = {
     ) {
       return 'JsPlatform/Extensions/bbcode24.png';
     };
-
-    // RenderedBBTextInstance.prototype._getVideoTexture = function() {
-    //   // Get the video resource to use
-    //   const videoResource = this._associatedObject
-    //     .getProperties(this.project)
-    //     .get('videoResource')
-    //     .getValue();
-
-    //   // This returns a VideoTexture with autoPlay set to false
-    //   return this._pixiResourcesLoader.getPIXIVideoTexture(
-    //     this._project,
-    //     videoResource
-    //   );
-    // };
 
     /**
      * This is called to update the PIXI object on the scene editor
@@ -381,11 +382,20 @@ module.exports = {
       this._pixiObject.textStyles.default.fontSize = `${size}px`;
 
       // Update font family
-      const family = this._associatedObject
-        .getProperties(this.project)
-        .get('family')
-        .getValue();
-      this._pixiObject.textStyles.default.fontFamily = family;
+      // const family = this._associatedObject
+      //   .getProperties(this.project)
+      //   .get('family')
+      //   .getValue();
+      // this._pixiObject.textStyles.default.fontFamily = family;
+
+      // // Update alignment
+      // const align = this._associatedObject
+      //   .getProperties(this.project)
+      //   .get('align')
+      //   .getValue();
+      // this._pixiObject.textStyles.default.align = align;
+
+      // this._pixiObject.textStyles.default.wordWrapWidth = this._pixiObject.width;
 
       // Read position and angle from the instance
       this._pixiObject.position.x =
@@ -399,6 +409,8 @@ module.exports = {
       if (this._instance.hasCustomSize()) {
         // this._pixiObject.textStyles.default.wordWrapWidth =
         //   this._instance.getCustomWidth() / 2;
+        this._pixiObject.textStyles.default.wordWrapWidth =
+          this._pixiObject.width / 10;
         // this._pixiObject.width = this._instance.getCustomWidth();
         // this._pixiObject.height = this._instance.getCustomHeight();
       }

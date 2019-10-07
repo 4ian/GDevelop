@@ -26,6 +26,8 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   this._family = objectData.content.family;
   /** @type number */
   this._size = objectData.content.size;
+  /** @type number */
+  this._wrappingWidth = objectData.content.wrappingWidth;
 
   // Use a boolean to track if the video was paused because we
   // navigated to another scene, and so should resume if we're back.
@@ -57,10 +59,10 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
   initialInstanceData
 ) {
-  // if (initialInstanceData.customSize) {
-  //   this.setWidth(initialInstanceData.width);
-  //   this.setHeight(initialInstanceData.height);
-  // }
+  if (initialInstanceData.customSize) {
+    // this.setWrapping(true);
+    this.setWrappingWidth(initialInstanceData.width);
+  }
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
@@ -114,6 +116,16 @@ gdjs.BBTextRuntimeObject.prototype.setOpacity = function(opacity) {
  */
 gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
   return this._opacity;
+};
+
+/**
+ * Set the word wrapping width for the text object.
+ * @param {number} width The new width to set.
+ */
+gdjs.TextRuntimeObject.prototype.setWrappingWidth = function(width) {
+  if (width <= 1) width = 1;
+  this._wrappingWidth = width;
+  // this._renderer.updateStyle();
 };
 
 /**

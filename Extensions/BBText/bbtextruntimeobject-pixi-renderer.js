@@ -50,7 +50,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
-  // this.updateVisible();
+  this.updateVisible();
 };
 
 gdjs.BBTextRuntimeObjectRenderer = gdjs.BBTextRuntimeObjectPixiRenderer;

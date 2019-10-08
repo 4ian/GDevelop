@@ -18,14 +18,20 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
         fill: runtimeObject._color,
         tagStyle: ['[', ']'],
         wordWrap: true,
-        wordWrapWidth: 250,
-        align: 'left',
+        wordWrapWidth: runtimeObject._wrappingWidth,
+        align: runtimeObject._align,
       },
     });
+    // this._pixiObject._style.wordWrapWidth = runtimeObject._wrappingWidth;
+    // this._pixiObject.dirty = true;
 
-    console.log('runtime obj', runtimeObject, this._pixiObject);
+    console.log('runtime obj', runtimeObject);
+    console.log('runtime ee', this._pixiObject);
+    console.log('runtime eeeee', this._object);
+
     this._object.hidden = !runtimeObject._visible;
   } else {
+    console.log('runtime obj', runtimeObject._wrappingWidth, this._pixiObject);
     // this._pixiObject._texture.baseTexture.source.currentTime = 0;
   }
 
@@ -74,6 +80,14 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
     this._pixiObject.texture &&
     this._pixiObject.texture.valid
   ) {
+    if (this._pixiObject._style.wordWrapWidth !== this._object._wrappingWidth) {
+      this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
+      this._pixiObject.dirty = true;
+    }
+    if (this._object._align !== this._pixiObject._style.align) {
+      this._pixiObject._style.align = this._object._align;
+      this._pixiObject.dirty = true;
+    }
     this.updatePosition();
     this._textureWasValid = true;
   }

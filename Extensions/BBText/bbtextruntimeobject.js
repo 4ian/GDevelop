@@ -27,7 +27,9 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type number */
   this._size = objectData.content.size;
   /** @type number */
-  this._wrappingWidth = objectData.content.wrappingWidth;
+  this._wrappingWidth = objectData.content.width;
+  /** @type string */
+  this._align = objectData.content.align;
 
   // Use a boolean to track if the video was paused because we
   // navigated to another scene, and so should resume if we're back.
@@ -60,7 +62,6 @@ gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = func
   initialInstanceData
 ) {
   if (initialInstanceData.customSize) {
-    // this.setWrapping(true);
     this.setWrappingWidth(initialInstanceData.width);
   }
 };
@@ -122,10 +123,9 @@ gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
  * Set the word wrapping width for the text object.
  * @param {number} width The new width to set.
  */
-gdjs.TextRuntimeObject.prototype.setWrappingWidth = function(width) {
+gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
   if (width <= 1) width = 1;
   this._wrappingWidth = width;
-  // this._renderer.updateStyle();
 };
 
 /**

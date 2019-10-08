@@ -11,7 +11,6 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-//TODO: add base color, base font, base size
 const MultiStyleText = require('./dist/pixi-multistyle-text.umd');
 console.log(MultiStyleText);
 module.exports = {
@@ -320,7 +319,7 @@ module.exports = {
           tagStyle: ['[', ']'],
           wordWrap: true,
           wordWrapWidth: 250,
-          align: 'right',
+          align: 'left',
         },
       };
 
@@ -382,20 +381,21 @@ module.exports = {
       this._pixiObject.textStyles.default.fontSize = `${size}px`;
 
       // Update font family
-      // const family = this._associatedObject
-      //   .getProperties(this.project)
-      //   .get('family')
-      //   .getValue();
-      // this._pixiObject.textStyles.default.fontFamily = family;
+      const family = this._associatedObject
+        .getProperties(this.project)
+        .get('family')
+        .getValue();
+      this._pixiObject.textStyles.default.fontFamily = family;
 
-      // // Update alignment
-      // const align = this._associatedObject
-      //   .getProperties(this.project)
-      //   .get('align')
-      //   .getValue();
-      // this._pixiObject.textStyles.default.align = align;
-
-      // this._pixiObject.textStyles.default.wordWrapWidth = this._pixiObject.width;
+      // Update alignment
+      const align = this._associatedObject
+        .getProperties(this.project)
+        .get('align')
+        .getValue();
+      if (align !== this._pixiObject._style.align) {
+        this._pixiObject._style.align = align;
+        this._pixiObject.dirty = true;
+      }
 
       // Read position and angle from the instance
       this._pixiObject.position.x =
@@ -406,13 +406,15 @@ module.exports = {
         this._instance.getAngle()
       );
 
-      if (this._instance.hasCustomSize()) {
-        // this._pixiObject.textStyles.default.wordWrapWidth =
-        //   this._instance.getCustomWidth() / 2;
-        this._pixiObject.textStyles.default.wordWrapWidth =
-          this._pixiObject.width / 10;
-        // this._pixiObject.width = this._instance.getCustomWidth();
-        // this._pixiObject.height = this._instance.getCustomHeight();
+      if (this._instance.hasCustomSize() && this._pixiObject) {
+        const customSize = this._instance.getCustomWidth();
+        if (
+          this._pixiObject &&
+          this._pixiObject.textStyles.default.wordWrapWidth !== customSize
+        ) {
+          this._pixiObject._style.wordWrapWidth = customSize;
+          this._pixiObject.dirty = true;
+        }
       }
     };
 

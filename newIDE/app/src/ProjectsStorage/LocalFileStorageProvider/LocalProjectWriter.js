@@ -1,12 +1,12 @@
 // @flow
-import { serializeToJSObject } from '../Utils/Serializer';
-import optionalRequire from '../Utils/OptionalRequire.js';
+import { serializeToJSObject } from '../../Utils/Serializer';
+import optionalRequire from '../../Utils/OptionalRequire.js';
 import {
   split,
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
-} from '../Utils/ObjectSplitter';
-import localFileSystem from '../Export/LocalExporters/LocalFileSystem';
+} from '../../Utils/ObjectSplitter';
+import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 
 const gd = global.gd;
@@ -85,62 +85,60 @@ const writeProjectFiles = (
   }
 };
 
-export default class LocalProjectWriter {
-  static saveProject = (project: gdProject): Promise<boolean> => {
-    const filePath = project.getProjectFile();
-    const projectPath = path.dirname(project.getProjectFile());
-    if (!filePath) {
-      return Promise.reject(
-        'Project file is empty, "Save as" should have been called?'
-      );
-    }
-
-    return writeProjectFiles(project, filePath, projectPath).then(() => {
-      return true; // Save was properly done
-    });
-  };
-
-  static saveProjectAs = (project: gdProject): Promise<boolean> => {
-    const defaultPath = project.getProjectFile();
-    const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
-    const browserWindow = electron.remote.getCurrentWindow();
-    const options = {
-      defaultPath,
-      filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
-    };
-
-    if (!dialog) {
-      return Promise.reject('Unsupported');
-    }
-    const filePath = dialog.showSaveDialog(browserWindow, options);
-    if (!filePath) {
-      return Promise.resolve(false); // Nothing was saved.
-    }
-    const projectPath = path.dirname(filePath);
-
-    // TODO: Ideally, errors while copying resources should be reported.
-    gd.ProjectResourcesCopier.copyAllResourcesTo(
-      project,
-      fileSystem,
-      projectPath,
-      true, // Update the project with the new resource paths
-      false, // Don't move absolute files
-      true // Keep relative files folders structure.
+export const onSaveProject = (project: gdProject): Promise<boolean> => {
+  const filePath = project.getProjectFile();
+  const projectPath = path.dirname(project.getProjectFile());
+  if (!filePath) {
+    return Promise.reject(
+      'Project file is empty, "Save as" should have been called?'
     );
+  }
 
-    // Update the project with the new file path (resources have already been updated)
-    project.setProjectFile(filePath);
+  return writeProjectFiles(project, filePath, projectPath).then(() => {
+    return true; // Save was properly done
+  });
+};
 
-    return writeProjectFiles(project, filePath, projectPath).then(() => {
-      return true; // Save was properly done
-    });
+export const onSaveProjectAs = (project: gdProject): Promise<boolean> => {
+  const defaultPath = project.getProjectFile();
+  const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
+  const browserWindow = electron.remote.getCurrentWindow();
+  const options = {
+    defaultPath,
+    filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
   };
 
-  static autoSaveProject = (project: gdProject) => {
-    const autoSavePath = project.getProjectFile() + '.autosave';
-    writeJSONFile(serializeToJSObject(project), autoSavePath).catch(err => {
-      console.error(`Unable to write ${autoSavePath}:`, err);
-      throw err;
-    });
-  };
-}
+  if (!dialog) {
+    return Promise.reject('Unsupported');
+  }
+  const filePath = dialog.showSaveDialog(browserWindow, options);
+  if (!filePath) {
+    return Promise.resolve(false); // Nothing was saved.
+  }
+  const projectPath = path.dirname(filePath);
+
+  // TODO: Ideally, errors while copying resources should be reported.
+  gd.ProjectResourcesCopier.copyAllResourcesTo(
+    project,
+    fileSystem,
+    projectPath,
+    true, // Update the project with the new resource paths
+    false, // Don't move absolute files
+    true // Keep relative files folders structure.
+  );
+
+  // Update the project with the new file path (resources have already been updated)
+  project.setProjectFile(filePath);
+
+  return writeProjectFiles(project, filePath, projectPath).then(() => {
+    return true; // Save was properly done
+  });
+};
+
+export const onAutoSaveProject = (project: gdProject) => {
+  const autoSavePath = project.getProjectFile() + '.autosave';
+  writeJSONFile(serializeToJSObject(project), autoSavePath).catch(err => {
+    console.error(`Unable to write ${autoSavePath}:`, err);
+    throw err;
+  });
+};

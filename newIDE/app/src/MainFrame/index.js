@@ -84,6 +84,7 @@ import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
+import { type ProjectsStorageProps } from '../ProjectsStorage';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -101,7 +102,6 @@ type State = {|
   createDialogOpen: boolean,
   exportDialogOpen: boolean,
   introDialogOpen: boolean,
-  saveDialogOpen: boolean,
   genericDialogOpen: boolean,
   loadingProject: boolean,
   previewLoading: boolean,
@@ -125,21 +125,11 @@ type State = {|
 type Props = {
   integratedEditor?: boolean,
   introDialog?: React.Element<*>,
-  onReadFromPathOrURL: (url: string) => Promise<any>,
   previewLauncher?: React.Element<PreviewLauncher>,
   onEditObject?: gdObject => void,
+  projectsStorage: ProjectsStorageProps,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseProject?: () => Promise<?string>,
-  saveDialog?: React.Element<*>,
-  onSaveProject?: gdProject => Promise<any>,
-  onSaveProjectAs?: gdProject => Promise<any>,
-  onAutoSaveProject?: (project: gdProject) => void,
-  shouldOpenAutosave?: (
-    filePath: string,
-    autoSavePath: string,
-    compareLastModified: boolean
-  ) => boolean,
   loading?: boolean,
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
@@ -156,7 +146,6 @@ class MainFrame extends React.Component<Props, State> {
     createDialogOpen: false,
     exportDialogOpen: false,
     introDialogOpen: false,
-    saveDialogOpen: false,
     genericDialogOpen: false,
     loadingProject: false,
     previewLoading: false,
@@ -179,7 +168,6 @@ class MainFrame extends React.Component<Props, State> {
   toolbar = null;
   _resourceSourceDialogs = {};
   _previewLauncher: ?PreviewLauncher = null;
-  _providers = null;
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
@@ -300,11 +288,14 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   openFromPathOrURL = (url: string, cb: Function) => {
-    const { i18n, shouldOpenAutosave } = this.props;
+    const { i18n, projectsStorage } = this.props;
 
     const projectFilePath = url;
     const autoSavePath = url + '.autosave';
-    if (shouldOpenAutosave && shouldOpenAutosave(url, autoSavePath, true)) {
+    if (
+      projectsStorage.shouldOpenAutosave &&
+      projectsStorage.shouldOpenAutosave(url, autoSavePath, true)
+    ) {
       //eslint-disable-next-line
       const answer = confirm(
         i18n._(
@@ -314,7 +305,7 @@ class MainFrame extends React.Component<Props, State> {
       if (answer) url = autoSavePath;
     }
 
-    this.props.onReadFromPathOrURL(url).then(
+    projectsStorage.onOpen(url).then(
       projectObject => {
         this.setState({ loadingProject: true }, () =>
           setTimeout(() => {
@@ -339,8 +330,12 @@ class MainFrame extends React.Component<Props, State> {
       },
       err => {
         if (
-          shouldOpenAutosave &&
-          shouldOpenAutosave(projectFilePath, autoSavePath, false)
+          projectsStorage.shouldOpenAutosave &&
+          projectsStorage.shouldOpenAutosave(
+            projectFilePath,
+            autoSavePath,
+            false
+          )
         ) {
           //eslint-disable-next-line
           const answer = confirm(
@@ -811,7 +806,7 @@ class MainFrame extends React.Component<Props, State> {
       openSceneEditor = true,
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
-    const { i18n, onAutoSaveProject } = this.props;
+    const { i18n, projectsStorage } = this.props;
     const sceneEditorOptions = {
       name,
       renderEditor: ({ isActive, editorRef }) => (
@@ -823,8 +818,11 @@ class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
-                if (values.autosaveOnPreview && onAutoSaveProject) {
-                  onAutoSaveProject(project);
+                if (
+                  values.autosaveOnPreview &&
+                  projectsStorage.onAutoSaveProject
+                ) {
+                  projectsStorage.onAutoSaveProject(project);
                 }
               }}
               showPreviewButton={!!this.props.previewLauncher}
@@ -856,8 +854,11 @@ class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
-                if (values.autosaveOnPreview && onAutoSaveProject) {
-                  onAutoSaveProject(project);
+                if (
+                  values.autosaveOnPreview &&
+                  projectsStorage.onAutoSaveProject
+                ) {
+                  projectsStorage.onAutoSaveProject(project);
                 }
               }}
               showPreviewButton={!!this.props.previewLauncher}
@@ -936,6 +937,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   openExternalLayout = (name: string) => {
+    const { projectsStorage } = this.props;
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
@@ -956,9 +958,9 @@ class MainFrame extends React.Component<Props, State> {
                     );
                     if (
                       values.autosaveOnPreview &&
-                      this.props.onAutoSaveProject
+                      projectsStorage.onAutoSaveProject
                     ) {
-                      this.props.onAutoSaveProject(project);
+                      projectsStorage.onAutoSaveProject(project);
                     }
                   }}
                   showPreviewButton={!!this.props.previewLauncher}
@@ -1069,7 +1071,7 @@ class MainFrame extends React.Component<Props, State> {
             <StartPage
               project={this.state.currentProject}
               setToolbar={this.setEditorToolbar}
-              canOpen={!!this.props.onChooseProject}
+              canOpen={!!this.props.projectsStorage.onOpenWithPicker}
               onOpen={this.chooseProject}
               onCreate={() => this.openCreateDialog()}
               onOpenProjectManager={() => this.openProjectManager()}
@@ -1191,10 +1193,11 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   chooseProject = () => {
-    if (!this.props.onChooseProject) return;
+    const { projectsStorage } = this.props;
+    if (!projectsStorage.onOpenWithPicker) return;
 
-    this.props
-      .onChooseProject()
+    projectsStorage
+      .onOpenWithPicker()
       .then(filepath => {
         if (!filepath) return;
 
@@ -1210,14 +1213,14 @@ class MainFrame extends React.Component<Props, State> {
 
     const { currentProject } = this.state;
     if (!currentProject) return;
-    const { i18n } = this.props;
+    const { i18n, projectsStorage } = this.props;
 
-    if (this.props.saveDialog) {
-      this._openSaveDialog();
-    } else if (this.props.onSaveProject) {
-      this.props.onSaveProject(currentProject).then(
-        () => {
-          this._showSnackMessage(i18n._(t`Project properly saved`));
+    if (projectsStorage.onSaveProject) {
+      projectsStorage.onSaveProject(currentProject).then(
+        (saveDone: boolean) => {
+          if (saveDone) {
+            this._showSnackMessage(i18n._(t`Project properly saved`));
+          }
         },
         err => {
           showErrorBox(
@@ -1236,12 +1239,10 @@ class MainFrame extends React.Component<Props, State> {
 
     const { currentProject } = this.state;
     if (!currentProject) return;
-    const { i18n } = this.props;
+    const { i18n, projectsStorage } = this.props;
 
-    if (this.props.saveDialog) {
-      this._openSaveDialog();
-    } else if (this.props.onSaveProjectAs) {
-      this.props.onSaveProjectAs(currentProject).then(
+    if (projectsStorage.onSaveProjectAs) {
+      projectsStorage.onSaveProjectAs(currentProject).then(
         saveDone => {
           if (saveDone)
             this._showSnackMessage(i18n._(t`Project properly saved`));
@@ -1297,12 +1298,6 @@ class MainFrame extends React.Component<Props, State> {
   _openIntroDialog = (open: boolean = true) => {
     this.setState({
       introDialogOpen: open,
-    });
-  };
-
-  _openSaveDialog = (open: boolean = true) => {
-    this.setState({
-      saveDialogOpen: open,
     });
   };
 
@@ -1476,7 +1471,6 @@ class MainFrame extends React.Component<Props, State> {
       renderExportDialog,
       createDialog,
       introDialog,
-      saveDialog,
       resourceSources,
       authentification,
       previewLauncher,
@@ -1638,12 +1632,6 @@ class MainFrame extends React.Component<Props, State> {
           React.cloneElement(introDialog, {
             open: this.state.introDialogOpen,
             onClose: () => this._openIntroDialog(false),
-          })}
-        {!!saveDialog &&
-          React.cloneElement(saveDialog, {
-            project: this.state.currentProject,
-            open: this.state.saveDialogOpen,
-            onClose: () => this._openSaveDialog(false),
           })}
         {!!this.state.currentProject &&
           this.state.platformSpecificAssetsDialogOpen && (

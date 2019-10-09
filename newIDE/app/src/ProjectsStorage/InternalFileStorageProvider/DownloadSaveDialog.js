@@ -1,15 +1,21 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
-import Dialog from '../UI/Dialog';
-import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import { Column, Line } from '../UI/Grid';
-import Window from '../Utils/Window';
-import { serializeToJSObject } from '../Utils/Serializer';
-import { showErrorBox } from '../UI/Messages/MessageBox';
-import Text from '../UI/Text';
+import * as React from 'react';
+import Dialog from '../../UI/Dialog';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
+import { Column, Line } from '../../UI/Grid';
+import Window from '../../Utils/Window';
+import { serializeToJSObject } from '../../Utils/Serializer';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
+import Text from '../../UI/Text';
 
-export default class BrowserSaveDialog extends Component {
+type Props = {|
+  project: gdProject,
+  onDone: () => void,
+|};
+
+export default class DownloadSaveDialog extends React.Component<Props> {
   _download = () => {
     let content = '';
     try {
@@ -24,14 +30,16 @@ export default class BrowserSaveDialog extends Component {
     downloadLink.href = uri;
     downloadLink.download = 'game.json';
 
-    document.body.appendChild(downloadLink);
+    const { body } = document;
+    if (!body) return;
+
+    body.appendChild(downloadLink);
     downloadLink.click();
-    document.body.removeChild(downloadLink);
+    body.removeChild(downloadLink);
   };
 
   render() {
-    const { open, onClose, project } = this.props;
-    if (!open || !project) return null;
+    const { onDone } = this.props;
 
     const actions = [
       <FlatButton
@@ -44,12 +52,12 @@ export default class BrowserSaveDialog extends Component {
         key="close"
         label={<Trans>Close</Trans>}
         primary={false}
-        onClick={onClose}
+        onClick={onDone}
       />,
     ];
 
     return (
-      <Dialog actions={actions} open={open} onRequestClose={onClose}>
+      <Dialog actions={actions} open onRequestClose={onDone}>
         <Column noMargin>
           <Line>
             <Text>

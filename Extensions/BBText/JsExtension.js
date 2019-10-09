@@ -166,22 +166,41 @@ module.exports = {
       .addIncludeFile('Extensions/BBText/dist/pixi-multistyle-text.umd.js');
 
     /// Actions / Conditions / Expressions
+    object
+      .addAction(
+        'SetText',
+        _('Set BBCode text'),
+        _('Set the BBCode formatted text.'),
+        _('Set BBCode text to _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/bbcode32.png',
+        'JsPlatform/Extensions/bbcode32.png'
+      )
+      .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('string', _('BBCode text'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setBBText');
 
-    // object
-    //   .addAction(
-    //     'Play',
-    //     _('Play a video'),
-    //     _(
-    //       'Play a video (recommended file format is MPEG4, with H264 video codec and AAC audio codec).'
-    //     ),
-    //     _('Play the video of _PARAM0_'),
-    //     '',
-    //     'JsPlatform/Extensions/videoicon24.png',
-    //     'JsPlatform/Extensions/videoicon16.png'
-    //   )
-    //   .addParameter('object', _('Example object'), 'ObjectExample', false)
-    //   .getCodeExtraInformation()
-    //   .setFunctionName('play');
+    object
+      .addAction(
+        'SetBaseProperty',
+        _('Set base style property'),
+        _('Set base style property for the formatted text.'),
+        _('Set base _PARAM1_  of _PARAM0_ to _PARAM2_'),
+        '',
+        'JsPlatform/Extensions/bbcode32.png',
+        'JsPlatform/Extensions/bbcode32.png'
+      )
+      .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter(
+        'stringWithSelector',
+        _('Property'),
+        '["color", "font family", "font size", "alignment", "opacity"]',
+        false
+      )
+      .addParameter('string', _('value'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setBaseProperty');
 
     // object
     //   .addAction(

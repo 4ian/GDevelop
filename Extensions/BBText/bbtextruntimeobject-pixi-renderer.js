@@ -69,7 +69,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
  * To be called when the object is removed from the scene: will pause the video.
  */
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.onDestroy = function() {
-  this.pause();
+  // this.pause();
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
@@ -91,6 +91,38 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
     this.updatePosition();
     this._textureWasValid = true;
   }
+};
+
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setBBText = function(text) {
+  this._pixiObject.setText(text);
+  this._pixiObject.updateText();
+  this.updatePosition();
+};
+
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setBaseProperty = function(
+  property,
+  value
+) {
+  const alias = {
+    color: 'fill',
+    'font family': 'fontFamily',
+    'font size': 'fontSize',
+    alignment: 'align',
+  };
+  console.log(property, value);
+  console.log('pixi:', alias[property]);
+  if (property === 'font size') value += 'px';
+  if (property === 'alignment') {
+    this._pixiObject._style.align = value;
+    this._pixiObject.dirty = true;
+  } else {
+    this._pixiObject.textStyles.default[alias[property]] = value;
+    // this._pixiObject.[alias[property]] = value;
+    console.log(this._pixiObject.textStyles.default[alias[property]]);
+    console.log(this._pixiObject.textStyles.default);
+  }
+  // this._pixiObject.dirty = true;
+  this.updatePosition();
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
@@ -134,38 +166,4 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setWidth = function(width) {
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setHeight = function(height) {
   this._pixiObject.height = height;
   this.updatePosition(); // Position needs to be updated, as position in the center of the PIXI Sprite.
-};
-
-/**
- * Get the internal HTMLVideoElement used for the video source.
- * @returns {?HTMLVideoElement} The video element, if any.
- */
-
-/**
- * Set the loop on video in renderer
- * @param {boolean} enable true to loop the video
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setVisible = function(enable) {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return;
-  // source.loop = enable;
-};
-
-/**
- * Set or unset mute on the video.
- * @param {boolean} enable true to mute
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setMute = function(enable) {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return;
-  // this._pixiObject._texture.baseTexture.source.muted = enable;
-};
-
-/**
- * Return true if the video is muted.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.isMuted = function() {
-  // var source = this._getHTMLVideoElementSource();
-  // if (!source) return false;
-  // return source.muted;
 };

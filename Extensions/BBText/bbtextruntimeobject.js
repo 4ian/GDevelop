@@ -158,13 +158,23 @@ gdjs.BBTextRuntimeObject.prototype.getHeight = function() {
   return this._renderer.getHeight();
 };
 
+// /**
+//  * Get if the video object is playing
+//  */
+// gdjs.BBTextRuntimeObject.prototype.play = function() {
+//   this._renderer.play();
+// };
+
 /**
  * Get if the video object is playing
  */
-gdjs.BBTextRuntimeObject.prototype.play = function() {
-  this._renderer.play();
+gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
+  this._renderer.setBBText(text);
 };
 
+gdjs.BBTextRuntimeObject.prototype.setBaseProperty = function(property, value) {
+  this._renderer.setBaseProperty(property, value);
+};
 /**
  * Get if the video object is paused.
  */

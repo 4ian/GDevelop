@@ -23,7 +23,7 @@ import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService'
 import Providers from './MainFrame/Providers';
 import LocalEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
 import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
-import ProjectsStorage from './ProjectsStorage';
+import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 const gd = global.gd;
 
@@ -43,8 +43,8 @@ export const create = (authentification: Authentification) => {
         eventsFunctionsExtensionOpener={null}
       >
         {({ i18n, eventsFunctionsExtensionsState }) => (
-          <ProjectsStorage storageProviders={[]}>
-            {projectsStorageProps => (
+          <ProjectStorageProviders storageProviders={[]}>
+            {({ currentStorageProviderOperations, useStorageProvider, storageProviders }) => (
               <ExternalEditor
                 serverPort={appArguments['server-port']}
                 isIntegrated={appArguments['mode'] === 'integrated'}
@@ -58,13 +58,15 @@ export const create = (authentification: Authentification) => {
                   }
                   resourceSources={localResourceSources}
                   authentification={authentification}
-                  projectsStorage={projectsStorageProps}
+                  storageProviders={storageProviders}
+                  useStorageProvider={useStorageProvider}
+                  storageProviderOperations={currentStorageProviderOperations}
                   resourceExternalEditors={localResourceExternalEditors}
                   initialPathsOrURLsToOpen={[]}
                 />
               </ExternalEditor>
             )}
-          </ProjectsStorage>
+          </ProjectStorageProviders>
         )}
       </Providers>
     );
@@ -78,11 +80,15 @@ export const create = (authentification: Authentification) => {
         eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
       >
         {({ i18n, eventsFunctionsExtensionsState }) => (
-          <ProjectsStorage
+          <ProjectStorageProviders
             storageProviders={[LocalFileStorageProvider]}
             defaultStorageProvider={LocalFileStorageProvider}
           >
-            {projectsStorageProps => (
+            {({
+              currentStorageProviderOperations,
+              useStorageProvider,
+              storageProviders,
+            }) => (
               <ElectronMainMenu i18n={i18n}>
                 <MainFrame
                   i18n={i18n}
@@ -93,13 +99,16 @@ export const create = (authentification: Authentification) => {
                   renderExportDialog={props => (
                     <ExportDialog {...props} exporters={getLocalExporters()} />
                   )}
-                  createDialog={
+                  renderCreateDialog={props => (
                     <CreateProjectDialog
+                      {...props}
                       examplesComponent={LocalExamples}
                       startersComponent={LocalStarters}
                     />
-                  }
-                  projectsStorage={projectsStorageProps}
+                  )}
+                  storageProviders={storageProviders}
+                  useStorageProvider={useStorageProvider}
+                  storageProviderOperations={currentStorageProviderOperations}
                   resourceSources={localResourceSources}
                   resourceExternalEditors={localResourceExternalEditors}
                   authentification={authentification}
@@ -113,7 +122,7 @@ export const create = (authentification: Authentification) => {
                 />
               </ElectronMainMenu>
             )}
-          </ProjectsStorage>
+          </ProjectStorageProviders>
         )}
       </Providers>
     );

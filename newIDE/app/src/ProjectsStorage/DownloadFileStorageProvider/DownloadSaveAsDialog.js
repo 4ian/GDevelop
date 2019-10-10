@@ -15,7 +15,7 @@ type Props = {|
   onDone: () => void,
 |};
 
-export default class DownloadSaveDialog extends React.Component<Props> {
+export default class DownloadSaveAsDialog extends React.Component<Props> {
   _download = () => {
     let content = '';
     try {
@@ -57,7 +57,7 @@ export default class DownloadSaveDialog extends React.Component<Props> {
     ];
 
     return (
-      <Dialog actions={actions} open onRequestClose={onDone}>
+      <Dialog actions={actions} open onRequestClose={onDone} maxWidth="sm">
         <Column noMargin>
           <Line>
             <Text>

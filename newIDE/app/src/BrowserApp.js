@@ -20,8 +20,10 @@ import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
 import { makeBrowserS3EventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/BrowserS3EventsFunctionCodeWriter';
 import Providers from './MainFrame/Providers';
-import ProjectsStorage from './ProjectsStorage';
+import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import InternalFileStorageProvider from './ProjectsStorage/InternalFileStorageProvider';
+import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
+import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
@@ -38,11 +40,19 @@ export const create = (authentification: Authentification) => {
       eventsFunctionsExtensionOpener={null}
     >
       {({ i18n, eventsFunctionsExtensionsState }) => (
-        <ProjectsStorage
-          storageProviders={[InternalFileStorageProvider]}
-          defaultStorageProvider={InternalFileStorageProvider}
+        <ProjectStorageProviders
+          storageProviders={[
+            InternalFileStorageProvider,
+            GoogleDriveStorageProvider,
+            DownloadFileStorageProvider,
+          ]}
+          defaultStorageProvider={GoogleDriveStorageProvider}
         >
-          {projectsStorageProps => (
+          {({
+            currentStorageProviderOperations,
+            useStorageProvider,
+            storageProviders,
+          }) => (
             <MainFrame
               i18n={i18n}
               eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
@@ -50,14 +60,17 @@ export const create = (authentification: Authentification) => {
               renderExportDialog={props => (
                 <ExportDialog {...props} exporters={getBrowserExporters()} />
               )}
-              createDialog={
+              renderCreateDialog={props => (
                 <CreateProjectDialog
+                  {...props}
                   examplesComponent={BrowserExamples}
                   startersComponent={BrowserStarters}
                 />
-              }
+              )}
               introDialog={<BrowserIntroDialog />}
-              projectsStorage={projectsStorageProps}
+              storageProviders={storageProviders}
+              useStorageProvider={useStorageProvider}
+              storageProviderOperations={currentStorageProviderOperations}
               resourceSources={browserResourceSources}
               resourceExternalEditors={browserResourceExternalEditors}
               authentification={authentification}
@@ -69,7 +82,7 @@ export const create = (authentification: Authentification) => {
               initialPathsOrURLsToOpen={appArguments['_']}
             />
           )}
-        </ProjectsStorage>
+        </ProjectStorageProviders>
       )}
     </Providers>
   );

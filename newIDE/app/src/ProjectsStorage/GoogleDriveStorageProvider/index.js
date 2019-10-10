@@ -1,0 +1,416 @@
+// @flow
+import * as React from 'react';
+import { type StorageProvider, type FileMetadata } from '../index';
+import { serializeToJSON } from '../../Utils/Serializer';
+import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
+import GoogleDriveSaveAsDialog from './GoogleDriveSaveAsDialog';
+
+const DEVELOPER_KEY = 'AIzaSyDH3UNpxzIpcTyd6aMCWI5oNFSptG_BhOc';
+const CLIENT_ID =
+  '28563107180-bd29h9f3og4h1632m94nv6hat2igrej6.apps.googleusercontent.com';
+const DISCOVERY_DOCS = [
+  'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
+];
+const SCOPE = 'https://www.googleapis.com/auth/drive.file';
+
+let apisLoaded = false;
+let apisLoadingPromise = null;
+
+/**
+ * Load Google Drive APIs. Return a fulfilled promise when done.
+ */
+const initializeApis = (): Promise<void> => {
+  if (apisLoaded) {
+    return Promise.resolve();
+  }
+
+  if (apisLoadingPromise) {
+    // Only do a single initialization attempt at a given time.
+    return apisLoadingPromise;
+  }
+
+  apisLoadingPromise = new Promise((resolve, reject) => {
+    const { body } = document;
+    if (!body) {
+      console.error('Google Drive is only supported in a browser');
+      reject(new Error('Unsupported'));
+      return;
+    }
+
+    const scriptElement = document.createElement('script');
+    scriptElement.type = 'text/javascript';
+    scriptElement.src = 'https://apis.google.com/js/api:client.js';
+    scriptElement.onload = function() {
+      const gapi = global.gapi;
+      if (!gapi) {
+        reject(
+          new Error(
+            'No gapi global object found after loading Google Drive API script'
+          )
+        );
+        return;
+      }
+
+      gapi.load('client:auth2:picker', () => {
+        const auth2LoadPromise = gapi.auth2.init({
+          apiKey: DEVELOPER_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPE,
+        });
+
+        gapi.client.setApiKey(DEVELOPER_KEY);
+        const driveLoadPromise = gapi.client.load('drive', 'v3');
+
+        resolve(Promise.all([auth2LoadPromise, driveLoadPromise]));
+      });
+    };
+    scriptElement.onerror = error => reject(error);
+    scriptElement.onabort = error => reject(error);
+
+    body.appendChild(scriptElement);
+  })
+    .then(() => {
+      apisLoaded = true;
+      apisLoadingPromise = null;
+    })
+    .catch(error => {
+      console.error('Error while loading Google Drive APIs:', error);
+      apisLoadingPromise = null;
+
+      throw error;
+    });
+
+  return apisLoadingPromise;
+};
+
+type GoogleUser = {
+  getAuthResponse: () => { access_token: string, error?: ?Error, },
+};
+
+let isAuthenticated = false;
+
+/**
+ * Sign in the user to Google Drive, returning the user object after a successful sign up
+ * (or if the user is already signed in).
+ */
+export const authenticate = (): Promise<GoogleUser> => {
+  return initializeApis().then(() => {
+    const gapi = global.gapi;
+    const googleAuth = gapi.auth2.getAuthInstance();
+    if (isAuthenticated && googleAuth.isSignedIn.get()) {
+      return googleAuth.currentUser.get();
+    }
+
+    isAuthenticated = false;
+    googleAuth.isSignedIn.listen(authenticated => {
+      console.info('Authenticated with Google APIs: ', authenticated);
+      isAuthenticated = authenticated;
+    });
+    return googleAuth
+      .signIn({ scope: SCOPE })
+      .then((googleUser: GoogleUser) => {
+        if (
+          !googleUser.getAuthResponse() ||
+          googleUser.getAuthResponse().error
+        ) {
+          console.error(
+            'OAuth2 error while sign in:',
+            googleUser.getAuthResponse()
+              ? googleUser.getAuthResponse().error
+              : 'No AuthResponse'
+          );
+          throw new Error('Authentication error');
+        }
+
+        isAuthenticated = true;
+        return googleUser;
+      });
+  });
+};
+
+/**
+ * Update a JSON file, given its file id.
+ */
+export const patchJsonFile = (
+  fileId: string,
+  googleUser: GoogleUser,
+  content: string
+): Promise<void> => {
+  return fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}`, {
+    method: 'PATCH',
+    headers: new Headers({
+      Authorization: `Bearer ${googleUser.getAuthResponse().access_token}`,
+      'Content-Type': 'application/json',
+    }),
+    body: content,
+  }).then(res => {
+    if (res.status !== 200) {
+      if (res.status === 401) {
+        isAuthenticated = false;
+      }
+
+      throw res;
+    }
+  });
+};
+
+/**
+ * Create a new empty JSON file, returning its fileid.
+ */
+export const createNewJsonFile = (
+  parentId: string,
+  name: string
+): Promise<string> => {
+  const gapi = global.gapi;
+
+  return gapi.client.drive.files
+    .create({
+      'content-type': 'application/json',
+      uploadType: 'multipart',
+      name: name,
+      parents: [parentId],
+      mimeType: 'application/json',
+      fields: 'id, name, kind, size',
+    })
+    .then(apiResponse => {
+      return apiResponse.result.id;
+    });
+};
+
+/**
+ * Information about a file or folder picked by the user.
+ */
+export type GoogleDriveFileOrFolder =
+  | {|
+      type: 'FOLDER',
+      id: string,
+      name: string,
+    |}
+  | {|
+      type: 'FILE',
+      id: string,
+      name: string,
+      parentId: string,
+    |};
+
+export type GoogleDriveFilePickerOptions = {|
+  selectFolderEnabled: boolean,
+  showUploadView: boolean,
+|};
+
+/**
+ * Display a file picker as a modal, resolving with the selected file or folder,
+ * if any.
+ *
+ * The picker dialog is not playing nice with material-ui dialogs or overlays. They should
+ * not be displayed when the picker is on screen.
+ */
+const showFilePicker = ({
+  selectFolderEnabled,
+  showUploadView,
+}: GoogleDriveFilePickerOptions): Promise<?GoogleDriveFileOrFolder> => {
+  return authenticate().then(googleUser => {
+    const google = global.google;
+
+    return new Promise(resolve => {
+      let picker = null;
+      const pickerBuilder = new google.picker.PickerBuilder()
+        .addView(
+          new google.picker.DocsView()
+            .setIncludeFolders(true)
+            .setSelectFolderEnabled(selectFolderEnabled)
+        )
+        .setOAuthToken(googleUser.getAuthResponse().access_token)
+        .setDeveloperKey(DEVELOPER_KEY)
+        .setCallback(data => {
+          if (
+            data[google.picker.Response.ACTION] === google.picker.Action.PICKED
+          ) {
+            const doc = data[google.picker.Response.DOCUMENTS][0];
+            const id: string = doc[google.picker.Document.ID];
+            const name: string = doc[google.picker.Document.NAME];
+            const parentId: string = doc[google.picker.Document.PARENT_ID];
+            if (
+              doc[google.picker.Document.TYPE] ===
+                google.picker.Type.LOCATION ||
+              doc[google.picker.Document.MIME_TYPE] ===
+                'application/vnd.google-apps.folder'
+            ) {
+              resolve({ id, name, type: 'FOLDER' });
+            } else {
+              resolve({ id, name, type: 'FILE', parentId });
+            }
+            if (picker) picker.dispose();
+          } else if (
+            data[google.picker.Response.ACTION] === google.picker.Action.CANCEL
+          ) {
+            resolve(null);
+            if (picker) picker.dispose();
+          }
+        });
+      if (showUploadView) {
+        pickerBuilder.addView(
+          new google.picker.DocsUploadView().setIncludeFolders(true)
+        );
+      }
+
+      picker = pickerBuilder.build();
+
+      picker.setVisible(true);
+      const pickerElements = document.getElementsByClassName('picker-dialog');
+      for (var i = 0; i < pickerElements.length; ++i) {
+        pickerElements[i].style.zIndex = '5000'; // Higher than Material UI modals
+      }
+    });
+  });
+};
+
+/**
+ * A storage that is using Google Drive to open and store files.
+ */
+export default ({
+  name: 'Google Drive',
+  renderIcon: () => <GoogleDrive />,
+  createOperations: ({ setDialog, closeDialog }) => {
+    initializeApis().catch(() => {});
+
+    return {
+      onOpen: (
+        fileMetadata: FileMetadata
+      ): Promise<{|
+        content: Object,
+        fileMetadata: FileMetadata,
+      |}> => {
+        const fileId = fileMetadata.fileIdentifier;
+
+        return authenticate()
+          .then(googleUser =>
+            fetch(
+              `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+              {
+                method: 'GET',
+                headers: new Headers({
+                  Authorization: `Bearer ${
+                    googleUser.getAuthResponse().access_token
+                  }`,
+                }),
+              }
+            )
+          )
+          .then(
+            response => {
+              return response.text().then(
+                fileContent => {
+                  return new Promise((resolve, reject) => {
+                    try {
+                      const dataObject = JSON.parse(fileContent);
+                      return resolve({
+                        content: dataObject,
+                        fileMetadata,
+                      });
+                    } catch (ex) {
+                      return reject(fileId + ' is a corrupted/malformed file.');
+                    }
+                  });
+                },
+                error => {
+                  console.error(
+                    'Error while reading the file from Google Drive API: ',
+                    error
+                  );
+                  throw error;
+                }
+              );
+            },
+            error => {
+              console.error(
+                'Error while fetching the file from Google Drive API: ',
+                error
+              );
+              throw error;
+            }
+          );
+      },
+      onOpenWithPicker: (): Promise<?FileMetadata> => {
+        return authenticate()
+          .then(googleUser =>
+            showFilePicker({ selectFolderEnabled: false, showUploadView: true })
+          )
+          .then(googleDriveFileOrFolder => {
+            if (!googleDriveFileOrFolder) {
+              return null;
+            }
+
+            return {
+              fileIdentifier: googleDriveFileOrFolder.id,
+            };
+          });
+      },
+      onSaveProject: (project: gdProject, fileMetadata: FileMetadata) => {
+        const fileId = fileMetadata.fileIdentifier;
+
+        const content = serializeToJSON(project);
+        return authenticate()
+          .then(googleUser => patchJsonFile(fileId, googleUser, content))
+          .then(() => ({
+            wasSaved: true,
+            fileMetadata,
+          }));
+      },
+      onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
+        return new Promise(resolve => {
+          setDialog(() => (
+            <GoogleDriveSaveAsDialog
+              onShowFilePicker={showFilePicker}
+              onCancel={() => {
+                closeDialog();
+                resolve({ wasSaved: false, fileMetadata });
+              }}
+              onSave={({ selectedFileOrFolder, newFileName, onError }) => {
+                const content = serializeToJSON(project);
+
+                if (selectedFileOrFolder.type === 'FOLDER') {
+                  return authenticate().then(googleUser =>
+                    createNewJsonFile(
+                      selectedFileOrFolder.id,
+                      newFileName
+                    ).then(newFileId =>
+                      patchJsonFile(newFileId, googleUser, content).then(() => {
+                        closeDialog();
+                        resolve({
+                          wasSaved: true,
+                          fileMetadata: {
+                            fileIdentifier: newFileId,
+                          },
+                        });
+                      })
+                    )
+                  );
+                } else {
+                  return authenticate()
+                    .then(googleUser =>
+                      patchJsonFile(
+                        selectedFileOrFolder.id,
+                        googleUser,
+                        content
+                      )
+                    )
+                    .then(() => {
+                      closeDialog();
+                      resolve({
+                        wasSaved: true,
+                        fileMetadata: {
+                          fileIdentifier: selectedFileOrFolder.id,
+                        },
+                      });
+                    });
+                }
+              }}
+            />
+          ));
+        });
+      },
+    };
+  },
+}: StorageProvider);

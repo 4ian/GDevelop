@@ -23,6 +23,24 @@ export function serializeToJSObject(
 }
 
 /**
+ * Tool function to save a serializable object to a JSON.
+ * Most gd.* objects are "serializable", meaning they have a serializeTo
+ * and unserializeFrom method.
+ *
+ * @param {*} serializable
+ * @param {*} methodName The name of the serialization method. "unserializeFrom" by default
+ */
+export function serializeToJSON(
+  serializable: gdSerializable,
+  methodName: string = 'serializeTo'
+): string {
+  const serializedElement = new gd.SerializerElement();
+  serializable[methodName](serializedElement);
+
+  return gd.Serializer.toJSON(serializedElement);
+}
+
+/**
  * Tool function to restore a serializable object from a JS object.
  * Most gd.* objects are "serializable", meaning they have a serializeTo
  * and unserializeFrom method.

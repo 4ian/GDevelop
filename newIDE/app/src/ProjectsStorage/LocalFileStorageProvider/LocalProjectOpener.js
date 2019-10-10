@@ -1,5 +1,6 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire.js';
+import { type FileMetadata } from '../index';
 import { unsplit } from '../../Utils/ObjectSplitter.js';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
@@ -23,7 +24,7 @@ const readJSONFile = (filepath: string): Promise<Object> => {
   });
 };
 
-export const onOpenWithPicker = (): Promise<?string> => {
+export const onOpenWithPicker = (): Promise<?FileMetadata> => {
   return new Promise((resolve, reject) => {
     if (!dialog) return reject('Not supported');
 
@@ -40,15 +41,21 @@ export const onOpenWithPicker = (): Promise<?string> => {
       paths => {
         if (!paths || !paths.length) return resolve(null);
 
-        return resolve(paths[0]);
+        return resolve({ fileIdentifier: paths[0] });
       }
     );
   });
 };
 
-export const onOpen = (filepath: string): Object => {
-  const projectPath = path.dirname(filepath);
-  return readJSONFile(filepath).then(object => {
+export const onOpen = (
+  fileMetadata: FileMetadata
+): Promise<{|
+  content: Object,
+  fileMetadata: FileMetadata,
+|}> => {
+  const filePath = fileMetadata.fileIdentifier;
+  const projectPath = path.dirname(filePath);
+  return readJSONFile(filePath).then(object => {
     return unsplit(object, {
       getReferencePartialObject: referencePath => {
         return readJSONFile(path.join(projectPath, referencePath) + '.json');
@@ -59,31 +66,39 @@ export const onOpen = (filepath: string): Object => {
       // of large game files.
       maxUnsplitDepth: 3,
     }).then(() => {
-      return object;
+      return { content: object, fileMetadata };
     });
   });
 };
 
-export const shouldOpenAutosave = (
-  filePath: string,
-  autoSavePath: string,
+export const hasAutoSave = (
+  fileMetadata: FileMetadata,
   compareLastModified: boolean
-): boolean => {
+): Promise<boolean> => {
+  const filePath = fileMetadata.fileIdentifier;
+  const autoSavePath = filePath + '.autosave';
   if (fs.existsSync(autoSavePath)) {
     if (!compareLastModified) {
-      return true;
+      return Promise.resolve(true);
     }
     try {
       const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
       const saveTime = fs.statSync(filePath).mtime.getTime();
       if (autoSavedTime > saveTime) {
-        return true;
+        return Promise.resolve(true);
       }
     } catch (err) {
       console.error('Unable to compare *.autosave to project', err);
-      return false;
+      return Promise.resolve(false);
     }
-    return false;
+    return Promise.resolve(false);
   }
-  return false;
+  return Promise.resolve(false);
+};
+
+export const onGetAutoSave = (fileMetadata: FileMetadata) => {
+  return Promise.resolve({
+    ...fileMetadata,
+    fileIdentifier: fileMetadata.fileIdentifier + '.autosave',
+  });
 };

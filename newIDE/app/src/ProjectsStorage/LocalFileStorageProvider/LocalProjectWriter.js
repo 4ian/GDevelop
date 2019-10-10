@@ -1,5 +1,6 @@
 // @flow
 import { serializeToJSObject } from '../../Utils/Serializer';
+import { type FileMetadata } from '../index';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import {
   split,
@@ -85,22 +86,34 @@ const writeProjectFiles = (
   }
 };
 
-export const onSaveProject = (project: gdProject): Promise<boolean> => {
-  const filePath = project.getProjectFile();
-  const projectPath = path.dirname(project.getProjectFile());
+export const onSaveProject = (
+  project: gdProject,
+  fileMetadata: FileMetadata
+): Promise<{|
+  wasSaved: boolean,
+  fileMetadata: FileMetadata,
+|}> => {
+  const filePath = fileMetadata.fileIdentifier;
   if (!filePath) {
     return Promise.reject(
       'Project file is empty, "Save as" should have been called?'
     );
   }
 
+  const projectPath = path.dirname(filePath);
   return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return true; // Save was properly done
+    return { wasSaved: true, fileMetadata }; // Save was properly done
   });
 };
 
-export const onSaveProjectAs = (project: gdProject): Promise<boolean> => {
-  const defaultPath = project.getProjectFile();
+export const onSaveProjectAs = (
+  project: gdProject,
+  fileMetadata: ?FileMetadata
+): Promise<{|
+  wasSaved: boolean,
+  fileMetadata: ?FileMetadata,
+|}> => {
+  const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
   const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const browserWindow = electron.remote.getCurrentWindow();
   const options = {
@@ -113,7 +126,7 @@ export const onSaveProjectAs = (project: gdProject): Promise<boolean> => {
   }
   const filePath = dialog.showSaveDialog(browserWindow, options);
   if (!filePath) {
-    return Promise.resolve(false); // Nothing was saved.
+    return Promise.resolve({ wasSaved: false, fileMetadata });
   }
   const projectPath = path.dirname(filePath);
 
@@ -131,12 +144,21 @@ export const onSaveProjectAs = (project: gdProject): Promise<boolean> => {
   project.setProjectFile(filePath);
 
   return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return true; // Save was properly done
+    return {
+      wasSaved: true,
+      fileMetadata: {
+        ...fileMetadata,
+        fileIdentifier: filePath,
+      },
+    }; // Save was properly done
   });
 };
 
-export const onAutoSaveProject = (project: gdProject) => {
-  const autoSavePath = project.getProjectFile() + '.autosave';
+export const onAutoSaveProject = (
+  project: gdProject,
+  fileMetadata: FileMetadata
+) => {
+  const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
   writeJSONFile(serializeToJSObject(project), autoSavePath).catch(err => {
     console.error(`Unable to write ${autoSavePath}:`, err);
     throw err;

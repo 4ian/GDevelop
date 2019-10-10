@@ -1,79 +1,60 @@
 // @flow
 import * as React from 'react';
 
-export type ProjectsStorageProps = {|
-  onOpenWithPicker?: () => Promise<?string>,
-  onOpen: (filepath: string) => Object,
-  onSaveProject: gdProject => Promise<boolean>,
-  onSaveProjectAs?: gdProject => Promise<boolean>,
-  onAutoSaveProject?: (project: gdProject) => void,
-  shouldOpenAutosave?: (
-    filePath: string,
-    autoSavePath: string,
+/**
+ * The data containing the file/url/file identifier to be loaded
+ * by a storage provider.
+ */
+export type FileMetadata = {|
+  // The file id, path or local path according to the provider
+  fileIdentifier: string,
+|};
+
+/**
+ * Interface returned by a storage provider to manipulate files.
+ */
+export type StorageProviderOperations = {|
+  onOpenWithPicker?: () => Promise<?FileMetadata>,
+  onOpen?: (
+    fileMetadata: FileMetadata
+  ) => Promise<{|
+    content: Object,
+    fileMetadata: FileMetadata,
+  |}>,
+  onSaveProject?: (
+    project: gdProject,
+    fileMetadata: FileMetadata
+  ) => Promise<{|
+    wasSaved: boolean,
+    fileMetadata: FileMetadata,
+  |}>,
+  onSaveProjectAs?: (
+    project: gdProject,
+    fileMetadata: ?FileMetadata
+  ) => Promise<{|
+    wasSaved: boolean,
+    fileMetadata: ?FileMetadata,
+  |}>,
+  onAutoSaveProject?: (project: gdProject, fileMetadata: FileMetadata) => void,
+  hasAutoSave?: (
+    fileMetadata: FileMetadata,
     compareLastModified: boolean
-  ) => boolean,
+  ) => Promise<boolean>,
+  onGetAutoSave?: (fileMetadata: FileMetadata) => Promise<FileMetadata>,
 |};
 
-export type StorageProvider = ({
-  setDialog: (() => React.Node) => void,
-  closeDialog: () => void,
-}) => ProjectsStorageProps;
-
-const emptyStorageProvider: StorageProvider = () => ({
-  onOpenWithPicker: () => Promise.reject('No storage provider set up'),
-  onOpen: () => ({}),
-  shouldOpenAutosave: () => false,
-  onSaveProject: (project: gdProject) =>
-    Promise.reject('No storage provider set up'),
-  onSaveProjectAs: (project: gdProject) =>
-    Promise.reject('No storage provider set up'),
-  onAutoSaveProject: (project: gdProject) => {},
-});
-
-type Props = {|
-  storageProviders: Array<StorageProvider>,
-  defaultStorageProvider?: StorageProvider,
-  children: (storage: ProjectsStorageProps) => React.Node,
+/**
+ * A storage provider is a function returning a StorageProviderOperations.
+ */
+export type StorageProvider = {|
+  name: string,
+  hiddenInOpenDialog?: boolean,
+  hiddenInSaveDialog?: boolean,
+  renderIcon?: () => React.Node,
+  createOperations: ({
+    /** Open a dialog (a render function) */
+    setDialog: (() => React.Node) => void,
+    /** Close the dialog */
+    closeDialog: () => void,
+  }) => StorageProviderOperations,
 |};
-
-type State = {|
-  currentStorageProvider: ?StorageProvider,
-  renderDialog: ?() => React.Node,
-|};
-
-export default class ProjectsStorage extends React.Component<Props, State> {
-  state = {
-    currentStorageProvider: this.props.defaultStorageProvider,
-    renderDialog: null,
-  };
-
-  _setDialog = (renderDialog: () => React.Node) => {
-    this.setState({
-      renderDialog,
-    });
-  };
-  _closeDialog = () => {
-    this.setState({
-      renderDialog: null,
-    });
-  };
-
-  render() {
-    const { children } = this.props;
-    const { renderDialog } = this.state;
-    const currentStorageProvider =
-      this.state.currentStorageProvider || emptyStorageProvider;
-
-    return (
-      <React.Fragment>
-        {children(
-          currentStorageProvider({
-            setDialog: this._setDialog,
-            closeDialog: this._closeDialog,
-          })
-        )}
-        {renderDialog && renderDialog()}
-      </React.Fragment>
-    );
-  }
-}

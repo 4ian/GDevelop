@@ -23,7 +23,7 @@ export const openPiskel = ({
   onChangesSaved,
   extraOptions,
 }: ExternalEditorOpenOptions) => {
-  if (!electron || !ipcRenderer) return;
+  if (!electron || !ipcRenderer || !path) return;
 
   const resources = resourceNames.map((resourceName, originalIndex) => {
     let resourcePath = getLocalResourceFullPath(project, resourceName);

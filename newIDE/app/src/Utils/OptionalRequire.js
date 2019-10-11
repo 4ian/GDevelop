@@ -1,4 +1,5 @@
-// Note: this file don't use export/imports to allow its usage from Node.js
+// @flow
+// Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 const nodeRequire = require('node-require-function')(); //TODO
 
 /**
@@ -9,11 +10,11 @@ const nodeRequire = require('node-require-function')(); //TODO
  * @param {string} moduleName The name of the module. For example: `fs`.
  */
 const optionalRequire = (
-  moduleName,
-  config = {
+  moduleName /*: string */,
+  config /*: ?{|rethrowException: boolean|} */ = {
     rethrowException: false,
   }
-) => {
+) /*: ?Object */ => {
   try {
     if (global.require) {
       // Electron will expose require on global object. Use it, with an
@@ -29,7 +30,7 @@ const optionalRequire = (
     // We don't have Electron require nor Node.js require (we must be in a browser)
     return null;
   } catch (ex) {
-    if (config.rethrowException) throw ex;
+    if (config && config.rethrowException) throw ex;
 
     console.error(
       'Exception while requiring module (from optionalRequire):',

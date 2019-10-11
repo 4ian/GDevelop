@@ -70,6 +70,8 @@ export default class LocalProjectOpener {
     autoSavePath: string,
     compareLastModified: boolean
   ): boolean => {
+    if (!fs) return false;
+
     if (fs.existsSync(autoSavePath)) {
       if (!compareLastModified) {
         return true;

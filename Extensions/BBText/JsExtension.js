@@ -171,7 +171,7 @@ module.exports = {
         'SetText',
         _('Set BBCode text'),
         _('Set the BBCode formatted text.'),
-        _('Set BBCode text to _PARAM0_'),
+        _('Set BBCode text of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/bbcode32.png',
         'JsPlatform/Extensions/bbcode32.png'
@@ -183,10 +183,70 @@ module.exports = {
 
     object
       .addAction(
-        'SetBaseProperty',
-        _('Set base style property'),
-        _('Set base style property for the formatted text.'),
-        _('Set base _PARAM1_  of _PARAM0_ to _PARAM2_'),
+        'SetColor',
+        _('Set base color'),
+        _('Set base color'),
+        _('Set base color of _PARAM0_ to _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/bbcode32.png',
+        'JsPlatform/Extensions/bbcode32.png'
+      )
+      .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('color', _('Color'))
+      .getCodeExtraInformation()
+      .setFunctionName('setColor');
+
+    object
+      .addAction(
+        'SetOpacity',
+        _('Set base opacity'),
+        _('Set base opacity'),
+        _('Set base opacity of _PARAM0_ to _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/bbcode32.png',
+        'JsPlatform/Extensions/bbcode32.png'
+      )
+      .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('number', _('Opacity (0-255)'))
+      .getCodeExtraInformation()
+      .setFunctionName('setOpacity');
+
+    object
+      .addAction(
+        'SetFontSize',
+        _('Set base font size'),
+        _('Set base font size'),
+        _('Set base font size of _PARAM0_ to _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/bbcode32.png',
+        'JsPlatform/Extensions/bbcode32.png'
+      )
+      .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('number', _('Font size in px'))
+      .getCodeExtraInformation()
+      .setFunctionName('setFontSize');
+
+    object
+      .addAction(
+        'SetFontFamily',
+        _('Set base font family'),
+        _('Set base font family'),
+        _('Set base font family of _PARAM0_ to _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/bbcode32.png',
+        'JsPlatform/Extensions/bbcode32.png'
+      )
+      .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('string', _('Font family'))
+      .getCodeExtraInformation()
+      .setFunctionName('setFontFamily');
+
+    object
+      .addAction(
+        'SetAlignment',
+        _('Set text alignment'),
+        _('Set text alignment'),
+        _('Set text alignment of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/bbcode32.png',
         'JsPlatform/Extensions/bbcode32.png'
@@ -194,60 +254,27 @@ module.exports = {
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter(
         'stringWithSelector',
-        _('Property'),
-        '["color", "font family", "font size", "alignment", "opacity"]',
+        _('Alignment'),
+        '["left", "right", "center"]',
         false
       )
-      .addParameter('string', _('value'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setBaseProperty');
+      .setFunctionName('setAlignment');
 
-    // object
-    //   .addAction(
-    //     'Loop',
-    //     _('Loop a video'),
-    //     _('Loop the specified Example.'),
-    //     _('Loop Example of _PARAM0_: _PARAM1_'),
-    //     '',
-    //     'JsPlatform/Extensions/videoicon24.png',
-    //     'JsPlatform/Extensions/videoicon16.png'
-    //   )
-    //   .addParameter('object', _('Example object'), 'ObjectExample', false)
-    //   .addParameter('yesorno', _('Activate loop'), '', false)
-    //   .getCodeExtraInformation()
-    //   .setFunctionName('setLoop');
-
-    // object
-    //   .addAction(
-    //     'SetTime',
-    //     _('Set time'),
-    //     _('Set the time of the video object in seconds'),
-    //     _('Set time of _PARAM0_: _PARAM1__PARAM2_ seconds'),
-    //     '',
-    //     'JsPlatform/Extensions/videoicon24.png',
-    //     'JsPlatform/Extensions/videoicon16.png'
-    //   )
-    //   .addParameter('object', _('Example object'), 'ObjectExample', false)
-    //   .addParameter('operator', _("Modification's sign"), '', false)
-    //   .addParameter('expression', _('Time in seconds'), '', false)
-    //   .getCodeExtraInformation()
-    //   .setFunctionName('setCurrentTime')
-    //   .setManipulatedType('number')
-    //   .setGetter('getCurrentTime');
-
-    // object
-    //   .addExpression(
-    //     'Volume',
-    //     _('Get the volume'),
-    //     _(
-    //       'Get the volume of a video object, between 0 (muted) and 100 (maximum).'
-    //     ),
-    //     '',
-    //     'JsPlatform/Extensions/videoicon16.png'
-    //   )
-    //   .addParameter('object', _('Object'), 'ObjectExample', false)
-    //   .getCodeExtraInformation()
-    //   .setFunctionName('getVolume');
+    object
+      .addAction(
+        'SetWidth',
+        _('Set width'),
+        _('Set width'),
+        _('Set width of _PARAM0_ to _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/bbcode32.png',
+        'JsPlatform/Extensions/bbcode32.png'
+      )
+      .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('number', _('Width'))
+      .getCodeExtraInformation()
+      .setFunctionName('setWidth');
 
     // object
     //   .addCondition(
@@ -263,8 +290,6 @@ module.exports = {
     //   .getCodeExtraInformation()
     //   .setFunctionName('isPaused');
 
-    // console.log(new MultiStyleText('echo', {}));
-    // console.log(this._pixiObject);
     return extension;
   },
   /**
@@ -327,8 +352,6 @@ module.exports = {
         pixiContainer,
         pixiResourcesLoader
       );
-
-      this._videoResource = undefined;
 
       const BBTextStyles = {
         default: {
@@ -450,9 +473,6 @@ module.exports = {
     RenderedBBTextInstance.prototype.getDefaultHeight = function() {
       return this._pixiObject.height;
     };
-
-    // We don't do anything special when instance is removed from the scene,
-    // because the video is never really played.
 
     objectsRenderingService.registerInstanceRenderer(
       'BBText::BBText',

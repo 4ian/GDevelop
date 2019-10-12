@@ -1,5 +1,5 @@
 /**
- * The PIXI.js renderer for the VideoRuntimeObject.
+ * The PIXI.js renderer for the BBCode Text runtime object.
  *
  * @class BBTextRuntimeObjectPixiRenderer
  * @constructor
@@ -22,26 +22,12 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
         align: runtimeObject._align,
       },
     });
-    // this._pixiObject._style.wordWrapWidth = runtimeObject._wrappingWidth;
-    // this._pixiObject.dirty = true;
-
-    console.log('runtime obj', runtimeObject);
-    console.log('runtime ee', this._pixiObject);
-    console.log('runtime eeeee', this._object);
 
     this._object.hidden = !runtimeObject._visible;
   } else {
     console.log('runtime obj', runtimeObject._wrappingWidth, this._pixiObject);
     // this._pixiObject._texture.baseTexture.source.currentTime = 0;
   }
-
-  // Needed to avoid video not playing/crashing in Chrome/Chromium browsers.
-  // See https://github.com/pixijs/pixi.js/issues/5996
-
-  // this._pixiObject._texture.baseTexture.source.preload = 'auto';
-  // this._pixiObject._texture.baseTexture.source.autoload = true;
-
-  // this._textureWasValid = false; // Will be set to true when video texture is loaded.
 
   runtimeScene
     .getLayer('')
@@ -65,16 +51,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   return this._pixiObject;
 };
 
-/**
- * To be called when the object is removed from the scene: will pause the video.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.onDestroy = function() {
-  // this.pause();
-};
-
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
-  // Make sure that the video is repositioned after the texture was loaded
-  // (as width and height will change).
   if (
     !this._textureWasValid &&
     this._pixiObject.texture &&
@@ -93,6 +70,17 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
   }
 };
 
+/**
+ * Set the rendered width
+ * @param {number} width The new width, in pixels.
+ */
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setWidth = function(width) {
+  this._object._wrappingWidth = width;
+  this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
+  this._pixiObject.dirty = true;
+  this.updatePosition(); // Position needs to be updated, as position in the center of the PIXI Sprite.
+};
+
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setBBText = function(text) {
   this._pixiObject.setText(text);
   this._pixiObject.updateText();
@@ -103,26 +91,32 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setBaseProperty = function(
   property,
   value
 ) {
-  const alias = {
-    color: 'fill',
-    'font family': 'fontFamily',
-    'font size': 'fontSize',
-    alignment: 'align',
-  };
-  console.log(property, value);
-  console.log('pixi:', alias[property]);
-  if (property === 'font size') value += 'px';
-  if (property === 'alignment') {
-    this._pixiObject._style.align = value;
-    this._pixiObject.dirty = true;
-  } else {
-    this._pixiObject.textStyles.default[alias[property]] = value;
-    // this._pixiObject.[alias[property]] = value;
-    console.log(this._pixiObject.textStyles.default[alias[property]]);
-    console.log(this._pixiObject.textStyles.default);
+  switch (property) {
+    case 'color':
+      const splitValue = value.split(';');
+      const hexColor = `#${gdjs.rgbToHex(
+        parseInt(splitValue[0]),
+        parseInt(splitValue[1]),
+        parseInt(splitValue[2])
+      )}`;
+      this._pixiObject.textStyles.default.fill = hexColor;
+      break;
+    case 'alignment':
+      this._pixiObject._style.align = value;
+      this._pixiObject.dirty = true;
+      break;
+    case 'font family':
+      this._pixiObject.textStyles.default.fontFamily = value;
+      break;
+    case 'font size':
+      this._pixiObject.textStyles.default.fontSize = `${value}px`;
+      break;
+    case 'opacity':
+      this._pixiObject.alpha = value / 255;
+      break;
   }
-  // this._pixiObject.dirty = true;
-  this.updatePosition();
+  this._pixiObject.dirty = true;
+  this.ensureUpToDate();
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
@@ -148,22 +142,4 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getWidth = function() {
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
   return this._pixiObject.height;
-};
-
-/**
- * Set the rendered video width
- * @param {number} width The new width, in pixels.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setWidth = function(width) {
-  this._pixiObject.width = width;
-  this.updatePosition(); // Position needs to be updated, as position in the center of the PIXI Sprite.
-};
-
-/**
- * Set the rendered video height
- * @param {number} height The new height, in pixels.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setHeight = function(height) {
-  this._pixiObject.height = height;
-  this.updatePosition(); // Position needs to be updated, as position in the center of the PIXI Sprite.
 };

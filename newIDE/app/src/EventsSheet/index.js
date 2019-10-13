@@ -807,12 +807,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     groupEvent.setFolded(true);
     groupEvent
       .getSubEvents()
-      .insertEvents(
-        eventsList,
-        0,
-        eventsList.getEventsCount(),
-        groupEvent.indexInList
-      );
+      .insertEvents(eventsList, 0, eventsList.getEventsCount(), 0);
 
     this.deleteSelection({ deleteInstructions: false });
   };

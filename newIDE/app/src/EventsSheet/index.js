@@ -757,7 +757,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
-    this._replaceSelectionByGroupsOfEvents(eventsList);
+    this._replaceSelectionByGroupOfEvents(eventsList);
     eventsList.delete();
   };
 
@@ -788,7 +788,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     this.deleteSelection({ deleteInstructions: false });
   };
 
-  _replaceSelectionByGroupsOfEvents = (eventsList: gdEventsList) => {
+  _replaceSelectionByGroupOfEvents = (eventsList: gdEventsList) => {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 

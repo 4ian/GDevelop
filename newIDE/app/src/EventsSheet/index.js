@@ -805,7 +805,9 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     groupEvent.setName('Grouped event');
     groupEvent.setFolded(true);
-    groupEvent.getSubEvents().insertEvents(
+    groupEvent
+      .getSubEvents()
+      .insertEvents(
         eventsList,
         0,
         eventsList.getEventsCount(),

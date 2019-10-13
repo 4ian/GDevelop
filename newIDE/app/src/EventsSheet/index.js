@@ -750,6 +750,17 @@ export default class EventsSheet extends React.Component<Props, State> {
     eventsList.delete();
   };
 
+  moveEventsIntoNewGroup = () => {
+    const eventsList = new gd.EventsList();
+
+    getSelectedEvents(this.state.selection).forEach(event =>
+      eventsList.insertEvent(event, eventsList.getEventsCount())
+    );
+
+    this._replaceSelectionByGroupOfEvents(eventsList);
+    eventsList.delete();
+  };
+
   _replaceSelectionByEventsFunction = (
     extensionName: string,
     eventsFunction: gdEventsFunction
@@ -773,6 +784,30 @@ export default class EventsSheet extends React.Component<Props, State> {
     const standardEvt = gd.asStandardEvent(newEvents[0]);
     standardEvt.getActions().push_back(action);
     action.delete();
+
+    this.deleteSelection({ deleteInstructions: false });
+  };
+
+  _replaceSelectionByGroupOfEvents = (eventsList: gdEventsList) => {
+    const contexts = getSelectedEventContexts(this.state.selection);
+    if (!contexts.length) return;
+
+    const newEvents = this.addNewEvent(
+      'BuiltinCommonInstructions::Group',
+      contexts[0]
+    );
+    if (!newEvents.length) {
+      console.error('A new event should have been created');
+      return;
+    }
+
+    const groupEvent = gd.asGroupEvent(newEvents[0]);
+
+    groupEvent.setName('Grouped events');
+    groupEvent.setFolded(true);
+    groupEvent
+      .getSubEvents()
+      .insertEvents(eventsList, 0, eventsList.getEventsCount(), 0);
 
     this.deleteSelection({ deleteInstructions: false });
   };
@@ -1092,6 +1127,10 @@ export default class EventsSheet extends React.Component<Props, State> {
                             {
                               label: 'Extract Events to a Function',
                               click: () => this.extractEventsToFunction(),
+                            },
+                            {
+                              label: 'Move Events into a Group',
+                              click: () => this.moveEventsIntoNewGroup(),
                             },
                             {
                               label: 'Analyze Objects Used in this Event',

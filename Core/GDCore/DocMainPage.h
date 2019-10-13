@@ -7,10 +7,10 @@
  *
  * \section gettingstarted Getting started
  *
- * In most cases, you should start by <a href="github.com/4ian/GDevelop/blob/master/newIDE/README.md">installing and launching the development version of GDevelop</a>.
+ * In most cases, you should start by <a href="https://github.com/4ian/GDevelop/blob/master/newIDE/README.md">installing and launching the development version of GDevelop</a>.
  *
- * - If you're interested in writing extensions for GDevelop, read <a href="github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md">the documentation about extensions</a>.
- * - If you want to dig more into how GDevelop is architectured and work on the core, read <a href="github.com/4ian/GDevelop/blob/master/Core/GDevelop-Architecture-Overview.md">GDevelop Architecture Overview</a>. Then, you can browse this reference to get more information about a class or function.
+ * - If you're interested in writing extensions for GDevelop, read <a href="https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md">the documentation about extensions</a>.
+ * - If you want to dig more into how GDevelop is architectured and work on the core, read <a href="https://github.com/4ian/GDevelop/blob/master/Core/GDevelop-Architecture-Overview.md">GDevelop Architecture Overview</a>. Then, you can browse this reference to get more information about a class or function.
  *
  * \section other Other documentations
  *
@@ -18,8 +18,8 @@
  *
  *  - [Open GDevelop C++ Platform documentation](../GDCpp Documentation/index.html)
  *  - [Open GDevelop JS Platform documentation](../GDJS Documentation/index.html)
- *  - <a href="github.com/4ian/GDevelop/blob/master/newIDE/README.md">Getting started with the editor</a>
- *  - <a href="github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md">Getting started with the extensions</a>
+ *  - <a href="https://github.com/4ian/GDevelop/blob/master/newIDE/README.md">Getting started with the editor</a>
+ *  - <a href="https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md">Getting started with the extensions</a>
  */
 
 /**

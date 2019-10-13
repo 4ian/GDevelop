@@ -803,7 +803,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     const groupEvent = gd.asGroupEvent(newEvents[0]);
 
-    groupEvent.setName('Grouped event');
+    groupEvent.setName('Grouped events');
     groupEvent.setFolded(true);
     groupEvent
       .getSubEvents()

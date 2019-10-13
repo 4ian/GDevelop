@@ -171,15 +171,18 @@ module.exports = {
         'SetText',
         _('Set BBCode text'),
         _('Set the BBCode formatted text.'),
-        _('Set BBCode text of _PARAM0_ to _PARAM1_'),
+        _('Set BBCode text of _PARAM0_ to _PARAM1_ _PARAM2_'),
         '',
         'JsPlatform/Extensions/bbcode32.png',
         'JsPlatform/Extensions/bbcode32.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('operator', _("Modification's sign"), '', false)
       .addParameter('string', _('BBCode text'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setBBText');
+      .setFunctionName('setBBText')
+      .setManipulatedType('string')
+      .setGetter('getBBText');
 
     object
       .addAction(
@@ -188,8 +191,8 @@ module.exports = {
         _('Set base color'),
         _('Set base color of _PARAM0_ to _PARAM1_'),
         '',
-        'JsPlatform/Extensions/bbcode32.png',
-        'JsPlatform/Extensions/bbcode32.png'
+        'res/actions/color24.png',
+        'res/actions/color24.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('color', _('Color'))
@@ -201,15 +204,18 @@ module.exports = {
         'SetOpacity',
         _('Set base opacity'),
         _('Set base opacity'),
-        _('Set base opacity of _PARAM0_ to _PARAM1_'),
+        _('Set base opacity of _PARAM0_ to _PARAM1_ _PARAM2_'),
         '',
-        'JsPlatform/Extensions/bbcode32.png',
-        'JsPlatform/Extensions/bbcode32.png'
+        'res/actions/opacity24.png',
+        'res/actions/opacity24.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
+      .addParameter('operator', _("Modification's sign"), '', false)
       .addParameter('number', _('Opacity (0-255)'))
       .getCodeExtraInformation()
-      .setFunctionName('setOpacity');
+      .setFunctionName('setOpacity')
+      .setManipulatedType('number')
+      .setGetter('getOpacity');
 
     object
       .addAction(
@@ -218,8 +224,8 @@ module.exports = {
         _('Set base font size'),
         _('Set base font size of _PARAM0_ to _PARAM1_'),
         '',
-        'JsPlatform/Extensions/bbcode32.png',
-        'JsPlatform/Extensions/bbcode32.png'
+        'res/actions/characterSize24.png',
+        'res/actions/characterSize24.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('number', _('Font size in px'))
@@ -233,8 +239,8 @@ module.exports = {
         _('Set base font family'),
         _('Set base font family of _PARAM0_ to _PARAM1_'),
         '',
-        'JsPlatform/Extensions/bbcode32.png',
-        'JsPlatform/Extensions/bbcode32.png'
+        'res/actions/font24.png',
+        'res/actions/font24.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('string', _('Font family'))
@@ -248,8 +254,8 @@ module.exports = {
         _('Set text alignment'),
         _('Set text alignment of _PARAM0_ to _PARAM1_'),
         '',
-        'JsPlatform/Extensions/bbcode32.png',
-        'JsPlatform/Extensions/bbcode32.png'
+        'res/actions/textAlign24.png',
+        'res/actions/textAlign24.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter(
@@ -264,17 +270,33 @@ module.exports = {
     object
       .addAction(
         'SetWidth',
-        _('Set width'),
-        _('Set width'),
-        _('Set width of _PARAM0_ to _PARAM1_'),
+        _('Set wrapping width'),
+        _('Set wrapping width'),
+        _('Set wrapping width of _PARAM0_ to _PARAM1_ _PARAM2_'),
         '',
-        'JsPlatform/Extensions/bbcode32.png',
-        'JsPlatform/Extensions/bbcode32.png'
+        'res/actions/scaleWidth24.png',
+        'res/actions/scaleWidth24.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('number', _('Width'))
+      .addParameter('operator', _("Modification's sign"), '', false)
+      .addParameter('expression', _('Number '), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setWidth');
+      .setFunctionName('setWidth')
+      .setManipulatedType('number')
+      .setGetter('getWidth');
+
+    // extension
+    //   .addExpression(
+    //     'GetText',
+    //     _('Get text'),
+    //     _('Get text'),
+    //     _('BBText'),
+    //     '',
+    //     'JsPlatform/Extensions/bbcode32.png',
+    //     'JsPlatform/Extensions/bbcode32.png'
+    //   )
+    //   .getCodeExtraInformation()
+    //   .setFunctionName('getBBText');
 
     // object
     //   .addCondition(

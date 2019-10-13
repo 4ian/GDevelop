@@ -72,12 +72,22 @@ gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
   this._renderer.setBBText(text);
 };
 
+gdjs.BBTextRuntimeObject.prototype.getBBText = function(text) {
+  console.log(this._renderer);
+  return this._renderer.text;
+};
+
 gdjs.BBTextRuntimeObject.prototype.setColor = function(value) {
   this._renderer.setBaseProperty('color', value);
 };
 
 gdjs.BBTextRuntimeObject.prototype.setOpacity = function(value) {
   this._renderer.setBaseProperty('opacity', value);
+};
+
+gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
+  console.log(this);
+  return this._opacity;
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(value) {

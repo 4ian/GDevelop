@@ -29,9 +29,6 @@ export const getRGBColorFromHex = (hex: string) => {
       b: c & 255,
       a: 255,
     };
-    return (
-      'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',1)'
-    );
   }
   console.warn('Bad Hex');
   return { r: 128, g: 128, b: 128, a: 255 };

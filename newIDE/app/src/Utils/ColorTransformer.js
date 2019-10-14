@@ -21,11 +21,11 @@ export const getRGBColorFromHex = (hex: string) => {
     if (c.length === 3) {
       c = [c[0], c[0], c[1], c[1], c[2], c[2]];
     }
-    c = '0x' + c.join('');
+    const cols = '0x' + c.join('');
     return {
-      r: (c >> 16) & 255,
-      g: (c >> 8) & 255,
-      b: c & 255,
+      r: parseInt((cols >> 16) & 255),
+      g: parseInt((cols >> 8) & 255),
+      b: parseInt(cols & 255),
       a: 255,
     };
   }

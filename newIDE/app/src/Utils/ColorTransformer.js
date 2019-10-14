@@ -1,4 +1,5 @@
 // @flow
+import * as PIXI from 'pixi.js';
 
 /**
  * Convert a rgb color value to a string hex value.
@@ -16,19 +17,11 @@ export const rgbToHexNumber = (r: number, g: number, b: number) =>
  * Convert a hex color value to an rgb object value.
  */
 export const getRGBColorFromHex = (hex: string) => {
-  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-    let c = hex.substring(1).split('');
-    if (c.length === 3) {
-      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-    }
-    const cols = '0x' + c.join('');
-    return {
-      r: parseInt((cols >> 16) & 255),
-      g: parseInt((cols >> 8) & 255),
-      b: parseInt(cols & 255),
-      a: 255,
-    };
-  }
-  console.warn('Bad Hex');
-  return { r: 128, g: 128, b: 128, a: 255 };
+  const rgb = PIXI.utils.hex2rgb(`0x${hex.replace('#', '')}`);
+  return {
+    r: Math.floor(rgb[0] * 255),
+    g: Math.floor(rgb[1] * 255),
+    b: Math.floor(rgb[2] * 255),
+    a: 255,
+  };
 };

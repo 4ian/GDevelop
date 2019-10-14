@@ -51,7 +51,7 @@ gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = func
   initialInstanceData
 ) {
   if (initialInstanceData.customSize) {
-    this.setWrappingWidth(initialInstanceData.width);
+    this.setWidth(initialInstanceData.width);
   }
 };
 
@@ -62,45 +62,71 @@ gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
 };
 
 gdjs.BBTextRuntimeObject.prototype.update = function(runtimeScene) {
-  this._renderer.ensureUpToDate();
+  if (this._renderer) this._renderer.ensureUpToDate();
 };
 
 /**
- * Set BBText base style properties
+ * Set/Get BBText base style properties
  */
 gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
-  this._renderer.setBBText(text);
+  this._text = text;
+  this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getBBText = function(text) {
-  console.log(this._renderer);
-  return this._renderer.text;
+  return this._text;
 };
 
 gdjs.BBTextRuntimeObject.prototype.setColor = function(value) {
-  this._renderer.setBaseProperty('color', value);
+  const splitValue = value.split(';');
+  const hexColor = `#${gdjs.rgbToHex(
+    parseInt(splitValue[0]),
+    parseInt(splitValue[1]),
+    parseInt(splitValue[2])
+  )}`;
+  this._color = hexColor;
+  this._renderer.updateColor();
+  this.update();
 };
 
-gdjs.BBTextRuntimeObject.prototype.setOpacity = function(value) {
-  this._renderer.setBaseProperty('opacity', value);
+gdjs.BBTextRuntimeObject.prototype.getColor = function() {
+  return this._color;
 };
 
 gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
-  console.log(this);
   return this._opacity;
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(value) {
-  this._renderer.setBaseProperty('font size', value);
+  this._size = `${value}px`;
+  this._renderer.updateFontSize();
+  this.update();
+};
+
+gdjs.BBTextRuntimeObject.prototype.getFontSize = function() {
+  return this._size;
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontFamily = function(value) {
-  this._renderer.setBaseProperty('font family', value);
+  this._family = value;
+  this._renderer.updateFontFamily();
+  this.update();
+};
+
+gdjs.BBTextRuntimeObject.prototype.getFontFamily = function() {
+  return this._family;
 };
 
 gdjs.BBTextRuntimeObject.prototype.setAlignment = function(value) {
-  this._renderer.setBaseProperty('alignment', value);
+  this._align = value;
+  this._renderer.updateAlignment();
+  this.update();
 };
+
+gdjs.BBTextRuntimeObject.prototype.getAlignment = function() {
+  return (this._align = value);
+};
+
 /**
  * Set object position on X axis.
  * @param {number} x The new position X of the object.
@@ -145,20 +171,12 @@ gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
 };
 
 /**
- * Set the word wrapping width for the text object.
- * @param {number} width The new width to set.
- */
-gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
-  if (width <= 1) width = 1;
-  this._wrappingWidth = width;
-};
-
-/**
  * Set the width.
  * @param {number} width The new width in pixels.
  */
 gdjs.BBTextRuntimeObject.prototype.setWidth = function(width) {
-  this._renderer.setWidth(width);
+  this._wrappingWidth = width;
+  this.update();
 };
 
 /**

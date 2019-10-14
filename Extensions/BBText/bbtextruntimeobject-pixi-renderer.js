@@ -52,6 +52,13 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
+  if (this._object._text !== this._pixiObject.text) {
+    this._pixiObject.setText(this._object._text);
+  }
+  if (this._object._wrappingWidth !== this._pixiObject._wrappingWidth) {
+    this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
+    this._pixiObject.dirty = true;
+  }
   if (
     !this._textureWasValid &&
     this._pixiObject.texture &&
@@ -70,53 +77,19 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
   }
 };
 
-/**
- * Set the rendered width
- * @param {number} width The new width, in pixels.
- */
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setWidth = function(width) {
-  this._object._wrappingWidth = width;
-  this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
-  this._pixiObject.dirty = true;
-  this.updatePosition(); // Position needs to be updated, as position in the center of the PIXI Sprite.
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateColor = function() {
+  this._pixiObject.textStyles.default.fill = this._object._color;
 };
 
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setBBText = function(text) {
-  this._pixiObject.setText(text);
-  this._pixiObject.updateText();
-  this.updatePosition();
-};
-
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setBaseProperty = function(
-  property,
-  value
-) {
-  switch (property) {
-    case 'color':
-      const splitValue = value.split(';');
-      const hexColor = `#${gdjs.rgbToHex(
-        parseInt(splitValue[0]),
-        parseInt(splitValue[1]),
-        parseInt(splitValue[2])
-      )}`;
-      this._pixiObject.textStyles.default.fill = hexColor;
-      break;
-    case 'alignment':
-      this._pixiObject._style.align = value;
-      this._pixiObject.dirty = true;
-      break;
-    case 'font family':
-      this._pixiObject.textStyles.default.fontFamily = value;
-      break;
-    case 'font size':
-      this._pixiObject.textStyles.default.fontSize = `${value}px`;
-      break;
-    case 'opacity':
-      this._pixiObject.alpha = value / 255;
-      break;
-  }
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function() {
+  this._pixiObject._style.align = this._object._align;
   this._pixiObject.dirty = true;
-  this.ensureUpToDate();
+};
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function() {
+  this._pixiObject.textStyles.default.fontFamily = this._object._family;
+};
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
+  this._pixiObject.textStyles.default.fontSize = this._object._size;
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

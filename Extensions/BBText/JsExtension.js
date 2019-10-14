@@ -197,7 +197,8 @@ module.exports = {
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('color', _('Color'))
       .getCodeExtraInformation()
-      .setFunctionName('setColor');
+      .setFunctionName('setColor')
+      .setGetter('getColor');
 
     object
       .addAction(
@@ -230,7 +231,8 @@ module.exports = {
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('number', _('Font size in px'))
       .getCodeExtraInformation()
-      .setFunctionName('setFontSize');
+      .setFunctionName('setFontSize')
+      .setGetter('getFontSize');
 
     object
       .addAction(
@@ -245,7 +247,8 @@ module.exports = {
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('string', _('Font family'))
       .getCodeExtraInformation()
-      .setFunctionName('setFontFamily');
+      .setFunctionName('setFontFamily')
+      .setGetter('getFontFamily');
 
     object
       .addAction(
@@ -265,7 +268,8 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setFunctionName('setAlignment');
+      .setFunctionName('setAlignment')
+      .setGetter('getAlignment');
 
     object
       .addAction(

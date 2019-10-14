@@ -47,6 +47,12 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawLine = function(x1, y1,
     this._graphics.endFill();
 };
 
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawEllipse = function(x1, y1, width, height) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.drawEllipse(x1, y1, width, height);
+    this._graphics.endFill();
+};
+
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(
         this._object._outlineSize,

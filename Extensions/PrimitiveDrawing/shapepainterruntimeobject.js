@@ -60,6 +60,10 @@ gdjs.ShapePainterRuntimeObject.prototype.drawLine = function(x1, y1, x2, y2, thi
     this._renderer.drawLine(x1, y1, x2, y2, thickness);
 };
 
+gdjs.ShapePainterRuntimeObject.prototype.drawEllipse = function(x1, y1, width, height) {
+    this._renderer.drawEllipse(x1, y1, width, height);
+};
+
 gdjs.ShapePainterRuntimeObject.prototype.setFillColor = function(rgbColor) {
     var colors = rgbColor.split(";");
     if ( colors.length < 3 ) return;

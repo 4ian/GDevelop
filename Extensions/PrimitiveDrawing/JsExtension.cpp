@@ -39,8 +39,12 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Circle"]
         .SetFunctionName("drawCircle");
-    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
         .SetFunctionName("drawLine");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Ellipse"]
+        .SetFunctionName("drawEllipse");
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");

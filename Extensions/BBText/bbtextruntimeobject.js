@@ -93,10 +93,6 @@ gdjs.BBTextRuntimeObject.prototype.getColor = function() {
   return this._color;
 };
 
-gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
-  return this._opacity;
-};
-
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(value) {
   this._size = `${value}px`;
   this._renderer.updateFontSize();

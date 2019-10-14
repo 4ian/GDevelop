@@ -18,7 +18,7 @@ type ColorResult = {
 type ColorChangeHandler = (color: ColorResult) => void;
 
 type Props = {|
-  color: ?RGBColor | string,
+  color: ?RGBColor,
   style?: Object,
   onChange?: ColorChangeHandler,
   onChangeComplete?: ColorChangeHandler,
@@ -76,16 +76,11 @@ class ColorPicker extends React.Component<Props, State> {
     this.setState({ displayColorPicker: false });
   };
 
-  getRgbBackground = (rgbColor: RGBColor) =>
-    `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, ${rgbColor.a || 1})`;
-
   render() {
     const { style, color, ...otherProps } = this.props;
 
-    const displayedRgbColor = color
-      ? typeof color === 'object'
-        ? this.getRgbBackground(color)
-        : color
+    const displayedColor = color
+      ? color
       : {
           r: 200,
           g: 200,
@@ -99,7 +94,9 @@ class ColorPicker extends React.Component<Props, State> {
           <div
             style={{
               ...styles.color,
-              background: displayedRgbColor,
+              background: `rgba(${displayedColor.r}, ${displayedColor.g}, ${
+                displayedColor.b
+              }, ${displayedColor.a || 1})`,
             }}
           >
             {color ? null : '?'}
@@ -109,7 +106,7 @@ class ColorPicker extends React.Component<Props, State> {
           <React.Fragment>
             <div style={styles.cover} onClick={this.handleClose} />
             <div style={styles.popover}>
-              <SketchPicker color={displayedRgbColor} {...otherProps} />
+              <SketchPicker color={displayedColor} {...otherProps} />
             </div>
           </React.Fragment>
         ) : null}

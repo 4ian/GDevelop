@@ -50,6 +50,7 @@ export default ({
           .map(storageProvider => (
             <ListItem
               key={storageProvider.name}
+              disabled={!!storageProvider.disabled}
               primaryText={storageProvider.name}
               leftIcon={
                 storageProvider.renderIcon

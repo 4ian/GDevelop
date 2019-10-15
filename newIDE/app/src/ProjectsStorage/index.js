@@ -50,6 +50,7 @@ export type StorageProvider = {|
   name: string,
   hiddenInOpenDialog?: boolean,
   hiddenInSaveDialog?: boolean,
+  disabled?: boolean,
   renderIcon?: () => React.Node,
   createOperations: ({
     /** Open a dialog (a render function) */

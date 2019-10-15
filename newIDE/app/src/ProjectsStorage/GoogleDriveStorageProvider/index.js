@@ -85,7 +85,7 @@ const initializeApis = (): Promise<void> => {
 };
 
 type GoogleUser = {
-  getAuthResponse: () => { access_token: string, error?: ?Error, },
+  getAuthResponse: () => { access_token: string, error?: ?Error },
 };
 
 let isAuthenticated = false;

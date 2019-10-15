@@ -24,6 +24,8 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import InternalFileStorageProvider from './ProjectsStorage/InternalFileStorageProvider';
 import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
+import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
+import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
@@ -44,9 +46,11 @@ export const create = (authentification: Authentification) => {
           storageProviders={[
             InternalFileStorageProvider,
             GoogleDriveStorageProvider,
+            DropboxStorageProvider,
+            OneDriveStorageProvider,
             DownloadFileStorageProvider,
           ]}
-          defaultStorageProvider={GoogleDriveStorageProvider}
+          defaultStorageProvider={InternalFileStorageProvider}
         >
           {({
             currentStorageProviderOperations,

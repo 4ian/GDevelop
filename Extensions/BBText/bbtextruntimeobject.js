@@ -183,7 +183,7 @@ gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function() {
 };
 
 /**
- * Set the width of the video.
+ * Set the width of the object.
  * @param {number} width The new width in pixels.
  */
 gdjs.BBTextRuntimeObject.prototype.setWidth = function(width) {

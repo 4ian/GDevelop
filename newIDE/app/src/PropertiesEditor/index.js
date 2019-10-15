@@ -11,7 +11,7 @@ import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
 import IconButton from '../UI/IconButton';
 import ColorField from '../UI/ColorField';
-import { getRGBColorFromHex } from '../Utils/ColorTransformer';
+import { hexToRGBColor } from '../Utils/ColorTransformer';
 import {
   type ResourceKind,
   type ResourceSource,
@@ -231,7 +231,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           floatingLabelText={getFieldLabel(this.props.instances, field)}
           disableAlpha
           fullWidth
-          color={getRGBColorFromHex(getFieldValue(this.props.instances, field))}
+          color={hexToRGBColor(getFieldValue(this.props.instances, field))}
           onChangeComplete={color => {
             this.props.instances.forEach(i =>
               setValue(i, color.hex || '#000000')

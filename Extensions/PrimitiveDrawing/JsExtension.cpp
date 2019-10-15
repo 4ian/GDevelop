@@ -49,6 +49,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RoundedRectangle"]
         .SetFunctionName("drawRoundedRectangle");
     GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
+        .SetFunctionName("drawStar");
+    GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
     GetAllActionsForObject(

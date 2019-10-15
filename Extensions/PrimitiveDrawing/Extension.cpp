@@ -38,10 +38,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/rectangle.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("Top left side: X Position"))
-      .AddParameter("expression", _("Top left side : Y Position"))
-      .AddParameter("expression", _("Bottom right side : X Position"))
-      .AddParameter("expression", _("Bottom right side : Y Position"))
+      .AddParameter("expression", _("Top left side: X position"))
+      .AddParameter("expression", _("Top left side : Y position"))
+      .AddParameter("expression", _("Bottom right side : X position"))
+      .AddParameter("expression", _("Bottom right side : Y position"))
       .SetFunctionName("DrawRectangle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -71,10 +71,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/line.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X Position of start point"))
-      .AddParameter("expression", _("Y Position of start point"))
-      .AddParameter("expression", _("X Position of end point"))
-      .AddParameter("expression", _("Y Position of end point"))
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .AddParameter("expression", _("X position of end point"))
+      .AddParameter("expression", _("Y position of end point"))
       .AddParameter("expression", _("Thickness ( in pixels )"))
       .SetFunctionName("DrawLine")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -99,18 +99,38 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("RoundedRectangle",
                 _("Rounded rectangle"),
                 _("Draw a rounded rectangle on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rounded rectangle (radius : _PARAM5_) with _PARAM0_"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rounded rectangle (radius: _PARAM5_) with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/roundedRectangle24.png",
                 "res/actions/roundedRectangle.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("Top left side: X Position"))
-      .AddParameter("expression", _("Top left side : Y Position"))
-      .AddParameter("expression", _("Bottom right side : X Position"))
-      .AddParameter("expression", _("Bottom right side : Y Position"))
+      .AddParameter("expression", _("Top left side: X position"))
+      .AddParameter("expression", _("Top left side: Y position"))
+      .AddParameter("expression", _("Bottom right side: X position"))
+      .AddParameter("expression", _("Bottom right side: Y position"))
       .AddParameter("expression", _("Radius ( in pixels )"))
       .SetFunctionName("DrawRoundedRectangle")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("Star",
+                _("Star"),
+                _("Draw a star on screen"),
+                _("Draw at _PARAM1_;_PARAM2_ an star of _PARAM3_ points and _PARAM4_ of radius (inner radius : _PARAM5_, rotation : _PARAM6_ ) "
+                "with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/star24.png",
+                "res/actions/star.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X coordinate of the center of the star"))
+      .AddParameter("expression", _("Y coordinate of the center of the star"))
+      .AddParameter("expression", _("Points of the star"))
+      .AddParameter("expression", _("The radius (in pixels)"))
+      .AddParameter("expression", _("The inner radius (in pixels, half radius by default)"))
+      .SetDefaultValue("1")
+      .AddParameter("expression", _("The rotation (in degrees)"))
+      .SetFunctionName("DrawStar")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("FillColor",

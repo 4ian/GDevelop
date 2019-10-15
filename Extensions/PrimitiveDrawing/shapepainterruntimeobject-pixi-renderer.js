@@ -59,6 +59,12 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawRoundedRectangle = func
     this._graphics.endFill();
 };
 
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawStar = function(x1, y1, points, radius, innerRadius, rotation) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.drawStar(x1, y1, points, radius, innerRadius ? innerRadius : radius/2, rotation ? gdjs.toRad(rotation) : 0);
+    this._graphics.endFill();
+};
+
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(
         this._object._outlineSize,

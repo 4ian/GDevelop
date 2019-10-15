@@ -53,6 +53,12 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawEllipse = function(x1, 
     this._graphics.endFill();
 };
 
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawRoundedRectangle = function(x1, y1, x2, y2, radius) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.drawRect(x1, y1, x2 - x1, y2 - y1, radius);
+    this._graphics.endFill();
+};
+
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(
         this._object._outlineSize,

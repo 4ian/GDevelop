@@ -96,6 +96,23 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("DrawEllipse")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddAction("RoundedRectangle",
+                _("Rounded rectangle"),
+                _("Draw a rounded rectangle on screen"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rounded rectangle (radius : _PARAM5_) with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/roundedRectangle24.png",
+                "res/actions/roundedRectangle.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("Top left side: X Position"))
+      .AddParameter("expression", _("Top left side : Y Position"))
+      .AddParameter("expression", _("Bottom right side : X Position"))
+      .AddParameter("expression", _("Bottom right side : Y Position"))
+      .AddParameter("expression", _("Radius ( in pixels )"))
+      .SetFunctionName("DrawRoundedRectangle")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
   obj.AddAction("FillColor",
                 _("Fill color"),
                 _("Change the color used when filling"),

@@ -60,8 +60,12 @@ gdjs.ShapePainterRuntimeObject.prototype.drawLine = function(x1, y1, x2, y2, thi
     this._renderer.drawLine(x1, y1, x2, y2, thickness);
 };
 
-gdjs.ShapePainterRuntimeObject.prototype.drawEllipse = function(x1, y1, width, height) {
-    this._renderer.drawEllipse(x1, y1, width, height);
+gdjs.ShapePainterRuntimeObject.prototype.drawEllipse = function(centerX, centerY, width, height) {
+    this._renderer.drawEllipse(centerX, centerY, width, height);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawRoundedRectangle = function(startX1, startY1, endX2, endY2, radius) {
+    this._renderer.drawRoundedRectangle(startX1, startY1, endX2, endY2, radius);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setFillColor = function(rgbColor) {

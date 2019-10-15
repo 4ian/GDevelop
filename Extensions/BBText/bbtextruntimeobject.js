@@ -7,7 +7,6 @@
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  console.log('OBJ:', this, objectData);
   /** @type number */
   this._opacity = objectData.content.opacity;
   /** @type boolean */
@@ -51,7 +50,7 @@ gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = func
   initialInstanceData
 ) {
   if (initialInstanceData.customSize) {
-    this.setWidth(initialInstanceData.width);
+    this.setWrappingWidth(initialInstanceData.width);
   }
 };
 
@@ -170,7 +169,7 @@ gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
  * Set the width.
  * @param {number} width The new width in pixels.
  */
-gdjs.BBTextRuntimeObject.prototype.setWidth = function(width) {
+gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
   this._wrappingWidth = width;
   this.update();
 };
@@ -178,6 +177,6 @@ gdjs.BBTextRuntimeObject.prototype.setWidth = function(width) {
 /**
  * Get the width of the object.
  */
-gdjs.BBTextRuntimeObject.prototype.getWidth = function() {
-  return this._renderer.getWidth();
+gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function() {
+  return this._wrappingWidth;
 };

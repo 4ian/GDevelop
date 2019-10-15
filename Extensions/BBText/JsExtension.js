@@ -285,9 +285,9 @@ module.exports = {
       .addParameter('operator', _("Modification's sign"), '', false)
       .addParameter('expression', _('Number '), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setWidth')
+      .setFunctionName('setWrappingWidth')
       .setManipulatedType('number')
-      .setGetter('getWidth');
+      .setGetter('getWrappingWidth');
 
     // extension
     //   .addExpression(

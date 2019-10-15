@@ -25,8 +25,15 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
 
     this._object.hidden = !runtimeObject._visible;
   } else {
-    console.log('runtime obj', runtimeObject._wrappingWidth, this._pixiObject);
-    // this._pixiObject._texture.baseTexture.source.currentTime = 0;
+    // No setting X/Y/Z as it will be updated below
+    this.updateColor();
+    this.updateAlignment();
+    this.updateFontFamily();
+    this.updateFontSize();
+    this.updatePosition();
+    this.updateAngle();
+    this.updateOpacity();
+    this.updateVisible();
   }
 
   runtimeScene
@@ -107,12 +114,4 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
   this._pixiObject.alpha = this._object._opacity / 255;
-};
-
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getWidth = function() {
-  return this._pixiObject.width;
-};
-
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
-  return this._pixiObject.height;
 };

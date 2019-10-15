@@ -50,6 +50,7 @@ gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = func
   initialInstanceData
 ) {
   if (initialInstanceData.customSize) {
+    this.setWidth(initialInstanceData.width);
     this.setWrappingWidth(initialInstanceData.width);
   }
 };
@@ -69,7 +70,7 @@ gdjs.BBTextRuntimeObject.prototype.update = function(runtimeScene) {
  */
 gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
   this._text = text;
-  this.update();
+  this._renderer.updateText();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getBBText = function(text) {
@@ -175,8 +176,31 @@ gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
 };
 
 /**
- * Get the width of the object.
+ * Get the wrapping width of the object.
  */
 gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function() {
   return this._wrappingWidth;
+};
+
+/**
+ * Set the width of the video.
+ * @param {number} width The new width in pixels.
+ */
+gdjs.BBTextRuntimeObject.prototype.setWidth = function(width) {
+  this._wrappingWidth = width;
+  this.update();
+};
+
+/**
+ * Get the width of the object.
+ */
+gdjs.BBTextRuntimeObject.prototype.getWidth = function() {
+  return this._renderer.getWidth();
+};
+
+/**
+ * Get the height of the object.
+ */
+gdjs.BBTextRuntimeObject.prototype.getHeight = function() {
+  return this._renderer.getHeight();
 };

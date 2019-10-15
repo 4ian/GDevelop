@@ -283,7 +283,7 @@ module.exports = {
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('operator', _("Modification's sign"), '', false)
-      .addParameter('expression', _('Number '), '', false)
+      .addParameter('expression', _('Number'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setWrappingWidth')
       .setManipulatedType('number')

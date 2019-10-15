@@ -59,9 +59,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
-  if (this._object._text !== this._pixiObject.text) {
-    this._pixiObject.setText(this._object._text);
-  }
   if (this._object._wrappingWidth !== this._pixiObject._wrappingWidth) {
     this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
     this._pixiObject.dirty = true;
@@ -82,6 +79,11 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
     this.updatePosition();
     this._textureWasValid = true;
   }
+};
+
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateText = function() {
+  this._pixiObject.setText(this._object._text);
+  this.updatePosition();
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateColor = function() {
@@ -114,4 +116,12 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
   this._pixiObject.alpha = this._object._opacity / 255;
+};
+
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getWidth = function() {
+  return this._pixiObject.width;
+};
+
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
+  return this._pixiObject.height;
 };

@@ -81,18 +81,18 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("Ellipse",
                 _("Ellipse"),
-                _("Draw a ellipse on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ a ellipse of width _PARAM3_ and height _PARAM4_ "
+                _("Draw an ellipse on screen"),
+                _("Draw at _PARAM1_;_PARAM2_ an ellipse of half width _PARAM3_ and half height _PARAM4_ "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/line24.png",
                 "res/actions/line.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X Position of start point"))
-      .AddParameter("expression", _("Y Position of start point"))
-      .AddParameter("expression", _("Width of ellipse"))
-      .AddParameter("expression", _("Height of ellipse"))
+      .AddParameter("expression", _("X coordinate of the center of the ellipse"))
+      .AddParameter("expression", _("Y coordinate of the center of the ellipse"))
+      .AddParameter("expression", _("The half width of the ellipse"))
+      .AddParameter("expression", _("The half height of the ellipse"))
       .SetFunctionName("DrawEllipse")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 

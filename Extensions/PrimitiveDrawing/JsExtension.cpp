@@ -52,6 +52,12 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
         .SetFunctionName("drawStar");
     GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
+        .SetFunctionName("drawArc");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
+        .SetFunctionName("drawArcTo");
+    GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
     GetAllActionsForObject(

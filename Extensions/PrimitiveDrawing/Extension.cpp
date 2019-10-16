@@ -126,11 +126,50 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("X coordinate of the center of the star"))
       .AddParameter("expression", _("Y coordinate of the center of the star"))
       .AddParameter("expression", _("Points of the star"))
-      .AddParameter("expression", _("The radius (in pixels)"))
-      .AddParameter("expression", _("The inner radius (in pixels, half radius by default)"))
-      .AddParameter("expression", _("The rotation (in degrees)"))
+      .AddParameter("expression", _("Radius (in pixels)"))
+      .AddParameter("expression", _("Inner radius (in pixels, half radius by default)"))
+      .AddParameter("expression", _("Rotation (in degrees)"))
       .SetFunctionName("DrawStar")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("Arc",
+                _("Arc"),
+                _("Draw an arc on screen"),
+                _("Draw at _PARAM1_;_PARAM2_ an arc with _PARAM3_ of radius, start angle: _PARAM4_, end angle: _PARAM4_ (anticlockwise: _PARAM5_) "
+                "with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/arc24.png",
+                "res/actions/arc.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X coordinate of the center of the arc"))
+      .AddParameter("expression", _("Y coordinate of the center of the arc"))
+      .AddParameter("expression", _("Radius (in pixels)"))
+      .AddParameter("expression", _("Start angle of the arc"))
+      .AddParameter("expression", _("End angle of the arc"))
+      .AddParameter("yesorno", _("anticlockwise (false by default)"))
+      .SetFunctionName("DrawArc")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("ArcTo",
+                _("ArcTo"),
+                _("Draw an arcTo on screen"),
+                _("Draw at x1: _PARAM1_;y1: _PARAM2_, x2:_PARAM3_;y2: _PARAM4_ , radius: _PARAM5_  "
+                "with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/arc24.png",
+                "res/actions/arc.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X coordinate start arc"))
+      .AddParameter("expression", _("Y coordinate start arc"))
+      .AddParameter("expression", _("X coordinate end arc"))
+      .AddParameter("expression", _("Y coordinate end arc"))
+      .AddParameter("expression", _("Radius (in pixels)"))
+      .SetFunctionName("DrawArcTo")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+      x1, y1, x2, y2, radius
 
   obj.AddAction("FillColor",
                 _("Fill color"),

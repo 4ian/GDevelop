@@ -72,6 +72,14 @@ gdjs.ShapePainterRuntimeObject.prototype.drawStar = function(centerX, centerY, p
     this._renderer.drawStar(centerX, centerY, points, radius, innerRadius, rotation);
 };
 
+gdjs.ShapePainterRuntimeObject.prototype.drawArc = function(centerX, centerY, radius, startAngle, endAngle, anticlockwise) {
+    this._renderer.drawArc(centerX, centerY, radius, startAngle, endAngle, anticlockwise);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawArcTo = function(x1, y1, x2, y2, radius) {
+    this._renderer.drawArcTo(x1, y1, x2, y2, radius);
+};
+
 gdjs.ShapePainterRuntimeObject.prototype.setFillColor = function(rgbColor) {
     var colors = rgbColor.split(";");
     if ( colors.length < 3 ) return;

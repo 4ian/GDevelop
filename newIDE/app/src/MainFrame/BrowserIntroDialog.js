@@ -4,6 +4,10 @@ import Dialog from '../UI/Dialog';
 import Window from '../Utils/Window';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Fullscreen from '@material-ui/icons/Fullscreen';
+import RaisedButton from '../UI/RaisedButton';
+import { Spacer, Line } from '../UI/Grid';
 
 export default class BetaIntroDialog extends Component {
   _onOpenWebsite() {
@@ -12,42 +16,85 @@ export default class BetaIntroDialog extends Component {
 
   render() {
     const { open, onClose } = this.props;
-    const actions = [
-      <FlatButton
-        key="download"
-        label={<Trans>Download full GDevelop desktop version</Trans>}
-        primary={false}
-        onClick={this._onOpenWebsite}
-      />,
-      <FlatButton
-        label={<Trans>Ok</Trans>}
-        primary={true}
-        onClick={onClose}
-        key="close"
-      />,
-    ];
 
     return (
-      <Dialog actions={actions} open={open} onRequestClose={onClose}>
-        <div>
-          <Text>
-            <Trans>
-              This is a version of GDevelop 5 that you can try online.
-            </Trans>
-          </Text>
-          <Text>
-            Choose a <b>new project to create</b> and then <b>open the scene</b>{' '}
-            to make changes to the game. You can{' '}
-            <b>launch a preview of your game</b> at any time!
-          </Text>
-          <Text>
-            <Trans>
-              Download the full version of GDevelop to create your own game
-              without limits!
-            </Trans>
-          </Text>
-        </div>
-      </Dialog>
+      <ResponsiveWindowMeasurer>
+        {windowWidth => (
+          <Dialog
+            title={<Trans>Welcome to GDevelop</Trans>}
+            actions={[
+              <FlatButton
+                key="download"
+                label={<Trans>Download GDevelop desktop app</Trans>}
+                primary={false}
+                onClick={this._onOpenWebsite}
+              />,
+              <FlatButton
+                label={<Trans>Close</Trans>}
+                primary={false}
+                onClick={onClose}
+                key="close"
+              />,
+            ]}
+            open={open}
+            onRequestClose={onClose}
+          >
+            <div>
+              <Text>
+                <Trans>
+                  This is a version of GDevelop 5 that you can try online.
+                </Trans>
+              </Text>
+              <Text>
+                Choose a <b>new project to create</b>, then edit the scene or
+                the events ruling the game. You can{' '}
+                <b>launch a preview of your game</b> at any time.
+              </Text>
+              <Text>
+                <Trans>
+                  Download the full version of GDevelop on your desktop computer
+                  to create your own game without limits!
+                </Trans>
+              </Text>
+              {windowWidth === 'small' &&
+                (!Window.isFullscreen() ? (
+                  <React.Fragment>
+                    <Spacer />
+                    <Text>
+                      <Trans>
+                        You're working on a small screen. It's recommended to
+                        activate Fullscreen Mode for using GDevelop.
+                      </Trans>
+                    </Text>
+                    <Line justifyContent="center">
+                      <RaisedButton
+                        label={<Trans>Activate Fullscreen</Trans>}
+                        primary
+                        onClick={() => {
+                          Window.requestFullscreen();
+                          setTimeout(() => {
+                            this.forceUpdate();
+                          }, 250 /* Let a bit of time for the fullscreen to kick in */);
+                        }}
+                        labelPosition="before"
+                        icon={<Fullscreen />}
+                      />
+                    </Line>
+                  </React.Fragment>
+                ) : (
+                  <Line justifyContent="center">
+                    <RaisedButton
+                      label={<Trans>Start using GDevelop</Trans>}
+                      primary
+                      onClick={onClose}
+                      labelPosition="before"
+                    />
+                  </Line>
+                ))}
+            </div>
+          </Dialog>
+        )}
+      </ResponsiveWindowMeasurer>
     );
   }
 }

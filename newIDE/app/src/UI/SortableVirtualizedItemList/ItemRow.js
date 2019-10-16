@@ -1,9 +1,8 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
 import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
-import { type Item } from '.';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 
 const styles = {
@@ -17,23 +16,28 @@ const styles = {
   },
 };
 
-type Props = {
-  index: number,
+const LEFT_MOUSE_BUTTON = 0;
+
+type Props<Item> = {
   item: Item,
+  itemName: string,
+  isBold: boolean,
   onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
-  selected: true,
+  selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => Array<any>,
-  style: Object,
+  onEdit?: ?(Item) => void,
+  hideMenuButton: boolean,
+  connectIconDragSource?: ?(React.Node) => React.Node,
 };
 
-class ItemRow extends React.Component<Props, *> {
+class ItemRow<Item> extends React.Component<Props<Item>> {
   textField: ?TextField;
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props<Item>) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
         if (this.textField) this.textField.focus();
@@ -42,12 +46,22 @@ class ItemRow extends React.Component<Props, *> {
   }
 
   render() {
-    const { item, selected, style, getThumbnail, errorStatus } = this.props;
+    const {
+      item,
+      itemName,
+      isBold,
+      selected,
+      getThumbnail,
+      errorStatus,
+      onEdit,
+      onItemSelected,
+      hideMenuButton,
+      connectIconDragSource,
+    } = this.props;
 
     return (
       <ThemeConsumer>
         {muiTheme => {
-          const itemName = item.getName();
           const label = this.props.editingName ? (
             <TextField
               id="rename-item-field"
@@ -71,6 +85,8 @@ class ItemRow extends React.Component<Props, *> {
                 color: selected
                   ? muiTheme.listItem.selectedTextColor
                   : undefined,
+                fontStyle: isBold ? 'italic' : undefined,
+                fontWeight: isBold ? 'bold' : 'normal',
               }}
             >
               {itemName}
@@ -94,20 +110,34 @@ class ItemRow extends React.Component<Props, *> {
                 : muiTheme.listItem.warningTextColor,
           };
 
+          const leftIcon = getThumbnail ? (
+            <ListIcon iconSize={32} src={getThumbnail()} />
+          ) : null;
+
           return (
             <ListItem
-              style={{ ...itemStyle, ...style }}
+              style={{ ...itemStyle }}
               primaryText={label}
               leftIcon={
-                getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
+                connectIconDragSource && leftIcon
+                  ? connectIconDragSource(<div>{leftIcon}</div>)
+                  : leftIcon
               }
-              displayMenuButton
+              displayMenuButton={!hideMenuButton}
               buildMenuTemplate={this.props.buildMenuTemplate}
               onClick={() => {
-                if (!this.props.onItemSelected) return;
+                if (!onItemSelected) return;
                 if (this.props.editingName) return;
 
-                this.props.onItemSelected(selected ? null : item);
+                onItemSelected(selected ? null : item);
+              }}
+              onDoubleClick={event => {
+                if (event.button !== LEFT_MOUSE_BUTTON) return;
+                if (!onEdit) return;
+                if (this.props.editingName) return;
+
+                onItemSelected(null);
+                onEdit(item);
               }}
             />
           );

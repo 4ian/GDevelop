@@ -13,6 +13,7 @@ import { unregister } from './registerServiceWorker';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
 import { showErrorBox } from './UI/Messages/MessageBox';
+const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 // No i18n in this file
 
@@ -32,6 +33,7 @@ class Bootstrapper extends Component<{}, State> {
     installAnalyticsEvents(this.authentification);
     installRaven();
     installFullstory();
+    GD_STARTUP_TIMES.push(["bootstrapperComponentDidMount", performance.now()]);
 
     if (electron) {
       import(/* webpackChunkName: "local-app" */ './LocalApp')
@@ -67,8 +69,13 @@ class Bootstrapper extends Component<{}, State> {
   }
 }
 
+
+
 const rootElement = document.getElementById('root');
-if (rootElement) ReactDOM.render(<Bootstrapper />, rootElement);
+if (rootElement) {
+  GD_STARTUP_TIMES.push(['reactDOMRenderCall', performance.now()]);
+  ReactDOM.render(<Bootstrapper />, rootElement);
+}
 else console.error('No root element defined in index.html');
 
 // registerServiceWorker();

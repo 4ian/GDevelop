@@ -8,28 +8,18 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../SelectionHandler';
-import { actionsContainer, conditionsContainer } from './ClassNames';
-import {
-  DropTarget,
-  type DropTargetMonitor,
-  type DropTargetConnector,
-  type ConnectDropTarget,
-} from 'react-dnd';
 import DropIndicator from './DropIndicator';
 import { Trans } from '@lingui/macro';
 import { hasClipboardConditions, hasClipboardActions } from '../ClipboardKind';
+import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
+import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   addButton: {
     cursor: 'pointer',
   },
 };
-
-type DropTargetProps = {|
-  connectDropTarget: ConnectDropTarget,
-  isOver: boolean,
-  canDrop: boolean,
-|};
 
 type Props = {
   instrsList: gdInstructionsList,
@@ -51,18 +41,24 @@ type Props = {
   onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
-  extraClassName?: string,
+  className?: string,
   style?: Object,
   disabled: boolean,
   renderObjectThumbnail: string => React.Node,
-  ...DropTargetProps,
+
+  screenType: ScreenType,
+  windowWidth: WidthType,
 };
 
 type State = {|
   canPaste: boolean,
 |};
 
-class InstructionsList extends React.Component<Props, State> {
+const DropTarget = makeDropTarget<{
+  isCondition: boolean,
+}>(reactDndInstructionType);
+
+export default class InstructionsList extends React.Component<Props, State> {
   state = { canPaste: false };
 
   onAddNewInstruction = () => {
@@ -85,7 +81,7 @@ class InstructionsList extends React.Component<Props, State> {
     const {
       addButtonLabel,
       areConditions,
-      extraClassName,
+      className,
       instrsList,
       onAddNewInstruction,
       onPasteInstructions,
@@ -101,8 +97,6 @@ class InstructionsList extends React.Component<Props, State> {
       disabled,
     } = this.props;
 
-    const { connectDropTarget, isOver, canDrop } = this.props;
-
     const instructions = mapFor(0, instrsList.size(), i => {
       const instruction = instrsList.get(i);
       const instructionContext = {
@@ -113,7 +107,6 @@ class InstructionsList extends React.Component<Props, State> {
       };
 
       return (
-        // $FlowFixMe - Flow don't see that DropTarget hoc is being used in instructions?
         <Instruction
           instruction={instruction}
           isCondition={areConditions}
@@ -147,6 +140,8 @@ class InstructionsList extends React.Component<Props, State> {
           onSubParameterClick={onParameterClick}
           disabled={disabled}
           renderObjectThumbnail={this.props.renderObjectThumbnail}
+          screenType={this.props.screenType}
+          windowWidth={this.props.windowWidth}
         />
       );
     });
@@ -160,96 +155,67 @@ class InstructionsList extends React.Component<Props, State> {
     ) : (
       <Trans>Add action</Trans>
     );
-    const instructionsList = connectDropTarget(
-      <div
-        className={`${
-          areConditions ? conditionsContainer : actionsContainer
-        } ${extraClassName || ''}`}
-        style={style}
-      >
-        {instructions}
-        {isOver && <DropIndicator canDrop={canDrop} />}
-        <span
-          onPointerEnter={() => {
-            const canPaste =
-              (areConditions && hasClipboardConditions()) ||
-              (!areConditions && hasClipboardActions());
-            this.setState({ canPaste });
-          }}
-          onPointerLeave={() => this.setState({ canPaste: false })}
-        >
-          <button
-            style={styles.addButton}
-            className="add-link"
-            onClick={this.onAddNewInstruction}
-            onContextMenu={e => {
-              e.stopPropagation();
-              onInstructionsListContextMenu(
-                e.clientX,
-                e.clientY,
-                instructionsListContext
-              );
-            }}
-          >
-            {addButtonLabel || addButtonDefaultLabel}
-          </button>
-          {canPaste && (
-            <span>
-              {' '}
-              <button
-                style={styles.addButton}
-                className="add-link"
-                onClick={this._onPasteInstructions}
-              >
-                {areConditions ? (
-                  <Trans>(or paste conditions)</Trans>
-                ) : (
-                  <Trans>(or paste actions)</Trans>
-                )}
-              </button>
-            </span>
-          )}
-        </span>
-      </div>
-    );
 
-    return instructionsList || null;
+    return (
+      <DropTarget
+        canDrop={draggedItem => draggedItem.isCondition === areConditions}
+        drop={() => {
+          onMoveToInstructionsList({
+            isCondition: areConditions,
+            instrsList: instrsList,
+          });
+        }}
+      >
+        {({ connectDropTarget, isOver, canDrop }) =>
+          connectDropTarget(
+            <div className={className} style={style}>
+              {instructions}
+              {isOver && <DropIndicator canDrop={canDrop} />}
+              <span
+                onPointerEnter={() => {
+                  const canPaste =
+                    (areConditions && hasClipboardConditions()) ||
+                    (!areConditions && hasClipboardActions());
+                  this.setState({ canPaste });
+                }}
+                onPointerLeave={() => this.setState({ canPaste: false })}
+              >
+                <button
+                  style={styles.addButton}
+                  className="add-link"
+                  onClick={this.onAddNewInstruction}
+                  onContextMenu={e => {
+                    e.stopPropagation();
+                    onInstructionsListContextMenu(
+                      e.clientX,
+                      e.clientY,
+                      instructionsListContext
+                    );
+                  }}
+                >
+                  {addButtonLabel || addButtonDefaultLabel}
+                </button>
+                {canPaste && (
+                  <span>
+                    {' '}
+                    <button
+                      style={styles.addButton}
+                      className="add-link"
+                      onClick={this._onPasteInstructions}
+                    >
+                      {areConditions ? (
+                        <Trans>(or paste conditions)</Trans>
+                      ) : (
+                        <Trans>(or paste actions)</Trans>
+                      )}
+                    </button>
+                  </span>
+                )}
+              </span>
+            </div>
+          )
+        }
+      </DropTarget>
+    );
   }
 }
-
-// Drag'n'drop support:
-
-const instructionsListTarget = {
-  canDrop(props: Props, monitor: DropTargetMonitor) {
-    return (
-      monitor.getItem() && monitor.getItem().isCondition === props.areConditions
-    );
-  },
-  drop(props: Props, monitor: DropTargetMonitor) {
-    if (monitor.didDrop()) {
-      return; // Drop already handled by an instruction
-    }
-    props.onMoveToInstructionsList({
-      isCondition: props.areConditions,
-      instrsList: props.instrsList,
-    });
-  },
-};
-
-function targetCollect(
-  connect: DropTargetConnector,
-  monitor: DropTargetMonitor
-): DropTargetProps {
-  return {
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver({ shallow: true }),
-    canDrop: monitor.canDrop(),
-  };
-}
-
-// $FlowFixMe - Typing of DragSource/DropTarget is a pain to get correctly
-export default DropTarget(
-  reactDndInstructionType,
-  instructionsListTarget,
-  targetCollect
-)(InstructionsList);

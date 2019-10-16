@@ -20,6 +20,10 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import { listItemWithoutIconHeight } from '../UI/List';
 
+// TODO: This component should be updated to be implemented using SortableVirtualizedItemList,
+// so that drag'n'drop is identical to other lists (and to benefit from better typing + future improvements
+// in SortableVirtualizedItemList).
+
 const styles = {
   listContainer: {
     flex: 1,

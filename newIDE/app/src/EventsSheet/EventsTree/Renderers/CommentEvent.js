@@ -2,7 +2,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import { type EventRendererProps } from './EventRenderer.flow';
+import { type EventRendererProps } from './EventRenderer';
 import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,

@@ -1,5 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { Line, Column } from '../../../UI/Grid';
@@ -15,6 +16,7 @@ import ShapePreview from './ShapePreview.js';
 import PolygonEditor from './PolygonEditor.js';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 import Text from '../../../UI/Text';
+import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
 
 type Props = BehaviorEditorProps;
 
@@ -180,6 +182,20 @@ export default class Physics2Editor extends React.Component<Props, State> {
               }}
             />
           </Column>
+        </Line>
+        <Line>
+          <DismissableAlertMessage
+            identifier="physics2-shape-collisions"
+            kind="info"
+          >
+            <Trans>
+              The shape used in the Physics behavior is independent from the
+              collision mask of the object. Be sure to use the "Collision"
+              condition provided by the Physics behavior in the events. The
+              usual "Collision" condition won't take into account the shape that
+              you've set up here.
+            </Trans>
+          </DismissableAlertMessage>
         </Line>
         <Line>
           <SelectField
@@ -386,7 +402,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
             />
           </Column>
           <BackgroundText>
-            An temporary image to help you visualize the shape/polygon
+            A temporary image to help you visualize the shape/polygon
           </BackgroundText>
         </Line>
         {shape === 'Polygon' && (

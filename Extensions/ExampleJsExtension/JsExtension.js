@@ -401,7 +401,9 @@ module.exports = {
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'MyDummyExtension::DummyObject',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor()
+      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
+        helpPagePath: '/extensions/extend-gdevelop',
+      })
     );
   },
   /**

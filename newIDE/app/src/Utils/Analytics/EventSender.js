@@ -7,9 +7,11 @@ import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
 } from './LocalStats';
+import { getStartupTimesSummary } from '../StartupTimes';
 
 const isDev = Window.isDev();
 let client = null;
+let startupTimesSummary = null;
 
 export const installAnalyticsEvents = (authentification: Authentification) => {
   if (isDev) {
@@ -28,7 +30,11 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
   });
 
   client.extendEvents(function() {
+    // Include the user public profile.
     const userProfile = authentification.getUserProfileSync();
+
+    // Compute the startup times (only once to avoid doing this for every event).
+    startupTimesSummary = startupTimesSummary || getStartupTimesSummary();
 
     return {
       user: {
@@ -41,6 +47,7 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
       localStats: {
         programOpeningCount: getProgramOpeningCount(),
       },
+      startupTimesSummary,
       page: {
         title: document.title,
         url: document.location.href,

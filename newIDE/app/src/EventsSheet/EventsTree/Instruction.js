@@ -17,19 +17,12 @@ import {
   type InstructionContext,
 } from '../SelectionHandler';
 import InstructionsList from './InstructionsList';
-import {
-  DragSource,
-  type DragSourceMonitor,
-  type DragSourceConnector,
-  type ConnectDragSource,
-  DropTarget,
-  type DropTargetMonitor,
-  type DropTargetConnector,
-  type ConnectDropTarget,
-} from 'react-dnd';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
+import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
+import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -43,15 +36,11 @@ const styles = {
   },
 };
 
-type DragSourceProps = {|
-  connectDragSource: ConnectDragSource,
-|};
+export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
 
-type DropTargetProps = {|
-  connectDropTarget: ConnectDropTarget,
-  isOver: boolean,
-  canDrop: boolean,
-|};
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
+  isCondition: boolean,
+}>(reactDndInstructionType);
 
 type Props = {|
   instruction: gdInstruction,
@@ -62,9 +51,6 @@ type Props = {|
   onDoubleClick: () => void,
   onContextMenu: (x: number, y: number) => void,
   onMoveToInstruction: () => void,
-
-  ...DragSourceProps,
-  ...DropTargetProps,
 
   // For potential sub-instructions list:
   selection: Object,
@@ -89,9 +75,12 @@ type Props = {|
   ) => void,
   onParameterClick: (event: any, parameterIndex: number) => void,
   renderObjectThumbnail: string => React.Node,
+
+  screenType: ScreenType,
+  windowWidth: WidthType,
 |};
 
-class Instruction extends React.Component<Props, *> {
+export default class Instruction extends React.Component<Props> {
   /**
    * Render the different parts of the text of the instruction.
    * Parameter can have formatting, be hovered and clicked. The rest
@@ -130,9 +119,15 @@ class Instruction extends React.Component<Props, *> {
                 [instructionParameter]: true,
                 [parameterType]: true,
               })}
-              onClick={domEvent =>
-                this.props.onParameterClick(domEvent, parameterIndex)
-              }
+              onClick={domEvent => {
+                this.props.onParameterClick(domEvent, parameterIndex);
+
+                // On touchscreen, don't propagate the click to the instruction div,
+                // as it's listening for taps to simulate double "clicks".
+                if (this.props.screenType === 'touch') {
+                  domEvent.stopPropagation();
+                }
+              }}
               onKeyPress={event => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   this.props.onParameterClick(event, parameterIndex);
@@ -156,12 +151,11 @@ class Instruction extends React.Component<Props, *> {
   };
 
   render() {
-    const { instruction, isCondition } = this.props;
     const {
-      connectDragSource,
-      connectDropTarget,
-      isOver,
-      canDrop,
+      instruction,
+      isCondition,
+      onClick,
+      onMoveToInstruction,
     } = this.props;
 
     //TODO: Metadata could be cached for performance boost.
@@ -175,158 +169,132 @@ class Instruction extends React.Component<Props, *> {
           instruction.getType()
         );
 
-    const instructionDiv = connectDropTarget(
-      // $FlowFixMe
-      connectDragSource(
-        <div
-          style={styles.container}
-          className={classNames({
-            [selectableArea]: true,
-            [selectedArea]: this.props.selected,
-          })}
-          onClick={e => {
-            e.stopPropagation();
-            this.props.onClick();
-          }}
-          onDoubleClick={e => {
-            e.stopPropagation();
-            this.props.onDoubleClick();
-          }}
-          onContextMenu={e => {
-            e.stopPropagation();
-            this.props.onContextMenu(e.clientX, e.clientY);
-          }}
-          onKeyPress={event => {
-            if (event.key === 'Enter') {
-              this.props.onDoubleClick();
-              event.stopPropagation();
-              event.preventDefault();
-            } else if (event.key === ' ') {
-              this.props.onClick();
-              event.stopPropagation();
-              event.preventDefault();
-            }
-          }}
-          tabIndex={0}
-        >
-          {instruction.isInverted() && (
-            <img
-              className={classNames({
-                [icon]: true,
-              })}
-              src="res/contraire.png"
-              alt="Condition is negated"
-            />
-          )}
-          <img
-            className={classNames({
-              [icon]: true,
-            })}
-            src={metadata.getSmallIconFilename()}
-            alt=""
-          />
-          {this._renderInstructionText(metadata)}
-          {metadata.canHaveSubInstructions() && (
-            <InstructionsList
-              style={
-                {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
-              }
-              extraClassName={subInstructionsContainer}
-              instrsList={instruction.getSubInstructions()}
-              areConditions={this.props.isCondition}
-              selection={this.props.selection}
-              onAddNewInstruction={this.props.onAddNewSubInstruction}
-              onPasteInstructions={this.props.onPasteSubInstructions}
-              onMoveToInstruction={this.props.onMoveToSubInstruction}
-              onMoveToInstructionsList={this.props.onMoveToSubInstructionsList}
-              onInstructionClick={this.props.onSubInstructionClick}
-              onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
-              onInstructionContextMenu={this.props.onSubInstructionContextMenu}
-              onInstructionsListContextMenu={
-                this.props.onSubInstructionsListContextMenu
-              }
-              onParameterClick={this.props.onSubParameterClick}
-              addButtonLabel={<Trans>Add a sub-condition</Trans>}
-              disabled={this.props.disabled}
-              renderObjectThumbnail={this.props.renderObjectThumbnail}
-            />
-          )}
-        </div>
-      )
-    );
+    return (
+      <DragSourceAndDropTarget
+        beginDrag={() => {
+          onClick(); // Select the dragged instruction
 
-    return isOver ? (
-      <React.Fragment>
-        <DropIndicator canDrop={canDrop} />
-        {instructionDiv}
-      </React.Fragment>
-    ) : (
-      instructionDiv || null
+          // No need to save here what is being dragged,
+          // as its the entire selection that is considered to be dragged.
+          return {
+            isCondition,
+          };
+        }}
+        canDrop={draggedItem => draggedItem.isCondition === isCondition}
+        drop={() => {
+          onMoveToInstruction();
+        }}
+      >
+        {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
+          // The instruction itself can be dragged and is a target for
+          // another instruction to be dropped. It's IMPORTANT NOT to have
+          // the subinstructions list inside the connectDropTarget/connectDragSource
+          // as otherwise this can confuse react-dnd ("Expected to find a valid target")
+          // (surely due to components re-mounting/rerendering ?).
+          const instructionElement = connectDropTarget(
+            connectDragSource(
+              <div
+                style={styles.container}
+                className={classNames({
+                  [selectableArea]: true,
+                  [selectedArea]: this.props.selected,
+                })}
+                onClick={e => {
+                  e.stopPropagation();
+
+                  if (
+                    this.props.screenType === 'touch' &&
+                    this.props.selected
+                  ) {
+                    // On touch screens, tapping again a selected instruction should edit it.
+                    this.props.onDoubleClick();
+                  } else {
+                    this.props.onClick();
+                  }
+                }}
+                onDoubleClick={e => {
+                  e.stopPropagation();
+                  this.props.onDoubleClick();
+                }}
+                onContextMenu={e => {
+                  e.stopPropagation();
+                  this.props.onContextMenu(e.clientX, e.clientY);
+                }}
+                onKeyPress={event => {
+                  if (event.key === 'Enter') {
+                    this.props.onDoubleClick();
+                    event.stopPropagation();
+                    event.preventDefault();
+                  } else if (event.key === ' ') {
+                    this.props.onClick();
+                    event.stopPropagation();
+                    event.preventDefault();
+                  }
+                }}
+                tabIndex={0}
+              >
+                {instruction.isInverted() && (
+                  <img
+                    className={classNames({
+                      [icon]: true,
+                    })}
+                    src="res/contraire.png"
+                    alt="Condition is negated"
+                  />
+                )}
+                <img
+                  className={classNames({
+                    [icon]: true,
+                  })}
+                  src={metadata.getSmallIconFilename()}
+                  alt=""
+                />
+                {this._renderInstructionText(metadata)}
+              </div>
+            )
+          );
+
+          return (
+            <React.Fragment>
+              {isOver && <DropIndicator canDrop={canDrop} />}
+              {instructionElement}
+              {metadata.canHaveSubInstructions() && (
+                <InstructionsList
+                  style={
+                    {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+                  }
+                  className={subInstructionsContainer}
+                  instrsList={instruction.getSubInstructions()}
+                  areConditions={this.props.isCondition}
+                  selection={this.props.selection}
+                  onAddNewInstruction={this.props.onAddNewSubInstruction}
+                  onPasteInstructions={this.props.onPasteSubInstructions}
+                  onMoveToInstruction={this.props.onMoveToSubInstruction}
+                  onMoveToInstructionsList={
+                    this.props.onMoveToSubInstructionsList
+                  }
+                  onInstructionClick={this.props.onSubInstructionClick}
+                  onInstructionDoubleClick={
+                    this.props.onSubInstructionDoubleClick
+                  }
+                  onInstructionContextMenu={
+                    this.props.onSubInstructionContextMenu
+                  }
+                  onInstructionsListContextMenu={
+                    this.props.onSubInstructionsListContextMenu
+                  }
+                  onParameterClick={this.props.onSubParameterClick}
+                  addButtonLabel={<Trans>Add a sub-condition</Trans>}
+                  disabled={this.props.disabled}
+                  renderObjectThumbnail={this.props.renderObjectThumbnail}
+                  screenType={this.props.screenType}
+                  windowWidth={this.props.windowWidth}
+                />
+              )}
+            </React.Fragment>
+          );
+        }}
+      </DragSourceAndDropTarget>
     );
   }
 }
-
-// Drag'n'drop support:
-
-export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
-
-type InstructionSourceProps = {
-  onClick: () => void,
-  isCondition: boolean,
-};
-
-const instructionSource = {
-  beginDrag(props: InstructionSourceProps) {
-    props.onClick(); // Select the dragged instruction
-    return {
-      // No need to save here what is being dragged,
-      // as its the entire selection that is considered to be dragged.
-      isCondition: props.isCondition,
-    };
-  },
-};
-
-function sourceCollect(
-  connect: DragSourceConnector,
-  monitor: DragSourceMonitor
-): DragSourceProps {
-  return {
-    connectDragSource: connect.dragSource(),
-  };
-}
-
-const instructionTarget = {
-  canDrop(props: Props, monitor: DropTargetMonitor) {
-    return (
-      monitor.getItem() && monitor.getItem().isCondition === props.isCondition
-    );
-  },
-  drop(props: Props, monitor: DropTargetMonitor) {
-    if (monitor.didDrop()) {
-      return; // Drop already handled by a subinstruction
-    }
-    props.onMoveToInstruction();
-  },
-};
-
-function targetCollect(
-  connect: DropTargetConnector,
-  monitor: DropTargetMonitor
-): DropTargetProps {
-  return {
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver({ shallow: true }),
-    canDrop: monitor.canDrop(),
-  };
-}
-
-// $FlowFixMe - Typing of DragSource/DropTarget is a pain to get correctly
-export default DragSource(
-  reactDndInstructionType,
-  instructionSource,
-  sourceCollect
-)(
-  DropTarget(reactDndInstructionType, instructionTarget, targetCollect)(
-    Instruction
-  )
-);

@@ -135,7 +135,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Arc",
                 _("Arc"),
                 _("Draw an arc on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ an arc with _PARAM3_ of radius, start angle: _PARAM4_, end angle: _PARAM4_ (anticlockwise: _PARAM5_) "
+                _("Draw at _PARAM1_;_PARAM2_ an arc with _PARAM3_ of radius, start angle: _PARAM4_, end angle: _PARAM5_ (anticlockwise: _PARAM6_) "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/arc24.png",
@@ -147,7 +147,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Radius (in pixels)"))
       .AddParameter("expression", _("Start angle of the arc"))
       .AddParameter("expression", _("End angle of the arc"))
-      .AddParameter("yesorno", _("anticlockwise (false by default)"))
+      .AddParameter("yesorno", _("Anticlockwise"))
       .SetFunctionName("DrawArc")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 

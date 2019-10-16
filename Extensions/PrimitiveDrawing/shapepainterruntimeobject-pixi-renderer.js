@@ -55,13 +55,15 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawEllipse = function(x1, 
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawRoundedRectangle = function(x1, y1, x2, y2, radius) {
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
-    this._graphics.drawRect(x1, y1, x2 - x1, y2 - y1, radius);
+    this._graphics.drawRoundedRect(x1, y1, x2 - x1, y2 - y1, radius);
+    this._graphics.closePath();
     this._graphics.endFill();
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawStar = function(x1, y1, points, radius, innerRadius, rotation) {
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.drawStar(x1, y1, points, radius, innerRadius ? innerRadius : radius/2, rotation ? gdjs.toRad(rotation) : 0);
+    this._graphics.closePath();
     this._graphics.endFill();
 };
 

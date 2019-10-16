@@ -85,8 +85,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Draw at _PARAM1_;_PARAM2_ an ellipse of half width _PARAM3_ and half height _PARAM4_ "
                 "with _PARAM0_"),
                 _("Drawing"),
-                "res/actions/line24.png",
-                "res/actions/line.png")
+                "res/actions/ellipse24.png",
+                "res/actions/ellipse.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X coordinate of the center of the ellipse"))
@@ -128,7 +128,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Points of the star"))
       .AddParameter("expression", _("The radius (in pixels)"))
       .AddParameter("expression", _("The inner radius (in pixels, half radius by default)"))
-      .SetDefaultValue("1")
       .AddParameter("expression", _("The rotation (in degrees)"))
       .SetFunctionName("DrawStar")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");

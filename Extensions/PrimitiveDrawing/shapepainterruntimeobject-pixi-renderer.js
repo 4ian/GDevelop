@@ -72,6 +72,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArc = function(x1, y1, 
     this._graphics.arc(x1, y1, radius, startAngle, endAngle, anticlockwise ? true : false);
     //this._graphics.closePath();
     this._graphics.endFill();
+};
     
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArcTo = function(x1, y1, x2, y2, radius) {
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);

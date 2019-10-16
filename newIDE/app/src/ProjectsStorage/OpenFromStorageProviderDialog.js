@@ -6,6 +6,10 @@ import FlatButton from '../UI/FlatButton';
 import { type StorageProvider } from '.';
 import { List, ListItem } from '../UI/List';
 import RaisedButton from '../UI/RaisedButton';
+import optionalRequire from '../Utils/OptionalRequire';
+import BackgroundText from '../UI/BackgroundText';
+import { Column, Line } from '../UI/Grid';
+const electron = optionalRequire('electron');
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
@@ -61,6 +65,19 @@ export default ({
             />
           ))}
       </List>
+      {!electron && (
+        <Line>
+          <Column>
+            <BackgroundText>
+              <Trans>
+                If you have a popup blocker interrupting the opening, allow the
+                popups and try a second time to open with the provider you
+                selected.
+              </Trans>
+            </BackgroundText>
+          </Column>
+        </Line>
+      )}
     </Dialog>
   );
 };

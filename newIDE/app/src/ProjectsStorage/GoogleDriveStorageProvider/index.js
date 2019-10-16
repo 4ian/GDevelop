@@ -1,9 +1,11 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type StorageProvider, type FileMetadata } from '../index';
 import { serializeToJSON } from '../../Utils/Serializer';
 import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
 import GoogleDriveSaveAsDialog from './GoogleDriveSaveAsDialog';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 const DEVELOPER_KEY = 'AIzaSyDH3UNpxzIpcTyd6aMCWI5oNFSptG_BhOc';
 const CLIENT_ID =
@@ -273,7 +275,9 @@ export default ({
   name: 'Google Drive',
   renderIcon: () => <GoogleDrive />,
   createOperations: ({ setDialog, closeDialog }) => {
-    initializeApis().catch(() => {});
+    initializeApis().catch(() => {
+      // Ignore error as we'll retry later.
+    });
 
     return {
       onOpen: (
@@ -410,6 +414,9 @@ export default ({
             />
           ));
         });
+      },
+      getOpenErrorMessage: (error: Error): MessageDescriptor => {
+        return t`Check that you don't have any blocked popup (if so, allow them and retry) and that you have the authorizations for reading the file you're trying to access.`;
       },
     };
   },

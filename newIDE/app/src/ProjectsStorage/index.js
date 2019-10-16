@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -14,6 +15,7 @@ export type FileMetadata = {|
  * Interface returned by a storage provider to manipulate files.
  */
 export type StorageProviderOperations = {|
+  // Project opening:
   onOpenWithPicker?: () => Promise<?FileMetadata>,
   onOpen?: (
     fileMetadata: FileMetadata
@@ -21,6 +23,9 @@ export type StorageProviderOperations = {|
     content: Object,
     fileMetadata: FileMetadata,
   |}>,
+  getOpenErrorMessage?: (error: Error) => MessageDescriptor,
+
+  // Project saving:
   onSaveProject?: (
     project: gdProject,
     fileMetadata: FileMetadata
@@ -35,6 +40,8 @@ export type StorageProviderOperations = {|
     wasSaved: boolean,
     fileMetadata: ?FileMetadata,
   |}>,
+
+  // Project auto saving:
   onAutoSaveProject?: (project: gdProject, fileMetadata: FileMetadata) => void,
   hasAutoSave?: (
     fileMetadata: FileMetadata,

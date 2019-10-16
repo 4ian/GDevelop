@@ -1279,7 +1279,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   chooseProjectWithStorageProviderPicker = () => {
-    const { storageProviderOperations } = this.props;
+    const { storageProviderOperations, i18n } = this.props;
     if (!storageProviderOperations.onOpenWithPicker) return;
 
     storageProviderOperations
@@ -1291,7 +1291,17 @@ class MainFrame extends React.Component<Props, State> {
           this.openSceneOrProjectManager()
         );
       })
-      .catch(() => {});
+      .catch(error => {
+        const errorMessage = storageProviderOperations.getOpenErrorMessage
+          ? storageProviderOperations.getOpenErrorMessage(error)
+          : t`Verify that you have the authorizations for reading the file you're trying to access.`;
+        showErrorBox(
+          [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
+            '\n'
+          ),
+          error
+        );
+      });
   };
 
   saveProject = () => {

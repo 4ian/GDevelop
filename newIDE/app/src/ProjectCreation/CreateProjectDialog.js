@@ -60,7 +60,6 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
         onRequestClose={onClose}
         open={open}
         noMargin
-        autoScrollBodyContent
       >
         <Column noMargin>
           <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>

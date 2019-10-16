@@ -72,7 +72,6 @@ export default function SubscriptionPendingDialog({
       maxWidth="sm"
       open
       noMargin
-      autoScrollBodyContent
     >
       {!hasPlan && (
         <Column>

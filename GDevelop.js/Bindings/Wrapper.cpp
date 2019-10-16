@@ -71,6 +71,7 @@
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"
+#include "../../Extensions/SkeletonObject/SkeletonObject.h"
 
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/EventsCodeGenerator.h>

@@ -70,7 +70,6 @@ export default class ProfileDialog extends Component<Props, State> {
             onRequestClose={onClose}
             open={open}
             noMargin
-            autoScrollBodyContent
           >
             <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
               <Tab label={<Trans>My Profile</Trans>} value="profile" />

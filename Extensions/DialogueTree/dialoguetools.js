@@ -52,7 +52,15 @@ gdjs.dialogueTree.loadFromJsonFile = function(
       } else {
         if (!content) return;
         gdjs.dialogueTree.yarnData = content;
-        gdjs.dialogueTree.runner.load(gdjs.dialogueTree.yarnData);
+
+        try {
+          gdjs.dialogueTree.runner.load(gdjs.dialogueTree.yarnData);
+        } catch (error) {
+          console.error(
+            'An error happened while loading parsing the dialogue tree data:',
+            error
+          );
+        }
 
         if (startDialogueNode && startDialogueNode.length > 0) {
           gdjs.dialogueTree.startFrom(startDialogueNode);
@@ -62,10 +70,28 @@ gdjs.dialogueTree.loadFromJsonFile = function(
 };
 
 /**
+ * Stop the currently running dialogue
+ */
+gdjs.dialogueTree.stopRunningDialogue = function() {
+  if (this.dialogueIsRunning) this.dialogueIsRunning = false;
+  if (this.dialogueData) this.dialogueData = null;
+  this.dialogueText = '';
+  this.clipTextEnd = 0;
+};
+
+/**
  * Check if the Dialogue Tree is currently parsing data.
  * For example, you can do things like disabling player movement while talking to a NPC.
  */
 gdjs.dialogueTree.isRunning = function() {
+  if (
+    this.dialogueIsRunning &&
+    !this.dialogueData &&
+    this.dialogueText &&
+    this.clipTextEnd >= this.dialogueText.length
+  ) {
+    this.dialogueIsRunning = false;
+  }
   return this.dialogueIsRunning;
 };
 
@@ -78,6 +104,15 @@ gdjs.dialogueTree.scrollClippedText = function() {
   if (this.dialogueText) {
     this.clipTextEnd += 1;
   }
+};
+
+/**
+ * Scroll the clipped text to its end, so the entire text is printed. This can be useful in keeping the event sheet logic simpler, while supporting more variation.
+ */
+gdjs.dialogueTree.completeClippedTextScrolling = function() {
+  if (this.pauseScrolling || !this.dialogueIsRunning || !this.dialogueText)
+    return;
+  this.clipTextEnd = this.dialogueText.length;
 };
 
 /**
@@ -106,7 +141,7 @@ gdjs.dialogueTree.getClippedLineText = function() {
  * Note that using this instead getClippedLineText will skip any <<wait>> commands entirely.
  */
 gdjs.dialogueTree.getLineText = function() {
-  this.clipTextEnd = this.dialogueText.length;
+  this.completeClippedTextScrolling();
   return this.dialogueText.length ? this.dialogueText : '';
 };
 
@@ -196,6 +231,37 @@ gdjs.dialogueTree.getLineOption = function(optionIndex) {
 };
 
 /**
+ * Get the text of the options the player can select, along with the selection cursor.
+ * @param {string} optionSelectionCursor The string used to draw the currently selected option's cursor
+ * @param {boolean} addNewLine when true each option is rendered on a new line.
+ */
+gdjs.dialogueTree.getLineOptionsText = function(
+  optionSelectionCursor,
+  addNewLine
+) {
+  if (!this.options.length) return '';
+  var textResult = '';
+  this.options.forEach(function(optionText, index) {
+    if (index === gdjs.dialogueTree.selectedOption) {
+      textResult += optionSelectionCursor;
+    } else {
+      textResult += optionSelectionCursor.replace(/.*/g, ' ');
+    }
+    textResult += optionText;
+    if (addNewLine) textResult += '\n';
+  });
+  return textResult;
+};
+gdjs.dialogueTree.getLineOptionsTextHorizontal = function(
+  optionSelectionCursor
+) {
+  return this.getLineOptionsText(optionSelectionCursor, false);
+};
+gdjs.dialogueTree.getLineOptionsTextVertical = function(optionSelectionCursor) {
+  return this.getLineOptionsText(optionSelectionCursor, true);
+};
+
+/**
  * Get the number of options that are presented to the player, during the parsing of an Options type line.
  * @returns {number} The number of options
  */
@@ -218,9 +284,16 @@ gdjs.dialogueTree.confirmSelectOption = function() {
     this.selectedOption !== -1
   ) {
     this.commandCalls = [];
-    this.dialogueData.select(this.selectedOption);
-    this.dialogueData = this.dialogue.next().value;
-    gdjs.dialogueTree.goToNextDialogueLine();
+    try {
+      this.dialogueData.select(this.selectedOption);
+      this.dialogueData = this.dialogue.next().value;
+      gdjs.dialogueTree.goToNextDialogueLine();
+    } catch (error) {
+      console.error(
+        `An error happened when trying to access the dialogue branch!`,
+        error
+      );
+    }
   }
 };
 
@@ -304,11 +377,12 @@ gdjs.dialogueTree.isDialogueLineType = function(type) {
   if (
     this.commandCalls &&
     this.commandCalls.some(function(call) {
-      return gdjs.dialogueTree.clipTextEnd > call.time;
+      return gdjs.dialogueTree.clipTextEnd > call.time && call.cmd === 'wait';
     })
   ) {
-    return true;
+    return !this.pauseScrolling;
   }
+
   return this.dialogueIsRunning ? this.dialogueDataType === type : false;
 };
 
@@ -344,6 +418,7 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   this.dialogueData = null;
   this.dialogueDataType = '';
   this.dialogueText = '';
+  this.clipTextEnd = 0;
   this.commandCalls = [];
   this.commandParameters = [];
   this.pauseScrolling = false;
@@ -424,11 +499,6 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   if (gdjs.dialogueTree._isLineTypeCommand()) {
     this.dialogueDataType = 'command';
     gdjs.dialogueTree.goToNextDialogueLine();
-  }
-
-  // Dialogue has finished
-  if (!this.dialogueData) {
-    this.dialogueIsRunning = false;
   }
 };
 

@@ -173,7 +173,6 @@ export default class AboutDialog extends PureComponent<Props, State> {
         open={open}
         maxWidth="sm"
         noMargin
-        autoScrollBodyContent
       >
         <PreferencesContext.Consumer>
           {({ values, checkUpdates }) => (

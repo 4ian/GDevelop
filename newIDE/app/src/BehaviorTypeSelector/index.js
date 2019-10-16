@@ -41,7 +41,6 @@ export default class BehaviorTypeSelector extends React.Component<
     return (
       <SelectField
         floatingLabelText={<Trans>Behavior type</Trans>}
-        floatingLabelFixed
         value={value}
         onChange={(e, i, value: string) => {
           onChange(value);

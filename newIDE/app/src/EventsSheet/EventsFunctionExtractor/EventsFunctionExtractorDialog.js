@@ -124,7 +124,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
         ]}
         open
         onRequestClose={onClose}
-        autoScrollBodyContent
         noMargin
       >
         <Column noMargin>

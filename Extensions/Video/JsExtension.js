@@ -500,7 +500,9 @@ module.exports = {
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       "Video::VideoObject",
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor()
+      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
+        helpPagePath: "/objects/video"
+      })
     );
   },
   /**

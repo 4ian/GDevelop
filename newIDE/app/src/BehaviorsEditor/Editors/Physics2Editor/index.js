@@ -1,5 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { Line, Column } from '../../../UI/Grid';
@@ -15,6 +16,7 @@ import ShapePreview from './ShapePreview.js';
 import PolygonEditor from './PolygonEditor.js';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 import Text from '../../../UI/Text';
+import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
 
 type Props = BehaviorEditorProps;
 
@@ -35,7 +37,6 @@ function NumericProperty(props: {|
       value={properties.get(propertyName).getValue()}
       key={propertyName}
       floatingLabelText={properties.get(propertyName).getLabel()}
-      floatingLabelFixed
       step={step}
       onChange={onUpdate}
       type="number"
@@ -105,7 +106,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
           <SelectField
             key={'bodyType'}
             floatingLabelText={properties.get('bodyType').getLabel()}
-            floatingLabelFixed
             value={properties.get('bodyType').getValue()}
             onChange={(e, i, newValue: string) => {
               behavior.updateProperty(
@@ -184,9 +184,22 @@ export default class Physics2Editor extends React.Component<Props, State> {
           </Column>
         </Line>
         <Line>
+          <DismissableAlertMessage
+            identifier="physics2-shape-collisions"
+            kind="info"
+          >
+            <Trans>
+              The shape used in the Physics behavior is independent from the
+              collision mask of the object. Be sure to use the "Collision"
+              condition provided by the Physics behavior in the events. The
+              usual "Collision" condition won't take into account the shape that
+              you've set up here.
+            </Trans>
+          </DismissableAlertMessage>
+        </Line>
+        <Line>
           <SelectField
             floatingLabelText={properties.get('shape').getLabel()}
-            floatingLabelFixed
             value={properties.get('shape').getValue()}
             onChange={(e, i, newValue: string) => {
               behavior.updateProperty(
@@ -226,7 +239,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
                   ? 'Length'
                   : 'Width'
               }
-              floatingLabelFixed
               min={0}
               onChange={newValue => {
                 behavior.updateProperty(
@@ -247,7 +259,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 .getValue()}
               key={'shapeDimensionB'}
               floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
-              floatingLabelFixed
               min={shape === 'Edge' ? undefined : 0}
               onChange={newValue => {
                 behavior.updateProperty(
@@ -264,7 +275,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
           {shape === 'Polygon' && (
             <SelectField
               floatingLabelText={properties.get('polygonOrigin').getLabel()}
-              floatingLabelFixed
               value={properties.get('polygonOrigin').getValue()}
               onChange={(e, i, newValue: string) => {
                 behavior.updateProperty(
@@ -392,7 +402,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
             />
           </Column>
           <BackgroundText>
-            An temporary image to help you visualize the shape/polygon
+            A temporary image to help you visualize the shape/polygon
           </BackgroundText>
         </Line>
         {shape === 'Polygon' && (

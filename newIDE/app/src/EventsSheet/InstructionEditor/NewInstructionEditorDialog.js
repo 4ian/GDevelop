@@ -35,7 +35,7 @@ import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import {
   ResponsiveWidthMeasurer,
   type WidthType,
-} from '../../UI/Reponsive/ReponsiveWidthMeasurer';
+} from '../../UI/Reponsive/ResponsiveWidthMeasurer';
 const gd = global.gd;
 
 const styles = {
@@ -389,7 +389,7 @@ export default class NewInstructionEditorDialog extends React.Component<
                 helpPagePath={instructionHelpPage || '/events'}
                 label={
                   !instructionHelpPage ||
-                  (width === 'small' &&
+                  (width === 'small' ||
                     step === 'object-or-free-instructions') ? (
                     <Trans>Help</Trans>
                   ) : this.props.isCondition ? (

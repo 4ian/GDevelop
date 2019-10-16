@@ -20,7 +20,9 @@ export default class DebuggerSelector extends React.Component<Props, void> {
         <SelectField
           fullWidth
           value={hasDebuggers ? this.props.selectedId : 0}
-          onChange={(e, i, value) => this.props.onChooseDebugger(value)}
+          onChange={(e, i, value) =>
+            this.props.onChooseDebugger(parseInt(value, 10) || 0)
+          }
           disabled={!hasDebuggers}
         >
           {this.props.debuggerIds.map(id => (

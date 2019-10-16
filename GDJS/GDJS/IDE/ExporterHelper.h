@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "GDCore/String.h"
 namespace gd {
 class Project;
 class Layout;
@@ -173,8 +174,7 @@ class ExporterHelper {
    * \param project The project to be used to generate the configuration file.
    * \param exportDir The directory where the config.xml must be created.
    */
-  bool ExportCordovaConfigFile(const gd::Project &project,
-                               gd::String exportDir);
+  bool ExportCordovaFiles(const gd::Project &project, gd::String exportDir);
 
   /**
    * \brief Generate the base Cocos2d files.

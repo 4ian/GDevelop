@@ -18,7 +18,7 @@ import Text from '../UI/Text';
 //TODO: Refactor into TreeTable?
 const Indent = ({ width }) => (
   <div style={{ ...styles.indent, width }}>
-    <SubdirectoryArrowRight color={styles.indentIconColor} />
+    <SubdirectoryArrowRight htmlColor={styles.indentIconColor} />
   </div>
 );
 

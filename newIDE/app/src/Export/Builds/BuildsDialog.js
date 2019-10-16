@@ -42,7 +42,6 @@ export default class BuildsDialog extends Component<Props, State> {
         ]}
         open={open}
         noMargin
-        autoScrollBodyContent
       >
         <Builds
           onBuildsUpdated={this._onBuildsUpdated}

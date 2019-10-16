@@ -26,14 +26,23 @@ gdjs.SkeletonObjectsManager.prototype.getSkeleton = function(runtimeScene, objec
     return this.loadedObjects[objectName];
 };
 
+/**
+ * Load the Skeleton data
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {Object} objectData
+ */
 gdjs.SkeletonObjectsManager.prototype.loadSkeleton = function(runtimeScene, objectData){
     var loader = new gdjs.sk.DataLoader();
-    var skeletalData = loader.getData(objectData.skeletalDataFilename);
     var skeleton = {"loader": loader,
                     "armatures": [],
                     "rootArmature": 0};
-    
-    if(!skeletalData) return skeleton;
+
+    var jsonManager = runtimeScene.getGame().getJsonManager();
+    var skeletalData = jsonManager.getLoadedJson(objectData.skeletalDataFilename);
+    if(!skeletalData) {
+        console.error("Tried to load a Skeleton file from \"" + objectData.skeletalDataFilename + "\" but this resource is not loaded.");
+        return skeleton;
+    }
 
     if(objectData.apiName === "DragonBones"){
         // Load sub-textures

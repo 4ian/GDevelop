@@ -110,6 +110,15 @@ void SerializableWithNameList<T>::Move(std::size_t oldIndex,
 }
 
 template <typename T>
+std::size_t SerializableWithNameList<T>::GetPosition(const T& element) const {
+  for(std::size_t index = 0;index<elements.size();++index) {
+    if (&element == elements[index].get()) return index;
+  }
+
+  return (size_t)-1;
+}
+
+template <typename T>
 void SerializableWithNameList<T>::SerializeElementsTo(
     const gd::String& elementName, SerializerElement& serializerElement) const {
   serializerElement.ConsiderAsArrayOf(elementName);

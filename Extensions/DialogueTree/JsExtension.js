@@ -39,7 +39,9 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Scene variable that holds the Yarn Json data')
+        _('Scene variable that holds the Yarn Json data'),
+        '',
+        false
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
@@ -61,7 +63,9 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
         'jsonResource',
-        _('Json file that holds the Yarn Json data')
+        _('Json file that holds the Yarn Json data'),
+        '',
+        false
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
@@ -70,7 +74,7 @@ module.exports = {
 
     extension
       .addAction(
-        'StarDialogueFromBranch',
+        'StartDialogueFromBranch',
         _('Start dialogue from branch'),
         _(
           'Start dialogue from branch. Use this to initiate the dialogue from a specified branch.'
@@ -80,16 +84,29 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Dialogue branch'))
+      .addParameter('string', _('Dialogue branch'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.startFrom');
+
+    extension
+      .addAction(
+        'StopRunningDialogue',
+        _('Stop running dialogue'),
+        _('Stop the running dialogue. Use this to interrupt dialogue parsing.'),
+        _('Stop running dialogue'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.stopRunningDialogue');
 
     extension
       .addAction(
         'GoToNextLine',
         _('Go to the next dialogue line'),
         _(
-          'Go to the next dialogue line. Use this to advance to the next dialogue line  when the player presses a button.'
+          'Go to the next dialogue line. Use this to advance to the next dialogue line when the player presses a button.'
         ),
         _('Go to the next dialogue line'),
         _('Dialogue Tree (experimental)'),
@@ -156,7 +173,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('expression', _('Option index number'))
+      .addParameter('expression', _('Option index number'), '', false)
       .setDefaultValue('0')
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.selectPreviousOption');
@@ -178,6 +195,21 @@ module.exports = {
 
     extension
       .addAction(
+        'CompleteClippedTextScrolling',
+        _('Complete clipped text scrolling'),
+        _(
+          'Complete the clipped text scrolling. Use this action whenever you want to skip scrolling.'
+        ),
+        _('Complete clipped text scrolling'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.completeClippedTextScrolling');
+
+    extension
+      .addAction(
         'SetVariable',
         _('Set dialogue state variable'),
         _(
@@ -188,8 +220,8 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('State Variable Name'))
-      .addParameter('expression', _('Variable Value'))
+      .addParameter('string', _('State Variable Name'), '', false)
+      .addParameter('expression', _('Variable Value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
 
@@ -221,7 +253,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('globalvar', _('Global Variable'))
+      .addParameter('globalvar', _('Global Variable'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.loadState');
 
@@ -260,9 +292,41 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('expression', _('Option Index Number'))
+      .addParameter('expression', _('Option Index Number'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getLineOption');
+
+    extension
+      .addStrExpression(
+        'HorizontalOptionsList',
+        _('Get a Horizontal list of options from the Options line type'),
+        _(
+          "Get the text of all available options from an Options line type as a horizontal list. You can also pass the selected option's cursor string, which by default is ->"
+        ),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Options Selection Cursor'), '', false)
+      .setDefaultValue('>')
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getLineOptionsTextHorizontal');
+
+    extension
+      .addStrExpression(
+        'VerticalOptionsList',
+        _('Get a Vertical list of options from the Options line type'),
+        _(
+          "Get the text of all available options from an Options line type as a vertical list. You can also pass the selected option's cursor string, which by default is ->"
+        ),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Options Selection Cursor'), '', false)
+      .setDefaultValue('>')
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getLineOptionsTextVertical');
 
     extension
       .addExpression(
@@ -283,7 +347,7 @@ module.exports = {
         'ClippedLineText',
         _('Get dialogue line text clipped'),
         _(
-          'Get dialogue line text clipped by the typewriter effect. Use the ScrollClippedText action to control the typewriter effect.'
+          'Get dialogue line text clipped by the typewriter effect. Use the "Scroll clipped text" action to control the typewriter effect.'
         ),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
@@ -295,8 +359,8 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchTitle',
-        _('Get the title of the current branch of running dialogue'),
-        _('Get the title of the current branch of running dialogue'),
+        _('Get the title of the current branch of the running dialogue'),
+        _('Get the title of the current branch of the running dialogue'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -307,8 +371,8 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchTags',
-        _('Get the tags of the current branch of running dialogue'),
-        _('Get the tags of the current branch of running dialogue'),
+        _('Get the tags of the current branch of the running dialogue'),
+        _('Get the tags of the current branch of the running dialogue'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -319,13 +383,13 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchTag',
-        _('Get a tag of the current branch of running dialogue via number'),
-        _('Get a tag of the current branch of running dialogue via number'),
+        _('Get a tag of the current branch of the running dialogue via its index'),
+        _('Get a tag of the current branch of the running dialogue via its index'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('expression', _('Tag Index Number'))
+      .addParameter('expression', _('Tag Index Number'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getBranchTag');
 
@@ -388,7 +452,7 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchText',
-        _('Get the raw text of the current branch'),
+        _('Get the full raw text of the current branch'),
         _('Get the full raw text of the current branch'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
@@ -406,13 +470,13 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Variable Name'))
+      .addParameter('string', _('Variable Name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getVariable');
 
     extension
       .addCondition(
-        'Is command called',
+        'IsCommandCalled',
         _('Command is called'),
         _(
           'Check if a specific Command is called. If it is a <<command withParameter>>, you can even get the parameter with the CommandParameter expression.'
@@ -422,14 +486,14 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Command String'))
+      .addParameter('string', _('Command String'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.isCommandCalled');
 
     extension
       .addCondition(
         'IsDialogueLineType',
-        _('The dialogue line type is'),
+        _('Dialogue line type'),
         _(
           'Check if the the current dialogue line line is one of the three existing types. Use this to set what logic is executed for each type.\nThe three types are as follows:\n- text: when displaying dialogue text.\n- options: when displaying [[branching/options]] for dialogue choices.\n-command: when <<commands>> are triggered by the dialogue data.'
         ),
@@ -449,12 +513,12 @@ module.exports = {
 
     extension
       .addCondition(
-        'Is running',
-        _('Is running'),
+        'IsDialogueRunning',
+        _('Dialogue is running'),
         _(
           'Check if the dialogue is running. Use this to for things like locking the player movement while speaking with a non player character.'
         ),
-        _('Is running'),
+        _('Dialogue is running'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -474,7 +538,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('Branch name'))
+      .addParameter('string', _('Branch name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.hasDialogueBranch');
 
@@ -485,7 +549,7 @@ module.exports = {
         _(
           'Check if a selected option has changed when the current dialogue line type is options. Use this to detect when the player has selected another option, so you can re-draw where the selection arrow is.'
         ),
-        _('Has selected option changed'),
+        _('Selected option has changed'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -495,8 +559,8 @@ module.exports = {
 
     extension
       .addCondition(
-        'Current branch title is',
-        _('Current dialogue branch title is'),
+        'CurrentBranchTitle',
+        _('Current dialogue branch title'),
         _(
           'Check if the current dialogue branch title is equal to a string. Use this to trigger game events when the player has visited a specific dialogue branch.'
         ),
@@ -505,13 +569,13 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('title name'))
+      .addParameter('string', _('title name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.branchTitleIs');
 
     extension
       .addCondition(
-        'Current branch contains Tag',
+        'CurrentBranchContainsTag',
         _('Current dialogue branch contains a tag'),
         _(
           'Check if the current dialogue branch contains a specific tag. Tags are an alternative useful way to <<commands>> to drive game logic with the dialogue data.'
@@ -521,13 +585,13 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('tag name'))
+      .addParameter('string', _('tag name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.branchContainsTag');
 
     extension
       .addCondition(
-        'Branch has been visited before',
+        'WasBranchVisited',
         _('Branch title has been visited before'),
         _('Check if the current branch has been visited before'),
         _('Branch title _PARAM0_ has been visited before'),
@@ -535,13 +599,13 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('branch title'))
+      .addParameter('string', _('branch title'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.branchTitleHasBeenVisited');
 
     extension
       .addCondition(
-        'Compare dialogue state variable',
+        'CompareDialogueStateVariable',
         _('Compare dialogue state variable'),
         _(
           'Compare dialogue state variable. Use this to trigger game events via dialogue variables.'
@@ -551,19 +615,19 @@ module.exports = {
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('State variable'))
-      .addParameter('string', _('Equal to'))
+      .addParameter('string', _('State variable'), '', false)
+      .addParameter('string', _('Equal to'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.compareVariable');
 
     extension
       .addCondition(
         'HasClippedTextScrollingCompleted',
-        _('Has clipped text scrolling completed'),
+        _('Clipped text has completed scrolling'),
         _(
           'Check if the clipped text scrolling has completed. Use this to prevent the player from going to the next dialogue line before the typing effect has revealed the entire text.'
         ),
-        _('Has clipped text scrolling completed'),
+        _('Clipped text has completed scrolling'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'

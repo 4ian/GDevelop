@@ -7,18 +7,13 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type ValueProps =
   | {|
-      value: string,
+      value: number | string,
       // event and index should not be used, and be removed eventually
       onChange?: (
         event: {| target: {| value: string |} |},
         index: number,
-        text: string
+        text: string // Note that even for number values, a string is returned
       ) => void,
-    |}
-  | {|
-      value: number,
-      // event and index should not be used, and be removed eventually
-      onChange?: (event: {||}, index: number, value: number) => void,
     |}
   | {|
       value: boolean,
@@ -41,7 +36,6 @@ type Props = {|
   margin?: 'none',
 
   floatingLabelText?: React.Node,
-  floatingLabelFixed?: boolean,
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
@@ -101,7 +95,7 @@ export default class SelectField extends React.Component<Props, {||}> {
                 : undefined
             }
             InputLabelProps={{
-              shrink: props.floatingLabelFixed ? true : undefined,
+              shrink: true,
             }}
             SelectProps={{
               native: true,

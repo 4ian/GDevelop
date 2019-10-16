@@ -5,7 +5,7 @@ import * as React from 'react';
 import ResourcesList from '../ResourcesList';
 import ResourcePropertiesEditor from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
-import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
+import EditorMosaic from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -105,7 +105,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   openProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties')) {
+    if (!this.editorMosaic.openEditor('properties', 'start', 66)) {
       this.setState({
         showPropertiesInfoBar: true,
       });
@@ -134,12 +134,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     const { selectedResource } = this.state;
 
     const editors = {
-      properties: (
-        <MosaicWindow
-          title={<Trans>Properties</Trans>}
-          // Pass resources to force MosaicWindow update when selectedResource is changed
-          resources={selectedResource ? [selectedResource] : []}
-        >
+      properties: {
+        type: 'secondary',
+        title: <Trans>Properties</Trans>,
+        renderEditor: () => (
           <ResourcePropertiesEditor
             key={selectedResource ? selectedResource.ptr : undefined}
             resources={selectedResource ? [selectedResource] : []}
@@ -156,18 +154,22 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onChooseResource={onChooseResource}
             resourceSources={resourceSources}
           />
-        </MosaicWindow>
-      ),
-      'resources-list': (
-        <ResourcesList
-          project={project}
-          onDeleteResource={this.deleteResource}
-          onRenameResource={onRenameResource}
-          onSelectResource={this._onResourceSelected}
-          selectedResource={selectedResource}
-          ref={resourcesList => (this._resourcesList = resourcesList)}
-        />
-      ),
+        ),
+      },
+      'resources-list': {
+        type: 'primary',
+        noTitleBar: true,
+        renderEditor: () => (
+          <ResourcesList
+            project={project}
+            onDeleteResource={this.deleteResource}
+            onRenameResource={onRenameResource}
+            onSelectResource={this._onResourceSelected}
+            selectedResource={selectedResource}
+            ref={resourcesList => (this._resourcesList = resourcesList)}
+          />
+        ),
+      },
     };
 
     return (
@@ -179,7 +181,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             direction: 'row',
             first: 'properties',
             second: 'resources-list',
-            splitPercentage: 75,
+            splitPercentage: 66,
           }}
         />
         <InfoBar

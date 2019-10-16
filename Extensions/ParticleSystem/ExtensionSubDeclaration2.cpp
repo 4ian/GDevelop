@@ -204,7 +204,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .SetManipulatedType("number");
 
   obj.AddCondition("ParticleSize1",
-                   _("SIze, parameter 1"),
+                   _("Size, parameter 1"),
                    _("Test parameter 1 of the size of particles"),
                    _("Parameter 1 of the size of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Common"),

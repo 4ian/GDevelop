@@ -31,7 +31,7 @@ type ListItemRightButtonProps =
       onReload: () => void,
     |}
   | {|
-      displayMenuButton: true,
+      displayMenuButton: boolean,
       buildMenuTemplate: () => Array<any>,
     |}
   | {|
@@ -69,6 +69,7 @@ type ListItemProps = {|
   |},
 
   style?: {|
+    color?: string,
     backgroundColor?: string,
     borderBottom?: string,
     opacity?: number,
@@ -108,8 +109,8 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
         </MUIListItemSecondaryAction>
       );
     }
-    if (props.displayMenuButton) {
-      return (
+    if (props.buildMenuTemplate) {
+      return props.displayMenuButton ? (
         <MUIListItemSecondaryAction>
           <ElementWithMenu
             ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
@@ -121,6 +122,14 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             buildMenuTemplate={props.buildMenuTemplate}
           />
         </MUIListItemSecondaryAction>
+      ) : (
+        <ElementWithMenu
+          ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
+          element={
+            <div /> /* We still need a dummy div for context menu placement */
+          }
+          buildMenuTemplate={props.buildMenuTemplate}
+        />
       );
     }
     if (props.displayLinkButton) {
@@ -174,7 +183,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
           selected={props.selected}
           style={props.style}
           onContextMenu={
-            props.displayMenuButton ? this._openContextMenu : undefined
+            props.buildMenuTemplate ? this._openContextMenu : undefined
           }
           alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
         >

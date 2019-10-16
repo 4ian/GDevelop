@@ -10,7 +10,7 @@ import {
   selectableArea,
 } from '../ClassNames';
 import { getHelpLink } from '../../../Utils/HelpLink';
-import { type EventRendererProps } from './EventRenderer.flow';
+import { type EventRendererProps } from './EventRenderer';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
 const gd = global.gd;

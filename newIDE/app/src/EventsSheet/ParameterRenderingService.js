@@ -8,7 +8,9 @@ import DefaultField from './ParameterFields/DefaultField';
 import RelationalOperatorField, {
   renderInlineRelationalOperator,
 } from './ParameterFields/RelationalOperatorField';
-import OperatorField from './ParameterFields/OperatorField';
+import OperatorField, {
+  renderInlineOperator,
+} from './ParameterFields/OperatorField';
 import MouseField, { renderInlineMouse } from './ParameterFields/MouseField';
 import KeyField, { renderInlineKey } from './ParameterFields/KeyField';
 import ObjectField, {
@@ -80,6 +82,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   object: renderInlineObjectWithThumbnail,
   yesorno: renderInlineYesNo,
   trueorfalse: renderInlineTrueFalse,
+  operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
 };
 

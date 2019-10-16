@@ -22,8 +22,9 @@ public/libGD.js
 # Third party editors
 public/external/piskel/piskel-editor
 public/external/piskel/piskel-editor.zip
-public/external/monaco-editor-min
-public/external/jfxr/jfxr-editor/
+public/external/monaco-editor-min/*
+public/external/jfxr/jfxr-editor/*
+public/external/yarn/yarn-editor/*
 
 # Resources
 resources/GDJS

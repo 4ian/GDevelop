@@ -8,17 +8,17 @@ type Props = {|
 |};
 
 /**
- * Pass the proper width to the children according to the window width.
- * Could be improved with react-measure to only compute the available width
- * for the component.
+ * Pass the proper size to the children according to the window size.
+ * This consider a window to be "small" if *both* the width and height
+ * are small.
  */
-export const ResponsiveWidthMeasurer = ({ children }: Props) => {
+export const ResponsiveWindowMeasurer = ({ children }: Props) => {
   if (typeof window === 'undefined') {
     return children('medium');
   }
 
   return children(
-    window.innerWidth < 750
+    window.innerWidth < 750 || window.innerHeight < 475
       ? 'small'
       : window.innerWidth < 1150
       ? 'medium'

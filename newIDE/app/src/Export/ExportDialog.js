@@ -131,7 +131,6 @@ export default class ExportDialog extends Component<Props, State> {
             ]}
             open
             noMargin
-            autoScrollBodyContent
           >
             {!exporter && (
               <React.Fragment>

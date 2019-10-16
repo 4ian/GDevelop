@@ -37,7 +37,6 @@ export default class ChangelogDialog extends React.Component<Props, State> {
         actions={actions}
         open={open}
         onRequestClose={onClose}
-        autoScrollBodyContent
         modal
       >
         <Text>

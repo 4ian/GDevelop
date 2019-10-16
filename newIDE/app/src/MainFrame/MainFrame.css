@@ -1,3 +1,7 @@
+html {
+  touch-action: none;
+}
+
 #root {
   height: 100%;
   display: flex;

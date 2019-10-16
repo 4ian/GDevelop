@@ -30,6 +30,17 @@ const editors: Array<ResourceExternalEditor> = [
       );
     },
   },
+  {
+    name: 'yarn-app',
+    displayName: 'Edit with Yarn',
+    kind: 'json',
+    edit: () => {
+      sendExternalEditorOpened('yarn');
+      Window.showMessageBox(
+        'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
+      );
+    },
+  },
 ];
 
 export default editors;

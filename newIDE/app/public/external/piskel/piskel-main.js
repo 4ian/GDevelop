@@ -1,5 +1,6 @@
 import { createPathEditorHeader } from '../utils/path-editor.js';
 const electron = require('electron');
+const electronWindow = electron.remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const async = require('async');
@@ -14,8 +15,7 @@ const updateFrameElements = () => {
     if (piskelOptions.singleFrame) {
       editorContentDocument.getElementsByClassName(
         'preview-list-wrapper'
-      )[0].style.display =
-        'none';
+      )[0].style.display = 'none';
     }
   });
 };
@@ -46,8 +46,8 @@ const readBase64ImageFile = file => {
 };
 
 /**
-* Save the content to the specified file
-*/
+ * Save the content to the specified file
+ */
 const saveToFile = (content, filePath, callback) => {
   const reader = new FileReader();
   reader.onload = () => {
@@ -306,7 +306,6 @@ const loadPiskelDataFromGd = () => {
         const layer = piskelController.getLayers()[0];
         const removeFrameIndex = layer.getFrames().indexOf(frameToDelete);
         if (removeFrameIndex !== -1) {
-
           // Always keep the frame count at 1 or above by inserting an empty frame if we're reaching 0 - as Piskel does not support having no frames
           if (piskelController.getFrameCount() === 1) {
             piskelController.setCurrentFrameIndex(
@@ -344,7 +343,7 @@ const loadPiskelDataFromGd = () => {
  * Inject custom buttons in Piskel's header,
  * get rid of the new file button,
  * make animation name and path editable
-*/
+ */
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   piskelOptions = receivedOptions;
 
@@ -365,31 +364,18 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
   // Load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
-  const headerStyle = {
-    saveFolderLabel:
-      'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
-    nameInput:
-      'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
-    saveButton:
-      'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    cancelButton:
-      'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    setFolderButton:
-      'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    fileExistsLabel:
-      'height:27px;color:aqua;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
-  };
+  const initialResourcePath =
+    receivedOptions.resources[0] === undefined
+      ? ''
+      : receivedOptions.resources[0].resourcePath;
+
   const savePathEditor = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
     onSaveToGd: saveToGD,
     onCancelChanges: closeWindow,
     projectPath: receivedOptions.projectPath,
-    initialResourcePath:
-      receivedOptions.resources[0] === undefined
-        ? ''
-        : receivedOptions.resources[0].resourcePath,
-    headerStyle,
+    initialResourcePath,
     name: receivedOptions.name,
     extension: piskelOptions.singleFrame ? '.png' : undefined,
   });
@@ -401,6 +387,15 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   pskl.UserSettings.set(
     pskl.UserSettings.SEAMLESS_MODE,
     piskelOptions.singleFrame
+  );
+
+  electronWindow.setTitle(
+    'GDevelop Pixel Editor (Piskel) - ' +
+      path.normalize(
+        !piskelOptions.singleFrame
+          ? receivedOptions.projectPath + '/' + receivedOptions.name
+          : initialResourcePath
+      )
   );
 
   // If there were no resources sent by GD, create an empty piskel document

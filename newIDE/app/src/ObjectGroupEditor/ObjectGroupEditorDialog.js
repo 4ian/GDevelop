@@ -31,7 +31,6 @@ export class ObjectGroupEditorDialog extends Component {
       <Dialog
         key={group.ptr}
         actions={actions}
-        autoScrollBodyContent
         noMargin
         modal
         onRequestClose={this.props.onCancel}

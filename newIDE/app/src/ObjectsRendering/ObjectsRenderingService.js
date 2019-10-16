@@ -7,6 +7,7 @@ import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
+import RenderedSkeletonInstance from './Renderers/RenderedSkeletonInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
@@ -27,6 +28,7 @@ export default {
     'PrimitiveDrawing::Drawer': RenderedShapePainterInstance,
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
+    'SkeletonObject::Skeleton': RenderedSkeletonInstance,
   },
   getThumbnail: function(project: gdProject, object: gdObject) {
     var objectType = object.getType();

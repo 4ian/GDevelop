@@ -935,6 +935,79 @@ module.exports = {
       }
     ]
   },
+  "dialogue-tree-with-yarn": {
+    "description": "A platformer showing a simple interactive story with dialogues like in RPG games, using the Yarn dialogue tree extension.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Panel Sprite (9-patch) Object",
+        "name": "PanelSpriteObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Anchor",
+        "name": "AnchorBehavior"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Dialogue Tree (Experimental)",
+        "name": "DialogueTree"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "downhill-bike-physics-demo": {
     "description": "A fun demo, using the Physics Engine to build an advanced simulation of a bike, with a person pedaling on it. Try to cross the finish line without falling and as fast as possible!",
     "usedExtensions": [
@@ -3237,6 +3310,51 @@ module.exports = {
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
+      }
+    ]
+  },
+  "skeletal-animation-demo": {
+    "description": "Example of a character animated using a skeletal animation based on Dragon Bones. This is a demo based on an experimental object. Be sure to read the documentation about this as it needs work to be maintained for use in large games.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Skeleton",
+        "name": "SkeletonObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Primitive drawing",
+        "name": "PrimitiveDrawing"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
       }
     ]
   },

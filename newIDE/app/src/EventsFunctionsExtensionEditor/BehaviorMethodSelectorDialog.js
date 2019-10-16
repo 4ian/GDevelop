@@ -82,7 +82,6 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
         noMargin
         title={<Trans>Choose a new behavior function ("method")</Trans>}
         onRequestClose={this.props.onCancel}
-        autoScrollBodyContent={true}
       >
         <List>
           <Subheader>

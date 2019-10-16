@@ -26,6 +26,17 @@ export type GroupWithContext = {|
 export type ObjectWithContextList = Array<ObjectWithContext>;
 export type GroupWithContextList = Array<GroupWithContext>;
 
+export const isSameObjectWithContext = (
+  objectWithContext: ?ObjectWithContext
+) => (other: ?ObjectWithContext) => {
+  return (
+    objectWithContext &&
+    other &&
+    objectWithContext.global === other.global &&
+    objectWithContext.object === other.object
+  );
+};
+
 export const enumerateObjects = (
   project: gdProject,
   objectsContainer: gdObjectsContainer,

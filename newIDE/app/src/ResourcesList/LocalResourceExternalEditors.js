@@ -1,6 +1,7 @@
 // @flow
 import { openPiskel } from './LocalPiskelBridge';
 import { openJfxr } from './LocalJfxrBridge';
+import { openYarn } from './LocalYarnBridge';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 
@@ -25,6 +26,15 @@ const editors: Array<ResourceExternalEditor> = [
     edit: options => {
       sendExternalEditorOpened('jfxr');
       return openJfxr(options);
+    },
+  },
+  {
+    name: 'Yarn',
+    displayName: 'Create/Edit a Dialogue Tree with Yarn (*.json)',
+    kind: 'json',
+    edit: options => {
+      sendExternalEditorOpened('yarn');
+      return openYarn(options);
     },
   },
 ];

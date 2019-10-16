@@ -66,7 +66,6 @@ export default class ExpressionParametersEditorDialog extends Component<
         }
         modal
         onRequestClose={this.props.onRequestClose}
-        autoScrollBodyContent
       >
         <ExpressionParametersEditor
           project={project}

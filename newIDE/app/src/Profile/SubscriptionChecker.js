@@ -104,7 +104,6 @@ export class SubscriptionCheckDialog extends React.Component<
         ]}
         onRequestClose={this._closeDialog}
         open={open}
-        autoScrollBodyContent
         title={this.props.title}
       >
         <Column noMargin>

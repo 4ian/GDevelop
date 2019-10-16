@@ -23,10 +23,10 @@ Overview of the architecture
 | `GDCpp` | GDevelop C++ game engine, used to **build native games**. |
 | `GDJS` | GDevelop JS game engine, used to build **HTML5 games**. |
 | `GDevelop.js` | Bindings of Core/GDCpp/GDJS and Extensions to JavaScript (used by the IDE). |
-| `newIDE` | The game editor, written in Javascript with React, Electron and Pixi.js. |
+| `newIDE` | The game editor, written in JavaScript with React, Electron and Pixi.js. |
 | `Extensions` | Extensions for C++ or JS game engines, providing objects, events and new features. |
 
-### Documentation
+To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 
 A pre-generated documentation of the Core library, C++ and JS game engines is [available here](http://4ian.github.io/GD-Documentation).
 

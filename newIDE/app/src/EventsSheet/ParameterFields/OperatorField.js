@@ -1,9 +1,14 @@
+// @flow
+import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import React, { Component } from 'react';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
-export default class OperatorField extends Component {
+export default class OperatorField extends Component<ParameterFieldProps> {
+  _field: ?SelectField;
   focus() {
     if (this._field && this._field.focus) this._field.focus();
   }
@@ -17,10 +22,9 @@ export default class OperatorField extends Component {
     return (
       <SelectField
         fullWidth
-        floatingLabelFixed
         floatingLabelText={description}
         value={this.props.value}
-        onChange={(e, i, value) => this.props.onChange(value)}
+        onChange={(e, i, value: string) => this.props.onChange(value)}
         ref={field => (this._field = field)}
         hintText={t`Choose an operator`}
       >
@@ -33,3 +37,28 @@ export default class OperatorField extends Component {
     );
   }
 }
+
+export const renderInlineOperator = ({
+  value,
+  InvalidParameterValue,
+}: ParameterInlineRendererProps) => {
+  if (!value) {
+    return (
+      <InvalidParameterValue isEmpty>
+        <Trans>Choose an operator</Trans>
+      </InvalidParameterValue>
+    );
+  }
+
+  if (
+    value !== '=' &&
+    value !== '+' &&
+    value !== '-' &&
+    value !== '*' &&
+    value !== '/'
+  ) {
+    return <InvalidParameterValue>{value}</InvalidParameterValue>;
+  }
+
+  return value;
+};

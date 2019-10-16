@@ -41,7 +41,6 @@ export default class SetupGridDialog extends Component {
         actions={actions}
         open={this.props.open}
         onRequestClose={this.props.onCancel}
-        autoScrollBodyContent={true}
       >
         <TextField
           floatingLabelText={<Trans>Cell width (in pixels)</Trans>}

@@ -26,6 +26,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     this._object.hidden = !runtimeObject._visible;
   } else {
     // No setting X/Y/Z as it will be updated below
+    this.updateText();
     this.updateColor();
     this.updateAlignment();
     this.updateFontFamily();
@@ -50,6 +51,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this.updateAngle();
   this.updateOpacity();
   this.updateVisible();
+  this.updateText();
 };
 
 gdjs.BBTextRuntimeObjectRenderer = gdjs.BBTextRuntimeObjectPixiRenderer;

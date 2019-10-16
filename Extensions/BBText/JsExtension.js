@@ -212,7 +212,7 @@ module.exports = {
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('operator', _("Modification's sign"), '', false)
-      .addParameter('number', _('Opacity (0-255)'))
+      .addParameter('expression', _('Opacity (0-255)'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setOpacity')
       .setManipulatedType('number')
@@ -229,7 +229,8 @@ module.exports = {
         'res/actions/characterSize24.png'
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('number', _('Font size in px'))
+      .addParameter('operator', _("Modification's sign"), '', false)
+      .addParameter('expression', _('Font size'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setFontSize')
       .setGetter('getFontSize');
@@ -283,7 +284,7 @@ module.exports = {
       )
       .addParameter('object', _('BBText object'), 'BBText', false)
       .addParameter('operator', _("Modification's sign"), '', false)
-      .addParameter('expression', _('Number'), '', false)
+      .addParameter('expression', _('Width in px'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setWrappingWidth')
       .setManipulatedType('number')
@@ -341,7 +342,9 @@ module.exports = {
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'BBText::BBText',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor()
+      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
+        helpPagePath: '/objects/BBTextObject',
+      })
     );
   },
   /**

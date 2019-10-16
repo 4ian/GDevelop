@@ -1,4 +1,7 @@
 module.exports = function(grunt) {
+  var fs = require('fs');
+  var isWin = /^win/.test(process.platform);
+
   var emscriptenPath = process.env.EMSCRIPTEN;
   var emscriptenMemoryProfiler = emscriptenPath + '/src/memoryprofiler.js';
   var cmakeToolchainpath =
@@ -6,20 +9,24 @@ module.exports = function(grunt) {
   var buildOutputPath = '../Binaries/Output/libGD.js/Release/';
   var buildPath = '../Binaries/embuild';
 
-  var isWin = /^win/.test(process.platform);
-  var cmakeBinary = isWin
-    ? '"C:\\Program Files (x86)\\CMake\\bin\\cmake"'
-    : 'emconfigure cmake';
-  var cmakeArgs = isWin ? '-G "MinGW Makefiles"' : '';
+  var cmakeBinary = 'emconfigure cmake';
+  var makeBinary = 'emmake make';
 
-  var makeBinary = isWin ? 'mingw32-make' : 'emmake make';
+  // Find CMake and make in default paths on Windows
+  if (isWin) {
+    makeBinary = 'emmake "C:\\MinGW\\bin\\mingw32-make"';
+    if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake')) {
+      cmakeBinary = 'emconfigure "C:\\Program Files\\CMake\\bin\\cmake"';
+    } else if (fs.existsSync('C:\\Program Files (x86)\\CMake\\bin\\cmake')) {
+      cmakeBinary = 'emconfigure "C:\\Program Files (x86)\\CMake\\bin\\cmake"';
+    }
+  }
 
   //Sanity checks
-  var fs = require('fs');
   if (!process.env.EMSCRIPTEN) {
     console.error('🔴 EMSCRIPTEN env. variable is not set');
     console.log(
-      '⚠️ Please set Emscripten environment by launching `emsdk_env` script'
+      '⚠️ Please set Emscripten environment by launching `emsdk_env` script (`emsdk_env.bat` on Windows)'
     );
   }
   if (!fs.existsSync(emscriptenMemoryProfiler)) {
@@ -69,8 +76,6 @@ module.exports = function(grunt) {
         src: [buildPath + '/CMakeCache.txt', 'CMakeLists.txt'],
         command:
           cmakeBinary +
-          ' ' +
-          cmakeArgs +
           ' ../.. -DFULL_VERSION_NUMBER=FALSE',
         options: {
           execOptions: {

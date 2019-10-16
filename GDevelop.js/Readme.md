@@ -8,6 +8,8 @@ GDevelop is a full featured, cross-platform, open-source game creator software r
 
 - Make sure you have [CMake 3.5+](http://www.cmake.org/)
 
+- On Windows, install MinGW (only `mingw32-base-bin` is required).
+
 - Install [Emscripten](https://github.com/kripken/emscripten), as explained on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 
 ```shell

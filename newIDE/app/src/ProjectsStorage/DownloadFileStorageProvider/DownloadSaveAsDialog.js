@@ -24,7 +24,7 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
       showErrorBox('Unable to save your project', err);
       return;
     }
-    var uri = 'data:application/json;charset=utf-8,' + content;
+    var uri = encodeURI('data:application/json;charset=utf-8,' + content);
 
     var downloadLink = document.createElement('a');
     downloadLink.href = uri;

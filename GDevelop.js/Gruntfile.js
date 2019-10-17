@@ -1,33 +1,51 @@
 module.exports = function(grunt) {
-  var fs = require('fs');
-  var isWin = /^win/.test(process.platform);
+  const fs = require('fs');
+  const isWin = /^win/.test(process.platform);
 
-  var emscriptenPath = process.env.EMSCRIPTEN;
-  var emscriptenMemoryProfiler = emscriptenPath + '/src/memoryprofiler.js';
-  var cmakeToolchainpath =
+  const buildOutputPath = '../Binaries/Output/libGD.js/Release/';
+  const buildPath = '../Binaries/embuild';
+
+  const emscriptenPath = process.env.EMSCRIPTEN;
+  const emscriptenMemoryProfiler = emscriptenPath + '/src/memoryprofiler.js';
+  const cmakeToolchainpath =
     emscriptenPath + '/cmake/Modules/Platform/Emscripten.cmake';
-  var buildOutputPath = '../Binaries/Output/libGD.js/Release/';
-  var buildPath = '../Binaries/embuild';
 
-  var cmakeBinary = 'emconfigure cmake';
-  var makeBinary = 'emmake make';
+  let cmakeBinary = 'emconfigure cmake';
+  let makeBinary = 'emmake make';
+  let cmakeArgs = '';
 
-  // Find CMake and make in default paths on Windows
+  // Use more specific paths on Windows
   if (isWin) {
-    makeBinary = 'emmake "C:\\MinGW\\bin\\mingw32-make"';
-    if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake')) {
-      cmakeBinary = 'emconfigure "C:\\Program Files\\CMake\\bin\\cmake"';
-    } else if (fs.existsSync('C:\\Program Files (x86)\\CMake\\bin\\cmake')) {
-      cmakeBinary = 'emconfigure "C:\\Program Files (x86)\\CMake\\bin\\cmake"';
+    // Use make from MinGW
+    if (!fs.existsSync('C:\\MinGW\\bin\\mingw32-make.exe')) {
+      console.error(
+        "🔴 Can't find mingw32-make in C:\\MinGW. Make sure MinGW is installed."
+      );
+      return;
     }
+    makeBinary = 'emmake "C:\\MinGW\\bin\\mingw32-make"';
+
+    // Find CMake in usual folders or fallback to PATH.
+    if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake.exe')) {
+      cmakeBinary = 'emconfigure "C:\\Program Files\\CMake\\bin\\cmake"';
+    } else if (fs.existsSync('C:\\Program Files (x86)\\CMake\\bin\\cmake.exe')) {
+      cmakeBinary = 'emconfigure "C:\\Program Files (x86)\\CMake\\bin\\cmake"';
+    } else {
+      console.log(
+        "⚠️ Can't find CMake in its usual Program Files folder. Make sure you have cmake in your PATH instead."
+      );
+    }
+
+    cmakeArgs = '-G "MinGW Makefiles"';
   }
 
   //Sanity checks
   if (!process.env.EMSCRIPTEN) {
     console.error('🔴 EMSCRIPTEN env. variable is not set');
     console.log(
-      '⚠️ Please set Emscripten environment by launching `emsdk_env` script (`emsdk_env.bat` on Windows)'
+      '⚠️ Please set Emscripten environment by launching `emsdk_env` script (or `emsdk_env.bat` on Windows).'
     );
+    return;
   }
   if (!fs.existsSync(emscriptenMemoryProfiler)) {
     console.error(
@@ -75,8 +93,7 @@ module.exports = function(grunt) {
       cmake: {
         src: [buildPath + '/CMakeCache.txt', 'CMakeLists.txt'],
         command:
-          cmakeBinary +
-          ' ../.. -DFULL_VERSION_NUMBER=FALSE',
+          cmakeBinary + ' ' + cmakeArgs + ' ../.. -DFULL_VERSION_NUMBER=FALSE',
         options: {
           execOptions: {
             cwd: buildPath,
@@ -114,7 +131,7 @@ module.exports = function(grunt) {
     clean: {
       options: { force: true },
       build: {
-        src: [buildOutputPath + 'libGD.js', buildOutputPath + 'libGD.min.js'],
+        src: [buildPath, buildOutputPath + 'libGD.js', buildOutputPath + 'libGD.min.js'],
       },
     },
     compress: {

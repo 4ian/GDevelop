@@ -49,7 +49,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -80,7 +80,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -125,7 +125,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -173,7 +173,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -233,7 +233,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -255,7 +255,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -299,7 +299,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -321,7 +321,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )

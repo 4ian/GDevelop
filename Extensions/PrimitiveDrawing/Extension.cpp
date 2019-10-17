@@ -132,6 +132,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("DrawStar")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+/*
   obj.AddAction("Arc",
                 _("Arc"),
                 _("Draw an arc on screen"),
@@ -168,8 +169,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Radius (in pixels)"))
       .SetFunctionName("DrawArcTo")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
-      x1, y1, x2, y2, radius
+*/
 
   obj.AddAction("FillColor",
                 _("Fill color"),

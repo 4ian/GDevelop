@@ -66,7 +66,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawStar = function(x1, y1,
     this._graphics.closePath();
     this._graphics.endFill();
 };
-
+/*
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArc = function(x1, y1, radius, startAngle, endAngle, anticlockwise) {
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.arc(x1, y1, radius, gdjs.toRad(startAngle), gdjs.toRad(endAngle), anticlockwise ? true : false);
@@ -81,7 +81,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArcTo = function(x1, y1
     //this._graphics.closePath();
     this._graphics.endFill();
 };
-
+*/
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(
         this._object._outlineSize,

@@ -13,8 +13,8 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   if (this._pixiObject === undefined) {
     this._pixiObject = new MultiStyleText(runtimeObject._text, {
       default: {
-        fontFamily: runtimeObject._family,
-        fontSize: `${runtimeObject._size}px`,
+        fontFamily: runtimeObject._fontFamily,
+        fontSize: `${runtimeObject._fontSize}px`,
         fill: runtimeObject._color,
         tagStyle: ['[', ']'],
         wordWrap: true,
@@ -25,16 +25,13 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
 
     this._object.hidden = !runtimeObject._visible;
   } else {
-    // No setting X/Y/Z as it will be updated below
+    // No setting X/Y/Z as it will be updated
     this.updateText();
     this.updateColor();
     this.updateAlignment();
     this.updateFontFamily();
     this.updateFontSize();
     this.updatePosition();
-    this.updateAngle();
-    this.updateOpacity();
-    this.updateVisible();
   }
 
   runtimeScene
@@ -47,11 +44,12 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
 
+  this.updateText();
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
   this.updateVisible();
-  this.updateText();
+  this.ensureUpToDate();
 };
 
 gdjs.BBTextRuntimeObjectRenderer = gdjs.BBTextRuntimeObjectPixiRenderer;
@@ -70,10 +68,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
     this._pixiObject.texture &&
     this._pixiObject.texture.valid
   ) {
-    if (this._pixiObject._style.wordWrapWidth !== this._object._wrappingWidth) {
-      this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
-      this._pixiObject.dirty = true;
-    }
     if (this._object._align !== this._pixiObject._style.align) {
       this._pixiObject._style.align = this._object._align;
       this._pixiObject.dirty = true;
@@ -97,10 +91,10 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function() {
   this._pixiObject.dirty = true;
 };
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function() {
-  this._pixiObject.textStyles.default.fontFamily = this._object._family;
+  this._pixiObject.textStyles.default.fontFamily = this._object._fontFamily;
 };
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
-  this._pixiObject.textStyles.default.fontSize = this._object._size;
+  this._pixiObject.textStyles.default.fontSize = `${this._object._fontSize}px`;
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

@@ -1,5 +1,5 @@
 /**
- * An object displaying a BBCode formated text on the screen.
+ * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
  * @memberof gdjs
  * @class BBTextRuntimeObject
  * @extends RuntimeObject
@@ -16,11 +16,11 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type string */
   this._color = objectData.content.color;
   /** @type string */
-  this._family = objectData.content.family;
+  this._fontFamily = objectData.content.fontFamily;
   /** @type number */
-  this._size = objectData.content.size;
+  this._fontSize = objectData.content.fontSize;
   /** @type number */
-  this._wrappingWidth = objectData.content.width;
+  this._wrappingWidth = 0;
   /** @type string */
   this._align = objectData.content.align;
 
@@ -50,7 +50,7 @@ gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = func
   initialInstanceData
 ) {
   if (initialInstanceData.customSize) {
-    this.setWidth(initialInstanceData.width);
+    //this is absolutely required to set the wrapping width to the instance's width
     this.setWrappingWidth(initialInstanceData.width);
   }
 };
@@ -73,12 +73,13 @@ gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
   this._renderer.updateText();
 };
 
-gdjs.BBTextRuntimeObject.prototype.getBBText = function(text) {
+gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
   return this._text;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setColor = function(value) {
-  const splitValue = value.split(';');
+gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {
+  const splitValue = rgbColorString.split(';');
+  if (splitValue.length !== 3) return;
   const hexColor = `#${gdjs.rgbToHex(
     parseInt(splitValue[0]),
     parseInt(splitValue[1]),
@@ -93,34 +94,34 @@ gdjs.BBTextRuntimeObject.prototype.getColor = function() {
   return this._color;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setFontSize = function(value) {
-  this._size = `${value}px`;
+gdjs.BBTextRuntimeObject.prototype.setFontSize = function(fontSize) {
+  this._fontSize = fontSize;
   this._renderer.updateFontSize();
   this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getFontSize = function() {
-  return this._size;
+  return this._fontSize;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setFontFamily = function(value) {
-  this._family = value;
+gdjs.BBTextRuntimeObject.prototype.setFontFamily = function(fontFamily) {
+  this._fontFamily = fontFamily;
   this._renderer.updateFontFamily();
   this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getFontFamily = function() {
-  return this._family;
+  return this._fontFamily;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setAlignment = function(value) {
-  this._align = value;
+gdjs.BBTextRuntimeObject.prototype.setAlignment = function(align) {
+  this._align = align;
   this._renderer.updateAlignment();
   this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getAlignment = function() {
-  return (this._align = value);
+  return this._align;
 };
 
 /**
@@ -180,15 +181,6 @@ gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
  */
 gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function() {
   return this._wrappingWidth;
-};
-
-/**
- * Set the width of the object.
- * @param {number} width The new width in pixels.
- */
-gdjs.BBTextRuntimeObject.prototype.setWidth = function(width) {
-  this._wrappingWidth = width;
-  this.update();
 };
 
 /**

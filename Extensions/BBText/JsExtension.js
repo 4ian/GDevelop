@@ -12,19 +12,20 @@
  */
 
 const MultiStyleText = require('./dist/pixi-multistyle-text.umd');
-console.log(MultiStyleText);
 module.exports = {
   createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'BBText',
-        'BBTextObject',
-        _('Display a BBText object on the scene.'),
+        'BBCode Text',
+        _(
+          'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
+        ),
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/BBTextObject');
+      .setExtensionHelpPath('/objects/bbtext_object');
 
     var objectBBText = new gd.ObjectJsImplementation();
     objectBBText.updateProperty = function(
@@ -44,16 +45,16 @@ module.exports = {
         objectContent.opacity = parseFloat(newValue);
         return true;
       }
-      if (propertyName === 'family') {
-        objectContent.family = newValue;
+      if (propertyName === 'fontFamily') {
+        objectContent.fontFamily = newValue;
         return true;
       }
       if (propertyName === 'visible') {
         objectContent.visible = newValue === '1';
         return true;
       }
-      if (propertyName === 'size') {
-        objectContent.size = String(newValue);
+      if (propertyName === 'fontSize') {
+        objectContent.fontSize = String(newValue);
         return true;
       }
       if (propertyName === 'align') {
@@ -88,8 +89,8 @@ module.exports = {
       );
 
       objectProperties.set(
-        'size',
-        new gd.PropertyDescriptor(objectContent.size)
+        'fontSize',
+        new gd.PropertyDescriptor(objectContent.fontSize)
           .setType('number')
           .setLabel(_('Base size'))
       );
@@ -105,8 +106,8 @@ module.exports = {
       );
 
       objectProperties.set(
-        'family',
-        new gd.PropertyDescriptor(objectContent.family)
+        'fontFamily',
+        new gd.PropertyDescriptor(objectContent.fontFamily)
           .setType('string')
           .setLabel(_('Base font family'))
       );
@@ -125,10 +126,10 @@ module.exports = {
         text:
           '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
-        size: '20',
+        fontSize: '20',
         visible: true,
         color: '#000000',
-        family: 'Arial',
+        fontFamily: 'Arial',
         align: 'left',
       })
     );
@@ -157,7 +158,9 @@ module.exports = {
       .addObject(
         'BBText',
         _('BBText'),
-        _('Displays a BBCode rich Text.'),
+        _(
+          'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
+        ),
         'JsPlatform/Extensions/bbcode32.png',
         objectBBText
       )
@@ -165,7 +168,6 @@ module.exports = {
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/BBText/dist/pixi-multistyle-text.umd.js');
 
-    /// Actions / Conditions / Expressions
     object
       .addAction(
         'SetText',
@@ -338,12 +340,11 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'BBText::BBText',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/BBTextObject',
+        helpPagePath: '/objects/bbtext_object',
       })
     );
   },
@@ -356,7 +357,6 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    // console.log(objectsRenderingService);
     /**
      * Renderer for instances of BBText inside the IDE.
      *
@@ -396,7 +396,6 @@ module.exports = {
 
       this._pixiObject = new MultiStyleText('', BBTextStyles);
 
-      console.log(this._pixiObject);
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
       this._pixiContainer.addChild(this._pixiObject);
@@ -421,7 +420,6 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedBBTextInstance.prototype.update = function() {
-      // Check if the text has changed
       const rawText = this._associatedObject
         .getProperties(this.project)
         .get('text')
@@ -430,35 +428,30 @@ module.exports = {
         this._pixiObject.setText(rawText);
       }
 
-      // Update opacity
       const opacity = this._associatedObject
         .getProperties(this.project)
         .get('opacity')
         .getValue();
       this._pixiObject.alpha = opacity / 255;
 
-      // Update color
       const color = this._associatedObject
         .getProperties(this.project)
         .get('color')
         .getValue();
       this._pixiObject.textStyles.default.fill = color;
 
-      // Update size
-      const size = this._associatedObject
+      const fontSize = this._associatedObject
         .getProperties(this.project)
-        .get('size')
+        .get('fontSize')
         .getValue();
-      this._pixiObject.textStyles.default.fontSize = `${size}px`;
+      this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
 
-      // Update font family
-      const family = this._associatedObject
+      const fontFamily = this._associatedObject
         .getProperties(this.project)
-        .get('family')
+        .get('fontFamily')
         .getValue();
-      this._pixiObject.textStyles.default.fontFamily = family;
+      this._pixiObject.textStyles.default.fontFamily = fontFamily;
 
-      // Update alignment
       const align = this._associatedObject
         .getProperties(this.project)
         .get('align')
@@ -468,7 +461,6 @@ module.exports = {
         this._pixiObject.dirty = true;
       }
 
-      // Read position and angle from the instance
       this._pixiObject.position.x =
         this._instance.getX() + this._pixiObject.width / 2;
       this._pixiObject.position.y =

@@ -171,24 +171,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 */
 
-  obj.AddAction("LineTo",
-                _("LineTo"),
-                _("Draw a line on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
-                  "(thickness : _PARAM5_) with _PARAM0_"),
-                _("Advanced"),
-                "res/actions/line24.png",
-                "res/actions/line.png")
-
-      .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X position of start point"))
-      .AddParameter("expression", _("Y position of start point"))
-      .AddParameter("expression", _("X position of end point"))
-      .AddParameter("expression", _("Y position of end point"))
-      .AddParameter("expression", _("Thickness ( in pixels )"))
-      .SetFunctionName("drawLineTo")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
   obj.AddAction("beginFillPath",
                 _("beginFillPath"),
                 _("beginFillPath"),
@@ -199,7 +181,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/line.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("drawLineTo")
+      .SetFunctionName("beginFillPath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("endFillPath",
@@ -246,6 +228,24 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("drawPathLineTo")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddAction("drawLineV2",
+                _("drawLineV2"),
+                _("drawLineV2"),
+                _("drawLineV2 Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
+                  "(thickness : _PARAM5_) with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .AddParameter("expression", _("X position of end point"))
+      .AddParameter("expression", _("Y position of end point"))
+      .AddParameter("expression", _("Thickness ( in pixels )"))
+      .SetFunctionName("drawLineV2")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
   obj.AddAction("closePath",
                 _("closePath"),
                 _("closePath"),
@@ -255,7 +255,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/line24.png",
                 "res/actions/line.png")
 
-      .AddParameter("object", _("Shape Painter object"), "Drawer"
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("closePath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 

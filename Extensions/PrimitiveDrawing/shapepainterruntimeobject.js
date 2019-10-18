@@ -86,11 +86,11 @@ gdjs.ShapePainterRuntimeObject.prototype.beginFillPath = function() {
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.endFillPath = function() {
-    this._renderer.endFill();
+    this._renderer.endFillPath();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawPathMoveTo = function(x1, y1) {
-    this._renderer.moveTo(x1, y1);
+    this._renderer.drawPathMoveTo(x1, y1);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawPathLineTo = function(x1, y1, thickness) {

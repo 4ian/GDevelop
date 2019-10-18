@@ -58,6 +58,25 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
         .SetFunctionName("drawArcTo");*/
     GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::beginFillPath"]
+        .SetFunctionName("beginFillPath");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::endFillPath"]
+        .SetFunctionName("endFillPath");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::drawPathMoveTo"]
+        .SetFunctionName("drawPathMoveTo");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::drawPathLineTo"]
+        .SetFunctionName("drawPathLineTo");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::closePath"]
+        .SetFunctionName("closePath");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::LineV2"]
+        .SetFunctionName("drawLineV2");
+
+    GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
     GetAllActionsForObject(

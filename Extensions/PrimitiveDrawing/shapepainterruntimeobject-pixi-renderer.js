@@ -82,6 +82,34 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArcTo = function(x1, y1
     this._graphics.endFill();
 };
 */
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.beginFillPath = function() {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.endFillPath = function() {
+    this._graphics.endFill();
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathMoveTo = function(x1, y1) {
+    this._graphics.moveTo(x1, y1);
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathLineTo = function(x1, y1, thickness) {
+    this._graphics.lineStyle(thickness);
+    this._graphics.lineTo(x1, y1);
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawLineV2 = function(x1, y1, x2, y2, thickness) {
+    this._graphics.lineStyle(thickness);
+    this._graphics.moveTo(x1, y1);
+    this._graphics.lineTo(x2,y2);
+    this._graphics.endFill();  
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.closePath = function() {
+    this._graphics.closePath();  
+};
+
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(
         this._object._outlineSize,

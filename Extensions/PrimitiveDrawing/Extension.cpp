@@ -171,6 +171,94 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 */
 
+  obj.AddAction("LineTo",
+                _("LineTo"),
+                _("Draw a line on screen"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
+                  "(thickness : _PARAM5_) with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .AddParameter("expression", _("X position of end point"))
+      .AddParameter("expression", _("Y position of end point"))
+      .AddParameter("expression", _("Thickness ( in pixels )"))
+      .SetFunctionName("drawLineTo")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("beginFillPath",
+                _("beginFillPath"),
+                _("beginFillPath"),
+                _("beginFillPath"
+                  " with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("drawLineTo")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("endFillPath",
+                _("endFillPath"),
+                _("endFillPath"),
+                _("endFillPath"
+                  " with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("endFillPath")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("drawPathMoveTo",
+                _("drawPathMoveTo"),
+                _("drawPathMoveTo"),
+                _("drawPathMoveTo"
+                  " with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .SetFunctionName("drawPathMoveTo")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("drawPathLineTo",
+                _("drawPathLineTo"),
+                _("drawPathLineTo"),
+                _("drawPathLineTo"
+                  " with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .AddParameter("expression", _("Thickness ( in pixels )"))
+      .SetFunctionName("drawPathLineTo")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("closePath",
+                _("closePath"),
+                _("closePath"),
+                _("closePath"
+                  " with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer"
+      .SetFunctionName("closePath")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
   obj.AddAction("FillColor",
                 _("Fill color"),
                 _("Change the color used when filling"),

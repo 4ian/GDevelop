@@ -39,8 +39,43 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Circle"]
         .SetFunctionName("drawCircle");
-    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
         .SetFunctionName("drawLine");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Ellipse"]
+        .SetFunctionName("drawEllipse");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RoundedRectangle"]
+        .SetFunctionName("drawRoundedRectangle");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
+        .SetFunctionName("drawStar");
+    /*GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
+        .SetFunctionName("drawArc");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
+        .SetFunctionName("drawArcTo");*/
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::beginFillPath"]
+        .SetFunctionName("beginFillPath");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::endFillPath"]
+        .SetFunctionName("endFillPath");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::drawPathMoveTo"]
+        .SetFunctionName("drawPathMoveTo");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::drawPathLineTo"]
+        .SetFunctionName("drawPathLineTo");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::closePath"]
+        .SetFunctionName("closePath");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::LineV2"]
+        .SetFunctionName("drawLineV2");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");

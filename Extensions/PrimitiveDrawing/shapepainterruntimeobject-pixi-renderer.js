@@ -47,6 +47,69 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawLine = function(x1, y1,
     this._graphics.endFill();
 };
 
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawEllipse = function(x1, y1, width, height) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.drawEllipse(x1, y1, width, height);
+    this._graphics.endFill();
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawRoundedRectangle = function(x1, y1, x2, y2, radius) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.drawRoundedRect(x1, y1, x2 - x1, y2 - y1, radius);
+    this._graphics.closePath();
+    this._graphics.endFill();
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawStar = function(x1, y1, points, radius, innerRadius, rotation) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.drawStar(x1, y1, points, radius, innerRadius ? innerRadius : radius/2, rotation ? gdjs.toRad(rotation) : 0);
+    this._graphics.closePath();
+    this._graphics.endFill();
+};
+/*
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArc = function(x1, y1, radius, startAngle, endAngle, anticlockwise) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.arc(x1, y1, radius, gdjs.toRad(startAngle), gdjs.toRad(endAngle), anticlockwise ? true : false);
+    //this._graphics.closePath();
+    this._graphics.endFill();
+};
+    
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArcTo = function(x1, y1, x2, y2, radius) {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    this._graphics.moveTo(200,200);
+    this._graphics.arcTo(x1, y1, x2, y2, radius);
+    //this._graphics.closePath();
+    this._graphics.endFill();
+};
+*/
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.beginFillPath = function() {
+    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.endFillPath = function() {
+    this._graphics.endFill();
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathMoveTo = function(x1, y1) {
+    this._graphics.moveTo(x1, y1);
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathLineTo = function(x1, y1, thickness) {
+    this._graphics.lineStyle(thickness);
+    this._graphics.lineTo(x1, y1);
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawLineV2 = function(x1, y1, x2, y2, thickness) {
+    this._graphics.lineStyle(thickness);
+    this._graphics.moveTo(x1, y1);
+    this._graphics.lineTo(x2,y2);
+    this._graphics.endFill();  
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.closePath = function() {
+    this._graphics.closePath();  
+};
+
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(
         this._object._outlineSize,

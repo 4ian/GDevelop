@@ -18,7 +18,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'BBText',
-        'BBCode Text',
+        'BBCode Text Object',
         _(
           'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
         ),
@@ -168,156 +168,111 @@ module.exports = {
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/BBText/dist/pixi-multistyle-text.umd.js');
 
-    object
-      .addAction(
-        'SetText',
-        _('Set BBCode text'),
-        _('Set the BBCode formatted text.'),
-        _('Set BBCode text of _PARAM0_ to _PARAM1_ _PARAM2_'),
-        '',
-        'JsPlatform/Extensions/bbcode32.png',
-        'JsPlatform/Extensions/bbcode32.png'
-      )
-      .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('operator', _("Modification's sign"), '', false)
-      .addParameter('string', _('BBCode text'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setBBText')
-      .setManipulatedType('string')
-      .setGetter('getBBText');
-
-    object
-      .addAction(
-        'SetColor',
-        _('Set base color'),
-        _('Set base color'),
-        _('Set base color of _PARAM0_ to _PARAM1_'),
-        '',
-        'res/actions/color24.png',
-        'res/actions/color24.png'
-      )
-      .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('color', _('Color'))
-      .getCodeExtraInformation()
-      .setFunctionName('setColor')
-      .setGetter('getColor');
-
-    object
-      .addAction(
-        'SetOpacity',
-        _('Set base opacity'),
-        _('Set base opacity'),
-        _('Set base opacity of _PARAM0_ to _PARAM1_ _PARAM2_'),
-        '',
-        'res/actions/opacity24.png',
-        'res/actions/opacity24.png'
-      )
-      .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('operator', _("Modification's sign"), '', false)
-      .addParameter('expression', _('Opacity (0-255)'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setOpacity')
-      .setManipulatedType('number')
-      .setGetter('getOpacity');
-
-    object
-      .addAction(
-        'SetFontSize',
-        _('Set base font size'),
-        _('Set base font size'),
-        _('Set base font size of _PARAM0_ to _PARAM1_'),
-        '',
-        'res/actions/characterSize24.png',
-        'res/actions/characterSize24.png'
-      )
-      .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('operator', _("Modification's sign"), '', false)
-      .addParameter('expression', _('Font size'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setFontSize')
-      .setGetter('getFontSize');
-
-    object
-      .addAction(
-        'SetFontFamily',
-        _('Set base font family'),
-        _('Set base font family'),
-        _('Set base font family of _PARAM0_ to _PARAM1_'),
-        '',
-        'res/actions/font24.png',
-        'res/actions/font24.png'
-      )
-      .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('string', _('Font family'))
-      .getCodeExtraInformation()
-      .setFunctionName('setFontFamily')
-      .setGetter('getFontFamily');
-
-    object
-      .addAction(
-        'SetAlignment',
-        _('Set text alignment'),
-        _('Set text alignment'),
-        _('Set text alignment of _PARAM0_ to _PARAM1_'),
-        '',
-        'res/actions/textAlign24.png',
-        'res/actions/textAlign24.png'
-      )
-      .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter(
+    // Single array approach to add all Setters/Getters, so we don't have to deal with SO much boilerplate repetition
+    // Could be useful for other extensions... Thinking of making an online tool to generate this file from json data some day
+    // 0 function name, 1 description, 2 icon name, 3 param property type, 4 hasModifier
+    [
+      [
+        'BBText',
+        'BBCode formatted text',
+        'textAlign24',
+        'string',
+        'BBCode text',
+      ],
+      ['Color', 'base color', 'color24', 'color', 'Color (Hex)'],
+      ['Opacity', 'base opacity', 'opacity24', 'number', 'Opacity (0-255)'],
+      ['FontSize', 'base font size', 'characterSize24', 'number', 'Font size'],
+      ['FontFamily', 'base font family', 'font24', 'string', 'Font family'],
+      [
+        'Alignment',
+        'text alignment',
+        'textAlign24',
         'stringWithSelector',
-        _('Alignment'),
-        '["left", "right", "center"]',
-        false
-      )
-      .getCodeExtraInformation()
-      .setFunctionName('setAlignment')
-      .setGetter('getAlignment');
+        'Alignment',
+        `["left", "right", "center"]`,
+      ],
+      [
+        'WrappingWidth',
+        'wrapping width',
+        'scaleWidth24',
+        'number',
+        'Wrapping width',
+      ],
+    ].forEach(p => {
+      // Add all the generic GETTERS
+      if (p[3] === 'number') {
+        object
+          .addExpression(
+            `Get${p[0]}`,
+            _(`Get ${p[1]}`),
+            _(`Get ${p[1]}`),
+            _(''),
+            '',
+            `res/actions/${p[2]}.png`,
+            `res/actions/${p[2]}.png`
+          )
+          .addParameter('object', _('BBText object'), 'BBText', false)
+          .getCodeExtraInformation()
+          .setFunctionName(`get${p[0]}`);
+      } else {
+        object
+          .addStrExpression(
+            `Get${p[0]}`,
+            _(`Get ${p[1]}`),
+            _(`Get ${p[1]}`),
+            _(''),
+            '',
+            `res/actions/${p[2]}.png`,
+            `res/actions/${p[2]}.png`
+          )
+          .addParameter('object', _('BBText object'), 'BBText', false)
+          .getCodeExtraInformation()
+          .setFunctionName(`get${p[0]}`);
+      }
 
-    object
-      .addAction(
-        'SetWidth',
-        _('Set wrapping width'),
-        _('Set wrapping width'),
-        _('Set wrapping width of _PARAM0_ to _PARAM1_ _PARAM2_'),
-        '',
-        'res/actions/scaleWidth24.png',
-        'res/actions/scaleWidth24.png'
-      )
-      .addParameter('object', _('BBText object'), 'BBText', false)
-      .addParameter('operator', _("Modification's sign"), '', false)
-      .addParameter('expression', _('Width in px'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setWrappingWidth')
-      .setManipulatedType('number')
-      .setGetter('getWrappingWidth');
-
-    // extension
-    //   .addExpression(
-    //     'GetText',
-    //     _('Get text'),
-    //     _('Get text'),
-    //     _('BBText'),
-    //     '',
-    //     'JsPlatform/Extensions/bbcode32.png',
-    //     'JsPlatform/Extensions/bbcode32.png'
-    //   )
-    //   .getCodeExtraInformation()
-    //   .setFunctionName('getBBText');
-
-    // object
-    //   .addCondition(
-    //     'Pause',
-    //     _('Is paused'),
-    //     _('Check if the video is paused.'),
-    //     _('_PARAM0_ is paused'),
-    //     '',
-    //     'JsPlatform/Extensions/videoicon24.png',
-    //     'JsPlatform/Extensions/videoicon16.png'
-    //   )
-    //   .addParameter('object', _('Example object'), 'ObjectExample', false)
-    //   .getCodeExtraInformation()
-    //   .setFunctionName('isPaused');
+      // Add all the generic SETTERS
+      if (p[3] === 'number' || p[3] === 'string') {
+        object
+          .addAction(
+            `Set${p[0]}`,
+            _(`Set ${p[1]}`),
+            _(`Set ${p[1]}`),
+            _(`Set ${p[1]} of _PARAM0_ to _PARAM1_ _PARAM2_`),
+            '',
+            `res/actions/${p[2]}.png`,
+            `res/actions/${p[2]}.png`
+          )
+          .addParameter('object', _('BBText object'), 'BBText', false)
+          .addParameter('operator', _("Modification's sign"), '', false)
+          .addParameter(
+            p[3] === 'number' ? 'expression' : 'string',
+            _(p[4]),
+            '',
+            false
+          )
+          .getCodeExtraInformation()
+          .setFunctionName(`set${p[0]}`)
+          .setManipulatedType(p[3])
+          .setGetter(`get${p[0]}`);
+      } else {
+        // Setter doesnt have a modifier (Color, alignment, etc)
+        object
+          .addAction(
+            `Set${p[0]}`,
+            _(`Set ${p[1]}`),
+            _(`Set ${p[1]}`),
+            _(`Set ${p[1]} of _PARAM0_ to _PARAM1_`),
+            '',
+            `res/actions/${p[2]}.png`,
+            `res/actions/${p[2]}.png`
+          )
+          .addParameter('object', _('BBText object'), 'BBText', false)
+          .addParameter(p[3], _(p[4]), p.length === 6 ? p[5] : '', false)
+          .getCodeExtraInformation()
+          .setFunctionName(`set${p[0]}`)
+          .setGetter(`get${p[0]}`);
+      }
+    });
 
     return extension;
   },

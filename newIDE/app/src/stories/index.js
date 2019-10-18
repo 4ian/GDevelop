@@ -157,6 +157,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
+import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 
 // No i18n in this file
 
@@ -1910,6 +1911,15 @@ storiesOf(
       }
       onCancel={action('cancel')}
       onSave={() => Promise.reject(new Error('fake-error'))}
+    />
+  ));
+
+storiesOf('OpenConfirmDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <OpenConfirmDialog
+      onClose={action('on close')}
+      onConfirm={action('on confirm')}
     />
   ));
 

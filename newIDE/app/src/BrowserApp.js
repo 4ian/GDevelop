@@ -43,6 +43,7 @@ export const create = (authentification: Authentification) => {
     >
       {({ i18n, eventsFunctionsExtensionsState }) => (
         <ProjectStorageProviders
+          appArguments={appArguments}
           storageProviders={[
             InternalFileStorageProvider,
             GoogleDriveStorageProvider,
@@ -56,6 +57,7 @@ export const create = (authentification: Authentification) => {
             currentStorageProviderOperations,
             useStorageProvider,
             storageProviders,
+            initialFileMetadataToOpen,
           }) => (
             <MainFrame
               i18n={i18n}
@@ -83,7 +85,7 @@ export const create = (authentification: Authentification) => {
                 objectsRenderingService: ObjectsRenderingService,
                 filterExamples: !Window.isDev(),
               })}
-              initialPathsOrURLsToOpen={appArguments['_']}
+              initialFileMetadataToOpen={initialFileMetadataToOpen}
             />
           )}
         </ProjectStorageProviders>

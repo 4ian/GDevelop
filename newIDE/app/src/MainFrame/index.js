@@ -92,6 +92,7 @@ import {
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
+import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -109,6 +110,7 @@ type State = {|
   createDialogOpen: boolean,
   exportDialogOpen: boolean,
   introDialogOpen: boolean,
+  openConfirmDialogOpen: boolean,
   genericDialogOpen: boolean,
   loadingProject: boolean,
   previewLoading: boolean,
@@ -148,7 +150,7 @@ type Props = {
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
   authentification: Authentification,
   extensionsLoader?: JsExtensionsLoader,
-  initialPathsOrURLsToOpen: ?Array<string>,
+  initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
 };
@@ -158,6 +160,7 @@ class MainFrame extends React.Component<Props, State> {
     createDialogOpen: false,
     exportDialogOpen: false,
     introDialogOpen: false,
+    openConfirmDialogOpen: false,
     genericDialogOpen: false,
     loadingProject: false,
     previewLoading: false,
@@ -191,14 +194,11 @@ class MainFrame extends React.Component<Props, State> {
   componentDidMount() {
     GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
 
-    const { initialPathsOrURLsToOpen } = this.props;
+    const { initialFileMetadataToOpen } = this.props;
 
     this._loadExtensions();
-    if (initialPathsOrURLsToOpen && initialPathsOrURLsToOpen[0]) {
-      // TODO: ensure proper storage provider is used
-      this.openFromFileMetadata({
-        fileIdentifier: initialPathsOrURLsToOpen[0],
-      }).then(() => this.openSceneOrProjectManager());
+    if (initialFileMetadataToOpen) {
+      this._openInitialFileMetadata(/* isAfterUserInteraction= */ false);
     } else if (this.props.introDialog && !Window.isDev())
       this._openIntroDialog(true);
 
@@ -207,6 +207,19 @@ class MainFrame extends React.Component<Props, State> {
       performance.now(),
     ]);
     console.info('Startup times:', getStartupTimesSummary());
+  }
+
+  _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
+    const { storageProviderOperations, initialFileMetadataToOpen } = this.props;
+
+    if (!initialFileMetadataToOpen) return;
+
+    if (!isAfterUserInteraction && storageProviderOperations.doesInitialOpenRequireUserInteraction) {
+      this._openOpenConfirmDialog(true);
+      return;
+    }
+
+    this.openFromFileMetadata(initialFileMetadataToOpen).then(() => this.openSceneOrProjectManager());
   }
 
   _languageDidChange() {
@@ -1429,6 +1442,12 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
+  _openOpenConfirmDialog = (open: boolean = true) => {
+    this.setState({
+      openConfirmDialogOpen: open,
+    });
+  };
+
   _openGenericDialog = (open: boolean = true) => {
     this.setState({
       genericDialogOpen: open,
@@ -1885,6 +1904,14 @@ class MainFrame extends React.Component<Props, State> {
               });
             }}
           />
+        )}
+        {this.state.openConfirmDialogOpen && (
+          <OpenConfirmDialog onClose={() => {
+            this._openOpenConfirmDialog(false);
+          }} onConfirm={() => {
+            this._openOpenConfirmDialog(false);
+            this._openInitialFileMetadata(/* isAfterUserInteraction= */ true);
+          }} />
         )}
         <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         <ChangelogDialogContainer />

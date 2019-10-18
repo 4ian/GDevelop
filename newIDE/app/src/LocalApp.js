@@ -43,8 +43,16 @@ export const create = (authentification: Authentification) => {
         eventsFunctionsExtensionOpener={null}
       >
         {({ i18n, eventsFunctionsExtensionsState }) => (
-          <ProjectStorageProviders storageProviders={[]}>
-            {({ currentStorageProviderOperations, useStorageProvider, storageProviders }) => (
+          <ProjectStorageProviders
+            appArguments={appArguments}
+            storageProviders={[]}
+          >
+            {({
+              currentStorageProviderOperations,
+              useStorageProvider,
+              storageProviders,
+              initialFileMetadataToOpen,
+            }) => (
               <ExternalEditor
                 serverPort={appArguments['server-port']}
                 isIntegrated={appArguments['mode'] === 'integrated'}
@@ -62,7 +70,7 @@ export const create = (authentification: Authentification) => {
                   useStorageProvider={useStorageProvider}
                   storageProviderOperations={currentStorageProviderOperations}
                   resourceExternalEditors={localResourceExternalEditors}
-                  initialPathsOrURLsToOpen={[]}
+                  initialFileMetadataToOpen={initialFileMetadataToOpen}
                 />
               </ExternalEditor>
             )}
@@ -81,6 +89,7 @@ export const create = (authentification: Authentification) => {
       >
         {({ i18n, eventsFunctionsExtensionsState }) => (
           <ProjectStorageProviders
+            appArguments={appArguments}
             storageProviders={[LocalFileStorageProvider]}
             defaultStorageProvider={LocalFileStorageProvider}
           >
@@ -88,6 +97,7 @@ export const create = (authentification: Authentification) => {
               currentStorageProviderOperations,
               useStorageProvider,
               storageProviders,
+              initialFileMetadataToOpen,
             }) => (
               <ElectronMainMenu i18n={i18n}>
                 <MainFrame
@@ -118,7 +128,7 @@ export const create = (authentification: Authentification) => {
                     objectsRenderingService: ObjectsRenderingService,
                     filterExamples: !Window.isDev(),
                   })}
-                  initialPathsOrURLsToOpen={appArguments['_']}
+                  initialFileMetadataToOpen={initialFileMetadataToOpen}
                 />
               </ElectronMainMenu>
             )}

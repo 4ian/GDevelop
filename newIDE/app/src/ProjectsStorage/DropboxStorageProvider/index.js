@@ -59,6 +59,7 @@ export default ({
     initializeApis().catch(() => {});
 
     return {
+      doesInitialOpenRequireUserInteraction: true,
       onOpen: (
         fileMetadata: FileMetadata
       ): Promise<{|

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type AppArguments } from '../Utils/Window';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -24,6 +25,10 @@ export type StorageProviderOperations = {|
     fileMetadata: FileMetadata,
   |}>,
   getOpenErrorMessage?: (error: Error) => MessageDescriptor,
+
+  // If set to true, opening a project at startup with this storage provider
+  // will trigger a confirmation modal (so that a user interaction happen).
+  doesInitialOpenRequireUserInteraction?: boolean,
 
   // Project saving:
   onSaveProject?: (
@@ -59,6 +64,7 @@ export type StorageProvider = {|
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,
   renderIcon?: () => React.Node,
+  getFileMetadataFromAppArguments?: (AppArguments) => ?FileMetadata,
   createOperations: ({
     /** Open a dialog (a render function) */
     setDialog: (() => React.Node) => void,

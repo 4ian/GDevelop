@@ -71,8 +71,7 @@ export default ({
             <BackgroundText>
               <Trans>
                 If you have a popup blocker interrupting the opening, allow the
-                popups and try a second time to open with the provider you
-                selected.
+                popups and try a second time to open the project.
               </Trans>
             </BackgroundText>
           </Column>

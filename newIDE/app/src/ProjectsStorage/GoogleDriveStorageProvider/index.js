@@ -6,14 +6,17 @@ import { serializeToJSON } from '../../Utils/Serializer';
 import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
 import GoogleDriveSaveAsDialog from './GoogleDriveSaveAsDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { type AppArguments } from '../../Utils/Window';
 
 const DEVELOPER_KEY = 'AIzaSyDH3UNpxzIpcTyd6aMCWI5oNFSptG_BhOc';
+const APP_ID = '28563107180';
 const CLIENT_ID =
   '28563107180-bd29h9f3og4h1632m94nv6hat2igrej6.apps.googleusercontent.com';
 const DISCOVERY_DOCS = [
   'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
 ];
-const SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const SCOPE =
+  'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install';
 
 let apisLoaded = false;
 let apisLoadingPromise = null;
@@ -225,6 +228,7 @@ const showFilePicker = ({
         )
         .setOAuthToken(googleUser.getAuthResponse().access_token)
         .setDeveloperKey(DEVELOPER_KEY)
+        .setAppId(APP_ID) // App ID is required to correctly identify files created with the app.
         .setCallback(data => {
           if (
             data[google.picker.Response.ACTION] === google.picker.Action.PICKED
@@ -274,12 +278,33 @@ const showFilePicker = ({
 export default ({
   name: 'Google Drive',
   renderIcon: () => <GoogleDrive />,
+  getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
+    if (appArguments.state) {
+      try {
+        // See "state" argument passed by Google Drive API:
+        // https://developers.google.com/drive/api/v3/enable-sdk#construct
+        const googleDriveState = JSON.parse(appArguments.state);
+        if (googleDriveState.ids && googleDriveState.ids[0]) {
+          return {
+            fileIdentifier: googleDriveState.ids[0],
+          };
+        }
+      } catch (e) {
+        console.warn(
+          "Error while trying to parse the Google Drive 'ids' in 'state' from the app arguments."
+        );
+      }
+    }
+
+    return null;
+  },
   createOperations: ({ setDialog, closeDialog }) => {
     initializeApis().catch(() => {
       // Ignore error as we'll retry later.
     });
 
     return {
+      doesInitialOpenRequireUserInteraction: true, // Authentication will open a popup, requiring user interaction
       onOpen: (
         fileMetadata: FileMetadata
       ): Promise<{|

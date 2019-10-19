@@ -37,6 +37,7 @@ import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
+import FileCopy from '@material-ui/icons/FileCopy';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -244,6 +245,7 @@ type Props = {|
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
   onSaveProject: () => void,
+  onSaveProjectAs: () => void,
   onCloseProject: () => void,
   onExportProject: () => void,
   onOpenPreferences: () => void,
@@ -577,6 +579,12 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>Save</Trans>}
             leftIcon={<Save />}
             onClick={() => this.props.onSaveProject()}
+          />,
+          <ListItem
+            key="save-as"
+            primaryText={<Trans>Save as...</Trans>}
+            leftIcon={<FileCopy />}
+            onClick={() => this.props.onSaveProjectAs()}
           />,
           <ListItem
             key="export"

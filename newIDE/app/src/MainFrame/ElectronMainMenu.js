@@ -79,15 +79,15 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     );
     ipcRenderer.on(
       ('main-menu-save': MainMenuEvent),
-      event => this._editor && this._editor.save()
+      event => this._editor && this._editor.saveProject()
     );
     ipcRenderer.on(
       ('main-menu-save-as': MainMenuEvent),
-      event => this._editor && this._editor.saveAs()
+      event => this._editor && this._editor.saveProjectAs()
     );
     ipcRenderer.on(
       ('main-menu-close': MainMenuEvent),
-      event => this._editor && this._editor.askToCloseProject(() => {})
+      event => this._editor && this._editor.askToCloseProject()
     );
     ipcRenderer.on(
       ('main-menu-export': MainMenuEvent),

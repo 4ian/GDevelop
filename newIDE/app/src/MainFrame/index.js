@@ -335,7 +335,12 @@ class MainFrame extends React.Component<Props, State> {
 
   openFromFileMetadata = (fileMetadata: FileMetadata): Promise<void> => {
     const { i18n, storageProviderOperations } = this.props;
-    const { hasAutoSave, onGetAutoSave, onOpen } = storageProviderOperations;
+    const {
+      hasAutoSave,
+      onGetAutoSave,
+      onOpen,
+      getOpenErrorMessage,
+    } = storageProviderOperations;
 
     if (!onOpen) {
       console.error(
@@ -417,14 +422,16 @@ class MainFrame extends React.Component<Props, State> {
           }
         );
       })
-      .catch(err => {
+      .catch(error => {
+        const errorMessage = getOpenErrorMessage
+          ? getOpenErrorMessage(error)
+          : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
         showErrorBox(
-          i18n._(
-            t`Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`
+          [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
+            '\n'
           ),
-          err
+          error
         );
-        return;
       })
       .then(() => this.setState({ loadingProject: false }));
   };

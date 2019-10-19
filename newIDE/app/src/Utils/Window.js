@@ -7,6 +7,17 @@ const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 const dialog = electron ? electron.remote.dialog : null;
 
+export type AppArguments = { [string]: any };
+
+/**
+ * The name of the key, in AppArguments, containing the array of
+ * positional arguments (i.e: `["file1", "file2"]` in `ls file1 file2`).
+ */
+export const POSITIONAL_ARGUMENTS_KEY = '_';
+
+/**
+ * Various utilities related to the app window management.
+ */
 export default class Window {
   static setTitle(title: string) {
     if (electron) {
@@ -95,7 +106,7 @@ export default class Window {
    * didn't have an option associated with them (see https://github.com/substack/minimist).
    * (On the web-app, this is emulated using the "project" argument).
    */
-  static getArguments(): { [string]: any } {
+  static getArguments(): AppArguments {
     if (electron) {
       return electron.remote.getGlobal('args');
     }
@@ -104,9 +115,9 @@ export default class Window {
     const params = new URLSearchParams(window.location.search);
     params.forEach((value, name) => (argumentsObject[name] = value));
 
-    // Emulate the minimist behavior of putting the arguments without option
+    // Emulate the minimist behavior of putting the positional arguments
     // in "_".
-    argumentsObject._ = argumentsObject.project
+    argumentsObject[POSITIONAL_ARGUMENTS_KEY] = argumentsObject.project
       ? [argumentsObject.project]
       : [];
 

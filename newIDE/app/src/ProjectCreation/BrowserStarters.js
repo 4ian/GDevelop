@@ -1,3 +1,4 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { List, ListItem } from '../UI/List';
@@ -6,9 +7,24 @@ import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
 import Text from '../UI/Text';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
 const gd = global.gd;
 
-export default class BrowserStarters extends Component {
+type Props = {|
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => void,
+  onCreate: (
+    gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => void,
+  onShowExamples: () => void,
+|};
+
+export default class BrowserStarters extends Component<Props> {
   render() {
     return (
       <Column noMargin>
@@ -39,7 +55,9 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('platformer');
-                  this.props.onOpen('example://platformer');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://platformer',
+                  });
                 }}
               />
               <ListItem
@@ -60,7 +78,9 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('space-shooter');
-                  this.props.onOpen('example://space-shooter');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://space-shooter',
+                  });
                 }}
               />
               <ListItem
@@ -80,7 +100,9 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('isometric-game');
-                  this.props.onOpen('example://isometric-game');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://isometric-game',
+                  });
                 }}
               />
               <ListItem
@@ -100,7 +122,9 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('downhill-bike-physics-demo');
-                  this.props.onOpen('example://downhill-bike-physics-demo');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://downhill-bike-physics-demo',
+                  });
                 }}
               />
               <ListItem
@@ -118,7 +142,9 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('pairs');
-                  this.props.onOpen('example://pairs');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://pairs',
+                  });
                 }}
               />
               <ListItem
@@ -129,7 +155,7 @@ export default class BrowserStarters extends Component {
                   sendNewGameCreated('');
 
                   const project = gd.ProjectHelper.createNewGDJSProject();
-                  this.props.onCreate(project);
+                  this.props.onCreate(project, null, null);
                 }}
               />
             </List>

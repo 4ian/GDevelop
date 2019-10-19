@@ -153,6 +153,11 @@ import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
 import PropertiesEditor from '../PropertiesEditor';
+import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
+import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
+import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
+import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 
 // No i18n in this file
 
@@ -1838,6 +1843,83 @@ storiesOf('CreateProjectDialog', module)
       open
       examplesComponent={Placeholder}
       startersComponent={Placeholder}
+      onClose={action('onClose')}
+      onCreate={action('onCreate')}
+      onOpen={action('onOpen')}
+    />
+  ));
+
+storiesOf('OpenFromStorageProviderDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <OpenFromStorageProviderDialog
+      storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
+      onChooseProvider={action('onChooseProvider')}
+      onClose={action('onClose')}
+      onCreateNewProject={action('onCreateNewProject')}
+    />
+  ));
+
+storiesOf(
+  'StorageProviders/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog',
+  module
+)
+  .addDecorator(muiDecorator)
+  .add('default, fake picked file, save working', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() =>
+        Promise.resolve({
+          type: 'FILE',
+          id: 'fake-id',
+          name: 'Fake Google Drive file',
+          parentId: 'fake-parent-id',
+        })
+      }
+      onCancel={action('cancel')}
+      onSave={() => Promise.resolve()}
+    />
+  ))
+  .add('default, fake picked folder, save working', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() =>
+        Promise.resolve({
+          type: 'FOLDER',
+          id: 'fake-id',
+          name: 'Fake Google Drive file',
+        })
+      }
+      onCancel={action('cancel')}
+      onSave={() => Promise.resolve()}
+    />
+  ))
+  .add('default, error when picking file/folder', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() => Promise.reject(new Error('fake-error'))}
+      onCancel={action('cancel')}
+      onSave={() => Promise.resolve()}
+    />
+  ))
+  .add('default, error while saving', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() =>
+        Promise.resolve({
+          type: 'FILE',
+          id: 'fake-id',
+          name: 'Fake Google Drive file',
+          parentId: 'fake-parent-id',
+        })
+      }
+      onCancel={action('cancel')}
+      onSave={() => Promise.reject(new Error('fake-error'))}
+    />
+  ));
+
+storiesOf('OpenConfirmDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <OpenConfirmDialog
+      onClose={action('on close')}
+      onConfirm={action('on confirm')}
     />
   ));
 
@@ -3125,6 +3207,7 @@ storiesOf('ProjectManager', module)
       )}
       onRenameExternalEvents={action('onRenameExternalEvents')}
       onSaveProject={action('onSaveProject')}
+      onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
@@ -3162,6 +3245,7 @@ storiesOf('ProjectManager', module)
       )}
       onRenameExternalEvents={action('onRenameExternalEvents')}
       onSaveProject={action('onSaveProject')}
+      onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}

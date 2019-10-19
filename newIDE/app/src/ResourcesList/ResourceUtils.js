@@ -99,7 +99,7 @@ export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
 ) => {
-  if (!fs) return 0;
+  if (!fs) return '';
   const resourcePath = path.normalize(
     getLocalResourceFullPath(project, resourceName)
   );

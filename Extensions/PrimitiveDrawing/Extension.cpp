@@ -116,7 +116,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Star",
                 _("Star"),
                 _("Draw a star on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ a star with _PARAM3_ points and radius: _PARAM4_ (inner radius : _PARAM5_, rotation : _PARAM6_ ) "
+                _("Draw at _PARAM1_;_PARAM2_ a star with _PARAM3_ points and radius: _PARAM4_ (inner radius: _PARAM5_, rotation: _PARAM6_ ) "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/star24.png",

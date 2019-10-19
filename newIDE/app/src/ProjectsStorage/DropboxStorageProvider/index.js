@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type StorageProvider, type FileMetadata } from '../index';
 import Dropbox from '../../UI/CustomSvgIcons/Dropbox';
@@ -52,7 +53,8 @@ export const authenticate = (): Promise<DropboxUser> => {
  * A storage that is using Dropbox to open and store files.
  */
 export default ({
-  name: 'Dropbox (coming soon)',
+  internalName: 'Dropbox',
+  name: t`Dropbox (coming soon)`,
   disabled: true,
   renderIcon: () => <Dropbox />,
   createOperations: ({ setDialog, closeDialog }) => {

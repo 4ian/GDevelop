@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import { type StorageProvider, type FileMetadata } from '../index';
 import internalExampleFiles from './InternalExampleFiles';
 
@@ -7,7 +8,8 @@ import internalExampleFiles from './InternalExampleFiles';
  * Used for the web-app.
  */
 export default ({
-  name: 'Internal files',
+  internalName: 'InternalFile',
+  name: t`Internal files`,
   hiddenInOpenDialog: true,
   hiddenInSaveDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({

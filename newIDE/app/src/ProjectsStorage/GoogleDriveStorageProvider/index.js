@@ -276,7 +276,8 @@ const showFilePicker = ({
  * A storage that is using Google Drive to open and store files.
  */
 export default ({
-  name: 'Google Drive',
+  internalName: 'GoogleDrive',
+  name: t`Google Drive`,
   renderIcon: () => <GoogleDrive />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (appArguments.state) {

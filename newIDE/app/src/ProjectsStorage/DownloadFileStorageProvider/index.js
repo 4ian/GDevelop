@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type StorageProvider, type FileMetadata } from '../index';
 import DownloadSaveAsDialog from './DownloadSaveAsDialog';
@@ -9,7 +10,8 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
  * Used for the web-app.
  */
 export default ({
-  name: 'Download a copy', //TODO: i18n
+  internalName: 'DownloadFile',
+  name: t`Download a copy`,
   renderIcon: () => <SaveAlt />,
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({

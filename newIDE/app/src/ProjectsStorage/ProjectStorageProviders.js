@@ -11,6 +11,7 @@ import { type AppArguments } from '../Utils/Window';
  * An empty StorageProvider doing nothing.
  */
 const emptyStorageProvider: StorageProvider = {
+  internalName: 'Empty',
   name: 'No storage',
   createOperations: () => ({
     onOpenWithPicker: () => Promise.reject('No storage provider set up'),

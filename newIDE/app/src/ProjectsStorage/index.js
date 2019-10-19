@@ -59,7 +59,8 @@ export type StorageProviderOperations = {|
  * A storage provider is a function returning a StorageProviderOperations.
  */
 export type StorageProvider = {|
-  name: string,
+  internalName: string,
+  name: MessageDescriptor,
   hiddenInOpenDialog?: boolean,
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,

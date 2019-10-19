@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import { type StorageProvider } from '../index';
 import {
   onOpenWithPicker,
@@ -18,7 +19,8 @@ import { type AppArguments, POSITIONAL_ARGUMENTS_KEY } from '../../Utils/Window'
  * file system (with native save/open dialogs).
  */
 export default ({
-  name: 'Local file system',
+  internalName: 'LocalFile',
+  name: t`Local file system`,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;

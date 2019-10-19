@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type StorageProvider, type FileMetadata } from '../index';
 import OneDrive from '../../UI/CustomSvgIcons/OneDrive';
@@ -52,7 +53,8 @@ export const authenticate = (): Promise<OneDriveUser> => {
  * A storage that is using OneDrive to open and store files.
  */
 export default ({
-  name: 'OneDrive (coming soon)',
+  internalName: 'OneDrive',
+  name: t`OneDrive (coming soon)`,
   disabled: true,
   renderIcon: () => <OneDrive />,
   createOperations: ({ setDialog, closeDialog }) => {

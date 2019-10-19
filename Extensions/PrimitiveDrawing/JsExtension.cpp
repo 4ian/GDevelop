@@ -42,6 +42,10 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
         .SetFunctionName("drawLine");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::LineV2"]
+        .SetFunctionName("drawLineV2");
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Ellipse"]
         .SetFunctionName("drawEllipse");
@@ -51,30 +55,49 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
         .SetFunctionName("drawStar");
-    /*GetAllActionsForObject(
+    GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
         .SetFunctionName("drawArc");
+/*
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
-        .SetFunctionName("drawArcTo");*/
+        .SetFunctionName("drawArcTo");
+*/
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::beginFillPath"]
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::BezierCurve"]
+        .SetFunctionName("drawBezierCurve");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::QuadraticCurve"]
+        .SetFunctionName("drawQuadraticCurve");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::BeginFillPath"]
         .SetFunctionName("beginFillPath");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::endFillPath"]
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::EndFillPath"]
         .SetFunctionName("endFillPath");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::drawPathMoveTo"]
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathMoveTo"]
         .SetFunctionName("drawPathMoveTo");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::drawPathLineTo"]
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathLineTo"]
         .SetFunctionName("drawPathLineTo");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::closePath"]
-        .SetFunctionName("closePath");
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathBezierCurveTo"]
+        .SetFunctionName("drawPathBezierCurveTo");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::LineV2"]
-        .SetFunctionName("drawLineV2");
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathArc"]
+        .SetFunctionName("drawPathArc");
+/*
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathArcTo"]
+        .SetFunctionName("drawPathArcTo");
+*/
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathQuadraticCurveTo"]
+        .SetFunctionName("drawPathQuadraticCurveTo");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClosePath"]
+        .SetFunctionName("closePath");
 
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]

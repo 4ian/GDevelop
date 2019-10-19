@@ -39,9 +39,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("Top left side: X position"))
-      .AddParameter("expression", _("Top left side : Y position"))
-      .AddParameter("expression", _("Bottom right side : X position"))
-      .AddParameter("expression", _("Bottom right side : Y position"))
+      .AddParameter("expression", _("Top left side: Y position"))
+      .AddParameter("expression", _("Bottom right side: X position"))
+      .AddParameter("expression", _("Bottom right side: Y position"))
       .SetFunctionName("DrawRectangle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -57,7 +57,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of center"))
       .AddParameter("expression", _("Y position of center"))
-      .AddParameter("expression", _("Radius ( in pixels )"))
+      .AddParameter("expression", _("Radius (in pixels)"))
       .SetFunctionName("DrawCircle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -65,7 +65,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Line"),
                 _("Draw a line on screen"),
                 _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
-                  "(thickness : _PARAM5_) with _PARAM0_"),
+                  "(thickness: _PARAM5_) with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/line24.png",
                 "res/actions/line.png")
@@ -75,24 +75,42 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Y position of start point"))
       .AddParameter("expression", _("X position of end point"))
       .AddParameter("expression", _("Y position of end point"))
-      .AddParameter("expression", _("Thickness ( in pixels )"))
+      .AddParameter("expression", _("Thickness (in pixels)"))
       .SetFunctionName("DrawLine")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+  
+   obj.AddAction("LineV2",
+                _("Line V2"),
+                _("Draw a line V2 on screen"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line V2 "
+                  "(thickness: _PARAM5_) with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/line24.png",
+                "res/actions/line.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .AddParameter("expression", _("X position of end point"))
+      .AddParameter("expression", _("Y position of end point"))
+      .AddParameter("expression", _("Thickness (in pixels)"))
+      .SetFunctionName("drawLineV2")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("Ellipse",
                 _("Ellipse"),
                 _("Draw an ellipse on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ an ellipse of half width _PARAM3_ and half height _PARAM4_ "
+                _("Draw at _PARAM1_;_PARAM2_ an ellipse of width _PARAM3_ and height _PARAM4_ "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/ellipse24.png",
                 "res/actions/ellipse.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X coordinate of the center of the ellipse"))
-      .AddParameter("expression", _("Y coordinate of the center of the ellipse"))
-      .AddParameter("expression", _("The half width of the ellipse"))
-      .AddParameter("expression", _("The half height of the ellipse"))
+      .AddParameter("expression", _("X position of center"))
+      .AddParameter("expression", _("Y position of center"))
+      .AddParameter("expression", _("The width of the ellipse"))
+      .AddParameter("expression", _("The height of the ellipse"))
       .SetFunctionName("DrawEllipse")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -109,53 +127,54 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Top left side: Y position"))
       .AddParameter("expression", _("Bottom right side: X position"))
       .AddParameter("expression", _("Bottom right side: Y position"))
-      .AddParameter("expression", _("Radius ( in pixels )"))
+      .AddParameter("expression", _("Radius (in pixels)"))
       .SetFunctionName("DrawRoundedRectangle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("Star",
                 _("Star"),
                 _("Draw a star on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ an star of _PARAM3_ points and _PARAM4_ of radius (inner radius : _PARAM5_, rotation : _PARAM6_ ) "
+                _("Draw at _PARAM1_;_PARAM2_ a star with _PARAM3_ points and radius: _PARAM4_ (inner radius: _PARAM5_, rotation: _PARAM6_) "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/star24.png",
                 "res/actions/star.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X coordinate of the center of the star"))
-      .AddParameter("expression", _("Y coordinate of the center of the star"))
-      .AddParameter("expression", _("Points of the star"))
+      .AddParameter("expression", _("X position of center"))
+      .AddParameter("expression", _("X position of center"))
+      .AddParameter("expression", _("Number of points of the star (minimum: 2)"))
       .AddParameter("expression", _("Radius (in pixels)"))
       .AddParameter("expression", _("Inner radius (in pixels, half radius by default)"))
       .AddParameter("expression", _("Rotation (in degrees)"))
       .SetFunctionName("DrawStar")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-/*
+
   obj.AddAction("Arc",
                 _("Arc"),
                 _("Draw an arc on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ an arc with _PARAM3_ of radius, start angle: _PARAM4_, end angle: _PARAM5_ (anticlockwise: _PARAM6_) "
+                _("Draw at _PARAM1_;_PARAM2_ an arc with _PARAM3_ of radius, start angle: _PARAM4_, end angle: _PARAM5_ (anticlockwise: _PARAM6_, close path:_PARAM7_) "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/arc24.png",
                 "res/actions/arc.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X coordinate of the center of the arc"))
-      .AddParameter("expression", _("Y coordinate of the center of the arc"))
+      .AddParameter("expression", _("X position of center"))
+      .AddParameter("expression", _("Y position of center"))
       .AddParameter("expression", _("Radius (in pixels)"))
-      .AddParameter("expression", _("Start angle of the arc"))
-      .AddParameter("expression", _("End angle of the arc"))
+      .AddParameter("expression", _("Start angle of the arc (in degrees)"))
+      .AddParameter("expression", _("End angle of the arc (in degrees)"))
       .AddParameter("yesorno", _("Anticlockwise"))
+      .AddParameter("yesorno", _("Close path"))
       .SetFunctionName("DrawArc")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
+/*
   obj.AddAction("ArcTo",
                 _("ArcTo"),
                 _("Draw an arcTo on screen"),
-                _("Draw at x1: _PARAM1_;y1: _PARAM2_, x2:_PARAM3_;y2: _PARAM4_ , radius: _PARAM5_  "
+                _("Draw arcTo at x1: _PARAM1_;y1: _PARAM2_, x2:_PARAM3_;y2: _PARAM4_ , radius: _PARAM5_  "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/arc24.png",
@@ -167,44 +186,86 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("X coordinate end arc"))
       .AddParameter("expression", _("Y coordinate end arc"))
       .AddParameter("expression", _("Radius (in pixels)"))
+      .AddParameter("yesorno", _("Close path"))
       .SetFunctionName("DrawArcTo")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 */
-
-  obj.AddAction("beginFillPath",
-                _("beginFillPath"),
-                _("beginFillPath"),
-                _("beginFillPath"
+  obj.AddAction("BezierCurve",
+                _("Bezier curve"),
+                _("Draw a bezier curve on screen"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM7_;_PARAM5_ a bezier curve (first control point:_PARAM3_;_PARAM4_, second control point:_PARAM5_;_PARAM6_) "
                   " with _PARAM0_"),
-                _("Advanced"),
-                "res/actions/line24.png",
-                "res/actions/line.png")
+                _("Drawing"),
+                "res/actions/delete24.png",
+                "res/actions/delete.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .AddParameter("expression", _("First control point x"))
+      .AddParameter("expression", _("First control point y"))
+      .AddParameter("expression", _("Second Control point x"))
+      .AddParameter("expression", _("Second Control point y"))
+      .AddParameter("expression", _("Destination point x"))
+      .AddParameter("expression", _("Destination point y"))
+      .SetFunctionName("drawBezierCurve")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("QuadraticCurve",
+                _("Quadratic curve"),
+                _("Draw a quadratic curve on screen"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM5_;_PARAM6_ a quadratic curve (control point:_PARAM3_;_PARAM4_) "
+                "with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/delete24.png",
+                "res/actions/delete.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X position of start point"))
+      .AddParameter("expression", _("Y position of start point"))
+      .AddParameter("expression", _("Control point x"))
+      .AddParameter("expression", _("Control point y"))
+      .AddParameter("expression", _("Destination point x"))
+      .AddParameter("expression", _("Destination point y"))
+      .SetFunctionName("drawQuadraticCurve")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("BeginFillPath",
+                _("Begin fill path"),
+                _("Begins drawing filling of an advanced path"),
+                _("Begins drawing filling of an advanced path "
+                  " with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/delete24.png",
+                "res/actions/delete.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("Start drawing x"))
+      .AddParameter("expression", _("Start drawing y"))
       .SetFunctionName("beginFillPath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddAction("endFillPath",
-                _("endFillPath"),
-                _("endFillPath"),
-                _("endFillPath"
+  obj.AddAction("EndFillPath",
+                _("End fill path"),
+                _("Finish the filling drawing in an advanced path"),
+                _("Finish the filling drawing in an advanced path "
                   " with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/line24.png",
-                "res/actions/line.png")
+                "res/actions/delete24.png",
+                "res/actions/delete.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("endFillPath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddAction("drawPathMoveTo",
-                _("drawPathMoveTo"),
-                _("drawPathMoveTo"),
-                _("drawPathMoveTo"
+  obj.AddAction("MovePathTo",
+                _("Move path to"),
+                _("Move the origin of a path."),
+                _("Move the origin of a path to _PARAM1_;_PARAM2_ "
                   " with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/line24.png",
-                "res/actions/line.png")
+                "res/actions/position24.png",
+                "res/actions/position.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
@@ -212,10 +273,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("drawPathMoveTo")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddAction("drawPathLineTo",
-                _("drawPathLineTo"),
-                _("drawPathLineTo"),
-                _("drawPathLineTo"
+  obj.AddAction("PathLineTo",
+                _("Path line to"),
+                _("Add to a path a line to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path a line to the position _PARAM1_;_PARAM2_ "
                   " with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/line24.png",
@@ -224,40 +285,95 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
       .AddParameter("expression", _("Y position of start point"))
-      .AddParameter("expression", _("Thickness ( in pixels )"))
       .SetFunctionName("drawPathLineTo")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddAction("drawLineV2",
-                _("drawLineV2"),
-                _("drawLineV2"),
-                _("drawLineV2 Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
-                  "(thickness : _PARAM5_) with _PARAM0_"),
+  obj.AddAction("PathBezierCurveTo",
+                _("Path bezier curve to"),
+                _("Add to a path a bezier curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path a bezier curve to the position _PARAM5_;_PARAM6_ (first control point:_PARAM1_;_PARAM2_, second control point:_PARAM3_;_PARAM4_) "
+                  " with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/line24.png",
-                "res/actions/line.png")
+                "res/actions/delete24.png",
+                "res/actions/delete.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X position of start point"))
-      .AddParameter("expression", _("Y position of start point"))
-      .AddParameter("expression", _("X position of end point"))
-      .AddParameter("expression", _("Y position of end point"))
-      .AddParameter("expression", _("Thickness ( in pixels )"))
-      .SetFunctionName("drawLineV2")
+      .AddParameter("expression", _("First control point x"))
+      .AddParameter("expression", _("First control point y"))
+      .AddParameter("expression", _("Second Control point x"))
+      .AddParameter("expression", _("Second Control point y"))
+      .AddParameter("expression", _("Destination point x"))
+      .AddParameter("expression", _("Destination point y"))
+      .SetFunctionName("drawPathBezierCurveTo")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+/*
+    obj.AddAction("drawPathArcTo",
+                _("drawPathArcTo"),
+                _("drawPathArcTo"),
+                _("drawPathArcTo"
+                " with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/arc24.png",
+                "res/actions/arc.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("X control point"))
+      .AddParameter("expression", _("Y control point"))
+      .AddParameter("expression", _("X coordinate end arc"))
+      .AddParameter("expression", _("Y coordinate end arc"))
+      .AddParameter("expression", _("Radius (in pixels)"))
+      .SetFunctionName("drawPathArcTo")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+*/
+
+  obj.AddAction("PathArc",
+                _("Path arc to"),
+                _("Add to a path an arc to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path an arc at the position _PARAM1_;_PARAM2_ (radius:_PARAM3_,start angle:_PARAM4_, end angles:_PARAM5_,anticlockwise:_PARAM6_ "
+                "with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/arc24.png",
+                "res/actions/arc.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("Center x of circle"))
+      .AddParameter("expression", _("Center y of circle"))
+      .AddParameter("expression", _("Radius (in pixels)"))
+      .AddParameter("expression", _("Start angle"))
+      .AddParameter("expression", _("End angle"))
+      .AddParameter("yesorno", _("Anticlockwise"))
+      .SetFunctionName("drawPathArc")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("PathQuadraticCurveTo",
+                _("Path quadratic curve to"),
+                _("Add to a path a quadratic curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path a quadratic curve to the position _PARAM3_;_PARAM4_ (control point:_PARAM1_;_PARAM2_) "
+                "with _PARAM0_"),
+                _("Advanced"),
+                "res/actions/delete24.png",
+                "res/actions/delete.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("Control point x"))
+      .AddParameter("expression", _("Control point y"))
+      .AddParameter("expression", _("Destination point x"))
+      .AddParameter("expression", _("Destination point y"))
+      .SetFunctionName("drawPathQuadraticCurveTo")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("closePath",
-                _("closePath"),
-                _("closePath"),
-                _("closePath"
-                  " with _PARAM0_"),
+                _("Close Path"),
+                _("Close the path of advanced shape. This close the outline between the last point and first."),
+                _("Close the path "
+                  "with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/line24.png",
-                "res/actions/line.png")
+                "res/actions/delete24.png",
+                "res/actions/delete.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("closePath")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");    
 
   obj.AddAction("FillColor",
                 _("Fill color"),

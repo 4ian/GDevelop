@@ -57,8 +57,6 @@ gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = func
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
   gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
-
-  this._renderer.onDestroy();
 };
 
 gdjs.BBTextRuntimeObject.prototype.update = function(runtimeScene) {

@@ -66,6 +66,8 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawStar = function(x1, y1,
     this._graphics.closePath();
     this._graphics.endFill();
 };
+
+// These functions are disabled as the way they work is unsure. See https://github.com/4ian/GDevelop/pull/1256
 /*
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArc = function(x1, y1, radius, startAngle, endAngle, anticlockwise) {
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
@@ -82,6 +84,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArcTo = function(x1, y1
     this._graphics.endFill();
 };
 */
+
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(
         this._object._outlineSize,

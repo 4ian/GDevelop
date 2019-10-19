@@ -16,6 +16,7 @@ import {
   type AppArguments,
   POSITIONAL_ARGUMENTS_KEY,
 } from '../../Utils/Window';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 /**
  * Use the Electron APIs to provide access to the native
@@ -40,5 +41,8 @@ export default ({
     onSaveProjectAs,
     onAutoSaveProject,
     onGetAutoSave,
+    getOpenErrorMessage: (error: Error): MessageDescriptor => {
+      return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorizations to open it.`;
+    },
   }),
 }: StorageProvider);

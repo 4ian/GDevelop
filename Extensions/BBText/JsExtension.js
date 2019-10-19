@@ -268,6 +268,43 @@ module.exports = {
             .setFunctionName(`set${property.functionName}`)
             .setGetter(`get${property.functionName}`);
         }
+
+        // Add compare Conditions via getters
+        if (property.type === 'string' || property.type === 'number') {
+          const propExpressionType =
+            property.type === 'string' ? 'string' : 'expression';
+          gdObject
+            .addCondition(
+              `Is${property.functionName}`,
+              _(`Is the ${property.description} equal to a value`),
+              _(`Check if the ${property.description} is equal to a value`),
+              _(`The ${property.paramLabel} of _PARAM0_ is _PARAM1__PARAM2_`),
+              '',
+              `${property.iconPath}.png`,
+              `${property.iconPath}.png`
+            )
+            .addParameter(
+              'object',
+              _(`${objectName} object`),
+              objectName,
+              false
+            )
+            .addParameter(
+              'relationalOperator',
+              _('Sign of the test'),
+              '',
+              false
+            )
+            .addParameter(
+              propExpressionType,
+              _(`${property.type} value`),
+              '',
+              false
+            )
+            .getCodeExtraInformation()
+            .setFunctionName(`get${property.functionName}`)
+            .setManipulatedType(property.type);
+        }
       });
     };
 

@@ -109,14 +109,14 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Top left side: Y position"))
       .AddParameter("expression", _("Bottom right side: X position"))
       .AddParameter("expression", _("Bottom right side: Y position"))
-      .AddParameter("expression", _("Radius ( in pixels )"))
+      .AddParameter("expression", _("Radius (in pixels)"))
       .SetFunctionName("DrawRoundedRectangle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("Star",
                 _("Star"),
                 _("Draw a star on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ an star of _PARAM3_ points and _PARAM4_ of radius (inner radius : _PARAM5_, rotation : _PARAM6_ ) "
+                _("Draw at _PARAM1_;_PARAM2_ a star with _PARAM3_ points and radius: _PARAM4_ (inner radius : _PARAM5_, rotation : _PARAM6_ ) "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/star24.png",
@@ -125,13 +125,14 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X coordinate of the center of the star"))
       .AddParameter("expression", _("Y coordinate of the center of the star"))
-      .AddParameter("expression", _("Points of the star"))
+      .AddParameter("expression", _("Number of points of the star (minimum: 2)"))
       .AddParameter("expression", _("Radius (in pixels)"))
       .AddParameter("expression", _("Inner radius (in pixels, half radius by default)"))
       .AddParameter("expression", _("Rotation (in degrees)"))
       .SetFunctionName("DrawStar")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  // These actions are not exposed yet as the way they work is unsure. See https://github.com/4ian/GDevelop/pull/1256
 /*
   obj.AddAction("Arc",
                 _("Arc"),

@@ -44,13 +44,21 @@ export const create = (authentification: Authentification) => {
       {({ i18n, eventsFunctionsExtensionsState }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
-          storageProviders={[
-            InternalFileStorageProvider,
-            GoogleDriveStorageProvider,
-            DropboxStorageProvider,
-            OneDriveStorageProvider,
-            DownloadFileStorageProvider,
-          ]}
+          storageProviders={
+            Window.isDev()
+              ? [
+                  InternalFileStorageProvider,
+                  GoogleDriveStorageProvider,
+                  DropboxStorageProvider,
+                  OneDriveStorageProvider,
+                  DownloadFileStorageProvider,
+                ]
+              : [
+                  // TODO: Enable Google Drive once app is validated.
+                  InternalFileStorageProvider,
+                  DownloadFileStorageProvider,
+                ]
+          }
           defaultStorageProvider={InternalFileStorageProvider}
         >
           {({

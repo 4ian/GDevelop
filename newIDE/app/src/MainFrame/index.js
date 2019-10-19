@@ -1364,12 +1364,13 @@ class MainFrame extends React.Component<Props, State> {
 
   saveProjectAs = () => {
     const { currentProject } = this.state;
-    const { storageProviders } = this.props;
+    const { storageProviders, storageProviderOperations } = this.props;
     if (!currentProject) return;
 
     if (
       storageProviders.filter(({ hiddenInSaveDialog }) => !hiddenInSaveDialog)
-        .length > 1
+        .length > 1 ||
+      !storageProviderOperations.onSaveProjectAs
     ) {
       this.openSaveToStorageProviderDialog();
     } else {

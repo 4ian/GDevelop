@@ -287,13 +287,6 @@ module.exports = {
         paramLabel: 'Color (Hex)',
       },
       {
-        functionName: 'Color',
-        description: 'base color',
-        iconPath: 'res/actions/color24',
-        type: 'color',
-        paramLabel: 'Color (Hex)',
-      },
-      {
         functionName: 'Opacity',
         description: 'base opacity',
         iconPath: 'res/actions/opacity24',

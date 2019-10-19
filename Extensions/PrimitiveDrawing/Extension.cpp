@@ -39,9 +39,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("Top left side: X position"))
-      .AddParameter("expression", _("Top left side : Y position"))
-      .AddParameter("expression", _("Bottom right side : X position"))
-      .AddParameter("expression", _("Bottom right side : Y position"))
+      .AddParameter("expression", _("Top left side: Y position"))
+      .AddParameter("expression", _("Bottom right side: X position"))
+      .AddParameter("expression", _("Bottom right side: Y position"))
       .SetFunctionName("DrawRectangle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 

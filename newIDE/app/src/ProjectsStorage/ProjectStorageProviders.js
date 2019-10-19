@@ -86,7 +86,8 @@ export default class ProjectStorageProviders extends React.Component<
     ...computeInitialFileMetadataToOpen(
       this.props.defaultStorageProvider,
       this.props.storageProviders,
-      this.props.appArguments),
+      this.props.appArguments
+    ),
     renderDialog: null,
   };
 

@@ -214,13 +214,18 @@ class MainFrame extends React.Component<Props, State> {
 
     if (!initialFileMetadataToOpen) return;
 
-    if (!isAfterUserInteraction && storageProviderOperations.doesInitialOpenRequireUserInteraction) {
+    if (
+      !isAfterUserInteraction &&
+      storageProviderOperations.doesInitialOpenRequireUserInteraction
+    ) {
       this._openOpenConfirmDialog(true);
       return;
     }
 
-    this.openFromFileMetadata(initialFileMetadataToOpen).then(() => this.openSceneOrProjectManager());
-  }
+    this.openFromFileMetadata(initialFileMetadataToOpen).then(() =>
+      this.openSceneOrProjectManager()
+    );
+  };
 
   _languageDidChange() {
     // A change in the language will automatically be applied
@@ -1906,12 +1911,15 @@ class MainFrame extends React.Component<Props, State> {
           />
         )}
         {this.state.openConfirmDialogOpen && (
-          <OpenConfirmDialog onClose={() => {
-            this._openOpenConfirmDialog(false);
-          }} onConfirm={() => {
-            this._openOpenConfirmDialog(false);
-            this._openInitialFileMetadata(/* isAfterUserInteraction= */ true);
-          }} />
+          <OpenConfirmDialog
+            onClose={() => {
+              this._openOpenConfirmDialog(false);
+            }}
+            onConfirm={() => {
+              this._openOpenConfirmDialog(false);
+              this._openInitialFileMetadata(/* isAfterUserInteraction= */ true);
+            }}
+          />
         )}
         <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         <ChangelogDialogContainer />

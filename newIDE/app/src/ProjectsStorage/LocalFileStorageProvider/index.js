@@ -12,7 +12,10 @@ import {
   onSaveProjectAs,
   onAutoSaveProject,
 } from './LocalProjectWriter';
-import { type AppArguments, POSITIONAL_ARGUMENTS_KEY } from '../../Utils/Window';
+import {
+  type AppArguments,
+  POSITIONAL_ARGUMENTS_KEY,
+} from '../../Utils/Window';
 
 /**
  * Use the Electron APIs to provide access to the native
@@ -27,7 +30,7 @@ export default ({
 
     return {
       fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
-    }
+    };
   },
   createOperations: () => ({
     onOpenWithPicker,

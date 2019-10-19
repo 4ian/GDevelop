@@ -7,11 +7,15 @@ import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
 import GoogleDriveSaveAsDialog from './GoogleDriveSaveAsDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../../Utils/Window';
+const isDev = process.env.NODE_ENV === 'development';
 
-const DEVELOPER_KEY = 'AIzaSyDH3UNpxzIpcTyd6aMCWI5oNFSptG_BhOc';
-const APP_ID = '28563107180';
-const CLIENT_ID =
-  '28563107180-bd29h9f3og4h1632m94nv6hat2igrej6.apps.googleusercontent.com';
+const DEVELOPER_KEY = isDev
+  ? 'AIzaSyDH3UNpxzIpcTyd6aMCWI5oNFSptG_BhOc'
+  : 'AIzaSyDJYQmzLCfjXnNImDa1X_cDTWjl2BOrcM4';
+const CLIENT_ID = isDev
+  ? '28563107180-bd29h9f3og4h1632m94nv6hat2igrej6.apps.googleusercontent.com'
+  : '44882707384-3t4tubr3fbht87sbtdp7u5mlo45k5uku.apps.googleusercontent.com';
+const APP_ID = isDev ? '28563107180' : '44882707384'; // This is the first part of CLIENT_ID.
 const DISCOVERY_DOCS = [
   'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
 ];

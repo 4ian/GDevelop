@@ -168,114 +168,178 @@ module.exports = {
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/BBText/dist/pixi-multistyle-text.umd.js');
 
-    // Single array approach to add all Setters/Getters, so we don't have to deal with SO much boilerplate repetition
-    // Could be useful for other extensions... Thinking of making an online tool to generate this file from json data some day
-    // 0 function name, 1 description, 2 icon name, 3 param property type, 4 hasModifier
-    [
-      [
-        'BBText',
-        'BBCode formatted text',
-        'textAlign24',
-        'string',
-        'BBCode text',
-      ],
-      ['Color', 'base color', 'color24', 'color', 'Color (Hex)'],
-      ['Opacity', 'base opacity', 'opacity24', 'number', 'Opacity (0-255)'],
-      ['FontSize', 'base font size', 'characterSize24', 'number', 'Font size'],
-      ['FontFamily', 'base font family', 'font24', 'string', 'Font family'],
-      [
-        'Alignment',
-        'text alignment',
-        'textAlign24',
-        'stringWithSelector',
-        'Alignment',
-        `["left", "right", "center"]`,
-      ],
-      [
-        'WrappingWidth',
-        'wrapping width',
-        'scaleWidth24',
-        'number',
-        'Wrapping width',
-      ],
-    ].forEach(p => {
-      // Add all the generic GETTERS
-      if (p[3] === 'number') {
-        object
-          .addExpression(
-            `Get${p[0]}`,
-            _(`Get ${p[1]}`),
-            _(`Get ${p[1]}`),
-            _(''),
-            '',
-            `res/actions/${p[2]}.png`,
-            `res/actions/${p[2]}.png`
-          )
-          .addParameter('object', _('BBText object'), 'BBText', false)
-          .getCodeExtraInformation()
-          .setFunctionName(`get${p[0]}`);
-      } else {
-        object
-          .addStrExpression(
-            `Get${p[0]}`,
-            _(`Get ${p[1]}`),
-            _(`Get ${p[1]}`),
-            _(''),
-            '',
-            `res/actions/${p[2]}.png`,
-            `res/actions/${p[2]}.png`
-          )
-          .addParameter('object', _('BBText object'), 'BBText', false)
-          .getCodeExtraInformation()
-          .setFunctionName(`get${p[0]}`);
-      }
+    // Utility function to add both a setter and a getter to a property from a list. Useful for setting multiple generic properties
+    const addSettersAndGettersToObjectHelper = (
+      gdObject,
+      properties,
+      objectName
+    ) => {
+      properties.forEach(property => {
+        // Add all the generic GETTERS
+        if (property.type === 'number') {
+          gdObject
+            .addExpression(
+              `Get${property.functionName}`,
+              _(`Get ${property.description}`),
+              _(`Get ${property.description}`),
+              _(''),
+              '',
+              `${property.iconPath}.png`,
+              `${property.iconPath}.png`
+            )
+            .addParameter(
+              'object',
+              _(`${objectName} object`),
+              objectName,
+              false
+            )
+            .getCodeExtraInformation()
+            .setFunctionName(`get${property.functionName}`);
+        } else {
+          gdObject
+            .addStrExpression(
+              `Get${property.functionName}`,
+              _(`Get ${property.description}`),
+              _(`Get ${property.description}`),
+              _(''),
+              '',
+              `${property.iconPath}.png`,
+              `${property.iconPath}.png`
+            )
+            .addParameter(
+              'object',
+              _(`${objectName} object`),
+              objectName,
+              false
+            )
+            .getCodeExtraInformation()
+            .setFunctionName(`get${property.functionName}`);
+        }
 
-      // Add all the generic SETTERS
-      if (p[3] === 'number' || p[3] === 'string') {
-        object
-          .addAction(
-            `Set${p[0]}`,
-            _(`Set ${p[1]}`),
-            _(`Set ${p[1]}`),
-            _(`Set ${p[1]} of _PARAM0_ to _PARAM1_ _PARAM2_`),
-            '',
-            `res/actions/${p[2]}.png`,
-            `res/actions/${p[2]}.png`
-          )
-          .addParameter('object', _('BBText object'), 'BBText', false)
-          .addParameter('operator', _("Modification's sign"), '', false)
-          .addParameter(
-            p[3] === 'number' ? 'expression' : 'string',
-            _(p[4]),
-            '',
-            false
-          )
-          .getCodeExtraInformation()
-          .setFunctionName(`set${p[0]}`)
-          .setManipulatedType(p[3])
-          .setGetter(`get${p[0]}`);
-      } else {
-        // Setter doesnt have a modifier (Color, alignment, etc)
-        object
-          .addAction(
-            `Set${p[0]}`,
-            _(`Set ${p[1]}`),
-            _(`Set ${p[1]}`),
-            _(`Set ${p[1]} of _PARAM0_ to _PARAM1_`),
-            '',
-            `res/actions/${p[2]}.png`,
-            `res/actions/${p[2]}.png`
-          )
-          .addParameter('object', _('BBText object'), 'BBText', false)
-          .addParameter(p[3], _(p[4]), p.length === 6 ? p[5] : '', false)
-          .getCodeExtraInformation()
-          .setFunctionName(`set${p[0]}`)
-          .setGetter(`get${p[0]}`);
-      }
-    });
+        // Add all the generic SETTERS
+        if (property.type === 'number' || property.type === 'string') {
+          gdObject
+            .addAction(
+              `Set${property.functionName}`,
+              _(`Set ${property.description}`),
+              _(`Set ${property.description}`),
+              _(`Set ${property.description} of _PARAM0_ to _PARAM1_ _PARAM2_`),
+              '',
+              `${property.iconPath}.png`,
+              `${property.iconPath}.png`
+            )
+            .addParameter(
+              'object',
+              _(`${objectName} object`),
+              objectName,
+              false
+            )
+            .addParameter('operator', _("Modification's sign"), '', false)
+            .addParameter(property.type, _(property.paramLabel), '', false)
+            .getCodeExtraInformation()
+            .setFunctionName(`set${property.functionName}`)
+            .setManipulatedType(property.type)
+            .setGetter(`get${property.functionName}`);
+        } else {
+          // Setter doesnt have a +- modifier (Color, alignment, etc)
+          gdObject
+            .addAction(
+              `Set${property.functionName}`,
+              _(`Set ${property.description}`),
+              _(`Set ${property.description}`),
+              _(`Set ${property.description} of _PARAM0_ to _PARAM1_`),
+              '',
+              `${property.iconPath}.png`,
+              `${property.iconPath}.png`
+            )
+            .addParameter(
+              'object',
+              _(`${objectName} object`),
+              objectName,
+              false
+            )
+            .addParameter(
+              property.type,
+              _(property.paramLabel),
+              property.options ? property.options : '',
+              false
+            )
+            .getCodeExtraInformation()
+            .setFunctionName(`set${property.functionName}`)
+            .setGetter(`get${property.functionName}`);
+        }
+      });
+    };
+
+    const SetterAndGetterProperties = [
+      {
+        functionName: 'BBText',
+        description: 'BBCode formatted text',
+        iconPath: 'res/actions/textAlign24',
+        type: 'string',
+        paramLabel: 'BBCode text',
+      },
+      {
+        functionName: 'Color',
+        description: 'base color',
+        iconPath: 'res/actions/color24',
+        type: 'color',
+        paramLabel: 'Color (Hex)',
+      },
+      {
+        functionName: 'Color',
+        description: 'base color',
+        iconPath: 'res/actions/color24',
+        type: 'color',
+        paramLabel: 'Color (Hex)',
+      },
+      {
+        functionName: 'Opacity',
+        description: 'base opacity',
+        iconPath: 'res/actions/opacity24',
+        type: 'number',
+        paramLabel: 'Opacity (0-255)',
+      },
+      {
+        functionName: 'FontSize',
+        description: 'base font size',
+        iconPath: 'res/actions/characterSize24',
+        type: 'number',
+        paramLabel: 'Font size',
+      },
+      {
+        functionName: 'FontFamily',
+        description: 'base font family',
+        iconPath: 'res/actions/font24',
+        type: 'string',
+        paramLabel: 'Font family',
+      },
+      {
+        functionName: 'Alignment',
+        description: 'text alignment',
+        iconPath: 'res/actions/textAlign24',
+        type: 'stringWithSelector',
+        paramLabel: 'Alignment',
+        options: `["left", "right", "center"]`,
+      },
+      {
+        functionName: 'WrappingWidth',
+        description: 'wrapping width',
+        iconPath: 'res/actions/scaleWidth24',
+        type: 'number',
+        paramLabel: 'Wrapping width',
+      },
+    ];
+
+    addSettersAndGettersToObjectHelper(
+      object,
+      SetterAndGetterProperties,
+      'BBText'
+    );
 
     return extension;
   },
+
   /**
    * You can optionally add sanity tests that will check the basic working
    * of your extension behaviors/objects by instanciating behaviors/objects

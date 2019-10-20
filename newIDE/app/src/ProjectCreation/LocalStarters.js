@@ -15,6 +15,8 @@ import optionalRequire from '../Utils/OptionalRequire.js';
 import { findEmptyPath } from './LocalPathFinder';
 import ListIcon from '../UI/ListIcon';
 import { showGameFileCreationError } from './LocalExamples';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
@@ -22,8 +24,15 @@ var fs = optionalRequire('fs-extra');
 const gd = global.gd;
 
 type Props = {|
-  onOpen: string => void,
-  onCreate: gdProject => void,
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => void,
+  onCreate: (
+    gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => void,
   onShowExamples: () => void,
 |};
 
@@ -58,7 +67,9 @@ export default class LocalStarters extends Component<Props, State> {
         return;
       }
 
-      this.props.onOpen(path.join(outputPath, exampleName + '.json'));
+      this.props.onOpen(LocalFileStorageProvider, {
+        fileIdentifier: path.join(outputPath, exampleName + '.json'),
+      });
       sendNewGameCreated(exampleName);
     });
   }
@@ -75,8 +86,11 @@ export default class LocalStarters extends Component<Props, State> {
     }
 
     const project = gd.ProjectHelper.createNewGDJSProject();
-    project.setProjectFile(path.join(outputPath, 'game.json'));
-    this.props.onCreate(project);
+    const filePath = path.join(outputPath, 'game.json');
+    project.setProjectFile(filePath);
+    this.props.onCreate(project, LocalFileStorageProvider, {
+      fileIdentifier: filePath,
+    });
     sendNewGameCreated('');
   }
 

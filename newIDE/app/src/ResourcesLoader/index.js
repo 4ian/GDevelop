@@ -56,7 +56,7 @@ class UrlsCache {
 export default class ResourcesLoader {
   static _cache = new UrlsCache();
 
-  static isLocalFile(filename: string): boolean {
+  static _isLocalFile(filename: string): boolean {
     return (
       filename.indexOf('data:') !== 0 &&
       filename.indexOf('http://') !== 0 &&
@@ -93,7 +93,7 @@ export default class ResourcesLoader {
   }
 
   /**
-   * Get the fully qualified URL/filename for a filename relative to the project.
+   * Get the fully qualified URL/filename for a URL/filename relative to the project.
    */
   static getFullUrl(
     project: gdProject,
@@ -103,7 +103,7 @@ export default class ResourcesLoader {
     const cachedUrl = ResourcesLoader._cache.getCachedUrl(project, filename);
     if (cachedUrl) return cachedUrl;
 
-    if (electron && ResourcesLoader.isLocalFile(filename)) {
+    if (electron && ResourcesLoader._isLocalFile(filename)) {
       // Support local filesystem with Electron
       const file = project.getProjectFile();
       const projectPath = path.dirname(file);

@@ -39,8 +39,25 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Circle"]
         .SetFunctionName("drawCircle");
-    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
         .SetFunctionName("drawLine");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Ellipse"]
+        .SetFunctionName("drawEllipse");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RoundedRectangle"]
+        .SetFunctionName("drawRoundedRectangle");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
+        .SetFunctionName("drawStar");
+    // These actions are not exposed yet as the way they work is unsure. See https://github.com/4ian/GDevelop/pull/1256
+    /*GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
+        .SetFunctionName("drawArc");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
+        .SetFunctionName("drawArcTo");*/
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");

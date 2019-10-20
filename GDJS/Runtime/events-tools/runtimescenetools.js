@@ -17,6 +17,10 @@ gdjs.evtTools.runtimeScene.sceneJustBegins = function(runtimeScene) {
     return runtimeScene.getTimeManager().isFirstFrame();
 };
 
+gdjs.evtTools.runtimeScene.sceneJustResumed = function(runtimeScene) {
+    return runtimeScene.sceneJustResumed();
+};
+
 gdjs.evtTools.runtimeScene.getSceneName = function(runtimeScene) {
     return runtimeScene.getName();
 };

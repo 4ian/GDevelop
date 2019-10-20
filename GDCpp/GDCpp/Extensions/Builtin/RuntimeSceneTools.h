@@ -60,6 +60,11 @@ bool GD_API SceneJustBegins(RuntimeScene &scene);
 /**
  * Only used internally by GD events generated code.
  */
+bool GD_API SceneJustResumed(RuntimeScene &scene);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 void GD_API MoveObjects(RuntimeScene &scene);
 
 /**

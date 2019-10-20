@@ -92,6 +92,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition("SceneJustResumed",
+                    _("Scene just resumed"),
+                    _("The scene has just resumed after being paused."),
+                    _("Scene just resumed"),
+                    _("Scene"),
+                    "res/conditions/depart24.png",
+                    "res/conditions/depart.png")
+      .SetHelpPath("/interface/scene-editor/events")
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsSimple();
+
+  extension
       .AddAction("Scene",
                  _("Change the scene"),
                  _("Stop this scene and start the specified one instead."),

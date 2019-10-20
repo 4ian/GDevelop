@@ -275,7 +275,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("PathLineTo",
                 _("Path line to"),
-                _("Add to a path a line to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path a line to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
                 _("Add to a path a line to the position _PARAM1_;_PARAM2_ "
                   " with _PARAM0_"),
                 _("Advanced"),
@@ -290,7 +290,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("PathBezierCurveTo",
                 _("Path bezier curve to"),
-                _("Add to a path a bezier curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path a bezier curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
                 _("Add to a path a bezier curve to the position _PARAM5_;_PARAM6_ (first control point:_PARAM1_;_PARAM2_, second control point:_PARAM3_;_PARAM4_) "
                   " with _PARAM0_"),
                 _("Advanced"),
@@ -328,7 +328,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("PathArc",
                 _("Path arc to"),
-                _("Add to a path an arc to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path an arc to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
                 _("Add to a path an arc at the position _PARAM1_;_PARAM2_ (radius:_PARAM3_,start angle:_PARAM4_, end angles:_PARAM5_,anticlockwise:_PARAM6_ "
                 "with _PARAM0_"),
                 _("Advanced"),
@@ -347,7 +347,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("PathQuadraticCurveTo",
                 _("Path quadratic curve to"),
-                _("Add to a path a quadratic curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo"),
+                _("Add to a path a quadratic curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
                 _("Add to a path a quadratic curve to the position _PARAM3_;_PARAM4_ (control point:_PARAM1_;_PARAM2_) "
                 "with _PARAM0_"),
                 _("Advanced"),

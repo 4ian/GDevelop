@@ -476,7 +476,7 @@ module.exports = {
           fontFamily: 'Arial',
           fontSize: '24px',
           fill: '#cccccc',
-          tagStyle: ['[', ']'],
+          tagStyle: 'bbcode',
           wordWrap: true,
           wordWrapWidth: 250,
           align: 'left',

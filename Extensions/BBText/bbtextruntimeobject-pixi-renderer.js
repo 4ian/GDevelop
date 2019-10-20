@@ -16,7 +16,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
         fontFamily: runtimeObject._fontFamily,
         fontSize: `${runtimeObject._fontSize}px`,
         fill: runtimeObject._color,
-        tagStyle: ['[', ']'],
+        tagStyle: 'bbcode',
         wordWrap: runtimeObject._wordWrap,
         wordWrapWidth: runtimeObject._wrappingWidth,
         align: runtimeObject._align,

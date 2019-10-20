@@ -112,10 +112,18 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawQuadraticCurve = functi
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.beginFillPath = function() {
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
+    /*if(!this.hasBeginFillPath){
+        this.beginFillPath();
+        this._graphics.haveBeginFillPath = true;
+    }*/
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.endFillPath = function() {
+   /* if(!this.hasBeginFillPath){
+        this.beginFillPath();
+    }*/
     this._graphics.endFill();
+    //this._graphics.haveBeginFillPath = false;
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathMoveTo = function(x1, y1) {
@@ -157,6 +165,14 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathQuadraticCurveTo = 
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.closePath = function() {
     this._graphics.closePath();  
+};
+
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.hasBeginFillPath = function() {
+    if(this._graphics.haveBeginFillPath){
+        return true;
+    }else{
+        return false;
+    }
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {

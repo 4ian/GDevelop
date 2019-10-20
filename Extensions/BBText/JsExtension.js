@@ -61,6 +61,10 @@ module.exports = {
         objectContent.align = newValue ? newValue : 'left';
         return true;
       }
+      if (propertyName === 'wordWrap') {
+        objectContent.wordWrap = newValue === '1';
+        return true;
+      }
 
       return false;
     };
@@ -113,6 +117,13 @@ module.exports = {
       );
 
       objectProperties.set(
+        'wordWrap',
+        new gd.PropertyDescriptor(objectContent.wordWrap ? 'true' : 'false')
+          .setType('boolean')
+          .setLabel(_('Word wrapping'))
+      );
+
+      objectProperties.set(
         'visible',
         new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
           .setType('boolean')
@@ -131,6 +142,7 @@ module.exports = {
         color: '#000000',
         fontFamily: 'Arial',
         align: 'left',
+        wordWrap: true,
       })
     );
 
@@ -175,6 +187,8 @@ module.exports = {
       objectName
     ) => {
       properties.forEach(property => {
+        property.type = property.type === 'boolean' ? 'yesorno' : property.type;
+
         // Add all the generic GETTERS
         if (property.type === 'number') {
           gdObject
@@ -304,6 +318,25 @@ module.exports = {
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`)
             .setManipulatedType(property.type);
+        } else if (property.type === 'yesorno') {
+          gdObject
+            .addCondition(
+              `Is${property.functionName}`,
+              _(`Is ${property.description} enabled`),
+              _(`Check if the ${property.description} is enabled`),
+              _(`is ${property.paramLabel} enabled`),
+              '',
+              `${property.iconPath}.png`,
+              `${property.iconPath}.png`
+            )
+            .addParameter(
+              'object',
+              _(`${objectName} object`),
+              objectName,
+              false
+            )
+            .getCodeExtraInformation()
+            .setFunctionName(`get${property.functionName}`);
         }
       });
     };
@@ -351,6 +384,13 @@ module.exports = {
         type: 'stringWithSelector',
         paramLabel: 'Alignment',
         options: `["left", "right", "center"]`,
+      },
+      {
+        functionName: 'WordWrap',
+        description: 'word wrap',
+        iconPath: 'res/actions/scaleWidth24',
+        type: 'boolean',
+        paramLabel: 'Word wrap',
       },
       {
         functionName: 'WrappingWidth',
@@ -500,6 +540,15 @@ module.exports = {
         .get('fontFamily')
         .getValue();
       this._pixiObject.textStyles.default.fontFamily = fontFamily;
+
+      const wordWrap = this._associatedObject
+        .getProperties(this.project)
+        .get('wordWrap')
+        .getValue();
+      if (wordWrap !== this._pixiObject._style.wordWrap) {
+        this._pixiObject._style.wordWrap = wordWrap === 'true';
+        this._pixiObject.dirty = true;
+      }
 
       const align = this._associatedObject
         .getProperties(this.project)

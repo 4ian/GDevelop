@@ -19,6 +19,8 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   this._fontFamily = objectData.content.fontFamily;
   /** @type number */
   this._fontSize = objectData.content.fontSize;
+  /** @type boolean */
+  this._wordWrap = objectData.content.wordWrap;
   /** @type number */
   this._wrappingWidth = 0;
   /** @type string */
@@ -179,6 +181,15 @@ gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
  */
 gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function() {
   return this._wrappingWidth;
+};
+
+gdjs.BBTextRuntimeObject.prototype.setWordWrap = function(wordWrap) {
+  this._wordWrap = wordWrap;
+  this.update();
+};
+
+gdjs.BBTextRuntimeObject.prototype.getWordWrap = function(wordWrap) {
+  return this._wordWrap;
 };
 
 /**

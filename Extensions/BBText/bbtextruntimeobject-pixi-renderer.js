@@ -17,7 +17,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
         fontSize: `${runtimeObject._fontSize}px`,
         fill: runtimeObject._color,
         tagStyle: ['[', ']'],
-        wordWrap: true,
+        wordWrap: runtimeObject._wordWrap,
         wordWrapWidth: runtimeObject._wrappingWidth,
         align: runtimeObject._align,
       },
@@ -59,6 +59,10 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
+  if (this._object._wordWrap !== this._pixiObject._wordWrap) {
+    this._pixiObject._style.wordWrap = this._object._wordWrap;
+    this._pixiObject.dirty = true;
+  }
   if (this._object._wrappingWidth !== this._pixiObject._wrappingWidth) {
     this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
     this._pixiObject.dirty = true;

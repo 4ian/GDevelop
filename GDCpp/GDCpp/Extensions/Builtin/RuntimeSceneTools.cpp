@@ -71,10 +71,6 @@ bool GD_API SceneJustBegins(RuntimeScene &scene) {
   return scene.GetTimeManager().IsFirstLoop();
 }
 
-bool GD_API SceneJustResumed(RuntimeScene &scene) {
-  return scene.SceneJustResumed();
-}
-
 void GD_API MoveObjects(RuntimeScene &scene) {
   RuntimeObjNonOwningPtrList allObjects =
       scene.objectsInstances.GetAllObjects();

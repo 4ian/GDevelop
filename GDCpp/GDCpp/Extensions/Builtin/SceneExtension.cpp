@@ -42,9 +42,6 @@ SceneExtension::SceneExtension() {
   GetAllConditions()["DepartScene"]
       .SetFunctionName("SceneJustBegins")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
-  GetAllConditions()["SceneJustResumed"]
-      .SetFunctionName("SceneJustResumed")
-      .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
   GetAllActions()["Scene"]
       .SetFunctionName("ReplaceScene")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");

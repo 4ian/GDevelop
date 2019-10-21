@@ -767,7 +767,7 @@ gdjs.RuntimeScene.prototype.getAdhocListOfAllInstances = function() {
  * Check if the scene was just resumed.
  * This is true during the first frame after the scene has been unpaused.
  *
- * @returns {boolean} The scene was just resumed
+ * @returns {boolean} true if the scene was just resumed
  */
 gdjs.RuntimeScene.prototype.sceneJustResumed = function() {
     return this._isJustResumed;

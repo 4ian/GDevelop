@@ -315,8 +315,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     if (context) {
       insertions = [context];
     } else if (hasEventsSelected) {
-
-      if(type === 'BuiltinCommonInstructions::Comment' || type === 'BuiltinCommonInstructions::Group' ){
+      if (
+        type === 'BuiltinCommonInstructions::Comment' ||
+        type === 'BuiltinCommonInstructions::Group'
+      ) {
         insertTopOfSelection = true;
       }
 

@@ -94,7 +94,7 @@ gdjs.ShapePainterRuntimeObject.prototype.drawQuadraticCurve = function(x1, y1, c
 
 gdjs.ShapePainterRuntimeObject.prototype.beginFillPath = function(x1, y1) {
     this._renderer.beginFillPath();
-    this._renderer.drawPathMoveTo(x1?x1:0, y1?y1:0);
+    this._renderer.drawPathMoveTo(x1, y1);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.endFillPath = function() {

@@ -15,7 +15,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "PrimitiveDrawing",
           _("Primitive drawing"),
           _("This Extension allows you to draw shapes and manipulate images."),
-          "Florian Rival",
+          "Florian Rival and Aurélien Vivet",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/shape_painter");
 
@@ -31,8 +31,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Rectangle",
                 _("Rectangle"),
                 _("Draw a rectangle on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a "
-                  "rectangle with _PARAM0_"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rectangle "
+                  "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/rectangle24.png",
                 "res/actions/rectangle.png")
@@ -48,8 +48,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Circle",
                 _("Circle"),
                 _("Draw a circle on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ a circle of radius _PARAM3_ with "
-                  "_PARAM0_"),
+                _("Draw at _PARAM1_;_PARAM2_ a circle of radius _PARAM3_ "
+                  "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/circle24.png",
                 "res/actions/circle.png")
@@ -64,8 +64,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Line",
                 _("Line"),
                 _("Draw a line on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
-                  "(thickness: _PARAM5_) with _PARAM0_"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line (thickness: _PARAM5_) "
+                  "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/line24.png",
                 "res/actions/line.png")
@@ -81,10 +81,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
   
    obj.AddAction("LineV2",
-                _("Line V2"),
-                _("Draw a line V2 on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line V2 "
-                  "(thickness: _PARAM5_) with _PARAM0_"),
+                _("Line"),
+                _("Draw a line on screen"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line (thickness: _PARAM5_) "
+                  "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/line24.png",
                 "res/actions/line.png")
@@ -118,7 +118,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("RoundedRectangle",
                 _("Rounded rectangle"),
                 _("Draw a rounded rectangle on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rounded rectangle (radius: _PARAM5_) with _PARAM0_"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rounded rectangle (radius: _PARAM5_) "
+                "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/roundedRectangle24.png",
                 "res/actions/roundedRectangle.png")
@@ -154,8 +155,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("Arc",
                 _("Arc"),
-                _("Draw an arc on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ an arc with _PARAM3_ of radius, start angle: _PARAM4_, end angle: _PARAM5_ (anticlockwise: _PARAM6_, close path: _PARAM7_) "
+                _("Draw an arc on screen, path can be closed with the parameters close path a line between start and end will be create"),
+                _("Draw at _PARAM1_;_PARAM2_ an arc with radius: _PARAM3_, start angle: _PARAM4_, end angle: _PARAM5_ (anticlockwise: _PARAM6_, close path: _PARAM7_) "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/arc24.png",
@@ -175,7 +176,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("ArcTo",
                 _("ArcTo"),
                 _("Draw an arcTo on screen"),
-                _("Draw arcTo at x1: _PARAM1_;y1: _PARAM2_, x2: _PARAM3_;y2: _PARAM4_ , radius: _PARAM5_  "
+                _("Draw arcTo at x1: _PARAM1_;y1: _PARAM2_, x2: _PARAM3_;y2: _PARAM4_ , radius: _PARAM5_ "
                 "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/arc24.png",
@@ -194,8 +195,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("BezierCurve",
                 _("Bezier curve"),
                 _("Draw a bezier curve on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM7_;_PARAM5_ a bezier curve (first control point: _PARAM3_;_PARAM4_, second control point: _PARAM5_;_PARAM6_) "
-                  " with _PARAM0_"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM7_;_PARAM8_ a bezier curve (first control point: _PARAM3_;_PARAM4_, second control point: _PARAM5_;_PARAM6_) "
+                  "with _PARAM0_"),
                 _("Drawing"),
                 "res/actions/delete24.png",
                 "res/actions/delete.png")
@@ -233,9 +234,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("BeginFillPath",
                 _("Begin fill path"),
-                _("Begins drawing filling of an advanced path"),
+                _("Begin to draw a simple one-color fill. Subsequent actions, such as \"Path line\" (in the Advanced category) can be used to draw. Be sure to use \"End fill path\" action when you're done drawing the shape."),
                 _("Begins drawing filling of an advanced path "
-                  " with _PARAM0_"),
+                  "with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/delete24.png",
                 "res/actions/delete.png")
@@ -250,7 +251,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("End fill path"),
                 _("Finish the filling drawing in an advanced path"),
                 _("Finish the filling drawing in an advanced path "
-                  " with _PARAM0_"),
+                  "with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/delete24.png",
                 "res/actions/delete.png")
@@ -260,10 +261,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("MovePathTo",
-                _("Move path to"),
-                _("Move the origin of a path."),
-                _("Move the origin of a path to _PARAM1_;_PARAM2_ "
-                  " with _PARAM0_"),
+                _("Move path drawing position"),
+                _("Move the drawing position for the current path"),
+                _("Move the drawing position of the path to _PARAM1_;_PARAM2_ "
+                  "with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/position24.png",
                 "res/actions/position.png")
@@ -275,10 +276,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("PathLineTo",
-                _("Path line to"),
-                _("Add to a path a line to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
+                _("Path line"),
+                _("Add to a path a line to a position. The origin comes from the previous action or from \"Begin fill path\" or \"Move path drawing position\". By default, the start position will be the object's position."),
                 _("Add to a path a line to the position _PARAM1_;_PARAM2_ "
-                  " with _PARAM0_"),
+                  "with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/line24.png",
                 "res/actions/line.png")
@@ -290,10 +291,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("PathBezierCurveTo",
-                _("Path bezier curve to"),
-                _("Add to a path a bezier curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
+                _("Path bezier curve"),
+                _("Add to a path a bezier curve to a position. The origin comes from the previous action or from \"Begin fill path\" or \"Move path drawing position\". By default, the start position will be the object's position."),
                 _("Add to a path a bezier curve to the position _PARAM5_;_PARAM6_ (first control point: _PARAM1_;_PARAM2_, second control point: _PARAM3_;_PARAM4_) "
-                  " with _PARAM0_"),
+                  "with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/delete24.png",
                 "res/actions/delete.png")
@@ -328,9 +329,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 */
 
   obj.AddAction("PathArc",
-                _("Path arc to"),
-                _("Add to a path an arc to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
-                _("Add to a path an arc at the position _PARAM1_;_PARAM2_ (radius: _PARAM3_,start angle: _PARAM4_, end angles: _PARAM5_,anticlockwise: _PARAM6_ "
+                _("Path arc"),
+                _("Add to a path an arc to a position. The origin comes from the previous action or from \"Begin fill path\" or \"Move path drawing position\". By default, the start position will be the object's position."),
+                _("Add to a path an arc at the position _PARAM1_;_PARAM2_ (radius: _PARAM3_, start angle: _PARAM4_, end angle: _PARAM5_, anticlockwise: _PARAM6_) "
                 "with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/arc24.png",
@@ -347,8 +348,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("PathQuadraticCurveTo",
-                _("Path quadratic curve to"),
-                _("Add to a path a quadratic curve to a position, the origin come from the previous action or from BeginFillPath or PathMoveTo, by default if nothing exist, start position will be the object's position."),
+                _("Path quadratic curve"),
+                _("Add to a path a quadratic curve to a position. The origin comes from the previous action or from \"Begin fill path\" or \"Move path drawing position\". By default, the start position will be the object's position."),
                 _("Add to a path a quadratic curve to the position _PARAM3_;_PARAM4_ (control point: _PARAM1_;_PARAM2_) "
                 "with _PARAM0_"),
                 _("Advanced"),
@@ -365,7 +366,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("closePath",
                 _("Close Path"),
-                _("Close the path of advanced shape. This close the outline between the last point and first."),
+                _("Close the path of an advanced shape. This close the outline between the last point and first."),
                 _("Close the path "
                   "with _PARAM0_"),
                 _("Advanced"),

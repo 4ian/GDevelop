@@ -306,6 +306,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   addNewEvent = (type: string, context: ?EventContext): Array<gdBaseEvent> => {
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
+    let insertTopOfSelection = false;
 
     let insertions: Array<{
       eventsList: gdEventsList,
@@ -314,10 +315,19 @@ export default class EventsSheet extends React.Component<Props, State> {
     if (context) {
       insertions = [context];
     } else if (hasEventsSelected) {
+      if (
+        type === 'BuiltinCommonInstructions::Comment' ||
+        type === 'BuiltinCommonInstructions::Group'
+      ) {
+        insertTopOfSelection = true;
+      }
+
       insertions = getSelectedEventContexts(this.state.selection).map(
         selectedEvent => ({
           eventsList: selectedEvent.eventsList,
-          indexInList: selectedEvent.indexInList,
+          indexInList: insertTopOfSelection
+            ? selectedEvent.indexInList - 1
+            : selectedEvent.indexInList,
         })
       );
     } else {

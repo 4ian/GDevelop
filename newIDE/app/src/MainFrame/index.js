@@ -93,6 +93,7 @@ import {
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -408,7 +409,7 @@ class MainFrame extends React.Component<Props, State> {
       })
       .then(({ content, fileMetadata }) => {
         const serializedProject = gd.Serializer.fromJSObject(content);
-
+        /*
         if(!content.gdVersion && content.eventsFunctions){
           showErrorBox(
           [i18n._(t`Unable to open this file.`), i18n._(t`This file is an extension file for GDevelop 5.`)].join(
@@ -426,6 +427,8 @@ class MainFrame extends React.Component<Props, State> {
         );
           return false;
         }
+*/
+        verifyProjectContent(i18n, content);
 
         return this.loadFromSerializedProject(
           serializedProject,

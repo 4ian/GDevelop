@@ -70,6 +70,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/line24.png",
                 "res/actions/line.png")
 
+      .SetHidden()
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
       .AddParameter("expression", _("Y position of start point"))

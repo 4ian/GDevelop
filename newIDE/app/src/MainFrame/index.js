@@ -409,26 +409,11 @@ class MainFrame extends React.Component<Props, State> {
       })
       .then(({ content, fileMetadata }) => {
         const serializedProject = gd.Serializer.fromJSObject(content);
-        /*
-        if(!content.gdVersion && content.eventsFunctions){
-          showErrorBox(
-          [i18n._(t`Unable to open this file.`), i18n._(t`This file is an extension file for GDevelop 5.`)].join(
-            '\n'
-          )        
-        );
-          return false;
-        }
 
-        if(!content.gdVersion && !content.eventsFunctions){
-          showErrorBox(
-          [i18n._(t`Unable to open this file.`), i18n._(t`This file not a file openable in GDevelop 5.`)].join(
-            '\n'
-          )        
-        );
-          return false;
+        if (!verifyProjectContent(i18n, content)) {
+          // The content is not recognized and the user was warned. Abort the opening.
+          return;
         }
-*/
-        verifyProjectContent(i18n, content);
 
         return this.loadFromSerializedProject(
           serializedProject,

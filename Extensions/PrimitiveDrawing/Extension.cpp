@@ -155,7 +155,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("Arc",
                 _("Arc"),
-                _("Draw an arc on screen, path can be closed with the parameters close path a line between start and end will be create"),
+                _("Draw an arc on screen. If \"Close path\" is set to yes, a line will be drawn between the start and end point of the arc, closing the shape."),
                 _("Draw at _PARAM1_;_PARAM2_ an arc with radius: _PARAM3_, start angle: _PARAM4_, end angle: _PARAM5_ (anticlockwise: _PARAM6_, close path: _PARAM7_) "
                 "with _PARAM0_"),
                 _("Drawing"),
@@ -366,7 +366,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("closePath",
                 _("Close Path"),
-                _("Close the path of an advanced shape. This close the outline between the last point and first."),
+                _("Close the path of the advanced shape. This closes the outline between the last and the first point."),
                 _("Close the path "
                   "with _PARAM0_"),
                 _("Advanced"),

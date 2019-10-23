@@ -93,6 +93,7 @@ import {
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -407,8 +408,12 @@ class MainFrame extends React.Component<Props, State> {
         });
       })
       .then(({ content, fileMetadata }) => {
-        const serializedProject = gd.Serializer.fromJSObject(content);
+        if (!verifyProjectContent(i18n, content)) {
+          // The content is not recognized and the user was warned. Abort the opening.
+          return;
+        }
 
+        const serializedProject = gd.Serializer.fromJSObject(content);
         return this.loadFromSerializedProject(
           serializedProject,
           fileMetadata

@@ -108,13 +108,17 @@ export default class DirectionTools extends Component<Props, State> {
       onEditWith,
     } = this.props;
 
+    const imageResourceExternalEditors = resourceExternalEditors.filter(
+      ({ kind }) => kind === 'image'
+    );
+
     return (
       <div style={styles.container}>
-        {!!resourceExternalEditors.length && (
+        {!!imageResourceExternalEditors.length && (
           <FlatButton
-            label={resourceExternalEditors[0].displayName}
+            label={imageResourceExternalEditors[0].displayName}
             icon={<Brush />}
-            onClick={() => onEditWith(resourceExternalEditors[0])}
+            onClick={() => onEditWith(imageResourceExternalEditors[0])}
           />
         )}
         <FlatButton

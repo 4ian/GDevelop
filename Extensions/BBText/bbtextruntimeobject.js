@@ -7,9 +7,24 @@
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  Object.keys(objectData.content).forEach(key => {
-    this[`_${key}`] = objectData.content[key];
-  });
+  /** @type number */
+  this._opacity = objectData.content.opacity;
+  /** @type boolean */
+  this._visible = objectData.content.visible;
+  /** @type string */
+  this._text = objectData.content.text;
+  /** @type string */
+  this._color = objectData.content.color;
+  /** @type string */
+  this._fontFamily = objectData.content.fontFamily;
+  /** @type number */
+  this._fontSize = objectData.content.fontSize;
+  /** @type boolean */
+  this._wordWrap = objectData.content.wordWrap;
+  /** @type number */
+  this._wrappingWidth = 0;
+  /** @type string */
+  this._align = objectData.content.align;
 
   if (this._renderer)
     gdjs.BBTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);

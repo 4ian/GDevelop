@@ -33,23 +33,10 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      // booleans
-      if (['wordWrap', 'visible'].includes(propertyName)) {
-        objectContent[propertyName] = newValue === '1';
-        return true;
-      }
-      // strings
-      else if (
-        [
-          'text',
-          'color',
-          'opacity',
-          'fontFamily',
-          'fontSize',
-          'align',
-        ].includes(propertyName)
-      ) {
-        objectContent[propertyName] = newValue;
+      if (propertyName in objectContent) {
+        if (typeof objectContent[propertyName] === 'boolean')
+          objectContent[propertyName] = newValue === '1';
+        else objectContent[propertyName] = newValue;
         return true;
       }
 

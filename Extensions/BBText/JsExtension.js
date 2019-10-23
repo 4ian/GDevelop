@@ -33,36 +33,24 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === 'text') {
-        objectContent.text = newValue;
+      // strings
+      if (
+        [
+          'text',
+          'color',
+          'opacity',
+          'fontFamily',
+          'fontSize',
+          'align',
+        ].includes(propertyName)
+      ) {
+        objectContent[propertyName] = newValue;
         return true;
       }
-      if (propertyName === 'color') {
-        objectContent.color = newValue;
-        return true;
-      }
-      if (propertyName === 'opacity') {
-        objectContent.opacity = parseFloat(newValue);
-        return true;
-      }
-      if (propertyName === 'fontFamily') {
-        objectContent.fontFamily = newValue;
-        return true;
-      }
-      if (propertyName === 'visible') {
-        objectContent.visible = newValue === '1';
-        return true;
-      }
-      if (propertyName === 'fontSize') {
-        objectContent.fontSize = String(newValue);
-        return true;
-      }
-      if (propertyName === 'align') {
-        objectContent.align = newValue ? newValue : 'left';
-        return true;
-      }
-      if (propertyName === 'wordWrap') {
-        objectContent.wordWrap = newValue === '1';
+
+      // booleans
+      if (['wordWrap', 'visible'].includes(propertyName)) {
+        objectContent[propertyName] = newValue === '1';
         return true;
       }
 

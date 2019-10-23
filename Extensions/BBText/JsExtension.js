@@ -33,8 +33,13 @@ module.exports = {
       propertyName,
       newValue
     ) {
+      // booleans
+      if (['wordWrap', 'visible'].includes(propertyName)) {
+        objectContent[propertyName] = newValue === '1';
+        return true;
+      }
       // strings
-      if (
+      else if (
         [
           'text',
           'color',
@@ -45,12 +50,6 @@ module.exports = {
         ].includes(propertyName)
       ) {
         objectContent[propertyName] = newValue;
-        return true;
-      }
-
-      // booleans
-      if (['wordWrap', 'visible'].includes(propertyName)) {
-        objectContent[propertyName] = newValue === '1';
         return true;
       }
 

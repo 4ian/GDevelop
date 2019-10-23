@@ -81,9 +81,9 @@ gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {
   const splitValue = rgbColorString.split(';');
   if (splitValue.length !== 3) return;
   const hexColor = `#${gdjs.rgbToHex(
-    parseInt(splitValue[0]),
-    parseInt(splitValue[1]),
-    parseInt(splitValue[2])
+    parseInt(splitValue[0], 0),
+    parseInt(splitValue[1], 0),
+    parseInt(splitValue[2], 0)
   )}`;
   this._color = hexColor;
   this._renderer.updateColor();

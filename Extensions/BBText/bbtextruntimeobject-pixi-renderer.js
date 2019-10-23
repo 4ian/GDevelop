@@ -25,7 +25,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
 
     this._object.hidden = !runtimeObject._visible;
   } else {
-    // No setting X/Y/Z as it will be updated
     this.updateText();
     this.updateColor();
     this.updateAlignment();

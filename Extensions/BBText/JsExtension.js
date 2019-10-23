@@ -187,15 +187,16 @@ module.exports = {
       objectName
     ) => {
       properties.forEach(property => {
-        property.type = property.type === 'boolean' ? 'yesorno' : property.type;
+        const parameterType =
+          property.type === 'boolean' ? 'yesorno' : property.type;
 
         // Add all the generic GETTERS
-        if (property.type === 'number') {
+        if (parameterType === 'number') {
           gdObject
             .addExpression(
               `Get${property.functionName}`,
-              _(`Get ${property.description}`),
-              _(`Get ${property.description}`),
+              _('Get ') + property.description,
+              _('Get ') + property.description,
               _(''),
               '',
               `${property.iconPath}.png`,
@@ -213,8 +214,8 @@ module.exports = {
           gdObject
             .addStrExpression(
               `Get${property.functionName}`,
-              _(`Get ${property.description}`),
-              _(`Get ${property.description}`),
+              _('Get ') + property.description,
+              _('Get ') + property.description,
               _(''),
               '',
               `${property.iconPath}.png`,
@@ -231,13 +232,15 @@ module.exports = {
         }
 
         // Add all the generic SETTERS
-        if (property.type === 'number' || property.type === 'string') {
+        if (parameterType === 'number' || parameterType === 'string') {
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              _(`Set ${property.description}`),
-              _(`Set ${property.description}`),
-              _(`Set ${property.description} of _PARAM0_ to _PARAM1_ _PARAM2_`),
+              _('Set ') + property.description,
+              _('Set ') + property.description,
+              _('Set ') +
+                property.description +
+                _(' of _PARAM0_ to _PARAM1_ _PARAM2_'),
               '',
               `${property.iconPath}.png`,
               `${property.iconPath}.png`
@@ -249,19 +252,19 @@ module.exports = {
               false
             )
             .addParameter('operator', _("Modification's sign"), '', false)
-            .addParameter(property.type, _(property.paramLabel), '', false)
+            .addParameter(parameterType, _(property.paramLabel), '', false)
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
-            .setManipulatedType(property.type)
+            .setManipulatedType(parameterType)
             .setGetter(`get${property.functionName}`);
         } else {
           // Setter doesnt have a +- modifier (Color, alignment, etc)
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              _(`Set ${property.description}`),
-              _(`Set ${property.description}`),
-              _(`Set ${property.description} of _PARAM0_ to _PARAM1_`),
+              _('Set ') + property.description,
+              _('Set ') + property.description,
+              _('Set ') + property.description + _(' of _PARAM0_ to _PARAM1_'),
               '',
               `${property.iconPath}.png`,
               `${property.iconPath}.png`
@@ -273,7 +276,7 @@ module.exports = {
               false
             )
             .addParameter(
-              property.type,
+              parameterType,
               _(property.paramLabel),
               property.options ? property.options : '',
               false
@@ -284,15 +287,17 @@ module.exports = {
         }
 
         // Add compare Conditions via getters
-        if (property.type === 'string' || property.type === 'number') {
+        if (parameterType === 'string' || parameterType === 'number') {
           const propExpressionType =
-            property.type === 'string' ? 'string' : 'expression';
+            parameterType === 'string' ? 'string' : 'expression';
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              _(`Is the ${property.description} equal to a value`),
-              _(`Check if the ${property.description} is equal to a value`),
-              _(`The ${property.paramLabel} of _PARAM0_ is _PARAM1__PARAM2_`),
+              _('Is the ') + property.description + _(' equal to a value'),
+              _('Check if the ') + property.description + _(' equals a value'),
+              _('The ') +
+                property.paramLabel +
+                _(' of _PARAM0_ is _PARAM1__PARAM2_'),
               '',
               `${property.iconPath}.png`,
               `${property.iconPath}.png`
@@ -311,20 +316,20 @@ module.exports = {
             )
             .addParameter(
               propExpressionType,
-              _(`${property.type} value`),
+              _(`${parameterType} value`),
               '',
               false
             )
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`)
-            .setManipulatedType(property.type);
-        } else if (property.type === 'yesorno') {
+            .setManipulatedType(parameterType);
+        } else if (parameterType === 'yesorno') {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              _(`Is ${property.description} enabled`),
-              _(`Check if the ${property.description} is enabled`),
-              _(`is ${property.paramLabel} enabled`),
+              property.description + _(' is enabled'),
+              _('Check if the') + property.description + _(' is enabled'),
+              property.paramLabel + _(' is enabled'),
               '',
               `${property.iconPath}.png`,
               `${property.iconPath}.png`
@@ -341,7 +346,7 @@ module.exports = {
       });
     };
 
-    const SetterAndGetterProperties = [
+    const setterAndGetterProperties = [
       {
         functionName: 'BBText',
         description: 'BBCode formatted text',
@@ -403,7 +408,7 @@ module.exports = {
 
     addSettersAndGettersToObjectHelper(
       object,
-      SetterAndGetterProperties,
+      setterAndGetterProperties,
       'BBText'
     );
 

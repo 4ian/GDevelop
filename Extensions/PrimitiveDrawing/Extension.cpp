@@ -172,34 +172,15 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("yesorno", _("Close path"))
       .SetFunctionName("DrawArc")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-/*
-  obj.AddAction("ArcTo",
-                _("ArcTo"),
-                _("Draw an arcTo on screen"),
-                _("Draw arcTo at x1: _PARAM1_;y1: _PARAM2_, x2: _PARAM3_;y2: _PARAM4_ , radius: _PARAM5_ "
-                "with _PARAM0_"),
-                _("Drawing"),
-                "res/actions/arc24.png",
-                "res/actions/arc.png")
 
-      .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X coordinate start arc"))
-      .AddParameter("expression", _("Y coordinate start arc"))
-      .AddParameter("expression", _("X coordinate end arc"))
-      .AddParameter("expression", _("Y coordinate end arc"))
-      .AddParameter("expression", _("Radius (in pixels)"))
-      .AddParameter("yesorno", _("Close path"))
-      .SetFunctionName("DrawArcTo")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-*/
   obj.AddAction("BezierCurve",
                 _("Bezier curve"),
                 _("Draw a bezier curve on screen"),
                 _("Draw from _PARAM1_;_PARAM2_ to _PARAM7_;_PARAM8_ a bezier curve (first control point: _PARAM3_;_PARAM4_, second control point: _PARAM5_;_PARAM6_) "
                   "with _PARAM0_"),
                 _("Drawing"),
-                "res/actions/delete24.png",
-                "res/actions/delete.png")
+                "res/actions/bezierCurve24.png",
+                "res/actions/bezierCurve.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
@@ -219,8 +200,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Draw from _PARAM1_;_PARAM2_ to _PARAM5_;_PARAM6_ a quadratic curve (control point: _PARAM3_;_PARAM4_) "
                 "with _PARAM0_"),
                 _("Drawing"),
-                "res/actions/delete24.png",
-                "res/actions/delete.png")
+                "res/actions/quadraticCurve24.png",
+                "res/actions/quadraticCurve.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
@@ -238,8 +219,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Begins drawing filling of an advanced path "
                   "with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/delete24.png",
-                "res/actions/delete.png")
+                "res/actions/beginFillPath24.png",
+                "res/actions/beginFillPath.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("Start drawing x"))
@@ -253,8 +234,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Finish the filling drawing in an advanced path "
                   "with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/delete24.png",
-                "res/actions/delete.png")
+                "res/actions/endFillPath24.png",
+                "res/actions/endFillPath.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("endFillPath")
@@ -296,8 +277,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Add to a path a bezier curve to the position _PARAM5_;_PARAM6_ (first control point: _PARAM1_;_PARAM2_, second control point: _PARAM3_;_PARAM4_) "
                   "with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/delete24.png",
-                "res/actions/delete.png")
+                "res/actions/bezierCurve24.png",
+                "res/actions/bezierCurve.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("First control point x"))
@@ -308,25 +289,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Destination point y"))
       .SetFunctionName("drawPathBezierCurveTo")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-/*
-    obj.AddAction("drawPathArcTo",
-                _("drawPathArcTo"),
-                _("drawPathArcTo"),
-                _("drawPathArcTo"
-                " with _PARAM0_"),
-                _("Advanced"),
-                "res/actions/arc24.png",
-                "res/actions/arc.png")
-
-      .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("X control point"))
-      .AddParameter("expression", _("Y control point"))
-      .AddParameter("expression", _("X coordinate end arc"))
-      .AddParameter("expression", _("Y coordinate end arc"))
-      .AddParameter("expression", _("Radius (in pixels)"))
-      .SetFunctionName("drawPathArcTo")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-*/
 
   obj.AddAction("PathArc",
                 _("Path arc"),
@@ -353,8 +315,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Add to a path a quadratic curve to the position _PARAM3_;_PARAM4_ (control point: _PARAM1_;_PARAM2_) "
                 "with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/delete24.png",
-                "res/actions/delete.png")
+                "res/actions/quadraticCurve24.png",
+                "res/actions/quadraticCurve.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("Control point x"))
@@ -370,8 +332,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Close the path "
                   "with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/delete24.png",
-                "res/actions/delete.png")
+                "res/actions/closePath24.png",
+                "res/actions/closePath.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("closePath")

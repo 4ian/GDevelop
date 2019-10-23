@@ -84,18 +84,6 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArc = function(x1, y1, 
     this._graphics.endFill();
 };
 
-/*    
-gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArcTo = function(x1, y1, x2, y2, radius, closePath) {
-    this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
-    this._graphics.moveTo(200,200);
-    this._graphics.arcTo(x1, y1, x2, y2, radius);
-    if(closePath){
-        this._graphics.closePath();
-    }
-    this._graphics.endFill();
-};
-*/
-
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawBezierCurve = function(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2) {
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.moveTo(x1, y1);
@@ -142,11 +130,6 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathArc = function(x1, 
     }
     this._graphics.arc(x1, y1, radius, gdjs.toRad(startAngle), gdjs.toRad(endAngle), anticlockwise ? true : false);
 };
-/*
-gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathArcTo = function(x1, y1, x2, y2, radius) {
-    this._graphics.arcTo(x1, y1, x2, y2, radius);
-};
-*/
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathQuadraticCurveTo = function(cpX, cpY, toX, toY) {
     if(this._graphics.graphicsData.length === 0){
@@ -158,14 +141,6 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawPathQuadraticCurveTo = 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.closePath = function() {
     this._graphics.closePath();  
 };
-
-/*
-gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.hasBegunFillPath = function() {
-    if(this._graphics.hasBegunFillPath){
-        return !!this._graphics.hasBegunFillPath;
-    }
-};
-*/
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.updateOutline = function() {
     this._graphics.lineStyle(

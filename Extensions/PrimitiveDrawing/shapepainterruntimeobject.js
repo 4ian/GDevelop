@@ -79,11 +79,7 @@ gdjs.ShapePainterRuntimeObject.prototype.drawStar = function(centerX, centerY, p
 gdjs.ShapePainterRuntimeObject.prototype.drawArc = function(centerX, centerY, radius, startAngle, endAngle, anticlockwise, closePath) {
     this._renderer.drawArc(centerX, centerY, radius, startAngle, endAngle, anticlockwise, closePath);
 };
-/*
-gdjs.ShapePainterRuntimeObject.prototype.drawArcTo = function(x1, y1, x2, y2, radius, closePath) {
-    this._renderer.drawArcTo(x1, y1, x2, y2, radius, closePath);
-};
-*/
+
 gdjs.ShapePainterRuntimeObject.prototype.drawBezierCurve = function(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2) {
     this._renderer.drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2);  
 };
@@ -116,11 +112,7 @@ gdjs.ShapePainterRuntimeObject.prototype.drawPathBezierCurveTo = function(cpX, c
 gdjs.ShapePainterRuntimeObject.prototype.drawPathArc = function(cx, cy, radius, startAngle, endAngle, anticlockwise) {
     this._renderer.drawPathArc(cx, cy, radius, startAngle, endAngle, anticlockwise);
 };
-/*
-gdjs.ShapePainterRuntimeObject.prototype.drawPathArcTo = function(x1, y1, x2, y2, radius) {
-    this._renderer.drawPathArcTo(x1, y1, x2, y2, radius);
-};
-*/
+
 gdjs.ShapePainterRuntimeObject.prototype.drawPathQuadraticCurveTo = function(cpX, cpY, toX, toY) {
     this._renderer.drawPathQuadraticCurveTo(cpX, cpY, toX, toY);  
 };

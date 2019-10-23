@@ -58,11 +58,6 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
         .SetFunctionName("drawArc");
-/*
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
-        .SetFunctionName("drawArcTo");
-*/
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::BezierCurve"]
         .SetFunctionName("drawBezierCurve");
@@ -87,11 +82,6 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathArc"]
         .SetFunctionName("drawPathArc");
-/*
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathArcTo"]
-        .SetFunctionName("drawPathArcTo");
-*/
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::PathQuadraticCurveTo"]
         .SetFunctionName("drawPathQuadraticCurveTo");

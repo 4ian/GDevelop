@@ -322,7 +322,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("trunc",
                      _("Truncation"),
-                     _("Troncate a number"),
+                     _("Truncate a number"),
                      _("Mathematical tools"),
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));

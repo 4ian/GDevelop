@@ -44,10 +44,6 @@ class MockFileSystem : public gd::AbstractFileSystem {
   virtual bool CopyFile(const gd::String& file, const gd::String& destination) {
     return true;
   }
-  virtual bool CopyDir(const gd::String& source,
-                       const gd::String& destination) {
-    return true;
-  }
   virtual bool ClearDir(const gd::String& directory) { return true; }
   virtual bool WriteToFile(const gd::String& file, const gd::String& content) {
     return true;

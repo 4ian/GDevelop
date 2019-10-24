@@ -46,19 +46,16 @@ export default class BrowserS3FileSystem {
   fileNameFrom = fullpath => {
     if (this._isExternalURL(fullpath)) return fullpath;
 
-    fullpath = this._translateURL(fullpath);
     return path.basename(fullpath);
   };
   dirNameFrom = fullpath => {
     if (this._isExternalURL(fullpath)) return '';
 
-    fullpath = this._translateURL(fullpath);
     return path.dirname(fullpath);
   };
   makeAbsolute = (filename, baseDirectory) => {
     if (this._isExternalURL(filename)) return filename;
 
-    filename = this._translateURL(filename);
     if (!this.isAbsolute(baseDirectory))
       baseDirectory = path.resolve(baseDirectory);
 
@@ -67,14 +64,12 @@ export default class BrowserS3FileSystem {
   makeRelative = (filename, baseDirectory) => {
     if (this._isExternalURL(filename)) return filename;
 
-    filename = this._translateURL(filename);
     return path.relative(baseDirectory, path.normalize(filename));
   };
   isAbsolute = fullpath => {
     if (this._isExternalURL(fullpath)) return true;
 
     if (fullpath.length === 0) return true;
-    fullpath = this._translateURL(fullpath);
     return (
       (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
       (fullpath.length > 1 && fullpath.charAt(1) === ':')
@@ -87,7 +82,6 @@ export default class BrowserS3FileSystem {
       return true;
     }
 
-    source = this._translateURL(source);
     console.warn('Copy not done from', source, 'to', dest);
     return true;
   };
@@ -145,16 +139,5 @@ export default class BrowserS3FileSystem {
       filename.substr(0, 8) === 'https://' ||
       filename.substr(0, 6) === 'ftp://'
     );
-  };
-
-  /**
-   * Return the filename associated to the URL on the server, relative to the games directory.
-   * (i.e: Transform g/mydirectory/myfile.png to mydirectory/myfile.png).
-   */
-  _translateURL = filename => {
-    if (filename.substr(0, 2) === 'g/' || filename.substr(0, 2) === 'g\\')
-      filename = filename.substr(2);
-
-    return filename;
   };
 }

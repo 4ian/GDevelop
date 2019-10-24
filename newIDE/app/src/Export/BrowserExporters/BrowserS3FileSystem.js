@@ -91,9 +91,6 @@ export default class BrowserS3FileSystem {
     console.warn('Copy not done from', source, 'to', dest);
     return true;
   };
-  copyDir = (source, dest) => {
-    throw new Error('Not implemented');
-  };
   writeToFile = (fullPath, contents) => {
     const key = fullPath.replace(this.bucketBaseUrl, '');
     const mime = {

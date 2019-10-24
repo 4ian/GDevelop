@@ -101,13 +101,6 @@ class GD_CORE_API AbstractFileSystem {
                         const gd::String& destination) = 0;
 
   /**
-   * \brief Copy a whole directory
-   * \return true if the operation succeeded.
-   */
-  virtual bool CopyDir(const gd::String& source,
-                       const gd::String& destination) = 0;
-
-  /**
    * \brief Write the content of a string to a file.
    * \return true if the operation succeeded.
    */

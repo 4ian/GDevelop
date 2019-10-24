@@ -87,22 +87,6 @@ export default {
     }
     return true;
   },
-  copyDir: function(source, dest) {
-    throw new Error(
-      'copyDir was never tested, please check that it does what you want to.'
-    );
-
-    // try {
-    //   if (source !== dest)
-    //     fs.copySync(source, dest, {
-    //       clobber: true,
-    //     });
-    // } catch (e) {
-    //   console.log('copyDir(' + source + ', ' + dest + ') failed: ' + e);
-    //   return false;
-    // }
-    // return true;
-  },
   writeToFile: function(file, contents) {
     try {
       fs.outputFileSync(file, contents);

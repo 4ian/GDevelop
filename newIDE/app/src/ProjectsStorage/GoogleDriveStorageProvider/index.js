@@ -7,6 +7,7 @@ import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
 import GoogleDriveSaveAsDialog from './GoogleDriveSaveAsDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../../Utils/Window';
+import { loadScript } from '../../Utils/LoadScript';
 const isDev = process.env.NODE_ENV === 'development';
 
 const DEVELOPER_KEY = isDev
@@ -38,47 +39,40 @@ const initializeApis = (): Promise<void> => {
     return apisLoadingPromise;
   }
 
-  apisLoadingPromise = new Promise((resolve, reject) => {
-    const { body } = document;
-    if (!body) {
-      console.error('Google Drive is only supported in a browser');
-      reject(new Error('Unsupported'));
-      return;
-    }
-
-    const scriptElement = document.createElement('script');
-    scriptElement.type = 'text/javascript';
-    scriptElement.src = 'https://apis.google.com/js/api:client.js';
-    scriptElement.onload = function() {
+  apisLoadingPromise = loadScript('https://apis.google.com/js/api:client.js')
+    .then(() => {
       const gapi = global.gapi;
       if (!gapi) {
-        reject(
-          new Error(
-            'No gapi global object found after loading Google Drive API script'
-          )
+        throw new Error(
+          'No gapi global object found after loading Google Drive API script'
         );
-        return;
       }
 
-      gapi.load('client:auth2:picker', () => {
-        const auth2LoadPromise = gapi.auth2.init({
-          apiKey: DEVELOPER_KEY,
-          clientId: CLIENT_ID,
-          discoveryDocs: DISCOVERY_DOCS,
-          scope: SCOPE,
+      return new Promise((resolve, reject) => {
+        gapi.load('client:auth2:picker', {
+          callback: () => {
+            const auth2LoadPromise = gapi.auth2.init({
+              apiKey: DEVELOPER_KEY,
+              clientId: CLIENT_ID,
+              discoveryDocs: DISCOVERY_DOCS,
+              scope: SCOPE,
+            });
+
+            gapi.client.setApiKey(DEVELOPER_KEY);
+            const driveLoadPromise = gapi.client.load('drive', 'v3');
+
+            resolve(Promise.all([auth2LoadPromise, driveLoadPromise]));
+          },
+          onerror: () => {
+            reject(
+              new Error(
+                'Unable to load auth2 and picker APIs for Google Drive.'
+              )
+            );
+          },
         });
-
-        gapi.client.setApiKey(DEVELOPER_KEY);
-        const driveLoadPromise = gapi.client.load('drive', 'v3');
-
-        resolve(Promise.all([auth2LoadPromise, driveLoadPromise]));
       });
-    };
-    scriptElement.onerror = error => reject(error);
-    scriptElement.onabort = error => reject(error);
-
-    body.appendChild(scriptElement);
-  })
+    })
     .then(() => {
       apisLoaded = true;
       apisLoadingPromise = null;

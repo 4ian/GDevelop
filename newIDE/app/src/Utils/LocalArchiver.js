@@ -7,13 +7,13 @@ const archiver = optionalRequire('archiver');
 /**
  * Archive the given folder to a file. Only available when running on Electron runtime.
  */
-export const archiveFolder = ({
+export const archiveLocalFolder = ({
   path,
   outputFilename,
-}: {
+}: {|
   path: string,
   outputFilename: string,
-}): Promise<string> => {
+|}): Promise<string> => {
   return new Promise((resolve, reject) => {
     if (!fs || !archiver) return reject(new Error('Archiver unavailable'));
 

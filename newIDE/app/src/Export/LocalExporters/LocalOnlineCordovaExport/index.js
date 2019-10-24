@@ -14,7 +14,7 @@ import { Column, Line } from '../../../UI/Grid';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
 import localFileSystem from '../LocalFileSystem';
-import { archiveFolder } from '../../../Utils/Archiver';
+import { archiveLocalFolder } from '../../../Utils/LocalArchiver';
 import optionalRequire from '../../../Utils/OptionalRequire.js';
 import Window from '../../../Utils/Window';
 import CreateProfile from '../../../Profile/CreateProfile';
@@ -115,7 +115,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
 
   launchCompression = (outputDir: string): Promise<string> => {
     const archiveOutputDir = os.tmpdir();
-    return archiveFolder({
+    return archiveLocalFolder({
       path: outputDir,
       outputFilename: path.join(archiveOutputDir, 'game-archive.zip'),
     });

@@ -18,7 +18,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'BBText',
-        'BBCode Text Object',
+        _('BBCode Text Object'),
         _(
           'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
         ),
@@ -212,9 +212,9 @@ module.exports = {
               `Set${property.functionName}`,
               _('Set ') + property.description,
               _('Set ') + property.description,
-              _('Set ') +
+              _('Do _PARAM1__PARAM2_ to the ') +
                 property.description +
-                _(' of _PARAM0_ to _PARAM1_ _PARAM2_'),
+                _(' of _PARAM0_'),
               '',
               `${property.iconPath}.png`,
               `${property.iconPath}.png`
@@ -267,7 +267,7 @@ module.exports = {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              _('Is the ') + property.description + _(' equal to a value'),
+              property.description,
               _('Check if the ') + property.description + _(' equals a value'),
               _('The ') +
                 property.paramLabel +
@@ -303,7 +303,7 @@ module.exports = {
               `Is${property.functionName}`,
               property.description + _(' is enabled'),
               _('Check if the') + property.description + _(' is enabled'),
-              property.paramLabel + _(' is enabled'),
+              property.paramLabel + _(' of _PARAM0_ is enabled'),
               '',
               `${property.iconPath}.png`,
               `${property.iconPath}.png`
@@ -323,60 +323,60 @@ module.exports = {
     const setterAndGetterProperties = [
       {
         functionName: 'BBText',
-        description: 'BBCode formatted text',
+        description: _('BBCode formatted text'),
         iconPath: 'res/actions/textAlign24',
         type: 'string',
-        paramLabel: 'BBCode text',
+        paramLabel: _('BBCode text'),
       },
       {
         functionName: 'Color',
-        description: 'base color',
+        description: _('base color'),
         iconPath: 'res/actions/color24',
         type: 'color',
-        paramLabel: 'Color (Hex)',
+        paramLabel: _('Color (Hex)'),
       },
       {
         functionName: 'Opacity',
-        description: 'base opacity',
+        description: _('base opacity'),
         iconPath: 'res/actions/opacity24',
         type: 'number',
-        paramLabel: 'Opacity (0-255)',
+        paramLabel: _('Opacity (0-255)'),
       },
       {
         functionName: 'FontSize',
-        description: 'base font size',
+        description: _('base font size'),
         iconPath: 'res/actions/characterSize24',
         type: 'number',
-        paramLabel: 'Font size',
+        paramLabel: _('Font size'),
       },
       {
         functionName: 'FontFamily',
-        description: 'base font family',
+        description: _('base font family'),
         iconPath: 'res/actions/font24',
         type: 'string',
-        paramLabel: 'Font family',
+        paramLabel: _('Font family'),
       },
       {
         functionName: 'Alignment',
-        description: 'text alignment',
+        description: _('text alignment'),
         iconPath: 'res/actions/textAlign24',
         type: 'stringWithSelector',
-        paramLabel: 'Alignment',
+        paramLabel: _('Alignment'),
         options: `["left", "right", "center"]`,
       },
       {
         functionName: 'WordWrap',
-        description: 'word wrap',
+        description: _('word wrap'),
         iconPath: 'res/actions/scaleWidth24',
         type: 'boolean',
-        paramLabel: 'Word wrap',
+        paramLabel: _('Word wrap'),
       },
       {
         functionName: 'WrappingWidth',
-        description: 'wrapping width',
+        description: _('wrapping width'),
         iconPath: 'res/actions/scaleWidth24',
         type: 'number',
-        paramLabel: 'Wrapping width',
+        paramLabel: _('Wrapping width'),
       },
     ];
 

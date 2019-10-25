@@ -172,8 +172,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
 
   extension
       .AddAction("SerializeToVariable",
-                 _("Save an inventory in a variable"),
-                 _("Save all the items of the inventory in a variable, so that "
+                 _("Save an inventory in a scene variable"),
+                 _("Save all the items of the inventory in a scene variable, so that "
                    "it can be restored later."),
                  _("Save inventory _PARAM1_ in variable _PARAM2_"),
                  _("Inventories/Variables"),
@@ -188,8 +188,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
 
   extension
       .AddAction("UnserializeFromVariable",
-                 _("Load an inventory from a variable"),
-                 _("Load the content of the inventory from a variable."),
+                 _("Load an inventory from a scene variable"),
+                 _("Load the content of the inventory from a scene variable."),
                  _("Load inventory _PARAM1_ from variable _PARAM2_"),
                  _("Inventories/Variables"),
                  "CppPlatform/Extensions/Inventoryicon24.png",

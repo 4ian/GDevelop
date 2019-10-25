@@ -798,10 +798,10 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Ray maximum distance (in pixels)"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the X position of the intersection"))
+          _("Scene variable where to store the X position of the intersection"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the Y position of the intersection"))
+          _("Scene variable where to store the Y position of the intersection"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 }

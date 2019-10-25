@@ -48,7 +48,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "",
           true)
       .AddParameter(
-          "scenevar", _("Store the response in this variable"), "", true)
+          "scenevar", _("Store the response in this scene variable"), "", true)
       .MarkAsComplex();
 
   extension
@@ -68,8 +68,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
   extension
       .AddAction(
           "JSONToVariableStructure",
-          _("Convert JSON to a variable"),
-          _("Parse a JSON object and store it into a variable"),
+          _("Convert JSON to a scene variable"),
+          _("Parse a JSON object and store it into a scene variable"),
           _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
           _("Network"),
           "res/actions/net24.png",
@@ -109,11 +109,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
 
   extension
       .AddStrExpression("ToJSON",
-                        _("Convert variable to JSON"),
-                        _("Convert a variable to JSON"),
+                        _("Convert scene variable to JSON"),
+                        _("Convert a scene variable to JSON"),
                         _("Conversion"),
                         "res/conditions/toujours24.png")
-      .AddParameter("scenevar", _("The variable to be stringified"));
+      .AddParameter("scenevar", _("Scene variable to be stringified"));
 
   extension
       .AddStrExpression("GlobalVarToJSON",

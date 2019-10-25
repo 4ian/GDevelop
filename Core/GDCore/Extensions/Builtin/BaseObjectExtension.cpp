@@ -1115,10 +1115,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Ray maximum distance (in pixels)"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the X position of the intersection"))
+          _("Scene variable where to store the X position of the intersection"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the Y position of the intersection"))
+          _("Scene variable where to store the Y position of the intersection"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 
@@ -1143,10 +1143,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Ray target Y position"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the X position of the intersection"))
+          _("Scene variable where to store the X position of the intersection"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the Y position of the intersection"))
+          _("Scene variable where to store the Y position of the intersection"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 

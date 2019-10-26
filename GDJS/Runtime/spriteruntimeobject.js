@@ -541,19 +541,19 @@ gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
 
     //Flipping
     if ( this._flippedX ) {
-        x = this._renderer.getUnscaledWidth() - x;
-        cx = this._renderer.getUnscaledWidth() - cx;
+        x = x + (cx - x) * 2;
     }
     if ( this._flippedY ) {
-        y = this._renderer.getUnscaledHeight() - y;
-        cy = this._renderer.getUnscaledHeight() - cy;
+        y = y + (cy - y) * 2;
     }
 
     //Scale
-    x *= Math.abs(this._scaleX);
-    y *= Math.abs(this._scaleY);
-    cx *= Math.abs(this._scaleX);
-    cy *= Math.abs(this._scaleY);
+    var absScaleX = Math.abs(this._scaleX);
+    var absScaleY = Math.abs(this._scaleY);
+    x *= absScaleX;
+    y *= absScaleY;
+    cx *= absScaleX;
+    cy *= absScaleY;
 
     //Rotation
     var oldX = x;
@@ -566,8 +566,8 @@ gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
     y = cy + sinValue*(xToCenterXDelta) + cosValue*(yToCenterYDelta);
 
     result.length = 2;
-    result[0] = x + this.getDrawableX();
-    result[1] = y + this.getDrawableY();
+    result[0] = x + (this.x - this._animationFrame.origin.x*absScaleX);
+    result[1] = y + (this.y - this._animationFrame.origin.y*absScaleY);
 };
 
 /**
@@ -577,7 +577,14 @@ gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
 gdjs.SpriteRuntimeObject.prototype.getDrawableX = function() {
     if ( this._animationFrame === null ) return this.x;
 
-    return this.x - this._animationFrame.origin.x*Math.abs(this._scaleX);
+    var absScaleX = Math.abs(this._scaleX);
+
+    if (!this._flippedX) {
+        return this.x - this._animationFrame.origin.x*absScaleX;
+    } else {
+        return this.x + (-this._animationFrame.origin.x
+            - this._renderer.getUnscaledWidth() + 2*this._animationFrame.center.x)*absScaleX;
+    }
 };
 
 /**
@@ -587,29 +594,44 @@ gdjs.SpriteRuntimeObject.prototype.getDrawableX = function() {
 gdjs.SpriteRuntimeObject.prototype.getDrawableY = function() {
     if ( this._animationFrame === null ) return this.y;
 
-    return this.y - this._animationFrame.origin.y*Math.abs(this._scaleY);
+    var absScaleY = Math.abs(this._scaleY);
+
+    if (!this._flippedY) {
+        return this.y - this._animationFrame.origin.y*absScaleY;
+    } else {
+        return this.y + (-this._animationFrame.origin.y
+            - this._renderer.getUnscaledHeight() + 2*this._animationFrame.center.y)*absScaleY;
+    }
 };
 
 /**
- * Get the X position of the center of the object, relative to top-left of the object.
- * @return {number} X position of the center of the object, relative to top-left of the object.
+ * Get the X position of the center of the object, relative to top-left of the texture of the object (`getDrawableX`).
+ * @return {number} X position of the center of the object, relative to `getDrawableX()`.
  */
 gdjs.SpriteRuntimeObject.prototype.getCenterX = function() {
     if ( this._animationFrame === null ) return 0;
 
-    //Just need to multiply by the scale as it is the center
-    return this._animationFrame.center.x*Math.abs(this._scaleX);
+    if (!this._flippedX) {
+        //Just need to multiply by the scale as it is the center.
+        return this._animationFrame.center.x*Math.abs(this._scaleX);
+    } else {
+        return (this._renderer.getUnscaledWidth() - this._animationFrame.center.x)*Math.abs(this._scaleX);
+    }
 };
 
 /**
- * Get the Y position of the center of the object, relative to top-left of the object.
- * @return {number} Y position of the center of the object, relative to top-left of the object.
+ * Get the Y position of the center of the object, relative to top-left of the texture of the object (`getDrawableY`).
+ * @return {number} Y position of the center of the object, relative to `getDrawableY()`.
  */
 gdjs.SpriteRuntimeObject.prototype.getCenterY = function() {
     if ( this._animationFrame === null ) return 0;
 
-    //Just need to multiply by the scale as it is the center
-    return this._animationFrame.center.y*Math.abs(this._scaleY);
+    if (!this._flippedY) {
+        //Just need to multiply by the scale as it is the center.
+        return this._animationFrame.center.y*Math.abs(this._scaleY);
+    } else {
+        return (this._renderer.getUnscaledHeight() - this._animationFrame.center.y)*Math.abs(this._scaleY);
+    }
 };
 
 /**
@@ -743,6 +765,7 @@ gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {
     if ( enable !== this._flippedX ) {
         this._scaleX *= -1;
         this._flippedX = enable;
+        this.hitBoxesDirty = true;
         this._renderer.update();
     }
 };
@@ -751,6 +774,7 @@ gdjs.SpriteRuntimeObject.prototype.flipY = function(enable) {
     if ( enable !== this._flippedY ) {
         this._scaleY *= -1;
         this._flippedY = enable;
+        this.hitBoxesDirty = true;
         this._renderer.update();
     }
 };

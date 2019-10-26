@@ -1,5 +1,11 @@
 gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer, loadingScreenSetup) {
   this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
+  if (!this._pixiRenderer) {
+    // A PIXI Renderer can be missing during tests, when creating a runtime game
+    // without a canvas.
+    return;
+  }
+
   this._loadingScreen = new PIXI.Container();
 
   this._progressText = new PIXI.Text(' ', {
@@ -42,6 +48,10 @@ gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer, loadingScreen
 gdjs.LoadingScreenRenderer = gdjs.LoadingScreenPixiRenderer; //Register the class to let the engine use it.
 
 gdjs.LoadingScreenPixiRenderer.prototype.render = function(percent) {
+  if (!this._pixiRenderer) {
+    return;
+  }
+
   var screenBorder = 10;
 
   if (this._madeWithText) {

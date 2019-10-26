@@ -274,10 +274,11 @@ gdjs.RuntimeObject.prototype.getY = function() {
 };
 
 /**
- * Get the X position of the rendered object.<br>
+ * Get the X position of the rendered object.
+ *
  * For most objects, this will returns the same value as getX(). But if the object
- * has an origin this.is not the same as the point (0,0) of the object displayed,
- * getDrawableX will differs.
+ * has an origin that is not the same as the point (0,0) of the object displayed,
+ * getDrawableX will differ.
  *
  * @return {number} The X position of the rendered object.
  */
@@ -286,10 +287,11 @@ gdjs.RuntimeObject.prototype.getDrawableX = function() {
 };
 
 /**
- * Get the Y position of the rendered object.<br>
+ * Get the Y position of the rendered object.
+ *
  * For most objects, this will returns the same value as getY(). But if the object
- * has an origin this.is not the same as the point (0,0) of the object displayed,
- * getDrawableY will differs.
+ * has an origin that is not the same as the point (0,0) of the object displayed,
+ * getDrawableY will differ.
  *
  * @return {number} The Y position of the rendered object.
  */
@@ -530,7 +532,7 @@ gdjs.RuntimeObject.prototype.hasVariable = function(name) {
 };
 
 /**
- * Hide or show the object
+ * Hide (or show) the object.
  * @param {boolean} enable Set it to true to hide the object, false to show it.
  */
 gdjs.RuntimeObject.prototype.hide = function(enable) {
@@ -540,6 +542,11 @@ gdjs.RuntimeObject.prototype.hide = function(enable) {
 
 /**
  * Return true if the object is not hidden.
+ *
+ * @note This is unrelated to the actual visibility of the objec on the screen.
+ * For this, see `getVisibilityAABB` to get the bounding boxes of the object as displayed
+ * on the scene.
+ *
  * @return {boolean} true if the object is not hidden.
  */
 gdjs.RuntimeObject.prototype.isVisible = function() {
@@ -555,7 +562,7 @@ gdjs.RuntimeObject.prototype.isHidden = function() {
 };
 
 /**
- * Return the width of the object
+ * Return the width of the object.
  * @return {number} The width of the object
  */
 gdjs.RuntimeObject.prototype.getWidth = function() {
@@ -563,7 +570,7 @@ gdjs.RuntimeObject.prototype.getWidth = function() {
 };
 
 /**
- * Return the width of the object
+ * Return the width of the object.
  * @return {number} The height of the object
  */
 gdjs.RuntimeObject.prototype.getHeight = function() {
@@ -571,16 +578,16 @@ gdjs.RuntimeObject.prototype.getHeight = function() {
 };
 
 /**
- * Return the X position of the object center, relative to the object position.
- * @return {number} the X position of the object center
+ * Return the X position of the object center, **relative to the object X position** (`getDrawableX`).
+ * @return {number} the X position of the object center, relative to `getDrawableX()`.
  */
 gdjs.RuntimeObject.prototype.getCenterX = function() {
     return this.getWidth() / 2;
 };
 
 /**
- * Return the Y position of the object center, relative to the object position.
- * @return {number} the Y position of the object center
+ * Return the Y position of the object center, **relative to the object position** (`getDrawableY`).
+ * @return {number} the Y position of the object center, relative to `getDrawableY()`.
  */
 gdjs.RuntimeObject.prototype.getCenterY = function() {
     return this.getHeight() / 2;
@@ -777,32 +784,28 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
     var centerX = this.getCenterX();
     var centerY = this.getCenterY();
 
-    if (this.getCenterX() === width / 2 && this.getCenterY() === height / 2) {
-        this.hitBoxes[0].vertices[0][0] =-width/2.0;
-        this.hitBoxes[0].vertices[0][1] =-height/2.0;
-        this.hitBoxes[0].vertices[1][0] =+width/2.0;
-        this.hitBoxes[0].vertices[1][1] =-height/2.0;
-        this.hitBoxes[0].vertices[2][0] =+width/2.0;
-        this.hitBoxes[0].vertices[2][1] =+height/2.0;
-        this.hitBoxes[0].vertices[3][0] =-width/2.0;
-        this.hitBoxes[0].vertices[3][1] =+height/2.0;
-
-        this.hitBoxes[0].rotate(this.getAngle()/180*Math.PI);
-        this.hitBoxes[0].move(this.getDrawableX()+this.getCenterX(), this.getDrawableY()+this.getCenterY());
+    if (centerX === width / 2 && centerY === height / 2) {
+        this.hitBoxes[0].vertices[0][0] = - centerX;
+        this.hitBoxes[0].vertices[0][1] = - centerY;
+        this.hitBoxes[0].vertices[1][0] = + centerX;
+        this.hitBoxes[0].vertices[1][1] = - centerY;
+        this.hitBoxes[0].vertices[2][0] = + centerX;
+        this.hitBoxes[0].vertices[2][1] = + centerY;
+        this.hitBoxes[0].vertices[3][0] = - centerX;
+        this.hitBoxes[0].vertices[3][1] = + centerY;
     } else {
-        this.hitBoxes[0].vertices[0][0] = 0;
-        this.hitBoxes[0].vertices[0][1] = 0;
-        this.hitBoxes[0].vertices[1][0] = width;
-        this.hitBoxes[0].vertices[1][1] = 0;
-        this.hitBoxes[0].vertices[2][0] = width;
-        this.hitBoxes[0].vertices[2][1] = height;
-        this.hitBoxes[0].vertices[3][0] = 0;
-        this.hitBoxes[0].vertices[3][1] = height;
-
-        this.hitBoxes[0].move(-centerX, -centerY);
-        this.hitBoxes[0].rotate(this.getAngle()/180*Math.PI);
-        this.hitBoxes[0].move(this.getDrawableX()+centerX, this.getDrawableY()+centerY);
+        this.hitBoxes[0].vertices[0][0] = 0 - centerX;
+        this.hitBoxes[0].vertices[0][1] = 0 - centerY;
+        this.hitBoxes[0].vertices[1][0] = width - centerX;
+        this.hitBoxes[0].vertices[1][1] = 0 - centerY;
+        this.hitBoxes[0].vertices[2][0] = width - centerX;
+        this.hitBoxes[0].vertices[2][1] = height - centerY;
+        this.hitBoxes[0].vertices[3][0] = 0 - centerX;
+        this.hitBoxes[0].vertices[3][1] = height - centerY;
     }
+
+    this.hitBoxes[0].rotate(this.getAngle()/180*Math.PI);
+    this.hitBoxes[0].move(this.getDrawableX()+centerX, this.getDrawableY()+centerY);
 };
 
 /**
@@ -1288,6 +1291,8 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
  * @return {boolean} true if obj1 and obj2 are in collision
  */
 gdjs.RuntimeObject.collisionTest = function(obj1, obj2, ignoreTouchingEdges) {
+    // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
+    // is not necessarily in the middle of the object (for sprites for example).
     //First check if bounding circle are too far.
     var o1w = obj1.getWidth();
     var o1h = obj1.getHeight();
@@ -1325,6 +1330,8 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2, ignoreTouchingEdges) {
  * @return A raycast result with the contact points and distances
  */
 gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
+    // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
+    // is not necessarily in the middle of the object (for sprites for example).
     var objW = this.getWidth();
     var objH = this.getHeight();
     var diffX = this.getDrawableX()+this.getCenterX() - x;

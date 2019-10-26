@@ -50,6 +50,8 @@ gdjs.PlatformObjectsManager.prototype.removePlatform = function(platformBehavior
  * @return An array with all platforms near the object.
  */
 gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, maxMovementLength, result) {
+    // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
+    // is not necessarily in the middle of the object (for sprites for example).
     var ow = object.getWidth();
     var oh = object.getHeight();
     var x = object.getDrawableX()+object.getCenterX();

@@ -608,6 +608,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._updatePotentialCollidingObjects 
             var o2w = obj2.getWidth();
             var o2h = obj2.getHeight();
 
+            // This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
+            // is not necessarily in the middle of the object (for sprites for example).
             var x = this.owner.getDrawableX()+this.owner.getCenterX()-(obj2.getDrawableX()+obj2.getCenterX());
             var y = this.owner.getDrawableY()+this.owner.getCenterY()-(obj2.getDrawableY()+obj2.getCenterY());
             var obj2BoundingRadius = Math.sqrt(o2w*o2w+o2h*o2h)/2.0;

@@ -14,13 +14,18 @@ import optionalRequire from '../Utils/OptionalRequire.js';
 import { findEmptyPath } from './LocalPathFinder';
 import ExamplesList from './ExamplesList';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 
 type Props = {|
-  onOpen: string => void,
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => void,
   onExamplesLoaded: () => void,
 |};
 
@@ -88,7 +93,9 @@ export default class LocalExamples extends Component<Props, State> {
         return;
       }
 
-      this.props.onOpen(path.join(outputPath, exampleName + '.json'));
+      this.props.onOpen(LocalFileStorageProvider, {
+        fileIdentifier: path.join(outputPath, exampleName + '.json'),
+      });
       sendNewGameCreated(exampleName);
     });
   };

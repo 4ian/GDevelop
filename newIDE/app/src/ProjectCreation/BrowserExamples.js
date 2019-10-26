@@ -4,6 +4,7 @@ import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import ExamplesList from './ExamplesList';
+import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
 
 // This is the list of available examples in src/fixtures folder.
 // To add a new example, add it first in resources/examples, using the desktop Electron version
@@ -135,7 +136,9 @@ export default class BrowserExamples extends Component {
             exampleNames={exampleNames}
             onCreateFromExample={exampleName => {
               sendNewGameCreated(exampleName);
-              this.props.onOpen(`example://${exampleName}`);
+              this.props.onOpen(InternalFileStorageProvider, {
+                fileIdentifier: `example://${exampleName}`,
+              });
             }}
           />
         </Line>

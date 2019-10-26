@@ -31,7 +31,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
 #if defined(GD_IDE_ONLY)
   obj.AddAction("Opacity",
-                _("Change Sprite opacity"),
+                _("Change sprite opacity"),
                 _("Change the opacity of a Sprite. 0 is fully transparent, 255 "
                   "is opaque (default)."),
                 _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),

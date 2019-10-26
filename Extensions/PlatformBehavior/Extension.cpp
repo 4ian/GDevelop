@@ -332,8 +332,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                     "this can be useful to allow double jump for example."),
                   _("Allow _PARAM0_ to jump again"),
                   _("Options"),
-                  "res/conditions/keyboard24.png",
-                  "res/conditions/keyboard.png")
+                  "CppPlatform/Extensions/platformerobjecticon24.png",
+                  "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()

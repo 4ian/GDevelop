@@ -260,7 +260,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("yesorno", _("Show the shadow"));
 
   obj.AddAction("Opacity",
-                _("Change Text Opacity"),
+                _("Change text opacity"),
                 _("Change the opacity of a Text. 0 is fully transparent, 255 "
                   "is opaque (default)."),
                 _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),

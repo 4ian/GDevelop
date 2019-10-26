@@ -113,9 +113,13 @@ export default class InstancesEditorContainer extends Component {
       this.props.height
     );
     gesture.panable(this.backgroundArea);
-    this.backgroundArea.on('mousedown', event =>
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y)
-    );
+    this.backgroundArea.on('mousedown', event => {
+      if (event.data.button === 1 || this.keyboardShortcuts.shouldMoveView()) {
+        event.stopPropagation();
+        return;
+      }
+      this._onBackgroundClicked(event.data.global.x, event.data.global.y);
+    });
     this.backgroundArea.on('touchstart', event => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
         return;

@@ -1,5 +1,9 @@
 /**
  * Tests for gdjs.SpriteRuntimeObject using a "real" PIXI RuntimeGame with assets.
+ *
+ * See also these test games:
+ * * GDJS/tests/games/rotate-flip-around-center-point/ship-rotate-flip.json
+ * * GDJS/tests/games/rotated-objects-hitboxes/game.json
  */
 describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', function() {
   const textureWidth = 64;
@@ -177,7 +181,7 @@ describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', func
     });
   });
 
-  it('properly computes hitboxes and point positions', function() {
+  it('properly computes hitboxes and point positions (after flipping or rotation)', function() {
     return gdjs.getPixiRuntimeGameWithAssets().then(runtimeGame => {
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
@@ -190,6 +194,14 @@ describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', func
       expect(object.getHitBoxes()[0].vertices[1]).to.eql([41.5 - originPointX, 2 - originPointY]);
       expect(object.getHitBoxes()[0].vertices[2]).to.eql([55.5 - originPointX, 31 - originPointY]);
       expect(object.getHitBoxes()[0].vertices[3]).to.eql([24.5 - originPointX, 30 - originPointY]);
+
+      // Sanity check the center position
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
+
+      // Sanity check the origin position
+      expect(object.getPointX("Origin")).to.be(0);
+      expect(object.getPointY("Origin")).to.be(0);
 
       // Hitbox with rotation
       object.setAngle(90);
@@ -209,6 +221,10 @@ describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', func
         6.4999,
         6.5001
       );
+
+      // Center is unchanged with rotation
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
 
       // Hitbox with flipping (X axis)
       //
@@ -235,6 +251,14 @@ describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', func
       expect(object.getHitBoxes()[0].vertices[2]).to.eql([centerPointX - 55.5 + centerPointX - originPointX, 31 - originPointY]);
       expect(object.getHitBoxes()[0].vertices[3]).to.eql([centerPointX - 24.5 + centerPointX - originPointX, 30 - originPointY]);
 
+      // Center is unchanged with flipping
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
+
+      // Origin *point* is flipped
+      expect(object.getPointX("Origin")).to.be(64);
+      expect(object.getPointY("Origin")).to.be(0);
+
       // Hitbox with flipping (X and Y axis)
       //
       // Same calculations as before for the point Y positions.
@@ -246,6 +270,14 @@ describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', func
       expect(object.getHitBoxes()[0].vertices[1]).to.eql([centerPointX - 41.5 + centerPointX - originPointX, centerPointY - 2 + centerPointY - originPointY]);
       expect(object.getHitBoxes()[0].vertices[2]).to.eql([centerPointX - 55.5 + centerPointX - originPointX, centerPointY - 31 + centerPointY - originPointY]);
       expect(object.getHitBoxes()[0].vertices[3]).to.eql([centerPointX - 24.5 + centerPointX - originPointX, centerPointY - 30 + centerPointY - originPointY]);
+
+      // Center is unchanged with flipping
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
+
+      // Origin *point* is flipped
+      expect(object.getPointX("Origin")).to.be(64);
+      expect(object.getPointY("Origin")).to.be(30);
 
       // Hitbox with flipping (X and Y axis) and rotation
       object.setAngle(-90);
@@ -261,6 +293,98 @@ describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', func
       );
       expect(object.getHitBoxes()[0].vertices[2]).to.eql([32, 6.5]);
       expect(object.getHitBoxes()[0].vertices[3]).to.eql([33, -24.5]);
+
+      // Center is unchanged with flipping and rotation
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
+
+      // Origin *point* is flipped and rotated
+      expect(object.getPointX("Origin")).to.be(47);
+      expect(object.getPointY("Origin")).to.be(-17);
+    });
+  });
+
+  it('properly computes hitboxes and point positions after scaling', function() {
+    return gdjs.getPixiRuntimeGameWithAssets().then(runtimeGame => {
+      const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
+      // Create an object with a custom hitbox
+      const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+
+      // Check the hitboxes without any rotation (only the non default origin
+      // which is at 32;16 is to be used).
+      expect(object.getHitBoxes()[0].vertices[0]).to.eql([12.5 - originPointX, 1 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[1]).to.eql([41.5 - originPointX, 2 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[2]).to.eql([55.5 - originPointX, 31 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[3]).to.eql([24.5 - originPointX, 30 - originPointY]);
+
+      // Sanity check the center position
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
+
+      // Sanity check the origin position
+      expect(object.getPointX("Origin")).to.be(0);
+      expect(object.getPointY("Origin")).to.be(0);
+
+      // Hitbox with 0.5 scaling (X and Y axis)
+      //
+      // On the X axis, points are like this (P = the first vertex of the hitboxes, O = origin, C = center):
+      // -20       -10       0         10        20        30        40        50        60        70        80        90
+      // |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+      //                                 P (12.5)            O (32)                          C (64)
+      //
+      // Object X position is 0, so the origin is at 0 in the scene coordinates:
+      // -20       -10       0         10        20        30        40        50        60        70        80        90
+      // |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+      // P (-19.5)           O (0)                           C (32)
+      //
+      // Object is scaled, relative to the origin, so points are like this now in the scene coordinates:
+      // -20       -10       0         10        20        30        40        50        60        70        80        90
+      // |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+      //           P (-9.75) O (0)           C (16)
+      //
+      object.setAngle(0);
+      object.setScale(0.5);
+      object.flipX(false);
+      object.flipY(false);
+      expect((12.5 - originPointX)/2).to.be(-9.75); // Sanity check of the first expected position
+      expect(object.getHitBoxes()[0].vertices[0]).to.eql([(12.5 - originPointX)/2, (1 - originPointY)/2]);
+      expect(object.getHitBoxes()[0].vertices[1]).to.eql([(41.5 - originPointX)/2, (2 - originPointY)/2]);
+      expect(object.getHitBoxes()[0].vertices[2]).to.eql([(55.5 - originPointX)/2, (31 - originPointY)/2]);
+      expect(object.getHitBoxes()[0].vertices[3]).to.eql([(24.5 - originPointX)/2, (30 - originPointY)/2]);
+
+      // Center is moved after scaling
+      expect(object.getPointX("Center")).to.be(16);
+      expect(object.getPointY("Center")).to.be(7.5);
+
+      // Origin is unchanged after scaling
+      expect(object.getPointX("Origin")).to.be(0);
+      expect(object.getPointY("Origin")).to.be(0);
+
+      // Hitbox with 0.5 scaling (X and Y axis) and flipping (X axis)
+
+      // Object is scaled, relative to the origin, and flipped on X axis so points are like this now in the scene coordinates:
+      // -20       -10       0         10        20        30        40        50        60        70        80        90
+      // |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+      //                                     C (16)          O (32)    P (41.75)
+      //
+      object.setAngle(0);
+      object.setScale(0.5);
+      object.flipX(true);
+      object.flipY(false);
+      expect((centerPointX - 12.5 + centerPointX - originPointX)/2).to.be(41.75); // Sanity check of the first expected position
+      expect(object.getHitBoxes()[0].vertices[0]).to.eql([(centerPointX - 12.5 + centerPointX - originPointX)/2, (1 - originPointY)/2]);
+      expect(object.getHitBoxes()[0].vertices[1]).to.eql([(centerPointX - 41.5 + centerPointX - originPointX)/2, (2 - originPointY)/2]);
+      expect(object.getHitBoxes()[0].vertices[2]).to.eql([(centerPointX - 55.5 + centerPointX - originPointX)/2, (31 - originPointY)/2]);
+      expect(object.getHitBoxes()[0].vertices[3]).to.eql([(centerPointX - 24.5 + centerPointX - originPointX)/2, (30 - originPointY)/2]);
+
+      // Center is unchanged with flipping
+      expect(object.getPointX("Center")).to.be(16);
+      expect(object.getPointY("Center")).to.be(7.5);
+
+      // Origin *point* is flipped
+      expect(object.getPointX("Origin")).to.be(32);
+      expect(object.getPointY("Origin")).to.be(0);
     });
   });
 });

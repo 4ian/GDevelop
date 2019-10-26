@@ -765,6 +765,7 @@ gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {
     if ( enable !== this._flippedX ) {
         this._scaleX *= -1;
         this._flippedX = enable;
+        this.hitBoxesDirty = true;
         this._renderer.update();
     }
 };
@@ -773,6 +774,7 @@ gdjs.SpriteRuntimeObject.prototype.flipY = function(enable) {
     if ( enable !== this._flippedY ) {
         this._scaleY *= -1;
         this._flippedY = enable;
+        this.hitBoxesDirty = true;
         this._renderer.update();
     }
 };

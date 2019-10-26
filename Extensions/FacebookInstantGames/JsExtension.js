@@ -30,7 +30,7 @@ module.exports = {
         "SavePlayerData",
         _("Save player data"),
         _(
-          "Save the content of the given variable in the player data, stored on Facebook Instant Games servers"
+          "Save the content of the given scene variable in the player data, stored on Facebook Instant Games servers"
         ),
         _(
           "Save the content of _PARAM1_ in key _PARAM0_ of player data (store success message in _PARAM2_ or error in _PARAM3_)"
@@ -40,7 +40,7 @@ module.exports = {
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter("string", 'Data key name (e.g: "Lives")', "", false)
-      .addParameter("scenevar", "Variable with the content to save", "", false)
+      .addParameter("scenevar", "Scene variable with the content to save", "", false)
       .addParameter(
         "scenevar",
         _("Variable where to store the success message (optional)"),

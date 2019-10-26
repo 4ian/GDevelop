@@ -42,7 +42,7 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
           "GetCheckoutUrlForProduct",
           _("Get the URL for buying a product"),
           _("Get the URL for buying a product from a shop. The URL will be "
-            "stored in the variable that you specify. You can then use the "
+            "stored in the scene variable that you specify. You can then use the "
             "action to open an URL to redirect the player to the checkout."),
           _("Get the URL for product #_PARAM2_ (quantity: _PARAM3_, variant: "
             "_PARAM4_) from shop _PARAM1_, and store it in _PARAM5_ (or "
@@ -60,8 +60,8 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Variant (0 by default)"))
       .SetDefaultValue("0")
       .AddParameter("scenevar",
-                    _("Variable where the URL for checkout must be stored"))
-      .AddParameter("scenevar", _("Variable containing the error (if any)"));
+                    _("Scene variable where the URL for checkout must be stored"))
+      .AddParameter("scenevar", _("Scene variable containing the error (if any)"));
 #endif
 }
 

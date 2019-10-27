@@ -5,6 +5,7 @@ import { type UserProfile } from '../../Profile/UserProfileContext';
 
 const waitTime = 1500;
 const bulkWaitTime = 5000;
+const maxTimeBeforeIgnoring = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
 export default class BuildsWatcher {
   runningWatchers: { [string]: boolean } = {};
@@ -27,7 +28,22 @@ export default class BuildsWatcher {
 
     builds.forEach(build => {
       if (build.status === 'pending') {
-        this._pollBuild(build.id, builds.length > 1 ? bulkWaitTime : waitTime);
+        if (
+          (!build.createdAt ||
+            build.createdAt < Date.now() - maxTimeBeforeIgnoring) &&
+          (!build.updatedAt ||
+            build.updatedAt < Date.now() - maxTimeBeforeIgnoring)
+        ) {
+          console.info(
+            "Ignoring a build for polling as it's too old and still pending",
+            build
+          );
+        } else {
+          this._pollBuild(
+            build.id,
+            builds.length > 1 ? bulkWaitTime : waitTime
+          );
+        }
       }
     });
   }

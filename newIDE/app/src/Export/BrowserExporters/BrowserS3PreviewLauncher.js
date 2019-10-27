@@ -39,7 +39,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   };
 
   _prepareExporter = (): Promise<any> => {
-    return findGDJS().then(({ gdjsRoot, filesContent }) => {
+    // TODO: Loader?
+    return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
       const prefix = makeTimestampedId();

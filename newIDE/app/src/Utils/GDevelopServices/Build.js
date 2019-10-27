@@ -1,8 +1,9 @@
 // @flow
 import axios from 'axios';
-import { GDevelopBuildApi } from './ApiConfigs';
+import { makeTimestampedId } from '../../Utils/TimestampedId';
+import { GDevelopBuildApi, GDevelopBuildUpload } from './ApiConfigs';
 
-export const getUrl = (key: string) =>
+export const getBuildUrl = (key: string) =>
   `https://s3-eu-west-1.amazonaws.com/gd-build/${key}`;
 
 export type TargetName = 'winExe' | 'winZip' | 'macZip' | 'linuxAppImage';
@@ -22,6 +23,37 @@ export type Build = {
   targets?: Array<TargetName>,
   createdAt: number,
   updatedAt: number,
+};
+
+export const uploadBuildFile = (
+  blob: Blob,
+  onProgress: (progress: number, total: number) => void
+): Promise<string> => {
+  const prefix = 'game-archive-' + makeTimestampedId();
+  const filename = 'game-archive.zip';
+
+  return new Promise((resolve, reject) => {
+    GDevelopBuildUpload.awsS3Client
+      .putObject(
+        {
+          Body: blob,
+          Bucket: GDevelopBuildUpload.options.destinationBucket,
+          Key: prefix + '/' + filename,
+        },
+        (err: ?Error) => {
+          if (err) return reject(err);
+
+          resolve(prefix + '/' + filename);
+        }
+      )
+      .on('httpUploadProgress', progress => {
+        if (!progress || !progress.total) {
+          onProgress(0, 0);
+          return;
+        }
+        onProgress(progress.loaded, progress.total);
+      });
+  });
 };
 
 export const buildElectron = (

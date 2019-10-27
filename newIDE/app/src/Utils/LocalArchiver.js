@@ -4,6 +4,7 @@ import optionalRequire from './OptionalRequire.js';
 const fs = optionalRequire('fs');
 const archiver = optionalRequire('archiver');
 
+// TODO: Move in a Archiver folder?
 /**
  * Archive the given folder to a file. Only available when running on Electron runtime.
  */

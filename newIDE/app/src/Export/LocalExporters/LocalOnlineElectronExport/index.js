@@ -9,7 +9,7 @@ import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,
   buildElectron,
-  getUrl,
+  getBuildUrl,
 } from '../../../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../../../Profile/UserProfileContext';
 import { Column, Line } from '../../../UI/Grid';
@@ -41,8 +41,8 @@ const gd = global.gd;
 type State = {
   exportStep: BuildStep,
   build: ?Build,
-  uploadProgress: number,
-  uploadMax: number,
+  stepCurrentProgress: number,
+  stepMaxProgress: number,
   errored: boolean,
   targets: Array<TargetName>,
 };
@@ -57,8 +57,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   state = {
     exportStep: '',
     build: null,
-    uploadProgress: 0,
-    uploadMax: 0,
+    stepCurrentProgress: 0,
+    stepMaxProgress: 0,
     errored: false,
     targets: ['winExe'],
   };
@@ -129,10 +129,10 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     return new Promise((resolve, reject) => {
       ipcRenderer.on(
         's3-file-upload-progress',
-        (event, uploadProgress, uploadMax) => {
+        (event, stepCurrentProgress, stepMaxProgress) => {
           this.setState({
-            uploadProgress,
-            uploadMax,
+            stepCurrentProgress,
+            stepMaxProgress,
           });
         }
       );
@@ -192,8 +192,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
 
     this.setState({
       exportStep: 'export',
-      uploadProgress: 0,
-      uploadMax: 0,
+      stepCurrentProgress: 0,
+      stepMaxProgress: 0,
       errored: false,
       build: null,
     });
@@ -235,7 +235,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   _download = (key: string) => {
     if (!this.state.build || !this.state.build[key]) return;
 
-    Window.openExternalURL(getUrl(this.state.build[key]));
+    Window.openExternalURL(getBuildUrl(this.state.build[key]));
   };
 
   _setTarget = (targetName: TargetName, enable: boolean) => {
@@ -254,8 +254,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     const {
       exportStep,
       build,
-      uploadMax,
-      uploadProgress,
+      stepMaxProgress,
+      stepCurrentProgress,
       errored,
     } = this.state;
     const t = str => str; //TODO;
@@ -335,8 +335,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
             exportStep={exportStep}
             build={build}
             onDownload={this._download}
-            uploadMax={uploadMax}
-            uploadProgress={uploadProgress}
+            stepMaxProgress={stepMaxProgress}
+            stepCurrentProgress={stepCurrentProgress}
             errored={errored}
             showSeeAllMyBuildsExplanation
           />

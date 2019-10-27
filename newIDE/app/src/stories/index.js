@@ -1492,8 +1492,8 @@ storiesOf('BuildStepsProgress', module)
       exportStep={''}
       build={null}
       onDownload={action('download')}
-      uploadMax={0}
-      uploadProgress={0}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
       errored={false}
     />
   ))
@@ -1502,9 +1502,29 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'export'}
       build={null}
       onDownload={action('download')}
-      uploadMax={0}
-      uploadProgress={0}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
       errored={false}
+    />
+  ))
+  .add('BuildStepsProgress (resources-download)', () => (
+    <BuildStepsProgress
+      exportStep={'resources-download'}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={27}
+      stepCurrentProgress={16}
+      errored={false}
+    />
+  ))
+  .add('BuildStepsProgress (export) (errored)', () => (
+    <BuildStepsProgress
+      exportStep={'export'}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
+      errored={true}
     />
   ))
   .add('BuildStepsProgress (compress)', () => (
@@ -1512,8 +1532,8 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'compress'}
       build={null}
       onDownload={action('download')}
-      uploadMax={0}
-      uploadProgress={0}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
       errored={false}
     />
   ))
@@ -1522,8 +1542,8 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'upload'}
       build={null}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
       errored={false}
     />
   ))
@@ -1532,8 +1552,8 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'upload'}
       build={null}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
       errored
     />
   ))
@@ -1542,9 +1562,9 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'waiting-for-build'}
       build={null}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
-      errored
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
     />
   ))
   .add('BuildStepsProgress (build)', () => (
@@ -1559,9 +1579,9 @@ storiesOf('BuildStepsProgress', module)
         createdAt: Date.now(),
       }}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
-      errored
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
       showSeeAllMyBuildsExplanation
     />
   ))
@@ -1578,8 +1598,8 @@ storiesOf('BuildStepsProgress', module)
         createdAt: Date.now(),
       }}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
       errored
     />
   ))
@@ -1597,9 +1617,9 @@ storiesOf('BuildStepsProgress', module)
         createdAt: Date.now(),
       }}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
-      errored
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
     />
   ));
 

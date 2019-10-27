@@ -35,9 +35,11 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
       <Column>
         <Line>
           <AlertMessage kind="warning">
-            Please double check online the changes to make sure that you are
-            aware of anything new in this version that would require you to
-            adapt your project.
+            <Trans>
+              Please double check online the changes to make sure that you are
+              aware of anything new in this version that would require you to
+              adapt your project.
+            </Trans>
           </AlertMessage>
         </Line>
         <Line>

@@ -38,10 +38,10 @@ export default class LocalS3Export extends Component {
     return new Promise((resolve, reject) => {
       ipcRenderer.on(
         's3-folder-upload-progress',
-        (event, uploadProgress, uploadMax) =>
+        (event, stepCurrentProgress, stepMaxProgress) =>
           this.setState({
-            uploadProgress,
-            uploadMax,
+            stepCurrentProgress,
+            stepMaxProgress,
           })
       );
       ipcRenderer.on('s3-folder-upload-done', (event, err, prefix) => {
@@ -148,8 +148,8 @@ export default class LocalS3Export extends Component {
       url,
       exportStarted,
       exportDone,
-      uploadProgress,
-      uploadMax,
+      stepCurrentProgress,
+      stepMaxProgress,
       uploadDone,
       deployDone,
     } = this.state;
@@ -167,7 +167,7 @@ export default class LocalS3Export extends Component {
         <Line alignItems="center">
           <LinearProgress
             style={{ flex: 1 }}
-            value={uploadMax > 0 ? (uploadProgress / uploadMax) * 100 : 0}
+            value={stepMaxProgress > 0 ? (stepCurrentProgress / stepMaxProgress) * 100 : 0}
             variant={
               (exportStarted && !exportDone) || (uploadDone && !deployDone)
                 ? 'indeterminate'

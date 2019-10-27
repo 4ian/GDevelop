@@ -14,6 +14,7 @@ import Authentification from '../Utils/GDevelopServices/Authentification';
 import UserProfileContext, {
   type UserProfile,
 } from '../Profile/UserProfileContext';
+import ExportLauncher from './ExportLauncher';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -179,13 +180,23 @@ export default class ExportDialog extends Component<Props, State> {
                 </Line>
               </React.Fragment>
             )}
-            {exporter && (
+            {exporter && exporter.ExportComponent && (
               <div style={styles.content}>
                 <exporter.ExportComponent
                   project={project}
                   authentification={authentification} //Still exist?
                   onChangeSubscription={onChangeSubscription}
                   onOpenBuildsDialog={this._openBuildsDialog}
+                  userProfile={userProfile}
+                />
+              </div>
+            )}
+            {exporter && exporter.exportPipeline && (
+              <div style={styles.content}>
+                <ExportLauncher
+                  exportPipeline={exporter.exportPipeline}
+                  project={project}
+                  onChangeSubscription={onChangeSubscription}
                   userProfile={userProfile}
                 />
               </div>

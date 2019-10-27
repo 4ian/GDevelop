@@ -1,5 +1,6 @@
 import * as React from 'react';
 import BrowserExport from './BrowserExport';
+import { browserOnlineCordovaExportPipeline } from './BrowserOnlineCordovaExport.js';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
 import Folder from '@material-ui/icons/Folder';
@@ -14,7 +15,7 @@ export const getBrowserExporters = () => [
     description:
       'Package your game for Android directly from GDevelop. iOS support is coming soon!',
     key: 'localonlinecordovaexport',
-    ExportComponent: BrowserExport,
+    exportPipeline: browserOnlineCordovaExportPipeline,
   },
   {
     name: 'Facebook Instant Games',

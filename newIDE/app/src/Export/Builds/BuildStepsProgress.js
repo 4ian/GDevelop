@@ -8,11 +8,12 @@ import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { Line, Spacer } from '../../UI/Grid';
+import { Line, Spacer, Column } from '../../UI/Grid';
 import BuildProgress from './BuildProgress';
 import { type Build } from '../../Utils/GDevelopServices/Build';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Text from '../../UI/Text';
+import AlertMessage from '../../UI/AlertMessage';
 
 const styles = {
   stepper: { flex: 1 },
@@ -22,6 +23,7 @@ const styles = {
 export type BuildStep =
   | ''
   | 'export'
+  | 'resources-download'
   | 'compress'
   | 'upload'
   | 'waiting-for-build'
@@ -31,8 +33,8 @@ type Props = {|
   exportStep: BuildStep,
   onDownload: (key: string) => void,
   build: ?Build,
-  uploadMax: number,
-  uploadProgress: number,
+  stepMaxProgress: number,
+  stepCurrentProgress: number,
   errored: boolean,
   showSeeAllMyBuildsExplanation?: boolean,
 |};
@@ -45,14 +47,14 @@ export default ({
   exportStep,
   onDownload,
   build,
-  uploadMax,
-  uploadProgress,
+  stepMaxProgress,
+  stepCurrentProgress,
   errored,
   showSeeAllMyBuildsExplanation,
 }: Props) => (
   <Stepper
     activeStep={
-      exportStep === 'export'
+      exportStep === 'export' || exportStep === 'resources-download'
         ? 0
         : exportStep === 'compress' || exportStep === 'upload'
         ? 1
@@ -68,13 +70,40 @@ export default ({
         <Trans>Game export</Trans>
       </StepLabel>
       <StepContent>
-        <Line alignItems="center">
-          <CircularProgress size={20} />
-          <Spacer />
-          <Text>
-            <Trans>Export in progress...</Trans>
-          </Text>
-        </Line>
+        {errored ? (
+          <AlertMessage kind="error">
+            <Trans>Can't properly export the game.</Trans>{' '}
+            <Trans>
+              Please check your internet connection or try again later.
+            </Trans>
+          </AlertMessage>
+        ) : exportStep === 'resources-download' ? (
+          <Column expand noMargin>
+            <Text>
+              <Trans>Downloading game resources...</Trans>
+            </Text>
+            <Line expand>
+              <LinearProgress
+                style={styles.linearProgress}
+                value={
+                  stepMaxProgress > 0
+                    ? (stepCurrentProgress / stepMaxProgress) * 100
+                    : 0
+                }
+                variant="determinate"
+              />
+            </Line>
+          </Column>
+        ) : (
+          <Column expand noMargin>
+            <Text>
+              <Trans>Export in progress...</Trans>
+            </Text>
+            <Line expand>
+              <LinearProgress style={styles.linearProgress} />
+            </Line>
+          </Column>
+        )}
       </StepContent>
     </Step>
     <Step>
@@ -83,12 +112,12 @@ export default ({
       </StepLabel>
       <StepContent>
         {errored ? (
-          <Text>
+          <AlertMessage kind="error">
+            <Trans>Can't upload your game to the build service.</Trans>{' '}
             <Trans>
-              Can't upload your game to the build service. Please check your
-              internet connection or try again later.
+              Please check your internet connection or try again later.
             </Trans>
-          </Text>
+          </AlertMessage>
         ) : exportStep === 'compress' ? (
           <Line alignItems="center">
             <CircularProgress size={20} />
@@ -101,7 +130,11 @@ export default ({
           <Line alignItems="center" expand>
             <LinearProgress
               style={styles.linearProgress}
-              value={uploadMax > 0 ? (uploadProgress / uploadMax) * 100 : 0}
+              value={
+                stepMaxProgress > 0
+                  ? (stepCurrentProgress / stepMaxProgress) * 100
+                  : 0
+              }
               variant="determinate"
             />
           </Line>
@@ -114,12 +147,12 @@ export default ({
       </StepLabel>
       <StepContent>
         {errored && (
-          <Text>
+          <AlertMessage kind="error">
             <Trans>
               Build could not start or errored. Please check your internet
               connection or try again later.
             </Trans>
-          </Text>
+          </AlertMessage>
         )}
         {!build && !errored && (
           <Text>

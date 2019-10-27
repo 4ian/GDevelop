@@ -7,7 +7,7 @@ import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,
   buildCordovaAndroid,
-  getUrl,
+  getBuildUrl,
 } from '../../../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../../../Profile/UserProfileContext';
 import { Column, Line } from '../../../UI/Grid';
@@ -38,8 +38,8 @@ const gd = global.gd;
 type State = {
   exportStep: BuildStep,
   build: ?Build,
-  uploadProgress: number,
-  uploadMax: number,
+  stepCurrentProgress: number,
+  stepMaxProgress: number,
   errored: boolean,
 };
 
@@ -53,8 +53,8 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   state = {
     exportStep: '',
     build: null,
-    uploadProgress: 0,
-    uploadMax: 0,
+    stepCurrentProgress: 0,
+    stepMaxProgress: 0,
     errored: false,
   };
   buildsWatcher = new BuildsWatcher();
@@ -124,10 +124,10 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     return new Promise((resolve, reject) => {
       ipcRenderer.on(
         's3-file-upload-progress',
-        (event, uploadProgress, uploadMax) => {
+        (event, stepCurrentProgress, stepMaxProgress) => {
           this.setState({
-            uploadProgress,
-            uploadMax,
+            stepCurrentProgress,
+            stepMaxProgress,
           });
         }
       );
@@ -186,8 +186,8 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
 
     this.setState({
       exportStep: 'export',
-      uploadProgress: 0,
-      uploadMax: 0,
+      stepCurrentProgress: 0,
+      stepMaxProgress: 0,
       errored: false,
       build: null,
     });
@@ -229,15 +229,15 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   _download = (key: string) => {
     if (!this.state.build || !this.state.build[key]) return;
 
-    Window.openExternalURL(getUrl(this.state.build[key]));
+    Window.openExternalURL(getBuildUrl(this.state.build[key]));
   };
 
   render() {
     const {
       exportStep,
       build,
-      uploadMax,
-      uploadProgress,
+      stepMaxProgress,
+      stepCurrentProgress,
       errored,
     } = this.state;
     const t = str => str; //TODO;
@@ -295,8 +295,8 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
             exportStep={exportStep}
             build={build}
             onDownload={this._download}
-            uploadMax={uploadMax}
-            uploadProgress={uploadProgress}
+            stepMaxProgress={stepMaxProgress}
+            stepCurrentProgress={stepCurrentProgress}
             errored={errored}
           />
         </Line>

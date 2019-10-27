@@ -1,18 +1,47 @@
 // @flow
-import indexHTML from './GDJSindex.html.js';
 
 const gdjsRoot =
   'https://s3-eu-west-1.amazonaws.com/gdevelop-resources/GDJS-5.0.0-beta81';
 
-export const findGDJS = (): Promise<{|
+type FileSet = 'preview' | 'cordova';
+
+const filesToDownload: { [FileSet]: Array<string> } = {
+  preview: ['/Runtime/index.html'],
+  cordova: [
+    '/Runtime/Cordova/www/index.html',
+    '/Runtime/Cordova/config.xml',
+    '/Runtime/Cordova/package.json',
+  ],
+};
+
+export type TextFileDescriptor = {| text: string, filePath: string |};
+
+export const findGDJS = (
+  fileSet: FileSet
+): Promise<{|
   gdjsRoot: string,
-  filesContent: { [string]: string },
+  filesContent: Array<TextFileDescriptor>,
 |}> => {
-  return Promise.resolve({
-    gdjsRoot,
-    filesContent: {
-      //TODO: Request and read it.
-      [gdjsRoot + '/Runtime/index.html']: indexHTML,
-    },
+  return Promise.all(
+    filesToDownload[fileSet].map(relativeFilePath => {
+      const url = gdjsRoot + relativeFilePath;
+
+      // Don't do any caching, rely on the browser cache only.
+      return fetch(url).then(response => {
+        if (!response.ok) {
+          console.error(`Error while downloading "${url}"`, response);
+          throw new Error(`Error while downloading "${url}" (status: ${response.status})`);
+        }
+        return response.text().then(text => ({
+          filePath: url,
+          text,
+        }));
+      });
+    })
+  ).then(filesContent => {
+    return {
+      gdjsRoot,
+      filesContent,
+    };
   });
 };

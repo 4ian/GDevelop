@@ -54,7 +54,7 @@ export default ({
     </Step>
     <Step>
       <StepLabel>
-        <Trans>Upload to build service</Trans>
+        <Trans>Compression</Trans>
       </StepLabel>
       <StepContent>
         {errored ? (
@@ -84,7 +84,7 @@ export default ({
           <Text>
             <Trans>
               You can now create a game on Facebook Instant Games, if not
-              already done, and upload the archive generated.
+              already done, and upload the generated archive.
             </Trans>
           </Text>
         </Line>

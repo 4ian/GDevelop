@@ -34,12 +34,51 @@ if (
   !gdevelopGamesPreviewOptions.secretAccessKey
 ) {
   console.warn(
-    "Either REACT_APP_PREVIEW_S3_ACCESS_KEY_ID or REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY are not defined. Preview in browsers won't be working"
+    "Either REACT_APP_PREVIEW_S3_ACCESS_KEY_ID or REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY are not defined. Preview won't work in the web-app."
   );
   console.info(
-    'Copy .env.dist file to .env and fill the values to fix this warning.'
+    'Copy .env.dist file to .env.local and fill the values to fix this warning.'
   );
 }
+
+const gdevelopBuildUploadRegion = 'eu-west-1';
+const gdevelopBuildUploadBucket = 'gd-games-in';
+
+const gdevelopBuildUploadOptions = {
+  destinationBucket: gdevelopBuildUploadBucket,
+  accessKeyId: process.env.REACT_APP_UPLOAD_S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.REACT_APP_UPLOAD_S3_SECRET_ACCESS_KEY,
+  region: gdevelopBuildUploadRegion,
+  destinationBucketBaseUrl: `https://s3-${gdevelopBuildUploadRegion}.amazonaws.com/${gdevelopBuildUploadBucket}/`,
+};
+
+if (
+  !gdevelopBuildUploadOptions.accessKeyId ||
+  !gdevelopBuildUploadOptions.secretAccessKey
+) {
+  console.warn(
+    "Either REACT_APP_UPLOAD_S3_ACCESS_KEY_ID or REACT_APP_UPLOAD_S3_SECRET_ACCESS_KEY are not defined. Upload of builds won't work in the web-app."
+  );
+  console.info(
+    'Copy .env.dist file to .env.local and fill the values to fix this warning.'
+  );
+}
+
+export const GDevelopBuildUpload = {
+  options: gdevelopBuildUploadOptions,
+  awsS3Client: new awsS3({
+    accessKeyId: gdevelopBuildUploadOptions.accessKeyId,
+    secretAccessKey: gdevelopBuildUploadOptions.secretAccessKey,
+    region: gdevelopBuildUploadOptions.region,
+    correctClockSkew: true,
+  }),
+};
+
+export const GDevelopBuildApi = {
+  baseUrl: isDev
+    ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/build',
+};
 
 export const GDevelopFirebaseConfig = {
   apiKey: 'AIzaSyAnX9QMacrIl3yo4zkVFEVhDppGVDDewBc',
@@ -54,12 +93,6 @@ export const GDevelopUsageApi = {
   baseUrl: isDev
     ? 'https://dwjjhr5k76.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://api.gdevelop-app.com/usage',
-};
-
-export const GDevelopBuildApi = {
-  baseUrl: isDev
-    ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/build',
 };
 
 export const GDevelopReleaseApi = {

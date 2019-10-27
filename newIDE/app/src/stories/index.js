@@ -1461,7 +1461,7 @@ storiesOf('LocalExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <GDI18nProvider language="en">
-      <LocalExport open project={project} onClose={action('close')} />
+      <LocalExport project={project} />
     </GDI18nProvider>
   ));
 
@@ -1470,7 +1470,7 @@ storiesOf('LocalS3Export', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <GDI18nProvider language="en">
-      <LocalS3Export open project={project} onClose={action('close')} />
+      <LocalS3Export project={project} />
     </GDI18nProvider>
   ));
 

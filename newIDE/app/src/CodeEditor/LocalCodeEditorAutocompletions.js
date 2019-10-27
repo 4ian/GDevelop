@@ -36,7 +36,7 @@ export const setupAutocompletions = (monaco: any) => {
       });
     });
 
-  findGDJS(gdjsRoot => {
+  findGDJS().then(({ gdjsRoot }) => {
     const runtimePath = path.join(gdjsRoot, 'Runtime');
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');

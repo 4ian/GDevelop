@@ -22,16 +22,12 @@ const checkIfPathHasJsExtensionModule = extensionFolderPath => {
 };
 
 const findJsExtensionModules = ({ filterExamples }) => {
-  return new Promise((resolve, reject) => {
-    findGDJS(gdjsRoot => {
-      if (!gdjsRoot) {
-        return reject();
-      }
-
-      const extensionsRoot = path.join(gdjsRoot, 'Runtime', 'Extensions');
-      console.info(
-        `Searching for JS extensions (file called JsExtension.js) in ${extensionsRoot}...`
-      );
+  return findGDJS().then(({ gdjsRoot }) => {
+    const extensionsRoot = path.join(gdjsRoot, 'Runtime', 'Extensions');
+    console.info(
+      `Searching for JS extensions (file called JsExtension.js) in ${extensionsRoot}...`
+    );
+    return new Promise((resolve, reject) => {
       fs.readdir(extensionsRoot, (error, extensionFolders) => {
         if (error) {
           return reject(error);

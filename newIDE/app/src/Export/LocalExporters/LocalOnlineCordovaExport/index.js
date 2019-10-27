@@ -60,31 +60,25 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   buildsWatcher = new BuildsWatcher();
 
   static prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(gdjsRoot => {
-        if (!gdjsRoot) {
-          showErrorBox('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
 
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          localFileSystem
-        );
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-        const outputDir = path.join(
-          fileSystem.getTempDir(),
-          'OnlineCordovaExport'
-        );
-        fileSystem.mkDir(outputDir);
-        fileSystem.clearDir(outputDir);
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      const outputDir = path.join(
+        fileSystem.getTempDir(),
+        'OnlineCordovaExport'
+      );
+      fileSystem.mkDir(outputDir);
+      fileSystem.clearDir(outputDir);
 
-        resolve({
-          exporter,
-          outputDir,
-        });
-      });
+      return {
+        exporter,
+        outputDir,
+      };
     });
   };
 

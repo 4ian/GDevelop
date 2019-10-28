@@ -70,7 +70,7 @@ export const create = (authentification: Authentification) => {
             <MainFrame
               i18n={i18n}
               eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
-              previewLauncher={<BrowserS3PreviewLauncher />}
+              renderPreviewLauncher={(props, ref) => <BrowserS3PreviewLauncher {...props} ref={ref} />}
               renderExportDialog={props => (
                 <ExportDialog {...props} exporters={getBrowserExporters()} />
               )}

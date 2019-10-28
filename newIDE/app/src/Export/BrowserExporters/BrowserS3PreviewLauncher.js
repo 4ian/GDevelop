@@ -14,7 +14,10 @@ type State = {|
   url: ?string,
 |};
 
-type Props = {};
+type Props = {|
+  onExport?: () => void,
+  onChangeSubscription?: () => void,
+|};
 
 export default class BrowserS3PreviewLauncher extends React.Component<
   Props,

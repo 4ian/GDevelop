@@ -61,7 +61,9 @@ import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import Authentification from '../Utils/GDevelopServices/Authentification';
 import {
-  type PreviewLauncher,
+  type PreviewLauncherInterface,
+  type PreviewLauncherProps,
+  type PreviewLauncherComponent,
   type PreviewOptions,
 } from '../Export/PreviewLauncher.flow';
 import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
@@ -138,7 +140,10 @@ type State = {|
 type Props = {
   integratedEditor?: boolean,
   introDialog?: React.Element<*>,
-  previewLauncher?: React.Element<PreviewLauncher>,
+  renderPreviewLauncher?: (
+    props: PreviewLauncherProps,
+    ref: (previewLauncher: ?PreviewLauncherInterface) => void
+  ) => React.Element<PreviewLauncherComponent>,
   onEditObject?: gdObject => void,
   storageProviderOperations: StorageProviderOperations,
   storageProviders: Array<StorageProvider>,
@@ -186,7 +191,7 @@ class MainFrame extends React.Component<Props, State> {
   };
   toolbar = null;
   _resourceSourceDialogs = {};
-  _previewLauncher: ?PreviewLauncher = null;
+  _previewLauncher: ?PreviewLauncherInterface = null;
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
@@ -912,7 +917,7 @@ class MainFrame extends React.Component<Props, State> {
                   );
                 }
               }}
-              showPreviewButton={!!this.props.previewLauncher}
+              showPreviewButton={!!this.props.renderPreviewLauncher}
               showNetworkPreviewButton={
                 this._previewLauncher &&
                 this._previewLauncher.canDoNetworkPreview()
@@ -953,7 +958,7 @@ class MainFrame extends React.Component<Props, State> {
                   );
                 }
               }}
-              showPreviewButton={!!this.props.previewLauncher}
+              showPreviewButton={!!this.props.renderPreviewLauncher}
               showNetworkPreviewButton={
                 this._previewLauncher &&
                 this._previewLauncher.canDoNetworkPreview()
@@ -1060,7 +1065,7 @@ class MainFrame extends React.Component<Props, State> {
                       );
                     }
                   }}
-                  showPreviewButton={!!this.props.previewLauncher}
+                  showPreviewButton={!!this.props.renderPreviewLauncher}
                   showNetworkPreviewButton={
                     this._previewLauncher &&
                     this._previewLauncher.canDoNetworkPreview()
@@ -1656,7 +1661,7 @@ class MainFrame extends React.Component<Props, State> {
       introDialog,
       resourceSources,
       authentification,
-      previewLauncher,
+      renderPreviewLauncher,
       resourceExternalEditors,
       eventsFunctionsExtensionsState,
       useStorageProvider,
@@ -1838,13 +1843,16 @@ class MainFrame extends React.Component<Props, State> {
             open: this.state.genericDialogOpen,
             onClose: () => this._openGenericDialog(false),
           })}
-        {!!previewLauncher &&
-          React.cloneElement(previewLauncher, {
-            ref: (previewLauncher: ?PreviewLauncher) =>
-              (this._previewLauncher = previewLauncher),
-            onExport: () => this.openExportDialog(true),
-            onChangeSubscription: () => this.openSubscription(true),
-          })}
+        {!!renderPreviewLauncher &&
+          renderPreviewLauncher(
+            {
+              onExport: () => this.openExportDialog(true),
+              onChangeSubscription: () => this.openSubscription(true),
+            },
+            (previewLauncher: ?PreviewLauncherInterface) => {
+              this._previewLauncher = previewLauncher;
+            }
+          )}
         {resourceSources.map(
           (resourceSource, index): React.Node => {
             const Component = resourceSource.component;

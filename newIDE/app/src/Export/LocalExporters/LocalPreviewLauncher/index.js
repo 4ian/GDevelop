@@ -182,7 +182,7 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  _checkSubscription = (options: PreviewOptions) => {
+  _checkSubscription = () => {
     if (!this._subscriptionChecker) return true;
 
     return this._subscriptionChecker.checkHasSubscription();

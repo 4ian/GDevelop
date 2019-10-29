@@ -410,7 +410,7 @@ export default class InstancesEditorContainer extends Component {
     // click/touch - enough to have the selection rectangle being
     // offset from the first click - which looks laggy. Set
     // the start position now.
-    if(!this.keyboardShortcuts.shouldMoveView()){
+    if (!this.keyboardShortcuts.shouldMoveView()) {
       this.selectionRectangle.startSelectionRectangle(x, y);
     }
 

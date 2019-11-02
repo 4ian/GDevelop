@@ -18,6 +18,8 @@ export type ExportPipeline<
   name: string,
   onlineBuildType?: string,
 
+  getInitialExportState: () => ExportState,
+
   renderHeader: ({|
     project: gdProject,
     exportState: ExportState,

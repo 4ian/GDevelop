@@ -50,7 +50,7 @@ export default class ExportLauncher extends Component<Props, State> {
     stepMaxProgress: 0,
     doneFooterOpen: false,
     errored: false,
-    exportState: null,
+    exportState: this.props.exportPipeline.getInitialExportState(),
   };
   buildsWatcher = new BuildsWatcher();
 

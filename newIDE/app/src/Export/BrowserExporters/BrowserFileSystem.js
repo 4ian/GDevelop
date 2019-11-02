@@ -36,8 +36,18 @@ const isURL = (filename: string) => {
  */
 export default class BrowserFileSystem {
   // The representation of the "file system":
-  _textFiles: { [string]: string } = {}; // Store all the text files (filepath => content)
-  _filesToDownload: { [string]: string } = {}; // Store all the files that should be downloaded (url => filepath)
+
+  /**
+   * Store all the text files (filepath => content)
+   * @private
+   */
+  _textFiles: { [string]: string } = {};
+
+  /**
+   * Store all the files that should be downloaded (filepath => url)
+   * @private
+   */
+  _filesToDownload: { [string]: string } = {};
 
   /**
    * Create a new in-memory file system.
@@ -65,23 +75,20 @@ export default class BrowserFileSystem {
    */
   getAllUrlFilesIn = (pathPrefix: string): Array<UrlFileDescriptor> => {
     return Object.keys(this._filesToDownload)
-      .map(url => ({
-        url,
-        filePath: this._filesToDownload[url],
-      }))
-      .filter(
-        UrlFileDescriptor =>
-          UrlFileDescriptor.filePath.indexOf(pathPrefix) === 0
-      );
+      .filter(filePath => filePath.indexOf(pathPrefix) === 0)
+      .map(filePath => ({
+        filePath,
+        url: this._filesToDownload[filePath],
+      }));
   };
 
   mkDir = (path: string) => {
-    // Directories will be created when creating the zip.
+    // "Directories" are assumed to exist.
     return true;
   };
   dirExists = (path: string) => {
     // TODO: To be changed to be EnsureDirExists.
-    // Directories will be created when creating the zip.
+    // "Directories" are assumed to exist.
     return true;
   };
   clearDir = (path: string) => {
@@ -122,7 +129,7 @@ export default class BrowserFileSystem {
 
       // Keep the URL "absolute" if on different domains.
       console.warn(
-        `${filePathOrURL} cannot be made relative to ${baseDirectoryOrURL}, please double check this behavior is correct`
+        `${filePathOrURL} cannot be made relative to ${baseDirectoryOrURL}, please double check this behavior is correct.`
       );
       return filePathOrURL;
     }
@@ -148,7 +155,7 @@ export default class BrowserFileSystem {
         return false;
       }
 
-      this._filesToDownload[source] = path.normalize(dest);
+      this._filesToDownload[path.normalize(dest)] = source;
       return true;
     }
 
@@ -169,8 +176,7 @@ export default class BrowserFileSystem {
   };
 
   readFile = (file: string): string => {
-    if (this._textFiles[file])
-      return this._textFiles[file];
+    if (this._textFiles[file]) return this._textFiles[file];
 
     console.error(`Unknown file ${file}, returning an empty string`);
     return '';
@@ -182,22 +188,26 @@ export default class BrowserFileSystem {
 
     // Simulate ReadDir by returning all external URLs
     // with the filename matching the extension.
-    Object.keys(this._filesToDownload).forEach(sourceFile => {
-      const destinationFile = this._filesToDownload[sourceFile];
-      const upperCaseUrl = destinationFile.toUpperCase();
-      if (upperCaseUrl.indexOf(ext) === upperCaseUrl.length - ext.length) {
-        output.push_back(destinationFile);
+    Object.keys(this._filesToDownload).forEach(filePath => {
+      const upperCaseFilePath = filePath.toUpperCase();
+      if (
+        upperCaseFilePath.indexOf(ext) ===
+        upperCaseFilePath.length - ext.length
+      ) {
+        output.push_back(filePath);
       }
     });
 
     return output;
   };
 
-  fileExists = (filename: string) => {
-    if (isURL(filename)) return true;
+  fileExists = (filePath: string) => {
+    if (isURL(filePath)) return true;
 
-    // Assume all files asked for exists.
-    console.log('file exists for', filename);
-    return true;
+    const normalizedFilePath = path.normalize(filePath);
+    return (
+      !!this._textFiles[normalizedFilePath] ||
+      !!this._filesToDownload[normalizedFilePath]
+    );
   };
 }

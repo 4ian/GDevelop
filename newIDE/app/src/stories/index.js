@@ -1495,6 +1495,18 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
+      hasBuildStep
+    />
+  ))
+  .add('BuildStepsProgress (not started) (without build step)', () => (
+    <BuildStepsProgress
+      exportStep={''}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
+      errored={false}
+      hasBuildStep={false}
     />
   ))
   .add('BuildStepsProgress (export)', () => (
@@ -1505,6 +1517,7 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (resources-download)', () => (
@@ -1515,6 +1528,7 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={27}
       stepCurrentProgress={16}
       errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (export) (errored)', () => (
@@ -1525,6 +1539,7 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={true}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (compress)', () => (
@@ -1535,6 +1550,7 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (upload)', () => (
@@ -1545,6 +1561,7 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (upload) (errored)', () => (
@@ -1555,6 +1572,7 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (waiting-for-build)', () => (
@@ -1565,6 +1583,7 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (build)', () => (
@@ -1583,6 +1602,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={20}
       errored={false}
       showSeeAllMyBuildsExplanation
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (build) (errored)', () => (
@@ -1601,11 +1621,12 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (build) (complete)', () => (
     <BuildStepsProgress
-      exportStep={'build'}
+      exportStep={'done'}
       build={{
         id: 'fake-build-id',
         userId: 'fake-user-id',
@@ -1620,6 +1641,18 @@ storiesOf('BuildStepsProgress', module)
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
+      hasBuildStep
+    />
+  ))
+  .add('BuildStepsProgress (done) (without build step)', () => (
+    <BuildStepsProgress
+      exportStep={'done'}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
+      hasBuildStep={false}
     />
   ));
 

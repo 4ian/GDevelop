@@ -17,9 +17,14 @@ import {
   downloadUrlsToBlobs,
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
-import { type ExportPipelineContext } from '../ExportPipeline.flow';
+import {
+  type ExportPipeline,
+  type ExportPipelineContext,
+} from '../ExportPipeline.flow';
 import Text from '../../UI/Text';
 const gd = global.gd;
+
+type ExportState = {||};
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -27,7 +32,25 @@ type PreparedExporter = {|
   outputDir: string,
 |};
 
-export const browserOnlineCordovaExportPipeline = {
+type ExportOutput = {|
+  textFiles: Array<TextFileDescriptor>,
+  urlFiles: Array<UrlFileDescriptor>,
+|};
+
+type ResourcesDownloadOutput = {|
+  textFiles: Array<TextFileDescriptor>,
+  blobFiles: Array<BlobFileDescriptor>,
+|};
+
+type CompressionOutput = Blob;
+
+export const browserOnlineCordovaExportPipeline: ExportPipeline<
+  ExportState,
+  PreparedExporter,
+  ExportOutput,
+  ResourcesDownloadOutput,
+  CompressionOutput
+> = {
   name: 'browser-online-cordova',
   onlineBuildType: 'cordova-build',
 
@@ -69,10 +92,7 @@ export const browserOnlineCordovaExportPipeline = {
   launchExport: (
     context: ExportPipelineContext,
     { exporter, outputDir, abstractFileSystem }: PreparedExporter
-  ): Promise<{|
-    textFiles: Array<TextFileDescriptor>,
-    urlFiles: Array<UrlFileDescriptor>,
-  |}> => {
+  ): Promise<ExportOutput> => {
     const { project } = context;
 
     const exportOptions = new gd.MapStringBoolean();
@@ -89,17 +109,8 @@ export const browserOnlineCordovaExportPipeline = {
 
   launchResourcesDownload: (
     context: ExportPipelineContext,
-    {
-      textFiles,
-      urlFiles,
-    }: {|
-      textFiles: Array<TextFileDescriptor>,
-      urlFiles: Array<UrlFileDescriptor>,
-    |}
-  ): Promise<{|
-    textFiles: Array<TextFileDescriptor>,
-    blobFiles: Array<BlobFileDescriptor>,
-  |}> => {
+    { textFiles, urlFiles }: ExportOutput
+  ): Promise<ResourcesDownloadOutput> => {
     return downloadUrlsToBlobs({
       urlFiles,
       onProgress: context.updateStepProgress,
@@ -111,13 +122,7 @@ export const browserOnlineCordovaExportPipeline = {
 
   launchCompression: (
     context: ExportPipelineContext,
-    {
-      textFiles,
-      blobFiles,
-    }: {|
-      blobFiles: Array<BlobFileDescriptor>,
-      textFiles: Array<TextFileDescriptor>,
-    |}
+    { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
     return archiveFiles({
       blobFiles,
@@ -135,6 +140,7 @@ export const browserOnlineCordovaExportPipeline = {
   },
 
   launchOnlineBuild: (
+    exportState: ExportState,
     userProfile: UserProfile,
     uploadBucketKey: string
   ): Promise<Build> => {

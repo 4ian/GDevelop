@@ -339,6 +339,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
             stepCurrentProgress={stepCurrentProgress}
             errored={errored}
             showSeeAllMyBuildsExplanation
+            hasBuildStep
           />
         </Line>
       </Column>

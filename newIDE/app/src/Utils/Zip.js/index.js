@@ -29,7 +29,7 @@ export const initializeZipJs = (): Promise<ZipJs> => {
     const zip: ?ZipJs = global.zip;
     if (!zip) {
       throw new Error(
-        'Can not find "zip" in the global namespace after loading zip.js'
+        'Can not find "zip" in the global namespace after loading zip.js. Has the zip.js script being loaded properly?'
       );
     }
 

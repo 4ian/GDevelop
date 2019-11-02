@@ -27,13 +27,15 @@ type State = {|
   stepCurrentProgress: number,
   stepMaxProgress: number,
   errored: boolean,
+  exportState: any,
+  doneFooterOpen: boolean,
 |};
 
 type Props = {|
   project: gdProject,
   onChangeSubscription: () => void,
   userProfile: UserProfile,
-  exportPipeline: ExportPipeline<any, any, any, any>,
+  exportPipeline: ExportPipeline<any, any, any, any, any>,
 |};
 
 /**
@@ -46,7 +48,9 @@ export default class ExportLauncher extends Component<Props, State> {
     build: null,
     stepCurrentProgress: 0,
     stepMaxProgress: 0,
+    doneFooterOpen: false,
     errored: false,
+    exportState: null,
   };
   buildsWatcher = new BuildsWatcher();
 
@@ -133,31 +137,41 @@ export default class ExportLauncher extends Component<Props, State> {
         );
       }, handleError(t('Error while exporting the game.')))
       .then(compressionOutput => {
-        this.setState({
-          exportStep: 'upload',
-        });
-        return exportPipeline.launchUpload(
-          exportPipelineContext,
-          compressionOutput
-        );
+        if (!!exportPipeline.onlineBuildType) {
+          this.setState({
+            exportStep: 'upload',
+          });
+          return exportPipeline
+            .launchUpload(exportPipelineContext, compressionOutput)
+            .then((uploadBucketKey: string) => {
+              this.setState({
+                exportStep: 'waiting-for-build',
+              });
+              return exportPipeline.launchOnlineBuild(
+                this.state.exportState,
+                userProfile,
+                uploadBucketKey
+              );
+            }, handleError(t('Error while uploading the game. Check your internet connection or try again later.')))
+            .then(build => {
+              this.setState(
+                {
+                  build,
+                  exportStep: 'build',
+                },
+                () => {
+                  this._startBuildWatch(userProfile);
+                }
+              );
+            }, handleError(t('Error while lauching the build of the game.')));
+        }
       }, handleError(t('Error while compressing the game.')))
-      .then((uploadBucketKey: string) => {
+      .then(() => {
         this.setState({
-          exportStep: 'waiting-for-build',
+          doneFooterOpen: true,
+          exportStep: 'done',
         });
-        return exportPipeline.launchOnlineBuild(userProfile, uploadBucketKey);
-      }, handleError(t('Error while uploading the game. Check your internet connection or try again later.')))
-      .then(build => {
-        this.setState(
-          {
-            build,
-            exportStep: 'build',
-          },
-          () => {
-            this._startBuildWatch(userProfile);
-          }
-        );
-      }, handleError(t('Error while lauching the build of the game.')))
+      })
       .catch(() => {
         /* Error handled previously */
       });
@@ -169,6 +183,18 @@ export default class ExportLauncher extends Component<Props, State> {
     Window.openExternalURL(getBuildUrl(this.state.build[key]));
   };
 
+  _closeDoneFooter = () =>
+    this.setState({
+      doneFooterOpen: false,
+    });
+
+  _updateExportState = (updater: any => any) => {
+    this.setState(prevState => ({
+      ...prevState,
+      exportState: updater(prevState.exportState),
+    }));
+  };
+
   render() {
     const {
       exportStep,
@@ -176,6 +202,8 @@ export default class ExportLauncher extends Component<Props, State> {
       stepMaxProgress,
       stepCurrentProgress,
       errored,
+      doneFooterOpen,
+      exportState,
     } = this.state;
     const t = str => str; //TODO;
     const { project, userProfile, exportPipeline } = this.props;
@@ -196,7 +224,13 @@ export default class ExportLauncher extends Component<Props, State> {
 
     return (
       <Column noMargin>
-        <Line>{exportPipeline.renderHeader()}</Line>
+        <Line>
+          {exportPipeline.renderHeader({
+            project,
+            exportState,
+            updateExportState: this._updateExportState,
+          })}
+        </Line>
         {(!exportPipeline.onlineBuildType || userProfile.authenticated) && (
           <Line justifyContent="center">
             <RaisedButton
@@ -226,6 +260,7 @@ export default class ExportLauncher extends Component<Props, State> {
         <Line expand>
           <BuildStepsProgress
             exportStep={exportStep}
+            hasBuildStep={!!exportPipeline.onlineBuildType}
             build={build}
             onDownload={this._downloadBuild}
             stepMaxProgress={stepMaxProgress}
@@ -233,6 +268,12 @@ export default class ExportLauncher extends Component<Props, State> {
             errored={errored}
           />
         </Line>
+        {doneFooterOpen &&
+          exportPipeline.renderDoneFooter &&
+          exportPipeline.renderDoneFooter({
+            exportState,
+            onClose: this._closeDoneFooter,
+          })}
       </Column>
     );
   }

@@ -21,6 +21,7 @@ type MainMenuEvent =
   | 'main-menu-export'
   | 'main-menu-create'
   | 'main-menu-open-project-manager'
+  | 'main-menu-start-guidelines'
   | 'main-menu-open-start-page'
   | 'main-menu-open-debugger'
   | 'main-menu-open-about'
@@ -100,6 +101,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     ipcRenderer.on(
       ('main-menu-open-project-manager': MainMenuEvent),
       event => this._editor && this._editor.openProjectManager()
+    );
+    ipcRenderer.on(
+      ('main-menu-start-guidelines': MainMenuEvent),
+      event => this._editor && this._editor.openGuidelines()
     );
     ipcRenderer.on(
       ('main-menu-open-start-page': MainMenuEvent),
@@ -220,6 +225,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
           label: i18n._(t`Show Project Manager`),
           accelerator: 'CommandOrControl+Alt+P',
           onClickSendEvent: 'main-menu-open-project-manager',
+        },
+        {
+          label: i18n._(t`Start guidelines`),
+          onClickSendEvent: 'main-menu-start-guidelines',
         },
         {
           label: i18n._(t`Show Start Page`),

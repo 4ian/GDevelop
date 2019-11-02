@@ -298,6 +298,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
             stepMaxProgress={stepMaxProgress}
             stepCurrentProgress={stepCurrentProgress}
             errored={errored}
+            hasBuildStep
           />
         </Line>
       </Column>

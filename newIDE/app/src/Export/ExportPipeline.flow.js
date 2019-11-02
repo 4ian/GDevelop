@@ -9,6 +9,7 @@ export type ExportPipelineContext = {|
 |};
 
 export type ExportPipeline<
+  ExportState,
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
@@ -17,7 +18,13 @@ export type ExportPipeline<
   name: string,
   onlineBuildType?: string,
 
-  renderHeader: () => React.Node,
+  renderHeader: ({|
+    project: gdProject,
+    exportState: ExportState,
+    updateExportState: (
+      updater: (prevExportState: ExportState) => ExportState
+    ) => void,
+  |}) => React.Node,
   renderLaunchButtonLabel: () => React.Node,
 
   prepareExporter: (
@@ -45,7 +52,13 @@ export type ExportPipeline<
   ) => Promise<string>,
 
   launchOnlineBuild: (
+    exportState: ExportState,
     userProfile: UserProfile,
     uploadBucketKey: string
   ) => Promise<Build>,
+
+  renderDoneFooter?: ({|
+    exportState: ExportState,
+    onClose: () => void,
+  |}) => React.Node,
 |};

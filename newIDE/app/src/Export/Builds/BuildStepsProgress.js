@@ -27,7 +27,8 @@ export type BuildStep =
   | 'compress'
   | 'upload'
   | 'waiting-for-build'
-  | 'build';
+  | 'build'
+  | 'done';
 
 type Props = {|
   exportStep: BuildStep,
@@ -37,6 +38,7 @@ type Props = {|
   stepCurrentProgress: number,
   errored: boolean,
   showSeeAllMyBuildsExplanation?: boolean,
+  hasBuildStep: boolean,
 |};
 
 /**
@@ -50,6 +52,7 @@ export default ({
   stepMaxProgress,
   stepCurrentProgress,
   errored,
+  hasBuildStep,
   showSeeAllMyBuildsExplanation,
 }: Props) => (
   <Stepper
@@ -60,6 +63,10 @@ export default ({
         ? 1
         : exportStep === 'waiting-for-build' || exportStep === 'build'
         ? 2
+        : exportStep === 'done'
+        ? hasBuildStep
+          ? 2
+          : 1
         : -1
     }
     orientation="vertical"
@@ -106,70 +113,82 @@ export default ({
         )}
       </StepContent>
     </Step>
-    <Step>
-      <StepLabel>
-        <Trans>Upload to build service</Trans>
-      </StepLabel>
-      <StepContent>
-        {errored ? (
-          <AlertMessage kind="error">
-            <Trans>Can't upload your game to the build service.</Trans>{' '}
-            <Trans>
-              Please check your internet connection or try again later.
-            </Trans>
-          </AlertMessage>
-        ) : exportStep === 'compress' ? (
-          <Line alignItems="center">
-            <CircularProgress size={20} />
-            <Spacer />
+    {hasBuildStep && (
+      <Step>
+        <StepLabel>
+          <Trans>Upload to build service</Trans>
+        </StepLabel>
+        <StepContent>
+          {errored ? (
+            <AlertMessage kind="error">
+              <Trans>Can't upload your game to the build service.</Trans>{' '}
+              <Trans>
+                Please check your internet connection or try again later.
+              </Trans>
+            </AlertMessage>
+          ) : exportStep === 'compress' ? (
+            <Line alignItems="center">
+              <CircularProgress size={20} />
+              <Spacer />
+              <Text>
+                <Trans>Compressing before upload...</Trans>
+              </Text>
+            </Line>
+          ) : (
+            <Line alignItems="center" expand>
+              <LinearProgress
+                style={styles.linearProgress}
+                value={
+                  stepMaxProgress > 0
+                    ? (stepCurrentProgress / stepMaxProgress) * 100
+                    : 0
+                }
+                variant="determinate"
+              />
+            </Line>
+          )}
+        </StepContent>
+      </Step>
+    )}
+    {hasBuildStep && (
+      <Step>
+        <StepLabel>
+          <Trans>Build and download</Trans>
+        </StepLabel>
+        <StepContent>
+          {errored && (
+            <AlertMessage kind="error">
+              <Trans>
+                Build could not start or errored. Please check your internet
+                connection or try again later.
+              </Trans>
+            </AlertMessage>
+          )}
+          {!build && !errored && (
             <Text>
-              <Trans>Compressing before upload...</Trans>
+              <Trans>Build is starting...</Trans>
             </Text>
-          </Line>
-        ) : (
-          <Line alignItems="center" expand>
-            <LinearProgress
-              style={styles.linearProgress}
-              value={
-                stepMaxProgress > 0
-                  ? (stepCurrentProgress / stepMaxProgress) * 100
-                  : 0
-              }
-              variant="determinate"
-            />
-          </Line>
-        )}
-      </StepContent>
-    </Step>
-    <Step>
-      <StepLabel>
-        <Trans>Build and download</Trans>
-      </StepLabel>
-      <StepContent>
-        {errored && (
-          <AlertMessage kind="error">
-            <Trans>
-              Build could not start or errored. Please check your internet
-              connection or try again later.
-            </Trans>
-          </AlertMessage>
-        )}
-        {!build && !errored && (
-          <Text>
-            <Trans>Build is starting...</Trans>
-          </Text>
-        )}
-        {build && <BuildProgress build={build} onDownload={onDownload} />}
-        {showSeeAllMyBuildsExplanation && (
-          <EmptyMessage>
-            <Trans>
-              If you close this window while the build is being done, you can
-              see its progress and download the game later by clicking on See
-              All My Builds below.
-            </Trans>
-          </EmptyMessage>
-        )}
-      </StepContent>
-    </Step>
+          )}
+          {build && <BuildProgress build={build} onDownload={onDownload} />}
+          {showSeeAllMyBuildsExplanation && (
+            <EmptyMessage>
+              <Trans>
+                If you close this window while the build is being done, you can
+                see its progress and download the game later by clicking on See
+                All My Builds below.
+              </Trans>
+            </EmptyMessage>
+          )}
+        </StepContent>
+      </Step>
+    )}
+    {!hasBuildStep && (
+      <Step>
+        <StepLabel>
+          <Trans>Done</Trans>
+        </StepLabel>
+        <StepContent />
+      </Step>
+    )}
   </Stepper>
 );

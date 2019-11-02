@@ -280,7 +280,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
         <Line>
           <Text>
             {t(
-              'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and/or macOS.'
+              'Your game will be exported and packaged online as a stand-alone game for Windows, Linux and/or macOS.'
             )}
           </Text>
         </Line>

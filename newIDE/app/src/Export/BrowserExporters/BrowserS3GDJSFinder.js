@@ -3,7 +3,7 @@
 const gdjsRoot =
   'https://s3-eu-west-1.amazonaws.com/gdevelop-resources/GDJS-5.0.0-beta81';
 
-type FileSet = 'preview' | 'cordova';
+type FileSet = 'preview' | 'cordova' | 'electron';
 
 const filesToDownload: { [FileSet]: Array<string> } = {
   preview: ['/Runtime/index.html'],
@@ -11,6 +11,11 @@ const filesToDownload: { [FileSet]: Array<string> } = {
     '/Runtime/Cordova/www/index.html',
     '/Runtime/Cordova/config.xml',
     '/Runtime/Cordova/package.json',
+  ],
+  electron: [
+    '/Runtime/index.html',
+    '/Runtime/Electron/main.js',
+    '/Runtime/Electron/package.json',
   ],
 };
 

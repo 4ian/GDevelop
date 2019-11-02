@@ -99,6 +99,45 @@ describe('BrowserFileSystem', () => {
         []
       );
     });
+    test('it can tell if a file exists', () => {
+      const browserFileSystem = new BrowserFileSystem({
+        textFiles: [
+          {
+            filePath: '/file1',
+            text: 'content1',
+          },
+        ],
+      });
+
+      expect(browserFileSystem.fileExists('/file1')).toBe(true);
+      expect(browserFileSystem.fileExists('/folder/downloaded-file')).toBe(
+        false
+      );
+
+      browserFileSystem.copyFile(
+        'http://file.com/from/url',
+        '/folder/downloaded-file'
+      );
+
+      expect(browserFileSystem.fileExists('/file1')).toBe(true);
+      expect(browserFileSystem.fileExists('/folder/downloaded-file')).toBe(
+        true
+      );
+
+      browserFileSystem.writeToFile('/another-folder/file2', 'content2');
+
+      expect(browserFileSystem.fileExists('/file1')).toBe(true);
+      expect(browserFileSystem.fileExists('/another-folder/file2')).toBe(true);
+      expect(browserFileSystem.fileExists('/folder/downloaded-file')).toBe(
+        true
+      );
+
+      // Paths should be normalized:
+      expect(browserFileSystem.fileExists('///file1')).toBe(true);
+      expect(browserFileSystem.fileExists('/folder///downloaded-file')).toBe(
+        true
+      );
+    });
   });
 
   describe('file path manipulation', () => {

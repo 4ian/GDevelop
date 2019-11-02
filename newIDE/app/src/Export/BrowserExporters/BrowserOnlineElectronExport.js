@@ -4,8 +4,9 @@ import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
-  buildCordovaAndroid,
+  buildElectron,
   uploadBuildFile,
+  type TargetName,
 } from '../../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../../Profile/UserProfileContext';
 import { findGDJS } from './BrowserS3GDJSFinder';
@@ -22,9 +23,13 @@ import {
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import Text from '../../UI/Text';
+import Checkbox from '../../UI/Checkbox';
+import { Line, Column } from '../../UI/Grid';
 const gd = global.gd;
 
-type ExportState = null;
+type ExportState = {|
+  targets: Array<TargetName>,
+|};
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -44,33 +49,86 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
-export const browserOnlineCordovaExportPipeline: ExportPipeline<
+export const browserOnlineElectronExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-online-cordova',
-  onlineBuildType: 'cordova-build',
+  name: 'browser-online-electron',
+  onlineBuildType: 'electron-build',
 
-  getInitialExportState: () => null,
+  getInitialExportState: () => ({
+    targets: [],
+  }),
 
-  renderHeader: () => (
-    <Text>
-      <Trans>
-        Packaging your game for Android will create an APK file that can be
-        installed on Android phones.
-      </Trans>
-    </Text>
-  ),
+  renderHeader: ({ exportState, updateExportState }) => {
+    const setTarget = (targetName: TargetName, enable: boolean) => {
+      updateExportState(prevExportState => {
+        if (enable && prevExportState.targets.indexOf(targetName) === -1) {
+          return {
+            ...prevExportState,
+            targets: [...prevExportState.targets, targetName],
+          };
+        } else if (
+          !enable &&
+          prevExportState.targets.indexOf(targetName) !== -1
+        ) {
+          return {
+            ...prevExportState,
+            targets: prevExportState.targets.filter(
+              name => name !== targetName
+            ),
+          };
+        }
 
-  renderLaunchButtonLabel: () => <Trans>Packaging for Android</Trans>,
+        return prevExportState;
+      });
+    };
+
+    return (
+      <React.Fragment>
+        <Column noMargin>
+          <Line>
+            <Text>
+              <Trans>
+                Your game will be exported and packaged online as a stand-alone
+                game for Windows, Linux and/or macOS.
+              </Trans>
+            </Text>
+          </Line>
+          <Checkbox
+            label={<Trans>Windows (zip file)</Trans>}
+            checked={exportState.targets.indexOf('winZip') !== -1}
+            onCheck={(e, checked) => setTarget('winZip', checked)}
+          />
+          <Checkbox
+            label={<Trans>Windows (auto-installer file)</Trans>}
+            checked={exportState.targets.indexOf('winExe') !== -1}
+            onCheck={(e, checked) => setTarget('winExe', checked)}
+          />
+          <Checkbox
+            label={<Trans>macOS (zip file)</Trans>}
+            checked={exportState.targets.indexOf('macZip') !== -1}
+            onCheck={(e, checked) => setTarget('macZip', checked)}
+          />
+          <Checkbox
+            label={<Trans>Linux (AppImage)</Trans>}
+            checked={exportState.targets.indexOf('linuxAppImage') !== -1}
+            onCheck={(e, checked) => setTarget('linuxAppImage', checked)}
+          />
+        </Column>
+      </React.Fragment>
+    );
+  },
+
+  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext
   ): Promise<PreparedExporter> => {
-    return findGDJS('cordova').then(({ gdjsRoot, filesContent }) => {
+    return findGDJS('electron').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
       const outputDir = '/export/';
@@ -98,7 +156,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     const { project } = context;
 
     const exportOptions = new gd.MapStringBoolean();
-    exportOptions.set('exportForCordova', true);
+    exportOptions.set('exportForElectron', true);
     exporter.exportWholePixiProject(project, outputDir, exportOptions);
     exportOptions.delete();
     exporter.delete();
@@ -149,10 +207,11 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     const { getAuthorizationHeader, profile } = userProfile;
     if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
-    return buildCordovaAndroid(
+    return buildElectron(
       getAuthorizationHeader,
       profile.uid,
-      uploadBucketKey
+      uploadBucketKey,
+      exportState.targets
     );
   },
 };

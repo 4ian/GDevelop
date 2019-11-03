@@ -1720,7 +1720,7 @@ class MainFrame extends React.Component<Props, State> {
     return (
       <div className="main-frame">
       
-      <GuidelinePopOver open={guidelinesOpen} />
+      <GuidelinePopOver opened={true} />
         <ProjectTitlebar fileMetadata={currentFileMetadata} />
         <Drawer
           open={projectManagerOpen}

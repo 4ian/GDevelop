@@ -18,7 +18,7 @@ const guidelines = [
   },
   {
     title: 'Bienvenue 2',
-    description: 'blablabla blabla blabla blabla blabla blabla.',
+    description: '2    blablabla blabla blabla blabla blabla blabla.',
     positionBind: 'projectPanel',
     position: {
       x: 700,
@@ -27,7 +27,7 @@ const guidelines = [
   },
   {
     title: 'Bienvenue 3',
-    description: 'blablWe will see the important button inlabla blabla.',
+    description: '3 will see the important button inlabla blabla.',
     positionBind: 'projectPanel',
     position: {
       x: 0,
@@ -46,18 +46,17 @@ const styles = {
   },
 };
 
-
 type Props = {|
-  open?: boolean
+  opened: boolean
 |};
 
 export default class GuidelinePopOver extends PureComponent<Props, State> {
-
   _inputRef = React.createRef();
 
   state = {
-    open: this.props.open,
+    open: true,
     index: 0,
+    indexData: 0,
     indexMax: guidelines.length - 1,
   };
 
@@ -96,12 +95,16 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
   };
 
   componentDidUpdate(prevProps, prevState) {
-      if (this.state.index !== prevState.index) {
-        this._inputRef.current.updatePosition();
-      }
+    if (this.state.index !== prevState.index) {
+      this._inputRef.current.updatePosition();
+
+      setTimeout(() => this.setState({ indexData: this.state.index }), 300);
+    }
   }
 
   render() {
+    const { opened } = this.props;
+
     let nextOrFinish;
     if (this.state.index === this.state.indexMax) {
       nextOrFinish = (
@@ -155,10 +158,10 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           <Grid container style={styles.container}>
             <Grid item xs={12} style={styles.description}>
               <Typography variant="h5">
-                {guidelines[this.state.index].title}
+                {guidelines[this.state.indexData].title}
               </Typography>
               <Typography wrap="true">
-                {guidelines[this.state.index].description}
+                {guidelines[this.state.indexData].description}
               </Typography>
             </Grid>
             <Grid

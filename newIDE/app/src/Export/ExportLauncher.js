@@ -50,7 +50,7 @@ export default class ExportLauncher extends Component<Props, State> {
     stepMaxProgress: 0,
     doneFooterOpen: false,
     errored: false,
-    exportState: this.props.exportPipeline.getInitialExportState(),
+    exportState: this.props.exportPipeline.getInitialExportState(this.props.project),
   };
   buildsWatcher = new BuildsWatcher();
 
@@ -101,6 +101,7 @@ export default class ExportLauncher extends Component<Props, State> {
     const exportPipelineContext = {
       project,
       updateStepProgress: this._updateStepProgress,
+      exportState: this.state.exportState,
     };
 
     this.setState({
@@ -137,17 +138,17 @@ export default class ExportLauncher extends Component<Props, State> {
         );
       }, handleError(t('Error while exporting the game.')))
       .then(compressionOutput => {
-        if (!!exportPipeline.onlineBuildType) {
+        const { launchUpload, launchOnlineBuild } = exportPipeline;
+        if (!!launchUpload && !!launchOnlineBuild) {
           this.setState({
             exportStep: 'upload',
           });
-          return exportPipeline
-            .launchUpload(exportPipelineContext, compressionOutput)
+          return launchUpload(exportPipelineContext, compressionOutput)
             .then((uploadBucketKey: string) => {
               this.setState({
                 exportStep: 'waiting-for-build',
               });
-              return exportPipeline.launchOnlineBuild(
+              return launchOnlineBuild(
                 this.state.exportState,
                 userProfile,
                 uploadBucketKey
@@ -214,12 +215,12 @@ export default class ExportLauncher extends Component<Props, State> {
         ? userProfile.limits[exportPipeline.onlineBuildType]
         : null;
     const canLaunchBuild = (userProfile: UserProfile) => {
-      if (!errored && exportStep !== '' && exportStep !== 'build') return false;
+      if (!errored && exportStep !== '' && exportStep !== 'done') return false;
 
       const limit: ?Limit = getBuildLimit(userProfile);
       if (limit && limit.limitReached) return false;
 
-      return true;
+      return exportPipeline.canLaunchBuild(exportState);
     };
 
     return (

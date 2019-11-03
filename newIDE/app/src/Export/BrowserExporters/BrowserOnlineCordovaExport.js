@@ -56,6 +56,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   getInitialExportState: () => null,
 
+  canLaunchBuild: () => true,
+
   renderHeader: () => (
     <Text>
       <Trans>
@@ -68,7 +70,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   renderLaunchButtonLabel: () => <Trans>Packaging for Android</Trans>,
 
   prepareExporter: (
-    context: ExportPipelineContext
+    context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
     return findGDJS('cordova').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
@@ -92,7 +94,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   },
 
   launchExport: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     { exporter, outputDir, abstractFileSystem }: PreparedExporter
   ): Promise<ExportOutput> => {
     const { project } = context;
@@ -110,7 +112,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   },
 
   launchResourcesDownload: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     { textFiles, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
     return downloadUrlsToBlobs({
@@ -123,7 +125,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   },
 
   launchCompression: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
     return archiveFiles({
@@ -135,7 +137,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   },
 
   launchUpload: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
     return uploadBuildFile(blobFile, context.updateStepProgress);

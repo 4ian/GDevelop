@@ -3,8 +3,9 @@ import * as React from 'react';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../Profile/UserProfileContext';
 
-export type ExportPipelineContext = {|
+export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
+  exportState: ExportState,
   updateStepProgress: (count: number, total: number) => void,
 |};
 
@@ -18,7 +19,7 @@ export type ExportPipeline<
   name: string,
   onlineBuildType?: string,
 
-  getInitialExportState: () => ExportState,
+  getInitialExportState: (project: gdProject) => ExportState,
 
   renderHeader: ({|
     project: gdProject,
@@ -29,31 +30,33 @@ export type ExportPipeline<
   |}) => React.Node,
   renderLaunchButtonLabel: () => React.Node,
 
+  canLaunchBuild: (exportState: ExportState) => boolean,
+
   prepareExporter: (
-    context: ExportPipelineContext
+    context: ExportPipelineContext<ExportState>
   ) => Promise<PreparedExporter>,
 
   launchExport: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     preparedExporter: PreparedExporter
   ) => Promise<ExportOutput>,
 
   launchResourcesDownload: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     exportOutput: ExportOutput
   ) => Promise<ResourcesDownloadOutput>,
 
   launchCompression: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     resourcesDownloadOutput: ResourcesDownloadOutput
   ) => Promise<CompressionOutput>,
 
-  launchUpload: (
-    context: ExportPipelineContext,
+  launchUpload?: (
+    context: ExportPipelineContext<ExportState>,
     compressionOutput: CompressionOutput
   ) => Promise<string>,
 
-  launchOnlineBuild: (
+  launchOnlineBuild?: (
     exportState: ExportState,
     userProfile: UserProfile,
     uploadBucketKey: string

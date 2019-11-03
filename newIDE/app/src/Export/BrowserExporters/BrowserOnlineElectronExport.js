@@ -63,6 +63,8 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     targets: [],
   }),
 
+  canLaunchBuild: (exportState: ExportState) => !!exportState.targets.length,
+
   renderHeader: ({ exportState, updateExportState }) => {
     const setTarget = (targetName: TargetName, enable: boolean) => {
       updateExportState(prevExportState => {
@@ -126,7 +128,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   renderLaunchButtonLabel: () => <Trans>Package</Trans>,
 
   prepareExporter: (
-    context: ExportPipelineContext
+    context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
     return findGDJS('electron').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
@@ -150,7 +152,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   },
 
   launchExport: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     { exporter, outputDir, abstractFileSystem }: PreparedExporter
   ): Promise<ExportOutput> => {
     const { project } = context;
@@ -168,7 +170,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   },
 
   launchResourcesDownload: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     { textFiles, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
     return downloadUrlsToBlobs({
@@ -181,7 +183,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   },
 
   launchCompression: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
     return archiveFiles({
@@ -193,7 +195,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   },
 
   launchUpload: (
-    context: ExportPipelineContext,
+    context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
     return uploadBuildFile(blobFile, context.updateStepProgress);

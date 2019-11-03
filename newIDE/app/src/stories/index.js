@@ -22,8 +22,6 @@ import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
-import LocalExport from '../Export/LocalExporters/LocalExport';
-import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
 import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
@@ -1455,33 +1453,6 @@ storiesOf('ParameterFields', module)
         />
       )}
     />
-  ));
-
-storiesOf('LocalExport', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <GDI18nProvider language="en">
-      <LocalExport project={project} />
-    </GDI18nProvider>
-  ));
-
-storiesOf('LocalS3Export', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <GDI18nProvider language="en">
-      <LocalS3Export project={project} />
-    </GDI18nProvider>
-  ));
-
-storiesOf('LocalCordovaExport', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <GDI18nProvider language="en">
-      <LocalCordovaExport project={project} />
-    </GDI18nProvider>
   ));
 
 storiesOf('BuildStepsProgress', module)

@@ -1,56 +1,87 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
-import Dialog from '../../UI/Dialog';
-import FlatButton from '../../UI/FlatButton';
+import React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
-import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
-import { Column, Line, Spacer } from '../../UI/Grid';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { Column, Line } from '../../UI/Grid';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
-import HelpButton from '../../UI/HelpButton';
-import {
-  displayProjectErrorsBox,
-  getErrors,
-} from '../../ProjectManager/ProjectErrorsChecker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
-import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
+import {
+  type ExportPipeline,
+  type ExportPipelineContext,
+} from '../ExportPipeline.flow';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-type Props = {|
-  project: gdProject,
-|};
-
-type State = {|
+type ExportState = {
   outputDir: string,
-  exportFinishedDialogOpen: boolean,
+};
+
+type PreparedExporter = {|
+  exporter: gdjsExporter,
 |};
 
-class LocalCordovaExport extends Component<Props, State> {
-  state = {
-    exportFinishedDialogOpen: false,
-    outputDir: '',
-  };
+type ExportOutput = null;
 
-  componentDidMount() {
-    const { project } = this.props;
-    this.setState({
-      outputDir: project ? project.getLastCompilationDirectory() : '',
-    });
-  }
+type ResourcesDownloadOutput = null;
 
-  static prepareExporter = (): Promise<any> => {
+type CompressionOutput = null;
+
+export const localCordovaExportPipeline: ExportPipeline<
+  ExportState,
+  PreparedExporter,
+  ExportOutput,
+  ResourcesDownloadOutput,
+  CompressionOutput
+> = {
+  name: 'local-cordova',
+
+  getInitialExportState: (project: gdProject) => ({
+    outputDir: project.getLastCompilationDirectory(),
+  }),
+
+  canLaunchBuild: exportState => !!exportState.outputDir,
+
+  renderHeader: ({ project, exportState, updateExportState }) => (
+    <Column noMargin>
+      <Line>
+        <Column noMargin>
+          <Text>
+            This will export your game as a Cordova project. Cordova is a
+            technology that enables HTML5 games to be packaged for iOS, Android
+            and more.
+          </Text>
+        </Column>
+      </Line>
+      <Line>
+        <LocalFolderPicker
+          type="export"
+          value={exportState.outputDir}
+          defaultPath={project.getLastCompilationDirectory()}
+          onChange={outputDir => {
+            updateExportState(() => ({ outputDir }));
+          }}
+          fullWidth
+        />
+      </Line>
+    </Column>
+  ),
+
+  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+
+  prepareExporter: (
+    context: ExportPipelineContext<ExportState>
+  ): Promise<PreparedExporter> => {
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
+      // TODO: Memory leak? Check for other exporters too.
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
         localFileSystem
@@ -61,132 +92,62 @@ class LocalCordovaExport extends Component<Props, State> {
         exporter,
       };
     });
-  };
+  },
 
-  launchExport = () => {
-    const t = str => str; //TODO;
-    const { project } = this.props;
-    if (!project) return;
+  launchExport: (
+    context: ExportPipelineContext<ExportState>,
+    { exporter }: PreparedExporter
+  ): Promise<ExportOutput> => {
+    const exportOptions = new gd.MapStringBoolean();
+    exportOptions.set('exportForCordova', true);
+    exporter.exportWholePixiProject(
+      context.project,
+      context.exportState.outputDir,
+      exportOptions
+    );
+    exportOptions.delete();
+    exporter.delete();
 
-    sendExportLaunched('local-cordova');
+    return Promise.resolve(null);
+  },
 
-    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
+  launchResourcesDownload: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ExportOutput
+  ): Promise<ResourcesDownloadOutput> => {
+    return Promise.resolve(null);
+  },
 
-    const outputDir = this.state.outputDir;
-    project.setLastCompilationDirectory(outputDir);
+  launchCompression: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ResourcesDownloadOutput
+  ): Promise<CompressionOutput> => {
+    return Promise.resolve(null);
+  },
 
-    LocalCordovaExport.prepareExporter()
-      .then(({ exporter }) => {
-        const exportOptions = new gd.MapStringBoolean();
-        exportOptions.set('exportForCordova', true);
-        exporter.exportWholePixiProject(project, outputDir, exportOptions);
-        exportOptions.delete();
-        exporter.delete();
-
-        this.setState({
-          exportFinishedDialogOpen: true,
-        });
-      })
-      .catch(err => {
-        showErrorBox('Unable to export the game', err);
-      });
-  };
-
-  openExportFolder = () => {
-    if (shell) shell.openItem(this.state.outputDir);
-  };
-
-  openPhoneGapBuild = () => {
-    Window.openExternalURL('https://build.phonegap.com');
-  };
-
-  render() {
-    const t = str => str; //TODO;
-    const { project } = this.props;
-    if (!project) return null;
+  renderDoneFooter: ({ exportState, onClose }) => {
+    const openExportFolder = () => {
+      if (shell) shell.openItem(exportState.outputDir);
+    };
 
     return (
       <Column noMargin>
-        <Line>
-          <Column noMargin>
-            <Text>
-              This will export your game as a Cordova project. Cordova is a
-              technology that enables HTML5 games to be packaged for <b>iOS</b>,{' '}
-              <b>Android</b> and more.
-            </Text>
-            <Text>
-              Third-party tools like <b>Adobe PhoneGap Build</b> allow game
-              developers to bundle their games using Cordova.
-            </Text>
-          </Column>
-        </Line>
-        <Line>
-          <LocalFolderPicker
-            type="export"
-            value={this.state.outputDir}
-            defaultPath={project.getLastCompilationDirectory()}
-            onChange={value => this.setState({ outputDir: value })}
-            fullWidth
-          />
-        </Line>
-        <Line>
-          <Spacer expand />
+        <Text>
+          <Trans>
+            You can now compile the game by yourself using Cordova command-line
+            tool to iOS (XCode is required) or Android (Android SDK is
+            required).
+          </Trans>
+        </Text>
+        <Line justifyContent="center">
           <RaisedButton
-            label={<Trans>Export</Trans>}
+            key="open"
+            label={<Trans>Open folder</Trans>}
             primary={true}
-            onClick={this.launchExport}
-            disabled={!this.state.outputDir}
+            onClick={openExportFolder}
           />
         </Line>
-        <Dialog
-          title={t('Export finished')}
-          actions={[
-            <FlatButton
-              key="open"
-              label={<Trans>Open folder</Trans>}
-              primary={true}
-              onClick={this.openExportFolder}
-            />,
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary={false}
-              onClick={() =>
-                this.setState({
-                  exportFinishedDialogOpen: false,
-                })
-              }
-            />,
-          ]}
-          secondaryActions={
-            <HelpButton key="help" helpPagePath="/publishing" />
-          }
-          modal
-          open={this.state.exportFinishedDialogOpen}
-        >
-          <Text>
-            <Trans>
-              You can now compress and upload the game to PhoneGap Build which
-              will compile it for you to an iOS and Android app.
-            </Trans>
-          </Text>
-          <Text>
-            <Trans>
-              You can also compile the game by yourself using Cordova
-              command-line tool to iOS (XCode is required) or Android (Android
-              SDK is required).
-            </Trans>
-          </Text>
-          <RaisedButton
-            fullWidth
-            primary
-            onClick={() => this.openPhoneGapBuild()}
-            label={t('Open PhoneGap Build')}
-          />
-        </Dialog>
       </Column>
     );
-  }
-}
-
-export default LocalCordovaExport;
+  },
+};

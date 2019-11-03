@@ -1,12 +1,12 @@
 import * as React from 'react';
-import LocalExport from './LocalExport';
+import {localExportPipeline} from './LocalExport';
 import LocalS3Export from './LocalS3Export';
 import LocalOnlineCordovaExport from './LocalOnlineCordovaExport';
-import LocalCordovaExport from './LocalCordovaExport';
-import LocalCocos2dExport from './LocalCocos2dExport';
+import { localCordovaExportPipeline } from './LocalCordovaExport';
+import { localCocos2dExportPipeline } from './LocalCocos2dExport';
 import LocalOnlineElectronExport from './LocalOnlineElectronExport';
 import LocalFacebookInstantGamesExport from './LocalFacebookInstantGamesExport';
-import LocalElectronExport from './LocalElectronExport';
+import { localElectronExportPipeline } from './LocalElectronExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
 import Folder from '@material-ui/icons/Folder';
@@ -49,7 +49,7 @@ export const getLocalExporters = () => [
     description:
       'Build the game locally as a HTML5 game. You can then export it on website like Itch.io or Kongregate.',
     key: 'localexport',
-    ExportComponent: LocalExport,
+    exportPipeline: localExportPipeline,
     advanced: true,
   },
   {
@@ -59,7 +59,7 @@ export const getLocalExporters = () => [
     description:
       'Build the game locally as a Cordova project, and export it manually to iOS or Android with Cordova developers tools.',
     key: 'localcordovaexport',
-    ExportComponent: LocalCordovaExport,
+    exportPipeline: localCordovaExportPipeline,
     advanced: true,
   },
   {
@@ -78,7 +78,7 @@ export const getLocalExporters = () => [
     description:
       'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
     key: 'localelectronexport',
-    ExportComponent: LocalElectronExport,
+    exportPipeline: localElectronExportPipeline,
     advanced: true,
   },
   {
@@ -88,7 +88,7 @@ export const getLocalExporters = () => [
     description:
       'Export your game using Cocos2d-JS game engine. The game can be compiled for Android or iOS if you install Cocos2d-JS developer tools.',
     key: 'localcocos2dexport',
-    ExportComponent: LocalCocos2dExport,
+    exportPipeline: localCocos2dExportPipeline,
     experimental: true,
   },
 ];

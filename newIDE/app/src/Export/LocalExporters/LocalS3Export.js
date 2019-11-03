@@ -4,7 +4,6 @@ import axios from 'axios';
 import { sleep } from 'wait-promise';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
-import LocalExport from './LocalExport';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -13,6 +12,9 @@ import { makeTimestampedId } from '../../Utils/TimestampedId';
 import TextField from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import Text from '../../UI/Text';
+import { findGDJS } from './LocalGDJSFinder';
+import localFileSystem from './LocalFileSystem';
+import assignIn from 'lodash/assignIn';
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -75,6 +77,24 @@ export default class LocalS3Export extends Component {
       });
   };
 
+  prepareExporter = (
+  ): Promise<PreparedExporter> => {
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
+
+      // TODO: Memory leak? Check for other exporters too.
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+
+      return {
+        exporter,
+      };
+    });
+  };
+
   launchExport = () => {
     const { project } = this.props;
     if (!project) return;
@@ -88,7 +108,7 @@ export default class LocalS3Export extends Component {
     });
 
     const outputDir = os.tmpdir() + '/GDS3Export-' + makeTimestampedId();
-    LocalExport.prepareExporter()
+    this.prepareExporter()
       .then(({ exporter }) => {
         const exportOptions = new gd.MapStringBoolean();
         exporter.exportWholePixiProject(project, outputDir, exportOptions);

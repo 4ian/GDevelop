@@ -5,7 +5,7 @@ import LocalOnlineCordovaExport from './LocalOnlineCordovaExport';
 import { localCordovaExportPipeline } from './LocalCordovaExport';
 import { localCocos2dExportPipeline } from './LocalCocos2dExport';
 import LocalOnlineElectronExport from './LocalOnlineElectronExport';
-import LocalFacebookInstantGamesExport from './LocalFacebookInstantGamesExport';
+import { localFacebookInstantGamesExportPipeline } from './LocalFacebookInstantGamesExport';
 import { localElectronExportPipeline } from './LocalElectronExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
@@ -31,7 +31,7 @@ export const getLocalExporters = () => [
     description:
       'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
     key: 'localfacebookinstantgames',
-    ExportComponent: LocalFacebookInstantGamesExport,
+    exportPipeline: localFacebookInstantGamesExportPipeline,
   },
   {
     name: 'Web (upload online)',

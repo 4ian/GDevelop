@@ -220,10 +220,9 @@ function generateBehavior(
     options.codeNamespacePrefix +
     '__' +
     mangleName(eventsBasedBehavior.getName());
+  const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(codeNamespace);
 
-  behaviorMetadata.setIncludeFile(
-    options.eventsFunctionCodeWriter.getIncludeFileFor(codeNamespace)
-  );
+  behaviorMetadata.setIncludeFile(includeFile);
 
   return Promise.resolve().then(() => {
     const behaviorMethodMangledNames = new gd.MapStringString();
@@ -260,11 +259,7 @@ function generateBehavior(
 
       const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
       codeExtraInformation
-        .setIncludeFile(
-          options.eventsFunctionCodeWriter.getIncludeFileFor(
-            eventsFunctionMangledName
-          )
-        )
+        .setIncludeFile(includeFile)
         .setFunctionName(eventsFunctionMangledName);
     });
 

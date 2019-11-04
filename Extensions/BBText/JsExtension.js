@@ -11,7 +11,6 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-const MultiStyleText = require('./dist/pixi-multistyle-text.umd');
 module.exports = {
   createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
@@ -152,7 +151,9 @@ module.exports = {
       )
       .setIncludeFile('Extensions/BBText/bbtextruntimeobject.js')
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
-      .addIncludeFile('Extensions/BBText/dist/pixi-multistyle-text.umd.js');
+      .addIncludeFile(
+        'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
+      );
 
     // Utility function to add both a setter and a getter to a property from a list. Useful for setting multiple generic properties
     const addSettersAndGettersToObjectHelper = (
@@ -461,6 +462,11 @@ module.exports = {
           align: 'left',
         },
       };
+
+      const MultiStyleText = objectsRenderingService.requireModule(
+        __dirname,
+        'pixi-multistyle-text/dist/pixi-multistyle-text.umd'
+      );
 
       this._pixiObject = new MultiStyleText('', BBTextStyles);
 

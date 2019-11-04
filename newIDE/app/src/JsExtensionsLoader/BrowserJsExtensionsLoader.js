@@ -61,6 +61,13 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'BBText',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BBText/JsExtension.js'),
+    objectsRenderingServiceModules: {
+      'pixi-multistyle-text/dist/pixi-multistyle-text.umd': require('GDJS-for-web-app-only/Runtime/Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd'),
+    },
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

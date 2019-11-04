@@ -22,6 +22,8 @@ gdjs.DestroyOutsideRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "DestroyO
 
 gdjs.DestroyOutsideRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 
+    // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
+    // is not necessarily in the middle of the object (for sprites for example).
     var ow = this.owner.getWidth();
     var oh = this.owner.getHeight();
     var ocx = this.owner.getDrawableX()+this.owner.getCenterX();

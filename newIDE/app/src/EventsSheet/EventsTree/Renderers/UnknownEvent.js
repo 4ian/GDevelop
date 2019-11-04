@@ -2,7 +2,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
-import { type EventRendererProps } from './EventRenderer.flow';
+import { type EventRendererProps } from './EventRenderer';
 
 export default class UnknownEvent extends React.Component<
   EventRendererProps,

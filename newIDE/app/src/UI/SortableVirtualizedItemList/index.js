@@ -3,52 +3,43 @@ import * as React from 'react';
 import { List } from 'react-virtualized';
 import ItemRow from './ItemRow';
 import { AddListItem } from '../ListCommonItem';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { listItemWith32PxIconHeight, listItemWithoutIconHeight } from '../List';
+import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
+import DropIndicator from './DropIndicator';
+import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
+import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
 
-const SortableItemRow = SortableElement(props => {
-  const { style, ...otherProps } = props;
-  return (
-    <div style={style}>
-      <ItemRow {...otherProps} />
-    </div>
-  );
-});
-
-const SortableAddItemRow = SortableElement(props => {
-  const { style, ...otherProps } = props;
-  return (
-    <div style={style}>
-      <AddListItem {...otherProps} />
-    </div>
-  );
-});
-
-export type Item = {
-  key: string | number,
-  getName: () => string,
-};
-
-type ItemsListProps = {
+type Props<Item> = {|
   height: number,
   width: number,
   fullList: Array<Item>,
-  selectedItem: ?Item,
+  selectedItems: Array<Item>,
   onAddNewItem?: () => void,
+  addNewItemLabel?: React.Node | string,
   onRename: (Item, string) => void,
-  getThumbnail?: Item => string,
+  getItemName: Item => string,
+  getItemThumbnail?: Item => string,
+  isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
+  onEditItem?: Item => void,
   renamedItem: ?Item,
-  addNewItemLabel: React.Node | string,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
   buildMenuTemplate: (Item, index: number) => any,
-};
+  onMoveSelectionToItem: (destinationItem: Item) => void,
+  canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
+  reactDndType: string,
+|};
 
-class ItemsList extends React.Component<ItemsListProps, *> {
-  list: any;
+export default class SortableVirtualizedItemList<Item> extends React.Component<
+  Props<Item>
+> {
+  _list: ?List;
+  DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(
+    this.props.reactDndType
+  );
 
   forceUpdateGrid() {
-    if (this.list) this.list.forceUpdateGrid();
+    if (this._list) this._list.forceUpdateGrid();
   }
 
   render() {
@@ -56,63 +47,135 @@ class ItemsList extends React.Component<ItemsListProps, *> {
       height,
       width,
       fullList,
-      selectedItem,
+      selectedItems,
       addNewItemLabel,
       renamedItem,
-      getThumbnail,
+      getItemThumbnail,
+      getItemName,
       erroredItems,
+      onAddNewItem,
+      isItemBold,
+      onEditItem,
+      onMoveSelectionToItem,
+      canMoveSelectionToItem,
     } = this.props;
+    const { DragSourceAndDropTarget } = this;
 
     return (
-      <List
-        ref={list => (this.list = list)}
-        height={height}
-        rowCount={fullList.length}
-        rowHeight={
-          getThumbnail ? listItemWith32PxIconHeight : listItemWithoutIconHeight
-        }
-        rowRenderer={({ index, key, style }) => {
-          const item = fullList[index];
-          if (item.key === 'add-item-row') {
-            return (
-              <SortableAddItemRow
-                index={fullList.length}
-                key={key}
-                style={style}
-                disabled
-                onClick={this.props.onAddNewItem}
-                primaryText={addNewItemLabel}
+      <ResponsiveWindowMeasurer>
+        {windowWidth => (
+          <ScreenTypeMeasurer>
+            {screenType => (
+              <List
+                ref={list => (this._list = list)}
+                height={height}
+                rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
+                rowHeight={
+                  getItemThumbnail
+                    ? listItemWith32PxIconHeight
+                    : listItemWithoutIconHeight
+                }
+                rowRenderer={({
+                  index,
+                  key,
+                  style,
+                }: {|
+                  index: number,
+                  key: string,
+                  style: Object,
+                |}) => {
+                  if (index >= fullList.length) {
+                    return (
+                      <div style={style} key={key}>
+                        <AddListItem
+                          disabled
+                          onClick={onAddNewItem}
+                          primaryText={addNewItemLabel}
+                        />
+                      </div>
+                    );
+                  }
+
+                  const item = fullList[index];
+                  const nameBeingEdited = renamedItem === item;
+                  const itemName = getItemName(item);
+
+                  return (
+                    <div style={style} key={key}>
+                      <DragSourceAndDropTarget
+                        beginDrag={() => {
+                          this.props.onItemSelected(item);
+                          return {};
+                        }}
+                        canDrop={() =>
+                          canMoveSelectionToItem
+                            ? canMoveSelectionToItem(item)
+                            : true
+                        }
+                        drop={() => {
+                          onMoveSelectionToItem(item);
+                        }}
+                      >
+                        {({
+                          connectDragSource,
+                          connectDropTarget,
+                          isOver,
+                          canDrop,
+                        }) => {
+                          // Add an extra div because connectDropTarget/connectDragSource can
+                          // only be used on native elements
+                          const dropTarget = connectDropTarget(
+                            <div>
+                              {isOver && <DropIndicator canDrop={canDrop} />}
+                              <ItemRow
+                                item={item}
+                                itemName={itemName}
+                                isBold={isItemBold ? isItemBold(item) : false}
+                                onRename={newName =>
+                                  this.props.onRename(item, newName)
+                                }
+                                editingName={nameBeingEdited}
+                                getThumbnail={
+                                  getItemThumbnail
+                                    ? () => getItemThumbnail(item)
+                                    : undefined
+                                }
+                                selected={selectedItems.indexOf(item) !== -1}
+                                onItemSelected={this.props.onItemSelected}
+                                errorStatus={
+                                  erroredItems
+                                    ? erroredItems[itemName] || ''
+                                    : ''
+                                }
+                                buildMenuTemplate={() =>
+                                  this.props.buildMenuTemplate(item, index)
+                                }
+                                onEdit={onEditItem}
+                                hideMenuButton={windowWidth === 'small'}
+                                connectIconDragSource={
+                                  // If on a touch screen, only set the icon to be draggable.
+                                  screenType === 'touch'
+                                    ? connectDragSource
+                                    : undefined
+                                }
+                              />
+                            </div>
+                          );
+
+                          return screenType === 'touch'
+                            ? dropTarget
+                            : connectDragSource(dropTarget);
+                        }}
+                      </DragSourceAndDropTarget>
+                    </div>
+                  );
+                }}
+                width={width}
               />
-            );
-          }
-
-          const nameBeingEdited = renamedItem === item;
-
-          return (
-            <SortableItemRow
-              index={index}
-              key={key}
-              item={item}
-              style={style}
-              onRename={newName => this.props.onRename(item, newName)}
-              editingName={nameBeingEdited}
-              getThumbnail={getThumbnail ? () => getThumbnail(item) : undefined}
-              selected={item === selectedItem}
-              onItemSelected={this.props.onItemSelected}
-              errorStatus={
-                erroredItems ? erroredItems[item.getName()] || '' : ''
-              }
-              buildMenuTemplate={() =>
-                this.props.buildMenuTemplate(item, index)
-              }
-            />
-          );
-        }}
-        width={width}
-      />
+            )}
+          </ScreenTypeMeasurer>
+        )}
+      </ResponsiveWindowMeasurer>
     );
   }
 }
-
-const SortableItemsList = SortableContainer(ItemsList, { withRef: true });
-export default SortableItemsList;

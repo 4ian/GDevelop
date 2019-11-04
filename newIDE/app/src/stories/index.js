@@ -65,7 +65,7 @@ import muiDecorator from './ThemeDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
-import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
+import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import ResourcesLoader from '../ResourcesLoader';
 import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
@@ -146,6 +146,18 @@ import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import NewObjectDialog from '../ObjectsList/NewObjectDialog';
 import { Column } from '../UI/Grid';
+import DragAndDropTestBed from './DragAndDropTestBed';
+import EditorMosaic from '../UI/EditorMosaic';
+import FlatButton from '../UI/FlatButton';
+import EditorMosaicPlayground from './EditorMosaicPlayground';
+import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
+import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
+import PropertiesEditor from '../PropertiesEditor';
+import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
+import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
+import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
+import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 
 // No i18n in this file
 
@@ -243,6 +255,12 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
       )}
     />
   ));
+
+storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
+  <DragAndDropContextProvider>
+    <DragAndDropTestBed />
+  </DragAndDropContextProvider>
+));
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
   .addDecorator(muiDecorator)
@@ -551,6 +569,185 @@ storiesOf('UI Building Blocks/ColorField', module)
     </div>
   ));
 
+storiesOf('UI Building Blocks/EditorMosaic', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EditorMosaicPlayground
+      renderButtons={({ openEditor }) => (
+        <FlatButton
+          onClick={() => openEditor('thirdEditor', 'end', 65)}
+          label="Open the third editor"
+        />
+      )}
+      renderEditorMosaic={({ editorRef }) => (
+        <EditorMosaic
+          ref={editorRef}
+          editors={{
+            firstEditor: {
+              type: 'primary',
+              title: 'First editor',
+              toolbarControls: [],
+              renderEditor: () => (
+                <div>
+                  This is the first editor (left), with title bar but no
+                  controls to close the window.
+                </div>
+              ),
+            },
+            secondEditor: {
+              type: 'primary',
+              noTitleBar: true,
+              renderEditor: () => (
+                <div>
+                  This is the second editor ("central"), without title bar.
+                </div>
+              ),
+            },
+            thirdEditor: {
+              type: 'secondary',
+              title: 'Third editor',
+              renderEditor: () => <div>This is the third editor (bottom).</div>,
+            },
+          }}
+          initialNodes={{
+            direction: 'column',
+            first: {
+              direction: 'row',
+              first: 'firstEditor',
+              second: 'secondEditor',
+              splitPercentage: 25,
+            },
+            second: 'thirdEditor',
+            splitPercentage: 65,
+          }}
+        />
+      )}
+    />
+  ))
+  .add('limit to one secondary editor', () => (
+    <EditorMosaicPlayground
+      renderButtons={({ openEditor }) => (
+        <React.Fragment>
+          <FlatButton
+            onClick={() => openEditor('firstEditor', 'end', 65)}
+            label="Open the 1st secondary editor"
+          />
+          <FlatButton
+            onClick={() => openEditor('secondEditor', 'end', 65)}
+            label="Open the 2nd secondary editor"
+          />
+          <FlatButton
+            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            label="Open the 3rd secondary editor"
+          />
+        </React.Fragment>
+      )}
+      renderEditorMosaic={({ editorRef }) => (
+        <EditorMosaic
+          limitToOneSecondaryEditor
+          ref={editorRef}
+          editors={{
+            firstEditor: {
+              type: 'secondary',
+              title: '1st secondary editor',
+              renderEditor: () => <div>This is a secondary editor.</div>,
+            },
+            secondEditor: {
+              type: 'secondary',
+              title: '2nd secondary editor',
+              renderEditor: () => <div>This is another secondary editor.</div>,
+            },
+            thirdEditor: {
+              type: 'secondary',
+              title: '3rd secondary editor',
+              renderEditor: () => (
+                <div>This is yet another secondary editor.</div>
+              ),
+            },
+            mainEditor: {
+              type: 'primary',
+              noTitleBar: true,
+              renderEditor: () => (
+                <div>This is the main editor, always shown</div>
+              ),
+            },
+          }}
+          initialNodes={{
+            direction: 'row',
+            first: 'mainEditor',
+            second: 'firstEditor',
+            splitPercentage: 65,
+          }}
+        />
+      )}
+    />
+  ));
+
+storiesOf('UI Building Blocks/EditorNavigator', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EditorMosaicPlayground
+      renderButtons={({ openEditor }) => (
+        <React.Fragment>
+          <FlatButton
+            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            label="Open the third editor"
+          />
+          <FlatButton
+            onClick={() => openEditor('noTransitionsEditor', 'end', 65)}
+            label="Open the editor without transitions"
+          />
+        </React.Fragment>
+      )}
+      renderEditorMosaic={({ editorRef }) => (
+        <EditorNavigator
+          ref={editorRef}
+          initialEditorName="firstEditor"
+          transitions={{
+            firstEditor: {
+              nextLabel: 'Second Editor',
+              nextEditor: 'secondEditor',
+            },
+            secondEditor: {
+              previousEditor: 'firstEditor',
+              nextLabel: 'Third Editor',
+              nextEditor: 'thirdEditor',
+            },
+            thirdEditor: {
+              previousEditor: 'secondEditor',
+            },
+          }}
+          editors={{
+            firstEditor: {
+              type: 'primary',
+              title: 'First editor',
+              toolbarControls: [],
+              renderEditor: () => <div>This is the first editor.</div>,
+            },
+            secondEditor: {
+              type: 'primary',
+              noTitleBar: true,
+              renderEditor: () => <div>This is the second editor.</div>,
+            },
+            thirdEditor: {
+              type: 'secondary',
+              title: 'Third editor',
+              renderEditor: () => <div>This is the third editor.</div>,
+            },
+            noTransitionsEditor: {
+              type: 'secondary',
+              title: 'Editor without transitions',
+              renderEditor: () => (
+                <div>This is an editor without transitions.</div>
+              ),
+            },
+          }}
+          onEditorChanged={action('Editor was changed')}
+        />
+      )}
+    />
+  ));
+
 storiesOf('UI Building Blocks/ClosableTabs', module)
   .addDecorator(muiDecorator)
   .add('3 tabs', () => (
@@ -716,75 +913,93 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
     <ValueStateHolder
       initialValue={0}
       render={(value, onChange) => (
-        <FixedHeightFlexContainer height={400}>
-          <Column expand>
-            <ClosableTabs>
-              <ClosableTab
-                onActivated={action('Tab 1 activated')}
-                closable
-                active={value === 0}
-                label="Tab 1"
-                onClick={() => onChange(0)}
-                onClose={action('Close tab 1')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-              <ClosableTab
-                onActivated={action('Tab 2 activated')}
-                closable
-                active={value === 1}
-                label="Tab 2"
-                onClick={() => onChange(1)}
-                onClose={action('Close tab 2')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-              <ClosableTab
-                onActivated={action('Tab 3 activated')}
-                closable
-                active={value === 2}
-                label="Tab 3"
-                onClick={() => onChange(2)}
-                onClose={action('Close tab 3')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-            </ClosableTabs>
-            {
-              <TabContentContainer active={value === 0}>
-                <div
-                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
-                >
-                  The second tab has a list of objects. Check that the scrolling
-                  position is maintained while navigating between tabs.
-                </div>
-              </TabContentContainer>
-            }
-            {
-              <TabContentContainer active={value === 1}>
-                <ObjectsList
-                  getThumbnail={() => 'res/unknown32.png'}
-                  project={project}
-                  objectsContainer={testLayout}
-                  onEditObject={action('On edit object')}
-                  selectedObjectNames={[]}
-                  selectedObjectTags={[]}
-                  onChangeSelectedObjectTags={() => {}}
-                  getAllObjectTags={() => []}
+        <DragAndDropContextProvider>
+          <FixedHeightFlexContainer height={400}>
+            <Column expand>
+              <ClosableTabs>
+                <ClosableTab
+                  onActivated={action('Tab 1 activated')}
+                  closable
+                  active={value === 0}
+                  label="Tab 1"
+                  onClick={() => onChange(0)}
+                  onClose={action('Close tab 1')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
                 />
-              </TabContentContainer>
-            }
-            {
-              <TabContentContainer active={value === 2}>
-                <div
-                  style={{ backgroundColor: 'green', height: '100%', flex: 1 }}
-                >
-                  Tab 3 content
-                </div>
-              </TabContentContainer>
-            }
-          </Column>
-        </FixedHeightFlexContainer>
+                <ClosableTab
+                  onActivated={action('Tab 2 activated')}
+                  closable
+                  active={value === 1}
+                  label="Tab 2"
+                  onClick={() => onChange(1)}
+                  onClose={action('Close tab 2')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                />
+                <ClosableTab
+                  onActivated={action('Tab 3 activated')}
+                  closable
+                  active={value === 2}
+                  label="Tab 3"
+                  onClick={() => onChange(2)}
+                  onClose={action('Close tab 3')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                />
+              </ClosableTabs>
+              {
+                <TabContentContainer active={value === 0}>
+                  <div
+                    style={{
+                      backgroundColor: 'green',
+                      height: '100%',
+                      flex: 1,
+                    }}
+                  >
+                    The second tab has a list of objects. Check that the
+                    scrolling position is maintained while navigating between
+                    tabs.
+                  </div>
+                </TabContentContainer>
+              }
+              {
+                <TabContentContainer active={value === 1}>
+                  <ObjectsList
+                    getThumbnail={() => 'res/unknown32.png'}
+                    project={project}
+                    objectsContainer={testLayout}
+                    onEditObject={action('On edit object')}
+                    selectedObjectNames={[]}
+                    selectedObjectTags={[]}
+                    onChangeSelectedObjectTags={() => {}}
+                    getAllObjectTags={() => []}
+                    canRenameObject={() => true}
+                    onDeleteObject={(objectWithContext, cb) => cb(true)}
+                    onRenameObject={(objectWithContext, newName, cb) =>
+                      cb(true)
+                    }
+                    onObjectCreated={() => {}}
+                    onObjectSelected={() => {}}
+                  />
+                </TabContentContainer>
+              }
+              {
+                <TabContentContainer active={value === 2}>
+                  <div
+                    style={{
+                      backgroundColor: 'green',
+                      height: '100%',
+                      flex: 1,
+                    }}
+                  >
+                    Tab 3 content
+                  </div>
+                </TabContentContainer>
+              }
+            </Column>
+          </FixedHeightFlexContainer>
+        </DragAndDropContextProvider>
       )}
     />
   ));
@@ -800,6 +1015,112 @@ storiesOf('UI Building Blocks/HelpIcon', module)
 storiesOf('HelpFinder', module)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpFinder open onClose={action('close')} />);
+
+storiesOf('PropertiesEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <PropertiesEditor
+      schema={[
+        {
+          name: 'Object name',
+          valueType: 'string',
+          disabled: true,
+          getValue: instance => 'Disabled field',
+          setValue: (instance, newValue) => {},
+          onEditButtonClick: instance => action('edit button clicked'),
+        },
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              valueType: 'number',
+              getValue: instance => 10,
+              setValue: (instance, newValue) => {},
+            },
+            {
+              name: 'Y',
+              valueType: 'number',
+              getValue: instance => 20.1234,
+              setValue: (instance, newValue) => {},
+            },
+          ],
+        },
+        {
+          name: 'Angle',
+          valueType: 'number',
+          getValue: instance => 90.123456,
+          setValue: (instance, newValue) => {},
+        },
+        {
+          name: 'Checked checkbox',
+          valueType: 'boolean',
+          getValue: instance => true,
+          setValue: (instance, newValue) => {},
+        },
+        {
+          name: 'Unchecked checkbox',
+          valueType: 'boolean',
+          getValue: instance => false,
+          setValue: (instance, newValue) => {},
+        },
+      ]}
+      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
+    />
+  ))
+  .add('row (window width = medium)', () => (
+    <PropertiesEditor
+      schema={[
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              valueType: 'number',
+              getValue: instance => 10,
+              setValue: (instance, newValue) => {},
+            },
+            {
+              name: 'Y',
+              valueType: 'number',
+              getValue: instance => 20.1234,
+              setValue: (instance, newValue) => {},
+            },
+          ],
+        },
+      ]}
+      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
+      windowWidth="medium"
+    />
+  ))
+  .add('row (window width = small)', () => (
+    <PropertiesEditor
+      schema={[
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              valueType: 'number',
+              getValue: instance => 10,
+              setValue: (instance, newValue) => {},
+            },
+            {
+              name: 'Y',
+              valueType: 'number',
+              getValue: instance => 20.1234,
+              setValue: (instance, newValue) => {},
+            },
+          ],
+        },
+      ]}
+      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
+      windowWidth="small"
+    />
+  ));
 
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
@@ -1140,7 +1461,7 @@ storiesOf('LocalExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <GDI18nProvider language="en">
-      <LocalExport open project={project} onClose={action('close')} />
+      <LocalExport project={project} />
     </GDI18nProvider>
   ));
 
@@ -1149,7 +1470,7 @@ storiesOf('LocalS3Export', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <GDI18nProvider language="en">
-      <LocalS3Export open project={project} onClose={action('close')} />
+      <LocalS3Export project={project} />
     </GDI18nProvider>
   ));
 
@@ -1410,7 +1731,7 @@ storiesOf('StartPage', module)
 storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)
   .add('with data', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={debuggerGameDataDump}
@@ -1425,10 +1746,10 @@ storiesOf('DebuggerContent', module)
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('without data', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={null}
@@ -1443,13 +1764,13 @@ storiesOf('DebuggerContent', module)
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('Profiler', module)
   .addDecorator(muiDecorator)
   .add('without profiler output', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1458,10 +1779,10 @@ storiesOf('Profiler', module)
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('without profiler output, while profiling', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1470,10 +1791,10 @@ storiesOf('Profiler', module)
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('with profiler output', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1482,10 +1803,10 @@ storiesOf('Profiler', module)
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('with profiler output, while profiling', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
@@ -1494,7 +1815,7 @@ storiesOf('Profiler', module)
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('MeasuresTable', module)
@@ -1522,6 +1843,83 @@ storiesOf('CreateProjectDialog', module)
       open
       examplesComponent={Placeholder}
       startersComponent={Placeholder}
+      onClose={action('onClose')}
+      onCreate={action('onCreate')}
+      onOpen={action('onOpen')}
+    />
+  ));
+
+storiesOf('OpenFromStorageProviderDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <OpenFromStorageProviderDialog
+      storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
+      onChooseProvider={action('onChooseProvider')}
+      onClose={action('onClose')}
+      onCreateNewProject={action('onCreateNewProject')}
+    />
+  ));
+
+storiesOf(
+  'StorageProviders/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog',
+  module
+)
+  .addDecorator(muiDecorator)
+  .add('default, fake picked file, save working', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() =>
+        Promise.resolve({
+          type: 'FILE',
+          id: 'fake-id',
+          name: 'Fake Google Drive file',
+          parentId: 'fake-parent-id',
+        })
+      }
+      onCancel={action('cancel')}
+      onSave={() => Promise.resolve()}
+    />
+  ))
+  .add('default, fake picked folder, save working', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() =>
+        Promise.resolve({
+          type: 'FOLDER',
+          id: 'fake-id',
+          name: 'Fake Google Drive file',
+        })
+      }
+      onCancel={action('cancel')}
+      onSave={() => Promise.resolve()}
+    />
+  ))
+  .add('default, error when picking file/folder', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() => Promise.reject(new Error('fake-error'))}
+      onCancel={action('cancel')}
+      onSave={() => Promise.resolve()}
+    />
+  ))
+  .add('default, error while saving', () => (
+    <GoogleDriveSaveAsDialog
+      onShowFilePicker={() =>
+        Promise.resolve({
+          type: 'FILE',
+          id: 'fake-id',
+          name: 'Fake Google Drive file',
+          parentId: 'fake-parent-id',
+        })
+      }
+      onCancel={action('cancel')}
+      onSave={() => Promise.reject(new Error('fake-error'))}
+    />
+  ));
+
+storiesOf('OpenConfirmDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <OpenConfirmDialog
+      onClose={action('on close')}
+      onConfirm={action('on confirm')}
     />
   ));
 
@@ -1531,8 +1929,8 @@ storiesOf('LayoutChooserDialog', module)
 
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
-  .add('default (no scope)', () => (
-    <DragDropContextProvider>
+  .add('default, medium screen (no scope)', () => (
+    <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
           <EventsTree
@@ -1562,16 +1960,56 @@ storiesOf('EventsTree', module)
             searchFocusOffset={null}
             onEventMoved={() => {}}
             showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'medium'}
           />
         </FixedHeightFlexContainer>
       </div>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
+  ))
+  .add('default, small screen (no scope)', () => (
+    <DragAndDropContextProvider>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testLayout.getEvents()}
+            project={project}
+            scope={{ layout: testLayout }}
+            globalObjectsContainer={project}
+            objectsContainer={testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onInstructionsListContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'small'}
+          />
+        </FixedHeightFlexContainer>
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
   .add('default (no scope)', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
@@ -1596,10 +2034,10 @@ storiesOf('EventsSheet', module)
           onCreateEventsFunction={action('create events function')}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ))
   .add('empty (no events) (no scope)', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
@@ -1624,7 +2062,7 @@ storiesOf('EventsSheet', module)
           onCreateEventsFunction={action('create events function')}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
@@ -2015,41 +2453,57 @@ storiesOf('ObjectsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testLayout}>
-      <div style={{ height: 250 }}>
-        <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
-          project={project}
-          objectsContainer={testLayout}
-          onEditObject={action('On edit object')}
-          selectedObjectNames={[]}
-          selectedObjectTags={[]}
-          onChangeSelectedObjectTags={selectedObjectTags => {}}
-          getAllObjectTags={() => []}
-        />
-      </div>
-    </SerializedObjectDisplay>
+    <DragAndDropContextProvider>
+      <SerializedObjectDisplay object={testLayout}>
+        <div style={{ height: 250 }}>
+          <ObjectsList
+            getThumbnail={() => 'res/unknown32.png'}
+            project={project}
+            objectsContainer={testLayout}
+            onEditObject={action('On edit object')}
+            onObjectCreated={action('On object created')}
+            selectedObjectNames={[]}
+            selectedObjectTags={[]}
+            onChangeSelectedObjectTags={selectedObjectTags => {}}
+            getAllObjectTags={() => []}
+            canRenameObject={() => true}
+            onDeleteObject={(objectWithContext, cb) => cb(true)}
+            onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+            onObjectSelected={() => {}}
+          />
+        </div>
+      </SerializedObjectDisplay>
+    </DragAndDropContextProvider>
   ))
   .add('with tags', () => (
-    <SerializedObjectDisplay object={testLayout}>
-      <div style={{ height: 250 }}>
-        <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
-          project={project}
-          objectsContainer={testLayout}
-          onEditObject={action('On edit object')}
-          selectedObjectNames={[]}
-          selectedObjectTags={['Tag1', 'Tag2']}
-          onChangeSelectedObjectTags={action('on change selected object tags')}
-          getAllObjectTags={() => [
-            'Tag1',
-            'Tag2',
-            'Looooooooooong Tag 3',
-            'Unselected Tag 4',
-          ]}
-        />
-      </div>
-    </SerializedObjectDisplay>
+    <DragAndDropContextProvider>
+      <SerializedObjectDisplay object={testLayout}>
+        <div style={{ height: 250 }}>
+          <ObjectsList
+            getThumbnail={() => 'res/unknown32.png'}
+            project={project}
+            objectsContainer={testLayout}
+            onEditObject={action('On edit object')}
+            onObjectCreated={action('On object created')}
+            selectedObjectNames={[]}
+            selectedObjectTags={['Tag1', 'Tag2']}
+            onChangeSelectedObjectTags={action(
+              'on change selected object tags'
+            )}
+            getAllObjectTags={() => [
+              'Tag1',
+              'Tag2',
+              'Looooooooooong Tag 3',
+              'Unselected Tag 4',
+            ]}
+            canRenameObject={() => true}
+            onDeleteObject={(objectWithContext, cb) => cb(true)}
+            onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+            onObjectSelected={() => {}}
+          />
+        </div>
+      </SerializedObjectDisplay>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('ObjectSelector', module)
@@ -2624,7 +3078,7 @@ storiesOf('EventsFunctionsList', module)
 storiesOf('EventsFunctionsExtensionEditor/index', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <DragDropContextProvider>
+    <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <EventsFunctionsExtensionEditor
           project={project}
@@ -2641,7 +3095,23 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           onCreateEventsFunction={action('on create events function')}
         />
       </FixedHeightFlexContainer>
-    </DragDropContextProvider>
+    </DragAndDropContextProvider>
+  ));
+
+storiesOf(
+  'EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor',
+  module
+)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={500}>
+      <ChooseEventsFunctionsExtensionEditor
+        eventsFunctionsExtension={testEventsFunctionsExtension}
+        onEditBehaviors={action('edit behaviors')}
+        onEditFreeFunctions={action('edit free functions')}
+        onEditExtensionOptions={action('edit extension options')}
+      />
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
@@ -2737,6 +3207,7 @@ storiesOf('ProjectManager', module)
       )}
       onRenameExternalEvents={action('onRenameExternalEvents')}
       onSaveProject={action('onSaveProject')}
+      onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
@@ -2774,6 +3245,7 @@ storiesOf('ProjectManager', module)
       )}
       onRenameExternalEvents={action('onRenameExternalEvents')}
       onSaveProject={action('onSaveProject')}
+      onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}

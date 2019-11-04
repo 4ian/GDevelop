@@ -53,7 +53,7 @@ export default {
     );
     this.editorConfigurations[objectType] = editorConfiguration;
   },
-  getDefaultObjectJsImplementationPropertiesEditor() {
+  getDefaultObjectJsImplementationPropertiesEditor(options) {
     return {
       component: ObjectPropertiesEditor,
       createNewObject: object =>
@@ -62,6 +62,7 @@ export default {
           .clone()
           .release(),
       castToObjectType: object => gd.asObjectJsImplementation(object),
+      helpPagePath: options.helpPagePath,
     };
   },
   editorConfigurations: {

@@ -1,5 +1,9 @@
 // @flow
 import * as React from 'react';
+import {
+  ResponsiveWindowMeasurer,
+  type WidthType,
+} from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
@@ -96,6 +100,7 @@ type MandatoryProps = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
+  windowWidth?: WidthType,
   mode?: 'column' | 'row',
 |};
 
@@ -391,11 +396,15 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
   };
 
   render() {
-    const { mode } = this.props;
+    const { mode, windowWidth } = this.props;
 
-    return (
+    const renderFields = (windowWidth: WidthType) => (
       <div
-        style={mode === 'row' ? styles.rowContainer : styles.columnContainer}
+        style={
+          mode === 'row' && windowWidth !== 'small'
+            ? styles.rowContainer
+            : styles.columnContainer
+        }
       >
         {this.props.schema.map(field => {
           if (field.children) {
@@ -406,6 +415,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                   schema={field.children}
                   instances={this.props.instances}
                   mode="row"
+                  windowWidth={windowWidth}
                 />
               );
             }
@@ -418,6 +428,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                     schema={field.children}
                     instances={this.props.instances}
                     mode="column"
+                    windowWidth={windowWidth}
                   />
                 </div>
               </div>
@@ -434,6 +445,16 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           return null;
         })}
       </div>
+    );
+
+    if (windowWidth) {
+      return renderFields(windowWidth);
+    }
+
+    return (
+      <ResponsiveWindowMeasurer>
+        {windowWidth => renderFields(windowWidth)}
+      </ResponsiveWindowMeasurer>
     );
   }
 }

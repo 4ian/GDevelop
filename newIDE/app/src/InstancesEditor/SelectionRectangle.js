@@ -52,7 +52,12 @@ export default class SelectionRectangle {
     return this.selectionRectangleStart;
   }
 
-  makeSelectionRectangle = (lastX, lastY) => {
+  startSelectionRectangle = (x, y) => {
+    this.selectionRectangleStart = { x, y };
+    this.selectionRectangleEnd = { x, y };
+  };
+
+  updateSelectionRectangle = (lastX, lastY) => {
     if (!this.selectionRectangleStart)
       this.selectionRectangleStart = { x: lastX, y: lastY };
 

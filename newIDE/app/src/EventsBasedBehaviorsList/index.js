@@ -31,6 +31,10 @@ type State = {|
   searchText: string,
 |};
 
+const getEventsBasedBehaviorName = (
+  eventsBasedBehavior: gdEventsBasedBehavior
+) => eventsBasedBehavior.getName();
+
 type Props = {|
   project: gdProject,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
@@ -69,7 +73,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     ) => cb(true),
   };
 
-  sortableList: any;
+  sortableList: ?SortableVirtualizedItemList<gdEventsFunction>;
   state: State = {
     renamedEventsBasedBehavior: null,
     searchText: '',
@@ -102,7 +106,9 @@ export default class EventsBasedBehaviorsList extends React.Component<
       {
         renamedEventsBasedBehavior,
       },
-      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
   };
 
@@ -131,16 +137,26 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
   };
 
-  _move = (oldIndex: number, newIndex: number) => {
-    const { eventsBasedBehaviorsList } = this.props;
-    eventsBasedBehaviorsList.move(oldIndex, newIndex);
+  _moveSelectionTo = (
+    destinationEventsBasedBehavior: gdEventsBasedBehavior
+  ) => {
+    const {
+      eventsBasedBehaviorsList,
+      selectedEventsBasedBehavior,
+    } = this.props;
+    if (!selectedEventsBasedBehavior) return;
+
+    eventsBasedBehaviorsList.move(
+      eventsBasedBehaviorsList.getPosition(selectedEventsBasedBehavior),
+      eventsBasedBehaviorsList.getPosition(destinationEventsBasedBehavior)
+    );
 
     this.forceUpdateList();
   };
 
   forceUpdateList = () => {
     this.forceUpdate();
-    this.sortableList.getWrappedInstance().forceUpdateGrid();
+    if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
   _copyEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
@@ -250,15 +266,10 @@ export default class EventsBasedBehaviorsList extends React.Component<
     } = this.props;
     const { searchText } = this.state;
 
-    const list = [
-      ...filterEventsBasedBehaviorsList(
-        enumerateEventsBasedBehaviors(eventsBasedBehaviorsList),
-        searchText
-      ),
-      {
-        key: 'add-item-row',
-      },
-    ];
+    const list = filterEventsBasedBehaviorsList(
+      enumerateEventsBasedBehaviors(eventsBasedBehaviorsList),
+      searchText
+    );
 
     // Force List component to be mounted again if project or eventsBasedBehaviorsList
     // has been changed. Avoid accessing to invalid objects that could
@@ -278,16 +289,18 @@ export default class EventsBasedBehaviorsList extends React.Component<
                 height={height}
                 onAddNewItem={this._addNewEventsBasedBehavior}
                 addNewItemLabel={<Trans>Add a new behavior</Trans>}
-                selectedItem={selectedEventsBasedBehavior}
+                getItemName={getEventsBasedBehaviorName}
+                selectedItems={
+                  selectedEventsBasedBehavior
+                    ? [selectedEventsBasedBehavior]
+                    : []
+                }
                 onItemSelected={onSelectEventsBasedBehavior}
                 renamedItem={this.state.renamedEventsBasedBehavior}
                 onRename={this._rename}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)
-                }
+                onMoveSelectionToItem={this._moveSelectionTo}
                 buildMenuTemplate={this._renderEventsBasedBehaviorMenuTemplate}
-                helperClass="sortable-helper"
-                distance={20}
+                reactDndType="GD_EVENTS_BASED_BEHAVIOR"
               />
             )}
           </AutoSizer>

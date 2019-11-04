@@ -33,8 +33,6 @@ gdjs.SpriteRuntimeObjectPixiRenderer.prototype._updatePIXISprite = function() {
         this._sprite.anchor.y = this._object._animationFrame.center.y/this._sprite.texture.frame.height;
         this._sprite.position.x = this._object.x + (this._object._animationFrame.center.x - this._object._animationFrame.origin.x)*Math.abs(this._object._scaleX);
         this._sprite.position.y = this._object.y + (this._object._animationFrame.center.y - this._object._animationFrame.origin.y)*Math.abs(this._object._scaleY);
-        if ( this._object._flippedX ) this._sprite.position.x += (this._sprite.texture.frame.width/2-this._object._animationFrame.center.x)*Math.abs(this._object._scaleX)*2;
-        if ( this._object._flippedY ) this._sprite.position.y += (this._sprite.texture.frame.height/2-this._object._animationFrame.center.y)*Math.abs(this._object._scaleY)*2;
         this._sprite.rotation = gdjs.toRad(this._object.angle);
         this._sprite.visible = !this._object.hidden;
         this._sprite.blendMode = this._object._blendMode;
@@ -74,14 +72,10 @@ gdjs.SpriteRuntimeObjectPixiRenderer.prototype.update = function() {
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.updateX = function() {
     this._sprite.position.x = this._object.x + (this._object._animationFrame.center.x - this._object._animationFrame.origin.x)*Math.abs(this._object._scaleX);
-    if ( this._object._flippedX )
-        this._sprite.position.x += (this._sprite.texture.frame.width/2-this._object._animationFrame.center.x)*Math.abs(this._object._scaleX)*2;
 }
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.updateY = function() {
     this._sprite.position.y = this._object.y + (this._object._animationFrame.center.y - this._object._animationFrame.origin.y)*Math.abs(this._object._scaleY);
-    if ( this._object._flippedY )
-        this._sprite.position.y += (this._sprite.texture.frame.height/2-this._object._animationFrame.center.y)*Math.abs(this._object._scaleY)*2;
 }
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.updateAngle = function() {

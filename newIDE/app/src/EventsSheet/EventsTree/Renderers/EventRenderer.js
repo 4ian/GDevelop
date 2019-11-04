@@ -1,12 +1,13 @@
 // @flow
 import * as React from 'react';
-
 import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
 } from '../../SelectionHandler';
 import { type EventsScope } from '../../EventsScope.flow';
+import { type ScreenType } from '../../../UI/Reponsive/ScreenTypeMeasurer';
+import { type WidthType } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type EventRendererProps = {
   project: gdProject,
@@ -40,4 +41,7 @@ export type EventRendererProps = {
 
   leftIndentWidth: number,
   renderObjectThumbnail: string => React.Node,
+
+  screenType: ScreenType,
+  windowWidth: WidthType,
 };

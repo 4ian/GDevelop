@@ -9,6 +9,7 @@ import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { Column, Line } from '../../UI/Grid';
+import Text from '../../UI/Text';
 
 type Props = {|
   url: ?string,
@@ -50,21 +51,23 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
           >
             <Line>
               <Column>
-                <Trans>
-                  Your preview is ready! Click on the button to launch the
-                  preview.
-                </Trans>
+                <Text>
+                  <Trans>
+                    Your preview is ready! Click on the button to launch the
+                    preview.
+                  </Trans>
+                </Text>
               </Column>
             </Line>
             <Line>
               <Column>
-                <span>
+                <Text>
                   <Trans>
                     To skip this dialog and{' '}
                     <b>directly open the preview next time</b>, please allow
                     popups to be opened for this website in your browser.
                   </Trans>
-                </span>
+                </Text>
               </Column>
             </Line>
           </Dialog>

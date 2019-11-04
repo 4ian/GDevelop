@@ -47,24 +47,18 @@ class LocalElectronExport extends Component<Props, State> {
   }
 
   static prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(gdjsRoot => {
-        if (!gdjsRoot) {
-          showErrorBox('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
 
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          localFileSystem
-        );
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
-        resolve({
-          exporter,
-        });
-      });
+      return {
+        exporter,
+      };
     });
   };
 

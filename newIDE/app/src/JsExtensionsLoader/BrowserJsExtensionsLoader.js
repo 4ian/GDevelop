@@ -9,46 +9,57 @@ import ObjectsEditorService from '../ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 const gd = global.gd;
 
+// The list of "JsExtension.js" files to be bundled in the webapp, keyed by their extension name.
 const jsExtensions = [
   {
     name: 'AdMob',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdMob/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'FacebookInstantGames',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'DeviceSensors',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceSensors/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'DeviceVibration',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceVibration/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'Physics2',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics2Behavior/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'ExampleJsExtension',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'Tween',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TweenBehavior/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'Video',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Video/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'FileSystem',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FileSystem/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'DialogueTree',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
+    objectsRenderingServiceModules: {},
   },
 ];
 
@@ -77,7 +88,7 @@ export default function makeExtensionsLoader({
       return Promise.resolve(
         jsExtensions
           .filter(({ name }) => !filterExamples || !name.includes('Example'))
-          .map(({ name, extensionModule }) => {
+          .map(({ name, extensionModule, objectsRenderingServiceModules }) => {
             // Load any editor for objects, if we have somewhere where
             // to register them.
             if (
@@ -87,6 +98,16 @@ export default function makeExtensionsLoader({
               extensionModule.registerEditorConfigurations(
                 objectsEditorService
               );
+            }
+
+            // Register modules for ObjectsRenderingService
+            if (objectsRenderingService && objectsRenderingServiceModules) {
+              for (let requirePath in objectsRenderingServiceModules) {
+                objectsRenderingService.registerModule(
+                  requirePath,
+                  objectsRenderingServiceModules[requirePath]
+                );
+              }
             }
 
             // Load any renderer for objects, if we have somewhere where

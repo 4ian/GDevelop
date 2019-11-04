@@ -32,9 +32,7 @@ module.exports = function(config) {
       '../Runtime/variable.js',
       '../Runtime/variablescontainer.js',
       '../Runtime/oncetriggers.js',
-      '../Runtime/runtimescene.js',
       '../Runtime/runtimebehavior.js',
-      '../Runtime/runtimeobject.js',
       '../Runtime/spriteruntimeobject.js',
       '../Runtime/events-tools/commontools.js',
       '../Runtime/events-tools/runtimescenetools.js',
@@ -59,13 +57,17 @@ module.exports = function(config) {
       './tests/Extensions/**.js',
 
       //All tests files:
-      './tests/init.js',
+      './tests-utils/init.gdjs.js',
+      './tests-utils/init.pixiruntimegamewithassets.js',
       '../../Extensions/**/tests/**.spec.js',
       './tests/**/*.js',
 
       //All benchmark files:
       './benchmarks/init.js',
-      './benchmarks/**/*.js'
+      './benchmarks/**/*.js',
+
+      // Assets
+      {pattern: './tests-utils/assets/*.jpg', watched: false, included: false, served: true, nocache: false}
     ]
   });
 };

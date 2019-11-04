@@ -5,15 +5,13 @@ if(GIT_FOUND)
 	execute_process(
 		COMMAND ${GIT_EXECUTABLE} clone "https://www.github.com/SFML/SFML.git" SFML
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-		ERROR_QUIET
 		OUTPUT_QUIET)
 
 	message( "Resetting SFML source code to version 2.4.1..." )
 	execute_process(
 		COMMAND ${GIT_EXECUTABLE} reset --hard 2.4.1
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SFML
-		ERROR_QUIET
-		OUTPUT_QUIET)
+		OUTPUT_QUIET) 
 
 	message( "Applying the patches..." )
 	file(GLOB SFML_PATCHES
@@ -26,9 +24,8 @@ if(GIT_FOUND)
 		foreach(SFML_PATCH ${SFML_PATCHES})
 			message( "Applying patch: ${SFML_PATCH}..." )
 			execute_process(
-				COMMAND ${GIT_EXECUTABLE} apply ${SFML_PATCH}
+				COMMAND ${GIT_EXECUTABLE} apply ${SFML_PATCH} --ignore-whitespace
 				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SFML
-				ERROR_QUIET
 				OUTPUT_QUIET)
 		endforeach()
 	endif()

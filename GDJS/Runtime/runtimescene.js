@@ -30,6 +30,7 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
+    this._isJustResumed = false; // True in the first frame after resuming the paused scene
 
     /** @type gdjs.RuntimeObject[] */
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
@@ -156,6 +157,9 @@ gdjs.RuntimeScene.prototype.onPause = function() {
  * on screen after having being paused.
  */
 gdjs.RuntimeScene.prototype.onResume = function() {
+
+    this._isJustResumed = true;
+
     for(var i = 0;i < gdjs.callbacksRuntimeSceneResumed.length;++i) {
         gdjs.callbacksRuntimeSceneResumed[i](this);
     }
@@ -280,6 +284,8 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
     // if (this._layersCameraCoordinates) {
     //  this.getRenderer().renderDebugDraw(this._allInstancesList, this._layersCameraCoordinates); //TODO
     // }
+
+    this._isJustResumed = false;
 
     this.render();
     if (this._profiler) this._profiler.end("render");
@@ -755,4 +761,14 @@ gdjs.RuntimeScene.prototype.getOnceTriggers = function() {
 gdjs.RuntimeScene.prototype.getAdhocListOfAllInstances = function() {
     this._constructListOfAllInstances();
     return this._allInstancesList;
+}
+
+/**
+ * Check if the scene was just resumed.
+ * This is true during the first frame after the scene has been unpaused.
+ *
+ * @returns {boolean} true if the scene was just resumed
+ */
+gdjs.RuntimeScene.prototype.sceneJustResumed = function() {
+    return this._isJustResumed;
 }

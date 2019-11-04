@@ -14,7 +14,6 @@ type Props = {|
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
   showPreviewButton: boolean,
-  showObjectsList: boolean,
   openObjectsList: () => void,
   openObjectGroupsList: () => void,
   openProperties: () => void,
@@ -71,20 +70,16 @@ export class Toolbar extends PureComponent<Props> {
           />
         )}
         {this.props.showPreviewButton && <ToolbarSeparator />}
-        {this.props.showObjectsList && (
-          <ToolbarIcon
-            onClick={this.props.openObjectsList}
-            src="res/ribbon_default/objects64.png"
-            tooltip={t`Open the objects editor`}
-          />
-        )}
-        {this.props.showObjectsList && (
-          <ToolbarIcon
-            onClick={this.props.openObjectGroupsList}
-            src={'res/ribbon_default/objectsgroups64.png'}
-            tooltip={t`Open the objects groups editor`}
-          />
-        )}
+        <ToolbarIcon
+          onClick={this.props.openObjectsList}
+          src="res/ribbon_default/objects64.png"
+          tooltip={t`Open the objects editor`}
+        />
+        <ToolbarIcon
+          onClick={this.props.openObjectGroupsList}
+          src={'res/ribbon_default/objectsgroups64.png'}
+          tooltip={t`Open the objects groups editor`}
+        />
         <ToolbarIcon
           onClick={this.props.openProperties}
           src="res/ribbon_default/editprop32.png"

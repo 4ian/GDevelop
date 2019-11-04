@@ -28,7 +28,7 @@ module.exports = {
     extension
       .addAction(
         'LoadDialogueFromSceneVariable',
-        _('Load dialogue Tree from a Scene Variable'),
+        _('Load dialogue Tree from a scene variable'),
         _(
           'Load a dialogue data object - Yarn json format, stored in a scene variable. Use this command to load all the Dialogue data at the beginning of the game.'
         ),

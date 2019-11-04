@@ -10,7 +10,7 @@ import {
   selectableArea,
   disabledText,
 } from '../ClassNames';
-import { type EventRendererProps } from './EventRenderer.flow';
+import { type EventRendererProps } from './EventRenderer';
 const gd = global.gd;
 
 const styles = {

@@ -1,3 +1,4 @@
+// @flow
 // Note: this file don't use export/imports nor Flow to allow its usage from Node.js
 
 const optionalRequire = require('../../Utils/OptionalRequire.js');
@@ -18,8 +19,8 @@ const tryPath = (
     else onNoAccess();
   });
 
-const findGDJS = (cb /*: (?string) => void*/) => {
-  if (!path || !process || !fs) return '';
+const findGDJS = () /*: Promise<{|gdjsRoot: string|}> */ => {
+  if (!path || !process || !fs) return Promise.reject(new Error('Unsupported'));
 
   const appPath = app ? app.getAppPath() : process.cwd();
 
@@ -28,21 +29,24 @@ const findGDJS = (cb /*: (?string) => void*/) => {
   const pathToRoot = isDarwin ? '../../../../' : path.join('..', '..');
   const rootPath = path.join(appPath, pathToRoot);
 
-  // First try to find GDJS in the parent folder (when newIDE is inside IDE)
-  tryPath(path.join(rootPath, '..', 'JsPlatform'), cb, () => {
-    // Or in the resources (for a standalone newIDE)
-    tryPath(path.join(appPath, '..', 'GDJS'), cb, () => {
-      // Or in the resources when developing with Electron
-      const devPath = path.join(
-        appPath,
-        '..',
-        '..',
-        'app',
-        'resources',
-        'GDJS'
-      );
-      tryPath(devPath, cb, () => {
-        cb(null);
+  return new Promise((resolve, reject) => {
+    const onFound = gdjsRoot => resolve({ gdjsRoot });
+    const onNotFound = () => reject(new Error('Could not find GDJS'));
+
+    // First try to find GDJS in the parent folder (when newIDE is inside IDE)
+    tryPath(path.join(rootPath, '..', 'JsPlatform'), onFound, () => {
+      // Or in the resources (for a standalone newIDE)
+      tryPath(path.join(appPath, '..', 'GDJS'), onFound, () => {
+        // Or in the resources when developing with Electron
+        const devPath = path.join(
+          appPath,
+          '..',
+          '..',
+          'app',
+          'resources',
+          'GDJS'
+        );
+        tryPath(devPath, onFound, onNotFound);
       });
     });
   });

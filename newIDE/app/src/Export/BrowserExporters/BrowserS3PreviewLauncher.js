@@ -14,7 +14,10 @@ type State = {|
   url: ?string,
 |};
 
-type Props = {};
+type Props = {|
+  onExport?: () => void,
+  onChangeSubscription?: () => void,
+|};
 
 export default class BrowserS3PreviewLauncher extends React.Component<
   Props,
@@ -36,35 +39,29 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   };
 
   _prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(({ gdjsRoot, filesContent }) => {
-        if (!gdjsRoot) {
-          console.error('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+    return findGDJS().then(({ gdjsRoot, filesContent }) => {
+      console.info('GDJS found in ', gdjsRoot);
 
-        const prefix = makeTimestampedId();
+      const prefix = makeTimestampedId();
 
-        const outputDir = getBaseUrl() + prefix;
-        const browserS3FileSystem = new BrowserS3FileSystem({
-          filesContent,
-          bucketBaseUrl: getBaseUrl(),
-          prefix,
-        });
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          browserS3FileSystem
-        );
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-        exporter.setCodeOutputDirectory(getBaseUrl() + prefix);
-
-        resolve({
-          exporter,
-          outputDir,
-          browserS3FileSystem,
-        });
+      const outputDir = getBaseUrl() + prefix;
+      const browserS3FileSystem = new BrowserS3FileSystem({
+        filesContent,
+        bucketBaseUrl: getBaseUrl(),
+        prefix,
       });
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        browserS3FileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      exporter.setCodeOutputDirectory(getBaseUrl() + prefix);
+
+      return {
+        exporter,
+        outputDir,
+        browserS3FileSystem,
+      };
     });
   };
 

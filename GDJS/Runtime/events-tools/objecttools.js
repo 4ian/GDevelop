@@ -60,7 +60,7 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
  *  + Cost(Testing NbObjList1+NbObjList2 booleans)
  *
  *
- * @param  {gdjsTwoListsTestPredicate} predicate The predicate function is called with the two objects to compare, and an optional argument `extraArg` 
+ * @param  {gdjsTwoListsTestPredicate} predicate The predicate function is called with the two objects to compare, and an optional argument `extraArg`
  * @param  {Hashtable} objectsLists1 e.g. Hashtable.newFrom({ A: objects1 });
  * @param  {Hashtable} objectsLists2 e.g. Hashtable.newFrom({ B: objects2 });
  * @param  {boolean} inverted If `inverted` == true, only the objects of the first table are filtered.
@@ -228,8 +228,8 @@ gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, dista
 gdjs.evtTools.object._movesToward = function(obj1, obj2, tolerance) {
     if ( obj1.hasNoForces() ) return false;
 
-    var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
-                              obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
+    var objAngle = Math.atan2(obj2.getDrawableY()+obj2.getCenterY() - (obj1.getDrawableY()+obj1.getCenterY()),
+                              obj2.getDrawableX()+obj2.getCenterX() - (obj1.getDrawableX()+obj1.getCenterX()));
     objAngle *= 180/3.14159;
 
     return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAverageForce().getAngle(), objAngle)) <= tolerance/2;
@@ -241,8 +241,8 @@ gdjs.evtTools.object.movesTowardTest = function(objectsLists1, objectsLists2, to
 };
 
 gdjs.evtTools.object._turnedToward = function(obj1, obj2, tolerance) {
-    var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
-                              obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
+    var objAngle = Math.atan2(obj2.getDrawableY()+obj2.getCenterY() - (obj1.getDrawableY()+obj1.getCenterY()),
+                              obj2.getDrawableX()+obj2.getCenterX() - (obj1.getDrawableX()+obj1.getCenterX()));
     objAngle *= 180/3.14159;
 
     return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAngle(), objAngle)) <= tolerance/2;
@@ -276,10 +276,10 @@ gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
             objectsCount += list.length;
         }
     }
-    
-    if (objectsCount === 0) 
+
+    if (objectsCount === 0)
         return false;
-    
+
     // Pick one random object
     var index = Math.floor(Math.random()*objectsCount);
     if (index >= objectsCount) index = objectsCount-1; //Should never happen.
@@ -299,7 +299,7 @@ gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
             startIndex += list.length;
         }
     }
-    
+
     gdjs.evtTools.object.pickOnly(objectsLists, theChosenOne);
     return true;
 };
@@ -355,7 +355,7 @@ gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX
         for (var j = 0; j < list.length; j++) {
             var object = list[j];
             var result = object.raycastTest(x, y, endX, endY, !inverted);
-            
+
             if( result.collision ) {
                 if ( !inverted && (result.closeSqDist <= testSqDist) ) {
                     testSqDist = result.closeSqDist;

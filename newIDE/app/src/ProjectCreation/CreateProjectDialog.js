@@ -7,18 +7,30 @@ import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type State = {|
   currentTab: 'starters' | 'examples' | 'tutorials',
 |};
 
+export type CreateProjectDialogWithComponentsProps = {|
+  open: boolean,
+  onClose: () => void,
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => void,
+  onCreate: (
+    gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => void,
+|};
+
 type Props = {|
+  ...CreateProjectDialogWithComponentsProps,
   startersComponent: any,
   examplesComponent: any,
-  open?: boolean,
-  onClose?: () => void,
-  onOpen?: (path: string) => void,
-  onCreate?: (project: gdProject) => void,
 |};
 
 export default class CreateProjectDialog extends React.Component<Props, State> {

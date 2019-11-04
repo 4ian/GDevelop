@@ -121,27 +121,20 @@ export default class LocalPreviewLauncher extends React.Component<
   };
 
   _prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(gdjsRoot => {
-        if (!gdjsRoot) {
-          //TODO
-          console.error('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
 
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          localFileSystem
-        );
-        const outputDir = path.join(fileSystem.getTempDir(), 'preview');
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const outputDir = path.join(fileSystem.getTempDir(), 'preview');
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
-        resolve({
-          outputDir,
-          exporter,
-        });
-      });
+      return {
+        outputDir,
+        exporter,
+      };
     });
   };
 
@@ -189,7 +182,7 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  _checkSubscription = (options: PreviewOptions) => {
+  _checkSubscription = () => {
     if (!this._subscriptionChecker) return true;
 
     return this._subscriptionChecker.checkHasSubscription();

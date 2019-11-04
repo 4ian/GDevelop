@@ -10,7 +10,7 @@ import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
 import localFileSystem from '../LocalFileSystem';
 import Progress from './Progress';
-import { archiveFolder } from '../../../Utils/Archiver';
+import { archiveLocalFolder } from '../../../Utils/LocalArchiver';
 import optionalRequire from '../../../Utils/OptionalRequire.js';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
@@ -49,31 +49,25 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
   };
 
   static prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(gdjsRoot => {
-        if (!gdjsRoot) {
-          showErrorBox('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
 
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          localFileSystem
-        );
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-        const outputDir = path.join(
-          fileSystem.getTempDir(),
-          'FacebookInstantGamesExport'
-        );
-        fileSystem.mkDir(outputDir);
-        fileSystem.clearDir(outputDir);
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      const outputDir = path.join(
+        fileSystem.getTempDir(),
+        'FacebookInstantGamesExport'
+      );
+      fileSystem.mkDir(outputDir);
+      fileSystem.clearDir(outputDir);
 
-        resolve({
-          exporter,
-          outputDir,
-        });
-      });
+      return {
+        exporter,
+        outputDir,
+      };
     });
   };
 
@@ -99,7 +93,7 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
   };
 
   launchCompression = (outputDir: string): Promise<string> => {
-    return archiveFolder({
+    return archiveLocalFolder({
       path: outputDir,
       outputFilename: this.state.archiveOutputFilename,
     });

@@ -77,8 +77,7 @@ export default class LocalS3Export extends Component {
       });
   };
 
-  prepareExporter = (
-  ): Promise<PreparedExporter> => {
+  prepareExporter = (): Promise<PreparedExporter> => {
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -187,7 +186,11 @@ export default class LocalS3Export extends Component {
         <Line alignItems="center">
           <LinearProgress
             style={{ flex: 1 }}
-            value={stepMaxProgress > 0 ? (stepCurrentProgress / stepMaxProgress) * 100 : 0}
+            value={
+              stepMaxProgress > 0
+                ? (stepCurrentProgress / stepMaxProgress) * 100
+                : 0
+            }
             variant={
               (exportStarted && !exportDone) || (uploadDone && !deployDone)
                 ? 'indeterminate'

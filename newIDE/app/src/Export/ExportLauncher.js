@@ -50,7 +50,9 @@ export default class ExportLauncher extends Component<Props, State> {
     stepMaxProgress: 0,
     doneFooterOpen: false,
     errored: false,
-    exportState: this.props.exportPipeline.getInitialExportState(this.props.project),
+    exportState: this.props.exportPipeline.getInitialExportState(
+      this.props.project
+    ),
   };
   buildsWatcher = new BuildsWatcher();
 
@@ -206,7 +208,6 @@ export default class ExportLauncher extends Component<Props, State> {
       doneFooterOpen,
       exportState,
     } = this.state;
-    const t = str => str; //TODO;
     const { project, userProfile, exportPipeline } = this.props;
     if (!project) return null;
 
@@ -251,11 +252,8 @@ export default class ExportLauncher extends Component<Props, State> {
         )}
         {!!exportPipeline.onlineBuildType && !userProfile.authenticated && (
           <CreateProfile
-            message={t(
-              // TODO
-              'Create an account to build your game for Android in one-click:'
-            )}
             onLogin={userProfile.onLogin}
+            onCreateAccount={userProfile.onCreateAccount}
           />
         )}
         <Line expand>

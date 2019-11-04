@@ -20,9 +20,9 @@ export default ({ message, onLogin, onCreateAccount }: Props) => (
       <Text>
         {message || (
           <Trans>
-            You are not connected. Create an account and connect to access to
-            GDevelop online services and build your game for Android, Windows,
-            macOS and Linux in one click!
+            You are not connected. Create an account to access to GDevelop
+            online services and build your game for Android, Windows, macOS and
+            Linux in one click!
           </Trans>
         )}
       </Text>

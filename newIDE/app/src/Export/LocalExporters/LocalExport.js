@@ -52,24 +52,24 @@ export const localExportPipeline: ExportPipeline<
   renderHeader: ({ project, exportState, updateExportState }) => (
     <Column noMargin>
       <Line>
-          <Text>
-            <Trans>
-              This will export your game to a folder that you can then upload on
-              a website or on game hosting like itch.io.
-            </Trans>
-          </Text>
-        </Line>
-        <Line>
-          <LocalFolderPicker
+        <Text>
+          <Trans>
+            This will export your game to a folder that you can then upload on a
+            website or on game hosting like itch.io.
+          </Trans>
+        </Text>
+      </Line>
+      <Line>
+        <LocalFolderPicker
           type="export"
-            value={exportState.outputDir}
-            defaultPath={project.getLastCompilationDirectory()}
-            onChange={outputDir => {
-              updateExportState(() => ({ outputDir }));
-            }}
-            fullWidth
-          />
-        </Line>
+          value={exportState.outputDir}
+          defaultPath={project.getLastCompilationDirectory()}
+          onChange={outputDir => {
+            updateExportState(() => ({ outputDir }));
+          }}
+          fullWidth
+        />
+      </Line>
     </Column>
   ),
 
@@ -99,7 +99,11 @@ export const localExportPipeline: ExportPipeline<
     { exporter }: PreparedExporter
   ): Promise<ExportOutput> => {
     const exportOptions = new gd.MapStringBoolean();
-    exporter.exportWholePixiProject(context.project, context.exportState.outputDir, exportOptions);
+    exporter.exportWholePixiProject(
+      context.project,
+      context.exportState.outputDir,
+      exportOptions
+    );
     exportOptions.delete();
     exporter.delete();
 

@@ -220,7 +220,9 @@ function generateBehavior(
     options.codeNamespacePrefix +
     '__' +
     mangleName(eventsBasedBehavior.getName());
-  const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(codeNamespace);
+  const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
+    codeNamespace
+  );
 
   behaviorMetadata.setIncludeFile(includeFile);
 

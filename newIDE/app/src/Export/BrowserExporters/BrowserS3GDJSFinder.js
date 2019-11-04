@@ -35,7 +35,9 @@ export const findGDJS = (
       return fetch(url).then(response => {
         if (!response.ok) {
           console.error(`Error while downloading "${url}"`, response);
-          throw new Error(`Error while downloading "${url}" (status: ${response.status})`);
+          throw new Error(
+            `Error while downloading "${url}" (status: ${response.status})`
+          );
         }
         return response.text().then(text => ({
           filePath: url,

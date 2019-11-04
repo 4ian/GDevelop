@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {localExportPipeline} from './LocalExport';
+import { localExportPipeline } from './LocalExport';
 import LocalS3Export from './LocalS3Export';
-import LocalOnlineCordovaExport from './LocalOnlineCordovaExport';
+import { localOnlineCordovaExportPipeline } from './LocalOnlineCordovaExport.js';
 import { localCordovaExportPipeline } from './LocalCordovaExport';
 import { localCocos2dExportPipeline } from './LocalCocos2dExport';
-import LocalOnlineElectronExport from './LocalOnlineElectronExport';
+import { localOnlineElectronExportPipeline } from './LocalOnlineElectronExport.js';
 import { localFacebookInstantGamesExportPipeline } from './LocalFacebookInstantGamesExport';
 import { localElectronExportPipeline } from './LocalElectronExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
@@ -22,7 +22,7 @@ export const getLocalExporters = () => [
     description:
       'Package your game for Android directly from GDevelop. iOS support is coming soon!',
     key: 'localonlinecordovaexport',
-    ExportComponent: LocalOnlineCordovaExport,
+    exportPipeline: localOnlineCordovaExportPipeline,
   },
   {
     name: 'Facebook Instant Games',
@@ -69,7 +69,7 @@ export const getLocalExporters = () => [
     description:
       'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
     key: 'localonlineelectronexport',
-    ExportComponent: LocalOnlineElectronExport,
+    exportPipeline: localOnlineElectronExportPipeline,
   },
   {
     name: 'Windows/macOS/Linux (manual)',

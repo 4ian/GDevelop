@@ -36,14 +36,14 @@ export default class BrowserS3FileSystem {
   bucketBaseUrl: string;
 
   // Store the content of some files.
-  _indexedFilesContent: {[string]: TextFileDescriptor};
+  _indexedFilesContent: { [string]: TextFileDescriptor };
 
   // Store all the objects that should be written on the S3 bucket.
   // Call uploadPendingObjects to send them
   _pendingUploadObjects: Array<PendingUploadFileDescriptor> = [];
 
-    // Store a set of all external URLs copied so that we can simulate
-    // readDir result.
+  // Store a set of all external URLs copied so that we can simulate
+  // readDir result.
   _allCopiedExternalUrls = new Set<string>();
 
   constructor({ filesContent, prefix, bucketBaseUrl }: ConstructorArgs) {
@@ -145,7 +145,8 @@ export default class BrowserS3FileSystem {
   };
 
   readFile = (file: string) => {
-    if (!!this._indexedFilesContent[file]) return this._indexedFilesContent[file].text;
+    if (!!this._indexedFilesContent[file])
+      return this._indexedFilesContent[file].text;
 
     console.error(`Unknown file ${file}, returning an empty string`);
     return '';

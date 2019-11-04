@@ -18,7 +18,7 @@ export type UrlFileDescriptor = {|
   url: string,
 |};
 
-function eachCallback <T>(
+function eachCallback<T>(
   array: Array<T>,
   callback: (T, () => void) => void,
   done: () => void
@@ -41,11 +41,11 @@ function eachCallback <T>(
   };
 
   callNextCallback();
-};
+}
 
 export const downloadUrlsToBlobs = async ({
   urlFiles,
-  onProgress
+  onProgress,
 }: {|
   urlFiles: Array<UrlFileDescriptor>,
   onProgress: (count: number, total: number) => void,
@@ -59,7 +59,9 @@ export const downloadUrlsToBlobs = async ({
           .then(response => {
             if (!response.ok) {
               console.error(`Error while downloading "${url}"`, response);
-              throw new Error(`Error while downloading "${url}" (status: ${response.status})`);
+              throw new Error(
+                `Error while downloading "${url}" (status: ${response.status})`
+              );
             }
             return response.blob();
           })

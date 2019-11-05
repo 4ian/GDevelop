@@ -1717,6 +1717,7 @@ class MainFrame extends React.Component<Props, State> {
               }}
               onExportProject={this.openExportDialog}
               onOpenPreferences={() => this.openPreferences(true)}
+              onOpenProfile={() => this.openProfile(true)}
               onOpenResources={() => {
                 this.openResources();
                 this.openProjectManager(false);

@@ -38,6 +38,7 @@ import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -249,6 +250,7 @@ type Props = {|
   onCloseProject: () => void,
   onExportProject: () => void,
   onOpenPreferences: () => void,
+  onOpenProfile: () => void,
   onOpenResources: () => void,
   onAddLayout: () => void,
   onAddExternalEvents: () => void,
@@ -569,53 +571,52 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (Window.hasMainMenu()) return null;
 
     return (
-      <ProjectStructureItem
-        primaryText={<Trans>Menu</Trans>}
-        open
-        indentNestedItems
-        renderNestedItems={() => [
+      <React.Fragment>
+        <ListItem
+          key="save"
+          primaryText={<Trans>Save</Trans>}
+          leftIcon={<Save />}
+          onClick={() => this.props.onSaveProject()}
+        />
+        <ListItem
+          key="save-as"
+          primaryText={<Trans>Save as...</Trans>}
+          leftIcon={<FileCopy />}
+          onClick={() => this.props.onSaveProjectAs()}
+        />
+        <ListItem
+          key="export"
+          primaryText={<Trans>Export</Trans>}
+          leftIcon={<AddToHomeScreen />}
+          onClick={() => this.props.onExportProject()}
+        />
+        <ListItem
+          key="close"
+          primaryText={<Trans>Close</Trans>}
+          leftIcon={<Close />}
+          onClick={() => this.props.onCloseProject()}
+        />
+        <ListItem
+          key="preferences"
+          primaryText={<Trans>Preferences</Trans>}
+          leftIcon={<Settings />}
+          onClick={() => this.props.onOpenPreferences()}
+        />
+        <ListItem
+          key="profile"
+          primaryText={<Trans>My profile</Trans>}
+          leftIcon={<AccountCircle />}
+          onClick={() => this.props.onOpenProfile()}
+        />
+        {!Window.isFullscreen() && (
           <ListItem
-            key="save"
-            primaryText={<Trans>Save</Trans>}
-            leftIcon={<Save />}
-            onClick={() => this.props.onSaveProject()}
-          />,
-          <ListItem
-            key="save-as"
-            primaryText={<Trans>Save as...</Trans>}
-            leftIcon={<FileCopy />}
-            onClick={() => this.props.onSaveProjectAs()}
-          />,
-          <ListItem
-            key="export"
-            primaryText={<Trans>Export</Trans>}
-            leftIcon={<AddToHomeScreen />}
-            onClick={() => this.props.onExportProject()}
-          />,
-          <ListItem
-            key="close"
-            primaryText={<Trans>Close</Trans>}
-            leftIcon={<Close />}
-            onClick={() => this.props.onCloseProject()}
-          />,
-          <ListItem
-            key="preferences"
-            primaryText={<Trans>Preferences</Trans>}
-            leftIcon={<Settings />}
-            onClick={() => this.props.onOpenPreferences()}
-          />,
-          ...(!Window.isFullscreen()
-            ? [
-                <ListItem
-                  key="fullscreen"
-                  primaryText={<Trans>Turn on Fullscreen</Trans>}
-                  leftIcon={<Fullscreen />}
-                  onClick={() => Window.requestFullscreen()}
-                />,
-              ]
-            : []),
-        ]}
-      />
+            key="fullscreen"
+            primaryText={<Trans>Turn on Fullscreen</Trans>}
+            leftIcon={<Fullscreen />}
+            onClick={() => Window.requestFullscreen()}
+          />
+        )}
+      </React.Fragment>
     );
   }
 

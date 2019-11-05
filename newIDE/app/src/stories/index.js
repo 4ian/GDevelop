@@ -105,7 +105,6 @@ import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
-import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Checkbox from '../UI/Checkbox';
@@ -3259,6 +3258,7 @@ storiesOf('ProjectManager', module)
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
+      onOpenProfile={action('onOpenProfile')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
@@ -3297,6 +3297,7 @@ storiesOf('ProjectManager', module)
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
+      onOpenProfile={action('onOpenProfile')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}

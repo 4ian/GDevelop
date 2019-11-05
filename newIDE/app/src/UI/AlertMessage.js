@@ -19,19 +19,21 @@ type Props = {|
   kind: 'info' | 'warning' | 'error',
   children: React.Node,
   onHide?: () => void,
+  renderRightButton?: () => React.Node,
 |};
 
 /**
  * Show an hint, warning or other message. If you want to allow the user
  * to permanently hide the hint/alert/message, see DismissableAlertMessage.
  */
-const AlertMessage = ({ kind, children, onHide }: Props) => (
+const AlertMessage = ({ kind, children, onHide, renderRightButton }: Props) => (
   <Paper>
     <Line noMargin alignItems="center">
       {kind === 'info' && <Info style={styles.icon} />}
       {kind === 'warning' && <Warning style={styles.icon} />}
       {kind === 'error' && <Error style={styles.icon} />}
       <Text style={styles.content}>{children}</Text>
+      {renderRightButton && renderRightButton()}
       {onHide && (
         <FlatButton label={<Trans>Hide</Trans>} onClick={() => onHide()} />
       )}

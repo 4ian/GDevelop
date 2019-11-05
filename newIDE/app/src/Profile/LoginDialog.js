@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import TextField from '../UI/TextField';
 import {
   type LoginForm,
@@ -14,47 +14,24 @@ import {
 import RightLoader from '../UI/RightLoader';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
+import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
+import AlertMessage from '../UI/AlertMessage';
 
 type Props = {|
-  open: boolean,
-  onClose: Function,
+  onClose: () => void,
+  onGoToCreateAccount: () => void,
   onLogin: (form: LoginForm) => void,
-  onCreateAccount: (form: LoginForm) => void,
   onForgotPassword: (form: LoginForm) => void,
   loginInProgress: boolean,
-  createAccountInProgress: boolean,
   error: ?LoginError,
   resetPasswordDialogOpen: boolean,
-  onCloseResetPasswordDialog: Function,
+  onCloseResetPasswordDialog: () => void,
   forgotPasswordInProgress: boolean,
 |};
 
 type State = {|
   form: LoginForm,
 |};
-
-const getEmailErrorText = (error: ?LoginError) => {
-  if (!error) return undefined;
-
-  if (error.code === 'auth/invalid-email') return 'This email is invalid';
-  if (error.code === 'auth/user-disabled') return 'The user was disabled';
-  if (error.code === 'auth/user-not-found')
-    return 'This user was not found: have you created your account?';
-  if (error.code === 'auth/email-already-in-use')
-    return 'This email was already used for another account';
-  if (error.code === 'auth/operation-not-allowed')
-    return 'Service seems to be unavailable, please try again later';
-  return undefined;
-};
-
-const getPasswordErrorText = (error: ?LoginError) => {
-  if (!error) return undefined;
-
-  if (error.code === 'auth/wrong-password') return 'The password is invalid';
-  if (error.code === 'auth/weak-password')
-    return 'This password is too weak: please use more letters and digits';
-  return undefined;
-};
 
 export default class LoginDialog extends Component<Props, State> {
   state = {
@@ -69,11 +46,6 @@ export default class LoginDialog extends Component<Props, State> {
     this.props.onLogin(form);
   };
 
-  _onCreateAccount = () => {
-    const { form } = this.state;
-    this.props.onCreateAccount(form);
-  };
-
   _onForgotPassword = () => {
     const { form } = this.state;
     this.props.onForgotPassword(form);
@@ -81,9 +53,8 @@ export default class LoginDialog extends Component<Props, State> {
 
   render() {
     const {
-      open,
       onClose,
-      createAccountInProgress,
+      onGoToCreateAccount,
       loginInProgress,
       error,
       resetPasswordDialogOpen,
@@ -92,16 +63,25 @@ export default class LoginDialog extends Component<Props, State> {
     } = this.props;
     const actions = [
       <FlatButton
-        label={<Trans>Close</Trans>}
-        key="close"
+        label={<Trans>Back</Trans>}
+        disabled={loginInProgress || forgotPasswordInProgress}
+        key="back"
         primary={false}
         onClick={onClose}
       />,
+      <LeftLoader isLoading={loginInProgress} key="login">
+        <RaisedButton
+          label={<Trans>Login</Trans>}
+          primary
+          onClick={this._onLogin}
+          disabled={loginInProgress || forgotPasswordInProgress}
+        />
+      </LeftLoader>,
     ];
 
     return (
       <Dialog
-        title={<Trans>Login or create a GDevelop account</Trans>}
+        title={<Trans>Login to your GDevelop account</Trans>}
         actions={actions}
         secondaryActions={[
           <RightLoader
@@ -111,19 +91,31 @@ export default class LoginDialog extends Component<Props, State> {
             <FlatButton
               label={<Trans>I forgot my password</Trans>}
               primary={false}
-              disabled={
-                loginInProgress ||
-                createAccountInProgress ||
-                forgotPasswordInProgress
-              }
+              disabled={loginInProgress || forgotPasswordInProgress}
               onClick={this._onForgotPassword}
             />
           </RightLoader>,
         ]}
-        onRequestClose={onClose}
-        open={open}
+        onRequestClose={() => {
+          if (!loginInProgress && !forgotPasswordInProgress) onClose();
+        }}
+        maxWidth="sm"
+        open
       >
         <Column noMargin>
+          <AlertMessage
+            kind="info"
+            renderRightButton={() => (
+              <FlatButton
+                label={<Trans>Create my account</Trans>}
+                disabled={loginInProgress || forgotPasswordInProgress}
+                primary
+                onClick={onGoToCreateAccount}
+              />
+            )}
+          >
+            <Trans>Don't have an account yet?</Trans>
+          </AlertMessage>
           <TextField
             value={this.state.form.email}
             floatingLabelText={<Trans>Email</Trans>}
@@ -153,32 +145,6 @@ export default class LoginDialog extends Component<Props, State> {
               });
             }}
           />
-          <Spacer />
-          <Line expand justifyContent="space-between">
-            <RightLoader isLoading={createAccountInProgress}>
-              <RaisedButton
-                label={<Trans>Create my account</Trans>}
-                disabled={
-                  loginInProgress ||
-                  createAccountInProgress ||
-                  forgotPasswordInProgress
-                }
-                onClick={this._onCreateAccount}
-              />
-            </RightLoader>
-
-            <LeftLoader isLoading={loginInProgress}>
-              <FlatButton
-                label={<Trans>Login</Trans>}
-                onClick={this._onLogin}
-                disabled={
-                  loginInProgress ||
-                  createAccountInProgress ||
-                  forgotPasswordInProgress
-                }
-              />
-            </LeftLoader>
-          </Line>
         </Column>
         <Dialog
           open={resetPasswordDialogOpen}

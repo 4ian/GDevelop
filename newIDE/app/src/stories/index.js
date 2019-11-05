@@ -158,6 +158,7 @@ import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStoragePro
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import CreateAccountDialog from '../Profile/CreateAccountDialog';
 
 // No i18n in this file
 
@@ -2662,7 +2663,12 @@ storiesOf('Changelog', module)
 storiesOf('CreateProfile', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <CreateProfile onLogin={action('login')} />);
+  .add('default', () => (
+    <CreateProfile
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+    />
+  ));
 
 storiesOf('LimitDisplayer', module)
   .addDecorator(paperDecorator)
@@ -2757,15 +2763,13 @@ storiesOf('SubscriptionPendingDialog', module)
     />
   ));
 
-storiesOf('LoginDialog', module)
+storiesOf('Profile/LoginDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2776,26 +2780,9 @@ storiesOf('LoginDialog', module)
   ))
   .add('login in progress', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
-      onLogin={action('on login')}
-      onForgotPassword={action('on forgot password')}
-      onCloseResetPasswordDialog={action('on close reset password dialog')}
-      resetPasswordDialogOpen={false}
-      forgotPasswordInProgress={false}
-      error={null}
-    />
-  ))
-  .add('create account in progress', () => (
-    <LoginDialog
-      open
-      onClose={action('on close')}
-      loginInProgress={false}
-      createAccountInProgress
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2806,11 +2793,9 @@ storiesOf('LoginDialog', module)
   ))
   .add('weak-password error', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2823,11 +2808,9 @@ storiesOf('LoginDialog', module)
   ))
   .add('invalid-email error', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2840,17 +2823,58 @@ storiesOf('LoginDialog', module)
   ))
   .add('Reset password', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
       forgotPasswordInProgress={false}
       resetPasswordDialogOpen
       error={null}
+    />
+  ));
+
+storiesOf('Profile/CreateAccountDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress={false}
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={null}
+    />
+  ))
+  .add('login in progress', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={null}
+    />
+  ))
+  .add('weak-password error', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress={false}
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={{
+        code: 'auth/weak-password',
+      }}
+    />
+  ))
+  .add('invalid-email error', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress={false}
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={{
+        code: 'auth/invalid-email',
+      }}
     />
   ));
 

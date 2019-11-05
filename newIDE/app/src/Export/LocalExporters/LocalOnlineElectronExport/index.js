@@ -327,6 +327,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
               'Create an account to build your game for Windows, Linux and macOS in one-click:'
             )}
             onLogin={userProfile.onLogin}
+            onCreateAccount={userProfile.onCreateAccount}
           />
         )}
         <Line expand>

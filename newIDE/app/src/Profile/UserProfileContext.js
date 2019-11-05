@@ -15,6 +15,7 @@ export type UserProfile = {|
   subscription: ?Subscription,
   onLogout: () => void,
   onLogin: () => void,
+  onCreateAccount: () => void,
   onRefreshUserProfile: () => void,
   getAuthorizationHeader: () => Promise<string>,
 |};
@@ -27,6 +28,7 @@ export const initialUserProfile = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onCreateAccount: () => {},
   onRefreshUserProfile: () => {},
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };

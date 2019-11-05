@@ -287,6 +287,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
               'Create an account to build your game for Android in one-click:'
             )}
             onLogin={userProfile.onLogin}
+            onCreateAccount={userProfile.onCreateAccount}
           />
         )}
         <Line expand>

@@ -122,7 +122,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
         project.getResourcesManager().addResource(resource);
 
         this._loadFrom(project.getResourcesManager());
-        this._onChangeResourceName(resource.getName());
+        const resourceName: string = resource.getName();
+        this._onChangeResourceName(resourceName);
+
+        // Imperatively set the value of the autocomplete, as it can be (on Windows for example),
+        // still focused. This means that when it's then getting blurred, the value we
+        // set for the resource name would get erased by the one that was getting entered.
+        if (this._autoComplete)
+          this._autoComplete.forceInputValueTo(resourceName);
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.

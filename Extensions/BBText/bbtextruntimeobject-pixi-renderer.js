@@ -58,10 +58,10 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
-  if (this._object._wordWrap !== this._pixiObject._wordWrap) {
+  if (this._pixiObject._style.wordWrap !== this._object._wordWrap) {
     this.updateWordWrap();
   }
-  if (this._object._wrappingWidth !== this._pixiObject._wrappingWidth) {
+  if (this._pixiObject._style.wordWrapWidth !== this._object._wrappingWidth) {
     this.updateWrappingWidth();
   }
   if (

@@ -208,6 +208,8 @@ module.exports = {
 
         // Add all the generic SETTERS
         if (parameterType === 'number' || parameterType === 'string') {
+          const expressionType =
+            parameterType === 'number' ? 'expression' : 'string';
           gdObject
             .addAction(
               `Set${property.functionName}`,
@@ -227,7 +229,7 @@ module.exports = {
               false
             )
             .addParameter('operator', _("Modification's sign"), '', false)
-            .addParameter(parameterType, _(property.paramLabel), '', false)
+            .addParameter(expressionType, _(property.paramLabel), '', false)
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
             .setManipulatedType(parameterType)

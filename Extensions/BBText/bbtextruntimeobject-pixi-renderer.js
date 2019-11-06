@@ -59,10 +59,10 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
   if (this._object._wordWrap !== this._pixiObject._wordWrap) {
-    this.updateWrap();
+    this.updateWordWrap();
   }
   if (this._object._wrappingWidth !== this._pixiObject._wrappingWidth) {
-    this.updateWrapWidth();
+    this.updateWrappingWidth();
   }
   if (
     !this._textureWasValid &&
@@ -78,13 +78,13 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
   }
 };
 
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateWrap = function() {
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateWordWrap = function() {
   this._pixiObject._style.wordWrap = this._object._wordWrap;
   this._pixiObject.dirty = true;
   this.updatePosition();
 };
 
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateWrapWidth = function() {
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function() {
   this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
   this._pixiObject.dirty = true;
   this.updatePosition();

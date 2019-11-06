@@ -51,7 +51,7 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
   initialInstanceData
 ) {
-  //this is absolutely required to set the wrapping width to the instance's width
+  // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
   this.setWrappingWidth(initialInstanceData.width);
 };
 

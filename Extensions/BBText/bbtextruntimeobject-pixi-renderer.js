@@ -25,7 +25,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
 
     this._object.hidden = !runtimeObject._visible;
   } else {
-    this.updateText();
     this.updateColor();
     this.updateAlignment();
     this.updateFontFamily();
@@ -43,7 +42,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
 
-  this.updateText();
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
@@ -58,6 +56,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
+  this.updateText();
   if (this._object._wordWrap !== this._pixiObject._wordWrap) {
     this._pixiObject._style.wordWrap = this._object._wordWrap;
     this._pixiObject.dirty = true;
@@ -65,18 +64,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
   if (this._object._wrappingWidth !== this._pixiObject._wrappingWidth) {
     this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
     this._pixiObject.dirty = true;
-  }
-  if (
-    !this._textureWasValid &&
-    this._pixiObject.texture &&
-    this._pixiObject.texture.valid
-  ) {
-    if (this._object._align !== this._pixiObject._style.align) {
-      this._pixiObject._style.align = this._object._align;
-      this._pixiObject.dirty = true;
-    }
-    this.updatePosition();
-    this._textureWasValid = true;
   }
 };
 

@@ -51,10 +51,8 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
   initialInstanceData
 ) {
-  if (initialInstanceData.customSize) {
-    //this is absolutely required to set the wrapping width to the instance's width
-    this.setWrappingWidth(initialInstanceData.width);
-  }
+  //this is absolutely required to set the wrapping width to the instance's width
+  this.setWrappingWidth(initialInstanceData.width);
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {

@@ -14,7 +14,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     this._pixiObject = new MultiStyleText(runtimeObject._text, {
       default: {
         fontFamily: runtimeObject._fontFamily,
-        fontSize: `${runtimeObject._fontSize}px`,
+        fontSize: runtimeObject._fontSize + 'px',
         fill: runtimeObject._color,
         tagStyle: 'bbcode',
         wordWrap: runtimeObject._wordWrap,
@@ -24,13 +24,12 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     });
 
     this._object.hidden = !runtimeObject._visible;
+    console.log(this._object, runtimeObject);
   } else {
-    this.updateText();
     this.updateColor();
     this.updateAlignment();
     this.updateFontFamily();
     this.updateFontSize();
-    this.updatePosition();
   }
 
   runtimeScene
@@ -48,34 +47,12 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this.updateAngle();
   this.updateOpacity();
   this.updateVisible();
-  this.ensureUpToDate();
 };
 
 gdjs.BBTextRuntimeObjectRenderer = gdjs.BBTextRuntimeObjectPixiRenderer;
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   return this._pixiObject;
-};
-
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
-  if (this._pixiObject._style.wordWrap !== this._object._wordWrap) {
-    this.updateWordWrap();
-  }
-  if (this._pixiObject._style.wordWrapWidth !== this._object._wrappingWidth) {
-    this.updateWrappingWidth();
-  }
-  if (
-    !this._textureWasValid &&
-    this._pixiObject.texture &&
-    this._pixiObject.texture.valid
-  ) {
-    if (this._object._align !== this._pixiObject._style.align) {
-      this._pixiObject._style.align = this._object._align;
-      this._pixiObject.dirty = true;
-    }
-    this.updatePosition();
-    this._textureWasValid = true;
-  }
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateWordWrap = function() {

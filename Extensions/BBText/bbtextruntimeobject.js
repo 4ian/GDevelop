@@ -59,10 +59,6 @@ gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
   gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 };
 
-gdjs.BBTextRuntimeObject.prototype.update = function(runtimeScene) {
-  if (this._renderer) this._renderer.ensureUpToDate();
-};
-
 /**
  * Set/Get BBText base style properties
  */
@@ -78,14 +74,15 @@ gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
 gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {
   const splitValue = rgbColorString.split(';');
   if (splitValue.length !== 3) return;
-  const hexColor = `#${gdjs.rgbToHex(
-    parseInt(splitValue[0], 0),
-    parseInt(splitValue[1], 0),
-    parseInt(splitValue[2], 0)
-  )}`;
+  const hexColor =
+    '#' +
+    gdjs.rgbToHex(
+      parseInt(splitValue[0], 0),
+      parseInt(splitValue[1], 0),
+      parseInt(splitValue[2], 0)
+    );
   this._color = hexColor;
   this._renderer.updateColor();
-  this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getColor = function() {
@@ -95,7 +92,6 @@ gdjs.BBTextRuntimeObject.prototype.getColor = function() {
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(fontSize) {
   this._fontSize = fontSize;
   this._renderer.updateFontSize();
-  this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getFontSize = function() {
@@ -105,7 +101,6 @@ gdjs.BBTextRuntimeObject.prototype.getFontSize = function() {
 gdjs.BBTextRuntimeObject.prototype.setFontFamily = function(fontFamily) {
   this._fontFamily = fontFamily;
   this._renderer.updateFontFamily();
-  this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getFontFamily = function() {
@@ -115,7 +110,6 @@ gdjs.BBTextRuntimeObject.prototype.getFontFamily = function() {
 gdjs.BBTextRuntimeObject.prototype.setAlignment = function(align) {
   this._align = align;
   this._renderer.updateAlignment();
-  this.update();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getAlignment = function() {
@@ -171,7 +165,7 @@ gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
  */
 gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
   this._wrappingWidth = width;
-  this.update();
+  this._renderer.updateWrappingWidth();
 };
 
 /**
@@ -183,7 +177,7 @@ gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function() {
 
 gdjs.BBTextRuntimeObject.prototype.setWordWrap = function(wordWrap) {
   this._wordWrap = wordWrap;
-  this.update();
+  this._renderer.updateWordWrap();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getWordWrap = function(wordWrap) {

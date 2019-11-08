@@ -165,12 +165,12 @@ const render = headerObject => {
     : 'Open save path options';
 
   headerObject.hideButton.style = headerObject.state.visible
-    ? 'opacity: 1'
+    ? 'opacity: 1; margin-right: 3px;'
     : 'opacity:0.5';
 
   headerObject.root.parentElement.style = headerObject.state.visible
-    ? 'position: relative; display:flex; width:100%;'
-    : 'position: absolute; display:flex; width:100%; height:80px; justify-content:flex-end';
+    ? 'position: relative; display:flex; width:100%'
+    : 'position: absolute; display:flex; width:40px; height:40px; right:0';
 
   headerObject.nameInput.value = headerObject.nameInput.value.replace(
     /[^a-zA-Z0-9_-]/g,

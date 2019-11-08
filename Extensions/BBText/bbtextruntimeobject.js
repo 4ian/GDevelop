@@ -22,7 +22,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type boolean */
   this._wordWrap = objectData.content.wordWrap;
   /** @type number */
-  this._wrappingWidth = 0;
+  this._wrappingWidth = 250;
   /** @type string */
   this._align = objectData.content.align;
 
@@ -52,7 +52,8 @@ gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = func
   initialInstanceData
 ) {
   // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
-  this.setWrappingWidth(initialInstanceData.width);
+  if (initialInstanceData.customSize)
+    this.setWrappingWidth(initialInstanceData.width);
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {

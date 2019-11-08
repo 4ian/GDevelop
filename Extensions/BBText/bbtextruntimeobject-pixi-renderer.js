@@ -24,7 +24,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     });
 
     this._object.hidden = !runtimeObject._visible;
-    console.log(this._object, runtimeObject);
   } else {
     this.updateColor();
     this.updateAlignment();

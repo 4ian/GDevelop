@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/fox/Documents/GDevelop projects/My project11/manipulate-text-object.json.autosave",
+    "projectFile": "/home/fox/DEV/GDevelop/newIDE/app/resources/examples/bbtext-object-demo/manipulate-bbtext-object.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -244,6 +244,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "about",
+          "width": 0,
+          "x": 10,
+          "y": 448,
+          "zOrder": 13,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -354,6 +369,23 @@
           "behaviors": [],
           "content": {
             "text": "[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font [spacing=7]spaced out[/spacing] \n [outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] [b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font [spacing=7]spaced out[/spacing] \n [outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] [b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font [spacing=7]spaced out[/spacing] \n [outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ",
+            "opacity": 255,
+            "fontSize": "20",
+            "visible": true,
+            "color": "#000000",
+            "fontFamily": "Arial",
+            "align": "left",
+            "wordWrap": true
+          }
+        },
+        {
+          "name": "about",
+          "tags": "",
+          "type": "BBText::BBText",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "text": "[b]BBCode[/b] or [i]Bulletin Board Code[/i] is a lightweight markup language used to format posts in many message boards. ",
             "opacity": 255,
             "fontSize": "20",
             "visible": true,

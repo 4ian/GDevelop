@@ -2,20 +2,20 @@
 	{
 		"title": "Start",
 		"tags": "",
-		"body": "<<avatar sign>> Press Z to interact with the tree critters 🐜🐛🐞 Spacebar to jump. \nAnd welcome to yarn's example GD project! ",
+		"body": "<<avatar sign>> [color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.\nAnd welcome to yarn's example GD project!",
 		"position": {
-			"x": -2074,
-			"y": 220
+			"x": -2144,
+			"y": 468
 		},
 		"colorID": 0
 	},
 	{
 		"title": "ant",
 		"tags": "",
-		"body": "<<avatar ant>>Please don't bug me now... <<wait 1000>>  I am quite busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
+		"body": "<<avatar ant>>[b]Please don't bug me now[/b]... <<wait 1000>>  I am [i]quite[/i] busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
 		"position": {
-			"x": -1808,
-			"y": 222
+			"x": -1878,
+			"y": 470
 		},
 		"colorID": 0
 	},
@@ -24,18 +24,18 @@
 		"tags": "",
 		"body": "<<if $seenCrumb == true>>\nOh yeah? You saw it on a branch?\nDid you taste it?...\n<<else>>\nOh ha-ha! I can see that you are lying.\n<<endif>>",
 		"position": {
-			"x": -2016,
-			"y": 504
+			"x": -2086,
+			"y": 752
 		},
 		"colorID": 3
 	},
 	{
 		"title": "antcrumbno",
 		"tags": "",
-		"body": "Then scram!\nI don't have time for you...",
+		"body": "Then [b]scram[/b]!\nI don't have time for you...",
 		"position": {
-			"x": -1624,
-			"y": 496
+			"x": -1694,
+			"y": 744
 		},
 		"colorID": 0
 	},
@@ -44,8 +44,8 @@
 		"tags": "",
 		"body": "<<avatar crumb>> <<set $seenCrumb to true >> You stumbled on a giant crumb.\nWhat would you like to do with it?\n[[ taste it | eatCrumb]] [[ take it| takeCrumb]] [[ nothing |null ]] ",
 		"position": {
-			"x": -1821,
-			"y": 726
+			"x": -1891,
+			"y": 974
 		},
 		"colorID": 6
 	},
@@ -54,8 +54,8 @@
 		"tags": "",
 		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
 		"position": {
-			"x": -2035,
-			"y": 977
+			"x": -2105,
+			"y": 1225
 		},
 		"colorID": 0
 	},
@@ -64,8 +64,8 @@
 		"tags": "",
 		"body": "The thing is way too heavy 😬 ....",
 		"position": {
-			"x": -1600,
-			"y": 964
+			"x": -1670,
+			"y": 1212
 		},
 		"colorID": 0
 	},
@@ -74,8 +74,8 @@
 		"tags": "",
 		"body": "<<wait 100>> ",
 		"position": {
-			"x": -1520,
-			"y": 727
+			"x": -1590,
+			"y": 975
 		},
 		"colorID": 0
 	}

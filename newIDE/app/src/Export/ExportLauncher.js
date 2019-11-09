@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import RaisedButton from '../UI/RaisedButton';
 import { sendExportLaunched } from '../Utils/Analytics/EventSender';
-import { type Build, getBuildUrl } from '../Utils/GDevelopServices/Build';
+import { type Build, type BuildArtifactKeyName, getBuildArtifactUrl } from '../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../Profile/UserProfileContext';
 import { Column, Line } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -23,6 +23,7 @@ import { type ExportPipeline } from './ExportPipeline.flow';
 
 type State = {|
   exportStep: BuildStep,
+  compressionOutput: any,
   build: ?Build,
   stepCurrentProgress: number,
   stepMaxProgress: number,
@@ -46,6 +47,7 @@ export default class ExportLauncher extends Component<Props, State> {
   state = {
     exportStep: '',
     build: null,
+    compressionOutput: null,
     stepCurrentProgress: 0,
     stepMaxProgress: 0,
     doneFooterOpen: false,
@@ -166,11 +168,16 @@ export default class ExportLauncher extends Component<Props, State> {
                   this._startBuildWatch(userProfile);
                 }
               );
+
+              return { compressionOutput };
             }, handleError(t('Error while lauching the build of the game.')));
         }
+
+        return { compressionOutput };
       }, handleError(t('Error while compressing the game.')))
-      .then(() => {
+      .then(({compressionOutput}) => {
         this.setState({
+          compressionOutput,
           doneFooterOpen: true,
           exportStep: 'done',
         });
@@ -180,10 +187,9 @@ export default class ExportLauncher extends Component<Props, State> {
       });
   };
 
-  _downloadBuild = (key: string) => {
-    if (!this.state.build || !this.state.build[key]) return;
-
-    Window.openExternalURL(getBuildUrl(this.state.build[key]));
+  _downloadBuild = (key: BuildArtifactKeyName) => {
+    const url = getBuildArtifactUrl(this.state.build, key);
+    if (url) Window.openExternalURL(url);
   };
 
   _closeDoneFooter = () =>
@@ -201,6 +207,7 @@ export default class ExportLauncher extends Component<Props, State> {
   render() {
     const {
       exportStep,
+      compressionOutput,
       build,
       stepMaxProgress,
       stepCurrentProgress,
@@ -270,6 +277,7 @@ export default class ExportLauncher extends Component<Props, State> {
         {doneFooterOpen &&
           exportPipeline.renderDoneFooter &&
           exportPipeline.renderDoneFooter({
+            compressionOutput,
             exportState,
             onClose: this._closeDoneFooter,
           })}

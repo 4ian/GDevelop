@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { localExportPipeline } from './LocalExport';
-import LocalS3Export from './LocalS3Export';
-import { localOnlineCordovaExportPipeline } from './LocalOnlineCordovaExport.js';
 import { localCordovaExportPipeline } from './LocalCordovaExport';
-import { localCocos2dExportPipeline } from './LocalCocos2dExport';
-import { localOnlineElectronExportPipeline } from './LocalOnlineElectronExport.js';
-import { localFacebookInstantGamesExportPipeline } from './LocalFacebookInstantGamesExport';
 import { localElectronExportPipeline } from './LocalElectronExport';
+import { localHTML5ExportPipeline } from './LocalHTML5Export';
+import { localCocos2dExportPipeline } from './LocalCocos2dExport';
+import { localFacebookInstantGamesExportPipeline } from './LocalFacebookInstantGamesExport';
+import { localOnlineCordovaExportPipeline } from './LocalOnlineCordovaExport.js';
+import { localOnlineElectronExportPipeline } from './LocalOnlineElectronExport.js';
+import { localOnlineWebExportPipeline } from './LocalOnlineWebExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
 import Folder from '@material-ui/icons/Folder';
@@ -39,8 +39,8 @@ export const getLocalExporters = () => [
     helpPage: '/publishing/web',
     description:
       'Upload your game online directly from GDevelop and share the link to players. Play to your game using your browser on computers and mobile phones.',
-    key: 'locals3export',
-    ExportComponent: LocalS3Export,
+    key: 'localonlinewebexport',
+    exportPipeline: localOnlineWebExportPipeline,
   },
   {
     name: 'Local folder',
@@ -49,7 +49,7 @@ export const getLocalExporters = () => [
     description:
       'Build the game locally as a HTML5 game. You can then export it on website like Itch.io or Kongregate.',
     key: 'localexport',
-    exportPipeline: localExportPipeline,
+    exportPipeline: localHTML5ExportPipeline,
     advanced: true,
   },
   {

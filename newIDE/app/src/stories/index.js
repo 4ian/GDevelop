@@ -22,7 +22,6 @@ import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
-import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
@@ -90,6 +89,12 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
+  erroredCordovaBuild,
+  pendingCordovaBuild,
+  pendingElectronBuild,
+  completeCordovaBuild,
+  completeElectronBuild,
+  completeWebBuild,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -1631,38 +1636,26 @@ storiesOf('BuildProgress', module)
   .addDecorator(muiDecorator)
   .add('errored', () => (
     <BuildProgress
-      build={{
-        status: 'error',
-        logsKey: '/fake-error.log',
-      }}
+      build={erroredCordovaBuild}
       onDownload={action('download')}
     />
   ))
   .add('pending (electron-build)', () => (
     <BuildProgress
-      build={{
-        type: 'electron-build',
-        status: 'pending',
-        updatedAt: Date.now(),
-      }}
+      build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
       onDownload={action('download')}
     />
   ))
   .add('pending (cordova-build)', () => (
     <BuildProgress
-      build={{
-        type: 'cordova-build',
-        status: 'pending',
-        updatedAt: Date.now(),
-      }}
+      build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
       onDownload={action('download')}
     />
   ))
   .add('pending and very old (cordova-build)', () => (
     <BuildProgress
       build={{
-        type: 'cordova-build',
-        status: 'pending',
+        ...pendingCordovaBuild,
         updatedAt: Date.now() - 1000 * 3600 * 24,
       }}
       onDownload={action('download')}
@@ -1670,28 +1663,19 @@ storiesOf('BuildProgress', module)
   ))
   .add('complete (cordova-build)', () => (
     <BuildProgress
-      build={{
-        type: 'cordova-build',
-        status: 'complete',
-        logsKey: '/fake-error.log',
-        apkKey: '/fake-game.apk',
-        updatedAt: Date.now(),
-      }}
+      build={completeCordovaBuild}
       onDownload={action('download')}
     />
   ))
   .add('complete (electron-build)', () => (
     <BuildProgress
-      build={{
-        type: 'electron-build',
-        status: 'complete',
-        logsKey: '/fake-error.log',
-        windowsExeKey: '/fake-windows-game.exe',
-        windowsZipKey: '/fake-windows-game.zip',
-        macosZipKey: '/fake-macos-game.zip',
-        linuxAppImageKey: '/fake-linux-game.AppImage',
-        updatedAt: Date.now(),
-      }}
+      build={completeElectronBuild}
+      onDownload={action('download')}
+    />
+  ))
+  .add('complete (web-build)', () => (
+    <BuildProgress
+      build={completeWebBuild}
       onDownload={action('download')}
     />
   ));

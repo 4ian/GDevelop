@@ -2,6 +2,7 @@ import * as React from 'react';
 import BrowserExport from './BrowserExport';
 import { browserOnlineCordovaExportPipeline } from './BrowserOnlineCordovaExport.js';
 import { browserOnlineElectronExportPipeline } from './BrowserOnlineElectronExport.js';
+import { browserOnlineWebExportPipeline } from './BrowserOnlineWebExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
 import Folder from '@material-ui/icons/Folder';
@@ -33,7 +34,7 @@ export const getBrowserExporters = () => [
     description:
       'Upload your game online directly from GDevelop and share the link to players. Play to your game using your browser on computers and mobile phones.',
     key: 'locals3export',
-    ExportComponent: BrowserExport,
+    exportPipeline: browserOnlineWebExportPipeline,
   },
   {
     name: 'Local folder',

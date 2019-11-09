@@ -27,9 +27,9 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Clamp a value"),
                      _("Mathematical tools"),
                      "res/mathfunction.png")
+      .AddParameter("expression", _("Value"))
       .AddParameter("expression", _("Min"))
-      .AddParameter("expression", _("Max"))
-      .AddParameter("expression", _("Value"));
+      .AddParameter("expression", _("Max"));
 
   extension
       .AddExpression("AngleDifference",

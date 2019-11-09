@@ -106,7 +106,7 @@ gdjs.evtTools.common.logicalNegation = function(bool) {
   return !bool;
 };
 
-gdjs.evtTools.common.clamp = function(min, max, x) {
+gdjs.evtTools.common.clamp = function(x, min, max) {
   return Math.min(Math.max(x, min), max);
 };
 

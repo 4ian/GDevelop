@@ -10,7 +10,7 @@
 namespace GDpriv {
 namespace MathematicalTools {
 
-double GD_API clamp(double min, double max, double expression) { 
+double GD_API clamp(double expression, double min, double max) { 
   return std::min(std::max(expression, min), max);
 }
 

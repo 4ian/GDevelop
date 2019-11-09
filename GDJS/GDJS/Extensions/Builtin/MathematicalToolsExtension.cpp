@@ -17,6 +17,7 @@ namespace gdjs {
 MathematicalToolsExtension::MathematicalToolsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(*this);
 
+  GetAllExpressions()["clamp"].SetFunctionName("gdjs.evtTools.common.clamp");
   GetAllExpressions()["cos"].SetFunctionName("Math.cos");
   GetAllExpressions()["sin"].SetFunctionName("Math.sin");
   GetAllExpressions()["tan"].SetFunctionName("Math.tan");

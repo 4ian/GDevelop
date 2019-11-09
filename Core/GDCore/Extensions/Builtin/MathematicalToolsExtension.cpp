@@ -22,6 +22,16 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
 #if defined(GD_IDE_ONLY)
 
   extension
+      .AddExpression("clamp",
+                     _("Clamp a value"),
+                     _("Clamp a value"),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Min"))
+      .AddParameter("expression", _("Max"))
+      .AddParameter("expression", _("Value"));
+
+  extension
       .AddExpression("AngleDifference",
                      _("Difference between two angles"),
                      _("Difference between two angles"),

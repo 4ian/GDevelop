@@ -34,7 +34,7 @@ type ResourcesDownloadOutput = null;
 
 type CompressionOutput = null;
 
-export const localExportPipeline: ExportPipeline<
+export const localHTML5ExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
   ExportOutput,

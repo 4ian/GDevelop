@@ -9,6 +9,9 @@ export type ExportPipelineContext<ExportState> = {|
   updateStepProgress: (count: number, total: number) => void,
 |};
 
+/**
+ * An export pipeline describing how to export and build a game.
+ */
 export type ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -51,18 +54,32 @@ export type ExportPipeline<
     resourcesDownloadOutput: ResourcesDownloadOutput
   ) => Promise<CompressionOutput>,
 
+  /**
+   * Launch the upload of the archive to the online build service.
+   * This step is only done if `launchUpload` and `launchOnlineBuild`
+   * are defined.
+   */
   launchUpload?: (
     context: ExportPipelineContext<ExportState>,
     compressionOutput: CompressionOutput
   ) => Promise<string>,
 
+  /**
+   * Launch the online build of the uploaded archive.
+   * This step is only done if `launchUpload` and `launchOnlineBuild`
+   * are defined.
+   */
   launchOnlineBuild?: (
     exportState: ExportState,
     userProfile: UserProfile,
     uploadBucketKey: string
   ) => Promise<Build>,
 
+  /**
+   * Render the footer when the whole export (+ online build if any) is done.
+   */
   renderDoneFooter?: ({|
+    compressionOutput: CompressionOutput,
     exportState: ExportState,
     onClose: () => void,
   |}) => React.Node,

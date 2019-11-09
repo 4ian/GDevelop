@@ -10,7 +10,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { Line, Spacer, Column } from '../../UI/Grid';
 import BuildProgress from './BuildProgress';
-import { type Build } from '../../Utils/GDevelopServices/Build';
+import { type Build, type BuildArtifactKeyName } from '../../Utils/GDevelopServices/Build';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
@@ -32,7 +32,7 @@ export type BuildStep =
 
 type Props = {|
   exportStep: BuildStep,
-  onDownload: (key: string) => void,
+  onDownload: (key: BuildArtifactKeyName) => void,
   build: ?Build,
   stepMaxProgress: number,
   stepCurrentProgress: number,

@@ -3,10 +3,7 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopBuildUpload } from './ApiConfigs';
 
-export const getBuildUrl = (key: string) =>
-  `https://s3-eu-west-1.amazonaws.com/gd-build/${key}`;
-
-export type TargetName = 'winExe' | 'winZip' | 'macZip' | 'linuxAppImage';
+export type TargetName = 'winExe' | 'winZip' | 'macZip' | 'linuxAppImage' | 's3';
 
 export type Build = {
   id: string,
@@ -18,11 +15,33 @@ export type Build = {
   windowsZipKey?: string,
   macosZipKey?: string,
   linuxAppImageKey?: string,
+  s3Key?: string,
   status: 'pending' | 'complete' | 'error',
-  type: 'cordova-build' | 'electron-build',
+  type: 'cordova-build' | 'electron-build' | 'web-build',
   targets?: Array<TargetName>,
   createdAt: number,
   updatedAt: number,
+};
+
+export type BuildArtifactKeyName =
+  | 'apkKey'
+  | 'windowsExeKey'
+  | 'windowsZipKey'
+  | 'macosZipKey'
+  | 'linuxAppImageKey'
+  | 's3Key'
+  | 'logsKey';
+
+export const getBuildArtifactUrl = (build: ?Build, keyName: BuildArtifactKeyName): ?string => {
+  if (!build || !build[keyName]) {
+    return null;
+  }
+
+  if (keyName === 's3Key') {
+    return `https://s3-eu-west-1.amazonaws.com/gd-games/${build[keyName]}/index.html`;
+  }
+
+  return `https://s3-eu-west-1.amazonaws.com/gd-build/${build[keyName]}`;
 };
 
 export const uploadBuildFile = (
@@ -72,6 +91,29 @@ export const buildElectron = (
         )}&type=electron-build&targets=${encodeURIComponent(
           targets.join(',')
         )}`,
+        null,
+        {
+          params: {},
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
+export const buildWeb = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  key: string
+): Promise<Build> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
+          userId
+        )}&key=${encodeURIComponent(key)}&type=web-build&targets=s3`,
         null,
         {
           params: {},

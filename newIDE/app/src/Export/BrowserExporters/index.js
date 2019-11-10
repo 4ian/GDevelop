@@ -1,87 +1,149 @@
+// @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import BrowserExport from './BrowserExport';
+import { type Exporter } from '../ExportDialog';
 import { browserOnlineCordovaExportPipeline } from './BrowserOnlineCordovaExport.js';
 import { browserOnlineElectronExportPipeline } from './BrowserOnlineElectronExport.js';
 import { browserOnlineWebExportPipeline } from './BrowserOnlineWebExport';
+import { browserHTML5ExportPipeline } from './BrowserHTML5Export';
+import { browserCordovaExportPipeline } from './BrowserCordovaExport';
+import { browserElectronExportPipeline } from './BrowserElectronExport';
+import { browserCocos2dExportPipeline } from './BrowserCocos2dExport';
+import { browserFacebookInstantGamesExportPipeline } from './BrowserFacebookInstantGamesExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
 import Folder from '@material-ui/icons/Folder';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import Cordova from '../../UI/CustomSvgIcons/Cordova';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
-import { browserHTML5ExportPipeline } from './BrowserHTML5Export';
 
-export const getBrowserExporters = () => [
+export const getBrowserExporters = (): Array<Exporter> => [
   {
-    name: 'Android (& iOS coming soon)',
+    name: <Trans>Android (&amp; iOS coming soon)</Trans>,
     renderIcon: props => <PhoneIphone {...props} />,
-    description:
-      'Package your game for Android directly from GDevelop. iOS support is coming soon!',
+    helpPage: '/publishing/android_and_ios',
+    description: (
+      <Trans>
+        Package your game for Android directly from GDevelop. iOS support is
+        coming soon!
+      </Trans>
+    ),
     key: 'browseronlinecordovaexport',
     exportPipeline: browserOnlineCordovaExportPipeline,
   },
   {
-    name: 'Facebook Instant Games',
-    renderIcon: props => <Facebook {...props} />,
-    helpPage: '/publishing/publishing-to-facebook-instant-games',
-    description:
-      'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
-    key: 'browserfacebookinstantgames',
-    ExportComponent: BrowserExport,
-    advanced: true,
-  },
-  {
-    name: 'Web (upload online)',
+    name: <Trans>Web (upload online)</Trans>,
     renderIcon: props => <Chrome {...props} />,
-    description:
-      'Upload your game online directly from GDevelop and share the link to players. Play to your game using your browser on computers and mobile phones.',
+    helpPage: '/publishing/web',
+    description: (
+      <Trans>
+        Upload your game online directly from GDevelop and share the link to
+        players. Play to your game using your browser on computers and mobile
+        phones.
+      </Trans>
+    ),
     key: 'browsers3export',
     exportPipeline: browserOnlineWebExportPipeline,
   },
   {
-    name: 'HTML5 game (zip)',
+    name: <Trans>HTML5 game (zip)</Trans>,
     renderIcon: props => <Folder {...props} />,
-    description:
-      'Build the game locally as a HTML5 game. You can then publish it on website like Kongregate, Game Jolt, itch.io, Poki...',
+    helpPage: '/publishing/html5_game_in_a_local_folder',
+    description: (
+      <Trans>
+        Build the game locally as a HTML5 game. You can then publish it on
+        website like Kongregate, Game Jolt, itch.io, Poki...
+      </Trans>
+    ),
     key: 'browserhtml5export',
     exportPipeline: browserHTML5ExportPipeline,
     advanced: true,
   },
   {
-    name: 'iOS & Android (manual)',
-    renderIcon: props => <Cordova {...props} />,
-    description:
-      'Build the game locally as a Cordova project, and export it manually then to iOS or Android with Cordova developers tools.',
-    key: 'browsercordovaexport',
-    ExportComponent: BrowserExport,
+    name: <Trans>Facebook Instant Games</Trans>,
+    renderIcon: props => <Facebook {...props} />,
+    helpPage: '/publishing/publishing-to-facebook-instant-games',
+    description: (
+      <Trans>
+        Package your game as a Facebook Instant Games that can be played on
+        Facebook Messenger.
+      </Trans>
+    ),
+    key: 'browserfacebookinstantgames',
+    exportPipeline: browserFacebookInstantGamesExportPipeline,
     advanced: true,
   },
   {
-    name: 'Windows/macOS/Linux',
+    name: <Trans>iOS &amp; Android (manual)</Trans>,
+    renderIcon: props => <Cordova {...props} />,
+    helpPage: '/publishing/android_and_ios_with_cordova',
+    description: (
+      <Trans>
+        Build the game locally as a Cordova project, and export it manually then
+        to iOS or Android with Cordova developers tools.
+      </Trans>
+    ),
+    key: 'browsercordovaexport',
+    exportPipeline: browserCordovaExportPipeline,
+    advanced: true,
+  },
+  {
+    name: <Trans>Windows/macOS/Linux</Trans>,
     renderIcon: props => <LaptopMac {...props} />,
     helpPage: '/publishing/windows-macos-linux',
-    description:
-      'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
+    description: (
+      <Trans>
+        Package your game as an app for Windows, macOS or Linux directly from
+        GDevelop.
+      </Trans>
+    ),
     key: 'browseronlineelectronexport',
     exportPipeline: browserOnlineElectronExportPipeline,
   },
   {
-    name: 'Windows/macOS/Linux (manual)',
+    name: <Trans>Windows/macOS/Linux (manual)</Trans>,
     renderIcon: props => <LaptopMac {...props} />,
     helpPage: '/publishing/windows-macos-linux-with-electron',
-    description:
-      'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
+    description: (
+      <Trans>
+        Build the game locally and export it manually to Windows, macOS or Linux
+        with third-party developer tools.
+      </Trans>
+    ),
     key: 'browserelectronexport',
-    ExportComponent: BrowserExport,
+    exportPipeline: browserElectronExportPipeline,
     advanced: true,
   },
   {
-    name: 'Cocos2d-JS',
+    name: <Trans>Cocos2d-JS</Trans>,
     renderIcon: props => <PhoneIphone {...props} />,
-    description:
-      'Export your game using Cocos2d-JS game engine. The game can be compiled for Android or iOS if you install Cocos2d-JS developer tools.',
+    helpPage: '/publishing/android_and_ios_with_cocos2d-js',
+    description: (
+      <Trans>
+        Export your game using Cocos2d-JS game engine. The game can be compiled
+        for Android or iOS if you install Cocos2d-JS developer tools.
+      </Trans>
+    ),
     key: 'browsercocos2dexport',
-    ExportComponent: BrowserExport,
+    exportPipeline: browserCocos2dExportPipeline,
     experimental: true,
   },
 ];
+
+/**
+ * Open an URL generated from a blob, to download it with the specified filename.
+ */
+export const openBlobDownloadUrl = (url: string, filename: string) => {
+  const { body } = document;
+  if (!body) return;
+
+  // Not using Window.openExternalURL because blob urls are blocked
+  // by Adblock Plus (and maybe other ad blockers).
+  const a = document.createElement('a');
+  body.appendChild(a);
+  a.style.display = 'none';
+  a.href = url;
+  a.download = filename;
+  a.click();
+  body.removeChild(a);
+};

@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
+import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
@@ -10,11 +10,11 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import BuildsDialog from './Builds/BuildsDialog';
 import { Line } from '../UI/Grid';
-import Authentification from '../Utils/GDevelopServices/Authentification';
 import UserProfileContext, {
   type UserProfile,
 } from '../Profile/UserProfileContext';
 import ExportLauncher from './ExportLauncher';
+import { type ExportPipeline } from './ExportPipeline.flow';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -22,12 +22,23 @@ const styles = {
   content: { padding: 24 },
 };
 
-export type Exporter = any; // TODO: Add typing
+export type Exporter = {|
+  name: React.Node,
+  renderIcon: (props: {|
+    style: {| width: number, height: number |},
+  |}) => React.Node,
+  helpPage: string,
+  description: React.Node,
+  disabled?: boolean,
+  advanced?: boolean,
+  experimental?: boolean,
+  key: string,
+  exportPipeline: ExportPipeline<any, any, any, any, any>,
+|};
 
 export type ExportDialogWithoutExportsProps = {|
   project: ?gdProject,
   onClose: () => void,
-  authentification: Authentification,
   onChangeSubscription: () => void,
 |};
 
@@ -42,7 +53,7 @@ type State = {|
   buildsDialogOpen: boolean,
 |};
 
-export default class ExportDialog extends Component<Props, State> {
+export default class ExportDialog extends React.Component<Props, State> {
   state = {
     chosenExporterKey: '',
     showExperimental: false,
@@ -83,13 +94,7 @@ export default class ExportDialog extends Component<Props, State> {
   };
 
   render() {
-    const {
-      project,
-      onClose,
-      authentification, //Still exist?
-      onChangeSubscription,
-      exporters,
-    } = this.props;
+    const { project, onClose, onChangeSubscription, exporters } = this.props;
     const { showExperimental, chosenExporterKey } = this.state;
     if (!project) return null;
 
@@ -179,17 +184,6 @@ export default class ExportDialog extends Component<Props, State> {
                   )}
                 </Line>
               </React.Fragment>
-            )}
-            {exporter && exporter.ExportComponent && (
-              <div style={styles.content}>
-                <exporter.ExportComponent
-                  project={project}
-                  authentification={authentification} //Still exist?
-                  onChangeSubscription={onChangeSubscription}
-                  onOpenBuildsDialog={this._openBuildsDialog}
-                  userProfile={userProfile}
-                />
-              </div>
             )}
             {exporter && exporter.exportPipeline && (
               <div style={styles.content}>

@@ -81,7 +81,6 @@ export const create = (authentification: Authentification) => {
               storageProviderOperations={currentStorageProviderOperations}
               resourceSources={browserResourceSources}
               resourceExternalEditors={browserResourceExternalEditors}
-              authentification={authentification}
               extensionsLoader={makeExtensionsLoader({
                 objectsEditorService: ObjectsEditorService,
                 objectsRenderingService: ObjectsRenderingService,

@@ -110,7 +110,7 @@ module.exports = {
         text:
           '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
-        fontSize: '20',
+        fontSize: 20,
         visible: true,
         color: '#000000',
         fontFamily: 'Arial',
@@ -172,14 +172,14 @@ module.exports = {
               `Get${property.functionName}`,
               _('Get ') + property.description,
               _('Get ') + property.description,
-              _(''),
               '',
-              `${property.iconPath}.png`,
-              `${property.iconPath}.png`
+              '',
+              property.iconPath,
+              property.iconPath
             )
             .addParameter(
               'object',
-              _(`${objectName} object`),
+              objectName + _(' object'),
               objectName,
               false
             )
@@ -191,14 +191,14 @@ module.exports = {
               `Get${property.functionName}`,
               _('Get ') + property.description,
               _('Get ') + property.description,
-              _(''),
               '',
-              `${property.iconPath}.png`,
-              `${property.iconPath}.png`
+              '',
+              property.iconPath,
+              property.iconPath
             )
             .addParameter(
               'object',
-              _(`${objectName} object`),
+              objectName + _(' object'),
               objectName,
               false
             )
@@ -219,17 +219,17 @@ module.exports = {
                 property.description +
                 _(' of _PARAM0_'),
               '',
-              `${property.iconPath}.png`,
-              `${property.iconPath}.png`
+              property.iconPath,
+              property.iconPath
             )
             .addParameter(
               'object',
-              _(`${objectName} object`),
+              objectName + _(' object'),
               objectName,
               false
             )
             .addParameter('operator', _("Modification's sign"), '', false)
-            .addParameter(expressionType, _(property.paramLabel), '', false)
+            .addParameter(expressionType, property.paramLabel, '', false)
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
             .setManipulatedType(parameterType)
@@ -243,18 +243,18 @@ module.exports = {
               _('Set ') + property.description,
               _('Set ') + property.description + _(' of _PARAM0_ to _PARAM1_'),
               '',
-              `${property.iconPath}.png`,
-              `${property.iconPath}.png`
+              property.iconPath,
+              property.iconPath
             )
             .addParameter(
               'object',
-              _(`${objectName} object`),
+              objectName + _(' object'),
               objectName,
               false
             )
             .addParameter(
               parameterType,
-              _(property.paramLabel),
+              property.paramLabel,
               property.options ? property.options : '',
               false
             )
@@ -276,12 +276,12 @@ module.exports = {
                 property.paramLabel +
                 _(' of _PARAM0_ is _PARAM1__PARAM2_'),
               '',
-              `${property.iconPath}.png`,
-              `${property.iconPath}.png`
+              property.iconPath,
+              property.iconPath
             )
             .addParameter(
               'object',
-              _(`${objectName} object`),
+              objectName + _(' object'),
               objectName,
               false
             )
@@ -293,7 +293,7 @@ module.exports = {
             )
             .addParameter(
               propExpressionType,
-              _(`${parameterType} value`),
+              parameterType + _(' value'),
               '',
               false
             )
@@ -308,12 +308,12 @@ module.exports = {
               _('Check if the') + property.description + _(' is enabled'),
               property.paramLabel + _(' of _PARAM0_ is enabled'),
               '',
-              `${property.iconPath}.png`,
-              `${property.iconPath}.png`
+              property.iconPath,
+              property.iconPath
             )
             .addParameter(
               'object',
-              _(`${objectName} object`),
+              objectName + _(' object'),
               objectName,
               false
             )
@@ -327,42 +327,42 @@ module.exports = {
       {
         functionName: 'BBText',
         description: _('BBCode formatted text'),
-        iconPath: 'res/actions/textAlign24',
+        iconPath: 'res/actions/textAlign24.png',
         type: 'string',
         paramLabel: _('BBCode text'),
       },
       {
         functionName: 'Color',
         description: _('base color'),
-        iconPath: 'res/actions/color24',
+        iconPath: 'res/actions/color24.png',
         type: 'color',
         paramLabel: _('Color (Hex)'),
       },
       {
         functionName: 'Opacity',
         description: _('base opacity'),
-        iconPath: 'res/actions/opacity24',
+        iconPath: 'res/actions/opacity24.png',
         type: 'number',
         paramLabel: _('Opacity (0-255)'),
       },
       {
         functionName: 'FontSize',
         description: _('base font size'),
-        iconPath: 'res/actions/characterSize24',
+        iconPath: 'res/actions/characterSize24.png',
         type: 'number',
         paramLabel: _('Font size'),
       },
       {
         functionName: 'FontFamily',
         description: _('base font family'),
-        iconPath: 'res/actions/font24',
+        iconPath: 'res/actions/font24.png',
         type: 'string',
         paramLabel: _('Font family'),
       },
       {
         functionName: 'Alignment',
         description: _('text alignment'),
-        iconPath: 'res/actions/textAlign24',
+        iconPath: 'res/actions/textAlign24.png',
         type: 'stringWithSelector',
         paramLabel: _('Alignment'),
         options: `["left", "right", "center"]`,
@@ -370,14 +370,14 @@ module.exports = {
       {
         functionName: 'WordWrap',
         description: _('word wrap'),
-        iconPath: 'res/actions/scaleWidth24',
+        iconPath: 'res/actions/scaleWidth24.png',
         type: 'boolean',
         paramLabel: _('Word wrap'),
       },
       {
         functionName: 'WrappingWidth',
         description: _('wrapping width'),
-        iconPath: 'res/actions/scaleWidth24',
+        iconPath: 'res/actions/scaleWidth24.png',
         type: 'number',
         paramLabel: _('Wrapping width'),
       },
@@ -427,6 +427,10 @@ module.exports = {
   registerInstanceRenderers: function(objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
+    const MultiStyleText = objectsRenderingService.requireModule(
+      __dirname,
+      'pixi-multistyle-text/dist/pixi-multistyle-text.umd'
+    );
 
     /**
      * Renderer for instances of BBText inside the IDE.
@@ -453,24 +457,19 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      const BBTextStyles = {
+      const bbTextStyles = {
         default: {
           fontFamily: 'Arial',
           fontSize: '24px',
           fill: '#cccccc',
           tagStyle: 'bbcode',
           wordWrap: true,
-          wordWrapWidth: 250,
+          wordWrapWidth: 250, // This value is the default wrapping width of the runtime object.
           align: 'left',
         },
       };
 
-      const MultiStyleText = objectsRenderingService.requireModule(
-        __dirname,
-        'pixi-multistyle-text/dist/pixi-multistyle-text.umd'
-      );
-
-      this._pixiObject = new MultiStyleText('', BBTextStyles);
+      this._pixiObject = new MultiStyleText('', bbTextStyles);
 
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
@@ -555,12 +554,12 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize() && this._pixiObject) {
-        const customSize = this._instance.getCustomWidth();
+        const customWidth = this._instance.getCustomWidth();
         if (
           this._pixiObject &&
-          this._pixiObject.textStyles.default.wordWrapWidth !== customSize
+          this._pixiObject.textStyles.default.wordWrapWidth !== customWidth
         ) {
-          this._pixiObject._style.wordWrapWidth = customSize;
+          this._pixiObject._style.wordWrapWidth = customWidth;
           this._pixiObject.dirty = true;
         }
       }

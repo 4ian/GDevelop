@@ -83,7 +83,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function() {
   this._pixiObject.textStyles.default.fontFamily = this._object._fontFamily;
 };
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
-  this._pixiObject.textStyles.default.fontSize = `${this._object._fontSize}px`;
+  this._pixiObject.textStyles.default.fontSize = this._object._fontSize + 'px';
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

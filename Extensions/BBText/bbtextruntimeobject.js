@@ -22,7 +22,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type boolean */
   this._wordWrap = objectData.content.wordWrap;
   /** @type number */
-  this._wrappingWidth = 250;
+  this._wrappingWidth = 250; // This value is the default wrapping width of the runtime object.
   /** @type string */
   this._align = objectData.content.align;
 

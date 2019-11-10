@@ -271,7 +271,7 @@ module.exports = {
             .addCondition(
               `Is${property.functionName}`,
               property.description,
-              _('Check if the ') + property.description + _(' equals a value'),
+              _('Compare the value of ') + property.description,
               _('The ') +
                 property.paramLabel +
                 _(' of _PARAM0_ is _PARAM1__PARAM2_'),

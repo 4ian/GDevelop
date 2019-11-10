@@ -25,15 +25,6 @@ export const getLocalExporters = () => [
     exportPipeline: localOnlineCordovaExportPipeline,
   },
   {
-    name: 'Facebook Instant Games',
-    renderIcon: props => <Facebook {...props} />,
-    helpPage: '/publishing/publishing-to-facebook-instant-games',
-    description:
-      'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
-    key: 'localfacebookinstantgames',
-    exportPipeline: localFacebookInstantGamesExportPipeline,
-  },
-  {
     name: 'Web (upload online)',
     renderIcon: props => <Chrome {...props} />,
     helpPage: '/publishing/web',
@@ -47,9 +38,19 @@ export const getLocalExporters = () => [
     renderIcon: props => <Folder {...props} />,
     helpPage: '/publishing/html5_game_in_a_local_folder',
     description:
-      'Build the game locally as a HTML5 game. You can then export it on website like Itch.io or Kongregate.',
+      'Build the game locally as a HTML5 game. You can then publish it on website like Kongregate, Game Jolt, itch.io, Poki...',
     key: 'localexport',
     exportPipeline: localHTML5ExportPipeline,
+    advanced: true,
+  },
+  {
+    name: 'Facebook Instant Games',
+    renderIcon: props => <Facebook {...props} />,
+    helpPage: '/publishing/publishing-to-facebook-instant-games',
+    description:
+      'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
+    key: 'localfacebookinstantgames',
+    exportPipeline: localFacebookInstantGamesExportPipeline,
     advanced: true,
   },
   {

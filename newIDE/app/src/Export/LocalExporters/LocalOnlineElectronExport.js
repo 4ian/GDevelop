@@ -2,11 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
-import {
-  type Build,
-  buildElectron,
-  type TargetName,
-} from '../../Utils/GDevelopServices/Build';
+import { type Build, buildElectron } from '../../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../../Profile/UserProfileContext';
 import { findGDJS } from './LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
@@ -16,18 +12,15 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import Text from '../../UI/Text';
-import Checkbox from '../../UI/Checkbox';
-import { Line, Column } from '../../UI/Grid';
+import {
+  type ExportState,
+  SetupExportHeader,
+} from '../GenericExporters/OnlineElectronExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd = global.gd;
-
-type ExportState = {|
-  targets: Array<TargetName>,
-|};
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -55,70 +48,12 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
   onlineBuildType: 'electron-build',
 
   getInitialExportState: () => ({
-    targets: [],
+    targets: ['winExe'],
   }),
 
   canLaunchBuild: (exportState: ExportState) => !!exportState.targets.length,
 
-  renderHeader: ({ exportState, updateExportState }) => {
-    const setTarget = (targetName: TargetName, enable: boolean) => {
-      updateExportState(prevExportState => {
-        if (enable && prevExportState.targets.indexOf(targetName) === -1) {
-          return {
-            ...prevExportState,
-            targets: [...prevExportState.targets, targetName],
-          };
-        } else if (
-          !enable &&
-          prevExportState.targets.indexOf(targetName) !== -1
-        ) {
-          return {
-            ...prevExportState,
-            targets: prevExportState.targets.filter(
-              name => name !== targetName
-            ),
-          };
-        }
-
-        return prevExportState;
-      });
-    };
-
-    return (
-      <React.Fragment>
-        <Column noMargin>
-          <Line>
-            <Text>
-              <Trans>
-                Your game will be exported and packaged online as a stand-alone
-                game for Windows, Linux and/or macOS.
-              </Trans>
-            </Text>
-          </Line>
-          <Checkbox
-            label={<Trans>Windows (zip file)</Trans>}
-            checked={exportState.targets.indexOf('winZip') !== -1}
-            onCheck={(e, checked) => setTarget('winZip', checked)}
-          />
-          <Checkbox
-            label={<Trans>Windows (auto-installer file)</Trans>}
-            checked={exportState.targets.indexOf('winExe') !== -1}
-            onCheck={(e, checked) => setTarget('winExe', checked)}
-          />
-          <Checkbox
-            label={<Trans>macOS (zip file)</Trans>}
-            checked={exportState.targets.indexOf('macZip') !== -1}
-            onCheck={(e, checked) => setTarget('macZip', checked)}
-          />
-          <Checkbox
-            label={<Trans>Linux (AppImage)</Trans>}
-            checked={exportState.targets.indexOf('linuxAppImage') !== -1}
-            onCheck={(e, checked) => setTarget('linuxAppImage', checked)}
-          />
-        </Column>
-      </React.Fragment>
-    );
-  },
+  renderHeader: props => <SetupExportHeader {...props} />,
 
   renderLaunchButtonLabel: () => <Trans>Package</Trans>,
 

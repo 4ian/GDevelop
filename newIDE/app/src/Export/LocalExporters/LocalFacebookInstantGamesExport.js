@@ -8,16 +8,16 @@ import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
-import Text from '../../UI/Text';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import LocalFilePicker from '../../UI/LocalFilePicker';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
-import FlatButton from '../../UI/FlatButton';
-import { getHelpLink } from '../../Utils/HelpLink';
-import Window from '../../Utils/Window';
+import {
+  ExplanationHeader,
+  DoneFooter,
+} from '../GenericExporters/FacebookInstantGamesExport';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
@@ -64,13 +64,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   renderHeader: ({ project, exportState, updateExportState }) => (
     <Column noMargin>
       <Line>
-        <Text>
-          <Trans>
-            Prepare your game for Facebook Instant Games so that it can be play
-            on Facebook Messenger. GDevelop will create a compressed file that
-            you can upload on your Facebook Developer account.
-          </Trans>
-        </Text>
+        <ExplanationHeader />
       </Line>
       <Line>
         <LocalFilePicker
@@ -162,34 +156,18 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
       if (shell && path)
         shell.openItem(path.dirname(exportState.archiveOutputFilename));
     };
-    const openLearnMore = () => {
-      Window.openExternalURL(
-        getHelpLink('/publishing/publishing-to-facebook-instant-games')
-      );
-    };
 
     return (
-      <Column noMargin>
-        <Text>
-          <Trans>
-            You can now create a game on Facebook Instant Games, if not already
-            done, and upload the generated archive.
-          </Trans>
-        </Text>
-        <Line justifyContent="center">
+      <DoneFooter
+        renderGameButton={() => (
           <RaisedButton
             key="open"
             label={<Trans>Open folder</Trans>}
             primary={true}
             onClick={openExportFolder}
           />
-          <FlatButton
-            label={<Trans>Learn more about Instant Games publication</Trans>}
-            primary
-            onClick={openLearnMore}
-          />
-        </Line>
-      </Column>
+        )}
+      />
     );
   },
 };

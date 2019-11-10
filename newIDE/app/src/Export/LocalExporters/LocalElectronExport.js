@@ -9,11 +9,14 @@ import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
-import Text from '../../UI/Text';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
+import {
+  ExplanationHeader,
+  DoneFooter,
+} from '../GenericExporters/ElectronExport';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -52,11 +55,7 @@ export const localElectronExportPipeline: ExportPipeline<
     <Column noMargin>
       <Line>
         <Column noMargin>
-          <Text>
-            This will export your game so that you can package it for Windows,
-            macOS or Linux. You will need to install third-party tools (Node.js,
-            Electron Builder) to package your game by yourself.
-          </Text>
+          <ExplanationHeader />
         </Column>
       </Line>
       <Line>
@@ -131,23 +130,16 @@ export const localElectronExportPipeline: ExportPipeline<
     };
 
     return (
-      <Column noMargin>
-        <Text>
-          <Trans>
-            The game was properly exported. You can now use Electron Builder
-            (you need Node.js installed and to use the command-line to run it)
-            to create an executable.
-          </Trans>
-        </Text>
-        <Line justifyContent="center">
+      <DoneFooter
+        renderGameButton={() => (
           <RaisedButton
             key="open"
             label={<Trans>Open folder</Trans>}
             primary={true}
             onClick={openExportFolder}
           />
-        </Line>
-      </Column>
+        )}
+      />
     );
   },
 };

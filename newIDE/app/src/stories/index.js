@@ -1674,10 +1674,7 @@ storiesOf('BuildProgress', module)
     />
   ))
   .add('complete (web-build)', () => (
-    <BuildProgress
-      build={completeWebBuild}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={completeWebBuild} onDownload={action('download')} />
   ));
 
 storiesOf('LocalFolderPicker', module)

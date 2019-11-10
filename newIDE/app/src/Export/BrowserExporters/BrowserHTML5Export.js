@@ -2,12 +2,6 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
-import {
-  type Build,
-  buildCordovaAndroid,
-  uploadBuildFile,
-} from '../../Utils/GDevelopServices/Build';
-import { type UserProfile } from '../../Profile/UserProfileContext';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import BrowserFileSystem from './BrowserFileSystem';
 import {
@@ -21,7 +15,9 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import { ExplanationHeader } from '../GenericExporters/OnlineCordovaExport';
+import RaisedButton from '../../UI/RaisedButton';
+import { BlobDownloadUrlHolder } from '../../Utils/BlobDownloadUrlHolder';
+import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
 const gd = global.gd;
 
 type ExportState = null;
@@ -44,15 +40,29 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
-export const browserOnlineCordovaExportPipeline: ExportPipeline<
+const openBlobDownloadUrl = (url: string, filename: string) => {
+  const { body } = document;
+  if (!body) return;
+
+  // Not using Window.openExternalURL because blob urls are blocked
+  // by Adblock Plus (and maybe other ad blockers).
+  const a = document.createElement('a');
+  body.appendChild(a);
+  a.style.display = 'none';
+  a.href = url;
+  a.download = filename;
+  a.click();
+  body.removeChild(a);
+};
+
+export const browserHTML5ExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-online-cordova',
-  onlineBuildType: 'cordova-build',
+  name: 'browser-html5',
 
   getInitialExportState: () => null,
 
@@ -60,18 +70,19 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Packaging for Android</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Export as a HTML5 game</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
-    return findGDJS('cordova').then(({ gdjsRoot, filesContent }) => {
+    return findGDJS('web').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
       const outputDir = '/export/';
       const abstractFileSystem = new BrowserFileSystem({
         textFiles: filesContent,
       });
+      // TODO: Memory leak? Check for other exporters too.
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
         abstractFileSystem
@@ -93,7 +104,6 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     const { project } = context;
 
     const exportOptions = new gd.MapStringBoolean();
-    exportOptions.set('exportForCordova', true);
     exporter.exportWholePixiProject(project, outputDir, exportOptions);
     exportOptions.delete();
     exporter.delete();
@@ -129,25 +139,22 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     });
   },
 
-  launchUpload: (
-    context: ExportPipelineContext<ExportState>,
-    blobFile: Blob
-  ): Promise<string> => {
-    return uploadBuildFile(blobFile, context.updateStepProgress);
-  },
-
-  launchOnlineBuild: (
-    exportState: ExportState,
-    userProfile: UserProfile,
-    uploadBucketKey: string
-  ): Promise<Build> => {
-    const { getAuthorizationHeader, profile } = userProfile;
-    if (!profile) return Promise.reject(new Error('User is not authenticated'));
-
-    return buildCordovaAndroid(
-      getAuthorizationHeader,
-      profile.uid,
-      uploadBucketKey
+  renderDoneFooter: ({ compressionOutput, exportState, onClose }) => {
+    return (
+      <DoneFooter
+        renderGameButton={() => (
+          <BlobDownloadUrlHolder blob={compressionOutput}>
+            {blobDownloadUrl => (
+              <RaisedButton
+                fullWidth
+                primary
+                onClick={() => openBlobDownloadUrl(blobDownloadUrl, 'game.zip')}
+                label={<Trans>Download the exported game</Trans>}
+              />
+            )}
+          </BlobDownloadUrlHolder>
+        )}
+      />
     );
   },
 };

@@ -3,7 +3,12 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopBuildUpload } from './ApiConfigs';
 
-export type TargetName = 'winExe' | 'winZip' | 'macZip' | 'linuxAppImage' | 's3';
+export type TargetName =
+  | 'winExe'
+  | 'winZip'
+  | 'macZip'
+  | 'linuxAppImage'
+  | 's3';
 
 export type Build = {
   id: string,
@@ -32,13 +37,18 @@ export type BuildArtifactKeyName =
   | 's3Key'
   | 'logsKey';
 
-export const getBuildArtifactUrl = (build: ?Build, keyName: BuildArtifactKeyName): ?string => {
+export const getBuildArtifactUrl = (
+  build: ?Build,
+  keyName: BuildArtifactKeyName
+): ?string => {
   if (!build || !build[keyName]) {
     return null;
   }
 
   if (keyName === 's3Key') {
-    return `https://s3-eu-west-1.amazonaws.com/gd-games/${build[keyName]}/index.html`;
+    return `https://s3-eu-west-1.amazonaws.com/gd-games/${
+      build[keyName]
+    }/index.html`;
   }
 
   return `https://s3-eu-west-1.amazonaws.com/gd-build/${build[keyName]}`;

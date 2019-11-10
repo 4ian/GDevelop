@@ -9,11 +9,14 @@ import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
-import Text from '../../UI/Text';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
+import {
+  ExplanationHeader,
+  DoneFooter,
+} from '../GenericExporters/CordovaExport';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -52,11 +55,7 @@ export const localCordovaExportPipeline: ExportPipeline<
     <Column noMargin>
       <Line>
         <Column noMargin>
-          <Text>
-            This will export your game as a Cordova project. Cordova is a
-            technology that enables HTML5 games to be packaged for iOS, Android
-            and more.
-          </Text>
+          <ExplanationHeader />
         </Column>
       </Line>
       <Line>
@@ -131,23 +130,16 @@ export const localCordovaExportPipeline: ExportPipeline<
     };
 
     return (
-      <Column noMargin>
-        <Text>
-          <Trans>
-            You can now compile the game by yourself using Cordova command-line
-            tool to iOS (XCode is required) or Android (Android SDK is
-            required).
-          </Trans>
-        </Text>
-        <Line justifyContent="center">
+      <DoneFooter
+        renderGameButton={() => (
           <RaisedButton
             key="open"
             label={<Trans>Open folder</Trans>}
             primary={true}
             onClick={openExportFolder}
           />
-        </Line>
-      </Column>
+        )}
+      />
     );
   },
 };

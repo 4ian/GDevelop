@@ -12,7 +12,7 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import Text from '../../UI/Text';
+import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -50,18 +50,9 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   canLaunchBuild: () => true,
 
-  renderHeader: () => (
-    <Text>
-      <Trans>
-        This will export your game and upload it on GDevelop games hosting. The
-        game will be freely accessible from the link, available for a few days
-        and playable from any computer browser or mobile phone (iOS, Android
-        5+).
-      </Trans>
-    </Text>
-  ),
+  renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Export online</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Publish online</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

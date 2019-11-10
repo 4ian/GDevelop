@@ -23,8 +23,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
 
   extension
       .AddExpression("clamp",
-                     _("Clamp a value"),
-                     _("Clamp a value"),
+                     _("Clamp (restrict a value to a given range)"),
+                     _("Restrict a value to a given range"),
                      _("Mathematical tools"),
                      "res/mathfunction.png")
       .AddParameter("expression", _("Value"))

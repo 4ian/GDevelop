@@ -1,4 +1,5 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# Generated files
+src/Version/VersionMetadata.js
 
 # dependencies
 node_modules

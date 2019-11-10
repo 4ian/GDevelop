@@ -15,7 +15,7 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import Text from '../../UI/Text';
+import { ExplanationHeader } from '../GenericExporters/OnlineCordovaExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -53,14 +53,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 
   canLaunchBuild: () => true,
 
-  renderHeader: () => (
-    <Text>
-      <Trans>
-        Packaging your game for Android will create an APK file that can be
-        installed on Android phones.
-      </Trans>
-    </Text>
-  ),
+  renderHeader: () => <ExplanationHeader />,
 
   renderLaunchButtonLabel: () => <Trans>Packaging for Android</Trans>,
 

@@ -21,7 +21,7 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import Text from '../../UI/Text';
+import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
 const gd = global.gd;
 
 type ExportState = null;
@@ -58,18 +58,9 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
 
   canLaunchBuild: () => true,
 
-  renderHeader: () => (
-    <Text>
-      <Trans>
-        This will export your game and upload it on GDevelop games hosting. The
-        game will be freely accessible from the link, available for a few days
-        and playable from any computer browser or mobile phone (iOS, Android
-        5+).
-      </Trans>
-    </Text>
-  ),
+  renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Export online</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Publish online</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -152,10 +143,6 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     const { getAuthorizationHeader, profile } = userProfile;
     if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
-    return buildWeb(
-      getAuthorizationHeader,
-      profile.uid,
-      uploadBucketKey
-    );
+    return buildWeb(getAuthorizationHeader, profile.uid, uploadBucketKey);
   },
 };

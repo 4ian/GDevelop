@@ -3,7 +3,10 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
-import { type Build, type BuildArtifactKeyName } from '../../Utils/GDevelopServices/Build';
+import {
+  type Build,
+  type BuildArtifactKeyName,
+} from '../../Utils/GDevelopServices/Build';
 import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';

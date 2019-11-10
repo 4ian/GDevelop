@@ -3,7 +3,11 @@
 import React, { Component } from 'react';
 import RaisedButton from '../UI/RaisedButton';
 import { sendExportLaunched } from '../Utils/Analytics/EventSender';
-import { type Build, type BuildArtifactKeyName, getBuildArtifactUrl } from '../Utils/GDevelopServices/Build';
+import {
+  type Build,
+  type BuildArtifactKeyName,
+  getBuildArtifactUrl,
+} from '../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../Profile/UserProfileContext';
 import { Column, Line } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -175,7 +179,7 @@ export default class ExportLauncher extends Component<Props, State> {
 
         return { compressionOutput };
       }, handleError(t('Error while compressing the game.')))
-      .then(({compressionOutput}) => {
+      .then(({ compressionOutput }) => {
         this.setState({
           compressionOutput,
           doneFooterOpen: true,

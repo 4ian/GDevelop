@@ -10,7 +10,10 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import difference_in_seconds from 'date-fns/difference_in_seconds';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Text from '../../UI/Text';
-import { type Build, type BuildArtifactKeyName } from '../../Utils/GDevelopServices/Build';
+import {
+  type Build,
+  type BuildArtifactKeyName,
+} from '../../Utils/GDevelopServices/Build';
 
 const buildTypesConfig = {
   'cordova-build': {

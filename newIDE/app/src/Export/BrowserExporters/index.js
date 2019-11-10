@@ -9,6 +9,7 @@ import Folder from '@material-ui/icons/Folder';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import Cordova from '../../UI/CustomSvgIcons/Cordova';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
+import { browserHTML5ExportPipeline } from './BrowserHTML5Export';
 
 export const getBrowserExporters = () => [
   {
@@ -16,7 +17,7 @@ export const getBrowserExporters = () => [
     renderIcon: props => <PhoneIphone {...props} />,
     description:
       'Package your game for Android directly from GDevelop. iOS support is coming soon!',
-    key: 'localonlinecordovaexport',
+    key: 'browseronlinecordovaexport',
     exportPipeline: browserOnlineCordovaExportPipeline,
   },
   {
@@ -25,24 +26,25 @@ export const getBrowserExporters = () => [
     helpPage: '/publishing/publishing-to-facebook-instant-games',
     description:
       'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
-    key: 'localfacebookinstantgames',
+    key: 'browserfacebookinstantgames',
     ExportComponent: BrowserExport,
+    advanced: true,
   },
   {
     name: 'Web (upload online)',
     renderIcon: props => <Chrome {...props} />,
     description:
       'Upload your game online directly from GDevelop and share the link to players. Play to your game using your browser on computers and mobile phones.',
-    key: 'locals3export',
+    key: 'browsers3export',
     exportPipeline: browserOnlineWebExportPipeline,
   },
   {
-    name: 'Local folder',
+    name: 'HTML5 game (zip)',
     renderIcon: props => <Folder {...props} />,
     description:
-      'Build the game locally as a HTML5 game. You can then export it on website like Itch.io or Kongregate.',
-    key: 'localexport',
-    ExportComponent: BrowserExport,
+      'Build the game locally as a HTML5 game. You can then publish it on website like Kongregate, Game Jolt, itch.io, Poki...',
+    key: 'browserhtml5export',
+    exportPipeline: browserHTML5ExportPipeline,
     advanced: true,
   },
   {
@@ -50,7 +52,7 @@ export const getBrowserExporters = () => [
     renderIcon: props => <Cordova {...props} />,
     description:
       'Build the game locally as a Cordova project, and export it manually then to iOS or Android with Cordova developers tools.',
-    key: 'localcordovaexport',
+    key: 'browsercordovaexport',
     ExportComponent: BrowserExport,
     advanced: true,
   },
@@ -60,7 +62,7 @@ export const getBrowserExporters = () => [
     helpPage: '/publishing/windows-macos-linux',
     description:
       'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
-    key: 'localonlineelectronexport',
+    key: 'browseronlineelectronexport',
     exportPipeline: browserOnlineElectronExportPipeline,
   },
   {
@@ -69,7 +71,7 @@ export const getBrowserExporters = () => [
     helpPage: '/publishing/windows-macos-linux-with-electron',
     description:
       'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
-    key: 'localelectronexport',
+    key: 'browserelectronexport',
     ExportComponent: BrowserExport,
     advanced: true,
   },
@@ -78,7 +80,7 @@ export const getBrowserExporters = () => [
     renderIcon: props => <PhoneIphone {...props} />,
     description:
       'Export your game using Cocos2d-JS game engine. The game can be compiled for Android or iOS if you install Cocos2d-JS developer tools.',
-    key: 'localcocos2dexport',
+    key: 'browsercocos2dexport',
     ExportComponent: BrowserExport,
     experimental: true,
   },

@@ -3,20 +3,19 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
-import Text from '../../UI/Text';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import { getHelpLink } from '../../Utils/HelpLink';
-import FlatButton from '../../UI/FlatButton';
-import AlertMessage from '../../UI/AlertMessage';
-import Window from '../../Utils/Window';
+import optionalRequire from '../../Utils/OptionalRequire';
+import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
+const electron = optionalRequire('electron');
+const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
@@ -41,7 +40,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-electron',
+  name: 'local-html5',
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),
@@ -52,12 +51,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
   renderHeader: ({ project, exportState, updateExportState }) => (
     <Column noMargin>
       <Line>
-        <Text>
-          <Trans>
-            This will export your game to a folder that you can then upload on a
-            website or on game hosting like itch.io.
-          </Trans>
-        </Text>
+        <ExplanationHeader />
       </Line>
       <Line>
         <LocalFolderPicker
@@ -73,7 +67,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
     </Column>
   ),
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Export as a HTML5 game</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -125,57 +119,21 @@ export const localHTML5ExportPipeline: ExportPipeline<
   },
 
   renderDoneFooter: ({ exportState, onClose }) => {
+    const openExportFolder = () => {
+      if (shell) shell.openItem(exportState.outputDir);
+    };
+
     return (
-      <Column noMargin>
-        <Text>
-          <Trans>
-            You can now upload the game to a web hosting to play to the game.
-          </Trans>
-        </Text>
-        <AlertMessage kind="warning">
-          <Trans>
-            Your game won't work if you open index.html on your computer. You
-            must upload it to a web hosting (Kongregate, Itch.io, etc...) or a
-            web server to run it.
-          </Trans>
-        </AlertMessage>
-        <Spacer />
-        <RaisedButton
-          fullWidth
-          primary
-          onClick={() =>
-            Window.openExternalURL(
-              getHelpLink('/publishing/publishing-to-gamejolt-store')
-            )
-          }
-          label={<Trans>Publish your game on Game Jolt</Trans>}
-        />
-        <RaisedButton
-          fullWidth
-          primary
-          onClick={() =>
-            Window.openExternalURL(
-              getHelpLink('/publishing/publishing-to-kongregate-store')
-            )
-          }
-          label={<Trans>Publish your game on Kongregate</Trans>}
-        />
-        <RaisedButton
-          fullWidth
-          primary
-          onClick={() =>
-            Window.openExternalURL(
-              getHelpLink('/publishing/publishing-to-itch-io')
-            )
-          }
-          label={<Trans>Publish your game on Itch.io</Trans>}
-        />
-        <FlatButton
-          fullWidth
-          onClick={() => Window.openExternalURL(getHelpLink('/publishing'))}
-          label={<Trans>Learn more about publishing</Trans>}
-        />
-      </Column>
+      <DoneFooter
+        renderGameButton={() => (
+          <RaisedButton
+            fullWidth
+            primary
+            onClick={() => openExportFolder()}
+            label={<Trans>Open the exported game folder</Trans>}
+          />
+        )}
+      />
     );
   },
 };

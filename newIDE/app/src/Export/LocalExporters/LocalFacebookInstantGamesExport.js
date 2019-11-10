@@ -51,7 +51,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-cordova',
+  name: 'local-facebook-instant-games',
 
   getInitialExportState: (project: gdProject) => ({
     archiveOutputFilename: app

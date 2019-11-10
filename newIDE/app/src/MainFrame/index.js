@@ -46,8 +46,6 @@ import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timePromise } from '../Utils/TimeFunction';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import HelpFinder from '../HelpFinder';
-
-// Editors:
 import DebuggerEditor from './Editors/DebuggerEditor';
 import EventsEditor from './Editors/EventsEditor';
 import ExternalEventsEditor from './Editors/ExternalEventsEditor';
@@ -59,7 +57,6 @@ import ResourcesEditor from './Editors/ResourcesEditor';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
-import Authentification from '../Utils/GDevelopServices/Authentification';
 import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
@@ -154,7 +151,6 @@ type Props = {
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
-  authentification: Authentification,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
@@ -1660,7 +1656,6 @@ class MainFrame extends React.Component<Props, State> {
       renderCreateDialog,
       introDialog,
       resourceSources,
-      authentification,
       renderPreviewLauncher,
       resourceExternalEditors,
       eventsFunctionsExtensionsState,
@@ -1802,7 +1797,6 @@ class MainFrame extends React.Component<Props, State> {
               this.openSubscription(true);
             },
             project: this.state.currentProject,
-            authentification,
           })}
         {!!renderCreateDialog &&
           this.state.createDialogOpen &&

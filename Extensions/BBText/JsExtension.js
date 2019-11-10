@@ -206,7 +206,7 @@ module.exports = {
             .setFunctionName(`get${property.functionName}`);
         }
 
-        // Add all the generic SETTERS
+        // Add all the generic setters
         if (parameterType === 'number' || parameterType === 'string') {
           const expressionType =
             parameterType === 'number' ? 'expression' : 'string';

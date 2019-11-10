@@ -183,18 +183,12 @@ gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
 };
 
 /**
- * Restrict the value in the given interval
- */
-gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
-  return val <= min ? min : val >= max ? max : val;
-};
-
-/**
  * Set the volume of the video object.
  * @param {number} volume The new volume.
  */
 gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
-  this._volume = this._clamp(this._normalize(volume, 0, 100), 0, 1) * 100;
+  this._volume =
+    gdjs.evtTools.common.clamp(this._normalize(volume, 0, 100), 0, 1) * 100;
   this._renderer.updateVolume();
 };
 
@@ -260,7 +254,7 @@ gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
  * @param {number} playbackSpeed The new playback speed.
  */
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
-  this._playbackSpeed = this._clamp(playbackSpeed, 0.5, 2);
+  this._playbackSpeed = gdjs.evtTools.common.clamp(playbackSpeed, 0.5, 2);
   this._renderer.setPlaybackSpeed(this._playbackSpeed);
 };
 

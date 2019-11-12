@@ -9,7 +9,7 @@ import {
 } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
-import { unregister } from './registerServiceWorker';
+import { register } from './serviceWorker';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
 import { showErrorBox } from './UI/Messages/MessageBox';
@@ -79,5 +79,5 @@ if (rootElement) {
 else console.error('No root element defined in index.html');
 
 // registerServiceWorker();
-unregister();
+register();
 sendProgramOpening();

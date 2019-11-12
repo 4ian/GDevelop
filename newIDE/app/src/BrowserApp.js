@@ -44,21 +44,13 @@ export const create = (authentification: Authentification) => {
       {({ i18n, eventsFunctionsExtensionsState }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
-          storageProviders={
-            Window.isDev()
-              ? [
-                  InternalFileStorageProvider,
-                  GoogleDriveStorageProvider,
-                  DropboxStorageProvider,
-                  OneDriveStorageProvider,
-                  DownloadFileStorageProvider,
-                ]
-              : [
-                  // TODO: Enable Google Drive once app is validated.
-                  InternalFileStorageProvider,
-                  DownloadFileStorageProvider,
-                ]
-          }
+          storageProviders={[
+            InternalFileStorageProvider,
+            GoogleDriveStorageProvider,
+            DropboxStorageProvider,
+            OneDriveStorageProvider,
+            DownloadFileStorageProvider,
+          ]}
           defaultStorageProvider={InternalFileStorageProvider}
         >
           {({
@@ -70,7 +62,9 @@ export const create = (authentification: Authentification) => {
             <MainFrame
               i18n={i18n}
               eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
-              renderPreviewLauncher={(props, ref) => <BrowserS3PreviewLauncher {...props} ref={ref} />}
+              renderPreviewLauncher={(props, ref) => (
+                <BrowserS3PreviewLauncher {...props} ref={ref} />
+              )}
               renderExportDialog={props => (
                 <ExportDialog {...props} exporters={getBrowserExporters()} />
               )}

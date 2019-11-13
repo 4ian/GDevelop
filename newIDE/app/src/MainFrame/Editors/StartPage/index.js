@@ -11,6 +11,7 @@ import BaseEditor from '../BaseEditor';
 import Window from '../../../Utils/Window';
 import { Line, Spacer } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
+import EducationTutorialImage from './EducationTutorialImage';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
@@ -79,6 +80,71 @@ class StartPage extends BaseEditor {
                       ...styles.logoPaper,
                     }}
                   >
+                    <EducationTutorialImage />
+                    <Text>
+                      <Trans>
+                        Learn step-by-step how create your first game. You will
+                        learn basic concept and will be able to play your game!
+                        Wiki has tutorials for beginners and complete
+                        documentation for the software. Tons of example are also
+                        available just for you in once click.
+                      </Trans>
+                    </Text>
+                  </Paper>
+                  {!project && canOpen && (
+                    <React.Fragment>
+                      <RaisedButton
+                        label={<Trans>Start interactice tutorial</Trans>}
+                        fullWidth
+                        onClick={onOpen}
+                        primary
+                      />
+                      <Spacer />
+                    </React.Fragment>
+                  )}
+                  {!!project && (
+                    <React.Fragment>
+                      <FlatButton
+                        label={<Trans>Restart interactice tutorial</Trans>}
+                        fullWidth
+                        onClick={onCloseProject}
+                      />
+                      <Spacer />
+                    </React.Fragment>
+                  )}
+                  {!!project && (
+                    <React.Fragment>
+                      <FlatButton
+                        label={<Trans>Close project</Trans>}
+                        fullWidth
+                        onClick={onCloseProject}
+                      />
+                      <Spacer />
+                    </React.Fragment>
+                  )}
+                  {
+                    <FlatButton
+                      label={<Trans>All tutorials</Trans>}
+                      fullWidth
+                      onClick={onOpenHelpFinder}
+                    />
+                  }
+                  {
+                    <FlatButton
+                      label={<Trans>Search the documentation</Trans>}
+                      fullWidth
+                      onClick={onOpenHelpFinder}
+                    />
+                  }
+                </div>
+
+                <div style={styles.centerContainer}>
+                  <Paper
+                    elevation={2}
+                    style={{
+                      ...styles.logoPaper,
+                    }}
+                  >
                     <GDevelopLogo />
                     <Text>
                       <Trans>
@@ -87,17 +153,6 @@ class StartPage extends BaseEditor {
                       </Trans>
                     </Text>
                   </Paper>
-                  {!project && canOpen && (
-                    <React.Fragment>
-                      <RaisedButton
-                        label={<Trans>Open a project</Trans>}
-                        fullWidth
-                        onClick={onOpen}
-                        primary
-                      />
-                      <Spacer />
-                    </React.Fragment>
-                  )}
                   {!project && (
                     <React.Fragment>
                       <RaisedButton
@@ -105,6 +160,26 @@ class StartPage extends BaseEditor {
                         fullWidth
                         onClick={onCreate}
                         primary
+                      />
+                      <Spacer />
+                    </React.Fragment>
+                  )}
+                  {!project && canOpen && (
+                    <React.Fragment>
+                      <FlatButton
+                        label={<Trans>Open a project</Trans>}
+                        fullWidth
+                        onClick={onOpen}
+                      />
+                      <Spacer />
+                    </React.Fragment>
+                  )}
+                  {!project && (
+                    <React.Fragment>
+                      <FlatButton
+                        label={<Trans>Open examples</Trans>}
+                        fullWidth
+                        onClick={onOpen}
                       />
                       <Spacer />
                     </React.Fragment>
@@ -130,15 +205,9 @@ class StartPage extends BaseEditor {
                       <Spacer />
                     </React.Fragment>
                   )}
-                  {
-                    <FlatButton
-                      label={<Trans>Search the documentation</Trans>}
-                      fullWidth
-                      onClick={onOpenHelpFinder}
-                    />
-                  }
                 </div>
               </Line>
+
               <Line alignItems="center" justifyContent="space-between">
                 <Line>
                   <FlatButton

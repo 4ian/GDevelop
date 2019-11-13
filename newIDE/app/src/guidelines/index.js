@@ -4,37 +4,38 @@ import Button from '@material-ui/core/Button';
 import Popover from '@material-ui/core/Popover';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import guidelines from './data.js';
 
-const guidelines = [
-  {
-    title: 'Bienvenue 1',
-    description:
-      'Welcome in GDevelop 5 ! We will see the important button in the interface.',
-    positionBind: 'toolbar',
-    position: {
-      x: 0,
-      y: 0,
-    },
-  },
-  {
-    title: 'Bienvenue 2',
-    description: '2    blablabla blabla blabla blabla blabla blabla.',
-    positionBind: 'projectPanel',
-    position: {
-      x: 700,
-      y: 100,
-    },
-  },
-  {
-    title: 'Bienvenue 3',
-    description: '3 will see the important button inlabla blabla.',
-    positionBind: 'projectPanel',
-    position: {
-      x: 0,
-      y: 700,
-    },
-  },
-];
+// const guidelines = [
+//   {
+//     title: 'Bienvenue 1',
+//     description:
+//       'Welcome in GDevelop 5 ! We will see the important button in the interface.',
+//     positionBind: 'toolbar',
+//     position: {
+//       x: 0,
+//       y: 0,
+//     },
+//   },
+//   {
+//     title: 'Bienvenue 2',
+//     description: '2    blablabla blabla blabla blabla blabla blabla.',
+//     positionBind: 'projectPanel',
+//     position: {
+//       x: 700,
+//       y: 100,
+//     },
+//   },
+//   {
+//     title: 'Bienvenue 3',
+//     description: '3 will see the important button inlabla blabla.',
+//     positionBind: 'projectPanel',
+//     position: {
+//       x: 0,
+//       y: 700,
+//     },
+//   },
+// ];
 
 const styles = {
   container: {
@@ -163,6 +164,12 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
               <Typography wrap="true">
                 {guidelines[this.state.indexData].description}
               </Typography>
+              <br/>
+              <img
+                class="fit-picture"
+                src={guidelines[this.state.indexData].imageSource}
+                alt="Grapefruit slice atop a pile of other slices"
+              />
             </Grid>
             <Grid
               container

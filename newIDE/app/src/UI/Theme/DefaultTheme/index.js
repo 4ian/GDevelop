@@ -72,6 +72,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
+
+  educationTutorialImage: {
+    src: 'res/education_tutorial.png',
+  },
   mosaicRootClassName: 'mosaic-gd-default-theme', // See Mosaic.css
   eventsSheetRootClassName: 'gd-events-sheet-default-theme', // See EventsSheet.css
   tableRootClassName: 'gd-table-default-theme', // See Table.css

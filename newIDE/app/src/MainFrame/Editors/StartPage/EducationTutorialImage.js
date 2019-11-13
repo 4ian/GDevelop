@@ -10,7 +10,13 @@ const styles = {
 
 const EducationTutorialImage = () => (
   <ThemeConsumer>
-    {muiTheme => <img src={muiTheme.educationTutorialImage.src} alt="" style={styles.logo} />}
+    {muiTheme => (
+      <img
+        src={muiTheme.educationTutorialImage.src}
+        alt=""
+        style={styles.logo}
+      />
+    )}
   </ThemeConsumer>
 );
 

@@ -5,37 +5,8 @@ import Popover from '@material-ui/core/Popover';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import guidelines from './data.js';
-
-// const guidelines = [
-//   {
-//     title: 'Bienvenue 1',
-//     description:
-//       'Welcome in GDevelop 5 ! We will see the important button in the interface.',
-//     positionBind: 'toolbar',
-//     position: {
-//       x: 0,
-//       y: 0,
-//     },
-//   },
-//   {
-//     title: 'Bienvenue 2',
-//     description: '2    blablabla blabla blabla blabla blabla blabla.',
-//     positionBind: 'projectPanel',
-//     position: {
-//       x: 700,
-//       y: 100,
-//     },
-//   },
-//   {
-//     title: 'Bienvenue 3',
-//     description: '3 will see the important button inlabla blabla.',
-//     positionBind: 'projectPanel',
-//     position: {
-//       x: 0,
-//       y: 700,
-//     },
-//   },
-// ];
+import Window from '../Utils/Window';
+import { getHelpLink } from '../Utils/HelpLink';
 
 const styles = {
   container: {
@@ -48,7 +19,7 @@ const styles = {
 };
 
 type Props = {|
-  opened: boolean
+  opened: boolean,
 |};
 
 export default class GuidelinePopOver extends PureComponent<Props, State> {
@@ -107,6 +78,9 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
     const { opened } = this.props;
 
     let nextOrFinish;
+    let imageTutorial;
+    let closeOrWikipage;
+
     if (this.state.index === this.state.indexMax) {
       nextOrFinish = (
         <Button
@@ -128,6 +102,40 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           Next
         </Button>
       );
+    }
+
+    if (this.state.index === this.state.indexMax) {
+      closeOrWikipage = (
+        <Button
+          variant="contained"
+          onClick={() => {
+            Window.openExternalURL(getHelpLink('/tutorials'));
+            this.togglePopover();
+          }}
+        >
+          See wikipage
+        </Button>
+      );
+    } else {
+      closeOrWikipage = (
+        <Button variant="contained" onClick={this.togglePopover}>
+          Close
+        </Button>
+      );
+    }
+
+    if (guidelines[this.state.indexData].imageSource !== undefined) {
+      imageTutorial = (
+        <img
+          class="fit-picture"
+          src={guidelines[this.state.indexData].imageSource}
+          alt={guidelines[this.state.indexData].imageAlt}
+        />
+      );
+    } else {
+      imageTutorial = () => {
+        return;
+      };
     }
 
     return (
@@ -164,12 +172,8 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
               <Typography wrap="true">
                 {guidelines[this.state.indexData].description}
               </Typography>
-              <br/>
-              <img
-                class="fit-picture"
-                src={guidelines[this.state.indexData].imageSource}
-                alt="Grapefruit slice atop a pile of other slices"
-              />
+              <br />
+              {imageTutorial}
             </Grid>
             <Grid
               container
@@ -179,9 +183,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
               xs={12}
             >
               <Grid container item justify="flex-start" xs={4}>
-                <Button variant="contained" onClick={this.togglePopover}>
-                  Close
-                </Button>
+                {closeOrWikipage}
               </Grid>
               <Grid
                 container

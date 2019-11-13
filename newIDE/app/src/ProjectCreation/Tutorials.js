@@ -7,6 +7,7 @@ import { getHelpLink } from '../Utils/HelpLink';
 import { List, ListItem } from '../UI/List';
 import Text from '../UI/Text';
 import Subheader from '../UI/Subheader';
+import RaisedButton from '../UI/RaisedButton';
 
 export default class Tutorials extends PureComponent {
   render() {
@@ -112,6 +113,14 @@ export default class Tutorials extends PureComponent {
                 }}
               />
             </List>
+            <Line alignItems="center" justifyContent="center">
+              <RaisedButton
+                label={<Trans>See other tutorials on wiki</Trans>}
+                onClick={() => {
+                  Window.openExternalURL(getHelpLink('/tutorials'));
+                }}
+              />
+            </Line>
           </Column>
         </Line>
       </Column>

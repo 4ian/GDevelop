@@ -77,6 +77,9 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo.png',
   },
+  educationTutorialImage: {
+    src: 'res/education_tutorial.png',
+  },
   mosaicRootClassName: 'mosaic-gd-dark-theme', // See Mosaic.css
   eventsSheetRootClassName: 'gd-events-sheet-dark-theme', // See EventsSheet.css
   tableRootClassName: 'gd-table-dark-theme', // See Table.css

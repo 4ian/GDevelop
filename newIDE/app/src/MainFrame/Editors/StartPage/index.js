@@ -15,6 +15,7 @@ import EducationTutorialImage from './EducationTutorialImage';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
+import { getHelpLink } from '../../../Utils/HelpLink';
 
 const styles = {
   innerContainer: {
@@ -124,16 +125,18 @@ class StartPage extends BaseEditor {
                   )}
                   {
                     <FlatButton
-                      label={<Trans>All tutorials</Trans>}
+                      label={<Trans>Search the documentation</Trans>}
                       fullWidth
                       onClick={onOpenHelpFinder}
                     />
                   }
                   {
                     <FlatButton
-                      label={<Trans>Search the documentation</Trans>}
+                      label={<Trans>See all tutorials on wiki</Trans>}
                       fullWidth
-                      onClick={onOpenHelpFinder}
+                      onClick={() => {
+                        Window.openExternalURL(getHelpLink('/tutorials'));
+                      }}
                     />
                   }
                 </div>
@@ -179,7 +182,7 @@ class StartPage extends BaseEditor {
                       <FlatButton
                         label={<Trans>Open examples</Trans>}
                         fullWidth
-                        onClick={onOpen}
+                        onClick={onCreate}
                       />
                       <Spacer />
                     </React.Fragment>

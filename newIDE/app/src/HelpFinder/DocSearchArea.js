@@ -41,6 +41,7 @@ type AlgoliaResult = {|
 
 type State = {|
   results: ?Array<AlgoliaResult>,
+  error: ?Error,
 |};
 
 const indexName = 'gdevelop';
@@ -53,6 +54,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
   client = algoliasearch(appId, apiKey, algoliaOptions);
   state = {
     results: null,
+    error: null,
   };
 
   _handleSearchTextChange = (searchText: string) => {
@@ -70,14 +72,22 @@ export default class DocSearchArea extends React.Component<Props, State> {
             params: algoliaOptions,
           },
         ])
-        .then(data => {
-          let hits = data.results[0].hits;
-          console.log(hits);
+        .then(
+          data => {
+            let hits = data.results[0].hits;
+            console.log(hits);
 
-          this.setState({
-            results: hits,
-          });
-        });
+            this.setState({
+              results: hits,
+              error: null,
+            });
+          },
+          error => {
+            this.setState({
+              error,
+            });
+          }
+        );
     }
   }, 200);
 
@@ -142,7 +152,14 @@ export default class DocSearchArea extends React.Component<Props, State> {
             visibility: !this.props.value ? 'hidden' : undefined,
           }}
         />
-        {this.state.results ? (
+        {this.state.error ? (
+          <Text>
+            <Trans>
+              Unable to search in the documentation. Are you sure you are online
+              and have a proper internet connection?
+            </Trans>
+          </Text>
+        ) : this.state.results ? (
           <List>
             {this.state.results.map(result => this._renderResult(result))}
           </List>

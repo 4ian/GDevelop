@@ -66,7 +66,11 @@ export const create = (authentification: Authentification) => {
                 <BrowserS3PreviewLauncher {...props} ref={ref} />
               )}
               renderExportDialog={props => (
-                <ExportDialog {...props} exporters={getBrowserExporters()} />
+                <ExportDialog
+                  {...props}
+                  exporters={getBrowserExporters()}
+                  allExportersRequireOnline
+                />
               )}
               renderCreateDialog={props => (
                 <CreateProjectDialog

@@ -15,6 +15,8 @@ export type AppArguments = { [string]: any };
  */
 export const POSITIONAL_ARGUMENTS_KEY = '_';
 
+let currentTitleBarColor: ?string = null;
+
 /**
  * Various utilities related to the app window management.
  */
@@ -34,6 +36,24 @@ export default class Window {
       }
     } else {
       document.title = title;
+    }
+  }
+
+  static setTitleBarColor(newColor: string) {
+    if (electron) {
+      // Nothing to do, the title bar is using the system window management.
+      return;
+    }
+
+    if (currentTitleBarColor === newColor) {
+      // Avoid potentially expensive DOM query/modification if no changes needed.
+      return;
+    }
+
+    const metaElement = document.querySelector('meta[name="theme-color"]');
+    if (metaElement) {
+      metaElement.setAttribute('content', newColor);
+      currentTitleBarColor = newColor;
     }
   }
 

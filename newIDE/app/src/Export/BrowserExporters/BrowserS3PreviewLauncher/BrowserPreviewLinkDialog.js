@@ -5,11 +5,11 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import React, { Component } from 'react';
-import Dialog from '../../UI/Dialog';
-import FlatButton from '../../UI/FlatButton';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { Column, Line } from '../../UI/Grid';
-import Text from '../../UI/Text';
+import Dialog from '../../../UI/Dialog';
+import FlatButton from '../../../UI/FlatButton';
+import { showErrorBox } from '../../../UI/Messages/MessageBox';
+import { Column, Line } from '../../../UI/Grid';
+import Text from '../../../UI/Text';
 
 type Props = {|
   url: ?string,

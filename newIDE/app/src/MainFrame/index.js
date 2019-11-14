@@ -42,7 +42,6 @@ import {
   type EditorTab,
   getEventsFunctionsExtensionEditor,
 } from './EditorTabsHandler';
-import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timePromise } from '../Utils/TimeFunction';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import HelpFinder from '../HelpFinder';
@@ -844,40 +843,59 @@ class MainFrame extends React.Component<Props, State> {
     project: gdProject,
     layout: gdLayout,
     options: PreviewOptions
-  ) =>
-    watchPromiseInState(this, 'previewLoading', () =>
-      this._handlePreviewResult(
-        this._previewLauncher &&
-          this._previewLauncher.launchLayoutPreview(project, layout, options)
-      )
+  ) => {
+    const { _previewLauncher } = this;
+    if (!_previewLauncher) return;
+
+    this.setState(
+      {
+        previewLoading: true,
+      },
+      () => {
+        _previewLauncher
+          .launchLayoutPreview(project, layout, options)
+          .catch(error => {
+            console.error(
+              'Error caught while launching preview, this should never happen.',
+              error
+            );
+          })
+          .then(() => {
+            this.setState({
+              previewLoading: false,
+            });
+          });
+      }
     );
+  };
 
   _launchExternalLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
     externalLayout: gdExternalLayout,
     options: PreviewOptions
-  ) =>
-    watchPromiseInState(this, 'previewLoading', () =>
-      this._handlePreviewResult(
-        this._previewLauncher &&
-          this._previewLauncher.launchExternalLayoutPreview(
-            project,
-            layout,
-            externalLayout,
-            options
-          )
-      )
-    );
+  ) => {
+    const { _previewLauncher } = this;
+    if (!_previewLauncher) return;
 
-  _handlePreviewResult = (previewPromise: ?Promise<any>): Promise<void> => {
-    if (!previewPromise) return Promise.reject();
-    const { i18n } = this.props;
-
-    return previewPromise.then(
-      (result: any) => {},
-      (err: any) => {
-        showErrorBox(i18n._(t`Unable to launch the preview!`), err);
+    this.setState(
+      {
+        previewLoading: true,
+      },
+      () => {
+        _previewLauncher
+          .launchExternalLayoutPreview(project, layout, externalLayout, options)
+          .catch(error => {
+            console.error(
+              'Error caught while launching preview, this should never happen.',
+              error
+            );
+          })
+          .then(() => {
+            this.setState({
+              previewLoading: false,
+            });
+          });
       }
     );
   };

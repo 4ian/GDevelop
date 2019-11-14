@@ -1,17 +1,19 @@
 // @flow
 import * as React from 'react';
-import BrowserS3FileSystem from './BrowserS3FileSystem';
 import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
-import { findGDJS } from './BrowserS3GDJSFinder';
+import BrowserPreviewErrorDialog from './BrowserPreviewErrorDialog';
+import BrowserS3FileSystem from '../BrowserS3FileSystem';
+import { findGDJS } from '../BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
-import { type PreviewOptions } from '../PreviewLauncher.flow';
-import { getBaseUrl } from '../../Utils/GDevelopServices/Preview';
-import { makeTimestampedId } from '../../Utils/TimestampedId';
+import { type PreviewOptions } from '../../PreviewLauncher.flow';
+import { getBaseUrl } from '../../../Utils/GDevelopServices/Preview';
+import { makeTimestampedId } from '../../../Utils/TimestampedId';
 const gd = global.gd;
 
 type State = {|
   showPreviewLinkDialog: boolean,
   url: ?string,
+  error: ?Error,
 |};
 
 type Props = {|
@@ -28,6 +30,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   state = {
     showPreviewLinkDialog: false,
     url: null,
+    error: null,
   };
 
   _openPreviewWindow = (project: gdProject, url: string): any => {
@@ -70,10 +73,12 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     layout: gdLayout,
     options: PreviewOptions
   ): Promise<any> => {
-    if (!project || !layout) return Promise.reject();
+    this.setState({
+      error: null,
+    });
 
-    return this._prepareExporter().then(
-      ({ exporter, outputDir, browserS3FileSystem }) => {
+    return this._prepareExporter()
+      .then(({ exporter, outputDir, browserS3FileSystem }) => {
         exporter.exportLayoutForPixiPreview(project, layout, outputDir);
         exporter.delete();
         return browserS3FileSystem
@@ -90,8 +95,12 @@ export default class BrowserS3PreviewLauncher extends React.Component<
               });
             }
           });
-      }
-    );
+      })
+      .catch((error: Error) => {
+        this.setState({
+          error,
+        });
+      });
   };
 
   launchExternalLayoutPreview = (
@@ -100,10 +109,12 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     externalLayout: gdExternalLayout,
     options: PreviewOptions
   ): Promise<any> => {
-    if (!project || !layout || !externalLayout) return Promise.reject();
+    this.setState({
+      error: null,
+    });
 
-    return this._prepareExporter().then(
-      ({ exporter, outputDir, browserS3FileSystem }) => {
+    return this._prepareExporter()
+      .then(({ exporter, outputDir, browserS3FileSystem }) => {
         exporter.exportExternalLayoutForPixiPreview(
           project,
           layout,
@@ -125,23 +136,43 @@ export default class BrowserS3PreviewLauncher extends React.Component<
               });
             }
           });
-      }
-    );
+      })
+      .catch((error: Error) => {
+        this.setState({
+          error,
+        });
+      });
   };
 
   render() {
-    const { showPreviewLinkDialog, url } = this.state;
-    if (!showPreviewLinkDialog) return null;
+    const { showPreviewLinkDialog, url, error } = this.state;
 
-    return (
-      <BrowserPreviewLinkDialog
-        url={url}
-        onClose={() =>
-          this.setState({
-            showPreviewLinkDialog: false,
-          })
-        }
-      />
-    );
+    if (error) {
+      return (
+        <BrowserPreviewErrorDialog
+          error={error}
+          onClose={() =>
+            this.setState({
+              error: null,
+            })
+          }
+        />
+      );
+    }
+
+    if (showPreviewLinkDialog) {
+      return (
+        <BrowserPreviewLinkDialog
+          url={url}
+          onClose={() =>
+            this.setState({
+              showPreviewLinkDialog: false,
+            })
+          }
+        />
+      );
+    }
+
+    return null;
   }
 }

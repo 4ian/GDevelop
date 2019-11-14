@@ -161,6 +161,7 @@ import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvide
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import CreateAccountDialog from '../Profile/CreateAccountDialog';
+import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 
 // No i18n in this file
 
@@ -2912,6 +2913,28 @@ storiesOf('LocalNetworkPreviewDialog', module)
       error={{ message: 'Oops' }}
       onRunPreviewLocally={action('on run preview locally')}
       onExport={action('on export')}
+      onClose={action('on close')}
+    />
+  ));
+
+storiesOf('BrowserPreviewErrorDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('generic error', () => (
+    <BrowserPreviewErrorDialog
+      error={new Error('fake error')}
+      onClose={action('on close')}
+    />
+  ))
+  .add('networking error', () => (
+    <BrowserPreviewErrorDialog
+      error={
+        // $FlowFixMe - mocking an Error with "code field"
+        {
+          code: 'NetworkingError',
+          message: "Oops, you're offline",
+        }
+      }
       onClose={action('on close')}
     />
   ));

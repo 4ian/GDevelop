@@ -13,6 +13,7 @@ import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Subheader from '../../UI/Subheader';
+import Text from '../../UI/Text';
 
 type Props = {|
   project: gdProject,
@@ -151,10 +152,10 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
             schema={this.schema.concat(instanceSchema)}
             instances={instances}
           />
-          <Line alignItems="center">
-            <Subheader>
+          <Line alignItems="center" justifyContent="space-between">
+            <Text>
               <Trans>Instance Variables</Trans>
-            </Subheader>
+            </Text>
             <IconButton
               onClick={() => {
                 this.props.editInstanceVariables(instance);

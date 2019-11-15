@@ -30,6 +30,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     maxWidth: 400,
+    margin: 10,
   },
   logoPaper: {
     marginBottom: 10,
@@ -37,6 +38,12 @@ const styles = {
     textAlign: 'center',
   },
 };
+
+type Props = {|
+  //TODO
+  //not yet used, j'en ai
+  onShowExamples: () => void,
+|};
 
 class StartPage extends BaseEditor {
   constructor() {
@@ -62,6 +69,9 @@ class StartPage extends BaseEditor {
       onOpen,
       onCreate,
       onOpenProjectManager,
+      onOpenGuidelines,
+      restartGuidelines,
+      guidelinesIsOpen,
       onCloseProject,
       onOpenAboutDialog,
       onOpenHelpFinder,
@@ -73,7 +83,7 @@ class StartPage extends BaseEditor {
         {({ i18n }) => (
           <ScrollBackground>
             <div style={styles.innerContainer}>
-              <Line expand justifyContent="center">
+              <Line expand alignItems="center" justifyContent="center">
                 <div style={styles.centerContainer}>
                   <Paper
                     elevation={2}
@@ -92,33 +102,26 @@ class StartPage extends BaseEditor {
                       </Trans>
                     </Text>
                   </Paper>
-                  {!project && canOpen && (
+                  {!project && canOpen && !guidelinesIsOpen && (
                     <React.Fragment>
                       <RaisedButton
-                        label={<Trans>Start interactice tutorial</Trans>}
+                        label={<Trans>Start interactive tutorial</Trans>}
                         fullWidth
-                        onClick={onOpen}
+                        onClick={onOpenGuidelines}
                         primary
                       />
                       <Spacer />
                     </React.Fragment>
                   )}
-                  {!!project && (
+                  {guidelinesIsOpen && (
                     <React.Fragment>
                       <FlatButton
-                        label={<Trans>Restart interactice tutorial</Trans>}
+                        label={<Trans>Restart interactive tutorial</Trans>}
                         fullWidth
-                        onClick={onCloseProject}
-                      />
-                      <Spacer />
-                    </React.Fragment>
-                  )}
-                  {!!project && (
-                    <React.Fragment>
-                      <FlatButton
-                        label={<Trans>Close project</Trans>}
-                        fullWidth
-                        onClick={onCloseProject}
+                        //TODO BOUH
+                        //When i click on it button disappear, i know my props is already true
+                        //but i wish reboot my GuidelinePopover (reset the index to zero and show the component if it closed)
+                        onClick={restartGuidelines}
                       />
                       <Spacer />
                     </React.Fragment>
@@ -182,7 +185,10 @@ class StartPage extends BaseEditor {
                       <FlatButton
                         label={<Trans>Open examples</Trans>}
                         fullWidth
-                        onClick={onCreate}
+                        //TODO BOUH
+                        //it acts like a onCreate props Oo
+                        //Wish open same dialog but on "examples" tab
+                        onClick={() => this.props.onShowExamples()}
                       />
                       <Spacer />
                     </React.Fragment>
@@ -232,7 +238,8 @@ class StartPage extends BaseEditor {
                     }
                   />
                 </Line>
-                <Line alignItems="center">
+                {/*TODO Le className disparait au rendu*/}
+                <Line alignItems="center" className="socialNetwork">
                   <FlatButton
                     label={i18n.language}
                     onClick={onOpenLanguageDialog}

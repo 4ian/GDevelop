@@ -106,7 +106,9 @@ export const create = (authentification: Authentification) => {
                   eventsFunctionsExtensionsState={
                     eventsFunctionsExtensionsState
                   }
-                  renderPreviewLauncher={(props, ref) => <LocalPreviewLauncher {...props} ref={ref} />}
+                  renderPreviewLauncher={(props, ref) => (
+                    <LocalPreviewLauncher {...props} ref={ref} />
+                  )}
                   renderExportDialog={props => (
                     <ExportDialog {...props} exporters={getLocalExporters()} />
                   )}

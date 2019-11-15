@@ -1,81 +1,97 @@
 import React, { PureComponent } from 'react';
-import { render } from 'react-dom';
 import Button from '@material-ui/core/Button';
-import Popover from '@material-ui/core/Popover';
-import Grid from '@material-ui/core/Grid';
+import Popper from '@material-ui/core/Popper';
+import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import guidelines from './data.js';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
+import { Line } from '../UI/Grid';
 
+//TODO wrap l'image dans le Paper avec l'overflow hidden
+//Actuellement l'image dépasse du Paper alors qu'il y a une marge autour du Popper
 const styles = {
   container: {
     maxWidth: 400,
     padding: 10,
+    marginTop: 10,
+    overflow: 'hidden',
   },
   description: {
     paddingBottom: 10,
   },
 };
 
-type Props = {|
-  opened: boolean,
+type State = {|
+  open: boolean,
+  index: number,
+  indexData: number,
+  indexMax: number,
+  //TODO
+  //anchor: HTML node quelque chose (le node qui contient le className/attribut)
 |};
+
+type Props = {|
+  open: boolean,
+|};
+
+//TODO
+//PureComponent ou React.Component<Props, State> voir la doc pour comprendre la différence.
+//Le bouton restart du tuto ferme le Popper mais le reouvre pas et surtout ne reset pas le Popper a l'index 0...
 
 export default class GuidelinePopOver extends PureComponent<Props, State> {
   _inputRef = React.createRef();
 
-  state = {
-    open: true,
-    index: 0,
-    indexData: 0,
-    indexMax: guidelines.length - 1,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: props.open,
+      index: 0,
+      indexData: 0,
+      indexMax: guidelines.length - 1,
+      anchor: document.getElementsByClassName('socialNetwork'),
+    };
+  }
 
-  togglePopover = () => {
+  componentWillReceiveProps(newProps) {
+    if (newProps.open !== this.props.open) {
+      this.setState({
+        open: newProps.open,
+      });
+    }
+    console.log('BOUH--------');
+    console.log(document.getElementsByClassName('socialNetwork'));
+    //console.log(document.querySelector('[data-guidelines]'));
+    //Sa fonctionne pas avec les attibuts en général donc data-guidelines non plus
+  }
+
+  //TODO BOUH
+  //Pour next() et back()
+  //Actualise le state anchor avec la valeur de l'attribut où je veux ancré Popper
+  //Valeur a recup dans data.js
+
+  next = () => {
     this.setState(currentState => ({
-      open: !currentState.open,
+      index: Math.min(currentState.indexMax, currentState.index + 1),
     }));
   };
 
-  next = () => {
-    this.setState(currentState => {
-      let val = currentState.index;
-      if (val === currentState.indexMax) {
-        val = currentState.indexMax;
-      } else {
-        val = currentState.index + 1;
-      }
-      return {
-        index: val,
-      };
-    });
+  back = () => {
+    this.setState(currentState => ({
+      index: Math.min(currentState.indexMax, currentState.index - 1),
+    }));
   };
 
-  back = () => {
-    this.setState(currentState => {
-      let val = currentState.index;
-      if (val === 0) {
-        val = 0;
-      } else {
-        val = currentState.index - 1;
-      }
-      return {
-        index: val,
-      };
-    });
-  };
+  componentDidMount() {}
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.index !== prevState.index) {
-      this._inputRef.current.updatePosition();
-
-      setTimeout(() => this.setState({ indexData: this.state.index }), 300);
+      this.setState({ indexData: this.state.index });
     }
   }
 
   render() {
-    const { opened } = this.props;
+    const { open } = this.state;
 
     let nextOrFinish;
     let imageTutorial;
@@ -86,7 +102,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
         <Button
           variant="contained"
           color="primary"
-          onClick={this.togglePopover}
+          onClick={this.props.closeHandler}
         >
           Finish
         </Button>
@@ -96,7 +112,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
         <Button
           variant="contained"
           color="primary"
-          disabled={this.state.index === this.state.indexMax ? true : false}
+          disabled={this.state.index === this.state.indexMax}
           onClick={this.next}
         >
           Next
@@ -110,7 +126,6 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           variant="contained"
           onClick={() => {
             Window.openExternalURL(getHelpLink('/tutorials'));
-            this.togglePopover();
           }}
         >
           See wikipage
@@ -118,7 +133,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
       );
     } else {
       closeOrWikipage = (
-        <Button variant="contained" onClick={this.togglePopover}>
+        <Button variant="contained" onClick={this.props.closeHandler}>
           Close
         </Button>
       );
@@ -127,71 +142,38 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
     if (guidelines[this.state.indexData].imageSource !== undefined) {
       imageTutorial = (
         <img
-          class="fit-picture"
           src={guidelines[this.state.indexData].imageSource}
           alt={guidelines[this.state.indexData].imageAlt}
         />
       );
     } else {
-      imageTutorial = () => {
-        return;
-      };
+      imageTutorial = null;
     }
 
     return (
-      <div className="app">
-        <Button
-          variant="contained"
-          disabled={this.state.open}
-          onClick={this.togglePopover}
-        >
-          Open popover
-        </Button>
-        <Popover
+      <div>
+        <Popper
           action={this._inputRef}
-          open={this.state.open}
-          anchorReference="anchorPosition"
-          anchorPosition={{
-            top: guidelines[this.state.index].position.x,
-            left: guidelines[this.state.index].position.y,
-          }}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
+          open={open}
+          anchorEl={this.state.anchor}
         >
-          <Grid container style={styles.container}>
-            <Grid item xs={12} style={styles.description}>
-              <Typography variant="h5">
-                {guidelines[this.state.indexData].title}
-              </Typography>
-              <Typography wrap="true">
-                {guidelines[this.state.indexData].description}
-              </Typography>
-              <br />
-              {imageTutorial}
-            </Grid>
-            <Grid
-              container
-              item
-              alignItems="flex-start"
-              justify="flex-start"
-              xs={12}
-            >
-              <Grid container item justify="flex-start" xs={4}>
-                {closeOrWikipage}
-              </Grid>
-              <Grid
-                container
-                item
-                alignItems="baseline"
-                justify="flex-end"
-                xs={8}
-              >
+          <Paper style={styles.container}>
+            <div style={styles.description}>
+              <Line>
+                <Typography variant="h5">
+                  {guidelines[this.state.indexData].title}
+                </Typography>
+              </Line>
+              <Line>
+                <Typography wrap="true">
+                  {guidelines[this.state.indexData].description}
+                </Typography>
+              </Line>
+              <Line>{imageTutorial}</Line>
+            </div>
+            <Line alignItems="center" justifyContent="space-between">
+              <Line>{closeOrWikipage}</Line>
+              <Line alignItems="center">
                 <Typography style={{ marginRight: 10 }}>
                   {this.state.index + 1} of {this.state.indexMax + 1}
                 </Typography>
@@ -204,10 +186,10 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
                 </Button>
 
                 {nextOrFinish}
-              </Grid>
-            </Grid>
-          </Grid>
-        </Popover>
+              </Line>
+            </Line>
+          </Paper>
+        </Popper>
       </div>
     );
   }

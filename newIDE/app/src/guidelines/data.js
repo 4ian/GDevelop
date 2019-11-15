@@ -7,7 +7,7 @@ export default [
       ' Typically, each different screen of your game is a scene:',
       ' the main menu, the pause menu and the levels are scenes.',
     ],
-    positionBind: 'projectManager',
+    positionBind: 'socialNetwork',
     position: {
       x: 0,
       y: 0,

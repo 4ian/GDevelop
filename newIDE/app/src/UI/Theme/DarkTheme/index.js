@@ -13,6 +13,11 @@ const notSoWhite = '#CCC';
 const gdevelopDarkBlue = '#3c4698';
 const blue = '#2c6bf5';
 
+// Use the fonts provided by the operating system(s) as possible.
+// If you update this font list, be sure to do it in all the other places using fonts in the codebase.
+const fontFamily =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
+
 const systemSelectionColor = '#4c92ff'; //OS X selection
 
 /**
@@ -35,7 +40,7 @@ const gdevelopTheme = {
     separatorColor: '#303030',
   },
   closableTabs: {
-    fontFamily: "'Roboto', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontFamily,
     backgroundColor: backgroundColor,
     textColor: '#878787',
     selectedBackgroundColor: gdevelopDarkBlue,
@@ -77,6 +82,9 @@ const gdevelopTheme = {
 
 // Theme for Material-UI components
 const muiTheme = createMuiTheme({
+  typography: {
+    fontFamily,
+  },
   palette: {
     type: 'dark',
     common: { black: 'rgba(110, 42, 42, 1)', white: '#fff' },

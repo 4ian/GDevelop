@@ -2,7 +2,11 @@
  * It mimics the Material UI Tables style. */
 
 .gd-table-dark-theme {
-  font-family: 'Roboto', '-apple-system', BlinkMacSystemFont, 'sans-serif';
+  /* Use the fonts provided by the operating system(s) as possible. */
+  /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
 .gd-table-dark-theme .tableHeaderRow,

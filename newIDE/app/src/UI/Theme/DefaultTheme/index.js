@@ -101,6 +101,12 @@ const muiTheme = createMuiTheme({
     },
   },
   overrides: {
+    MuiTypography: {
+      h6: {
+        // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
+        fontWeight: 400,
+      },
+    },
     MuiInput: {
       underline: {
         '&:before': {

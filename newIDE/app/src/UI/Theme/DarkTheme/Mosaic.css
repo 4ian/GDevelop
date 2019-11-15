@@ -16,6 +16,7 @@
   color: white !important;
   font-weight: 400 !important;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px; /* Same as ClosableTabs font size */
 }
 
 /* Hovered titlebar background */

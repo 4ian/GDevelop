@@ -25,12 +25,11 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    marginTop: 7,
-    marginBottom: 7,
+    marginTop: 6,
+    marginBottom: 6,
     marginLeft: 10,
     marginRight: 10,
-    textTransform: 'uppercase',
-    fontSize: '13px',
+    fontSize: '15px', // Same as in Mosaic.css (for mosaic-window-title)
   },
   closeButton: {
     marginTop: 7,

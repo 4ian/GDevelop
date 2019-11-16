@@ -13,6 +13,7 @@ import Dialog from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   container: {
@@ -114,13 +115,18 @@ export default class DirectionTools extends Component<Props, State> {
 
     return (
       <div style={styles.container}>
-        {!!imageResourceExternalEditors.length && (
-          <FlatButton
-            label={imageResourceExternalEditors[0].displayName}
-            icon={<Brush />}
-            onClick={() => onEditWith(imageResourceExternalEditors[0])}
-          />
-        )}
+        <ResponsiveWindowMeasurer>
+          {windowWidth =>
+            windowWidth !== 'small' &&
+            !!imageResourceExternalEditors.length && (
+              <FlatButton
+                label={imageResourceExternalEditors[0].displayName}
+                icon={<Brush />}
+                onClick={() => onEditWith(imageResourceExternalEditors[0])}
+              />
+            )
+          }
+        </ResponsiveWindowMeasurer>
         <FlatButton
           label={<Trans>Preview</Trans>}
           icon={<PlayArrow />}

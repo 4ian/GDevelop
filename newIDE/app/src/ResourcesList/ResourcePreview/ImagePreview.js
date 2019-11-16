@@ -25,6 +25,12 @@ const styles = {
     overflow: 'scroll',
     height: 200,
     background: 'url("res/transparentback.png") repeat',
+
+    // The container contains the image and the "overlay" that can display
+    // points or polygons that can be drag'n'dropped. `touch-action` must
+    // be set to `none`, otherwise the (mobile) browser will claim the
+    // `pointermove` event for "native" behavior like panning the page.
+    touchAction: 'none',
   },
   spriteThumbnailImage: {
     position: 'relative',

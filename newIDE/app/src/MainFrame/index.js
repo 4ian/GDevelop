@@ -93,6 +93,7 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import GuidelinePopOver from '../guidelines';
+import GuidelineMarker from '../guidelines/GuidelineMarker';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1814,16 +1815,18 @@ class MainFrame extends React.Component<Props, State> {
             </EmptyMessage>
           )}
         </Drawer>
-        <Toolbar
-          ref={toolbar => (this.toolbar = toolbar)}
-          showProjectIcons={!this.props.integratedEditor}
-          hasProject={!!this.state.currentProject}
-          toggleProjectManager={this.toggleProjectManager}
-          exportProject={() => this.openExportDialog(true)}
-          requestUpdate={this.props.requestUpdate}
-          simulateUpdateDownloaded={this.simulateUpdateDownloaded}
-          simulateUpdateAvailable={this.simulateUpdateAvailable}
-        />
+        <GuidelineMarker identifier="Toolbar">
+          <Toolbar
+            ref={toolbar => (this.toolbar = toolbar)}
+            showProjectIcons={!this.props.integratedEditor}
+            hasProject={!!this.state.currentProject}
+            toggleProjectManager={this.toggleProjectManager}
+            exportProject={() => this.openExportDialog(true)}
+            requestUpdate={this.props.requestUpdate}
+            simulateUpdateDownloaded={this.simulateUpdateDownloaded}
+            simulateUpdateAvailable={this.simulateUpdateAvailable}
+          />
+        </GuidelineMarker>
 
         <ClosableTabs hideLabels={!!this.props.integratedEditor}>
           {getEditors(this.state.editorTabs).map((editorTab, id) => {

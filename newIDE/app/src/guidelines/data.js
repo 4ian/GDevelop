@@ -17,7 +17,7 @@ export default [
     title: 'Launch you game !',
     description: 'Your first game is now finish, you can launch the preview !',
     imageSource: 'res/GD-logo-big.png',
-    positionBind: 'previewButton',
+    positionBind: 'Toolbar',
     position: {
       x: 700,
       y: 100,
@@ -29,7 +29,7 @@ export default [
       'Your first game is now finish You can find more informations',
       'and tutorials on wikipage. \n\n Have fun with GDevelop5!',
     ],
-    positionBind: 'previewButton',
+    positionBind: 'socialNetwork',
     position: {
       x: 0,
       y: 700,

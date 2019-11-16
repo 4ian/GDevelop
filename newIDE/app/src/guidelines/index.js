@@ -12,6 +12,7 @@ import { Line } from '../UI/Grid';
 
 //TODO wrap l'image dans le Paper avec l'overflow hidden
 //Actuellement l'image dépasse du Paper alors qu'il y a une marge autour du Popper
+//Actualisé la position de la Popper.
 
 const styles = {
   container: {
@@ -30,13 +31,13 @@ type State = {|
   index: number,
   indexData: number,
   indexMax: number,
-  //TODO
-  //anchor: HTML node quelque chose (le node qui contient le className/attribut)
-  //https://flow.org/en/docs/react/types/
+  anchor: *,
+  arrowRef: *,
 |};
 
 type Props = {|
   open: boolean,
+  closeHandler: () => void,
 |};
 
 //TODO
@@ -44,39 +45,31 @@ type Props = {|
 //Le bouton restart du tuto ferme le Popper mais le reouvre pas et surtout ne reset pas le Popper a l'index 0...
 
 export default class GuidelinePopOver extends PureComponent<Props, State> {
-  _inputRef = React.createRef();
-
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       open: props.open,
       index: 0,
       indexData: 0,
       indexMax: guidelines.length - 1,
+      anchor: null,
+      arrowRef: null,
     };
   }
 
-  componentWillReceiveProps(newProps) {
-    const element = document.querySelectorAll('.guideline-socialNetwork')[0].getBoundingClientRect();
-    console.log(element);
+  componentWillReceiveProps(newProps: *) {
+    let elementHTML = document.querySelectorAll(
+      '.guideline-' + guidelines[this.state.indexData].positionBind
+    )[0];
+    const element = ReactDOM.findDOMNode(elementHTML);
 
     if (newProps.open !== this.props.open) {
       this.setState({
         open: newProps.open,
-        anchor: this.element,
+        anchor: element,
       });
     }
-    console.log('BOUH--------');
-    //console.log(document.querySelectorAll('.guideline-socialNetwork')[0]);
-    //console.log(document.querySelectorAll('.guideline-socialNetwork'));
-    //console.log(document.getElementsByClassName('guideline-socialNetwork'));
-    //console.log(document.querySelector('[data-guidelines]'));
   }
-
-  //TODO BOUH
-  //Pour next() et back()
-  //Actualise le state anchor avec la valeur de l'attribut où je veux ancré Popper
-  //Valeur a recup dans data.js
 
   next = () => {
     this.setState(currentState => ({
@@ -92,7 +85,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
 
   componentDidMount() {}
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: *, prevState: *) {
     if (this.state.index !== prevState.index) {
       this.setState({ indexData: this.state.index });
     }
@@ -161,9 +154,18 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
     return (
       <div>
         <Popper
-          action={this._inputRef}
           open={open}
           anchorEl={this.state.anchor}
+          placement="bottom"
+          modifiers={{
+            flip: {
+              enabled: true,
+            },
+            preventOverflow: {
+              enabled: true,
+              boundariesElement: 'scrollParent',
+            },
+          }}
         >
           <Paper style={styles.container}>
             <div style={styles.description}>
@@ -192,7 +194,6 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
                 >
                   Back
                 </Button>
-
                 {nextOrFinish}
               </Line>
             </Line>

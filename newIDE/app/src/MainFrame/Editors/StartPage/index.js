@@ -40,11 +40,8 @@ const styles = {
   },
 };
 
-type Props = {|
-  //TODO
-  //not yet used, j'en ai
-  onShowExamples: () => void,
-|};
+//TODO
+//Forcé l'ouverture de onCreate, mais avec l'onglet "example"
 
 class StartPage extends BaseEditor {
   constructor() {

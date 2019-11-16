@@ -16,6 +16,7 @@ import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
 import { getHelpLink } from '../../../Utils/HelpLink';
+import GuidelineMarker from '../../../guidelines/GuidelineMarker';
 
 const styles = {
   innerContainer: {
@@ -239,27 +240,31 @@ class StartPage extends BaseEditor {
                   />
                 </Line>
                 {/*TODO Le className disparait au rendu*/}
-                <Line alignItems="center" className="socialNetwork">
-                  <FlatButton
-                    label={i18n.language}
-                    onClick={onOpenLanguageDialog}
-                    icon={<Language />}
-                  />
-                  <IconButton
-                    className="icon-facebook"
-                    onClick={() =>
-                      Window.openExternalURL(
-                        'https://www.facebook.com/GDevelopApp'
-                      )
-                    }
-                  />
-                  <IconButton
-                    className="icon-twitter"
-                    onClick={() =>
-                      Window.openExternalURL('https://twitter.com/GDevelopApp')
-                    }
-                  />
-                </Line>
+                <GuidelineMarker identifier="socialNetwork">
+                  <Line alignItems="center">
+                    <FlatButton
+                      label={i18n.language}
+                      onClick={onOpenLanguageDialog}
+                      icon={<Language />}
+                    />
+                    <IconButton
+                      className="icon-facebook"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://www.facebook.com/GDevelopApp'
+                        )
+                      }
+                    />
+                    <IconButton
+                      className="icon-twitter"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://twitter.com/GDevelopApp'
+                        )
+                      }
+                    />
+                  </Line>
+                </GuidelineMarker>
               </Line>
             </div>
           </ScrollBackground>

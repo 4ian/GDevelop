@@ -1,4 +1,6 @@
+// @flow
 import React, { PureComponent } from 'react';
+import ReactDOM from 'react-dom';
 import Button from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
 import Paper from '@material-ui/core/Paper';
@@ -10,6 +12,7 @@ import { Line } from '../UI/Grid';
 
 //TODO wrap l'image dans le Paper avec l'overflow hidden
 //Actuellement l'image dépasse du Paper alors qu'il y a une marge autour du Popper
+
 const styles = {
   container: {
     maxWidth: 400,
@@ -29,6 +32,7 @@ type State = {|
   indexMax: number,
   //TODO
   //anchor: HTML node quelque chose (le node qui contient le className/attribut)
+  //https://flow.org/en/docs/react/types/
 |};
 
 type Props = {|
@@ -49,20 +53,24 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
       index: 0,
       indexData: 0,
       indexMax: guidelines.length - 1,
-      anchor: document.getElementsByClassName('socialNetwork'),
     };
   }
 
   componentWillReceiveProps(newProps) {
+    const element = document.querySelectorAll('.guideline-socialNetwork')[0].getBoundingClientRect();
+    console.log(element);
+
     if (newProps.open !== this.props.open) {
       this.setState({
         open: newProps.open,
+        anchor: this.element,
       });
     }
     console.log('BOUH--------');
-    console.log(document.getElementsByClassName('socialNetwork'));
+    //console.log(document.querySelectorAll('.guideline-socialNetwork')[0]);
+    //console.log(document.querySelectorAll('.guideline-socialNetwork'));
+    //console.log(document.getElementsByClassName('guideline-socialNetwork'));
     //console.log(document.querySelector('[data-guidelines]'));
-    //Sa fonctionne pas avec les attibuts en général donc data-guidelines non plus
   }
 
   //TODO BOUH

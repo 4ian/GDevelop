@@ -15,6 +15,7 @@ import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoad
 import EmptyMessage from '../../UI/EmptyMessage';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 
 const gd = global.gd;
 
@@ -34,6 +35,7 @@ const styles = {
     width: 32,
     height: 32,
     marginRight: 8,
+    flexSrink: 0,
   },
 };
 
@@ -130,9 +132,9 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
         {({ i18n }) => (
           <Column>
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
-            <Line alignItems="center">
-              <img src="res/function32.png" alt="" style={styles.icon} />
-              <Column expand>
+            <ResponsiveLineStackLayout alignItems="center">
+              <Line alignItems="center" noMargin>
+                <img src="res/function32.png" alt="" style={styles.icon} />
                 <SelectField
                   value={type}
                   floatingLabelText={<Trans>Function type</Trans>}
@@ -161,24 +163,20 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     primaryText={t`String Expression`}
                   />
                 </SelectField>
-              </Column>
-              <Column expand>
-                <SemiControlledTextField
-                  commitOnBlur
-                  floatingLabelText={
-                    <Trans>Full name displayed in editor</Trans>
-                  }
-                  hintText={getFullNameHintText(type)}
-                  value={eventsFunction.getFullName()}
-                  onChange={text => {
-                    eventsFunction.setFullName(text);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
-                    this.forceUpdate();
-                  }}
-                  fullWidth
-                />
-              </Column>
-            </Line>
+              </Line>
+              <SemiControlledTextField
+                commitOnBlur
+                floatingLabelText={<Trans>Full name displayed in editor</Trans>}
+                hintText={getFullNameHintText(type)}
+                value={eventsFunction.getFullName()}
+                onChange={text => {
+                  eventsFunction.setFullName(text);
+                  if (onConfigurationUpdated) onConfigurationUpdated();
+                  this.forceUpdate();
+                }}
+                fullWidth
+              />
+            </ResponsiveLineStackLayout>
             <Line noMargin>
               <SemiControlledTextField
                 commitOnBlur

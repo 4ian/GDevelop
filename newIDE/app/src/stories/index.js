@@ -1420,58 +1420,6 @@ storiesOf('PropertiesEditor', module)
       ]}
       instances={[{ name: 'instance1' }, { name: 'instance2' }]}
     />
-  ))
-  .add('row (window width = medium)', () => (
-    <PropertiesEditor
-      schema={[
-        {
-          name: 'Position',
-          type: 'row',
-          children: [
-            {
-              name: 'X',
-              valueType: 'number',
-              getValue: instance => 10,
-              setValue: (instance, newValue) => {},
-            },
-            {
-              name: 'Y',
-              valueType: 'number',
-              getValue: instance => 20.1234,
-              setValue: (instance, newValue) => {},
-            },
-          ],
-        },
-      ]}
-      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
-      windowWidth="medium"
-    />
-  ))
-  .add('row (window width = small)', () => (
-    <PropertiesEditor
-      schema={[
-        {
-          name: 'Position',
-          type: 'row',
-          children: [
-            {
-              name: 'X',
-              valueType: 'number',
-              getValue: instance => 10,
-              setValue: (instance, newValue) => {},
-            },
-            {
-              name: 'Y',
-              valueType: 'number',
-              getValue: instance => 20.1234,
-              setValue: (instance, newValue) => {},
-            },
-          ],
-        },
-      ]}
-      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
-      windowWidth="small"
-    />
   ));
 
 storiesOf('ParameterFields', module)

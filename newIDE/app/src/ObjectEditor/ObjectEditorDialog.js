@@ -9,10 +9,7 @@ import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from '../UI/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
-
-import { Column, Line } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import Text from '../UI/Text';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 
 type StateType = {|

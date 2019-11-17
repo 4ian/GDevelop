@@ -7,6 +7,7 @@ import { Line, Column } from '../../UI/Grid';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -54,7 +55,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </Line>
-        <Line>
+        <ResponsiveLineStackLayout>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Top margin</Trans>}
@@ -77,8 +78,8 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-        </Line>
-        <Line>
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Left margin</Trans>}
@@ -101,8 +102,8 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-        </Line>
-        <Line>
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}
@@ -125,7 +126,7 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-        </Line>
+        </ResponsiveLineStackLayout>
       </Column>
     );
   }

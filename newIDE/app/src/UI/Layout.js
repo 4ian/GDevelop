@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { Spacer, Line } from './Grid';
+import { ResponsiveWindowMeasurer } from './Reponsive/ResponsiveWindowMeasurer';
 
 type TextFieldWithButtonLayoutProps = {|
   renderTextField: () => React.Node,
@@ -55,5 +57,53 @@ export const TextFieldWithButtonLayout = ({
           : textFieldWithButtonLayoutStyles.filledTextFieldRightButtonMargins
       )}
     </div>
+  );
+};
+
+type ResponsiveLineStackLayoutProps = {|
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  noMargin?: boolean,
+  children: React.Node,
+|};
+
+export const ResponsiveLineStackLayout = ({
+  alignItems,
+  justifyContent,
+  expand,
+  noMargin,
+  children,
+}: ResponsiveLineStackLayoutProps) => {
+  const count = React.Children.count(children);
+
+  return (
+    <ResponsiveWindowMeasurer>
+      {windowWidth =>
+        windowWidth === 'small' ? (
+          React.Children.map(children, (child, index) => {
+            return <Line expand>{child}</Line>;
+          })
+        ) : (
+          <Line
+            alignItems={alignItems}
+            justifyContent={justifyContent}
+            expand={expand}
+            noMargin={noMargin}
+          >
+            {' '}
+            {React.Children.map(children, (child, index) => {
+              return (
+                <React.Fragment>
+                  {index !== 0 && <Spacer />}
+                  {child}
+                  {index !== count - 1 && <Spacer />}
+                </React.Fragment>
+              );
+            })}
+          </Line>
+        )
+      }
+    </ResponsiveWindowMeasurer>
   );
 };

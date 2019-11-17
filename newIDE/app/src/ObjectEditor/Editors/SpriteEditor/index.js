@@ -33,6 +33,7 @@ import {
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { Column, Line } from '../../../UI/Grid';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 
 const gd = global.gd;
 
@@ -48,9 +49,6 @@ const styles = {
   },
   addAnimation: {
     display: 'flex',
-  },
-  buttonRightMargin: {
-    marginRight: 4,
   },
 };
 
@@ -447,13 +445,12 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           objectName={objectName}
           onSizeUpdated={onSizeUpdated}
           extraBottomTools={
-            <div>
+            <ResponsiveLineStackLayout>
               <RaisedButton
                 label={<Trans>Edit hitboxes</Trans>}
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
-                style={styles.buttonRightMargin}
               />
               <RaisedButton
                 label={<Trans>Edit points</Trans>}
@@ -461,7 +458,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 onClick={() => this.openPointsEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
               />
-            </div>
+            </ResponsiveLineStackLayout>
           }
         />
         {this.state.pointsEditorOpen && (

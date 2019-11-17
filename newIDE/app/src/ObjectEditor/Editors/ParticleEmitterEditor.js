@@ -11,6 +11,7 @@ import ColorField from '../../UI/ColorField';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { type EditorProps } from './EditorProps.flow';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 export default class ParticleEmitterEditor extends React.Component<
@@ -79,34 +80,30 @@ export default class ParticleEmitterEditor extends React.Component<
         )}
         {particleEmitterObject.getRendererType() ===
           gd.ParticleEmitterObject.Line && (
-          <Line>
-            <Column expand noMargin>
-              <SemiControlledTextField
-                commitOnBlur
-                floatingLabelText={<Trans>Lines length</Trans>}
-                fullWidth
-                type="number"
-                value={particleEmitterObject.getRendererParam1()}
-                onChange={value => {
-                  particleEmitterObject.setRendererParam1(parseFloat(value));
-                  this.forceUpdate();
-                }}
-              />
-            </Column>
-            <Column expand noMargin>
-              <SemiControlledTextField
-                commitOnBlur
-                floatingLabelText={<Trans>Lines thickness</Trans>}
-                fullWidth
-                type="number"
-                value={particleEmitterObject.getRendererParam2()}
-                onChange={value => {
-                  particleEmitterObject.setRendererParam2(parseFloat(value));
-                  this.forceUpdate();
-                }}
-              />
-            </Column>
-          </Line>
+          <ResponsiveLineStackLayout>
+            <SemiControlledTextField
+              commitOnBlur
+              floatingLabelText={<Trans>Lines length</Trans>}
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getRendererParam1()}
+              onChange={value => {
+                particleEmitterObject.setRendererParam1(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+            <SemiControlledTextField
+              commitOnBlur
+              floatingLabelText={<Trans>Lines thickness</Trans>}
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getRendererParam2()}
+              onChange={value => {
+                particleEmitterObject.setRendererParam2(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </ResponsiveLineStackLayout>
         )}
         {particleEmitterObject.getRendererType() ===
           gd.ParticleEmitterObject.Quad && (
@@ -126,41 +123,37 @@ export default class ParticleEmitterEditor extends React.Component<
                 floatingLabelText={<Trans>Select an image</Trans>}
               />
             </Line>
-            <Line>
-              <Column expand noMargin>
-                <SemiControlledTextField
-                  commitOnBlur
-                  floatingLabelText={<Trans>Particles start width</Trans>}
-                  fullWidth
-                  type="number"
-                  value={particleEmitterObject.getRendererParam1()}
-                  onChange={value => {
-                    particleEmitterObject.setRendererParam1(
-                      Math.max(0, parseFloat(value))
-                    );
-                    this.forceUpdate();
-                  }}
-                />
-              </Column>
-              <Column expand noMargin>
-                <SemiControlledTextField
-                  commitOnBlur
-                  floatingLabelText={<Trans>Particles start height</Trans>}
-                  fullWidth
-                  type="number"
-                  value={particleEmitterObject.getRendererParam2()}
-                  onChange={value => {
-                    particleEmitterObject.setRendererParam2(
-                      Math.max(0, parseFloat(value))
-                    );
-                    this.forceUpdate();
-                  }}
-                />
-              </Column>
-            </Line>
+            <ResponsiveLineStackLayout>
+              <SemiControlledTextField
+                commitOnBlur
+                floatingLabelText={<Trans>Particles start width</Trans>}
+                fullWidth
+                type="number"
+                value={particleEmitterObject.getRendererParam1()}
+                onChange={value => {
+                  particleEmitterObject.setRendererParam1(
+                    Math.max(0, parseFloat(value))
+                  );
+                  this.forceUpdate();
+                }}
+              />
+              <SemiControlledTextField
+                commitOnBlur
+                floatingLabelText={<Trans>Particles start height</Trans>}
+                fullWidth
+                type="number"
+                value={particleEmitterObject.getRendererParam2()}
+                onChange={value => {
+                  particleEmitterObject.setRendererParam2(
+                    Math.max(0, parseFloat(value))
+                  );
+                  this.forceUpdate();
+                }}
+              />
+            </ResponsiveLineStackLayout>
           </React.Fragment>
         )}
-        <Line>
+        <ResponsiveLineStackLayout>
           <ColorField
             floatingLabelText={<Trans>Particles start color</Trans>}
             disableAlpha
@@ -190,8 +183,8 @@ export default class ParticleEmitterEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-        </Line>
-        <Line>
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
           <ColorField
             floatingLabelText={<Trans>Particles end color</Trans>}
             disableAlpha
@@ -221,7 +214,7 @@ export default class ParticleEmitterEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-        </Line>
+        </ResponsiveLineStackLayout>
         <Line>
           <Checkbox
             label={<Trans>Additive rendering</Trans>}
@@ -243,151 +236,129 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Maximum number of particles displayed</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getMaxParticleNb()}
-              onChange={value => {
-                particleEmitterObject.setMaxParticleNb(
-                  parseInt(value, 10) || 0
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Number of particles in tank (-1 for infinite)</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getTank()}
-              onChange={value => {
-                particleEmitterObject.setTank(parseInt(value, 10) || 0);
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Flow of particles (particles/seconds)</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getFlow()}
-              onChange={value => {
-                particleEmitterObject.setFlow(parseInt(value, 10) || 0);
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Minimum emitter force applied on particles</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getEmitterForceMin()}
-              onChange={value => {
-                particleEmitterObject.setEmitterForceMin(
-                  parseInt(value, 10) || 0
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Maximum emitter force applied on particles</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getEmitterForceMax()}
-              onChange={value => {
-                particleEmitterObject.setEmitterForceMax(
-                  parseInt(value, 10) || 0
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={<Trans>Spray cone angle (in degrees)</Trans>}
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getConeSprayAngle()}
-              onChange={value => {
-                particleEmitterObject.setConeSprayAngle(
-                  parseInt(value, 10) || 0
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={<Trans>Radius of the emitter</Trans>}
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getZoneRadius()}
-              onChange={value => {
-                particleEmitterObject.setZoneRadius(parseInt(value, 10) || 0);
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={<Trans>Gravity on particles on X axis</Trans>}
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleGravityX()}
-              onChange={value => {
-                particleEmitterObject.setParticleGravityX(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={<Trans>Gravity on particles on Y axis</Trans>}
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleGravityY()}
-              onChange={value => {
-                particleEmitterObject.setParticleGravityY(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Maximum number of particles displayed</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getMaxParticleNb()}
+            onChange={value => {
+              particleEmitterObject.setMaxParticleNb(parseInt(value, 10) || 0);
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Number of particles in tank (-1 for infinite)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getTank()}
+            onChange={value => {
+              particleEmitterObject.setTank(parseInt(value, 10) || 0);
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Flow of particles (particles/seconds)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getFlow()}
+            onChange={value => {
+              particleEmitterObject.setFlow(parseInt(value, 10) || 0);
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Minimum emitter force applied on particles</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getEmitterForceMin()}
+            onChange={value => {
+              particleEmitterObject.setEmitterForceMin(
+                parseInt(value, 10) || 0
+              );
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Maximum emitter force applied on particles</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getEmitterForceMax()}
+            onChange={value => {
+              particleEmitterObject.setEmitterForceMax(
+                parseInt(value, 10) || 0
+              );
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={<Trans>Spray cone angle (in degrees)</Trans>}
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getConeSprayAngle()}
+            onChange={value => {
+              particleEmitterObject.setConeSprayAngle(parseInt(value, 10) || 0);
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={<Trans>Radius of the emitter</Trans>}
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getZoneRadius()}
+            onChange={value => {
+              particleEmitterObject.setZoneRadius(parseInt(value, 10) || 0);
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={<Trans>Gravity on particles on X axis</Trans>}
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleGravityX()}
+            onChange={value => {
+              particleEmitterObject.setParticleGravityX(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={<Trans>Gravity on particles on Y axis</Trans>}
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleGravityY()}
+            onChange={value => {
+              particleEmitterObject.setParticleGravityY(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
         <Line>
           <Column expand noMargin>
             <SemiControlledTextField
@@ -403,100 +374,86 @@ export default class ParticleEmitterEditor extends React.Component<
             />
           </Column>
         </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Particle minimum lifetime (in seconds)</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleLifeTimeMin()}
-              onChange={value => {
-                particleEmitterObject.setParticleLifeTimeMin(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Particle maximum lifetime (in seconds)</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleLifeTimeMax()}
-              onChange={value => {
-                particleEmitterObject.setParticleLifeTimeMax(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Particle start size (in percents)</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleSize1()}
-              onChange={value => {
-                particleEmitterObject.setParticleSize1(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={<Trans>Particle end size (in percents)</Trans>}
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleSize2()}
-              onChange={value => {
-                particleEmitterObject.setParticleSize2(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Particle minimum rotation speed (degrees/second)</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleAngle1()}
-              onChange={value => {
-                particleEmitterObject.setParticleAngle1(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand noMargin>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Particle maximum rotation speed (degrees/second)</Trans>
-              }
-              fullWidth
-              type="number"
-              value={particleEmitterObject.getParticleAngle2()}
-              onChange={value => {
-                particleEmitterObject.setParticleAngle2(parseFloat(value));
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Particle minimum lifetime (in seconds)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleLifeTimeMin()}
+            onChange={value => {
+              particleEmitterObject.setParticleLifeTimeMin(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Particle maximum lifetime (in seconds)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleLifeTimeMax()}
+            onChange={value => {
+              particleEmitterObject.setParticleLifeTimeMax(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={<Trans>Particle start size (in percents)</Trans>}
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleSize1()}
+            onChange={value => {
+              particleEmitterObject.setParticleSize1(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={<Trans>Particle end size (in percents)</Trans>}
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleSize2()}
+            onChange={value => {
+              particleEmitterObject.setParticleSize2(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Particle minimum rotation speed (degrees/second)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleAngle1()}
+            onChange={value => {
+              particleEmitterObject.setParticleAngle1(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Particle maximum rotation speed (degrees/second)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleAngle2()}
+            onChange={value => {
+              particleEmitterObject.setParticleAngle2(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
       </Column>
     );
   }

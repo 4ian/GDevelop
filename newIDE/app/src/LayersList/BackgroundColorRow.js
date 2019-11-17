@@ -24,7 +24,7 @@ export default ({ layout, onBackgroundColorChanged }: Props) => (
       >
         <TableRowColumn style={styles.handleColumn} />
         <TableRowColumn>
-          <TextField hintText={t`Background color`} disabled />
+          <TextField hintText={t`Background color`} margin="none" disabled />
         </TableRowColumn>
         <TableRowColumn style={styles.effectsColumn}>
           <ColorPicker

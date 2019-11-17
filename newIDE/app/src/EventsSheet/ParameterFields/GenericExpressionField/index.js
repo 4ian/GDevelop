@@ -22,6 +22,16 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Paper from '@material-ui/core/Paper';
 const gd = global.gd;
 
+export const textFieldRightButtonMargins = {
+  marginTop: 17, //Properly align with the text field
+  marginLeft: 10,
+};
+
+export const textFieldWithLabelRightButtonMargins = {
+  marginTop: 33, //Properly align with the text field
+  marginLeft: 10,
+};
+
 const styles = {
   container: {
     display: 'flex',
@@ -47,14 +57,6 @@ const styles = {
   },
   backgroundHighlightingWithDescription: {
     marginTop: 38, //Properly align with the text field
-  },
-  functionsButton: {
-    marginTop: 17, //Properly align with the text field
-    marginLeft: 10,
-  },
-  functionsButtonWithDescription: {
-    marginTop: 33, //Properly align with the text field
-    marginLeft: 10,
   },
 };
 
@@ -312,8 +314,8 @@ export default class ExpressionField extends React.Component<Props, State> {
           this.props.renderExtraButton &&
           this.props.renderExtraButton({
             style: description
-              ? styles.functionsButtonWithDescription
-              : styles.functionsButton,
+              ? textFieldWithLabelRightButtonMargins
+              : textFieldRightButtonMargins,
           })}
         {!this.props.isInline && (
           <RaisedButton
@@ -328,8 +330,8 @@ export default class ExpressionField extends React.Component<Props, State> {
             primary
             style={
               description
-                ? styles.functionsButtonWithDescription
-                : styles.functionsButton
+                ? textFieldWithLabelRightButtonMargins
+                : textFieldRightButtonMargins
             }
             onClick={this._openExpressionPopover}
           />

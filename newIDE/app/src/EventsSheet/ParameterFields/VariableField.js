@@ -7,14 +7,15 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
 import { icon } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import {
+  textFieldRightButtonMargins,
+  textFieldWithLabelRightButtonMargins,
+} from './GenericExpressionField';
 
 const styles = {
   container: {
     display: 'flex',
-    alignItems: 'baseline',
-  },
-  moreButton: {
-    marginLeft: 10,
+    alignItems: 'flex-start',
   },
 };
 
@@ -41,12 +42,14 @@ export default class VariableField extends Component<Props, {||}> {
       variablesContainer,
     } = this.props;
 
+    const description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
+
     return (
       <div style={styles.container}>
         <SemiControlledAutoComplete
-          floatingLabelText={
-            parameterMetadata ? parameterMetadata.getDescription() : undefined
-          }
+          floatingLabelText={description}
           fullWidth
           value={value}
           onChange={onChange}
@@ -64,7 +67,11 @@ export default class VariableField extends Component<Props, {||}> {
             icon={<OpenInNew />}
             disabled={!this.props.variablesContainer}
             primary
-            style={styles.moreButton}
+            style={
+              description
+                ? textFieldWithLabelRightButtonMargins
+                : textFieldRightButtonMargins
+            }
             onClick={onOpenDialog}
           />
         )}

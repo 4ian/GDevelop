@@ -12,7 +12,6 @@ import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
 import OpenInNew from '@material-ui/icons/OpenInNew';
-import Subheader from '../../UI/Subheader';
 import Text from '../../UI/Text';
 
 type Props = {|

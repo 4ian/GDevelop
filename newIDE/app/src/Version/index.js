@@ -7,4 +7,5 @@ const gdCoreVersionString: string = gd
   : 'Unknown';
 
 export const getIDEVersion = (): string => VersionMetadata.version;
+export const getIDEVersionWithHash = (): string => VersionMetadata.versionWithHash;
 export const getGDCoreVersion = (): string => gdCoreVersionString;

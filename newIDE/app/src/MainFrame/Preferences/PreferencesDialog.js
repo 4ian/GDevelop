@@ -112,12 +112,14 @@ export default class PreferencesDialog extends Component<Props, State> {
                 </ResponsiveLineStackLayout>
                 <Line noMargin>
                   <Text>
-                    You can contribute and create your own themes:{' '}
-                    <FlatButton
-                      label={<Trans>Learn more</Trans>}
-                      onClick={this.createTheme}
-                    />{' '}
+                    <Trans>
+                      You can contribute and create your own themes:{' '}
+                    </Trans>
                   </Text>
+                  <FlatButton
+                    label={<Trans>Learn more</Trans>}
+                    onClick={this.createTheme}
+                  />
                 </Line>
                 <Line>
                   <Toggle

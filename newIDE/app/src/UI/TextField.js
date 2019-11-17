@@ -72,7 +72,7 @@ type Props = {|
   rowsMax?: number,
 
   // Styling:
-  margin?: 'none' | 'normal',
+  margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
     fontSize?: 18,
@@ -128,6 +128,7 @@ export default class TextField extends React.Component<Props, {||}> {
       <I18n>
         {({ i18n }) => (
           <MUITextField
+            variant={props.margin === 'none' ? 'standard' : 'filled'}
             // Value and change handling:
             type={props.type !== undefined ? props.type : undefined}
             value={props.value !== undefined ? props.value : undefined}
@@ -157,7 +158,7 @@ export default class TextField extends React.Component<Props, {||}> {
             rows={props.rows}
             rowsMax={props.rowsMax}
             // Styling:
-            margin={props.margin || 'normal'}
+            margin={props.margin || 'dense'}
             fullWidth={props.fullWidth}
             InputProps={{
               disableUnderline:

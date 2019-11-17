@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
   ResponsiveWindowMeasurer,
@@ -13,13 +14,14 @@ import FlatButton from '../UI/FlatButton';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
-import IconButton from '../UI/IconButton';
 import {
   type ResourceKind,
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { TextFieldWithButtonLayout } from '../UI/Layout';
+import RaisedButton from '../UI/RaisedButton';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -216,32 +218,39 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     } else {
       const { onEditButtonClick, setValue } = field;
       return (
-        <div style={styles.fieldContainer} key={field.name}>
-          <SemiControlledTextField
-            value={getFieldValue(
-              this.props.instances,
-              field,
-              '(Multiple values)'
-            )}
-            id={field.name}
-            floatingLabelText={getFieldLabel(this.props.instances, field)}
-            floatingLabelFixed
-            onChange={newValue => {
-              this.props.instances.forEach(i => setValue(i, newValue || ''));
-              this._onInstancesModified(this.props.instances);
-            }}
-            style={styles.field}
-            disabled={field.disabled}
-          />
-          {onEditButtonClick && (
-            <IconButton
-              disabled={this.props.instances.length !== 1}
-              onClick={() => onEditButtonClick(this.props.instances[0])}
-            >
-              <Edit />
-            </IconButton>
+        <TextFieldWithButtonLayout
+          key={field.name}
+          renderTextField={() => (
+            <SemiControlledTextField
+              value={getFieldValue(
+                this.props.instances,
+                field,
+                '(Multiple values)'
+              )}
+              id={field.name}
+              floatingLabelText={getFieldLabel(this.props.instances, field)}
+              floatingLabelFixed
+              onChange={newValue => {
+                this.props.instances.forEach(i => setValue(i, newValue || ''));
+                this._onInstancesModified(this.props.instances);
+              }}
+              style={styles.field}
+              disabled={field.disabled}
+            />
           )}
-        </div>
+          renderButton={style =>
+            onEditButtonClick ? (
+              <RaisedButton
+                style={style}
+                primary
+                disabled={this.props.instances.length !== 1}
+                icon={<Edit />}
+                label={<Trans>Edit</Trans>}
+                onClick={() => onEditButtonClick(this.props.instances[0])}
+              />
+            ) : null
+          }
+        />
       );
     }
   };

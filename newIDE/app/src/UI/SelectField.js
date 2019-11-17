@@ -76,7 +76,8 @@ export default class SelectField extends React.Component<Props, {||}> {
         {({ i18n }) => (
           <TextField
             select
-            margin={props.margin || 'normal'}
+            variant={props.margin === 'none' ? 'standard' : 'filled'}
+            margin={props.margin || 'dense'}
             disabled={props.disabled}
             fullWidth={props.fullWidth}
             label={props.floatingLabelText}

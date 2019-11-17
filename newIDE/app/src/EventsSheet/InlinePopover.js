@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Popper from '@material-ui/core/Popper';
 import Background from '../UI/Background';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 
 const styles = {
   popover: {
@@ -20,9 +20,6 @@ const styles = {
     // then. Only one InlinePopover should be shown at a time anyway.
     zIndex: 2,
   },
-  contentContainer: {
-    overflow: 'hidden',
-  },
 };
 
 export default class InlinePopover extends Component {
@@ -36,8 +33,10 @@ export default class InlinePopover extends Component {
           placement="bottom"
         >
           <Background>
-            <Column>
-              <div style={styles.contentContainer}>{this.props.children}</div>
+            <Column expand>
+              <Line>
+                {this.props.children}
+              </Line>
             </Column>
           </Background>
         </Popper>

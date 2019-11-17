@@ -29,7 +29,11 @@ type Props = {|
     transform?: string,
     transition?: string,
     opacity?: number,
+    margin?: number,
     marginRight?: number,
+    marginLeft?: number,
+    marginTop?: number,
+    marginBottom?: number,
   |},
   size?: 'small',
 

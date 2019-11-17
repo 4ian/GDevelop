@@ -147,7 +147,7 @@ import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import NewObjectDialog from '../ObjectsList/NewObjectDialog';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
@@ -162,6 +162,16 @@ import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvid
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
+import RaisedButton from '../UI/RaisedButton';
+import Text from '../UI/Text';
+import ToolbarIcon from '../UI/ToolbarIcon';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import IconButton from '../UI/IconButton';
+import FilterList from '@material-ui/icons/FilterList';
+import Brush from '@material-ui/icons/Brush';
+import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import fakeResourceExternalEditors from './FakeResourceExternalEditors';
+import { TextFieldWithButtonLayout } from '../UI/Layout';
 
 // No i18n in this file
 
@@ -194,9 +204,116 @@ const {
 
 const Placeholder = () => <div>Placeholder component</div>;
 
+const buildFakeMenuTemplate = () => [
+  {
+    label: 'Option 1',
+    click: action('click option 1'),
+  },
+  { type: 'separator' },
+  {
+    label: 'Option 2',
+    click: action('click option 2'),
+  },
+];
+
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
 ));
+
+storiesOf('UI Building Blocks/Buttons', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Column>
+      <Line>
+        <Text>Buttons:</Text>
+      </Line>
+      <Line>
+        <RaisedButton label="Raised button" onClick={action('onClick')} />
+        <RaisedButton
+          label="Primary Raised button"
+          primary
+          onClick={action('onClick')}
+        />
+      </Line>
+      <Line>
+        <FlatButton label="Flat button" onClick={action('onClick')} />
+        <FlatButton
+          label="Primary Flat button"
+          primary
+          onClick={action('onClick')}
+        />
+      </Line>
+      <Line>
+        <Text>Buttons with menus:</Text>
+      </Line>
+      <Line>
+        <RaisedButton
+          label="Traditional Raised button"
+          onClick={action('onClick')}
+        />
+        <RaisedButtonWithMenu
+          label="Button with menu"
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithMenu
+          label="... and with icon"
+          icon={<Brush />}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
+        <Text>Icons with menu:</Text>
+      </Line>
+      <Line>
+        <ElementWithMenu
+          element={
+            <ToolbarIcon
+              src="res/ribbon_default/bug32.png"
+              tooltip={'ToolbarIcon with menu'}
+            />
+          }
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <ElementWithMenu
+          element={
+            <IconButton>
+              <FilterList />
+            </IconButton>
+          }
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
+        <Text>In a mini toolbar:</Text>
+      </Line>
+      <Line>
+        <MiniToolbar>
+          <MiniToolbarText>Some text:</MiniToolbarText>
+          <IconButton>
+            <Brush />
+          </IconButton>
+          <ElementWithMenu
+            element={
+              <IconButton>
+                <FilterList />
+              </IconButton>
+            }
+            buildMenuTemplate={() => [
+              {
+                label: 'Option 1',
+                click: action('click option 1'),
+              },
+              { type: 'separator' },
+              {
+                label: 'Option 2',
+                click: action('click option 2'),
+              },
+            ]}
+          />
+        </MiniToolbar>
+      </Line>
+    </Column>
+  ));
 
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
@@ -255,6 +372,25 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
           <p>
             State value is {value} ({typeof value})
           </p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('reduced margin, in a MiniToolbar', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <MiniToolbar>
+            <MiniToolbarText>Please enter something:</MiniToolbarText>
+            <SemiControlledTextField
+              margin="none"
+              value={value}
+              onChange={onChange}
+              commitOnBlur
+            />
+          </MiniToolbar>
+          <p>State value is {value}</p>
         </React.Fragment>
       )}
     />
@@ -445,6 +581,218 @@ storiesOf('UI Building Blocks/SearchBar', module)
           click: () => {},
         },
       ]}
+    />
+  ));
+
+storiesOf('UI Building Blocks/Layout', module)
+  .addDecorator(muiDecorator)
+  .add('Empty text field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello world"
+          value=""
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty text field, margin=none', () => (
+    <TextFieldWithButtonLayout
+      margin="none"
+      renderTextField={() => (
+        <SemiControlledTextField
+          margin="none"
+          floatingLabelText="Hello world"
+          value=""
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          floatingLabelText="Hello world"
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field, noFloatingLabelText', () => (
+    <TextFieldWithButtonLayout
+      noFloatingLabelText
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field, margin=none', () => (
+    <TextFieldWithButtonLayout
+      margin="none"
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          margin="none"
+          floatingLabelText="Hello world"
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field, margin=none, noFloatingLabelText', () => (
+    <TextFieldWithButtonLayout
+      margin="none"
+      noFloatingLabelText
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          margin="none"
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field, margin=none, noFloatingLabelText, with a small IconButton', () => (
+    <TextFieldWithButtonLayout
+      margin="none"
+      noFloatingLabelText
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          margin="none"
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <IconButton size="small">
+          <Brush />
+        </IconButton>
+      )}
+    />
+  ))
+  .add('Filled text field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello"
+          value="123"
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled text field, full width', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello"
+          value="123"
+          onChange={() => {}}
+          fullWidth
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled multiline text field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello"
+          multiLine
+          value={'123\n456\n789\nblablabla bla bla'}
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled auto complete field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          floatingLabelText="Hello world"
+          value={'Choice 5'}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled auto complete field, full width', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          floatingLabelText="Hello world"
+          value={'Choice 5'}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+          fullWidth
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
     />
   ));
 
@@ -1143,7 +1491,7 @@ storiesOf('ParameterFields', module)
           parameterRenderingService={ParameterRenderingService}
           resourceSources={[]}
           onChooseResource={() => Promise.reject('unimplemented')}
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
         />
       )}
     />
@@ -2028,7 +2376,7 @@ storiesOf('EventsSheet', module)
           onChooseResource={source =>
             action('Choose resource from source', source)
           }
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
@@ -2056,7 +2404,7 @@ storiesOf('EventsSheet', module)
           onChooseResource={source =>
             action('Choose resource from source', source)
           }
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
@@ -2239,7 +2587,7 @@ storiesOf('InstructionEditor', module)
         objectsContainer={testLayout}
         isCondition
         instruction={testInstruction}
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
         onChooseResource={() => {
           action('onChooseResource');
           return Promise.reject();
@@ -2258,7 +2606,7 @@ storiesOf('InstructionEditor', module)
         objectsContainer={testLayout}
         isCondition
         instruction={testInstruction}
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
         onChooseResource={() => {
           action('onChooseResource');
           return Promise.reject();
@@ -2282,7 +2630,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testInstruction}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
         action('onChooseResource');
         return Promise.reject();
@@ -2303,7 +2651,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testInstruction}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
         action('onChooseResource');
         return Promise.reject();
@@ -2324,7 +2672,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={true}
       instruction={testInstruction}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
         action('onChooseResource');
         return Promise.reject();
@@ -2348,7 +2696,7 @@ storiesOf('TextEditor', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ));
@@ -2365,7 +2713,7 @@ storiesOf('TiledSpriteEditor', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ));
@@ -2382,7 +2730,7 @@ storiesOf('PanelSpriteEditor', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ));
@@ -2399,7 +2747,7 @@ storiesOf('SpriteEditor and related editors', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ))
@@ -2996,7 +3344,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       initialResourceName="resource-that-does-not-exists-in-the-project"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -3008,7 +3356,20 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      initialResourceName="icon128.png"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource, no margin', () => (
+    <ResourceSelector
+      margin="none"
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
       initialResourceName="icon128.png"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -3020,7 +3381,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       resourceName="icon128.png"
       onChange={action('on change')}
     />
@@ -3031,8 +3392,35 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       initialResourceName="fake-audio1.mp3"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('font resource, with reset button', () => (
+    <ResourceSelector
+      canBeReset
+      resourceKind="font"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      initialResourceName="font.otf"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('font resource, no margin, with reset button', () => (
+    <ResourceSelector
+      canBeReset
+      margin="none"
+      resourceKind="font"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      initialResourceName="font.otf"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
     />
@@ -3139,7 +3527,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           onChooseResource={source =>
             action('Choose resource from source', source)
           }
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
           openInstructionOrExpression={action('open instruction or expression')}
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}

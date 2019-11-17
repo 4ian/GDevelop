@@ -41,6 +41,15 @@ const styles = {
 };
 
 const validateParameterName = (i18n: I18nType, newName: string) => {
+  if (!newName) {
+    showWarningBox(
+      i18n._(
+        t`The name of a parameter can not be empty. Enter a name for the parameter or you won't be able to use it.`
+      )
+    );
+    return false;
+  }
+
   if (!gd.Project.validateObjectName(newName)) {
     showWarningBox(
       i18n._(
@@ -131,7 +140,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           <SemiControlledTextField
                             commitOnBlur
                             margin="none"
-                            hintText={t`Enter the parameter name`}
+                            hintText={t`Enter the parameter name (mandatory)`}
                             value={parameter.getName()}
                             onChange={text => {
                               if (!validateParameterName(i18n, text)) return;
@@ -141,13 +150,6 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               this.props.onParametersUpdated();
                             }}
                             disabled={isParameterDisabled(i)}
-                            errorText={
-                              parameter.getName() ? null : (
-                                <Trans>
-                                  Name of the parameter is mandatory.
-                                </Trans>
-                              )
-                            }
                             fullWidth
                           />
                         </Column>

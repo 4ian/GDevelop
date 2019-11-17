@@ -90,6 +90,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             style={styles.checkbox}
           />
           <ResourceSelector
+            margin="none"
             project={project}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
@@ -110,6 +111,8 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           <Column expand>
             <Line>
               <SemiControlledTextField
+                floatingLabelText={<Trans>Initial text to display</Trans>}
+                floatingLabelFixed
                 commitOnBlur
                 hintText={t`Enter the text to be displayed by the object`}
                 fullWidth

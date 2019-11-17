@@ -6,7 +6,6 @@ import React, { PureComponent } from 'react';
 import Background from '../UI/Background';
 import TextField from '../UI/TextField';
 import { Line, Column, Spacer } from '../UI/Grid';
-import FlatButton from '../UI/FlatButton';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';
@@ -16,6 +15,7 @@ import {
   type SearchInEventsInputs,
   type ReplaceInEventsInputs,
 } from './EventsSearcher';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -104,15 +104,17 @@ export default class SearchPanel extends PureComponent<Props, State> {
         <Column>
           <Line alignItems="baseline">
             <TextField
+              margin="none"
               ref={_searchTextField =>
                 (this.searchTextField = _searchTextField)
               }
-              hintText={t`Text to search`}
+              hintText={t`Text to search in parameters`}
               onChange={(e, searchText) => this.setState({ searchText })}
               value={searchText}
               fullWidth
             />
-            <FlatButton
+            <Spacer />
+            <RaisedButton
               disabled={!searchText}
               primary
               label={<Trans>Search</Trans>}
@@ -121,12 +123,14 @@ export default class SearchPanel extends PureComponent<Props, State> {
           </Line>
           <Line alignItems="baseline">
             <TextField
-              hintText={t`Text to replace`}
+              margin="none"
+              hintText={t`Text to replace in parameters`}
               onChange={(e, replaceText) => this.setState({ replaceText })}
               value={replaceText}
               fullWidth
             />
-            <FlatButton
+            <Spacer />
+            <RaisedButton
               disabled={
                 !replaceText ||
                 !searchText ||

@@ -1,12 +1,10 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import IconButton from '../UI/IconButton';
 import SemiControlledAutoComplete, {
   type DataSource,
 } from '../UI/SemiControlledAutoComplete';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import { Line } from '../UI/Grid';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import Add from '@material-ui/icons/Add';
 import Brush from '@material-ui/icons/Brush';
@@ -19,6 +17,9 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import { TextFieldWithButtonLayout } from '../UI/Layout';
+import IconButton from '../UI/IconButton';
 
 type Props = {|
   project: gdProject,
@@ -33,17 +34,13 @@ type Props = {|
   onChange: string => void,
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
-  margin?: 'none' | 'normal',
+  margin?: 'none' | 'dense',
 |};
 
 type State = {|
   notExistingError: boolean,
   resourceName: string,
 |};
-
-const styles = {
-  container: { display: 'flex', flex: 1, alignItems: 'flex-end' },
-};
 
 export default class ResourceSelector extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -259,8 +256,10 @@ export default class ResourceSelector extends React.Component<Props, State> {
       externalEditor => externalEditor.kind === this.props.resourceKind
     );
     return (
-      <div style={styles.container}>
-        <Line nomargin expand>
+      <TextFieldWithButtonLayout
+        noFloatingLabelText={!this.props.floatingLabelText}
+        margin={this.props.margin}
+        renderTextField={() => (
           <SemiControlledAutoComplete
             floatingLabelText={this.props.floatingLabelText}
             hintText={this.props.hintText}
@@ -273,32 +272,42 @@ export default class ResourceSelector extends React.Component<Props, State> {
             margin={this.props.margin}
             ref={autoComplete => (this._autoComplete = autoComplete)}
           />
-          {this.props.canBeReset && (
-            <IconButton
-              onClick={() => {
-                this._onResetResourceName();
-              }}
-            >
-              <BackspaceIcon />
-            </IconButton>
-          )}
-          {!!externalEditors.length && (
-            <ElementWithMenu
-              element={
-                <IconButton>
-                  <Brush />
-                </IconButton>
-              }
-              buildMenuTemplate={() =>
-                externalEditors.map(externalEditor => ({
-                  label: externalEditor.displayName,
-                  click: () => this._editWith(externalEditor),
-                }))
-              }
-            />
-          )}
-        </Line>
-      </div>
+        )}
+        renderButton={style => (
+          <React.Fragment>
+            {this.props.canBeReset && (
+             <IconButton
+                size="small"
+               onClick={() => {
+                 this._onResetResourceName();
+               }}
+             >
+               <BackspaceIcon />
+             </IconButton>
+            )}
+            {!!externalEditors.length ? (
+              <RaisedButtonWithMenu
+                style={style}
+                icon={<Brush />}
+                label={
+                  this.state.resourceName ? (
+                    <Trans>Edit</Trans>
+                  ) : (
+                    <Trans>Create</Trans>
+                  )
+                }
+                primary
+                buildMenuTemplate={() =>
+                  externalEditors.map(externalEditor => ({
+                    label: externalEditor.displayName,
+                    click: () => this._editWith(externalEditor),
+                  }))
+                }
+              />
+            ) : null}
+          </React.Fragment>
+        )}
+      />
     );
   }
 }

@@ -13,6 +13,7 @@ import { withSerializableObject } from '../Utils/SerializableObjectEditorContain
 import { Column, Line } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Text from '../UI/Text';
+import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 
 type StateType = {|
   currentTab: string,
@@ -83,25 +84,25 @@ export class ObjectEditorDialog extends Component<*, StateType> {
           </div>
         }
       >
-        <Line alignItems="baseline">
-          <Column>
-            <Text noShrink>Object Name:</Text>
-          </Column>
-          <Column expand>
-            <SemiControlledTextField
-              fullWidth
-              commitOnBlur
-              margin="none"
-              value={this.state.newObjectName}
-              hintText={t`Object Name`}
-              onChange={text => {
-                if (this.props.canRenameObject(text)) {
-                  this.setState({ newObjectName: text });
-                }
-              }}
-            />
-          </Column>
-        </Line>
+        <MiniToolbar alignItems="baseline">
+          <MiniToolbarText>
+            <Trans>Object Name:</Trans>
+          </MiniToolbarText>
+          <SemiControlledTextField
+            fullWidth
+            commitOnBlur
+            margin="none"
+            value={this.state.newObjectName}
+            hintText={t`Object Name`}
+            onChange={text => {
+              if (text === this.state.newObjectName) return;
+
+              if (this.props.canRenameObject(text)) {
+                this.setState({ newObjectName: text });
+              }
+            }}
+          />
+        </MiniToolbar>
         {currentTab === 'properties' && EditorComponent && (
           <EditorComponent
             object={this.props.object}

@@ -164,6 +164,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               key="help"
             />,
           ]}
+          title={<Trans>Project properties</Trans>}
           open={this.props.open}
           onRequestClose={this.props.onClose}
         >

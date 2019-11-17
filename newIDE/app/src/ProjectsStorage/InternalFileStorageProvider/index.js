@@ -2,6 +2,10 @@
 import { t } from '@lingui/macro';
 import { type StorageProvider, type FileMetadata } from '../index';
 import internalExampleFiles from './InternalExampleFiles';
+import {
+  POSITIONAL_ARGUMENTS_KEY,
+  type AppArguments,
+} from '../../Utils/Window';
 
 /**
  * "Internal" storage giving access to embedded examples.
@@ -12,6 +16,14 @@ export default ({
   name: t`Internal files`,
   hiddenInOpenDialog: true,
   hiddenInSaveDialog: true,
+  getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
+    if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
+    if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;
+
+    return {
+      fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
+    };
+  },
   createOperations: ({ setDialog, closeDialog }) => ({
     onOpen: (fileMetadata: FileMetadata) => {
       const url = fileMetadata.fileIdentifier;

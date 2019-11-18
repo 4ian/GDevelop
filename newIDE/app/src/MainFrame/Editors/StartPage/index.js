@@ -15,7 +15,6 @@ import EducationTutorialImage from './EducationTutorialImage';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
-import { getHelpLink } from '../../../Utils/HelpLink';
 import GuidelineMarker from '../../../guidelines/GuidelineMarker';
 
 const styles = {
@@ -40,9 +39,6 @@ const styles = {
   },
 };
 
-//TODO
-//Forcé l'ouverture de onCreate, mais avec l'onglet "example"
-
 class StartPage extends BaseEditor {
   constructor() {
     super();
@@ -60,12 +56,21 @@ class StartPage extends BaseEditor {
     if (this.props.setToolbar) this.props.setToolbar(null);
   }
 
+  onCreateOpenByTabName = (
+    open: boolean = true,
+    tabName: string = this.state.createDialogInitialTab
+  ) => {
+    this.setState({
+      createDialogOpen: open,
+      createDialogInitialTab: tabName,
+    });
+  };
+
   render() {
     const {
       project,
       canOpen,
       onOpen,
-      onCreate,
       onOpenProjectManager,
       onOpenGuidelines,
       restartGuidelines,
@@ -116,9 +121,6 @@ class StartPage extends BaseEditor {
                       <FlatButton
                         label={<Trans>Restart interactive tutorial</Trans>}
                         fullWidth
-                        //TODO BOUH
-                        //When i click on it button disappear, i know my props is already true
-                        //but i wish reboot my GuidelinePopover (reset the index to zero and show the component if it closed)
                         onClick={restartGuidelines}
                       />
                       <Spacer />
@@ -133,11 +135,11 @@ class StartPage extends BaseEditor {
                   }
                   {
                     <FlatButton
-                      label={<Trans>See all tutorials on wiki</Trans>}
+                      label={<Trans>See tutorials</Trans>}
                       fullWidth
-                      onClick={() => {
-                        Window.openExternalURL(getHelpLink('/tutorials'));
-                      }}
+                      onClick={() =>
+                        this.props.onCreateOpenByTabName(true, 'tutorials')
+                      }
                     />
                   }
                 </div>
@@ -162,7 +164,9 @@ class StartPage extends BaseEditor {
                       <RaisedButton
                         label={<Trans>Create a new project</Trans>}
                         fullWidth
-                        onClick={onCreate}
+                        onClick={() =>
+                          this.props.onCreateOpenByTabName(true, 'starters')
+                        }
                         primary
                       />
                       <Spacer />
@@ -183,10 +187,9 @@ class StartPage extends BaseEditor {
                       <FlatButton
                         label={<Trans>Open examples</Trans>}
                         fullWidth
-                        //TODO BOUH
-                        //it acts like a onCreate props Oo
-                        //Wish open same dialog but on "examples" tab
-                        onClick={() => this.props.onShowExamples()}
+                        onClick={() =>
+                          this.props.onCreateOpenByTabName(true, 'examples')
+                        }
                       />
                       <Spacer />
                     </React.Fragment>
@@ -236,7 +239,6 @@ class StartPage extends BaseEditor {
                     }
                   />
                 </Line>
-                {/*TODO Le className disparait au rendu*/}
                 <GuidelineMarker identifier="socialNetwork">
                   <Line alignItems="center">
                     <FlatButton

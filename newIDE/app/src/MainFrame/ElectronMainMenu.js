@@ -96,7 +96,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     );
     ipcRenderer.on(
       ('main-menu-create': MainMenuEvent),
-      event => this._editor && this._editor.openCreateDialog()
+      event => this._editor && this._editor.openCreateDialogTabByName()
     );
     ipcRenderer.on(
       ('main-menu-open-project-manager': MainMenuEvent),

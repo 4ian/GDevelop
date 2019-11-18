@@ -1,0 +1,69 @@
+.guidelineContainer {
+    max-width: 400;
+    padding: 10;
+}
+.guidelineDescription {
+    padding-bottom: 10;
+    overflow: 'hidden';
+}
+.guidelineimage {
+    width: '100%';
+}
+
+.guidelineArrowContainer {
+    z-index: 2000;
+}
+.guidelineArrowContainer[x-placement*="bottom"] .guidelineArrow {
+    top: 0;
+    left: 0;
+    width: 3em;
+    height: 1em;
+    margin-top: -1em;
+}
+.guidelineArrowContainer[x-placement*="top"] .guidelineArrow {
+    left: 0;
+    bottom: 0;
+    width: 3em;
+    height: 1em;
+    margin-bottom: -1em;
+}
+.guidelineArrowContainer[x-placement*="right"] .guidelineArrow {
+    left: 0;
+    width: 1em;
+    height: 3em;
+    margin-left: -1em;
+}
+.guidelineArrowContainer[x-placement*="left"] .guidelineArrow {
+    right: 0;
+    width: 1em;
+    height: 3em;
+    margin-right: -1em;
+}
+.guidelineArrowContainer[x-placement*="left"] .guidelineArrow::before {
+    border-color: transparent transparent transparent #fff;
+    border-width: 1em 0 1em 1em;
+}
+.guidelineArrowContainer[x-placement*="right"] .guidelineArrow::before {
+    border-color: transparent #fff transparent transparent;
+    border-width: 1em 1em 1em 0;
+}
+.guidelineArrowContainer[x-placement*="top"] .guidelineArrow::before {
+    border-color: #fff transparent transparent transparent;
+    border-width: 1em 1em 0 1em;
+}
+.guidelineArrowContainer[x-placement*="bottom"] .guidelineArrow::before {
+    border-color: transparent transparent #fff transparent;
+    border-width: 0 1em 1em 1em;
+}
+.guidelineArrow {
+    position: absolute;
+    font-size: 10px;
+}
+.guidelineArrow::before {
+    width: 0;
+    height: 0;
+    margin: auto;
+    content: "";
+    display: block;
+    border-style: solid;
+}

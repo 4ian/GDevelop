@@ -109,6 +109,7 @@ const styles = {
 };
 
 type State = {|
+  createDialogInitialTab: string,
   createDialogOpen: boolean,
   exportDialogOpen: boolean,
   introDialogOpen: boolean,
@@ -164,6 +165,7 @@ type Props = {
 
 class MainFrame extends React.Component<Props, State> {
   state = {
+    createDialogInitialTab: 'starters',
     createDialogOpen: false,
     exportDialogOpen: false,
     introDialogOpen: false,
@@ -195,6 +197,7 @@ class MainFrame extends React.Component<Props, State> {
   toolbar = null;
   _resourceSourceDialogs = {};
   _previewLauncher: ?PreviewLauncherInterface = null;
+  _guidelines = React.createRef<GuidelinePopOver>();
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
@@ -300,6 +303,13 @@ class MainFrame extends React.Component<Props, State> {
           );
         }
       });
+  };
+
+  restartGuidelines = () => {
+    // this._guidelines.current is a reference to your component. Beware, it can be `null` if for some reason it was not rendered on the screen by React.
+    if (this._guidelines.current) {
+      this._guidelines.current.reset();
+    }
   };
 
   loadFromSerializedProject = (
@@ -515,15 +525,6 @@ class MainFrame extends React.Component<Props, State> {
       this.setState({
         projectManagerOpen: !this.state.projectManagerOpen,
       });
-  };
-
-  restartGuidelines = () => {
-    this.setState({
-      guidelinesOpen: !this.state.guidelinesOpen,
-      //TODO
-      //Ici je passe un index 0 et je le transmet en props à Guidelines component ou il y a plus simple ?
-      //ça agit comme un toggle, ça devrait reset le component de Guidelines.
-    });
   };
 
   openProjectManager = (open: boolean = true) => {
@@ -1237,8 +1238,9 @@ class MainFrame extends React.Component<Props, State> {
                 ).length
               }
               onOpen={this.chooseProject}
-              onCreate={() => this.openCreateDialog()}
-              onShowExamples={() => this.onShowExamples()}
+              onCreateOpenByTabName={(isOpen, tabName) =>
+                this.openCreateDialogTabByName(isOpen, tabName)
+              }
               onOpenProjectManager={() => this.openProjectManager()}
               onOpenGuidelines={() => this.openGuidelines()}
               restartGuidelines={() => this.restartGuidelines()}
@@ -1356,15 +1358,13 @@ class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  openCreateDialog = (open: boolean = true) => {
+  openCreateDialogTabByName = (
+    open: boolean = true,
+    tabName: string = this.state.createDialogInitialTab
+  ) => {
     this.setState({
       createDialogOpen: open,
-    });
-  };
-
-  onShowExamples = (open: boolean = true) => {
-    this.setState({
-      createDialogOpen: open,
+      createDialogInitialTab: tabName,
     });
   };
 
@@ -1744,8 +1744,12 @@ class MainFrame extends React.Component<Props, State> {
     return (
       <div className="main-frame">
         <GuidelinePopOver
+          ref={this._guidelines}
           open={guidelinesOpen}
-          closeHandler={this.restartGuidelines}
+          closeHandler={() => {
+            this.openGuidelines(false);
+            this.restartGuidelines();
+          }}
         />
         <ProjectTitlebar fileMetadata={currentFileMetadata} />
         <Drawer
@@ -1882,16 +1886,17 @@ class MainFrame extends React.Component<Props, State> {
         {!!renderCreateDialog &&
           this.state.createDialogOpen &&
           renderCreateDialog({
+            initialTab: this.state.createDialogInitialTab,
             open: this.state.createDialogOpen,
-            onClose: () => this.openCreateDialog(false),
+            onClose: () => this.openCreateDialogTabByName(false),
             onOpen: (storageProvider, fileMetadata) => {
-              this.openCreateDialog(false);
+              this.openCreateDialogTabByName(false);
               useStorageProvider(storageProvider)
                 .then(() => this.openFromFileMetadata(fileMetadata))
                 .then(() => this.openSceneOrProjectManager());
             },
             onCreate: (project, storageProvider, fileMetadata) => {
-              this.openCreateDialog(false);
+              this.openCreateDialogTabByName(false);
               useStorageProvider(storageProvider)
                 .then(() => this.loadFromProject(project, fileMetadata))
                 .then(() => this.openSceneOrProjectManager());
@@ -1991,7 +1996,7 @@ class MainFrame extends React.Component<Props, State> {
             }}
             onCreateNewProject={() => {
               this.openOpenFromStorageProviderDialog(false);
-              this.openCreateDialog(true);
+              this.openCreateDialogTabByName(true);
             }}
           />
         )}

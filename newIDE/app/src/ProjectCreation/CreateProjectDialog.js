@@ -14,6 +14,7 @@ type State = {|
 |};
 
 export type CreateProjectDialogWithComponentsProps = {|
+  initialTab: any,
   open: boolean,
   onClose: () => void,
   onOpen: (
@@ -34,9 +35,17 @@ type Props = {|
 |};
 
 export default class CreateProjectDialog extends React.Component<Props, State> {
-  state = {
-    currentTab: 'starters',
+  static defaultProps = {
+    initialTab: 'starters',
   };
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      currentTab: props.initialTab,
+    };
+  }
 
   _onChangeTab = (newTab: 'starters' | 'examples' | 'tutorials') => {
     this.setState({

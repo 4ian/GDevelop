@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import ReactDOM from 'react-dom';
 import Button from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
 import Paper from '@material-ui/core/Paper';
@@ -9,27 +8,35 @@ import guidelines from './data.js';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
 import { Line } from '../UI/Grid';
+import './style.css';
 
-//TODO wrap l'image dans le Paper avec l'overflow hidden
-//Actuellement l'image dépasse du Paper alors qu'il y a une marge autour du Popper
-//Actualisé la position de la Popper.
+
+//TODO 
+/*
+- Rendre la arrow du Guidelines dans les couleurs du thème.
+- Ouvrir le Guideline et "Create a new project" ou un Dialog qui rend le fond noir transparent ajoute un style qui provient de nul part directement sur le body.
+style="overflow: hidden; padding-right: 17px;"
+Cela ne provient pas de "import './style.css';"
+- Si aucun marqueur existe, que faire, (la position devrait être 0;0 ?)
+*/
 
 const styles = {
-  container: {
+  guidelineContainer: {
     maxWidth: 400,
     padding: 10,
-    marginTop: 10,
+  },
+  guidelineDescription: {
+    paddingBottom: 10,
     overflow: 'hidden',
   },
-  description: {
-    paddingBottom: 10,
+  guidelineImage: {
+    width: '100%',
   },
 };
 
 type State = {|
   open: boolean,
   index: number,
-  indexData: number,
   indexMax: number,
   anchor: *,
   arrowRef: *,
@@ -40,56 +47,87 @@ type Props = {|
   closeHandler: () => void,
 |};
 
-//TODO
-//PureComponent ou React.Component<Props, State> voir la doc pour comprendre la différence.
-//Le bouton restart du tuto ferme le Popper mais le reouvre pas et surtout ne reset pas le Popper a l'index 0...
-
 export default class GuidelinePopOver extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
       open: props.open,
       index: 0,
-      indexData: 0,
       indexMax: guidelines.length - 1,
       anchor: null,
       arrowRef: null,
     };
   }
 
-  componentWillReceiveProps(newProps: *) {
-    let elementHTML = document.querySelectorAll(
-      '.guideline-' + guidelines[this.state.indexData].positionBind
-    )[0];
-    const element = ReactDOM.findDOMNode(elementHTML);
-
+  componentWillReceiveProps(newProps: Props) {
+    this._updatePopover();
     if (newProps.open !== this.props.open) {
       this.setState({
         open: newProps.open,
-        anchor: element,
       });
     }
   }
 
-  next = () => {
-    this.setState(currentState => ({
-      index: Math.min(currentState.indexMax, currentState.index + 1),
-    }));
+  _handleArrowRef = (node: any) => {
+    this.setState({
+      arrowRef: node,
+    });
+  };
+
+  _updatePopover = () => {
+    let elementHTML = document.querySelectorAll(
+      '.guideline-' + guidelines[this.state.index].positionBind
+    )[0];
+
+    if (!elementHTML) {
+      console.log(
+        "The anchor for GuidelinePopOver doesn't exist. Guidelines cannot working."
+      );
+      return;
+    }
+    this.setState({
+      anchor: elementHTML,
+    });
+  };
+
+  reset = () => {
+    this.setState(
+      {
+        index: 0,
+      },
+      () => {
+        this._updatePopover();
+      }
+    );
   };
 
   back = () => {
-    this.setState(currentState => ({
-      index: Math.min(currentState.indexMax, currentState.index - 1),
-    }));
+    this.setState(
+      currentState => ({
+        index: Math.min(currentState.indexMax, currentState.index - 1),
+      }),
+      () => {
+        this._updatePopover();
+      }
+    );
   };
 
-  componentDidMount() {}
+  next = () => {
+    this.setState(
+      currentState => ({
+        index: Math.min(currentState.indexMax, currentState.index + 1),
+      }),
+      () => {
+        this._updatePopover();
+      }
+    );
+  };
 
-  componentDidUpdate(prevProps: *, prevState: *) {
-    if (this.state.index !== prevState.index) {
-      this.setState({ indexData: this.state.index });
-    }
-  }
+  close = () => {
+    this.setState({
+      open: false,
+    });
+  };
 
   render() {
     const { open } = this.state;
@@ -140,11 +178,12 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
       );
     }
 
-    if (guidelines[this.state.indexData].imageSource !== undefined) {
+    if (guidelines[this.state.index].imageSource !== undefined) {
       imageTutorial = (
         <img
-          src={guidelines[this.state.indexData].imageSource}
-          alt={guidelines[this.state.indexData].imageAlt}
+          src={guidelines[this.state.index].imageSource}
+          alt={guidelines[this.state.index].imageAlt}
+          style={styles.guidelineImage}
         />
       );
     } else {
@@ -165,18 +204,26 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
               enabled: true,
               boundariesElement: 'scrollParent',
             },
+            arrow: {
+              enabled: true,
+              element: this.state.arrowRef,
+            },
           }}
+          className="guidelineArrowContainer"
+          x-arrow
         >
-          <Paper style={styles.container}>
-            <div style={styles.description}>
+          <div ref={this._handleArrowRef} className="guidelineArrow" />
+
+          <Paper elevation={24} style={styles.guidelineContainer}>
+            <div style={styles.guidelineDescription}>
               <Line>
                 <Typography variant="h5">
-                  {guidelines[this.state.indexData].title}
+                  {guidelines[this.state.index].title}
                 </Typography>
               </Line>
               <Line>
                 <Typography wrap="true">
-                  {guidelines[this.state.indexData].description}
+                  {guidelines[this.state.index].description}
                 </Typography>
               </Line>
               <Line>{imageTutorial}</Line>

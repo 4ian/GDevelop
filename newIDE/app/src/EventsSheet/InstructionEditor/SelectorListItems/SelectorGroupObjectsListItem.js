@@ -3,7 +3,10 @@ import * as React from 'react';
 import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import type { GroupWithContext } from '../../../ObjectsList/EnumerateObjects';
-import { getObjectOrObjectGroupListItemKey } from './Keys';
+import {
+  getObjectGroupListItemKey,
+  getObjectOrObjectGroupListItemValue,
+} from './Keys';
 
 type Props = {|
   groupWithContext: GroupWithContext,
@@ -21,11 +24,10 @@ export const renderGroupObjectsListItem = ({
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem
-      key={
-        getObjectOrObjectGroupListItemKey(groupName) +
-        (groupWithContext.global ? '-global' : '')
+      key={getObjectGroupListItemKey(groupWithContext)}
+      selected={
+        selectedValue === getObjectOrObjectGroupListItemValue(groupName)
       }
-      selected={selectedValue === getObjectOrObjectGroupListItemKey(groupName)}
       primaryText={groupName}
       leftIcon={
         <ListIcon

@@ -6,7 +6,7 @@ import { type InstructionOrExpressionTreeNode } from '../InstructionOrExpression
 import { type EnumeratedInstructionOrExpressionMetadata } from '../InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
-import { getSubheaderListItemKey, getInstructionListItemKey } from './Keys';
+import { getSubheaderListItemKey, getInstructionListItemValue } from './Keys';
 
 type Props = {|
   instructionTreeNode: InstructionOrExpressionTreeNode,
@@ -44,7 +44,7 @@ export const renderInstructionTree = ({
       if (typeof instructionOrGroup.type === 'string') {
         // $FlowFixMe - see above
         const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
-        const value = getInstructionListItemKey(instructionOrGroup.type);
+        const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
         return (
           <ListItem

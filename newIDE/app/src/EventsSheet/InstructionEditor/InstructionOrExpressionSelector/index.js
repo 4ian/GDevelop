@@ -14,7 +14,7 @@ import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
 import { ListItem } from '../../../UI/List';
-import { getInstructionListItemKey } from '../SelectorListItems/Keys';
+import { getInstructionListItemValue } from '../SelectorListItems/Keys';
 
 const styles = {
   searchBar: {
@@ -141,7 +141,7 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
                                 enumeratedInstructionOrExpressionMetadata.type,
                                 enumeratedInstructionOrExpressionMetadata
                               ),
-                            selectedValue: getInstructionListItemKey(
+                            selectedValue: getInstructionListItemValue(
                               selectedType
                             ),
                           })
@@ -151,7 +151,9 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
                         iconSize,
                         onChoose,
                         useSubheaders,
-                        selectedValue: getInstructionListItemKey(selectedType),
+                        selectedValue: getInstructionListItemValue(
+                          selectedType
+                        ),
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
                       })}

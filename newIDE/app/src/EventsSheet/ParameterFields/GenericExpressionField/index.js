@@ -46,7 +46,7 @@ const styles = {
   },
   expressionSelectorPopoverContent: {
     display: 'flex',
-    maxHeight: 350,
+    maxHeight: 250,
   },
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -178,11 +178,12 @@ export default class ExpressionField extends React.Component<Props, State> {
       if (this._field) this._field.focus();
 
       setTimeout(() => {
-        if (this._inputElement)
+        if (this._inputElement) {
           this._inputElement.setSelectionRange(
             cursorPosition,
             cursorPosition + functionCall.length
           );
+        }
       }, 5);
     }, 5);
   };
@@ -254,6 +255,7 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const popoverStyle = {
       width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
+      marginLeft: -5, // Remove the offset that the Popper has for some reason with disablePortal={true}
       // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
       // There will be only one ExpressionSelector opened at a time, so it's fair to put the
       // highest z index. If this is breaking, check the z-index of material-ui.
@@ -294,6 +296,9 @@ export default class ExpressionField extends React.Component<Props, State> {
                 open={this.state.popoverOpen}
                 anchorEl={this._fieldElement}
                 placement="bottom"
+                disablePortal={
+                  true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */
+                }
               >
                 <Paper style={styles.expressionSelectorPopoverContent}>
                   <ExpressionSelector

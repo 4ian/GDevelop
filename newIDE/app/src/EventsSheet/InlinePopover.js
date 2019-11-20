@@ -7,8 +7,6 @@ import { Column } from '../UI/Grid';
 const styles = {
   popover: {
     paddingBottom: 10,
-    paddingLeft: 5,
-    paddingRight: 5,
     overflowY: 'auto',
 
     // Restrict size in case of extra small or large popover (though this should not happen)

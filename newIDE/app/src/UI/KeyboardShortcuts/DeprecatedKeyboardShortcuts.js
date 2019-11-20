@@ -106,12 +106,10 @@ export default class DeprecatedKeyboardShortcuts {
   };
 
   _onKeyDown = evt => {
-    console.log('keydown');
-    console.log(document.activeElement);
     if (!this.isFocused) return;
 
     let preventDefault = false;
-    console.log('KEY DOWN');
+
     if (evt.metaKey) this.metaPressed = true;
     if (evt.altKey) this.altPressed = true;
     if (evt.which === CTRL_KEY) this.rawCtrlPressed = true;

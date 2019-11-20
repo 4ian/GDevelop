@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
-import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import DeprecatedKeyboardShortcuts from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -152,7 +152,7 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
-    this.keyboardShortcuts = new KeyboardShortcuts({
+    this.keyboardShortcuts = new DeprecatedKeyboardShortcuts({
       onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,
       onCopy: this.props.onCopy,

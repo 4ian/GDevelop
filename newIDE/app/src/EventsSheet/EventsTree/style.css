@@ -1,6 +1,12 @@
 /* This overwrite the default react-sortable-tree css to display events list */
 
 /**
+ * Remove the outline visible on the events sheet (contrary to most
+ * controls on screen, we don't want a visible focus there).
+ */
+.gd-events-sheet:focus { outline: none; }
+
+/**
  * Draggable handle on the left of an event
  */
 .gd-events-sheet .rst__moveHandle {

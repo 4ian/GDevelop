@@ -6,9 +6,12 @@
 .gd-events-sheet .rst__moveHandle {
     width: 10px;
     background: #4ab0e4;
-    border: 1px solid #49AFE4;
     box-shadow: none;
     border-radius: 0;
+}
+
+.gd-events-sheet .rst__moveHandle:hover {
+    background-color: #767676!important;
 }
 
 .gd-events-sheet .events-tree {
@@ -121,7 +124,6 @@
  */
 .gd-events-sheet .selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
 }
 
 /**
@@ -129,7 +131,6 @@
  */
 .gd-events-sheet .large-selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
 }
 
 /**

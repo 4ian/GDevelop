@@ -1068,85 +1068,107 @@ export default class EventsSheet extends React.Component<Props, State> {
                           ref={eventContextMenu =>
                             (this.eventContextMenu = eventContextMenu)
                           }
-                          buildMenuTemplate={() => [
-                            {
-                              label: 'Copy',
+                          buildMenuTemplate={() => {
+                            let contextList = [
+                              {
+                                label: 'Copy',
+                                click: () => this.copySelection(),
+                                accelerator: 'CmdOrCtrl+C',
+                              },
+                              {
+                                label: 'Cut',
+                                click: () => this.cutSelection(),
+                                accelerator: 'CmdOrCtrl+X',
+                              },
+                              {
+                                label: 'Paste',
+                                click: () => this.pasteEvents(),
+                                enabled: hasClipboardEvents(),
+                                accelerator: 'CmdOrCtrl+V',
+                              },
+                              {
+                                label: 'Delete',
+                                click: () => this.deleteSelection(),
+                                accelerator: 'Delete',
+                              },
+                              {
+                                label: 'Toggle disabled',
+                                click: () => this.toggleDisabled(),
+                                enabled: this._selectionCanToggleDisabled(),
+                              },
+                              { type: 'separator' },
+                              {
+                                label: 'Add New Event Below',
+                                click: () =>
+                                  this.addNewEvent(
+                                    'BuiltinCommonInstructions::Standard'
+                                  ),
+                              },
+                              {
+                                label: 'Add Sub Event',
+                                click: () => this.addSubEvents(),
+                                enabled: this._selectionCanHaveSubEvents(),
+                              },
+                              {
+                                label: 'Add Other',
+                                submenu: this.state.allEventsMetadata.map(
+                                  metadata => {
+                                    return {
+                                      label: metadata.fullName,
+                                      click: () =>
+                                        this.addNewEvent(metadata.type),
+                                    };
+                                  }
+                                ),
+                              },
+                              { type: 'separator' },
+                              {
+                                label: 'Undo',
+                                click: this.undo,
+                                enabled: canUndo(this.state.history),
+                                accelerator: 'CmdOrCtrl+Z',
+                              },
+                              {
+                                label: 'Redo',
+                                click: this.redo,
+                                enabled: canRedo(this.state.history),
+                                accelerator: 'CmdOrCtrl+Shift+Z',
+                              },
+                              { type: 'separator' },
+                              {
+                                label: 'Extract Events to a Function',
+                                click: () => this.extractEventsToFunction(),
+                              },
+                              {
+                                label: 'Move Events into a Group',
+                                click: () => this.moveEventsIntoNewGroup(),
+                              },
+                              {
+                                label: 'Analyze Objects Used in this Event',
+                                click: this._openEventsContextAnalyzer,
+                              },
+                            ];
+
+                            const edition = {
+                              label: 'Edit',
                               click: () => this.copySelection(),
                               accelerator: 'CmdOrCtrl+C',
-                            },
-                            {
-                              label: 'Cut',
-                              click: () => this.cutSelection(),
-                              accelerator: 'CmdOrCtrl+X',
-                            },
-                            {
-                              label: 'Paste',
-                              click: () => this.pasteEvents(),
-                              enabled: hasClipboardEvents(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            {
-                              label: 'Delete',
-                              click: () => this.deleteSelection(),
-                              accelerator: 'Delete',
-                            },
-                            {
-                              label: 'Toggle disabled',
-                              click: () => this.toggleDisabled(),
-                              enabled: this._selectionCanToggleDisabled(),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Add New Event Below',
-                              click: () =>
-                                this.addNewEvent(
-                                  'BuiltinCommonInstructions::Standard'
-                                ),
-                            },
-                            {
-                              label: 'Add Sub Event',
-                              click: () => this.addSubEvents(),
-                              enabled: this._selectionCanHaveSubEvents(),
-                            },
-                            {
-                              label: 'Add Other',
-                              submenu: this.state.allEventsMetadata.map(
-                                metadata => {
-                                  return {
-                                    label: metadata.fullName,
-                                    click: () =>
-                                      this.addNewEvent(metadata.type),
-                                  };
+                            };
+
+                            getSelectedEvents(this.state.selection).forEach(
+                              event => {
+                                if (
+                                  event.getType() ===
+                                    'BuiltinCommonInstructions::Comment' ||
+                                  event.getType() ===
+                                    'BuiltinCommonInstructions::Group'
+                                ) {
+                                  contextList.unshift(edition);
                                 }
-                              ),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Undo',
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: 'Redo',
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Extract Events to a Function',
-                              click: () => this.extractEventsToFunction(),
-                            },
-                            {
-                              label: 'Move Events into a Group',
-                              click: () => this.moveEventsIntoNewGroup(),
-                            },
-                            {
-                              label: 'Analyze Objects Used in this Event',
-                              click: this._openEventsContextAnalyzer,
-                            },
-                          ]}
+                              }
+                            );
+                            return contextList;
+                          }}
                         />
                         <ContextMenu
                           ref={instructionContextMenu =>

@@ -9,7 +9,7 @@ const styles = {
     paddingBottom: 10,
     paddingLeft: 5,
     paddingRight: 5,
-    overflowY: 'hidden',
+    overflowY: 'auto',
 
     // Restrict size in case of extra small or large popover (though this should not happen)
     minHeight: 30,

@@ -39,6 +39,14 @@
 }
 
 /**
+ * Background and default text color of content of an event
+ */
+.gd-events-sheet-default-theme .rst__rowContents {
+  background-color: white;
+  color: black;
+}
+
+/**
  * Selectable area (instructions)
  */
 .gd-events-sheet-default-theme .selectable:hover {

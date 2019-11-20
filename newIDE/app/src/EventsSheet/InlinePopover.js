@@ -9,10 +9,18 @@ const styles = {
     paddingBottom: 10,
     paddingLeft: 5,
     paddingRight: 5,
-    maxWidth: 600,
-    height: 80,
     overflowY: 'hidden',
+
+    // Restrict size in case of extra small or large popover (though this should not happen)
+    minHeight: 30,
+    maxHeight: 400,
+    maxWidth: 600,
     minWidth: 300, // Avoid extra small popover for some parameters like relational operator
+
+    // When displayed in an events sheet that has Mosaic windows (see `EditorMosaic`) next to it,
+    // it could be displayed behind them, because they have a z-index of 1 :/ Use a z-index of 2
+    // then. Only one InlinePopover should be shown at a time anyway.
+    zIndex: 2,
   },
   contentContainer: {
     overflow: 'hidden',

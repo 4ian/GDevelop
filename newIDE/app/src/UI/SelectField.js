@@ -27,7 +27,7 @@ type Props = {|
     flex?: 1,
     width?: 'auto',
   },
-  margin?: 'none',
+  margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
 

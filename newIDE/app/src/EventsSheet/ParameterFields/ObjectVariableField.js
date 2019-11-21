@@ -53,7 +53,7 @@ export default class ObjectVariableField extends React.Component<
     }
 
     return (
-      <div>
+      <React.Fragment>
         <VariableField
           variablesContainer={variablesContainer}
           parameterMetadata={this.props.parameterMetadata}
@@ -76,7 +76,7 @@ export default class ObjectVariableField extends React.Component<
             }}
           />
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }

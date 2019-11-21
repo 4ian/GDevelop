@@ -21,6 +21,7 @@ export default class OperatorField extends Component<ParameterFieldProps> {
 
     return (
       <SelectField
+        margin={this.props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
         value={this.props.value}

@@ -40,6 +40,7 @@ export default class VariableField extends Component<Props, {||}> {
       <TextFieldWithButtonLayout
         renderTextField={() => (
           <SemiControlledAutoComplete
+            margin={this.props.isInline ? 'none' : 'dense'}
             floatingLabelText={description}
             fullWidth
             value={value}

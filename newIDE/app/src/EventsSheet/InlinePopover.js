@@ -34,9 +34,7 @@ export default class InlinePopover extends Component {
         >
           <Background>
             <Column expand>
-              <Line>
-                {this.props.children}
-              </Line>
+              <Line>{this.props.children}</Line>
             </Column>
           </Background>
         </Popper>

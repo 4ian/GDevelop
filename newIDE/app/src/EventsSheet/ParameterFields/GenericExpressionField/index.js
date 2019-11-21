@@ -167,13 +167,23 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const functionCall = formatExpressionCall(expressionInfo, parameterValues);
 
+    // Generate the expression with the function call
     const { value } = this.props;
     const newValue =
       value.substr(0, cursorPosition) +
       functionCall +
       value.substr(cursorPosition);
 
+    // Apply changes
     if (this.props.onChange) this.props.onChange(newValue);
+    this.setState(
+      {
+        validatedValue: newValue,
+      },
+      () => this._enqueueValidation()
+    );
+
+    // Focus again and select what was just added.
     setTimeout(() => {
       if (this._field) this._field.focus();
 

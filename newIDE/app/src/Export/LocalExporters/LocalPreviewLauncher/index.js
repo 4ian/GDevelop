@@ -28,7 +28,7 @@ type State = {
   networkPreviewPort: ?number,
   networkPreviewError: ?any,
   previewGamePath: ?string,
-  debugToolsOpen: boolean,
+  devToolsOpen: boolean,
   previewBrowserWindowConfig: ?{
     width: number,
     height: number,
@@ -50,7 +50,7 @@ export default class LocalPreviewLauncher extends React.Component<
     networkPreviewPort: null,
     networkPreviewError: null,
     previewGamePath: null,
-    debugToolsOpen: true,
+    devToolsOpen: true,
     previewBrowserWindowConfig: null,
   };
   _subscriptionChecker: ?SubscriptionChecker = null;
@@ -66,12 +66,12 @@ export default class LocalPreviewLauncher extends React.Component<
     const win = new BrowserWindow(this.state.previewBrowserWindowConfig);
     win.loadURL(`file://${this.state.previewGamePath}/index.html`);
     win.webContents.on('devtools-opened', () => {
-      this.setState({ debugToolsOpen: true });
+      this.setState({ devToolsOpen: true });
     });
     win.webContents.on('devtools-closed', () => {
-      this.setState({ debugToolsOpen: false });
+      this.setState({ devToolsOpen: false });
     });
-    if (this.state.debugToolsOpen) win.openDevTools();
+    if (this.state.devToolsOpen) win.openDevTools();
   };
 
   _openPreviewWindow = (

@@ -4,6 +4,7 @@ import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
+import TextEditorDialog from './InstructionEditor/TextEditorDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
@@ -133,6 +134,8 @@ type State = {|
 
   serializedEventsToExtract: ?Object,
 
+  textEditorDialog: boolean,
+
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
@@ -204,6 +207,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     searchFocusOffset: null,
 
     allEventsMetadata: [],
+
+    textEditorDialog: false,
   };
 
   componentDidMount() {
@@ -361,6 +366,20 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
 
     return newEvents;
+  };
+
+  //TODO ideally see for use toggle
+  openTextEditorDialog = () => {
+    this.setState({
+      textEditorDialog: true,
+    });
+  };
+
+  //TODO close and save in history
+  closeTextEditorDialog = () => {
+    this.setState({
+      textEditorDialog: false,
+    });
   };
 
   openInstructionEditor = (
@@ -1151,8 +1170,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
                             const edition = {
                               label: 'Edit',
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
+                              click: () => this.openTextEditorDialog(),
                             };
 
                             getSelectedEvents(this.state.selection).forEach(
@@ -1288,6 +1306,23 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 serializedEventsToExtract: null,
                               });
                             }}
+                          />
+                        )}
+                        {this.state.textEditorDialog && (
+                          <TextEditorDialog
+                            open={this.state.textEditorDialog}
+                            event={this.state.selection}
+                            onApply={() => {
+                              //TODO save dans l'eventsheet les changements
+                              this.setState({
+                                textEditorDialog: false,
+                              });
+                            }}
+                            onClose={() =>
+                              this.setState({
+                                textEditorDialog: false,
+                              })
+                            }
                           />
                         )}
                         <InfoBar

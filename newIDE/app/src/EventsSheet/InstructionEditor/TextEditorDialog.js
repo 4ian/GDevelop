@@ -10,7 +10,6 @@ import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import { getSelectedEvents } from '../SelectionHandler';
 
 const gd = global.gd;
 
@@ -29,58 +28,159 @@ const styles = {
 
 type Props = {|
   event: any,
-  open: boolean,
   onClose: () => void,
   onApply: () => void,
 |};
 
 type State = {|
-  searchText: string,
   textValue: any,
+  textColors: any,
+  backgroundColors: any,
 |};
 
-//TODO prendre en compte aussi les commentaires des groupes, vérifié le type de l'event getType()
-//Puis selon le cas retourné le text avec la methode approprié a l'event getComment() ou getName()
-//Voir comment recup l'event car ma façon de faire dans le state récupère ce text "\"
 export default class TextEditorDialog extends React.PureComponent<
   Props,
   State
 > {
-  recupereLecommentaire = () => {
-    return gd
-      .asCommentEvent(
-        getSelectedEvents(this.props.event).some(event => {
-          return event;
-        })
-      )
-      .getComment();
+  setName = () => {
+    const { event } = this.props;
+    const eventType = event.getType();
+    if (eventType === 'BuiltinCommonInstructions::Group') {
+      gd.asGroupEvent(event).setName(this.state.textValue);
+    }
+  };
+
+  setComment = () => {
+    const { event } = this.props;
+    const eventType = event.getType();
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      gd.asCommentEvent(event).setComment(this.state.textValue);
+    }
+  };
+
+  setTextColors = () => {
+    const { event } = this.props;
+    const { textColors } = this.state;
+    const eventType = event.getType();
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      gd.asCommentEvent(event).setTextColor(
+        parseInt(textColors.red),
+        parseInt(textColors.green),
+        parseInt(textColors.blue)
+      );
+    } else if (eventType === 'BuiltinCommonInstructions::Group') {
+      //Text color for group not supported in Core, instead GroupEvent.js handle this
+      return;
+    }
+  };
+
+  setBackgroundColors = () => {
+    const { event } = this.props;
+    const { backgroundColors } = this.state;
+    const eventType = event.getType();
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      gd.asCommentEvent(event).setBackgroundColor(
+        parseInt(backgroundColors.red),
+        parseInt(backgroundColors.green),
+        parseInt(backgroundColors.blue)
+      );
+    } else if (eventType === 'BuiltinCommonInstructions::Group') {
+      gd.asGroupEvent(event).setBackgroundColor(
+        parseInt(backgroundColors.red),
+        parseInt(backgroundColors.green),
+        parseInt(backgroundColors.blue)
+      );
+    }
+  };
+
+  getComment = () => {
+    const { event } = this.props;
+    const eventType = event.getType();
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      return gd.asCommentEvent(event).getComment();
+    } else if (eventType === 'BuiltinCommonInstructions::Group') {
+      return gd.asGroupEvent(event).getName();
+    } else {
+      console.error(
+        'Dialog was opened for an unsupported event type: ' + eventType
+      );
+      return '';
+    }
+  };
+
+  getTextColors = () => {
+    const { event } = this.props;
+    const eventType = event.getType();
+    let textColors;
+
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      const commentEvent = gd.asCommentEvent(event);
+      textColors = {
+        red: commentEvent.getTextColorRed(),
+        green: commentEvent.getTextColorGreen(),
+        blue: commentEvent.getTextColorBlue(),
+      };
+      return textColors;
+    } else if (eventType === 'BuiltinCommonInstructions::Group') {
+      var groupEvent = gd.asGroupEvent(event);
+      const r = groupEvent.getBackgroundColorR(),
+        g = groupEvent.getBackgroundColorG(),
+        b = groupEvent.getBackgroundColorB();
+
+      textColors = (r + g + b) / 3 > 200 ? 'black' : 'white'; //Because text color is not supported by Core
+      return textColors;
+    } else {
+      console.error('Dialog was opened for an unsupported event text color.');
+      return '';
+    }
+  };
+
+  getBackgroundColors = () => {
+    const { event } = this.props;
+    const eventType = event.getType();
+    let backgroundColors;
+
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      const commentEvent = gd.asCommentEvent(event);
+      backgroundColors = {
+        red: commentEvent.getBackgroundColorRed(),
+        green: commentEvent.getBackgroundColorGreen(),
+        blue: commentEvent.getBackgroundColorBlue(),
+      };
+
+      return backgroundColors;
+    } else if (eventType === 'BuiltinCommonInstructions::Group') {
+      const groupEvent = gd.asGroupEvent(event);
+      backgroundColors = {
+        red: groupEvent.getBackgroundColorR(),
+        green: groupEvent.getBackgroundColorG(),
+        blue: groupEvent.getBackgroundColorB(),
+      };
+
+      return backgroundColors;
+    } else {
+      console.error(
+        'Dialog was opened for an unsupported event background color'
+      );
+      return '';
+    }
   };
 
   state = {
-    searchText: '',
-    textValue: this.recupereLecommentaire(),
-  };
-
-  componentWillReceiveProps(newProps: Props) {
-    if (newProps.open && !this.props.open) {
-    }
-  }
-
-  _handleSearchTextChange = (searchText: string) => {
-    this.setState({
-      searchText,
-    });
+    textValue: this.getComment(),
+    textColors: this.getTextColors(),
+    backgroundColors: this.getBackgroundColors(),
   };
 
   render() {
-    const { event, open, onApply, onClose } = this.props;
-
-    console.log(event);
+    const { event, onApply, onClose } = this.props;
+    const eventType = event.getType();
 
     return (
       <Dialog
         title={<Trans>Text editor</Trans>}
         onRequestClose={onClose}
+        open
         noMargin
         actions={[
           <FlatButton
@@ -93,8 +193,18 @@ export default class TextEditorDialog extends React.PureComponent<
             key={'Apply'}
             label={<Trans>Apply</Trans>}
             primary
-            onClick={onApply}
             keyboardFocused
+            onClick={() => {
+              if (eventType === 'BuiltinCommonInstructions::Comment') {
+                this.setComment();
+              } else if (eventType === 'BuiltinCommonInstructions::Group') {
+                this.setName();
+              }
+              this.setTextColors();
+              this.setBackgroundColors();
+
+              onApply();
+            }}
           />,
         ]}
         secondaryActions={[
@@ -103,7 +213,6 @@ export default class TextEditorDialog extends React.PureComponent<
             helpPagePath="/interface/scene-editor/layers-and-cameras"
           />,
         ]}
-        open={open}
       >
         <Column noMargin>
           <MiniToolbar>
@@ -117,48 +226,68 @@ export default class TextEditorDialog extends React.PureComponent<
               style={styles.sizeTextField}
               disableAlpha
               color={{
-                r: 125,
-                g: 125,
-                b: 125,
+                r: this.state.backgroundColors.red,
+                g: this.state.backgroundColors.green,
+                b: this.state.backgroundColors.blue,
                 a: 255,
               }}
               onChangeComplete={color => {
+                this.setState({
+                  backgroundColors: {
+                    red: color.rgb.r,
+                    green: color.rgb.g,
+                    blue: color.rgb.b,
+                  },
+                });
+
                 this.forceUpdate();
               }}
             />
-            <MiniToolbarText>
-              <Trans>Text color:</Trans>
-            </MiniToolbarText>
-            <ColorPicker
-              style={styles.sizeTextField}
-              disableAlpha
-              color={{
-                r: 125,
-                g: 125,
-                b: 125,
-                a: 255,
-              }}
-              onChangeComplete={color => {
-                this.forceUpdate();
-              }}
-            />
+
+            {eventType !== 'BuiltinCommonInstructions::Group' && (
+              <React.Fragment>
+                <MiniToolbarText>
+                  <Trans>Text color:</Trans>
+                </MiniToolbarText>
+                <ColorPicker
+                  style={styles.sizeTextField}
+                  disableAlpha
+                  color={{
+                    r: this.state.textColors.red,
+                    g: this.state.textColors.green,
+                    b: this.state.textColors.blue,
+                    a: 255,
+                  }}
+                  onChangeComplete={color => {
+                    this.setState({
+                      textColors: {
+                        red: color.rgb.r,
+                        green: color.rgb.g,
+                        blue: color.rgb.b,
+                      },
+                    });
+
+                    this.forceUpdate();
+                  }}
+                />
+              </React.Fragment>
+            )}
           </MiniToolbar>
           <Line noMargin>
             <Column expand>
               <Line>
                 <SemiControlledTextField
                   commitOnBlur
-                  hintText={t`Enter the text to be displayed in your comment`}
+                  hintText={t`Enter the text to be displayed`}
                   fullWidth
                   multiLine
-                  rows={8}
-                  rowsMax={8}
+                  rows={100}
+                  rowsMax={100}
                   value={this.state.textValue}
                   onChange={value => {
                     this.setState({
                       textValue: value,
                     });
-                    //event.setComment(value);
                     this.forceUpdate();
                   }}
                 />

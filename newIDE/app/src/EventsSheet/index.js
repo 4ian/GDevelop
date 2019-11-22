@@ -134,7 +134,7 @@ type State = {|
 
   serializedEventsToExtract: ?Object,
 
-  textEditorDialog: boolean,
+  textEditedEvent: ?any,
 
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
@@ -211,7 +211,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     allEventsMetadata: [],
 
-    textEditorDialog: false,
+    textEditedEvent: null,
   };
 
   componentDidMount() {
@@ -367,17 +367,19 @@ export default class EventsSheet extends React.Component<Props, State> {
     return newEvents;
   };
 
-  //TODO ideally see for use toggle
   openTextEditorDialog = () => {
+    const selectedEvents = getSelectedEvents(this.state.selection);
+    if (!selectedEvents.length) return;
+
+    const event = selectedEvents[selectedEvents.length - 1]; // Get the last selected event.
     this.setState({
-      textEditorDialog: true,
+      textEditedEvent: event,
     });
   };
 
-  //TODO close and save in history
   closeTextEditorDialog = () => {
     this.setState({
-      textEditorDialog: false,
+      textEditedEvent: null,
     });
   };
 
@@ -1207,8 +1209,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
                             const edition = {
                               label: 'Edit',
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
+                              click: () => this.openTextEditorDialog(),
                             };
 
                             getSelectedEvents(this.state.selection).forEach(
@@ -1221,35 +1222,10 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 ) {
                                   contextList.unshift(edition);
                                 }
-                              ),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Undo',
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: 'Redo',
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Extract Events to a Function',
-                              click: () => this.extractEventsToFunction(),
-                            },
-                            {
-                              label: 'Move Events into a Group',
-                              click: () => this.moveEventsIntoNewGroup(),
-                            },
-                            {
-                              label: 'Analyze Objects Used in this Event',
-                              click: this._openEventsContextAnalyzer,
-                            },
-                          ]}
+                              }
+                            );
+                            return contextList;
+                          }}
                         />
                         <ContextMenu
                           ref={instructionContextMenu =>
@@ -1371,19 +1347,16 @@ export default class EventsSheet extends React.Component<Props, State> {
                             }}
                           />
                         )}
-                        {this.state.textEditorDialog && (
+                        {this.state.textEditedEvent && (
                           <TextEditorDialog
-                            open={this.state.textEditorDialog}
-                            event={this.state.selection}
+                            event={this.state.textEditedEvent}
                             onApply={() => {
-                              //TODO save dans l'eventsheet les changements
-                              this.setState({
-                                textEditorDialog: false,
-                              });
+                              this.closeTextEditorDialog();
+                              this._saveChangesToHistory();
                             }}
                             onClose={() =>
                               this.setState({
-                                textEditorDialog: false,
+                                textEditedEvent: null,
                               })
                             }
                           />

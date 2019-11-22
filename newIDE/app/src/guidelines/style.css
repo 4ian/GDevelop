@@ -39,22 +39,6 @@
     height: 3em;
     margin-right: -1em;
 }
-.guidelineArrowContainer[x-placement*="left"] .guidelineArrow::before {
-    border-color: transparent transparent transparent #fff;
-    border-width: 1em 0 1em 1em;
-}
-.guidelineArrowContainer[x-placement*="right"] .guidelineArrow::before {
-    border-color: transparent #fff transparent transparent;
-    border-width: 1em 1em 1em 0;
-}
-.guidelineArrowContainer[x-placement*="top"] .guidelineArrow::before {
-    border-color: #fff transparent transparent transparent;
-    border-width: 1em 1em 0 1em;
-}
-.guidelineArrowContainer[x-placement*="bottom"] .guidelineArrow::before {
-    border-color: transparent transparent #fff transparent;
-    border-width: 0 1em 1em 1em;
-}
 .guidelineArrow {
     position: absolute;
     font-size: 10px;

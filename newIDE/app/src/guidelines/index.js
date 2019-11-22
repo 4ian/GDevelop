@@ -8,10 +8,10 @@ import guidelines from './data.js';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
 import { Line } from '../UI/Grid';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import './style.css';
 
-
-//TODO 
+//TODO
 /*
 - Rendre la arrow du Guidelines dans les couleurs du thème.
 - Ouvrir le Guideline et "Create a new project" ou un Dialog qui rend le fond noir transparent ajoute un style qui provient de nul part directement sur le body.
@@ -192,60 +192,67 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
 
     return (
       <div>
-        <Popper
-          open={open}
-          anchorEl={this.state.anchor}
-          placement="bottom"
-          modifiers={{
-            flip: {
-              enabled: true,
-            },
-            preventOverflow: {
-              enabled: true,
-              boundariesElement: 'scrollParent',
-            },
-            arrow: {
-              enabled: true,
-              element: this.state.arrowRef,
-            },
-          }}
-          className="guidelineArrowContainer"
-          x-arrow
-        >
-          <div ref={this._handleArrowRef} className="guidelineArrow" />
+        <ThemeConsumer>
+          {muiTheme => (
+            <Popper
+              open={open}
+              anchorEl={this.state.anchor}
+              placement="bottom"
+              modifiers={{
+                flip: {
+                  enabled: true,
+                },
+                preventOverflow: {
+                  enabled: true,
+                  boundariesElement: 'scrollParent',
+                },
+                arrow: {
+                  enabled: true,
+                  element: this.state.arrowRef,
+                },
+              }}
+              className={muiTheme.eventsSheetRootClassName.guidelineArrowContainer}
+              x-arrow
+            >
+              <div
+                ref={this._handleArrowRef}
+                className={muiTheme.eventsSheetRootClassName.guidelineArrow}
+              />
 
-          <Paper elevation={24} style={styles.guidelineContainer}>
-            <div style={styles.guidelineDescription}>
-              <Line>
-                <Typography variant="h5">
-                  {guidelines[this.state.index].title}
-                </Typography>
-              </Line>
-              <Line>
-                <Typography wrap="true">
-                  {guidelines[this.state.index].description}
-                </Typography>
-              </Line>
-              <Line>{imageTutorial}</Line>
-            </div>
-            <Line alignItems="center" justifyContent="space-between">
-              <Line>{closeOrWikipage}</Line>
-              <Line alignItems="center">
-                <Typography style={{ marginRight: 10 }}>
-                  {this.state.index + 1} of {this.state.indexMax + 1}
-                </Typography>
-                <Button
-                  variant="contained"
-                  disabled={this.state.index === 0 ? true : false}
-                  onClick={this.back}
-                >
-                  Back
-                </Button>
-                {nextOrFinish}
-              </Line>
-            </Line>
-          </Paper>
-        </Popper>
+              <Paper elevation={24} style={styles.guidelineContainer}>
+                <div style={styles.guidelineDescription}>
+                  <Line>
+                    <Typography variant="h5">
+                      {guidelines[this.state.index].title}
+                    </Typography>
+                  </Line>
+                  <Line>
+                    <Typography wrap="true">
+                      {guidelines[this.state.index].description}
+                    </Typography>
+                  </Line>
+                  <Line>{imageTutorial}</Line>
+                </div>
+                <Line alignItems="center" justifyContent="space-between">
+                  <Line>{closeOrWikipage}</Line>
+                  <Line alignItems="center">
+                    <Typography style={{ marginRight: 10 }}>
+                      {this.state.index + 1} of {this.state.indexMax + 1}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      disabled={this.state.index === 0 ? true : false}
+                      onClick={this.back}
+                    >
+                      Back
+                    </Button>
+                    {nextOrFinish}
+                  </Line>
+                </Line>
+              </Paper>
+            </Popper>
+          )}
+        </ThemeConsumer>
       </div>
     );
   }

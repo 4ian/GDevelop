@@ -31,12 +31,9 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
         <SelectOption value="=" primaryText={t`= (equal to)`} />
         <SelectOption value="<" primaryText={t`< (less than)`} />
         <SelectOption value=">" primaryText={t`> (greater than)`} />
-        <SelectOption value="<=" primaryText={t`\u2264 (less or equal to)`} />
-        <SelectOption
-          value=">="
-          primaryText={t`\u2265 (greater or equal to)`}
-        />
-        <SelectOption value="!=" primaryText={t`\u2260 (not equal to)`} />
+        <SelectOption value="<=" primaryText={t`≤ (less or equal to)`} />
+        <SelectOption value=">=" primaryText={t`≥ (greater or equal to)`} />
+        <SelectOption value="!=" primaryText={t`≠ (not equal to)`} />
       </SelectField>
     );
   }

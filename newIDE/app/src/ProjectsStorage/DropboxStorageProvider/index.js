@@ -66,7 +66,6 @@ export default ({
         fileMetadata: FileMetadata
       ): Promise<{|
         content: Object,
-        fileMetadata: FileMetadata,
       |}> => {
         return Promise.reject(new Error('Unimplemented'));
       },

@@ -407,7 +407,7 @@ class MainFrame extends React.Component<Props, State> {
           throw err;
         });
       })
-      .then(({ content, fileMetadata }) => {
+      .then(({ content }) => {
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
           return;
@@ -416,6 +416,9 @@ class MainFrame extends React.Component<Props, State> {
         const serializedProject = gd.Serializer.fromJSObject(content);
         return this.loadFromSerializedProject(
           serializedProject,
+          // Note that fileMetadata is the original, unchanged one, even if we're loading
+          // an autosave. If we're for some reason loading an autosave, we still consider
+          // that we're opening the file that was originally requested by the user.
           fileMetadata
         ).then(
           () => {

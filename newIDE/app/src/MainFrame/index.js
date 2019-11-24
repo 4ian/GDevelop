@@ -93,7 +93,6 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import GuidelinePopOver from '../guidelines';
-import GuidelineMarker from '../guidelines/GuidelineMarker';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1819,7 +1818,6 @@ class MainFrame extends React.Component<Props, State> {
             </EmptyMessage>
           )}
         </Drawer>
-        <GuidelineMarker identifier="Toolbar">
           <Toolbar
             ref={toolbar => (this.toolbar = toolbar)}
             showProjectIcons={!this.props.integratedEditor}
@@ -1829,8 +1827,8 @@ class MainFrame extends React.Component<Props, State> {
             requestUpdate={this.props.requestUpdate}
             simulateUpdateDownloaded={this.simulateUpdateDownloaded}
             simulateUpdateAvailable={this.simulateUpdateAvailable}
+            identifier="Toolbar"
           />
-        </GuidelineMarker>
 
         <ClosableTabs hideLabels={!!this.props.integratedEditor}>
           {getEditors(this.state.editorTabs).map((editorTab, id) => {

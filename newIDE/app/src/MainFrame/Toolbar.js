@@ -17,6 +17,7 @@ type Props = {
   simulateUpdateDownloaded: ?() => void,
   simulateUpdateAvailable: ?() => void,
   exportProject: Function,
+  identifier: string,
 };
 
 type State = {
@@ -42,7 +43,9 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
         {windowWidth => (
           <I18n>
             {({ i18n }) => (
-              <Toolbar>
+              <Toolbar 
+               {...(this.props.identifier ? { className: 'guideline-' + this.props.identifier } : {})}
+               >
                 <ToolbarGroup firstChild>
                   {this.props.showProjectIcons && (
                     <ToolbarIcon

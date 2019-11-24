@@ -19,6 +19,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
     margin?: number,
     flexShrink?: 0,
   |},
+  identifier?: string,
   labelPosition?: 'before',
 |};
 
@@ -32,7 +33,14 @@ type Props = {
  */
 export default class RaisedButton extends React.Component<Props, {||}> {
   render() {
-    const { label, primary, labelPosition, icon, ...otherProps } = this.props;
+    const {
+      label,
+      primary,
+      labelPosition,
+      icon,
+      identifier,
+      ...otherProps
+    } = this.props;
 
     // In theory, focus ripple is only shown after a keyboard interaction
     // (see https://github.com/mui-org/material-ui/issues/12067). However, as
@@ -46,6 +54,7 @@ export default class RaisedButton extends React.Component<Props, {||}> {
         size="small"
         color={primary ? 'primary' : 'default'}
         focusRipple={focusRipple}
+        {...(identifier ? { className: 'guideline-' + identifier } : {})}
         {...otherProps}
       >
         {labelPosition !== 'before' && icon}

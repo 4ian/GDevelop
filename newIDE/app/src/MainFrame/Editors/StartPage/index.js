@@ -15,7 +15,6 @@ import EducationTutorialImage from './EducationTutorialImage';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
-import GuidelineMarker from '../../../guidelines/GuidelineMarker';
 
 const styles = {
   innerContainer: {
@@ -162,6 +161,7 @@ class StartPage extends BaseEditor {
                   {!project && (
                     <React.Fragment>
                       <RaisedButton
+                        identifier="createANewProject"
                         label={<Trans>Create a new project</Trans>}
                         fullWidth
                         onClick={() =>
@@ -239,31 +239,27 @@ class StartPage extends BaseEditor {
                     }
                   />
                 </Line>
-                <GuidelineMarker identifier="socialNetwork">
-                  <Line alignItems="center">
-                    <FlatButton
-                      label={i18n.language}
-                      onClick={onOpenLanguageDialog}
-                      icon={<Language />}
-                    />
-                    <IconButton
-                      className="icon-facebook"
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://www.facebook.com/GDevelopApp'
-                        )
-                      }
-                    />
-                    <IconButton
-                      className="icon-twitter"
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://twitter.com/GDevelopApp'
-                        )
-                      }
-                    />
-                  </Line>
-                </GuidelineMarker>
+                <Line alignItems="center" identifier="socialNetwork">
+                  <FlatButton
+                    label={i18n.language}
+                    onClick={onOpenLanguageDialog}
+                    icon={<Language />}
+                  />
+                  <IconButton
+                    className="icon-facebook"
+                    onClick={() =>
+                      Window.openExternalURL(
+                        'https://www.facebook.com/GDevelopApp'
+                      )
+                    }
+                  />
+                  <IconButton
+                    className="icon-twitter"
+                    onClick={() =>
+                      Window.openExternalURL('https://twitter.com/GDevelopApp')
+                    }
+                  />
+                </Line>
               </Line>
             </div>
           </ScrollBackground>

@@ -51,3 +51,43 @@
     display: block;
     border-style: solid;
 }
+
+
+/**
+* Guideline arrow
+*/
+.guidelineArrowContainer[x-placement*="left"] .guidelineArrow::before {
+    border-color: transparent transparent transparent #fff;
+    border-width: 1em 0 1em 1em;
+  }
+.guidelineArrowContainer[x-placement*="right"] .guidelineArrow::before {
+    border-color: transparent #fff transparent transparent;
+    border-width: 1em 1em 1em 0;
+  }
+.guidelineArrowContainer[x-placement*="top"] .guidelineArrow::before {
+    border-color: #fff transparent transparent transparent;
+    border-width: 1em 1em 0 1em;
+  }
+.guidelineArrowContainer[x-placement*="bottom"] .guidelineArrow::before {
+    border-color: transparent transparent #fff transparent;
+    border-width: 0 1em 1em 1em;
+  }
+
+/*
+* clickTarget
+*/
+#clickTarget{
+    z-index: 1000;
+    animation: blink 1.5s infinite;
+    animation-direction: alternate;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes blink {
+  from {
+     box-shadow: 0 0 0px 0px #0088ff91;
+  }
+  to {
+     box-shadow: 0 0 24px 12px #0088ff91;
+  }
+}

@@ -764,7 +764,7 @@ gdjs.SpriteRuntimeObject.prototype.getCenterY = function() {
 gdjs.SpriteRuntimeObject.prototype.setX = function(x) {
     if ( x === this.x ) return;
 
-    this.x = x;
+    gdjs.RuntimeObject.prototype.setX.call(this, x);
     if (this._animationFrame !== null) {
         this.hitBoxesDirty = true;
         this._renderer.updateX();
@@ -778,7 +778,7 @@ gdjs.SpriteRuntimeObject.prototype.setX = function(x) {
 gdjs.SpriteRuntimeObject.prototype.setY = function(y) {
     if ( y === this.y ) return;
 
-    this.y = y;
+    gdjs.RuntimeObject.prototype.setY.call(this, y);
     if ( this._animationFrame !== null) {
         this.hitBoxesDirty = true;
         this._renderer.updateY();

@@ -256,8 +256,11 @@ gdjs.RuntimeObject.prototype.getUniqueId = function() {
  * @param {number} y The new Y position
  */
 gdjs.RuntimeObject.prototype.setPosition = function(x,y) {
-    this.setX(x);
-    this.setY(y);
+    if ( x === this.x && y === this.y ) return;
+
+    this.x = x;
+    this.y = y;
+    this.hitBoxesDirty = true;
 };
 
 /**
@@ -840,8 +843,8 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
 
 /**
  * @typedef {Object} AABB
- * @property {Array} min The [x,y] coordinates of the top left point
- * @property {Array} max The [x,y] coordinates of the bottom right point
+ * @property {number[]} min The [x,y] coordinates of the top left point
+ * @property {number[]} max The [x,y] coordinates of the bottom right point
  */
 
 /**

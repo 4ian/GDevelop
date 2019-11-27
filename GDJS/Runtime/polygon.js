@@ -222,7 +222,7 @@ gdjs.Polygon.collisionTest._statics = {
 /**
  * Do a raycast test.<br>
  * Please note that the polygon must be <b>convex</b>!
- * 
+ *
  * For some theory, check <a href="https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments">Find the Intersection Point of Two Line Segments</a>.
  *
  * @param {gdjs.Polygon} poly The polygon to test
@@ -313,7 +313,7 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
         {
             var x = p[0] + t*r[0];
             var y = p[1] + t*r[1];
-            
+
             var sqDist = (x-startX)*(x-startX) + (y-startY)*(y-startY);
             if ( sqDist < minSqDist )
             {

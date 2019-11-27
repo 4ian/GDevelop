@@ -528,6 +528,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "gd-splash-image.js");
   InsertUnique(includesFiles, "libs/hshg.js");
   InsertUnique(includesFiles, "libs/rbush.js");
+  InsertUnique(includesFiles, "objectpositionsmanager.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "timemanager.js");

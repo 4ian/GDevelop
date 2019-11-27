@@ -211,12 +211,76 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
     return isTrue;
 };
 
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to test collisions for
+ * @param {Hashtable} objectsLists2 The second lists of objects to test collisions for
+ * @param {boolean} inverted If set to true, only objects from the first lists that are not in collision with *any* other objects will be picked.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collisions if only their edges are touching.
+ */
 gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
-    return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.collisionTest,
-        objectsLists1, objectsLists2, inverted, ignoreTouchingEdges);
+    var object1IdsSet = {};
+    var object2IdsSet = {};
+
+    for(var key in objectsLists1.items) { // TODO: extract in function (objectsListsToObjectIdsSet)
+        var list = objectsLists1.items[key];
+        for(var i = 0;i<list.length;++i) {
+            object1IdsSet[list[i].id] = true;
+        }
+    }
+    for(var key in objectsLists2.items) { // TODO: extract in function (objectsListsToObjectIdsSet)
+        var list = objectsLists2.items[key];
+        for(var i = 0;i<list.length;++i) {
+            object2IdsSet[list[i].id] = true;
+        }
+    }
+
+    var isTrue = runtimeScene.getObjectPositionsManager().collisionTest(object1IdsSet, object2IdsSet, inverted, ignoreTouchingEdges);
+
+    //Trim not picked objects from lists.
+    for(var key in objectsLists1.items) { // TODO: extract in method related to object lists/sets (filterObjectsListsWithObjectIdsSet)
+        var list = objectsLists1.items[key];
+        var finalSize = 0;
+
+        for(var i = 0;i<list.length;++i) {
+            var obj = list[i];
+            if (object1IdsSet[obj.id]) {
+                list[finalSize] = obj;
+                finalSize++;
+            }
+        }
+
+        list.length = finalSize;
+    }
+
+    if ( !inverted ) {
+        for(var key in objectsLists2.items) { // TODO: extract in method related to object lists/sets (filterObjectsListsWithObjectIdsSet)
+            var list = objectsLists2.items[key];
+            var finalSize = 0;
+
+            for(var i = 0;i<list.length;++i) {
+                var obj = list[i];
+                if (object2IdsSet[obj.id]) {
+                    list[finalSize] = obj;
+                    finalSize++;
+                }
+            }
+
+            list.length = finalSize;
+        }
+    }
+
+    return isTrue;
 };
 
+
+gdjs.evtTools.object.OLDhitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
+    return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.collisionTest,
+      objectsLists1, objectsLists2, inverted, ignoreTouchingEdges);
+}
+
 gdjs.evtTools.object._distanceBetweenObjects = function(obj1, obj2, distance) {
+    gdjs.evtTools.object._distanceBetweenObjectsCount++;
     return obj1.getSqDistanceToObject(obj2) <= distance;
 };
 

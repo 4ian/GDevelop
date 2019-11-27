@@ -27,6 +27,7 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._lastId = 0;
     this._name = "";
     this._timeManager = new gdjs.TimeManager(Date.now());
+    this._objectPositionsManager = new gdjs.ObjectPositionsManager();
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
@@ -378,7 +379,7 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
             if (object.isHidden()) {
                 rendererObject.visible = false;
             } else {
-                var aabb = object.getVisibilityAABB();
+                var aabb = object.getVisibilityAABB(); // TODO: Use the ObjectPositionsManager
                 if (aabb && // If no AABB is returned, the object should always be visible
                     (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
                     aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1])) {
@@ -679,6 +680,14 @@ gdjs.RuntimeScene.prototype.hasLayer = function(name) {
 
 gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
     this._layers.keys(result);
+};
+
+/**
+ * Get the ObjectPositionsManager of the scene.
+ * @return {gdjs.ObjectPositionsManager} The gdjs.ObjectPositionsManager of the scene.
+ */
+gdjs.RuntimeScene.prototype.getObjectPositionsManager = function() {
+    return this._objectPositionsManager;
 };
 
 /**

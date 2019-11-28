@@ -1,3 +1,5 @@
+// @ts-check
+
 describe('gdjs.ObjectPositionsManager', function() {
   const defaultWidth = 2;
   const defaultHeight = 2;
@@ -62,7 +64,7 @@ describe('gdjs.ObjectPositionsManager', function() {
       objectPositionsManager.distanceTest(object1IdsSet, object2IdsSet, 5, true)
     ).to.be(true);
     expect(object1IdsSet).to.eql({ 1: true });
-    expect(object2IdsSet).to.eql({});
+    expect(object2IdsSet).to.eql({ 2: true, 3: true }); // Second list is *not* filtered when the test is inverted
   });
 
   it('can find no nearby object positions', function() {
@@ -135,8 +137,8 @@ describe('gdjs.ObjectPositionsManager', function() {
     objectPositionsManager.markObjectAsRemoved(object2);
 
     // Check that now object1 only is 5 pixels away from object0.
-    object1IdsSet = { 0: true };
-    object2IdsSet = { 1: true };
+    const object1IdsSet = { 0: true };
+    const object2IdsSet = { 1: true };
 
     // It's not legal to pass object2 id in the set (reducing the usefulness of the test),
     // because all ids are supposed to be managed by the ObjectPositionsManager.
@@ -167,8 +169,8 @@ describe('gdjs.ObjectPositionsManager', function() {
     objectPositionsManager.markObjectAsCreated(object2);
 
     // Check that object2 is still found near object0
-    object1IdsSet = { 0: true };
-    object2IdsSet = { 1: true, 2: true };
+    const object1IdsSet = { 0: true };
+    const object2IdsSet = { 1: true, 2: true };
 
     expect(
       objectPositionsManager.distanceTest(

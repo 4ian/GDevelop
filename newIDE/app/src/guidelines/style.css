@@ -78,6 +78,7 @@
 */
 #clickTarget{
     z-index: 1000;
+    position: inherit;
     animation: blink 1.5s infinite;
     animation-direction: alternate;
     animation-timing-function: ease-in-out;

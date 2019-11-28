@@ -72,7 +72,7 @@ class StartPage extends BaseEditor {
       onOpen,
       onOpenProjectManager,
       onOpenGuidelines,
-      restartGuidelines,
+      closeGuidelines,
       guidelinesIsOpen,
       onCloseProject,
       onOpenAboutDialog,
@@ -104,7 +104,7 @@ class StartPage extends BaseEditor {
                       </Trans>
                     </Text>
                   </Paper>
-                  {!project && canOpen && !guidelinesIsOpen && (
+                  {canOpen && !guidelinesIsOpen && (
                     <React.Fragment>
                       <RaisedButton
                         label={<Trans>Start interactive tutorial</Trans>}
@@ -118,9 +118,9 @@ class StartPage extends BaseEditor {
                   {guidelinesIsOpen && (
                     <React.Fragment>
                       <FlatButton
-                        label={<Trans>Restart interactive tutorial</Trans>}
+                        label={<Trans>Close interactive tutorial</Trans>}
                         fullWidth
-                        onClick={restartGuidelines}
+                        onClick={closeGuidelines}
                       />
                       <Spacer />
                     </React.Fragment>

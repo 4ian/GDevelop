@@ -79,6 +79,7 @@ type ProjectStructureItemProps = {|
   error?: ?Error,
   onRefresh?: () => void,
   open?: boolean,
+  identifier?: string,
 |};
 
 const ProjectStructureItem = (props: ProjectStructureItemProps) => (
@@ -89,9 +90,13 @@ const ProjectStructureItem = (props: ProjectStructureItemProps) => (
         leftIcon,
         onRefresh,
         indentNestedItems,
+        identifier,
         ...otherProps
       } = props;
       return (
+        <div
+        {...(identifier ? { className: 'guideline-' + identifier } : {})}
+        >
         <ListItem
           style={{
             backgroundColor: muiTheme.listItem.groupBackgroundColor,
@@ -106,6 +111,7 @@ const ProjectStructureItem = (props: ProjectStructureItemProps) => (
           onReload={onRefresh}
           reloadButtonTooltip={`An error has occured in functions. Click to reload them.`}
         />
+        </div>
       );
     }}
   </ThemeConsumer>
@@ -687,6 +693,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             ]}
           />
           <ProjectStructureItem
+          identifier="projectStructureScenes"
             primaryText={<Trans>Scenes</Trans>}
             leftIcon={
               <ListIcon
@@ -731,6 +738,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 })
                 .concat(
                   <AddListItem
+                  identifier="addScene"
                     key={'add-scene'}
                     onClick={this.props.onAddLayout}
                     primaryText={<Trans>Click to add a scene</Trans>}

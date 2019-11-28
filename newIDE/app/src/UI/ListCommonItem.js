@@ -6,15 +6,20 @@ import BackgroundText from './BackgroundText';
 type Props = {|
   onClick?: () => void,
   primaryText: React.Node,
+  identifier?: string,
 |};
 
 export const AddListItem = (props: Props) => {
   return (
+    <div
+     {...(props.identifier ? { className: 'guideline-' + props.identifier } : {})}
+    >
     <ListItem
       onClick={props.onClick}
       primaryText={<BackgroundText>{props.primaryText}</BackgroundText>}
       displayAddIcon
     />
+    </div>
   );
 };
 

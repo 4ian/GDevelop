@@ -304,10 +304,12 @@ class MainFrame extends React.Component<Props, State> {
       });
   };
 
-  restartGuidelines = () => {
+  closeGuidelines = () => {
     // this._guidelines.current is a reference to your component. Beware, it can be `null` if for some reason it was not rendered on the screen by React.
     if (this._guidelines.current) {
       this._guidelines.current.reset();
+      this.openGuidelines(false);
+
     }
   };
 
@@ -1242,7 +1244,7 @@ class MainFrame extends React.Component<Props, State> {
               }
               onOpenProjectManager={() => this.openProjectManager()}
               onOpenGuidelines={() => this.openGuidelines()}
-              restartGuidelines={() => this.restartGuidelines()}
+              closeGuidelines={() => this.closeGuidelines()}
               guidelinesIsOpen={this.state.guidelinesOpen}
               onCloseProject={() => {
                 this.askToCloseProject();
@@ -1747,7 +1749,7 @@ class MainFrame extends React.Component<Props, State> {
           open={guidelinesOpen}
           closeHandler={() => {
             this.openGuidelines(false);
-            this.restartGuidelines();
+            this.closeGuidelines();
           }}
         />
         <ProjectTitlebar fileMetadata={currentFileMetadata} />

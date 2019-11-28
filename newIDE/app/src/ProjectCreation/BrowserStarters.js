@@ -170,6 +170,7 @@ export default class BrowserStarters extends Component<Props> {
                 }}
               />
               <ListItem
+              identifier="createEmptyGame"
                 primaryText={<Trans>Empty game</Trans>}
                 secondaryText={<Trans>Start a new game from scratch.</Trans>}
                 secondaryTextLines={2}

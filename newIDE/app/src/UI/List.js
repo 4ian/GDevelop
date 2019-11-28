@@ -63,6 +63,7 @@ type ListItemProps = {|
   open?: boolean,
   initiallyOpen?: boolean,
   disabled?: boolean,
+  identifier?: string,
 
   nestedListStyle?: {|
     padding: 0,
@@ -166,11 +167,12 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
 
   render() {
     const { props, state } = this;
-    const { renderNestedItems } = props;
+    const { renderNestedItems, identifier } = props;
 
     if (!renderNestedItems) {
       return (
         <MUIListItem
+         {...(identifier ? { className: 'guideline-' + identifier } : {})}
           button
           dense={useDenseLists}
           disableRipple

@@ -817,6 +817,7 @@ gdjs.SpriteRuntimeObject.prototype.isFlippedY = function() {
  * @return {number} The width of the object, in pixels.
  */
 gdjs.SpriteRuntimeObject.prototype.getWidth = function() {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     return this._renderer.getWidth();
 };
 
@@ -826,6 +827,7 @@ gdjs.SpriteRuntimeObject.prototype.getWidth = function() {
  * @return {number} The height of the object, in pixels.
  */
 gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     return this._renderer.getHeight();
 };
 

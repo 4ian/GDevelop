@@ -1,0 +1,17 @@
+{
+  "name": "gdevelop-javascript-platform",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://gdevelop-app.com",
+  "devDependencies": {
+    "@types/expect.js": "^0.3.29",
+    "@types/mocha": "^5.2.7",
+    "typescript": "3.6.4"
+  },
+  "dependencies": {},
+  "scripts": {
+    "copy-runtime-to-ide": "echo \"Use scripts/CopyRuntimeToGD.sh (or .bat on Windows)\"",
+    "check-types": "tsc"
+  }
+}

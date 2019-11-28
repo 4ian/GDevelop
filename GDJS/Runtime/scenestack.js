@@ -1,3 +1,4 @@
+// @ts-check
 
 /**
  * Hold the stack of scenes (gdjs.RuntimeScene) being played.
@@ -50,11 +51,11 @@ gdjs.SceneStack.prototype.step = function(elapsedTime) {
     return true;
 };
 
-gdjs.SceneStack.prototype.renderWithoutStep = function(elapsedTime) {
+gdjs.SceneStack.prototype.renderWithoutStep = function() {
 	if (this._stack.length === 0) return false;
 
 	var currentScene = this._stack[this._stack.length - 1];
-    currentScene.render(elapsedTime);
+    currentScene.render();
 
     return true;
 };

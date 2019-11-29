@@ -8,6 +8,7 @@ import guidelines from './data.js';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
 import { Line } from '../UI/Grid';
+import { Trans } from '@lingui/macro';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import './style.css';
 
@@ -28,6 +29,8 @@ BUG - Le <Guideline> avec le <Popper> ajoute un décalage sur le body lorsqu'une
 style="overflow: hidden; padding-right: 17px;"
 Cela ne provient pas de "import './style.css' à premiere vu.
 
+BUG -  Lorsque je lance le tuto, ouvre un projet, le ripple effect se fait sur toute la page.
+
 BUG - Lorsque je lance le tuto, ouvre un projet, ferme le tuto, et la relance, la Popper utilise un anchor inconnu et place mal la Popper.
 
 BUG - Lorsque je lance le tuto, ouvre un projet, la project manager s'ouvre la suite du tuto ne sedéclenche pas.
@@ -43,21 +46,6 @@ Je ne sais pas trop où mettre ce css.
 Il faudrait créer une fake ref.
 (passé en ref un element toujour affiché comme la classe "main-frame", pas possible sinon le Popper est en dehors du cadre)
 */
-
-const styles = {
-  guidelineContainer: {
-    maxWidth: 400,
-    padding: 10,
-  },
-  guidelineDescription: {
-    paddingBottom: 10,
-    overflow: 'hidden',
-    whiteSpace: 'pre-line',
-  },
-  guidelineImage: {
-    width: '100%',
-  },
-};
 
 type State = {|
   open: boolean,
@@ -222,7 +210,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           color="primary"
           onClick={this.props.closeHandler}
         >
-          Finish
+         <Trans>Finish</Trans>
         </Button>
       );
     } else {
@@ -233,7 +221,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           disabled={this.state.index === this.state.indexMax}
           onClick={this.next}
         >
-          Next
+         <Trans>Next</Trans>
         </Button>
       );
     }
@@ -246,13 +234,13 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
             Window.openExternalURL(getHelpLink('/tutorials'));
           }}
         >
-          See wikipage
+          <Trans>See wikipage</Trans>
         </Button>
       );
     } else {
       closeOrWikipage = (
         <Button variant="contained" onClick={this.props.closeHandler}>
-          Close
+          <Trans>Close</Trans>
         </Button>
       );
     }
@@ -262,7 +250,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
         <img
           src={guidelines[this.state.index].imageSource}
           alt={guidelines[this.state.index].imageAlt}
-          style={styles.guidelineImage}
+          className={"guidelineImage"}
         />
       );
     } else {
@@ -298,8 +286,6 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
                         element: this.state.arrowRef,
                       },
                     }}
-                   
-                     //className={'guidelineArrowContainer'}
                     className="guidelineArrowContainer"
                   >
                     <div
@@ -307,16 +293,16 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
                       className={'guidelineArrow'}
                     />
 
-                    <Paper elevation={24} style={styles.guidelineContainer}>
-                      <div style={styles.guidelineDescription}>
+                    <Paper elevation={24} className={"guidelineContainer"}>
+                      <div className={"guidelineDescription"}>
                         <Line>
                           <Typography variant="h5">
-                            {guidelines[this.state.index].title}
+                            <Trans>{guidelines[this.state.index].title}</Trans>
                           </Typography>
                         </Line>
                         <Line>
                           <Typography wrap="true">
-                            {guidelines[this.state.index].description}
+                            <Trans>{guidelines[this.state.index].description}</Trans>
                           </Typography>
                         </Line>
                         <Line>{imageTutorial}</Line>
@@ -325,14 +311,14 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
                         <Line>{closeOrWikipage}</Line>
                         <Line alignItems="center">
                           <Typography style={{ marginRight: 10 }}>
-                            {this.state.index + 1} of {this.state.indexMax + 1}
+                            {this.state.index + 1} <Trans>of</Trans> {this.state.indexMax + 1}
                           </Typography>
                           <Button
                             variant="contained"
                             disabled={this.state.index === 0 ? true : false}
                             onClick={this.back}
                           >
-                            Back
+                            <Trans>Back</Trans>
                           </Button>
                           {nextOrFinish}
                         </Line>

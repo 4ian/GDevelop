@@ -1,11 +1,12 @@
 
 .guidelineContainer {
-    max-width: 400;
-    padding: 10;
+    max-width: 400px;
+    padding: 10px;
 }
 .guidelineDescription {
     padding-bottom: 10;
     overflow: 'hidden';
+    white-space: 'pre-line';
 }
 .guidelineimage {
     width: '100%';

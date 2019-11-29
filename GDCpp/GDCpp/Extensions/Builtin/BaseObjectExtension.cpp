@@ -109,9 +109,6 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["Ecarter"]
       .SetFunctionName("SeparateObjectsWithoutForces")
       .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
-  objectActions["SeparateFromObjects"]
-      .SetFunctionName("SeparateFromObjects")
-      .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
   objectConditions["CollisionPoint"].SetFunctionName("IsCollidingWithPoint");
 
   objectExpressions["X"].SetFunctionName("GetX");
@@ -173,6 +170,9 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["NbObjet"]
       .SetFunctionName("PickedObjectsCount")
       .SetManipulatedType("number")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
+  GetAllConditions()["SeparateFromObjects"]
+      .SetFunctionName("SeparateObjects")
       .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
   GetAllConditions()["CollisionNP"]
       .SetFunctionName("HitBoxesCollision")

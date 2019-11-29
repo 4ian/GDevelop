@@ -11,22 +11,22 @@
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
-    "orientation": "default",
-    "packageName": "",
-    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/Collisions benchmark.json",
+    "orientation": "landscape",
+    "packageName": "com.example.gamename",
+    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/Separate objects benchmark.json",
     "scaleMode": "linear",
-    "sizeOnStartupMode": "",
+    "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
-    "name": "Projet",
+    "name": "Project",
     "author": "",
     "windowWidth": 800,
     "windowHeight": 600,
     "latestCompilationDirectory": "",
     "maxFPS": 60,
-    "minFPS": 10,
+    "minFPS": 20,
     "verticalSync": false,
     "platformSpecificAssets": {},
     "loadingScreen": {
@@ -102,19 +102,28 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "2DWoodBox.jpg",
+        "file": "NewObject-1.png",
         "kind": "image",
         "metadata": "",
-        "name": "2DWoodBox.jpg",
+        "name": "NewObject-1.png",
         "smoothed": true,
-        "userAdded": false
+        "userAdded": true
       },
       {
         "alwaysLoaded": false,
-        "file": "spship.png",
+        "file": "NewObject2-1.png",
         "kind": "image",
         "metadata": "",
-        "name": "spship.png",
+        "name": "NewObject2-1.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "NewObject3-1.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "NewObject3-1.png",
         "smoothed": true,
         "userAdded": false
       }
@@ -128,8 +137,8 @@
     {
       "b": 209,
       "disableInputWhenNotFocused": true,
-      "mangledName": "Nouvelle_32sc_232ne",
-      "name": "Nouvelle scène",
+      "mangledName": "NewScene",
+      "name": "NewScene",
       "oglFOV": 90,
       "oglZFar": 500,
       "oglZNear": 1,
@@ -157,58 +166,13 @@
         {
           "angle": 0,
           "customSize": false,
-          "height": 243,
-          "layer": "",
-          "locked": false,
-          "name": "NouvelObjet1",
-          "width": 278,
-          "x": 108.5,
-          "y": 59,
-          "zOrder": 1,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "NouvelObjet",
+          "name": "NewObject3",
           "width": 0,
-          "x": 400.5,
-          "y": 253,
-          "zOrder": 1,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "NouvelObjet",
-          "width": 0,
-          "x": 195.5,
-          "y": 95,
-          "zOrder": 1,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "NouvelObjet",
-          "width": 0,
-          "x": 563.5,
-          "y": 370,
+          "x": 689,
+          "y": 110,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -217,33 +181,24 @@
       ],
       "objects": [
         {
-          "name": "NouvelObjet",
+          "name": "NewObject",
           "tags": "",
           "type": "Sprite",
-          "updateIfNotVisible": true,
-          "variables": [
-            {
-              "name": "NewVariable",
-              "value": "1"
-            },
-            {
-              "name": "NewVariable2",
-              "value": "2"
-            }
-          ],
+          "updateIfNotVisible": false,
+          "variables": [],
           "behaviors": [],
           "animations": [
             {
-              "name": "",
+              "name": "NewObject",
               "useMultipleDirections": false,
               "directions": [
                 {
                   "looping": false,
-                  "timeBetweenFrames": 1,
+                  "timeBetweenFrames": 0.08,
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "2DWoodBox.jpg",
+                      "image": "NewObject-1.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -256,26 +211,7 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
+                      "customCollisionMask": []
                     }
                   ]
                 }
@@ -284,24 +220,24 @@
           ]
         },
         {
-          "name": "NouvelObjet1",
+          "name": "NewObject2",
           "tags": "",
           "type": "Sprite",
-          "updateIfNotVisible": true,
+          "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
           "animations": [
             {
-              "name": "",
+              "name": "NewObject2",
               "useMultipleDirections": false,
               "directions": [
                 {
                   "looping": false,
-                  "timeBetweenFrames": 1,
+                  "timeBetweenFrames": 0.08,
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "spship.png",
+                      "image": "NewObject2-1.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -314,26 +250,46 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NewObject3",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "NewObject3",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "NewObject3-1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
                     }
                   ]
                 }
@@ -365,7 +321,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Repeat",
-              "repeatExpression": "1200",
+              "repeatExpression": "700",
               "conditions": [],
               "actions": [
                 {
@@ -375,9 +331,9 @@
                   },
                   "parameters": [
                     "",
-                    "NouvelObjet",
-                    "Random(400)",
-                    "Random(300)",
+                    "NewObject",
+                    "Random(800)",
+                    "Random(600)",
                     ""
                   ],
                   "subInstructions": []
@@ -389,10 +345,34 @@
                   },
                   "parameters": [
                     "",
-                    "NouvelObjet1",
-                    "0",
-                    "0",
+                    "NewObject2",
+                    "Random(800)",
+                    "Random(600)",
                     ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeScale"
+                  },
+                  "parameters": [
+                    "NewObject",
+                    "=",
+                    "0.3"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeScale"
+                  },
+                  "parameters": [
+                    "NewObject2",
+                    "=",
+                    "0.3"
                   ],
                   "subInstructions": []
                 }
@@ -400,6 +380,131 @@
               "events": []
             }
           ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Timer"
+              },
+              "parameters": [
+                "",
+                "1",
+                "\"DirectionChange\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "",
+                "\"DirectionChange\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetAngle"
+              },
+              "parameters": [
+                "NewObject",
+                "=",
+                "Random(360)"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetAngle"
+              },
+              "parameters": [
+                "NewObject2",
+                "=",
+                "Random(360)"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "AddForceAL"
+              },
+              "parameters": [
+                "NewObject",
+                "NewObject.Angle()",
+                "30",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "AddForceAL"
+              },
+              "parameters": [
+                "NewObject2",
+                "NewObject2.Angle()",
+                "30",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SeparateFromObjects"
+              },
+              "parameters": [
+                "NewObject",
+                "NewObject2",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SeparateFromObjects"
+              },
+              "parameters": [
+                "NewObject2",
+                "NewObject2",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
@@ -413,46 +518,11 @@
                 "value": "MettreXY"
               },
               "parameters": [
-                "NouvelObjet1",
+                "NewObject3",
                 "=",
                 "MouseX()",
                 "=",
                 "MouseY()"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "NouvelObjet1",
-                "NouvelObjet",
-                "",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ChangeDirection"
-              },
-              "parameters": [
-                "NouvelObjet",
-                "+",
-                "1"
               ],
               "subInstructions": []
             }

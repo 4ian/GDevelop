@@ -114,9 +114,6 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["AngleOfDisplacement"]
       .SetFunctionName("averageForceAngleIs")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["SeparateFromObjects"]
-      .SetFunctionName("separateFromObjectsList")
-      .SetIncludeFile("runtimeobject.js");
   objectActions["Ecarter"]
       .codeExtraInformation  // Deprecated
       .SetFunctionName("separateObjectsWithoutForces")
@@ -202,6 +199,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.pickedObjectsCount");
   GetAllConditions()["NbObjet"].SetFunctionName(
       "gdjs.evtTools.object.pickedObjectsCount");
+  GetAllActions()["SeparateFromObjects"]
+      .SetFunctionName("gdjs.evtTools.object.separateObjects");
   GetAllConditions()["CollisionNP"]
       .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
   GetAllConditions()["Raycast"].SetFunctionName(

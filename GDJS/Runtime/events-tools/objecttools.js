@@ -216,59 +216,16 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
  * @param {Hashtable} objectsLists2 The second lists of objects to test collisions for
  * @param {boolean} inverted If set to true, only objects from the first lists that are not in collision with *any* other objects will be picked.
  * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
- * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collisions if only their edges are touching.
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
  */
 gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
-    var object1IdsSet = {};
-    var object2IdsSet = {};
-
-    for(var key in objectsLists1.items) { // TODO: extract in function (objectsListsToObjectIdsSet)
-        var list = objectsLists1.items[key];
-        for(var i = 0;i<list.length;++i) {
-            object1IdsSet[list[i].id] = true;
-        }
-    }
-    for(var key in objectsLists2.items) { // TODO: extract in function (objectsListsToObjectIdsSet)
-        var list = objectsLists2.items[key];
-        for(var i = 0;i<list.length;++i) {
-            object2IdsSet[list[i].id] = true;
-        }
-    }
+    var object1IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists1);
+    var object2IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists2);
 
     var isTrue = runtimeScene.getObjectPositionsManager().collisionTest(object1IdsSet, object2IdsSet, inverted, ignoreTouchingEdges);
 
-    //Trim not picked objects from lists.
-    for(var key in objectsLists1.items) { // TODO: extract in method related to object lists/sets (filterObjectsListsWithObjectIdsSet)
-        var list = objectsLists1.items[key];
-        var finalSize = 0;
-
-        for(var i = 0;i<list.length;++i) {
-            var obj = list[i];
-            if (object1IdsSet[obj.id]) {
-                list[finalSize] = obj;
-                finalSize++;
-            }
-        }
-
-        list.length = finalSize;
-    }
-
-    if ( !inverted ) {
-        for(var key in objectsLists2.items) { // TODO: extract in method related to object lists/sets (filterObjectsListsWithObjectIdsSet)
-            var list = objectsLists2.items[key];
-            var finalSize = 0;
-
-            for(var i = 0;i<list.length;++i) {
-                var obj = list[i];
-                if (object2IdsSet[obj.id]) {
-                    list[finalSize] = obj;
-                    finalSize++;
-                }
-            }
-
-            list.length = finalSize;
-        }
-    }
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists1, object1IdsSet);
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists2, object2IdsSet);
 
     return isTrue;
 };
@@ -287,6 +244,39 @@ gdjs.evtTools.object._distanceBetweenObjects = function(obj1, obj2, distance) {
 gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
     return gdjs.evtTools.object.twoListsTest(gdjs.evtTools.object._distanceBetweenObjects,
         objectsLists1, objectsLists2, inverted, distance*distance);
+};
+
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to move
+ * @param {Hashtable} objectsLists2 The lists of objects to move away from
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.separateObjects = function(objectsLists1, objectsLists2, ignoreTouchingEdges, runtimeScene) {
+    var object1IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists1);
+    var object2IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists2);
+
+    runtimeScene.getObjectPositionsManager().separateObjects(object1IdsSet, object2IdsSet, ignoreTouchingEdges);
+};
+
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to move
+ * @param {Hashtable} objectsLists2 The lists of objects to move away from
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.OLDseparateObjects = function(objectsLists1, objectsLists2, ignoreTouchingEdges, runtimeScene) {
+    var lists = gdjs.staticArray(gdjs.evtTools.object.separateObjects);
+    objectsLists1.values(lists);
+    for(var i = 0, len = lists.length;i<len;++i) {
+        var list = lists[i];
+
+        for(var j = 0;j < list.length;++j) {
+            /** @type gdjs.RuntimeObject */
+            var object = list[j];
+            object.separateFromObjectsList(objectsLists2, ignoreTouchingEdges);
+        }
+    }
 };
 
 gdjs.evtTools.object._movesToward = function(obj1, obj2, tolerance) {

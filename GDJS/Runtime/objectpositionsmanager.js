@@ -1,13 +1,25 @@
 // @ts-check
 
-/***
+/**
+ * Represents the coordinates, AABB and hitboxes of an object.
+ *
  * @typedef {Object} ObjectPosition
+ * @property {ObjectWithCoordinatesInterface} object
  * @property {number} objectId
  * @property {string} objectNameId
  * @property {number} x
  * @property {number} y
- * @property {Object} hitboxes
+ * @property {gdjs.Polygon[]} hitboxes
  * @property {AABB} aabb
+ */
+
+/**
+ * Represents the updates to do to coordinates, AABB and hitboxes of an object.
+ *
+ * @typedef {Object} ObjectPositionCoordinatesUpdate
+ * @property {number} objectId
+ * @property {number} x
+ * @property {number} y
  */
 
 /**
@@ -23,11 +35,20 @@
  * @property {() => string} getNameId
  * @property {() => number} getX
  * @property {() => number} getY
- * @property {() => Object} getHitBoxes
+ * @property {() => gdjs.Polygon[]} getHitBoxes
  * @property {() => AABB} getAABB
+ * @property {(number) => void} setX
+ * @property {(number) => void} setY
  */
 
-/***
+/**
+ * Store the coordinates, AABB and hitboxes of objects of a scene, and
+ * allow to query objects near a position/near another object, detect
+ * collisions and separate colliding objects.
+ *
+ * Internally, object positions are stored into a spatial data structure.
+ * This allow for fast queries/collision handling of objects.
+ *
  * @class gdjs.ObjectPositionsManager
  */
 gdjs.ObjectPositionsManager = function() {
@@ -40,11 +61,39 @@ gdjs.ObjectPositionsManager = function() {
   /** @type Object.<number, boolean> */
   this._removedObjectIdsSet = {};
 
-  // TODO: use the default AABB format of RBush?
   this._positionsRBushes = {};
 
   /** @type Object.<number, ObjectPosition> */
   this._allObjectPositions = {};
+};
+
+/**
+ * Tool function to move an ObjectPosition, and update the associated object coordinates.
+ *
+ * @param {ObjectPosition} objectPosition
+ * @param {number} deltaX The delta to apply on X axis
+ * @param {number} deltaY The delta to apply on Y axis
+ */
+gdjs.ObjectPositionsManager._moveObjectPosition = function(
+  objectPosition,
+  deltaX,
+  deltaY
+) {
+  objectPosition.x += deltaX;
+  objectPosition.y += deltaY;
+  objectPosition.aabb.min[0] += deltaX;
+  objectPosition.aabb.min[1] += deltaY;
+  objectPosition.aabb.max[0] += deltaX;
+  objectPosition.aabb.max[1] += deltaY;
+  for (var i = 0; i < objectPosition.hitboxes.length; i++) {
+    objectPosition.hitboxes[i].move(deltaX, deltaY);
+  }
+
+  // Update the object represented by this position. Note that this will potentially
+  // mark the object as being "dirty" (see `markObjectAsDirty`), which is sub-optimal
+  // but ok.
+  objectPosition.object.setX(objectPosition.x);
+  objectPosition.object.setY(objectPosition.y);
 };
 
 gdjs.ObjectPositionsManager.prototype.getCounters = function() {
@@ -55,12 +104,14 @@ gdjs.ObjectPositionsManager.prototype.getCounters = function() {
 };
 
 /**
- * @param {string} nameId
+ * Get the spatial data structure handling objects with the given name identifier.
+ * @param {string} nameId The name identifier of the objects.
  */
 gdjs.ObjectPositionsManager.prototype._getPositionsRBush = function(nameId) {
   var positionsRBush = this._positionsRBushes[nameId];
   if (positionsRBush) return positionsRBush;
 
+  // TODO: use the default AABB format of RBush?
   // @ts-ignore - TODO: types for rbush
   return (this._positionsRBushes[nameId] = rbush(9, [
     '.aabb.min[0]',
@@ -85,6 +136,8 @@ gdjs.ObjectPositionsManager.prototype.markObjectAsCreated = function(object) {
 };
 
 /**
+ * Mark an object as removed. It should be removed from the spatial data structure and its
+ * position/AABB/hitboxes removed from memory.
  * @param {ObjectWithCoordinatesInterface} object
  */
 gdjs.ObjectPositionsManager.prototype.markObjectAsRemoved = function(object) {
@@ -92,6 +145,7 @@ gdjs.ObjectPositionsManager.prototype.markObjectAsRemoved = function(object) {
 };
 
 /**
+ * Mark an object as dirty, after it has moved, AABB or hitboxes were changed.
  * @param {ObjectWithCoordinatesInterface} object
  */
 gdjs.ObjectPositionsManager.prototype.markObjectAsDirty = function(object) {
@@ -122,6 +176,7 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
     var objectNameId = object.getNameId();
 
     objectPosition = this._allObjectPositions[objectId] = {
+      object: object,
       objectId: object.id,
       objectNameId: objectNameId,
       x: object.getX(),
@@ -133,6 +188,9 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
     delete this._dirtyObjects[objectId];
   }
 
+  // Handle removed objects *after* handling dirty objects.
+  // This is because an object can be mark for deletion, then moved
+  // before the end of the frame.
   for (var objectId in this._removedObjectIdsSet) {
     var objectPosition = this._allObjectPositions[objectId];
     if (objectPosition) {
@@ -147,6 +205,25 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
 };
 
 // Query methods:
+
+/**
+ * Returns a set containing all the name identifiers corresponding to the object
+ * passed (as a set of object ids).
+ * @param {Object.<number, boolean>} objectIdsSet The set of object identifiers
+ * @returns {Object.<number, boolean>} The set of name identifiers
+ */
+gdjs.ObjectPositionsManager.prototype._getAllObjectNameIds = function(
+  objectIdsSet
+) {
+  /** @type Object.<number, boolean> */
+  var objectNameIdsSet = {};
+  for (var objectId in objectIdsSet) {
+    var objectPosition = this._allObjectPositions[objectId];
+    objectNameIdsSet[objectPosition.objectNameId] = true;
+  }
+
+  return objectNameIdsSet;
+};
 
 /**
  * @param {Object.<number, boolean>} object1IdsSet
@@ -170,11 +247,7 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
 
   // Get the set of all objectNameIds for the second list, to know in which
   // RBush we have to search them.
-  var object2NameIdsSet = {};
-  for (var object2Id in object2IdsSet) {
-    var object2Position = this._allObjectPositions[object2Id];
-    object2NameIdsSet[object2Position.objectNameId] = true;
-  }
+  var object2NameIdsSet = this._getAllObjectNameIds(object2IdsSet);
 
   for (var object1Id in object1IdsSet) {
     var atLeastOneObject = false;
@@ -197,13 +270,14 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
       for (var j = 0; j < nearbyObjectPositions.length; ++j) {
         var object2Position = nearbyObjectPositions[j];
 
-        // It's possible that we're testing collision between lists containing the same objects
+        // It's possible that we're testing distance between lists containing the same objects
         if (object2Position.objectId === object1Position.objectId) continue;
 
         if (object2IdsSet[object2Position.objectId]) {
           if (!inverted) {
             isTrue = true;
 
+            // TODO: implement a real distance check
             pickedObject2IdsSet[object2Position.objectId] = true;
             pickedObject1IdsSet[object1Id] = true;
           }
@@ -222,14 +296,28 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
   }
 
   // Trim sets
-  this.keepOnlyIdsFromObjectIdsSet(object1IdsSet, pickedObject1IdsSet);
+  gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+    object1IdsSet,
+    pickedObject1IdsSet
+  );
   if (!inverted) {
-    this.keepOnlyIdsFromObjectIdsSet(object2IdsSet, pickedObject2IdsSet);
+    gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+      object2IdsSet,
+      pickedObject2IdsSet
+    );
   }
 
   return isTrue;
 };
 
+/**
+ * Test if there is a collision between any of the two hitboxes (any polygon from the first
+ * touching any polygon of the second).
+ *
+ * @param {gdjs.Polygon[]} hitBoxes1
+ * @param {gdjs.Polygon[]} hitBoxes2
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ */
 gdjs.ObjectPositionsManager.prototype._checkHitboxesCollision = function(
   hitBoxes1,
   hitBoxes2,
@@ -253,10 +341,16 @@ gdjs.ObjectPositionsManager.prototype._checkHitboxesCollision = function(
 };
 
 /**
+ * Check collisions between the specified set of objects, filtering both sets to only
+ * keep the object ids that are actually in collision with a member of the other set.
+ *
+ * If `inverted` is true, only the first set is filtered with the object ids that are NOT
+ * in collision with any object of the second set.
+ *
  * @param {Object.<number, boolean>} object1IdsSet
  * @param {Object.<number, boolean>} object2IdsSet
  * @param {boolean} inverted
- * @param {boolean} ignoreTouchingEdges
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
  */
 gdjs.ObjectPositionsManager.prototype.collisionTest = function(
   object1IdsSet,
@@ -274,11 +368,7 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
 
   // Get the set of all objectNameIds for the second list, to know in which
   // RBush we have to search them.
-  var object2NameIdsSet = {};
-  for (var object2Id in object2IdsSet) {
-    var object2Position = this._allObjectPositions[object2Id];
-    object2NameIdsSet[object2Position.objectNameId] = true;
-  }
+  var object2NameIdsSet = this._getAllObjectNameIds(object2IdsSet);
 
   for (var object1Id in object1IdsSet) {
     var atLeastOneObject = false;
@@ -337,21 +427,147 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
   }
 
   // Trim sets
-  this.keepOnlyIdsFromObjectIdsSet(object1IdsSet, pickedObject1IdsSet);
+  gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+    object1IdsSet,
+    pickedObject1IdsSet
+  );
   if (!inverted) {
-    this.keepOnlyIdsFromObjectIdsSet(object2IdsSet, pickedObject2IdsSet);
+    gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+      object2IdsSet,
+      pickedObject2IdsSet
+    );
   }
 
   return isTrue;
 };
 
+/**
+ * Test if there are collisions between any of the two hitboxes (any polygon from the first
+ * touching any polygon of the second), and if so update the `moveCoordinates` array with
+ * the delta that should be applied to hitboxes to be separated.
+ *
+ * @param {gdjs.Polygon[]} hitBoxes
+ * @param {gdjs.Polygon[]} otherHitBoxes
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ */
+gdjs.ObjectPositionsManager.prototype._separateHitboxes = function(
+  hitBoxes,
+  otherHitBoxes,
+  ignoreTouchingEdges,
+  moveCoordinates
+) {
+  var moved = false;
+
+  for (var k = 0, lenk = hitBoxes.length; k < lenk; ++k) {
+    for (var l = 0, lenl = otherHitBoxes.length; l < lenl; ++l) {
+      var result = gdjs.Polygon.collisionTest(
+        hitBoxes[k],
+        otherHitBoxes[l],
+        ignoreTouchingEdges
+      );
+      if (result.collision) {
+        moveCoordinates[0] += result.move_axis[0];
+        moveCoordinates[1] += result.move_axis[1];
+        moved = true;
+      }
+    }
+  }
+
+  return moved;
+};
+
+/**
+ * Separate the specified sets of objects.
+ *
+ * @param {Object.<number, boolean>} object1IdsSet
+ * @param {Object.<number, boolean>} object2IdsSet
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ */
+gdjs.ObjectPositionsManager.prototype.separateObjects = function(
+  object1IdsSet,
+  object2IdsSet,
+  ignoreTouchingEdges
+) {
+  this.update();
+
+  var isTrue = false;
+
+  // Get the set of all objectNameIds for the second list, to know in which
+  // RBush we have to search them.
+  var object2NameIdsSet = this._getAllObjectNameIds(object2IdsSet);
+
+  /** @type ObjectPositionCoordinatesUpdate[] */
+  var objectPositionUpdates = [];
+
+  for (var object1Id in object1IdsSet) {
+    var moved = false;
+    var moveCoordinates = [0, 0];
+
+    var object1Position = this._allObjectPositions[object1Id];
+
+    var searchArea = {
+      minX: object1Position.aabb.min[0],
+      minY: object1Position.aabb.min[1],
+      maxX: object1Position.aabb.max[0],
+      maxY: object1Position.aabb.max[1],
+    };
+
+    for (var object2NameId in object2NameIdsSet) {
+      /** @type ObjectPosition[] */
+      var nearbyObjectPositions = this._getPositionsRBush(object2NameId).search(
+        searchArea
+      );
+
+      for (var j = 0; j < nearbyObjectPositions.length; ++j) {
+        var object2Position = nearbyObjectPositions[j];
+
+        // It's possible that we're testing collision between lists containing the same objects
+        if (object2Position.objectId === object1Position.objectId) continue;
+
+        if (object2IdsSet[object2Position.objectId]) {
+          moved =
+            this._separateHitboxes(
+              object1Position.hitboxes,
+              object2Position.hitboxes,
+              ignoreTouchingEdges,
+              moveCoordinates
+            ) || moved;
+        }
+      }
+    }
+
+    if (moved) {
+      objectPositionUpdates.push({
+        objectId: object1Position.objectId,
+        x: moveCoordinates[0],
+        y: moveCoordinates[1],
+      });
+    }
+  }
+
+  // Apply all new positions at once after all collisions are handled.
+  for (var i = 0; i < objectPositionUpdates.length; i++) {
+    var objectPositionUpdate = objectPositionUpdates[i];
+    var object1Position = this._allObjectPositions[
+      objectPositionUpdate.objectId
+    ];
+    gdjs.ObjectPositionsManager._moveObjectPosition(
+      object1Position,
+      objectPositionUpdate.x,
+      objectPositionUpdate.y
+    );
+  }
+};
+
 // Sets utilities:
 
 /**
+ * Delete any element of the first set that is not in the second one.
+ *
  * @param {Object.<number, boolean>} objectIdsSet
  * @param {Object.<number, boolean>} objectIdsSet2
  */
-gdjs.ObjectPositionsManager.prototype.keepOnlyIdsFromObjectIdsSet = function(
+gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet = function(
   objectIdsSet,
   objectIdsSet2
 ) {
@@ -359,5 +575,56 @@ gdjs.ObjectPositionsManager.prototype.keepOnlyIdsFromObjectIdsSet = function(
     if (!objectIdsSet2[objectId]) {
       delete objectIdsSet[objectId];
     }
+  }
+};
+
+/**
+ * Generate a set of object ids from the lists of objects passed. Useful
+ * as gdjs.ObjectPositionsManager only deals with ids for genericity.
+ *
+ * @param {Hashtable} objectsLists The lists of objects
+ * @returns {Object.<number, boolean>} A set containing the object ids
+ */
+gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet = function(
+  objectsLists
+) {
+  /** @type Object.<number, boolean> */
+  var objectIdsSet = {};
+
+  for (var key in objectsLists.items) {
+    var list = objectsLists.items[key];
+    for (var i = 0; i < list.length; ++i) {
+      objectIdsSet[list[i].id] = true;
+    }
+  }
+
+  return objectIdsSet;
+};
+
+/**
+ * Remove from the lists of objects any object that is not in the set of object ids.
+ * Useful as gdjs.ObjectPositionsManager only deals with ids for genericity, but events
+ * are using lists of objects.
+ *
+ * @param {Hashtable} objectsLists The lists of objects
+ * @param {Object.<number, boolean>} objectIdsSet A set containing the object ids to keep
+ */
+gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet = function(
+  objectsLists,
+  objectIdsSet
+) {
+  for (var key in objectsLists.items) {
+    var list = objectsLists.items[key];
+    var finalSize = 0;
+
+    for (var i = 0; i < list.length; ++i) {
+      var obj = list[i];
+      if (objectIdsSet[obj.id]) {
+        list[finalSize] = obj;
+        finalSize++;
+      }
+    }
+
+    list.length = finalSize;
   }
 };

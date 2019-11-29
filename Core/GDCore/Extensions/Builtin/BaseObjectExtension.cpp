@@ -602,7 +602,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectList", _("Object 2 (won't move)"));
 
-  obj.AddAction("SeparateFromObjects",
+  extension.AddAction("SeparateFromObjects",
                 _("Separate two objects"),
                 _("Move an object away from another using their collision "
                   "masks.\nBe sure to call this action on a reasonable number "
@@ -612,7 +612,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/ecarter24.png",
                 "res/actions/ecarter.png")
 
-      .AddParameter("object", _("Object"))
+      .AddParameter("objectList", _("Object"))
       .AddParameter("objectList", _("Objects (won't move)"))
       .AddParameter("yesorno",
                     _("Ignore objects that are touching each other on their "
@@ -620,6 +620,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "",
                     true)
       .SetDefaultValue("no")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
   obj.AddCondition("CollisionPoint",

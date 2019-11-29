@@ -25,6 +25,9 @@ bool GD_API ObjectsTurnedToward(
 
 /**
  * Only used internally by GD events generated code.
+ *
+ * Complexity is O(n*m) and could be improved by using a spatial data structure
+ * to store object positions (see GDJS).
  */
 bool GD_API HitBoxesCollision(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
@@ -35,12 +38,27 @@ bool GD_API HitBoxesCollision(
 
 /**
  * Only used internally by GD events generated code.
+ *
+ * Complexity is O(n*m) and could be improved by using a spatial data structure
+ * to store object positions (see GDJS).
+ */
+void GD_API SeparateObjects(
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
+    bool ignoreTouchingEdges = false,
+    RuntimeScene &scene);
+
+/**
+ * Only used internally by GD events generated code.
  */
 double GD_API PickedObjectsCount(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists);
 
 /**
  * Only used internally by GD events generated code.
+ *
+ * Complexity is O(n*m) and could be improved by using a spatial data structure
+ * to store object positions (see GDJS).
  */
 float GD_API DistanceBetweenObjects(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,

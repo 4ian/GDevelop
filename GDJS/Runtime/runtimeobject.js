@@ -846,6 +846,8 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
 };
 
 /**
+ * An axis aligned bounding box, usually used for an object.
+ *
  * @typedef {Object} AABB
  * @property {number[]} min The [x,y] coordinates of the top left point
  * @property {number[]} max The [x,y] coordinates of the bottom right point

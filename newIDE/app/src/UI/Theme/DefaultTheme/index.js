@@ -5,6 +5,7 @@ import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 import './Markdown.css';
+import './Guidelines.css';
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';
@@ -79,6 +80,7 @@ const gdevelopTheme = {
   eventsSheetRootClassName: 'gd-events-sheet-default-theme', // See EventsSheet.css
   tableRootClassName: 'gd-table-default-theme', // See Table.css
   markdownRootClassName: 'gd-markdown-default-theme', // See Markdown.css
+  guidelinesRootClassName: 'gd-guidelines-default-theme', // See Guidelines.css
   gdevelopIconsCSSFilter: '',
 };
 

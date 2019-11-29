@@ -188,7 +188,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
     const clickTargetElementHTML = document.querySelectorAll(
       '.guideline-' + guidelines[this.state.index].clickTargetBind
     )[0];
- 
+
     /*
     clickTarget n'est pas disponible à ce moment donc ça ne fonctionne pas avec l'ID
     const clickTargetElementHTML = document.getElementById("clickTarget");
@@ -276,7 +276,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           guidelines[this.state.index].positionBind && (
             <ThemeConsumer>
               {muiTheme => (
-                <div>
+                <div  className={muiTheme.guidelinesRootClassName} >
                   <Popper
                     open={open}
                     anchorEl={this.state.anchor}
@@ -298,13 +298,13 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
                         element: this.state.arrowRef,
                       },
                     }}
-                    //className={muiTheme.eventsSheetRootClassName.guidelineArrowContainer}
+                   
+                     //className={'guidelineArrowContainer'}
                     className="guidelineArrowContainer"
                   >
                     <div
                       ref={this._handleArrowRef}
-                      className="guidelineArrow"
-                      //className={muiTheme.eventsSheetRootClassName.guidelineArrow}
+                      className={'guidelineArrow'}
                     />
 
                     <Paper elevation={24} style={styles.guidelineContainer}>

@@ -208,23 +208,3 @@
   width: 16px;
   height: 16px;
 }
-
-/**
-* Guideline arrow
-*/
-.gd-events-sheet-default-theme .guidelineArrowContainer[x-placement*="left"] .gd-events-sheet-default-theme .guidelineArrow::before {
-  border-color: transparent transparent transparent #fff;
-  border-width: 1em 0 1em 1em;
-}
-.gd-events-sheet-default-theme .guidelineArrowContainer[x-placement*="right"] .gd-events-sheet-default-theme .guidelineArrow::before {
-  border-color: transparent #fff transparent transparent;
-  border-width: 1em 1em 1em 0;
-}
-.gd-events-sheet-default-theme .guidelineArrowContainer[x-placement*="top"] .gd-events-sheet-default-theme .guidelineArrow::before {
-  border-color: #fff transparent transparent transparent;
-  border-width: 1em 1em 0 1em;
-}
-.gd-events-sheet-default-theme .guidelineArrowContainer[x-placement*="bottom"] .gd-events-sheet-default-theme .guidelineArrow::before {
-  border-color: transparent transparent #fff transparent;
-  border-width: 0 1em 1em 1em;
-}

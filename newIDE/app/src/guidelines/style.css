@@ -1,3 +1,4 @@
+
 .guidelineContainer {
     max-width: 400;
     padding: 10;
@@ -12,31 +13,31 @@
 
 .guidelineArrowContainer {
     z-index: 2000;
+} 
+
+/**
+* Guideline arrow general
+*/
+ .guidelineArrowContainer[x-placement*] .guidelineArrow {
+    width: 3em;
+    height: 1em;
 }
 .guidelineArrowContainer[x-placement*="bottom"] .guidelineArrow {
     top: 0;
     left: 0;
-    width: 3em;
-    height: 1em;
     margin-top: -1em;
 }
 .guidelineArrowContainer[x-placement*="top"] .guidelineArrow {
     left: 0;
     bottom: 0;
-    width: 3em;
-    height: 1em;
     margin-bottom: -1em;
 }
 .guidelineArrowContainer[x-placement*="right"] .guidelineArrow {
     left: 0;
-    width: 1em;
-    height: 3em;
     margin-left: -1em;
 }
 .guidelineArrowContainer[x-placement*="left"] .guidelineArrow {
     right: 0;
-    width: 1em;
-    height: 3em;
     margin-right: -1em;
 }
 .guidelineArrow {
@@ -50,13 +51,12 @@
     content: "";
     display: block;
     border-style: solid;
-}
-
+} 
 
 /**
-* Guideline arrow
+* Guideline arrow color for themes
 */
-.guidelineArrowContainer[x-placement*="left"] .guidelineArrow::before {
+/* .guidelineArrowContainer[x-placement*="left"] .guidelineArrow::before {
     border-color: transparent transparent transparent #fff;
     border-width: 1em 0 1em 1em;
   }
@@ -66,17 +66,17 @@
   }
 .guidelineArrowContainer[x-placement*="top"] .guidelineArrow::before {
     border-color: #fff transparent transparent transparent;
-    border-width: 1em 1em 0 1em;
+    border-width: 0 0 0 0;
   }
 .guidelineArrowContainer[x-placement*="bottom"] .guidelineArrow::before {
     border-color: transparent transparent #fff transparent;
     border-width: 0 1em 1em 1em;
-  }
+  } */
 
 /*
 * clickTarget
 */
-#clickTarget{
+ #clickTarget{
     z-index: 1000;
     position: inherit;
     animation: blink 1.5s infinite;
@@ -91,4 +91,4 @@
   to {
      box-shadow: 0 0 24px 12px #0088ff91;
   }
-}
+} 

@@ -1,0 +1,20 @@
+/**
+* Guideline arrow color
+* The other css are in "newIDE\app\src\guidelines\style.css"
+*/
+.guidelineArrowContainer[x-placement*="left"] .guidelineArrow::before {
+    border-color: transparent transparent transparent #303030;
+    border-width: 1em 0 1em 1em;
+  }
+.guidelineArrowContainer[x-placement*="right"] .guidelineArrow::before {
+    border-color: transparent #303030 transparent transparent;
+    border-width: 1em 1em 1em 0;
+  }
+.guidelineArrowContainer[x-placement*="top"] .guidelineArrow::before {
+    border-color: #303030 transparent transparent transparent;
+    border-width: 0 0 0 0;
+  }
+.guidelineArrowContainer[x-placement*="bottom"] .guidelineArrow::before {
+    border-color: transparent transparent #303030 transparent;
+    border-width: 0 1em 1em 1em;
+  }

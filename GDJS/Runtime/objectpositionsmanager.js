@@ -69,7 +69,11 @@ gdjs.ObjectPositionsManager = function() {
 
   this._positionsRBushes = {};
 
-  /** @type Object.<number, ObjectPosition> */
+  /**
+   * A map containing all ObjectPosition handled in the spatial data structure,
+   * keyed by their object id.
+   * @type Object.<number, ObjectPosition>
+   */
   this._allObjectPositions = {};
 };
 
@@ -229,7 +233,13 @@ gdjs.ObjectPositionsManager.prototype._getAllObjectNameIds = function(
   var objectNameIdsSet = {};
   for (var objectId in objectIdsSet) {
     var objectPosition = this._allObjectPositions[objectId];
-    objectNameIdsSet[objectPosition.objectNameId] = true;
+
+    // Some IDs can be missing in the map of all object positions
+    // (e.g: a deleted object that is still manipulated by GDevelop events).
+    // Ignore these IDs.
+    if (objectPosition) {
+      objectNameIdsSet[objectPosition.objectNameId] = true;
+    }
   }
 
   return objectNameIdsSet;
@@ -282,6 +292,11 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
     var atLeastOneObject = false;
 
     var object1Position = this._allObjectPositions[object1Id];
+
+    // Some IDs can be missing in the map of all object positions
+    // (e.g: a deleted object that is still manipulated by GDevelop events).
+    // Ignore these IDs.
+    if (!object1Position) continue;
 
     var searchArea = {
       minX: object1Position.aabb.min[0] - distance,
@@ -409,6 +424,11 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
     var atLeastOneObject = false;
 
     var object1Position = this._allObjectPositions[object1Id];
+
+    // Some IDs can be missing in the map of all object positions
+    // (e.g: a deleted object that is still manipulated by GDevelop events).
+    // Ignore these IDs.
+    if (!object1Position) continue;
 
     var searchArea = {
       minX: object1Position.aabb.min[0],
@@ -540,6 +560,11 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
 
     var object1Position = this._allObjectPositions[object1Id];
 
+    // Some IDs can be missing in the map of all object positions
+    // (e.g: a deleted object that is still manipulated by GDevelop events).
+    // Ignore these IDs.
+    if (!object1Position) continue;
+
     var searchArea = {
       minX: object1Position.aabb.min[0],
       minY: object1Position.aabb.min[1],
@@ -586,11 +611,17 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
     var object1Position = this._allObjectPositions[
       objectPositionUpdate.objectId
     ];
-    gdjs.ObjectPositionsManager._moveObjectPosition(
-      object1Position,
-      objectPositionUpdate.x,
-      objectPositionUpdate.y
-    );
+
+    // Some IDs can be missing in the map of all object positions
+    // (e.g: a deleted object that is still manipulated by GDevelop events).
+    // Ignore these IDs.
+    if (object1Position) {
+      gdjs.ObjectPositionsManager._moveObjectPosition(
+        object1Position,
+        objectPositionUpdate.x,
+        objectPositionUpdate.y
+      );
+    }
   }
 };
 
@@ -638,7 +669,7 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
 
   for (var objectNameId in objectNameIdsSet) {
     // Check if all points for all object positions
-    for(var i = 0;i<points.length;i++) {
+    for (var i = 0; i < points.length; i++) {
       var point = points[i];
       var searchArea = {
         minX: point[0],

@@ -5,6 +5,7 @@ describe('gdjs.ObjectPositionsManager', function() {
   const defaultHeight = 3;
   const objectNameId1 = 1;
   const objectNameId2 = 2;
+  const noop = () => {};
 
   /** @returns {ObjectWithCoordinatesInterface} */
   const makeFakeObjectWithCoordinates = ({
@@ -17,9 +18,6 @@ describe('gdjs.ObjectPositionsManager', function() {
     setX,
     setY,
   }) => {
-    const objectWidth = width || defaultWidth;
-    const objectHeight = height || defaultHeight;
-
     return {
       id,
       getNameId: () => nameId,
@@ -27,19 +25,19 @@ describe('gdjs.ObjectPositionsManager', function() {
       getY: () => y,
       getDrawableX: () => x,
       getDrawableY: () => y,
-      getCenterX: () => objectWidth / 2,
-      getCenterY: () => objectHeight / 2,
+      getCenterX: () => width / 2,
+      getCenterY: () => height / 2,
       getHitBoxes: () => [
-        gdjs.Polygon.createRectangle(objectWidth, objectHeight)
-          .move(objectWidth / 2, objectHeight / 2) // Rectangle is by default centered, while here we consider x/y as being in the top left
+        gdjs.Polygon.createRectangle(width, height)
+          .move(width / 2, height / 2) // Rectangle is by default centered, while here we consider x/y as being in the top left
           .move(x, y),
       ],
       getAABB: () => ({
         min: [x, y],
-        max: [x + objectWidth, y + objectHeight],
+        max: [x + width, y + height],
       }),
-      setX: setX || (() => {}),
-      setY: setY || (() => {}),
+      setX: setX,
+      setY: setY,
     };
   };
 
@@ -51,6 +49,10 @@ describe('gdjs.ObjectPositionsManager', function() {
       nameId: objectNameId1,
       x: 10,
       y: 10,
+      width: defaultWidth,
+      height: defaultHeight,
+      setX: noop,
+      setY: noop,
     });
     objectPositionsManager.markObjectAsCreated(object0);
     const object1 = makeFakeObjectWithCoordinates({
@@ -58,6 +60,10 @@ describe('gdjs.ObjectPositionsManager', function() {
       nameId: objectNameId1,
       x: 20,
       y: 20,
+      width: defaultWidth,
+      height: defaultHeight,
+      setX: noop,
+      setY: noop,
     });
     objectPositionsManager.markObjectAsCreated(object1);
     const object2 = makeFakeObjectWithCoordinates({
@@ -65,6 +71,10 @@ describe('gdjs.ObjectPositionsManager', function() {
       nameId: objectNameId2,
       x: 6,
       y: 6,
+      width: defaultWidth,
+      height: defaultHeight,
+      setX: noop,
+      setY: noop,
     });
     objectPositionsManager.markObjectAsCreated(object2);
     const object3 = makeFakeObjectWithCoordinates({
@@ -72,6 +82,10 @@ describe('gdjs.ObjectPositionsManager', function() {
       nameId: objectNameId2,
       x: 8,
       y: 8,
+      width: defaultWidth,
+      height: defaultHeight,
+      setX: noop,
+      setY: noop,
     });
     objectPositionsManager.markObjectAsCreated(object3);
 
@@ -277,6 +291,10 @@ describe('gdjs.ObjectPositionsManager', function() {
         nameId: objectNameId1,
         x: 12,
         y: 12,
+        width: defaultWidth,
+        height: defaultHeight,
+        setX: noop,
+        setY: noop,
       });
       objectPositionsManager.markObjectAsDirty(object1);
 
@@ -309,6 +327,10 @@ describe('gdjs.ObjectPositionsManager', function() {
         nameId: objectNameId1,
         x: 12,
         y: 12,
+        width: defaultWidth,
+        height: defaultHeight,
+        setX: noop,
+        setY: noop,
       });
       objectPositionsManager.markObjectAsDirty(object1);
 
@@ -317,10 +339,7 @@ describe('gdjs.ObjectPositionsManager', function() {
 
       // Check that now object1 only is 5 pixels away from object0.
       const object1IdsSet = { 0: true };
-      const object2IdsSet = { 1: true };
-
-      // It's not legal to pass object2 id in the set (reducing the usefulness of the test),
-      // because all ids are supposed to be managed by the ObjectPositionsManager.
+      const object2IdsSet = { 1: true, 2: true };
 
       expect(
         objectPositionsManager.distanceTest(
@@ -349,6 +368,10 @@ describe('gdjs.ObjectPositionsManager', function() {
         nameId: objectNameId1,
         x: 8,
         y: 8,
+        width: defaultWidth,
+        height: defaultHeight,
+        setX: noop,
+        setY: noop,
       });
       objectPositionsManager.markObjectAsCreated(object2);
 
@@ -399,6 +422,8 @@ describe('gdjs.ObjectPositionsManager', function() {
         nameId: objectNameId2,
         x: 30,
         y: 30,
+        width: defaultWidth,
+        height: defaultHeight,
         setX: x => {
           expect().fail();
         },
@@ -414,6 +439,10 @@ describe('gdjs.ObjectPositionsManager', function() {
         nameId: objectNameId1,
         x: 2,
         y: 2,
+        width: defaultWidth,
+        height: defaultHeight,
+        setX: noop,
+        setY: noop,
       });
       objectPositionsManager.markObjectAsCreated(object2);
 
@@ -425,6 +454,8 @@ describe('gdjs.ObjectPositionsManager', function() {
         y: 8,
         width: 5,
         height: 5,
+        setX: noop,
+        setY: noop,
       });
       objectPositionsManager.markObjectAsCreated(object3);
 
@@ -435,6 +466,10 @@ describe('gdjs.ObjectPositionsManager', function() {
         nameId: objectNameId2,
         x: 9,
         y: 9,
+        width: defaultWidth,
+        height: defaultHeight,
+        setX: noop,
+        setY: noop,
       });
       objectPositionsManager.markObjectAsCreated(object4);
 

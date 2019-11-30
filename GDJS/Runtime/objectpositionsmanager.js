@@ -485,7 +485,7 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
  * @param {gdjs.Polygon[]} otherHitBoxes
  * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
  */
-gdjs.ObjectPositionsManager.prototype._separateHitboxes = function(
+gdjs.ObjectPositionsManager._separateHitboxes = function(
   hitBoxes,
   otherHitBoxes,
   ignoreTouchingEdges,
@@ -561,7 +561,7 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
 
         if (object2IdsSet[object2Position.objectId]) {
           moved =
-            this._separateHitboxes(
+            gdjs.ObjectPositionsManager._separateHitboxes(
               object1Position.hitboxes,
               object2Position.hitboxes,
               ignoreTouchingEdges,
@@ -594,6 +594,102 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
   }
 };
 
+/**
+ * Test if the point is inside of the polygons of the hitboxes.
+ *
+ * @param {gdjs.Polygon[]} hitBoxes
+ * @param {number} x X position of the point
+ * @param {number} y Y position of the point
+ */
+gdjs.ObjectPositionsManager._isPointInside = function(hitBoxes, x, y) {
+  for (var k = 0, lenk = hitBoxes.length; k < lenk; ++k) {
+    if (gdjs.Polygon.isPointInside(hitBoxes[k], x, y)) return true;
+  }
+
+  return false;
+};
+
+/**
+ * Check which of the specified objects are containing one of the specified points inside their hitboxes
+ * (or inside their AABB is `accurate` is set to false).
+ *
+ * If `inverted` is true, the objects which are NOT containing ANY point will be picked.
+ *
+ * @param {Object.<number, boolean>} objectIdsSet The set of object ids to filter
+ * @param {number[][]} points Array of point positions (X as first element, Y as second element)
+ * @param {boolean} accurate If true, use the hitboxes to check if a point is inside an object
+ * @param {boolean} inverted If true, filter to keep only the objects not containing any of the points inside them.
+ */
+gdjs.ObjectPositionsManager.prototype.pointsTest = function(
+  objectIdsSet,
+  points,
+  accurate,
+  inverted
+) {
+  this.update();
+
+  var isAnyObjectContainingAnyPoint = false;
+  /** @type {Object.<number, boolean>} */
+  var pickedObjectIdsSet = {};
+
+  // Get the set of all objectNameIds for the list, to know in which
+  // RBush we have to search them.
+  var objectNameIdsSet = this._getAllObjectNameIds(objectIdsSet);
+
+  for (var objectNameId in objectNameIdsSet) {
+    // Check if all points for all object positions
+    for(var i = 0;i<points.length;i++) {
+      var point = points[i];
+      var searchArea = {
+        minX: point[0],
+        minY: point[1],
+        maxX: point[0],
+        maxY: point[1],
+      };
+
+      /** @type ObjectPosition[] */
+      var nearbyObjectPositions = this._getPositionsRBush(objectNameId).search(
+        searchArea
+      );
+
+      for (var j = 0; j < nearbyObjectPositions.length; ++j) {
+        var objectPosition = nearbyObjectPositions[j];
+        var isOnObject =
+          !accurate ||
+          gdjs.ObjectPositionsManager._isPointInside(
+            objectPosition.hitboxes,
+            point[0],
+            point[1]
+          );
+
+        if (isOnObject) {
+          if (!inverted) isAnyObjectContainingAnyPoint = true;
+          pickedObjectIdsSet[objectPosition.objectId] = true;
+        }
+      }
+    }
+  }
+
+  if (inverted) {
+    // If inverted, remove all object ids that are colliding with a point
+    gdjs.ObjectPositionsManager._removeIdsFromObjectIdsSet(
+      objectIdsSet,
+      pickedObjectIdsSet
+    );
+
+    // Return true if there is at least one object not colliding with any point
+    for (var anyObjectId in objectIdsSet) return true;
+    return false;
+  } else {
+    // Trim sets and return the result
+    gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+      objectIdsSet,
+      pickedObjectIdsSet
+    );
+    return isAnyObjectContainingAnyPoint;
+  }
+};
+
 // Sets utilities:
 
 /**
@@ -608,6 +704,23 @@ gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet = function(
 ) {
   for (var objectId in objectIdsSet) {
     if (!objectIdsSet2[objectId]) {
+      delete objectIdsSet[objectId];
+    }
+  }
+};
+
+/**
+ * Delete any element of the first set that is in the second one.
+ *
+ * @param {Object.<number, boolean>} objectIdsSet
+ * @param {Object.<number, boolean>} objectIdsSet2
+ */
+gdjs.ObjectPositionsManager._removeIdsFromObjectIdsSet = function(
+  objectIdsSet,
+  objectIdsSet2
+) {
+  for (var objectId in objectIdsSet) {
+    if (objectIdsSet2[objectId]) {
       delete objectIdsSet[objectId];
     }
   }
@@ -657,6 +770,39 @@ gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet = function(
       if (objectIdsSet[obj.id]) {
         list[finalSize] = obj;
         finalSize++;
+      }
+    }
+
+    list.length = finalSize;
+  }
+};
+
+/**
+ * Remove from the lists of objects any object that is not in the sets of object ids, grouped
+ * by arbitrary key that are not considered.
+ * Useful as gdjs.ObjectPositionsManager only deals with ids for genericity, but events
+ * are using lists of objects.
+ *
+ * @param {Hashtable} objectsLists The lists of objects
+ * @param {Object.<string, Object.<number, boolean>>} groupedObjectIdsSets A set containing the object ids to keep
+ */
+gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets = function(
+  objectsLists,
+  groupedObjectIdsSets
+) {
+  for (var key in objectsLists.items) {
+    var list = objectsLists.items[key];
+    var finalSize = 0;
+
+    for (var i = 0; i < list.length; ++i) {
+      var obj = list[i];
+
+      for (var setKey in groupedObjectIdsSets) {
+        if (groupedObjectIdsSets[setKey][obj.id]) {
+          list[finalSize] = obj;
+          finalSize++;
+          break;
+        }
       }
     }
 

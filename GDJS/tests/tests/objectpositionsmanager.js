@@ -85,6 +85,21 @@ describe('gdjs.ObjectPositionsManager', function() {
       expect(object2IdsSet).to.eql({ 3: true });
     });
 
+    it('can find object positions containing any of the specified points', function() {
+      const { objectPositionsManager } = makeObjectPositionsManager();
+      const objectIdsSet = { 0: true, 1: true, 2: true, 3: true };
+
+      expect(
+        objectPositionsManager.pointsTest(
+          objectIdsSet,
+          [[8,8], [22, 22]],
+          true,
+          false
+        )
+      ).to.be(true);
+      expect(objectIdsSet).to.eql({ 1: true, 2: true, 3: true  });
+    });
+
     it('can find nearby object positions when using the same ids in both sets', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
       const object1IdsSet = { 1: true, 2: true, 3: true };
@@ -151,6 +166,21 @@ describe('gdjs.ObjectPositionsManager', function() {
       ).to.be(true);
       expect(object1IdsSet).to.eql({ 1: true });
       expect(object2IdsSet).to.eql({ 2: true, 3: true }); // Second list is *not* filtered when the test is inverted
+    });
+
+    it('can find object positions that are NOT containing any of the specified points', function() {
+      const { objectPositionsManager } = makeObjectPositionsManager();
+      const objectIdsSet = { 0: true, 1: true, 2: true, 3: true };
+
+      expect(
+        objectPositionsManager.pointsTest(
+          objectIdsSet,
+          [[8,8], [22, 22]],
+          true,
+          true
+        )
+      ).to.be(true);
+      expect(objectIdsSet).to.eql({ 0: true });
     });
 
     it('can find NO nearby object positions', function() {
@@ -287,6 +317,68 @@ describe('gdjs.ObjectPositionsManager', function() {
       ).to.be(true);
       expect(object1IdsSet).to.eql({ 0: true });
       expect(object2IdsSet).to.eql({ 2: true });
+    });
+  });
+
+  describe('Set of ids helpers', function() {
+    const runtimeScene = new gdjs.RuntimeScene(null);
+
+    it('objectsListsToObjectIdsSet', function() {
+      var object1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
+      var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
+      var object3 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: []});
+      var object4 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectC", type: "", behaviors: []});
+      var objectsLists = new Hashtable();
+      objectsLists.put("ObjectA", [object1, object2]);
+      objectsLists.put("ObjectB", [object3]);
+      objectsLists.put("ObjectC", [object4]);
+
+      expect(gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists)).to.eql({
+        [object1.id]: true,
+        [object2.id]: true,
+        [object3.id]: true,
+        [object4.id]: true,
+      });
+    });
+
+    it('keepOnlyObjectsFromObjectIdsSet', function() {
+      var object1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
+      var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
+      var object3 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: []});
+      var object4 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectC", type: "", behaviors: []});
+      var objectsLists = new Hashtable();
+      objectsLists.put("ObjectA", [object1, object2]);
+      objectsLists.put("ObjectB", [object3]);
+      objectsLists.put("ObjectC", [object4]);
+
+      gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists, {
+        [object1.id]: true,
+        [object3.id]: true,
+      });
+
+      expect(objectsLists.get("ObjectA")).to.eql([object1]);
+      expect(objectsLists.get("ObjectB")).to.eql([object3]);
+      expect(objectsLists.get("ObjectC")).to.eql([]);
+    });
+
+    it('keepOnlyObjectsFromGroupedObjectIdsSet', function() {
+      var object1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
+      var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
+      var object3 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: []});
+      var object4 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectC", type: "", behaviors: []});
+      var objectsLists = new Hashtable();
+      objectsLists.put("ObjectA", [object1, object2]);
+      objectsLists.put("ObjectB", [object3]);
+      objectsLists.put("ObjectC", [object4]);
+
+      gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets(objectsLists, {
+        "SomeKey": { [object1.id]: true },
+        "another key (could be any string)": { [object3.id]: true }
+      });
+
+      expect(objectsLists.get("ObjectA")).to.eql([object1]);
+      expect(objectsLists.get("ObjectB")).to.eql([object3]);
+      expect(objectsLists.get("ObjectC")).to.eql([]);
     });
   });
 });

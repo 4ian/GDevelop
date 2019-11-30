@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * Tests for gdjs.InputManager and related.
  */
@@ -98,7 +100,7 @@ describe('gdjs.InputManager', function() {
 	});
 });
 
-describe('gdjs.RuntimeObject.cursorOnObject', function() {
+describe('gdjs.evtTools.input.cursorOnObject', function() {
 	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 	runtimeScene.loadFromScene({
@@ -111,30 +113,65 @@ describe('gdjs.RuntimeObject.cursorOnObject', function() {
 
 	var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 	object.setPosition(450, 500);
+	object.getWidth = function() { return 5; };
+	object.getHeight = function() { return 5; };
 
 	it('should handle mouse', function() {
+		var objectsLists = new Hashtable();
+		objectsLists.put("obj1", [object]);
 		runtimeGame.getInputManager().onMouseMove(100, 100);
-		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, false)).to.be(false);
+		expect(objectsLists.get("obj1")).to.have.length(0);
+
+		objectsLists.put("obj1", [object]);
 		runtimeGame.getInputManager().onMouseMove(450, 500);
-		expect(object.cursorOnObject(runtimeScene)).to.be(true);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, false)).to.be(true);
+		expect(objectsLists.get("obj1")).to.have.length(1);
+		expect(objectsLists.get("obj1")[0]).to.be(object);
+	});
+
+	it('should handle inversion of the test', function() {
+		var objectsLists = new Hashtable();
+		objectsLists.put("obj1", [object]);
+		runtimeGame.getInputManager().onMouseMove(100, 100);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, true)).to.be(true);
+		expect(objectsLists.get("obj1")).to.have.length(1);
+		expect(objectsLists.get("obj1")[0]).to.be(object);
+
+		objectsLists.put("obj1", [object]);
+		runtimeGame.getInputManager().onMouseMove(450, 500);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, true)).to.be(false);
+		expect(objectsLists.get("obj1")).to.have.length(0);
 	});
 
 	it('should handle touch', function() {
+		var objectsLists = new Hashtable();
+		objectsLists.put("obj1", [object]);
+
 		runtimeGame.getInputManager().onMouseMove(0, 0);
 		runtimeGame.getInputManager().touchSimulateMouse(false);
 
 		runtimeGame.getInputManager().onTouchStart(0, 100, 100);
-		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+		objectsLists.put("obj1", [object]);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, false)).to.be(false);
+		expect(objectsLists.get("obj1")).to.have.length(0);
 		runtimeGame.getInputManager().onFrameEnded();
 
+		objectsLists.put("obj1", [object]);
+
 		runtimeGame.getInputManager().onTouchStart(1, 450, 500);
-		expect(object.cursorOnObject(runtimeScene)).to.be(true);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, false)).to.be(true);
+		expect(objectsLists.get("obj1")).to.have.length(1);
+		expect(objectsLists.get("obj1")[0]).to.be(object);
 		runtimeGame.getInputManager().onFrameEnded();
 
 		runtimeGame.getInputManager().onTouchEnd(1);
-		expect(object.cursorOnObject(runtimeScene)).to.be(true);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, false)).to.be(true);
+		expect(objectsLists.get("obj1")).to.have.length(1);
+		expect(objectsLists.get("obj1")[0]).to.be(object);
 		runtimeGame.getInputManager().onFrameEnded();
 
-		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+		expect(gdjs.evtTools.input.cursorOnObject(objectsLists, runtimeScene, true, false)).to.be(false);
+		expect(objectsLists.get("obj1")).to.have.length(0);
 	});
 });

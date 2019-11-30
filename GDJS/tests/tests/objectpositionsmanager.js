@@ -7,14 +7,19 @@ describe('gdjs.ObjectPositionsManager', function() {
   const objectNameId2 = 2;
 
   /** @returns {ObjectWithCoordinatesInterface} */
-  const makeFakeObjectWithCoordinates = (
+  const makeFakeObjectWithCoordinates = ({
     id,
     nameId,
     x,
     y,
-    width = defaultWidth,
-    height = defaultHeight
-  ) => {
+    width,
+    height,
+    setX,
+    setY,
+  }) => {
+    const objectWidth = width || defaultWidth;
+    const objectHeight = height || defaultHeight;
+
     return {
       id,
       getNameId: () => nameId,
@@ -22,29 +27,52 @@ describe('gdjs.ObjectPositionsManager', function() {
       getY: () => y,
       getDrawableX: () => x,
       getDrawableY: () => y,
-      getCenterX: () => width / 2,
-      getCenterY: () => height / 2,
+      getCenterX: () => objectWidth / 2,
+      getCenterY: () => objectHeight / 2,
       getHitBoxes: () => [
-        gdjs.Polygon.createRectangle(width, height)
-          .move(width / 2, height / 2) // Rectangle is by default centered, while here we consider x/y as being in the top left
+        gdjs.Polygon.createRectangle(objectWidth, objectHeight)
+          .move(objectWidth / 2, objectHeight / 2) // Rectangle is by default centered, while here we consider x/y as being in the top left
           .move(x, y),
       ],
-      getAABB: () => ({ min: [x, y], max: [x + width, y + height] }),
-      setX: () => {},
-      setY: () => {},
+      getAABB: () => ({
+        min: [x, y],
+        max: [x + objectWidth, y + objectHeight],
+      }),
+      setX: setX || (() => {}),
+      setY: setY || (() => {}),
     };
   };
 
   const makeObjectPositionsManager = () => {
     const objectPositionsManager = new gdjs.ObjectPositionsManager();
 
-    const object0 = makeFakeObjectWithCoordinates(0, objectNameId1, 10, 10);
+    const object0 = makeFakeObjectWithCoordinates({
+      id: 0,
+      nameId: objectNameId1,
+      x: 10,
+      y: 10,
+    });
     objectPositionsManager.markObjectAsCreated(object0);
-    const object1 = makeFakeObjectWithCoordinates(1, objectNameId1, 20, 20);
+    const object1 = makeFakeObjectWithCoordinates({
+      id: 1,
+      nameId: objectNameId1,
+      x: 20,
+      y: 20,
+    });
     objectPositionsManager.markObjectAsCreated(object1);
-    const object2 = makeFakeObjectWithCoordinates(2, objectNameId2, 6, 6);
+    const object2 = makeFakeObjectWithCoordinates({
+      id: 2,
+      nameId: objectNameId2,
+      x: 6,
+      y: 6,
+    });
     objectPositionsManager.markObjectAsCreated(object2);
-    const object3 = makeFakeObjectWithCoordinates(3, objectNameId2, 8, 8);
+    const object3 = makeFakeObjectWithCoordinates({
+      id: 3,
+      nameId: objectNameId2,
+      x: 8,
+      y: 8,
+    });
     objectPositionsManager.markObjectAsCreated(object3);
 
     return { objectPositionsManager, object0, object1, object2, object3 };
@@ -92,12 +120,15 @@ describe('gdjs.ObjectPositionsManager', function() {
       expect(
         objectPositionsManager.pointsTest(
           objectIdsSet,
-          [[8,8], [22, 22]],
+          [
+            [8, 8],
+            [22, 22],
+          ],
           true,
           false
         )
       ).to.be(true);
-      expect(objectIdsSet).to.eql({ 1: true, 2: true, 3: true  });
+      expect(objectIdsSet).to.eql({ 1: true, 2: true, 3: true });
     });
 
     it('can find nearby object positions when using the same ids in both sets', function() {
@@ -175,7 +206,10 @@ describe('gdjs.ObjectPositionsManager', function() {
       expect(
         objectPositionsManager.pointsTest(
           objectIdsSet,
-          [[8,8], [22, 22]],
+          [
+            [8, 8],
+            [22, 22],
+          ],
           true,
           true
         )
@@ -238,7 +272,12 @@ describe('gdjs.ObjectPositionsManager', function() {
       expect(object2IdsSet).to.eql({ 2: true });
 
       // Move object1 closer to object0
-      object1 = makeFakeObjectWithCoordinates(1, objectNameId1, 12, 12);
+      object1 = makeFakeObjectWithCoordinates({
+        id: 1,
+        nameId: objectNameId1,
+        x: 12,
+        y: 12,
+      });
       objectPositionsManager.markObjectAsDirty(object1);
 
       // Check that now object1 and object2 are 5 pixels away from object0.
@@ -265,7 +304,12 @@ describe('gdjs.ObjectPositionsManager', function() {
       } = makeObjectPositionsManager();
 
       // Move object1 closer to object0
-      object1 = makeFakeObjectWithCoordinates(1, objectNameId1, 12, 12);
+      object1 = makeFakeObjectWithCoordinates({
+        id: 1,
+        nameId: objectNameId1,
+        x: 12,
+        y: 12,
+      });
       objectPositionsManager.markObjectAsDirty(object1);
 
       // Remove object2
@@ -300,7 +344,12 @@ describe('gdjs.ObjectPositionsManager', function() {
       // Remove object2 and immediately reuse its id to make another object close to object0.
       // Note how we changed its nameId from objectNameId2 to objectNameId1.
       objectPositionsManager.markObjectAsRemoved(object2);
-      object2 = makeFakeObjectWithCoordinates(2, objectNameId1, 8, 8);
+      object2 = makeFakeObjectWithCoordinates({
+        id: 2,
+        nameId: objectNameId1,
+        x: 8,
+        y: 8,
+      });
       objectPositionsManager.markObjectAsCreated(object2);
 
       // Check that object2 is still found near object0
@@ -320,20 +369,123 @@ describe('gdjs.ObjectPositionsManager', function() {
     });
   });
 
+  describe('Separate object positions when colliding', function() {
+    it('can separate some objects', function() {
+      const objectPositionsManager = new gdjs.ObjectPositionsManager();
+
+      let newObject0X = 0;
+      let newObject0Y = 0;
+
+      // Object that will be moved
+      const object0 = makeFakeObjectWithCoordinates({
+        id: 0,
+        nameId: objectNameId1,
+        x: 7,
+        y: 7,
+        width: 5,
+        height: 5,
+        setX: x => {
+          newObject0X = x;
+        },
+        setY: y => {
+          newObject0Y = y;
+        },
+      });
+      objectPositionsManager.markObjectAsCreated(object0);
+
+      // Object that is too far to be moved
+      const object1 = makeFakeObjectWithCoordinates({
+        id: 1,
+        nameId: objectNameId2,
+        x: 30,
+        y: 30,
+        setX: x => {
+          expect().fail();
+        },
+        setY: y => {
+          expect().fail();
+        },
+      });
+      objectPositionsManager.markObjectAsCreated(object1);
+
+      // An obstacle but too far from previous objects
+      const object2 = makeFakeObjectWithCoordinates({
+        id: 2,
+        nameId: objectNameId1,
+        x: 2,
+        y: 2,
+      });
+      objectPositionsManager.markObjectAsCreated(object2);
+
+      // An obstacle that is colliding with object0
+      const object3 = makeFakeObjectWithCoordinates({
+        id: 3,
+        nameId: objectNameId2,
+        x: 8,
+        y: 8,
+        width: 5,
+        height: 5,
+      });
+      objectPositionsManager.markObjectAsCreated(object3);
+
+      // An obstacle that is colliding with object0 but not
+      // in the set of objects to consider.
+      const object4 = makeFakeObjectWithCoordinates({
+        id: 4,
+        nameId: objectNameId2,
+        x: 9,
+        y: 9,
+      });
+      objectPositionsManager.markObjectAsCreated(object4);
+
+      const object1IdsSet = { 0: true, 1: true };
+      const object2IdsSet = { 2: true, 3: true };
+
+      objectPositionsManager.separateObjects(
+        object1IdsSet,
+        object2IdsSet,
+        false
+      );
+
+      // Check that object0 (which height is 5) was pushed out of object3 (which Y position is 8,
+      // so new Y position is 8 - 5 = 3).
+      expect(newObject0X).to.be(7);
+      expect(newObject0Y).to.be(3);
+    });
+  });
+
   describe('Set of ids helpers', function() {
     const runtimeScene = new gdjs.RuntimeScene(null);
 
     it('objectsListsToObjectIdsSet', function() {
-      var object1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
-      var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
-      var object3 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: []});
-      var object4 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectC", type: "", behaviors: []});
+      var object1 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectA',
+        type: '',
+        behaviors: [],
+      });
+      var object2 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectA',
+        type: '',
+        behaviors: [],
+      });
+      var object3 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectB',
+        type: '',
+        behaviors: [],
+      });
+      var object4 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectC',
+        type: '',
+        behaviors: [],
+      });
       var objectsLists = new Hashtable();
-      objectsLists.put("ObjectA", [object1, object2]);
-      objectsLists.put("ObjectB", [object3]);
-      objectsLists.put("ObjectC", [object4]);
+      objectsLists.put('ObjectA', [object1, object2]);
+      objectsLists.put('ObjectB', [object3]);
+      objectsLists.put('ObjectC', [object4]);
 
-      expect(gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists)).to.eql({
+      expect(
+        gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists)
+      ).to.eql({
         [object1.id]: true,
         [object2.id]: true,
         [object3.id]: true,
@@ -342,43 +494,81 @@ describe('gdjs.ObjectPositionsManager', function() {
     });
 
     it('keepOnlyObjectsFromObjectIdsSet', function() {
-      var object1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
-      var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
-      var object3 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: []});
-      var object4 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectC", type: "", behaviors: []});
-      var objectsLists = new Hashtable();
-      objectsLists.put("ObjectA", [object1, object2]);
-      objectsLists.put("ObjectB", [object3]);
-      objectsLists.put("ObjectC", [object4]);
-
-      gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists, {
-        [object1.id]: true,
-        [object3.id]: true,
+      var object1 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectA',
+        type: '',
+        behaviors: [],
       });
+      var object2 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectA',
+        type: '',
+        behaviors: [],
+      });
+      var object3 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectB',
+        type: '',
+        behaviors: [],
+      });
+      var object4 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectC',
+        type: '',
+        behaviors: [],
+      });
+      var objectsLists = new Hashtable();
+      objectsLists.put('ObjectA', [object1, object2]);
+      objectsLists.put('ObjectB', [object3]);
+      objectsLists.put('ObjectC', [object4]);
 
-      expect(objectsLists.get("ObjectA")).to.eql([object1]);
-      expect(objectsLists.get("ObjectB")).to.eql([object3]);
-      expect(objectsLists.get("ObjectC")).to.eql([]);
+      gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(
+        objectsLists,
+        {
+          [object1.id]: true,
+          [object3.id]: true,
+        }
+      );
+
+      expect(objectsLists.get('ObjectA')).to.eql([object1]);
+      expect(objectsLists.get('ObjectB')).to.eql([object3]);
+      expect(objectsLists.get('ObjectC')).to.eql([]);
     });
 
     it('keepOnlyObjectsFromGroupedObjectIdsSet', function() {
-      var object1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
-      var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: []});
-      var object3 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: []});
-      var object4 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectC", type: "", behaviors: []});
-      var objectsLists = new Hashtable();
-      objectsLists.put("ObjectA", [object1, object2]);
-      objectsLists.put("ObjectB", [object3]);
-      objectsLists.put("ObjectC", [object4]);
-
-      gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets(objectsLists, {
-        "SomeKey": { [object1.id]: true },
-        "another key (could be any string)": { [object3.id]: true }
+      var object1 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectA',
+        type: '',
+        behaviors: [],
       });
+      var object2 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectA',
+        type: '',
+        behaviors: [],
+      });
+      var object3 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectB',
+        type: '',
+        behaviors: [],
+      });
+      var object4 = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'ObjectC',
+        type: '',
+        behaviors: [],
+      });
+      var objectsLists = new Hashtable();
+      objectsLists.put('ObjectA', [object1, object2]);
+      objectsLists.put('ObjectB', [object3]);
+      objectsLists.put('ObjectC', [object4]);
 
-      expect(objectsLists.get("ObjectA")).to.eql([object1]);
-      expect(objectsLists.get("ObjectB")).to.eql([object3]);
-      expect(objectsLists.get("ObjectC")).to.eql([]);
+      gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets(
+        objectsLists,
+        {
+          SomeKey: { [object1.id]: true },
+          'another key (could be any string)': { [object3.id]: true },
+        }
+      );
+
+      expect(objectsLists.get('ObjectA')).to.eql([object1]);
+      expect(objectsLists.get('ObjectB')).to.eql([object3]);
+      expect(objectsLists.get('ObjectC')).to.eql([]);
     });
   });
 });

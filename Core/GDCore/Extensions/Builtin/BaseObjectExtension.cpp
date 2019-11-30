@@ -964,6 +964,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object 2"))
       .AddParameter("expression", _("Distance"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
   extension

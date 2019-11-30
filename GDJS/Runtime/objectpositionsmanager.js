@@ -9,6 +9,8 @@
  * @property {string} objectNameId
  * @property {number} x
  * @property {number} y
+ * @property {number} centerX
+ * @property {number} centerY
  * @property {gdjs.Polygon[]} hitboxes
  * @property {AABB} aabb
  */
@@ -35,6 +37,10 @@
  * @property {() => string} getNameId
  * @property {() => number} getX
  * @property {() => number} getY
+ * @property {() => number} getDrawableX
+ * @property {() => number} getDrawableY
+ * @property {() => number} getCenterX
+ * @property {() => number} getCenterY
  * @property {() => gdjs.Polygon[]} getHitBoxes
  * @property {() => AABB} getAABB
  * @property {(number) => void} setX
@@ -81,6 +87,8 @@ gdjs.ObjectPositionsManager._moveObjectPosition = function(
 ) {
   objectPosition.x += deltaX;
   objectPosition.y += deltaY;
+  objectPosition.centerX += deltaX;
+  objectPosition.centerY += deltaY;
   objectPosition.aabb.min[0] += deltaX;
   objectPosition.aabb.min[1] += deltaY;
   objectPosition.aabb.max[0] += deltaX;
@@ -181,6 +189,8 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
       objectNameId: objectNameId,
       x: object.getX(),
       y: object.getY(),
+      centerX: object.getDrawableX() + object.getCenterX(),
+      centerY: object.getDrawableY() + object.getCenterY(),
       hitboxes: object.getHitBoxes(),
       aabb: object.getAABB(),
     };
@@ -226,6 +236,24 @@ gdjs.ObjectPositionsManager.prototype._getAllObjectNameIds = function(
 };
 
 /**
+ * Tool function to get squared distance between the centers of two ObjectPositions
+ *
+ * @param {ObjectPosition} objectPosition1
+ * @param {ObjectPosition} objectPosition2
+ */
+gdjs.ObjectPositionsManager._getObjectPositionsSquaredDistance = function(
+  objectPosition1,
+  objectPosition2
+) {
+  return (
+    (objectPosition2.centerX - objectPosition1.centerX) *
+      (objectPosition2.centerX - objectPosition1.centerX) +
+    (objectPosition2.centerY - objectPosition1.centerY) *
+      (objectPosition2.centerY - objectPosition1.centerY)
+  );
+};
+
+/**
  * @param {Object.<number, boolean>} object1IdsSet
  * @param {Object.<number, boolean>} object2IdsSet
  * @param {number} distance
@@ -239,6 +267,7 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
 ) {
   this.update();
 
+  var squaredDistance = distance * distance;
   var isTrue = false;
   /** @type {Object.<number, boolean>} */
   var pickedObject1IdsSet = {};
@@ -274,15 +303,21 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
         if (object2Position.objectId === object1Position.objectId) continue;
 
         if (object2IdsSet[object2Position.objectId]) {
-          if (!inverted) {
-            isTrue = true;
+          if (
+            gdjs.ObjectPositionsManager._getObjectPositionsSquaredDistance(
+              object1Position,
+              object2Position
+            ) < squaredDistance
+          ) {
+            if (!inverted) {
+              isTrue = true;
 
-            // TODO: implement a real distance check
-            pickedObject2IdsSet[object2Position.objectId] = true;
-            pickedObject1IdsSet[object1Id] = true;
+              pickedObject2IdsSet[object2Position.objectId] = true;
+              pickedObject1IdsSet[object1Id] = true;
+            }
+
+            atLeastOneObject = true;
           }
-
-          atLeastOneObject = true;
         }
       }
     }

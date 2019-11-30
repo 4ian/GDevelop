@@ -236,12 +236,31 @@ gdjs.evtTools.object.OLDhitBoxesCollisionTest = function(objectsLists1, objectsL
       objectsLists1, objectsLists2, inverted, ignoreTouchingEdges);
 }
 
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to test distance from
+ * @param {Hashtable} objectsLists2 The second lists of objects to test distance to
+ * @param {number} distance The maximum distance between objects
+ * @param {boolean} inverted If set to true, only objects from the first lists that have *no* objects from the second lists below the specified distance will be picked.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted, runtimeScene) {
+    var object1IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists1);
+    var object2IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists2);
+
+    var isTrue = runtimeScene.getObjectPositionsManager().distanceTest(object1IdsSet, object2IdsSet, distance, inverted);
+
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists1, object1IdsSet);
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists2, object2IdsSet);
+
+    return isTrue;
+};
+
 gdjs.evtTools.object._distanceBetweenObjects = function(obj1, obj2, distance) {
     gdjs.evtTools.object._distanceBetweenObjectsCount++;
     return obj1.getSqDistanceToObject(obj2) <= distance;
 };
 
-gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
+gdjs.evtTools.object.OLDdistanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
     return gdjs.evtTools.object.twoListsTest(gdjs.evtTools.object._distanceBetweenObjects,
         objectsLists1, objectsLists2, inverted, distance*distance);
 };

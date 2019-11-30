@@ -64,7 +64,8 @@ float GD_API DistanceBetweenObjects(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
     float length,
-    bool conditionInverted);
+    bool conditionInverted,
+    RuntimeScene &scene);
 
 /**
  * Only used internally by GD events generated code.

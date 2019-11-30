@@ -20,6 +20,10 @@ describe('gdjs.ObjectPositionsManager', function() {
       getNameId: () => nameId,
       getX: () => x,
       getY: () => y,
+      getDrawableX: () => x,
+      getDrawableY: () => y,
+      getCenterX: () => width / 2,
+      getCenterY: () => height / 2,
       getHitBoxes: () => [
         gdjs.Polygon.createRectangle(width, height)
           .move(width / 2, height / 2) // Rectangle is by default centered, while here we consider x/y as being in the top left
@@ -56,7 +60,7 @@ describe('gdjs.ObjectPositionsManager', function() {
         objectPositionsManager.distanceTest(
           object1IdsSet,
           object2IdsSet,
-          5,
+          6,
           false
         )
       ).to.be(true);
@@ -196,7 +200,7 @@ describe('gdjs.ObjectPositionsManager', function() {
         objectPositionsManager.distanceTest(
           object1IdsSet,
           object2IdsSet,
-          5,
+          6,
           false
         )
       ).to.be(true);
@@ -215,7 +219,7 @@ describe('gdjs.ObjectPositionsManager', function() {
         objectPositionsManager.distanceTest(
           object1IdsSet,
           object2IdsSet,
-          5,
+          6,
           false
         )
       ).to.be(true);

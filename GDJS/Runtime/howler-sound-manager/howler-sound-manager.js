@@ -1,14 +1,15 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2013-present Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
 
 /**
- * A thin wrapper around a Howl object.
- * `gdjs.HowlerSound` just adds `paused`, `stopped`, `rate` and `canBeDestroyed` methods.
+ * A thin wrapper around a Howl object with:
+ * * Extra methods `paused`, `stopped`, `getRate`/`setRate` and `canBeDestroyed` methods.
+ * * Automatic clamping when calling `setRate` to ensure a valid value is passed to Howler.js.
  *
- * See https://github.com/goldfire/howler.js/tree/2.0 for the full documentation.
+ * See https://github.com/goldfire/howler.js#methods for the full documentation.
  *
  * @memberof gdjs
  * @class HowlerSound
@@ -30,6 +31,16 @@ gdjs.HowlerSound = function(o) {
 			that._stopped = true;
 		}
     });
+    this.on('playerror', function(id, error) {
+		console.error("Can't play a sound, considering it as stopped. Error is:", error);
+		that._paused = false;
+		that._stopped = true;
+	});
+
+	// Track play/pause event to be sure the status is
+	// sync'ed with the sound - though this should be redundant
+	// with `play`/`pause` methods already doing that. Keeping
+	// that to be sure that the status is always correct.
     this.on('play', function() {
 		that._paused = false;
 		that._stopped = false;
@@ -41,20 +52,40 @@ gdjs.HowlerSound = function(o) {
 };
 gdjs.HowlerSound.prototype = Object.create(Howl.prototype);
 
+// Redefine `stop`/`play`/`pause` to ensure the status of the sound
+// is immediately updated (so that calling `stopped` just after
+// `play` will return false).
+
+gdjs.HowlerSound.prototype.stop = function() {
+	this._paused = false;
+	this._stopped = true;
+	return Howl.prototype.stop.call(this);
+};
+gdjs.HowlerSound.prototype.play = function() {
+	this._paused = false;
+	this._stopped = false;
+	return Howl.prototype.play.call(this);
+};
+gdjs.HowlerSound.prototype.pause = function() {
+	this._paused = true;
+	this._stopped = false;
+	return Howl.prototype.pause.call(this);
+};
+
+// Add methods to query the status of the sound:
+
 gdjs.HowlerSound.prototype.paused = function() {
 	return this._paused;
 };
 gdjs.HowlerSound.prototype.stopped = function() {
 	return this._stopped;
 };
-gdjs.HowlerSound.prototype.stop = function() {
-	this._paused = false;
-	this._stopped = true;
-	return Howl.prototype.stop.call(this);
-};
 gdjs.HowlerSound.prototype.canBeDestroyed = function() {
 	return this._canBeDestroyed;
 };
+
+// Methods to safely update the rate of the sound:
+
 gdjs.HowlerSound.prototype.getRate = function() {
     return this._rate;
 };
@@ -308,7 +339,7 @@ gdjs.HowlerSoundManager.prototype.clearAll = function() {
 
 gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {
 	resources = resources || this._resources;
-	
+
 	//Construct the list of files to be loaded.
 	//For one loaded file, it can have one or more resources
 	//that use it.

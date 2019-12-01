@@ -5,21 +5,15 @@ import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
-type ValueProps =
-  | {|
-      value: number | string,
-      // event and index should not be used, and be removed eventually
-      onChange?: (
-        event: {| target: {| value: string |} |},
-        index: number,
-        text: string // Note that even for number values, a string is returned
-      ) => void,
-    |}
-  | {|
-      value: boolean,
-      // event and index should not be used, and be removed eventually
-      onChange?: (event: {||}, index: number, value: boolean) => void,
-    |};
+type ValueProps = {|
+  value: number | string,
+  // event and index should not be used, and be removed eventually
+  onChange?: (
+    event: {| target: {| value: string |} |},
+    index: number,
+    text: string // Note that even for number values, a string is returned
+  ) => void,
+|};
 
 // We support a subset of the props supported by Material-UI v0.x SelectField
 // They should be self descriptive - refer to Material UI docs otherwise.

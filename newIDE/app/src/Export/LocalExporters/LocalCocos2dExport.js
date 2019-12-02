@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { Column, Line } from '../../UI/Grid';
-import { findGDJS } from './LocalGDJSFinder';
+import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';

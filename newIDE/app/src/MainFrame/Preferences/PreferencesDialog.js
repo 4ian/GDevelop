@@ -70,6 +70,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             setEventsSheetShowObjectThumbnails,
             setAutosaveOnPreview,
             setUseNewInstructionEditorDialog,
+            setUseGDJSDevelopmentWatcher,
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -171,6 +172,23 @@ export default class PreferencesDialog extends Component<Props, State> {
                     label={<Trans>Use the new action/condition editor</Trans>}
                   />
                 </Line>
+                {Window.isDev() && (
+                  <Line>
+                    <Toggle
+                      onToggle={(e, check) =>
+                        setUseGDJSDevelopmentWatcher(check)
+                      }
+                      toggled={values.useGDJSDevelopmentWatcher}
+                      labelPosition="right"
+                      label={
+                        <Trans>
+                          Watch changes in game engine (GDJS) sources and auto
+                          import them (dev only)
+                        </Trans>
+                      }
+                    />
+                  </Line>
+                )}
                 <Line>
                   {dismissedAlertMessages.length ? (
                     <Column noMargin>

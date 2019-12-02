@@ -8,7 +8,7 @@ import {
   buildWeb,
 } from '../../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../../Profile/UserProfileContext';
-import { findGDJS } from './BrowserS3GDJSFinder';
+import { findGDJS } from '../../GameEngineFinder/BrowserS3GDJSFinder';
 import BrowserFileSystem from './BrowserFileSystem';
 import {
   type UrlFileDescriptor,

@@ -3,7 +3,7 @@ import * as React from 'react';
 import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import BrowserPreviewErrorDialog from './BrowserPreviewErrorDialog';
 import BrowserS3FileSystem from '../BrowserS3FileSystem';
-import { findGDJS } from '../BrowserS3GDJSFinder';
+import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import { getBaseUrl } from '../../../Utils/GDevelopServices/Preview';

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
-import { findGDJS } from './BrowserS3GDJSFinder';
+import { findGDJS } from '../../GameEngineFinder/BrowserS3GDJSFinder';
 import BrowserFileSystem from './BrowserFileSystem';
 import {
   type UrlFileDescriptor,

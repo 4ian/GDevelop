@@ -174,76 +174,79 @@ export const LocalGDJSDevelopmentWatcher = () => {
   const preferences = React.useContext(PreferencesContext);
   const shouldWatch = preferences.values.useGDJSDevelopmentWatcher;
 
-  React.useEffect(() => {
-    if (!shouldWatch) {
-      // Nothing to set up in the effect if watch is deactivated.
-      return;
-    }
-
-    let stopWatchers = false;
-    let watchers = [];
-    let startTime = performance.now();
-    getAllDevelopmentWatchPaths().then(({ paths, pathsWithErrors }) => {
-      // There is a non nul chance that for some reason the effect was cleaned up
-      // before we retrieved all the paths. Stop there if it's the case.
-      if (stopWatchers) return;
-
-      if (!fs) {
-        console.error(
-          "Unable to use 'fs' from Node.js to watch changes in GDJS."
-        );
+  React.useEffect(
+    () => {
+      if (!shouldWatch) {
+        // Nothing to set up in the effect if watch is deactivated.
         return;
       }
 
-      // Create watchers
-      paths.forEach(watchPath => {
-        let watcher = null;
-        try {
-          watcher = fs.watch(watchPath, {}, onWatchEvent);
-        } catch (error) {
-          pathsWithErrors[watchPath] = error;
-          return null;
+      let stopWatchers = false;
+      let watchers = [];
+      let startTime = performance.now();
+      getAllDevelopmentWatchPaths().then(({ paths, pathsWithErrors }) => {
+        // There is a non nul chance that for some reason the effect was cleaned up
+        // before we retrieved all the paths. Stop there if it's the case.
+        if (stopWatchers) return;
+
+        if (!fs) {
+          console.error(
+            "Unable to use 'fs' from Node.js to watch changes in GDJS."
+          );
+          return;
         }
 
-        if (watcher) {
-          watcher.on('error', error => {
-            console.warn(genericWatcherErrorMessage, error);
-          });
+        // Create watchers
+        paths.forEach(watchPath => {
+          let watcher = null;
+          try {
+            watcher = fs.watch(watchPath, {}, onWatchEvent);
+          } catch (error) {
+            pathsWithErrors[watchPath] = error;
+            return null;
+          }
 
-          watchers.push(watcher);
+          if (watcher) {
+            watcher.on('error', error => {
+              console.warn(genericWatcherErrorMessage, error);
+            });
+
+            watchers.push(watcher);
+          }
+        });
+
+        if (Object.keys(pathsWithErrors).length) {
+          console.warn(
+            'Error while setting up watchers for some paths: ',
+            pathsWithErrors
+          );
+        }
+
+        const totalTimeStr = (performance.now() - startTime).toFixed(2);
+        if (watchers.length) {
+          console.info(
+            `Watchers for GDJS Runtime/extensions installed in ${totalTimeStr}ms.`
+          );
+        } else {
+          console.warn(
+            `No watchers for GDJS Runtime/extensions installed (took ${totalTimeStr}ms).`
+          );
         }
       });
 
-      if (Object.keys(pathsWithErrors).length) {
-        console.warn(
-          'Error while setting up watchers for some paths: ',
-          pathsWithErrors
-        );
-      }
+      // Close all the watchers when the React effect is unregistered
+      return () => {
+        stopWatchers = true;
+        if (!watchers.length) return;
 
-      const totalTimeStr = (performance.now() - startTime).toFixed(2);
-      if (watchers.length) {
-        console.info(
-          `Watchers for GDJS Runtime/extensions installed in ${totalTimeStr}ms.`
-        );
-      } else {
-        console.warn(
-          `No watchers for GDJS Runtime/extensions installed (took ${totalTimeStr}ms).`
-        );
-      }
-    });
-
-    // Close all the watchers when the React effect is unregistered
-    return () => {
-      stopWatchers = true;
-      if (!watchers.length) return;
-
-      watchers.forEach(watcher => {
-        watcher.close();
-      });
-      console.info('Watchers for GDJS Runtime closed.');
-    };
-  }, [shouldWatch]);
+        watchers.forEach(watcher => {
+          watcher.close();
+        });
+        console.info('Watchers for GDJS Runtime closed.');
+      };
+    },
+    [shouldWatch]
+  );
 
   return null;
 };

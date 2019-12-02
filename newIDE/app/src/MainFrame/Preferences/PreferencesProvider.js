@@ -39,9 +39,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseNewInstructionEditorDialog: this._setUseNewInstructionEditorDialog.bind(
       this
     ),
-    setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(
-      this
-    ),
+    setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
   };
 
   componentDidMount() {

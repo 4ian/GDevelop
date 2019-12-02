@@ -29,6 +29,7 @@ export type PreferencesValues = {|
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
   useNewInstructionEditorDialog: boolean,
+  useGDJSDevelopmentWatcher: boolean,
 |};
 
 export type Preferences = {|
@@ -44,6 +45,7 @@ export type Preferences = {|
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
   setUseNewInstructionEditorDialog: (enabled: boolean) => void,
+  setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -58,6 +60,7 @@ export const initialPreferences = {
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
     useNewInstructionEditorDialog: false,
+    useGDJSDevelopmentWatcher: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -70,6 +73,7 @@ export const initialPreferences = {
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
   setUseNewInstructionEditorDialog: (enabled: boolean) => {},
+  setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -1,6 +1,6 @@
 // Note: this file does not use export/imports nor Flow to allow its usage from Node.js
 
-const { findGDJS } = require('../Export/LocalExporters/LocalGDJSFinder');
+const { findGDJS } = require('../GameEngineFinder/LocalGDJSFinder');
 const optionalRequire = require('../Utils/OptionalRequire');
 const path = optionalRequire('path');
 const fs = optionalRequire('fs');

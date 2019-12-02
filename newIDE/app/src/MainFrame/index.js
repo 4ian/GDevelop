@@ -150,6 +150,7 @@ type Props = {
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
+  renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
@@ -1682,6 +1683,7 @@ class MainFrame extends React.Component<Props, State> {
       eventsFunctionsExtensionsState,
       useStorageProvider,
       i18n,
+      renderGDJSDevelopmentWatcher,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1960,6 +1962,7 @@ class MainFrame extends React.Component<Props, State> {
         )}
         <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         <ChangelogDialogContainer />
+        {renderGDJSDevelopmentWatcher && renderGDJSDevelopmentWatcher()}
       </div>
     );
   }

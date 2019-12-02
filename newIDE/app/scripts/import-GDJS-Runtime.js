@@ -2,9 +2,9 @@ var shell = require('shelljs');
 var path = require('path');
 var isWin = /^win/.test(process.platform);
 
-var destFolder = path.join(process.cwd(), '..', 'resources', 'GDJS', 'Runtime');
-var destFolder2 = path.join(process.cwd(), '..', 'node_modules', 'GDJS-for-web-app-only', 'Runtime');
-var gdjsScriptsFolder = '../../../GDJS/scripts';
+var destFolder = path.join(__dirname, '..', 'resources', 'GDJS', 'Runtime');
+var destFolder2 = path.join(__dirname, '..', 'node_modules', 'GDJS-for-web-app-only', 'Runtime');
+var gdjsScriptsFolder = path.join(__dirname, '../../../GDJS/scripts');
 
 if (isWin) {
   shell.exec('CopyRuntimeToGD.bat ' + "\"" + destFolder + "\"", {

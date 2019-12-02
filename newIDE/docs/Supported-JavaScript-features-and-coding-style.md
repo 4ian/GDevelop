@@ -1,6 +1,6 @@
 # Supported JavaScript features and coding styles
 
-> *tl;dr:* the game engine is a classic "ES5" JavaScript project and needs caution. The editor is a modern, shiny codebase with bundling and latest JavaScript features.
+> *tl;dr:* the game engine is a classic "ES5" JavaScript project and requires caution. The editor is a modern, shiny codebase with bundling and latest JavaScript features.
 
 ## For the game engine (GDJS) and extensions
 
@@ -33,14 +33,16 @@ To avoid this:
 
 > ℹ️ Typing is adding annotation about the type of variables, to enable auto completion and have automatic verification for bugs.
 
-It's recommended to add **[JSDoc annotation](https://jsdoc.app/index.html)** so that the game engine and your extensions can have:
+It's good practice to add **[JSDoc annotation](https://jsdoc.app/index.html)** so that the game engine and your extensions can have:
 * *documentation* auto-generated
 * *auto-completion* provided by **[Typescript](https://www.typescriptlang.org/)**.
-* in the **future**, static verification for bugs with **Typescript**.
+* *static type checking* for bugs with **Typescript**.
+
+For the static verification, you must add `// @ts-check` at the top of your file. Learn how to [launch type checking in GJDS Readme](../../GDJS/README.md).
 
 ### What about code formatting?
 
-In the future, the whole codebase will be run through Prettier to be autoformatted.
+In the future, the whole codebase will be run through Prettier to be autoformatted (it's partially applied now).
 It's a good idea to start using it now on your new extensions (install the extension in your IDE).
 
 ## For the editor (`newIDE/app`)

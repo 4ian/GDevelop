@@ -170,8 +170,8 @@ module.exports = {
           gdObject
             .addExpression(
               `Get${property.functionName}`,
-              _('Get ') + property.description,
-              _('Get ') + property.description,
+              property.expressionDescription,
+              property.expressionSentence,
               '',
               '',
               property.iconPath,
@@ -189,8 +189,8 @@ module.exports = {
           gdObject
             .addStrExpression(
               `Get${property.functionName}`,
-              _('Get ') + property.description,
-              _('Get ') + property.description,
+              property.expressionDescription,
+              property.expressionSentence,
               '',
               '',
               property.iconPath,
@@ -213,11 +213,9 @@ module.exports = {
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              _('Set ') + property.description,
-              _('Set ') + property.description,
-              _('Do _PARAM1__PARAM2_ to the ') +
-                property.description +
-                _(' of _PARAM0_'),
+              property.actionDescription,
+              property.actionDescription,
+              property.actionSentence,
               '',
               property.iconPath,
               property.iconPath
@@ -239,9 +237,9 @@ module.exports = {
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              _('Set ') + property.description,
-              _('Set ') + property.description,
-              _('Set ') + property.description + _(' of _PARAM0_ to _PARAM1_'),
+              property.actionDescription,
+              property.actionDescription,
+              property.actionSentence,
               '',
               property.iconPath,
               property.iconPath
@@ -255,7 +253,7 @@ module.exports = {
             .addParameter(
               parameterType,
               property.paramLabel,
-              property.options ? property.options : '',
+              property.options ? '["' + property.options.join('", "') + '"]': '',
               false
             )
             .getCodeExtraInformation()
@@ -270,11 +268,9 @@ module.exports = {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.description,
-              _('Compare the value of ') + property.description,
-              _('The ') +
-                property.paramLabel +
-                _(' of _PARAM0_ is _PARAM1__PARAM2_'),
+              property.conditionDescription,
+              property.conditionDescription,
+              property.conditionSentence,
               '',
               property.iconPath,
               property.iconPath
@@ -304,9 +300,9 @@ module.exports = {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.description + _(' is enabled'),
-              _('Check if the') + property.description + _(' is enabled'),
-              property.paramLabel + _(' of _PARAM0_ is enabled'),
+              property.conditionDescription,
+              property.conditionDescription,
+              property.conditionSentence,
               '',
               property.iconPath,
               property.iconPath
@@ -326,60 +322,100 @@ module.exports = {
     const setterAndGetterProperties = [
       {
         functionName: 'BBText',
-        description: _('BBCode formatted text'),
         iconPath: 'res/actions/textAlign24.png',
         type: 'string',
         paramLabel: _('BBCode text'),
+        conditionDescription: _('Compare the value of BBCode text'),
+        conditionSentence: _('The BBCode text of _PARAM0_ is _PARAM1__PARAM2_'),
+        actionDescription: _('Set BBCode text'),
+        actionSentence: _('Do _PARAM1__PARAM2_ to the BBCode text of _PARAM0_'),
+        expressionDescription: _('Get BBCode text'),
+        expressionSentence:_('Get BBCode text'),
       },
       {
         functionName: 'Color',
-        description: _('base color'),
         iconPath: 'res/actions/color24.png',
         type: 'color',
         paramLabel: _('Color (Hex)'),
+        conditionDescription: _('Compare the value of base color'),
+        conditionSentence: _('The base color of _PARAM0_ is _PARAM1__PARAM2_'),
+        actionDescription: _('Set base color'),
+        actionSentence: _('Set base color of _PARAM0_ to _PARAM1_'),
+        expressionDescription: _('Get base color'),
+        expressionSentence:_('Get base color'),
       },
       {
         functionName: 'Opacity',
-        description: _('base opacity'),
         iconPath: 'res/actions/opacity24.png',
         type: 'number',
         paramLabel: _('Opacity (0-255)'),
+        conditionDescription: _('Compare the value of base opacity'),
+        conditionSentence: _('The base opacity of _PARAM0_ is _PARAM1__PARAM2_'),
+        actionDescription: _('Set base opacity'),
+        actionSentence: _('Do _PARAM1__PARAM2_ to the base opacity of _PARAM0_'),
+        expressionDescription: _('Get base opacity'),
+        expressionSentence:_('Get base opacity'),
       },
       {
         functionName: 'FontSize',
-        description: _('base font size'),
         iconPath: 'res/actions/characterSize24.png',
         type: 'number',
         paramLabel: _('Font size'),
+        conditionDescription: _('Compare the value of base font size'),
+        conditionSentence: _('The base font size of _PARAM0_ is _PARAM1__PARAM2_'),
+        actionDescription: _('Set base font size'),
+        actionSentence: _('Do _PARAM1__PARAM2_ to the base font size of _PARAM0_'),
+        expressionDescription: _('Get base font size'),
+        expressionSentence:_('Get base font size'),
       },
       {
         functionName: 'FontFamily',
-        description: _('base font family'),
         iconPath: 'res/actions/font24.png',
         type: 'string',
         paramLabel: _('Font family'),
+        conditionDescription: _('Compare the value of font family'),
+        conditionSentence: _('The base font family of _PARAM0_ is _PARAM1__PARAM2_'),
+        actionDescription: _('Set font family'),
+        actionSentence: _('Do _PARAM1__PARAM2_ to the base font family of _PARAM0_'),
+        expressionDescription: _('Get base font family'),
+        expressionSentence:_('Get base font family'),
       },
       {
         functionName: 'Alignment',
-        description: _('text alignment'),
         iconPath: 'res/actions/textAlign24.png',
         type: 'stringWithSelector',
         paramLabel: _('Alignment'),
-        options: `["left", "right", "center"]`,
+        options: [_('left'), _('right'), _('center')],
+        conditionDescription: _('Compare the value of text alignment'),
+        conditionSentence: _('The text alignment of _PARAM0_ is _PARAM1__PARAM2_'),
+        actionDescription: _('Set text alignment'),
+        actionSentence: _('Set text alignment of _PARAM0_ to _PARAM1_'),
+        expressionDescription: _('Get text alignment'),
+        expressionSentence:_('Get text alignment'),
       },
       {
         functionName: 'WordWrap',
-        description: _('word wrap'),
         iconPath: 'res/actions/scaleWidth24.png',
         type: 'boolean',
         paramLabel: _('Word wrap'),
+        conditionDescription: _('Check if word wrap is enabled'),
+        conditionSentence: _('word wrap is enabled'),
+        actionDescription: _('Set word wrap'),
+        actionSentence: _('Set word wrap of _PARAM0_ to _PARAM1_'),
+        expressionDescription: _('Get word wrap'),
+        expressionSentence:_('Get word wrap'),
       },
       {
         functionName: 'WrappingWidth',
-        description: _('wrapping width'),
         iconPath: 'res/actions/scaleWidth24.png',
         type: 'number',
         paramLabel: _('Wrapping width'),
+        conditionDescription: _('Compare the value of wrapping width'),
+        conditionSentence: _('The wrapping width of _PARAM0_ is _PARAM1__PARAM2_'),
+        actionDescription: _('Set wrapping width'),
+        actionSentence: _('Do _PARAM1__PARAM2_ to the wrapping width of _PARAM0_'),
+        expressionDescription: _('Get wrapping width'),
+        expressionSentence:_('Get wrapping width'),
       },
     ];
 

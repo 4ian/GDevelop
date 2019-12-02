@@ -56,7 +56,7 @@ export default class SelectField extends React.Component<Props, {||}> {
     // Dig into children props to see if the current value is valid or not.
     let hasValidValue = true;
     const childrenValues = React.Children.map(props.children, child => {
-      if (child === null) return null;
+      if (child === null || !child.props) return null;
 
       return child.props.value;
     });

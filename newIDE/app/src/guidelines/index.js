@@ -1,4 +1,8 @@
 // @flow
+
+import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+
 import React, { PureComponent } from 'react';
 import Button from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
@@ -8,7 +12,6 @@ import guidelines from './data.js';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
 import { Line } from '../UI/Grid';
-import { Trans } from '@lingui/macro';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import './style.css';
 
@@ -33,14 +36,7 @@ BUG -  Lorsque je lance le tuto, ouvre un projet, le ripple effect se fait sur t
 
 BUG - Lorsque je lance le tuto, ouvre un projet, ferme le tuto, et la relance, la Popper utilise un anchor inconnu et place mal la Popper.
 
-BUG - Lorsque je lance le tuto, ouvre un projet, la project manager s'ouvre la suite du tuto ne sedéclenche pas.
-
-- Comment rendre les datas de l'objet traduisible ? On utilise quoi la fonction t(), le compoment <Trans> ou <i18n>.
-Pour quoi trois système de traduction ?
-
-- Pour le thème de la flèche de <popper> il faut même que le css utilise la couleur du thème actuel, mais dans les fichiers css on n'y met pas de variable.
-J'ai pas trop envie de mettre le css du popper et celui de la flèche dans deux dossiers différents.
-Je ne sais pas trop où mettre ce css.
+BUG - Lorsque je lance le tuto, ouvre un projet, la project manager s'ouvre la suite du tuto ne se déclenche pas.
 
 - Si aucun marqueur existe, que faire, (la position devrait être 0;0 ou centré a l'écran?)
 Il faudrait créer une fake ref.
@@ -210,7 +206,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           color="primary"
           onClick={this.props.closeHandler}
         >
-         <Trans>Finish</Trans>
+          <Trans>Finish</Trans>
         </Button>
       );
     } else {
@@ -221,7 +217,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
           disabled={this.state.index === this.state.indexMax}
           onClick={this.next}
         >
-         <Trans>Next</Trans>
+          <Trans>Next</Trans>
         </Button>
       );
     }
@@ -250,7 +246,7 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
         <img
           src={guidelines[this.state.index].imageSource}
           alt={guidelines[this.state.index].imageAlt}
-          className={"guidelineImage"}
+          className={'guidelineImage'}
         />
       );
     } else {
@@ -262,72 +258,91 @@ export default class GuidelinePopOver extends PureComponent<Props, State> {
         {guidelines[this.state.index] &&
           !!open &&
           guidelines[this.state.index].positionBind && (
-            <ThemeConsumer>
-              {muiTheme => (
-                <div  className={muiTheme.guidelinesRootClassName} >
-                  <Popper
-                    open={open}
-                    anchorEl={this.state.anchor}
-                    placement={
-                      guidelines[this.state.index].forceArrowOrientation
-                        ? guidelines[this.state.index].forceArrowOrientation
-                        : 'bottom'
-                    }
-                    modifiers={{
-                      flip: {
-                        enabled: true,
-                      },
-                      preventOverflow: {
-                        enabled: true,
-                        boundariesElement: 'window',
-                      },
-                      arrow: {
-                        enabled: true,
-                        element: this.state.arrowRef,
-                      },
-                    }}
-                    className="guidelineArrowContainer"
-                  >
-                    <div
-                      ref={this._handleArrowRef}
-                      className={'guidelineArrow'}
-                    />
+            <I18n>
+              {({ i18n }) => {
+                return (
+                  <ThemeConsumer>
+                    {muiTheme => (
+                      <div className={muiTheme.guidelinesRootClassName}>
+                        <Popper
+                          open={open}
+                          anchorEl={this.state.anchor}
+                          placement={
+                            guidelines[this.state.index].forceArrowOrientation
+                              ? guidelines[this.state.index]
+                                  .forceArrowOrientation
+                              : 'bottom'
+                          }
+                          modifiers={{
+                            flip: {
+                              enabled: true,
+                            },
+                            preventOverflow: {
+                              enabled: true,
+                              boundariesElement: 'window',
+                            },
+                            arrow: {
+                              enabled: true,
+                              element: this.state.arrowRef,
+                            },
+                          }}
+                          className="guidelineArrowContainer"
+                        >
+                          <div
+                            ref={this._handleArrowRef}
+                            className={'guidelineArrow'}
+                          />
 
-                    <Paper elevation={24} className={"guidelineContainer"}>
-                      <div className={"guidelineDescription"}>
-                        <Line>
-                          <Typography variant="h5">
-                            <Trans>{guidelines[this.state.index].title}</Trans>
-                          </Typography>
-                        </Line>
-                        <Line>
-                          <Typography wrap="true">
-                            <Trans>{guidelines[this.state.index].description}</Trans>
-                          </Typography>
-                        </Line>
-                        <Line>{imageTutorial}</Line>
-                      </div>
-                      <Line alignItems="center" justifyContent="space-between">
-                        <Line>{closeOrWikipage}</Line>
-                        <Line alignItems="center">
-                          <Typography style={{ marginRight: 10 }}>
-                            {this.state.index + 1} <Trans>of</Trans> {this.state.indexMax + 1}
-                          </Typography>
-                          <Button
-                            variant="contained"
-                            disabled={this.state.index === 0 ? true : false}
-                            onClick={this.back}
+                          <Paper
+                            elevation={24}
+                            className={'guidelineContainer'}
                           >
-                            <Trans>Back</Trans>
-                          </Button>
-                          {nextOrFinish}
-                        </Line>
-                      </Line>
-                    </Paper>
-                  </Popper>
-                </div>
-              )}
-            </ThemeConsumer>
+                            <div className={'guidelineDescription'}>
+                              <Line>
+                                <Typography variant="h5">
+                                  {i18n._(guidelines[this.state.index].title)}
+                                </Typography>
+                              </Line>
+                              <Line>
+                                <Typography wrap="true">
+                                 {i18n._(guidelines[this.state.index].description)}
+                                    
+                                </Typography>
+                              </Line>
+                              <Line>{imageTutorial}</Line>
+                            </div>
+                            <Line
+                              alignItems="center"
+                              justifyContent="space-between"
+                            >
+                              <Line>{closeOrWikipage}</Line>
+                              <Line alignItems="center">
+                                <Typography style={{ marginRight: 10 }}>
+                                  <Trans>
+                                    {this.state.index + 1} of{' '}
+                                    {this.state.indexMax + 1}
+                                  </Trans>
+                                </Typography>
+                                <Button
+                                  variant="contained"
+                                  disabled={
+                                    this.state.index === 0 ? true : false
+                                  }
+                                  onClick={this.back}
+                                >
+                                  <Trans>Back</Trans>
+                                </Button>
+                                {nextOrFinish}
+                              </Line>
+                            </Line>
+                          </Paper>
+                        </Popper>
+                      </div>
+                    )}
+                  </ThemeConsumer>
+                );
+              }}
+            </I18n>
           )}
       </div>
     );

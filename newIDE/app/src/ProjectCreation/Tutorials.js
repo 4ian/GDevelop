@@ -26,6 +26,18 @@ export default class Tutorials extends PureComponent {
           <Column expand noMargin>
             <List>
               <ListItem
+                primaryText={<Trans>Geometry Monster Tutorial</Trans>}
+                secondaryText={
+                  <Trans>Make a hyper-casual mobile game where the player must grab shapes and avoid bombs.</Trans>
+                }
+                onClick={() => {
+                  sendTutorialOpened('Geometry Monster');
+                  Window.openExternalURL(
+                    getHelpLink('/tutorials/geometry-monster')
+                  );
+                }}
+              />
+              <ListItem
                 primaryText={<Trans>Platformer Tutorial</Trans>}
                 secondaryText={
                   <Trans>Make a platform game from scratch.</Trans>

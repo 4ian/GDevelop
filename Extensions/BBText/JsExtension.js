@@ -155,17 +155,16 @@ module.exports = {
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       );
 
-    // Utility function to add both a setter and a getter to a property from a list. Useful for setting multiple generic properties
-    const addSettersAndGettersToObjectHelper = (
-      gdObject,
-      properties,
-      objectName
-    ) => {
+    /**
+     * Utility function to add both a setter and a getter to a property from a list.
+     * Useful for setting multiple generic properties.
+     */
+    const addSettersAndGettersToObject = (gdObject, properties, objectName) => {
       properties.forEach(property => {
         const parameterType =
           property.type === 'boolean' ? 'yesorno' : property.type;
 
-        // Add all the generic GETTERS
+        // Add the expression
         if (parameterType === 'number') {
           gdObject
             .addExpression(
@@ -177,15 +176,10 @@ module.exports = {
               property.iconPath,
               property.iconPath
             )
-            .addParameter(
-              'object',
-              objectName + _(' object'),
-              objectName,
-              false
-            )
+            .addParameter('object', objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
-        } else {
+        } else if (parameterType === 'string') {
           gdObject
             .addStrExpression(
               `Get${property.functionName}`,
@@ -196,36 +190,26 @@ module.exports = {
               property.iconPath,
               property.iconPath
             )
-            .addParameter(
-              'object',
-              objectName + _(' object'),
-              objectName,
-              false
-            )
+            .addParameter('object', objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
         }
 
-        // Add all the generic setters
+        // Add the action
         if (parameterType === 'number' || parameterType === 'string') {
           const expressionType =
             parameterType === 'number' ? 'expression' : 'string';
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              property.actionDescription,
+              property.paramLabel,
               property.actionDescription,
               property.actionSentence,
               '',
               property.iconPath,
               property.iconPath
             )
-            .addParameter(
-              'object',
-              objectName + _(' object'),
-              objectName,
-              false
-            )
+            .addParameter('object', objectName, objectName, false)
             .addParameter('operator', _("Modification's sign"), '', false)
             .addParameter(expressionType, property.paramLabel, '', false)
             .getCodeExtraInformation()
@@ -233,27 +217,23 @@ module.exports = {
             .setManipulatedType(parameterType)
             .setGetter(`get${property.functionName}`);
         } else {
-          // Setter doesnt have a +- modifier (Color, alignment, etc)
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              property.actionDescription,
+              property.paramLabel,
               property.actionDescription,
               property.actionSentence,
               '',
               property.iconPath,
               property.iconPath
             )
-            .addParameter(
-              'object',
-              objectName + _(' object'),
-              objectName,
-              false
-            )
+            .addParameter('object', objectName, objectName, false)
             .addParameter(
               parameterType,
               property.paramLabel,
-              property.options ? '["' + property.options.join('", "') + '"]': '',
+              property.options
+                ? '["' + property.options.join('", "') + '"]'
+                : '',
               false
             )
             .getCodeExtraInformation()
@@ -261,26 +241,21 @@ module.exports = {
             .setGetter(`get${property.functionName}`);
         }
 
-        // Add compare Conditions via getters
+        // Add condition
         if (parameterType === 'string' || parameterType === 'number') {
           const propExpressionType =
             parameterType === 'string' ? 'string' : 'expression';
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.conditionDescription,
+              property.paramLabel,
               property.conditionDescription,
               property.conditionSentence,
               '',
               property.iconPath,
               property.iconPath
             )
-            .addParameter(
-              'object',
-              objectName + _(' object'),
-              objectName,
-              false
-            )
+            .addParameter('object', objectName, objectName, false)
             .addParameter(
               'relationalOperator',
               _('Sign of the test'),
@@ -300,19 +275,14 @@ module.exports = {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.conditionDescription,
+              property.paramLabel,
               property.conditionDescription,
               property.conditionSentence,
               '',
               property.iconPath,
               property.iconPath
             )
-            .addParameter(
-              'object',
-              objectName + _(' object'),
-              objectName,
-              false
-            )
+            .addParameter('object', objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
         }
@@ -322,51 +292,61 @@ module.exports = {
     const setterAndGetterProperties = [
       {
         functionName: 'BBText',
-        iconPath: 'res/actions/textAlign24.png',
+        iconPath: 'res/actions/text24.png',
         type: 'string',
         paramLabel: _('BBCode text'),
-        conditionDescription: _('Compare the value of BBCode text'),
+        conditionDescription: _('Compare the value of the BBCode text.'),
         conditionSentence: _('The BBCode text of _PARAM0_ is _PARAM1__PARAM2_'),
         actionDescription: _('Set BBCode text'),
         actionSentence: _('Do _PARAM1__PARAM2_ to the BBCode text of _PARAM0_'),
         expressionDescription: _('Get BBCode text'),
-        expressionSentence:_('Get BBCode text'),
+        expressionSentence: _('Get BBCode text'),
       },
       {
         functionName: 'Color',
         iconPath: 'res/actions/color24.png',
         type: 'color',
-        paramLabel: _('Color (Hex)'),
-        conditionDescription: _('Compare the value of base color'),
-        conditionSentence: _('The base color of _PARAM0_ is _PARAM1__PARAM2_'),
+        paramLabel: _('Color'),
+        conditionDescription: '', // No conditions for a "color" property
+        conditionSentence: '', // No conditions for a "color" property
         actionDescription: _('Set base color'),
         actionSentence: _('Set base color of _PARAM0_ to _PARAM1_'),
-        expressionDescription: _('Get base color'),
-        expressionSentence:_('Get base color'),
+        expressionDescription: '', // No expression for a "color" property
+        expressionSentence: '', // No expression for a "color" property
       },
       {
         functionName: 'Opacity',
         iconPath: 'res/actions/opacity24.png',
         type: 'number',
-        paramLabel: _('Opacity (0-255)'),
-        conditionDescription: _('Compare the value of base opacity'),
-        conditionSentence: _('The base opacity of _PARAM0_ is _PARAM1__PARAM2_'),
+        paramLabel: _('Opacity'),
+        conditionDescription: _(
+          'Compare the value of the base opacity of the text.'
+        ),
+        conditionSentence: _(
+          'The base opacity of _PARAM0_ is _PARAM1__PARAM2_'
+        ),
         actionDescription: _('Set base opacity'),
-        actionSentence: _('Do _PARAM1__PARAM2_ to the base opacity of _PARAM0_'),
-        expressionDescription: _('Get base opacity'),
-        expressionSentence:_('Get base opacity'),
+        actionSentence: _(
+          'Do _PARAM1__PARAM2_ to the base opacity of _PARAM0_'
+        ),
+        expressionDescription: _('Get the base opacity'),
+        expressionSentence: _('Get the base opacity'),
       },
       {
         functionName: 'FontSize',
         iconPath: 'res/actions/characterSize24.png',
         type: 'number',
         paramLabel: _('Font size'),
-        conditionDescription: _('Compare the value of base font size'),
-        conditionSentence: _('The base font size of _PARAM0_ is _PARAM1__PARAM2_'),
+        conditionDescription: _('Compare the base font size of the text.'),
+        conditionSentence: _(
+          'The base font size of _PARAM0_ is _PARAM1__PARAM2_'
+        ),
         actionDescription: _('Set base font size'),
-        actionSentence: _('Do _PARAM1__PARAM2_ to the base font size of _PARAM0_'),
-        expressionDescription: _('Get base font size'),
-        expressionSentence:_('Get base font size'),
+        actionSentence: _(
+          'Do _PARAM1__PARAM2_ to the base font size of _PARAM0_'
+        ),
+        expressionDescription: _('Get the base font size'),
+        expressionSentence: _('Get the base font size'),
       },
       {
         functionName: 'FontFamily',
@@ -374,24 +354,28 @@ module.exports = {
         type: 'string',
         paramLabel: _('Font family'),
         conditionDescription: _('Compare the value of font family'),
-        conditionSentence: _('The base font family of _PARAM0_ is _PARAM1__PARAM2_'),
+        conditionSentence: _(
+          'The base font family of _PARAM0_ is _PARAM1__PARAM2_'
+        ),
         actionDescription: _('Set font family'),
-        actionSentence: _('Do _PARAM1__PARAM2_ to the base font family of _PARAM0_'),
-        expressionDescription: _('Get base font family'),
-        expressionSentence:_('Get base font family'),
+        actionSentence: _(
+          'Do _PARAM1__PARAM2_ to the base font family of _PARAM0_'
+        ),
+        expressionDescription: _('Get the base font family'),
+        expressionSentence: _('Get the base font family'),
       },
       {
         functionName: 'Alignment',
         iconPath: 'res/actions/textAlign24.png',
         type: 'stringWithSelector',
         paramLabel: _('Alignment'),
-        options: [_('left'), _('right'), _('center')],
-        conditionDescription: _('Compare the value of text alignment'),
-        conditionSentence: _('The text alignment of _PARAM0_ is _PARAM1__PARAM2_'),
-        actionDescription: _('Set text alignment'),
+        options: ['left', 'right', 'center'],
+        conditionDescription: _('Check the current text alignment'),
+        conditionSentence: _('The text alignment of _PARAM0_ is _PARAM1_'),
+        actionDescription: _('Change the alignment of the text.'),
         actionSentence: _('Set text alignment of _PARAM0_ to _PARAM1_'),
-        expressionDescription: _('Get text alignment'),
-        expressionSentence:_('Get text alignment'),
+        expressionDescription: _('Get the text alignment'),
+        expressionSentence: _('Get the text alignment'),
       },
       {
         functionName: 'WordWrap',
@@ -399,31 +383,35 @@ module.exports = {
         type: 'boolean',
         paramLabel: _('Word wrap'),
         conditionDescription: _('Check if word wrap is enabled'),
-        conditionSentence: _('word wrap is enabled'),
+        conditionSentence: _('Word wrap is enabled'),
         actionDescription: _('Set word wrap'),
-        actionSentence: _('Set word wrap of _PARAM0_ to _PARAM1_'),
-        expressionDescription: _('Get word wrap'),
-        expressionSentence:_('Get word wrap'),
+        actionSentence: _('Activate word wrap for _PARAM0_: _PARAM1_'),
+        expressionDescription: '',
+        expressionSentence: '',
       },
       {
         functionName: 'WrappingWidth',
         iconPath: 'res/actions/scaleWidth24.png',
         type: 'number',
         paramLabel: _('Wrapping width'),
-        conditionDescription: _('Compare the value of wrapping width'),
-        conditionSentence: _('The wrapping width of _PARAM0_ is _PARAM1__PARAM2_'),
-        actionDescription: _('Set wrapping width'),
-        actionSentence: _('Do _PARAM1__PARAM2_ to the wrapping width of _PARAM0_'),
-        expressionDescription: _('Get wrapping width'),
-        expressionSentence:_('Get wrapping width'),
+        conditionDescription: _(
+          'Compare the width, in pixels, after which the text is wrapped on next line.'
+        ),
+        conditionSentence: _(
+          'The wrapping width of _PARAM0_ is _PARAM1__PARAM2_'
+        ),
+        actionDescription: _(
+          'Change the width, in pixels, after which the text is wrapped on next line.'
+        ),
+        actionSentence: _(
+          'Do _PARAM1__PARAM2_ to the wrapping width of _PARAM0_'
+        ),
+        expressionDescription: _('Get the wrapping width'),
+        expressionSentence: _('Get the wrapping width'),
       },
     ];
 
-    addSettersAndGettersToObjectHelper(
-      object,
-      setterAndGetterProperties,
-      'BBText'
-    );
+    addSettersAndGettersToObject(object, setterAndGetterProperties, 'BBText');
 
     return extension;
   },

@@ -27,149 +27,113 @@ const styles = {
 };
 
 type Props = {|
-  event: any,
+  event: gdBaseEvent,
   onClose: () => void,
   onApply: () => void,
 |};
 
 type State = {|
   textValue: any,
-  textColors: any,
-  backgroundColors: any,
+  textColor: {| r: number, g: number, b: number |},
+  backgroundColor: {| r: number, g: number, b: number |},
 |};
 
-export default class TextEditorDialog extends React.PureComponent<
-  Props,
-  State
-> {
-  setName = () => {
+export default class TextEditorDialog extends React.Component<Props, State> {
+  _applyChangesOnEvent = () => {
     const { event } = this.props;
+    const { textValue, textColor, backgroundColor } = this.state;
     const eventType = event.getType();
-    if (eventType === 'BuiltinCommonInstructions::Group') {
-      gd.asGroupEvent(event).setName(this.state.textValue);
-    }
-  };
 
-  setComment = () => {
-    const { event } = this.props;
-    const eventType = event.getType();
     if (eventType === 'BuiltinCommonInstructions::Comment') {
-      gd.asCommentEvent(event).setComment(this.state.textValue);
-    }
-  };
+      //Text value
+      gd.asCommentEvent(event).setComment(textValue);
 
-  setTextColors = () => {
-    const { event } = this.props;
-    const { textColors } = this.state;
-    const eventType = event.getType();
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      //Text color
       gd.asCommentEvent(event).setTextColor(
-        parseInt(textColors.red),
-        parseInt(textColors.green),
-        parseInt(textColors.blue)
+        parseInt(textColor.r),
+        parseInt(textColor.g),
+        parseInt(textColor.b)
+      );
+      //Background color
+      gd.asCommentEvent(event).setBackgroundColor(
+        parseInt(backgroundColor.r),
+        parseInt(backgroundColor.g),
+        parseInt(backgroundColor.b)
       );
     } else if (eventType === 'BuiltinCommonInstructions::Group') {
+      //Text value
+      gd.asGroupEvent(event).setName(textValue);
+
       //Text color for group not supported in Core, instead GroupEvent.js handle this
+      //Background color
+      gd.asGroupEvent(event).setBackgroundColor(
+        parseInt(backgroundColor.r),
+        parseInt(backgroundColor.g),
+        parseInt(backgroundColor.b)
+      );
       return;
     }
   };
 
-  setBackgroundColors = () => {
-    const { event } = this.props;
-    const { backgroundColors } = this.state;
-    const eventType = event.getType();
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
-      gd.asCommentEvent(event).setBackgroundColor(
-        parseInt(backgroundColors.red),
-        parseInt(backgroundColors.green),
-        parseInt(backgroundColors.blue)
-      );
-    } else if (eventType === 'BuiltinCommonInstructions::Group') {
-      gd.asGroupEvent(event).setBackgroundColor(
-        parseInt(backgroundColors.red),
-        parseInt(backgroundColors.green),
-        parseInt(backgroundColors.blue)
-      );
-    }
-  };
-
-  getComment = () => {
+  _getInitialStateFromEvent = () => {
     const { event } = this.props;
     const eventType = event.getType();
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
-      return gd.asCommentEvent(event).getComment();
-    } else if (eventType === 'BuiltinCommonInstructions::Group') {
-      return gd.asGroupEvent(event).getName();
-    } else {
-      console.error(
-        'Dialog was opened for an unsupported event type: ' + eventType
-      );
-      return '';
-    }
-  };
-
-  getTextColors = () => {
-    const { event } = this.props;
-    const eventType = event.getType();
-    let textColors;
+    let text, textColors, backgroundColors;
 
     if (eventType === 'BuiltinCommonInstructions::Comment') {
       const commentEvent = gd.asCommentEvent(event);
       textColors = {
-        red: commentEvent.getTextColorRed(),
-        green: commentEvent.getTextColorGreen(),
-        blue: commentEvent.getTextColorBlue(),
+        r: commentEvent.getTextColorRed(),
+        g: commentEvent.getTextColorGreen(),
+        b: commentEvent.getTextColorBlue(),
       };
-      return textColors;
+
+      backgroundColors = {
+        r: commentEvent.getBackgroundColorRed(),
+        g: commentEvent.getBackgroundColorGreen(),
+        b: commentEvent.getBackgroundColorBlue(),
+      };
+
+      text = gd.asCommentEvent(event).getComment();
     } else if (eventType === 'BuiltinCommonInstructions::Group') {
       var groupEvent = gd.asGroupEvent(event);
       const r = groupEvent.getBackgroundColorR(),
         g = groupEvent.getBackgroundColorG(),
         b = groupEvent.getBackgroundColorB();
 
-      textColors = (r + g + b) / 3 > 200 ? 'black' : 'white'; //Because text color is not supported by Core
-      return textColors;
-    } else {
-      console.error('Dialog was opened for an unsupported event text color.');
-      return '';
-    }
-  };
-
-  getBackgroundColors = () => {
-    const { event } = this.props;
-    const eventType = event.getType();
-    let backgroundColors;
-
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
-      const commentEvent = gd.asCommentEvent(event);
-      backgroundColors = {
-        red: commentEvent.getBackgroundColorRed(),
-        green: commentEvent.getBackgroundColorGreen(),
-        blue: commentEvent.getBackgroundColorBlue(),
+      const white = {
+        r: 255,
+        g: 255,
+        b: 255,
       };
 
-      return backgroundColors;
-    } else if (eventType === 'BuiltinCommonInstructions::Group') {
-      const groupEvent = gd.asGroupEvent(event);
-      backgroundColors = {
-        red: groupEvent.getBackgroundColorR(),
-        green: groupEvent.getBackgroundColorG(),
-        blue: groupEvent.getBackgroundColorB(),
+      const black = {
+        r: 0,
+        g: 0,
+        b: 0,
       };
 
-      return backgroundColors;
+      textColors = (r + g + b) / 3 > 200 ? black : white; //Because text color is not supported by Core
+
+      backgroundColors = {
+        r: groupEvent.getBackgroundColorR(),
+        g: groupEvent.getBackgroundColorG(),
+        b: groupEvent.getBackgroundColorB(),
+      };
+
+      text = gd.asGroupEvent(event).getName();
     } else {
       console.error(
-        'Dialog was opened for an unsupported event background color'
+        'Dialog was opened for an unsupported event type: ' + eventType
       );
-      return '';
     }
-  };
 
-  state = {
-    textValue: this.getComment(),
-    textColors: this.getTextColors(),
-    backgroundColors: this.getBackgroundColors(),
+    //return state = this._getInitialStateFromEvent();
+    this.setState({
+      textValue: text,
+      textColor: textColors,
+      backgroundColor: backgroundColors,
+    });
   };
 
   render() {
@@ -178,7 +142,7 @@ export default class TextEditorDialog extends React.PureComponent<
 
     return (
       <Dialog
-        title={<Trans>Text editor</Trans>}
+        title={<Trans>Edit the event text</Trans>}
         onRequestClose={onClose}
         open
         noMargin
@@ -195,13 +159,7 @@ export default class TextEditorDialog extends React.PureComponent<
             primary
             keyboardFocused
             onClick={() => {
-              if (eventType === 'BuiltinCommonInstructions::Comment') {
-                this.setComment();
-              } else if (eventType === 'BuiltinCommonInstructions::Group') {
-                this.setName();
-              }
-              this.setTextColors();
-              this.setBackgroundColors();
+              this._applyChangesOnEvent();
 
               onApply();
             }}
@@ -225,26 +183,13 @@ export default class TextEditorDialog extends React.PureComponent<
             <ColorPicker
               style={styles.sizeTextField}
               disableAlpha
-              color={{
-                r: this.state.backgroundColors.red,
-                g: this.state.backgroundColors.green,
-                b: this.state.backgroundColors.blue,
-                a: 255,
-              }}
+              color={this.state.backgroundColor}
               onChangeComplete={color => {
-                this.setState({
-                  backgroundColors: {
-                    red: color.rgb.r,
-                    green: color.rgb.g,
-                    blue: color.rgb.b,
-                  },
-                });
-
-                this.forceUpdate();
+                this.setState({ backgroundColor: color.rgb });
               }}
             />
 
-            {eventType !== 'BuiltinCommonInstructions::Group' && (
+            {eventType === 'BuiltinCommonInstructions::Comment' && (
               <React.Fragment>
                 <MiniToolbarText>
                   <Trans>Text color:</Trans>
@@ -252,22 +197,9 @@ export default class TextEditorDialog extends React.PureComponent<
                 <ColorPicker
                   style={styles.sizeTextField}
                   disableAlpha
-                  color={{
-                    r: this.state.textColors.red,
-                    g: this.state.textColors.green,
-                    b: this.state.textColors.blue,
-                    a: 255,
-                  }}
+                  color={this.state.textColor}
                   onChangeComplete={color => {
-                    this.setState({
-                      textColors: {
-                        red: color.rgb.r,
-                        green: color.rgb.g,
-                        blue: color.rgb.b,
-                      },
-                    });
-
-                    this.forceUpdate();
+                    this.setState({ textColor: color.rgb });
                   }}
                 />
               </React.Fragment>
@@ -281,14 +213,13 @@ export default class TextEditorDialog extends React.PureComponent<
                   hintText={t`Enter the text to be displayed`}
                   fullWidth
                   multiLine
-                  rows={100}
-                  rowsMax={100}
+                  rows={8}
+                  rowsMax={8}
                   value={this.state.textValue}
                   onChange={value => {
                     this.setState({
                       textValue: value,
                     });
-                    this.forceUpdate();
                   }}
                 />
               </Line>

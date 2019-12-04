@@ -134,7 +134,7 @@ type State = {|
 
   serializedEventsToExtract: ?Object,
 
-  textEditedEvent: ?any,
+  textEditedEvent: ?gdBaseEvent,
 
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,

@@ -75,7 +75,7 @@ type Props = {|
   margin?: 'none' | 'normal',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: number | string,
+    fontSize?: 18,
     fontStyle?: 'normal' | 'italic',
     width?: number | '100%',
     flex?: 1,

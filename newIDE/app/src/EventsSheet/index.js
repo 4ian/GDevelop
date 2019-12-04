@@ -4,7 +4,7 @@ import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
-import TextEditorDialog from './InstructionEditor/TextEditorDialog';
+import EventTextDialog from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
@@ -367,7 +367,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     return newEvents;
   };
 
-  openTextEditorDialog = () => {
+  openEventTextDialog = () => {
     const selectedEvents = getSelectedEvents(this.state.selection);
     if (!selectedEvents.length) return;
 
@@ -377,7 +377,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  closeTextEditorDialog = () => {
+  closeEventTextDialog = () => {
     this.setState({
       textEditedEvent: null,
     });
@@ -1209,7 +1209,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
                             const edition = {
                               label: 'Edit',
-                              click: () => this.openTextEditorDialog(),
+                              click: () => this.openEventTextDialog(),
                             };
 
                             getSelectedEvents(this.state.selection).forEach(
@@ -1348,10 +1348,10 @@ export default class EventsSheet extends React.Component<Props, State> {
                           />
                         )}
                         {this.state.textEditedEvent && (
-                          <TextEditorDialog
+                          <EventTextDialog
                             event={this.state.textEditedEvent}
                             onApply={() => {
-                              this.closeTextEditorDialog();
+                              this.closeEventTextDialog();
                               this._saveChangesToHistory();
                             }}
                             onClose={() =>

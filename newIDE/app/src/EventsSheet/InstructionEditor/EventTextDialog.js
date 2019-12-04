@@ -38,7 +38,7 @@ type State = {|
   backgroundColor: {| r: number, g: number, b: number |},
 |};
 
-export default class TextEditorDialog extends React.Component<Props, State> {
+export default class EventTextDialog extends React.Component<Props, State> {
   _applyChangesOnEvent = () => {
     const { event } = this.props;
     const { textValue, textColor, backgroundColor } = this.state;

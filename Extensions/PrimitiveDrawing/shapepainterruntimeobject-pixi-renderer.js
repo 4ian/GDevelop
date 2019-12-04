@@ -48,7 +48,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawLine = function(x1, y1,
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawLineV2 = function(x1, y1, x2, y2, thickness) {
-    this._graphics.lineStyle(thickness);
+    this._graphics.lineStyle(thickness, this._object._outlineColor, this._object._outlineOpacity / 255);
     this._graphics.moveTo(x1, y1);
     this._graphics.lineTo(x2,y2);
     this._graphics.endFill();  

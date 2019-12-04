@@ -1,5 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import IconButton from '../UI/IconButton';
@@ -7,7 +6,6 @@ import SemiControlledAutoComplete, {
   type DataSource,
 } from '../UI/SemiControlledAutoComplete';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import Add from '@material-ui/icons/Add';
@@ -48,10 +46,6 @@ const styles = {
 };
 
 export default class ResourceSelector extends React.Component<Props, State> {
-  static defaultProps = {
-    canBeReset: false,
-  };
-
   constructor(props: Props) {
     super(props);
 
@@ -266,7 +260,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     );
     return (
       <div style={styles.container}>
-        <Line expand>
+        <Line nomargin expand>
           <SemiControlledAutoComplete
             floatingLabelText={this.props.floatingLabelText}
             hintText={this.props.hintText}
@@ -280,13 +274,13 @@ export default class ResourceSelector extends React.Component<Props, State> {
             ref={autoComplete => (this._autoComplete = autoComplete)}
           />
           {this.props.canBeReset && (
-            <FlatButton
-              label={<Trans>Reset</Trans>}
-              icon={<BackspaceIcon />}
+            <IconButton
               onClick={() => {
                 this._onResetResourceName();
               }}
-            />
+            >
+              <BackspaceIcon />
+            </IconButton>
           )}
           {!!externalEditors.length && (
             <ElementWithMenu

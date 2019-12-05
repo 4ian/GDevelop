@@ -10,7 +10,7 @@
  * @memberof gdjs
  * @class RuntimeGame
  * @param {Object} data The object (usually stored in data.json) containing the full project data
- * @param {Object} spec Optional object for specifiying additional options: {forceFullscreen: ...}
+ * @param {Object=} spec Optional object for specifiying additional options: {forceFullscreen: ...}
  */
 gdjs.RuntimeGame = function(data, spec) {
   spec = spec || {};

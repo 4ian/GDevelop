@@ -1,9 +1,12 @@
 //@flow
-import { findGDJS } from '../Export/LocalExporters/LocalGDJSFinder';
+import { findGDJS } from '../GameEngineFinder/LocalGDJSFinder';
 import optionalRequire from '../Utils/OptionalRequire';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
+// TODO: Replace the reading into files by an automatic generation of a .d.ts
+// using TypeScript from the game engine sources, and have a script integrate the .d.ts
+// into newIDE sources
 export const setupAutocompletions = (monaco: any) => {
   const importAllJsFilesFromFolder = (folderPath: string) =>
     fs.readdir(folderPath, (error: ?Error, filenames: Array<string>) => {

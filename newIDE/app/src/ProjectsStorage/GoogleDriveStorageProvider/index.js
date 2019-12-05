@@ -308,7 +308,6 @@ export default ({
         fileMetadata: FileMetadata
       ): Promise<{|
         content: Object,
-        fileMetadata: FileMetadata,
       |}> => {
         const fileId = fileMetadata.fileIdentifier;
 
@@ -335,7 +334,6 @@ export default ({
                       const dataObject = JSON.parse(fileContent);
                       return resolve({
                         content: dataObject,
-                        fileMetadata,
                       });
                     } catch (ex) {
                       return reject(fileId + ' is a corrupted/malformed file.');

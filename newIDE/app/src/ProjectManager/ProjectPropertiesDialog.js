@@ -237,17 +237,17 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           <SelectField
             fullWidth
             floatingLabelText={<Trans>Project file type</Trans>}
-            value={isFolderProject}
-            onChange={(e, i, value: boolean) =>
-              this.setState({ isFolderProject: value })
+            value={isFolderProject ? 'folder-project' : 'single-file'}
+            onChange={(e, i, value: string) =>
+              this.setState({ isFolderProject: value === 'folder-project' })
             }
           >
             <SelectOption
-              value={false}
+              value={'single-file'}
               primaryText={t`Single file (default)`}
             />
             <SelectOption
-              value={true}
+              value={'folder-project'}
               primaryText={t`Multiple files, saved in folder next to the main file`}
             />
           </SelectField>

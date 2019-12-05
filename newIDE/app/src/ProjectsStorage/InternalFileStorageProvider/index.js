@@ -30,7 +30,6 @@ export default ({
       if (internalExampleFiles[url])
         return Promise.resolve({
           content: internalExampleFiles[url],
-          fileMetadata,
         });
 
       return Promise.reject(new Error(`Unknown built-in game with URL ${url}`));

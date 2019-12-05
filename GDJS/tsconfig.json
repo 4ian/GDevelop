@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "Runtime/**/*",
+    "../Extensions/**/*.js",
+    "tests/tests/**/*.js",
+    "tests/tests-utils/**/*.js",
+    "tests/benchmarks/**/*.js"
+  ],
+  "exclude": [
+    "Runtime/Cocos2d",
+    "Runtime/Cordova",
+    "Runtime/Electron",
+    "Runtime/FacebookInstantGames",
+    "Runtime/libs/CocoonJS"
+  ]
+}

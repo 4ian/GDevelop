@@ -22,7 +22,6 @@ export type StorageProviderOperations = {|
     fileMetadata: FileMetadata
   ) => Promise<{|
     content: Object,
-    fileMetadata: FileMetadata,
   |}>,
   getOpenErrorMessage?: (error: Error) => MessageDescriptor,
 

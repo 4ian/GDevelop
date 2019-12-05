@@ -81,17 +81,15 @@ It's possible to create new themes for the UI. See [this file](https://github.co
 
 Make sure to have the standalone app running with Electron.
 
-- If you want create/modify _a extensions_, check the [README about extensions](./README-extensions.md) for a step-by-step explanations to get started in 5 minutes.
+- If you want create/modify _extensions_, check the [README about extensions](./README-extensions.md) for a step-by-step explanations to get started in 5 minutes.
 
-- The _game engine core_ ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
+- The _game engine core_ ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime).
 
-  ```bash
-  cd newIDE/app
-  cd scripts
-  node import-GDJS-Runtime.js
-  ```
+If you modify any file while the IDE is running with Electron, a watcher will _automatically import_ your changes (look at the console to be sure).
 
-  You can then launch a preview in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
+You can then _launch a preview_ in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
+
+> If you deactivated the watcher in preferences, run the `import-GDJS-Runtime.js` script manually (`cd newIDE/app/scripts` then `node import-GDJS-Runtime.js`) after every change, before launching a preview.
 
 ### Recommended tools for development
 

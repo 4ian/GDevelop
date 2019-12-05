@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import { type Build, buildWeb } from '../../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../../Profile/UserProfileContext';
-import { findGDJS } from './LocalGDJSFinder';
+import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import localFileSystem from './LocalFileSystem';

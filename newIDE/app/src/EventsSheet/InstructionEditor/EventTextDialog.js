@@ -25,6 +25,12 @@ const styles = {
   toolbarItem: toolbarItemStyle,
   checkbox: toolbarItemStyle,
 };
+type RGBColor = {|
+  r?: number,
+  g?: number,
+  b?: number,
+  a?: number,
+|};
 
 type Props = {|
   event: gdBaseEvent,
@@ -33,9 +39,9 @@ type Props = {|
 |};
 
 type State = {|
-  textValue: any,
-  textColor: {| r: number, g: number, b: number |},
-  backgroundColor: {| r: number, g: number, b: number |},
+  textValue: string,
+  textColor: RGBColor,
+  backgroundColor: RGBColor,
 |};
 
 export default class EventTextDialog extends React.Component<Props, State> {
@@ -78,7 +84,7 @@ export default class EventTextDialog extends React.Component<Props, State> {
   _getInitialStateFromEvent = () => {
     const { event } = this.props;
     const eventType = event.getType();
-    let text, textColors, backgroundColors;
+    let text: string, textColors: RGBColor, backgroundColors: RGBColor;
 
     if (eventType === 'BuiltinCommonInstructions::Comment') {
       const commentEvent = gd.asCommentEvent(event);
@@ -128,16 +134,18 @@ export default class EventTextDialog extends React.Component<Props, State> {
       );
     }
 
-    //return state = this._getInitialStateFromEvent();
-    this.setState({
+    return {
       textValue: text,
       textColor: textColors,
       backgroundColor: backgroundColors,
-    });
+    };
   };
+
+  state = this._getInitialStateFromEvent();
 
   render() {
     const { event, onApply, onClose } = this.props;
+    const { textValue, textColor, backgroundColor } = this.state;
     const eventType = event.getType();
 
     return (
@@ -183,7 +191,7 @@ export default class EventTextDialog extends React.Component<Props, State> {
             <ColorPicker
               style={styles.sizeTextField}
               disableAlpha
-              color={this.state.backgroundColor}
+              color={backgroundColor}
               onChangeComplete={color => {
                 this.setState({ backgroundColor: color.rgb });
               }}
@@ -197,7 +205,7 @@ export default class EventTextDialog extends React.Component<Props, State> {
                 <ColorPicker
                   style={styles.sizeTextField}
                   disableAlpha
-                  color={this.state.textColor}
+                  color={textColor}
                   onChangeComplete={color => {
                     this.setState({ textColor: color.rgb });
                   }}
@@ -214,8 +222,8 @@ export default class EventTextDialog extends React.Component<Props, State> {
                   fullWidth
                   multiLine
                   rows={8}
-                  rowsMax={8}
-                  value={this.state.textValue}
+                  rowsMax={30}
+                  value={textValue}
                   onChange={value => {
                     this.setState({
                       textValue: value,

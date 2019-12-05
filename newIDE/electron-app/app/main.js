@@ -9,6 +9,7 @@ const protocol = electron.protocol;
 const parseArgs = require('minimist');
 const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
+const exec = require("child_process").execFile;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const {
@@ -131,6 +132,13 @@ app.on('ready', function() {
       electron.shell.openExternal(url);
     }
   });
+
+  mainWindow.webContents.on('devtools-reload-page', (e, url) => {
+    if (isDev) {
+      exec("npm", ["run", "reload-extensions"]);
+      console.info("GD electron was reloaded in dev mode. Executed npm run reload-extensions");
+    }
+  })
 
   //Prevent opening any website or url inside Electron.
   mainWindow.webContents.on('new-window', (e, url) => {

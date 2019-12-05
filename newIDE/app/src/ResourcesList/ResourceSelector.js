@@ -1,6 +1,13 @@
 // @flow
+
 import * as React from 'react';
 import IconButton from '../UI/IconButton';
+import SemiControlledAutoComplete, {
+  type DataSource,
+} from '../UI/SemiControlledAutoComplete';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import { Line } from '../UI/Grid';
+import BackspaceIcon from '@material-ui/icons/Backspace';
 import Add from '@material-ui/icons/Add';
 import Brush from '@material-ui/icons/Brush';
 import {
@@ -9,12 +16,8 @@ import {
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
-import SemiControlledAutoComplete, {
-  type DataSource,
-} from '../UI/SemiControlledAutoComplete';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
@@ -25,6 +28,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
   fullWidth?: boolean,
+  canBeReset?: boolean,
   initialResourceName: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
@@ -141,7 +145,23 @@ export default class ResourceSelector extends React.Component<Props, State> {
       });
   };
 
+  _onResetResourceName = () => {
+    this.setState(
+      {
+        resourceName: '',
+        notExistingError: false,
+      },
+      () => {
+        if (this.props.onChange) this.props.onChange(this.state.resourceName);
+      }
+    );
+  };
+
   _onChangeResourceName = (resourceName: string) => {
+    if (resourceName === '') {
+      this._onResetResourceName();
+      return;
+    }
     this.setState(
       {
         resourceName,
@@ -240,33 +260,44 @@ export default class ResourceSelector extends React.Component<Props, State> {
     );
     return (
       <div style={styles.container}>
-        <SemiControlledAutoComplete
-          floatingLabelText={this.props.floatingLabelText}
-          hintText={this.props.hintText}
-          openOnFocus
-          dataSource={this.autoCompleteData || []}
-          value={this.state.resourceName}
-          onChange={this._onChangeResourceName}
-          errorText={errorText}
-          fullWidth={this.props.fullWidth}
-          margin={this.props.margin}
-          ref={autoComplete => (this._autoComplete = autoComplete)}
-        />
-        {!!externalEditors.length && (
-          <ElementWithMenu
-            element={
-              <IconButton>
-                <Brush />
-              </IconButton>
-            }
-            buildMenuTemplate={() =>
-              externalEditors.map(externalEditor => ({
-                label: externalEditor.displayName,
-                click: () => this._editWith(externalEditor),
-              }))
-            }
+        <Line nomargin expand>
+          <SemiControlledAutoComplete
+            floatingLabelText={this.props.floatingLabelText}
+            hintText={this.props.hintText}
+            openOnFocus
+            dataSource={this.autoCompleteData || []}
+            value={this.state.resourceName}
+            onChange={this._onChangeResourceName}
+            errorText={errorText}
+            fullWidth={this.props.fullWidth}
+            margin={this.props.margin}
+            ref={autoComplete => (this._autoComplete = autoComplete)}
           />
-        )}
+          {this.props.canBeReset && (
+            <IconButton
+              onClick={() => {
+                this._onResetResourceName();
+              }}
+            >
+              <BackspaceIcon />
+            </IconButton>
+          )}
+          {!!externalEditors.length && (
+            <ElementWithMenu
+              element={
+                <IconButton>
+                  <Brush />
+                </IconButton>
+              }
+              buildMenuTemplate={() =>
+                externalEditors.map(externalEditor => ({
+                  label: externalEditor.displayName,
+                  click: () => this._editWith(externalEditor),
+                }))
+              }
+            />
+          )}
+        </Line>
       </div>
     );
   }

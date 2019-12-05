@@ -97,6 +97,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             resourcesLoader={ResourcesLoader}
             resourceKind="font"
             fullWidth
+            canBeReset
             initialResourceName={textObject.getFontName()}
             onChange={resourceName => {
               textObject.setFontName(resourceName);

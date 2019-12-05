@@ -26,7 +26,7 @@
  */
 .gd-events-sheet-dark-theme .rst__moveHandle {
   background: #494949 !important;
-  border: none;
+  border: none!important;
 }
 
 .gd-events-sheet-dark-theme .rst__moveHandle:hover {

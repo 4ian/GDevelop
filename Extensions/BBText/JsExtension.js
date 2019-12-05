@@ -110,7 +110,7 @@ module.exports = {
         text:
           '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
-        fontSize: 20,
+        fontSize: "20",
         visible: true,
         color: '#000000',
         fontFamily: 'Arial',

@@ -49,15 +49,15 @@ export default class EventTextDialog extends React.Component<Props, State> {
 
       //Text color
       gd.asCommentEvent(event).setTextColor(
-        parseInt(textColor.r, 10),
-        parseInt(textColor.g, 10),
-        parseInt(textColor.b, 10)
+        textColor.r,
+        textColor.g,
+        textColor.b
       );
       //Background color
       gd.asCommentEvent(event).setBackgroundColor(
-        parseInt(backgroundColor.r, 10),
-        parseInt(backgroundColor.g, 10),
-        parseInt(backgroundColor.b, 10)
+        backgroundColor.r,
+        backgroundColor.g,
+        backgroundColor.b
       );
     } else if (eventType === 'BuiltinCommonInstructions::Group') {
       //Text value
@@ -66,9 +66,9 @@ export default class EventTextDialog extends React.Component<Props, State> {
       //Text color for group not supported in Core, instead GroupEvent.js handle this
       //Background color
       gd.asGroupEvent(event).setBackgroundColor(
-        parseInt(backgroundColor.r, 10),
-        parseInt(backgroundColor.g, 10),
-        parseInt(backgroundColor.b, 10)
+        backgroundColor.r,
+        backgroundColor.g,
+        backgroundColor.b
       );
       return;
     }

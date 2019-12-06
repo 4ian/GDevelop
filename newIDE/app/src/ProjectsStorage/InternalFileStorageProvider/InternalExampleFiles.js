@@ -94,21 +94,20 @@ import exampleFile89 from '../../fixtures/shoot-bullet-in-parabola/shoot-bullet-
 import exampleFile90 from '../../fixtures/shoot-bullets/shoot-bullets.json';
 import exampleFile91 from '../../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
 import exampleFile92 from '../../fixtures/simple-space-shooter/simple-space-shooter.json';
-import exampleFile93 from '../../fixtures/skeletal-animation-demo/skeletal-animation-demo.json';
-import exampleFile94 from '../../fixtures/snap-object-to-grid/snap-object-to-grid.json';
-import exampleFile95 from '../../fixtures/space-invaders/space-invaders.json';
-import exampleFile96 from '../../fixtures/space-shooter/space-shooter.json';
-import exampleFile97 from '../../fixtures/splash-screen/splash-screen.json';
-import exampleFile98 from '../../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
-import exampleFile99 from '../../fixtures/take-screenshot/take-screenshot.json';
-import exampleFile100 from '../../fixtures/text-entry-object/text-entry-object.json';
-import exampleFile101 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
-import exampleFile102 from '../../fixtures/text-to-speech/text-to-speech.json';
-import exampleFile103 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
-import exampleFile104 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
-import exampleFile105 from '../../fixtures/video-player/video-player.json';
-import exampleFile106 from '../../fixtures/z-depth/z-depth.json';
-import exampleFile107 from '../../fixtures/zombie-laser/zombie-laser.json';
+import exampleFile93 from '../../fixtures/snap-object-to-grid/snap-object-to-grid.json';
+import exampleFile94 from '../../fixtures/space-invaders/space-invaders.json';
+import exampleFile95 from '../../fixtures/space-shooter/space-shooter.json';
+import exampleFile96 from '../../fixtures/splash-screen/splash-screen.json';
+import exampleFile97 from '../../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
+import exampleFile98 from '../../fixtures/take-screenshot/take-screenshot.json';
+import exampleFile99 from '../../fixtures/text-entry-object/text-entry-object.json';
+import exampleFile100 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
+import exampleFile101 from '../../fixtures/text-to-speech/text-to-speech.json';
+import exampleFile102 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
+import exampleFile103 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
+import exampleFile104 from '../../fixtures/video-player/video-player.json';
+import exampleFile105 from '../../fixtures/z-depth/z-depth.json';
+import exampleFile106 from '../../fixtures/zombie-laser/zombie-laser.json';
 
 // prettier-ignore
 export default {
@@ -205,19 +204,18 @@ export default {
   'example://shoot-bullets': exampleFile90,
   'example://shooting-bullets-explanation': exampleFile91,
   'example://simple-space-shooter': exampleFile92,
-  'example://skeletal-animation-demo': exampleFile93,
-  'example://snap-object-to-grid': exampleFile94,
-  'example://space-invaders': exampleFile95,
-  'example://space-shooter': exampleFile96,
-  'example://splash-screen': exampleFile97,
-  'example://sprite-fade-in-out': exampleFile98,
-  'example://take-screenshot': exampleFile99,
-  'example://text-entry-object': exampleFile100,
-  'example://text-fade-in-out': exampleFile101,
-  'example://text-to-speech': exampleFile102,
-  'example://toggle-music-play-sound': exampleFile103,
-  'example://type-on-text-effect': exampleFile104,
-  'example://video-player': exampleFile105,
-  'example://z-depth': exampleFile106,
-  'example://zombie-laser': exampleFile107,
+  'example://snap-object-to-grid': exampleFile93,
+  'example://space-invaders': exampleFile94,
+  'example://space-shooter': exampleFile95,
+  'example://splash-screen': exampleFile96,
+  'example://sprite-fade-in-out': exampleFile97,
+  'example://take-screenshot': exampleFile98,
+  'example://text-entry-object': exampleFile99,
+  'example://text-fade-in-out': exampleFile100,
+  'example://text-to-speech': exampleFile101,
+  'example://toggle-music-play-sound': exampleFile102,
+  'example://type-on-text-effect': exampleFile103,
+  'example://video-player': exampleFile104,
+  'example://z-depth': exampleFile105,
+  'example://zombie-laser': exampleFile106,
 };

@@ -133,7 +133,7 @@ app.on('ready', function() {
     }
   });
 
-  mainWindow.webContents.on('devtools-reload-page', (e, url) => {
+  mainWindow.webContents.on('devtools-reload-page', () => {
     if (isDev) {
       exec('npm', ['run', 'reload-extensions']);
       console.info('GD electron was reloaded in dev mode. Executed npm run reload-extensions');

@@ -9,7 +9,7 @@ const protocol = electron.protocol;
 const parseArgs = require('minimist');
 const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
-const exec = require("child_process").execFile;
+const exec = require('child_process').execFile;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const {
@@ -135,8 +135,8 @@ app.on('ready', function() {
 
   mainWindow.webContents.on('devtools-reload-page', (e, url) => {
     if (isDev) {
-      exec("npm", ["run", "reload-extensions"]);
-      console.info("GD electron was reloaded in dev mode. Executed npm run reload-extensions");
+      exec('npm', ['run', 'reload-extensions']);
+      console.info('GD electron was reloaded in dev mode. Executed npm run reload-extensions');
     }
   })
 

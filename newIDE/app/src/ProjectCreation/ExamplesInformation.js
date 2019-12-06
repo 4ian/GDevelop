@@ -1381,6 +1381,55 @@ module.exports = {
       }
     ]
   },
+  "geometry-monster": {
+    "description": "A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "health-bar": {
     "description": "The platform example game adapted to add a health bar to the player, that is decreased when the player touches an enemy.",
     "usedExtensions": [

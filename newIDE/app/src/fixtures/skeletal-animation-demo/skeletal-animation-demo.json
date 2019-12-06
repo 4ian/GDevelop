@@ -290,36 +290,6 @@
       ],
       "objects": [
         {
-          "apiName": "DragonBones",
-          "debugPolygons": true,
-          "name": "Skeleton",
-          "rootArmatureName": "",
-          "skeletalDataFilename": "skeleton.json",
-          "tags": "",
-          "textureDataFilename": "skeleton_texture.json",
-          "textureName": "skeleton_texture.png",
-          "type": "SkeletonObject::Skeleton",
-          "variables": [],
-          "behaviors": [
-            {
-              "name": "PlatformerObject",
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
-              "acceleration": 1500,
-              "canGrabPlatforms": false,
-              "deceleration": 1500,
-              "gravity": 1000,
-              "ignoreDefaultControls": true,
-              "jumpSpeed": 600,
-              "maxFallingSpeed": 700,
-              "maxSpeed": 250,
-              "roundCoordinates": false,
-              "slopeMaxAngle": 60,
-              "xGrabTolerance": 10,
-              "yGrabOffset": 0
-            }
-          ]
-        },
-        {
           "name": "Ground",
           "tags": "",
           "type": "Sprite",
@@ -916,19 +886,6 @@
         }
       ],
       "objects": [
-        {
-          "apiName": "DragonBones",
-          "debugPolygons": true,
-          "name": "Skeleton",
-          "rootArmatureName": "",
-          "skeletalDataFilename": "skeleton.json",
-          "tags": "",
-          "textureDataFilename": "skeleton_texture.json",
-          "textureName": "skeleton_texture.png",
-          "type": "SkeletonObject::Skeleton",
-          "variables": [],
-          "behaviors": []
-        },
         {
           "name": "Ground",
           "tags": "",

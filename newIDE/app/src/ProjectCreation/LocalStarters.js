@@ -150,6 +150,26 @@ export default class LocalStarters extends Component<Props, State> {
                     leftIcon={
                       <ListIcon
                         iconSize={40}
+                        src="res/starters_icons/geometry-monster.png"
+                      />
+                    }
+                    primaryText={<Trans>Geometry Monster</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A hyper casual endless game where you have to collect
+                        shapes and avoid bombs, with a progressively increasing
+                        difficulty.
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'geometry-monster')
+                    }
+                  />
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
                         src="res/starters_icons/isometric-game.png"
                       />
                     }
@@ -175,8 +195,8 @@ export default class LocalStarters extends Component<Props, State> {
                     primaryText="Downhill Bike Racing"
                     secondaryText={
                       <Trans>
-                        An example of a 2D physics based driving game, where
-                        player have to reach the end as fast as possible.
+                        An example of a 2D physics based game, where players
+                        have to reach the end as fast as possible.
                       </Trans>
                     }
                     secondaryTextLines={2}

@@ -5,9 +5,8 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import HelpButton from '../../UI/HelpButton';
 import { Line, Column } from '../../UI/Grid';
-import ColorPicker from '../../UI/ColorField/ColorPicker';
+import ColorPicker, { type RGBColor } from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 
@@ -25,12 +24,6 @@ const styles = {
   toolbarItem: toolbarItemStyle,
   checkbox: toolbarItemStyle,
 };
-type RGBColor = {|
-  r?: number,
-  g?: number,
-  b?: number,
-  a?: number,
-|};
 
 type Props = {|
   event: gdBaseEvent,
@@ -56,15 +49,15 @@ export default class EventTextDialog extends React.Component<Props, State> {
 
       //Text color
       gd.asCommentEvent(event).setTextColor(
-        parseInt(textColor.r),
-        parseInt(textColor.g),
-        parseInt(textColor.b)
+        parseInt(textColor.r, 10),
+        parseInt(textColor.g, 10),
+        parseInt(textColor.b, 10)
       );
       //Background color
       gd.asCommentEvent(event).setBackgroundColor(
-        parseInt(backgroundColor.r),
-        parseInt(backgroundColor.g),
-        parseInt(backgroundColor.b)
+        parseInt(backgroundColor.r, 10),
+        parseInt(backgroundColor.g, 10),
+        parseInt(backgroundColor.b, 10)
       );
     } else if (eventType === 'BuiltinCommonInstructions::Group') {
       //Text value
@@ -73,34 +66,37 @@ export default class EventTextDialog extends React.Component<Props, State> {
       //Text color for group not supported in Core, instead GroupEvent.js handle this
       //Background color
       gd.asGroupEvent(event).setBackgroundColor(
-        parseInt(backgroundColor.r),
-        parseInt(backgroundColor.g),
-        parseInt(backgroundColor.b)
+        parseInt(backgroundColor.r, 10),
+        parseInt(backgroundColor.g, 10),
+        parseInt(backgroundColor.b, 10)
       );
       return;
     }
   };
 
-  _getInitialStateFromEvent = () => {
+  _getInitialStateFromEvent = (): State => {
     const { event } = this.props;
     const eventType = event.getType();
-    let text: string, textColors: RGBColor, backgroundColors: RGBColor;
+
+    let textValue: string = '';
+    let textColor: RGBColor = { r: 0, g: 0, b: 0 };
+    let backgroundColor: RGBColor = { r: 0, g: 0, b: 0 };
 
     if (eventType === 'BuiltinCommonInstructions::Comment') {
       const commentEvent = gd.asCommentEvent(event);
-      textColors = {
+      textColor = {
         r: commentEvent.getTextColorRed(),
         g: commentEvent.getTextColorGreen(),
         b: commentEvent.getTextColorBlue(),
       };
 
-      backgroundColors = {
+      backgroundColor = {
         r: commentEvent.getBackgroundColorRed(),
         g: commentEvent.getBackgroundColorGreen(),
         b: commentEvent.getBackgroundColorBlue(),
       };
 
-      text = gd.asCommentEvent(event).getComment();
+      textValue = gd.asCommentEvent(event).getComment();
     } else if (eventType === 'BuiltinCommonInstructions::Group') {
       var groupEvent = gd.asGroupEvent(event);
       const r = groupEvent.getBackgroundColorR(),
@@ -119,15 +115,15 @@ export default class EventTextDialog extends React.Component<Props, State> {
         b: 0,
       };
 
-      textColors = (r + g + b) / 3 > 200 ? black : white; //Because text color is not supported by Core
+      textColor = (r + g + b) / 3 > 200 ? black : white; //Because text color is not supported by Core
 
-      backgroundColors = {
+      backgroundColor = {
         r: groupEvent.getBackgroundColorR(),
         g: groupEvent.getBackgroundColorG(),
         b: groupEvent.getBackgroundColorB(),
       };
 
-      text = gd.asGroupEvent(event).getName();
+      textValue = gd.asGroupEvent(event).getName();
     } else {
       console.error(
         'Dialog was opened for an unsupported event type: ' + eventType
@@ -135,9 +131,9 @@ export default class EventTextDialog extends React.Component<Props, State> {
     }
 
     return {
-      textValue: text,
-      textColor: textColors,
-      backgroundColor: backgroundColors,
+      textValue,
+      textColor,
+      backgroundColor,
     };
   };
 
@@ -168,23 +164,13 @@ export default class EventTextDialog extends React.Component<Props, State> {
             keyboardFocused
             onClick={() => {
               this._applyChangesOnEvent();
-
               onApply();
             }}
-          />,
-        ]}
-        secondaryActions={[
-          <HelpButton
-            key="help"
-            helpPagePath="/interface/scene-editor/layers-and-cameras"
           />,
         ]}
       >
         <Column noMargin>
           <MiniToolbar>
-            <MiniToolbarText>
-              <Trans />
-            </MiniToolbarText>
             <MiniToolbarText>
               <Trans>Background color:</Trans>
             </MiniToolbarText>

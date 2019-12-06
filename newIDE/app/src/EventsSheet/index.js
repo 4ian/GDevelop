@@ -1354,11 +1354,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                               this.closeEventTextDialog();
                               this._saveChangesToHistory();
                             }}
-                            onClose={() =>
-                              this.setState({
-                                textEditedEvent: null,
-                              })
-                            }
+                            onClose={this.closeEventTextDialog}
                           />
                         )}
                         <InfoBar

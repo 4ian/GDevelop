@@ -1,3 +1,4 @@
 dist/
 app/www/
 .env
+app/extensions/ReactDeveloperTools

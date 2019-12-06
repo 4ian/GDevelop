@@ -94,7 +94,7 @@ app.on('ready', function() {
     options.show = false;
   }
  
-  if (isDev) BrowserWindow.addDevToolsExtension(path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.0_0/'));
+  if (isDev) BrowserWindow.addDevToolsExtension(path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.1_0/'));
 
   mainWindow = new BrowserWindow(options);
   if (!isIntegrated) mainWindow.maximize();

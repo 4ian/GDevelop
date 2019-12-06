@@ -74,7 +74,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources && npm run make-version-metadata",
-    "import-resources": "cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js && npm run import-zipped-external-editors && npm run import-zipped-electron-extensions",
+    "import-resources": "npm run import-zipped-external-editors && npm run import-zipped-electron-extensions && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",
     "start": "npm run import-resources && npm run make-version-metadata && react-scripts start",

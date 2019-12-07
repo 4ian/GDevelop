@@ -47,24 +47,19 @@ const styles = {
   animationTools: {
     flexShrink: 0,
   },
-  addAnimation: {
-    display: 'flex',
-  },
 };
 
 const AddAnimationLine = ({ onAdd, extraTools }) => (
-  <Column>
-    <Line justifyContent="space-between" expand>
+  <Column expand>
+    <Line justifyContent="space-between">
       {extraTools}
-      <div style={styles.addAnimation}>
-        <RaisedButton
-          label={<Trans>Add an animation</Trans>}
-          primary
-          onClick={onAdd}
-          labelPosition="before"
-          icon={<Add />}
-        />
-      </div>
+      <RaisedButton
+        label={<Trans>Add an animation</Trans>}
+        primary
+        onClick={onAdd}
+        labelPosition="before"
+        icon={<Add />}
+      />
     </Line>
   </Column>
 );
@@ -445,7 +440,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           objectName={objectName}
           onSizeUpdated={onSizeUpdated}
           extraBottomTools={
-            <ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout noMargin>
               <RaisedButton
                 label={<Trans>Edit hitboxes</Trans>}
                 primary={false}

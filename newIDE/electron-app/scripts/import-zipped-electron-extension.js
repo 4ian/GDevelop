@@ -1,7 +1,10 @@
 /**
- * This script will extract a zipped file of a prebuilt external extension to GD that we don't want added to git history
- * The zip file contains the raw, unchanged sources, which will be extracted into a folder
- * The zip should be kept in a folder somewhere within the project
+ * This script will extract a zipped file of a prebuilt Electron extension.
+ * The zip file must contain the raw, unchanged sources, which will be extracted
+ * to the folder passed as parameter, in a subfolder with the extension name.
+ * 
+ * This is useful to avoid mixing the Electron extension source files inside
+ * GDevelop sources.
  */
 var shell = require('shelljs');
 var fs = require('fs');

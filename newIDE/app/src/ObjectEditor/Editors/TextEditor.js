@@ -58,7 +58,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             <Trans>Color:</Trans>
           </MiniToolbarText>
           <ColorPicker
-            style={styles.sizeTextField}
+            style={styles.toolbarItem}
             disableAlpha
             color={{
               r: textObject.getColorR(),

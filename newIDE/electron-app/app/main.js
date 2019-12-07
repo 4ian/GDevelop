@@ -9,7 +9,6 @@ const protocol = electron.protocol;
 const parseArgs = require('minimist');
 const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
-const exec = require('child_process').execFile;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const {

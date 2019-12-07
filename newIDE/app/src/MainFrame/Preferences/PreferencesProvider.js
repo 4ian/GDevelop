@@ -39,6 +39,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseNewInstructionEditorDialog: this._setUseNewInstructionEditorDialog.bind(
       this
     ),
+    setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
   };
 
   componentDidMount() {
@@ -89,6 +90,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           useNewInstructionEditorDialog,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          useGDJSDevelopmentWatcher,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

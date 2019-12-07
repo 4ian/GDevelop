@@ -42,12 +42,9 @@ import {
   type EditorTab,
   getEventsFunctionsExtensionEditor,
 } from './EditorTabsHandler';
-import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timePromise } from '../Utils/TimeFunction';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import HelpFinder from '../HelpFinder';
-
-// Editors:
 import DebuggerEditor from './Editors/DebuggerEditor';
 import EventsEditor from './Editors/EventsEditor';
 import ExternalEventsEditor from './Editors/ExternalEventsEditor';
@@ -59,7 +56,6 @@ import ResourcesEditor from './Editors/ResourcesEditor';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
-import Authentification from '../Utils/GDevelopServices/Authentification';
 import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
@@ -154,7 +150,7 @@ type Props = {
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
-  authentification: Authentification,
+  renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
@@ -412,7 +408,7 @@ class MainFrame extends React.Component<Props, State> {
           throw err;
         });
       })
-      .then(({ content, fileMetadata }) => {
+      .then(({ content }) => {
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
           return;
@@ -421,6 +417,9 @@ class MainFrame extends React.Component<Props, State> {
         const serializedProject = gd.Serializer.fromJSObject(content);
         return this.loadFromSerializedProject(
           serializedProject,
+          // Note that fileMetadata is the original, unchanged one, even if we're loading
+          // an autosave. If we're for some reason loading an autosave, we still consider
+          // that we're opening the file that was originally requested by the user.
           fileMetadata
         ).then(
           () => {
@@ -848,40 +847,59 @@ class MainFrame extends React.Component<Props, State> {
     project: gdProject,
     layout: gdLayout,
     options: PreviewOptions
-  ) =>
-    watchPromiseInState(this, 'previewLoading', () =>
-      this._handlePreviewResult(
-        this._previewLauncher &&
-          this._previewLauncher.launchLayoutPreview(project, layout, options)
-      )
+  ) => {
+    const { _previewLauncher } = this;
+    if (!_previewLauncher) return;
+
+    this.setState(
+      {
+        previewLoading: true,
+      },
+      () => {
+        _previewLauncher
+          .launchLayoutPreview(project, layout, options)
+          .catch(error => {
+            console.error(
+              'Error caught while launching preview, this should never happen.',
+              error
+            );
+          })
+          .then(() => {
+            this.setState({
+              previewLoading: false,
+            });
+          });
+      }
     );
+  };
 
   _launchExternalLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
     externalLayout: gdExternalLayout,
     options: PreviewOptions
-  ) =>
-    watchPromiseInState(this, 'previewLoading', () =>
-      this._handlePreviewResult(
-        this._previewLauncher &&
-          this._previewLauncher.launchExternalLayoutPreview(
-            project,
-            layout,
-            externalLayout,
-            options
-          )
-      )
-    );
+  ) => {
+    const { _previewLauncher } = this;
+    if (!_previewLauncher) return;
 
-  _handlePreviewResult = (previewPromise: ?Promise<any>): Promise<void> => {
-    if (!previewPromise) return Promise.reject();
-    const { i18n } = this.props;
-
-    return previewPromise.then(
-      (result: any) => {},
-      (err: any) => {
-        showErrorBox(i18n._(t`Unable to launch the preview!`), err);
+    this.setState(
+      {
+        previewLoading: true,
+      },
+      () => {
+        _previewLauncher
+          .launchExternalLayoutPreview(project, layout, externalLayout, options)
+          .catch(error => {
+            console.error(
+              'Error caught while launching preview, this should never happen.',
+              error
+            );
+          })
+          .then(() => {
+            this.setState({
+              previewLoading: false,
+            });
+          });
       }
     );
   };
@@ -1660,12 +1678,12 @@ class MainFrame extends React.Component<Props, State> {
       renderCreateDialog,
       introDialog,
       resourceSources,
-      authentification,
       renderPreviewLauncher,
       resourceExternalEditors,
       eventsFunctionsExtensionsState,
       useStorageProvider,
       i18n,
+      renderGDJSDevelopmentWatcher,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1717,6 +1735,7 @@ class MainFrame extends React.Component<Props, State> {
               }}
               onExportProject={this.openExportDialog}
               onOpenPreferences={() => this.openPreferences(true)}
+              onOpenProfile={() => this.openProfile(true)}
               onOpenResources={() => {
                 this.openResources();
                 this.openProjectManager(false);
@@ -1801,7 +1820,6 @@ class MainFrame extends React.Component<Props, State> {
               this.openSubscription(true);
             },
             project: this.state.currentProject,
-            authentification,
           })}
         {!!renderCreateDialog &&
           this.state.createDialogOpen &&
@@ -1944,6 +1962,7 @@ class MainFrame extends React.Component<Props, State> {
         )}
         <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         <ChangelogDialogContainer />
+        {renderGDJSDevelopmentWatcher && renderGDJSDevelopmentWatcher()}
       </div>
     );
   }

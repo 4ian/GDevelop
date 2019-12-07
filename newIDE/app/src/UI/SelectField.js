@@ -4,22 +4,17 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { computeTextFieldStyleProps } from './TextField';
 
-type ValueProps =
-  | {|
-      value: number | string,
-      // event and index should not be used, and be removed eventually
-      onChange?: (
-        event: {| target: {| value: string |} |},
-        index: number,
-        text: string // Note that even for number values, a string is returned
-      ) => void,
-    |}
-  | {|
-      value: boolean,
-      // event and index should not be used, and be removed eventually
-      onChange?: (event: {||}, index: number, value: boolean) => void,
-    |};
+type ValueProps = {|
+  value: number | string,
+  // event and index should not be used, and be removed eventually
+  onChange?: (
+    event: {| target: {| value: string |} |},
+    index: number,
+    text: string // Note that even for number values, a string is returned
+  ) => void,
+|};
 
 // We support a subset of the props supported by Material-UI v0.x SelectField
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -33,7 +28,7 @@ type Props = {|
     flex?: 1,
     width?: 'auto',
   },
-  margin?: 'none',
+  margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
 
@@ -62,7 +57,7 @@ export default class SelectField extends React.Component<Props, {||}> {
     // Dig into children props to see if the current value is valid or not.
     let hasValidValue = true;
     const childrenValues = React.Children.map(props.children, child => {
-      if (child === null) return null;
+      if (child === null || !child.props) return null;
 
       return child.props.value;
     });
@@ -82,7 +77,7 @@ export default class SelectField extends React.Component<Props, {||}> {
         {({ i18n }) => (
           <TextField
             select
-            margin={props.margin || 'normal'}
+            {...computeTextFieldStyleProps(props)}
             disabled={props.disabled}
             fullWidth={props.fullWidth}
             label={props.floatingLabelText}

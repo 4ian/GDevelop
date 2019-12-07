@@ -149,9 +149,14 @@ export default class DebuggerContent extends React.Component<Props, State> {
                   )
                 ) : (
                   <EmptyMessage>
-                    {gameData
-                      ? 'Choose an element to inspect in the list'
-                      : 'Pause the game (from the toolbar) or hit refresh (on the left) to inspect the game'}
+                    {gameData ? (
+                      <Trans>Choose an element to inspect in the list</Trans>
+                    ) : (
+                      <Trans>
+                        Pause the game (from the toolbar) or hit refresh (on the
+                        left) to inspect the game
+                      </Trans>
+                    )}
                   </EmptyMessage>
                 )}
                 <Column>

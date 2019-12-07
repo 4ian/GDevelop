@@ -1,20 +1,61 @@
+// @flow
 import path from 'path';
 import { uploadObject } from '../../Utils/GDevelopServices/Preview';
 const gd = global.gd;
 
+export type TextFileDescriptor = {|
+  filePath: string,
+  text: string,
+|};
+
+type PendingUploadFileDescriptor = {|
+  Key: string,
+  Body: string,
+  ContentType: 'text/javascript' | 'text/html',
+|};
+
+type ConstructorArgs = {|
+  filesContent: Array<TextFileDescriptor>,
+  prefix: string,
+  bucketBaseUrl: string,
+|};
+
+const isURL = (filename: string) => {
+  return (
+    filename.substr(0, 7) === 'http://' ||
+    filename.substr(0, 8) === 'https://' ||
+    filename.substr(0, 6) === 'ftp://'
+  );
+};
+
+/**
+ * An in-memory "file system" that can be used for GDevelop previews.
+ */
 export default class BrowserS3FileSystem {
-  constructor({ filesContent, prefix, bucketBaseUrl }) {
-    this.filesContent = filesContent;
+  prefix: string;
+  bucketBaseUrl: string;
+
+  // Store the content of some files.
+  _indexedFilesContent: { [string]: TextFileDescriptor };
+
+  // Store all the objects that should be written on the S3 bucket.
+  // Call uploadPendingObjects to send them
+  _pendingUploadObjects: Array<PendingUploadFileDescriptor> = [];
+
+  // Store a set of all external URLs copied so that we can simulate
+  // readDir result.
+  _allCopiedExternalUrls = new Set<string>();
+
+  constructor({ filesContent, prefix, bucketBaseUrl }: ConstructorArgs) {
     this.prefix = prefix;
     this.bucketBaseUrl = bucketBaseUrl;
 
-    // Store all the objects that should be written on the S3 bucket.
-    // Call uploadPendingObjects to send them
-    this._pendingUploadObjects = [];
-
-    // Store a set of all external URLs copied so that we can simulate
-    // readDir result.
-    this._allCopiedExternalUrls = new Set();
+    this._indexedFilesContent = {};
+    filesContent.forEach(textFileDescriptor => {
+      this._indexedFilesContent[
+        textFileDescriptor.filePath
+      ] = textFileDescriptor;
+    });
   }
 
   uploadPendingObjects = () => {
@@ -30,71 +71,62 @@ export default class BrowserS3FileSystem {
     );
   };
 
-  mkDir = path => {
+  mkDir = (path: string) => {
     // Assume required directories always exist.
   };
-  dirExists = path => {
+  dirExists = (path: string) => {
     // Assume required directories always exist.
     return true;
   };
-  clearDir = path => {
+  clearDir = (path: string) => {
     // Assume path is cleared.
   };
   getTempDir = () => {
     return '/virtual-unused-tmp-dir';
   };
-  fileNameFrom = fullpath => {
-    if (this._isExternalURL(fullpath)) return fullpath;
+  fileNameFrom = (fullpath: string) => {
+    if (isURL(fullpath)) return fullpath;
 
-    fullpath = this._translateURL(fullpath);
     return path.basename(fullpath);
   };
-  dirNameFrom = fullpath => {
-    if (this._isExternalURL(fullpath)) return '';
+  dirNameFrom = (fullpath: string) => {
+    if (isURL(fullpath)) return '';
 
-    fullpath = this._translateURL(fullpath);
     return path.dirname(fullpath);
   };
-  makeAbsolute = (filename, baseDirectory) => {
-    if (this._isExternalURL(filename)) return filename;
+  makeAbsolute = (filename: string, baseDirectory: string) => {
+    if (isURL(filename)) return filename;
 
-    filename = this._translateURL(filename);
     if (!this.isAbsolute(baseDirectory))
       baseDirectory = path.resolve(baseDirectory);
 
     return path.resolve(baseDirectory, path.normalize(filename));
   };
-  makeRelative = (filename, baseDirectory) => {
-    if (this._isExternalURL(filename)) return filename;
+  makeRelative = (filename: string, baseDirectory: string) => {
+    if (isURL(filename)) return filename;
 
-    filename = this._translateURL(filename);
     return path.relative(baseDirectory, path.normalize(filename));
   };
-  isAbsolute = fullpath => {
-    if (this._isExternalURL(fullpath)) return true;
+  isAbsolute = (fullpath: string) => {
+    if (isURL(fullpath)) return true;
 
     if (fullpath.length === 0) return true;
-    fullpath = this._translateURL(fullpath);
     return (
       (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
       (fullpath.length > 1 && fullpath.charAt(1) === ':')
     );
   };
-  copyFile = (source, dest) => {
+  copyFile = (source: string, dest: string) => {
     //URL are not copied.
-    if (this._isExternalURL(source)) {
+    if (isURL(source)) {
       this._allCopiedExternalUrls.add(source);
       return true;
     }
 
-    source = this._translateURL(source);
     console.warn('Copy not done from', source, 'to', dest);
     return true;
   };
-  copyDir = (source, dest) => {
-    throw new Error('Not implemented');
-  };
-  writeToFile = (fullPath, contents) => {
+  writeToFile = (fullPath: string, contents: string) => {
     const key = fullPath.replace(this.bucketBaseUrl, '');
     const mime = {
       '.js': 'text/javascript',
@@ -112,18 +144,19 @@ export default class BrowserS3FileSystem {
     return true;
   };
 
-  readFile = file => {
-    if (this.filesContent.hasOwnProperty(file)) return this.filesContent[file];
+  readFile = (file: string) => {
+    if (!!this._indexedFilesContent[file])
+      return this._indexedFilesContent[file].text;
 
     console.error(`Unknown file ${file}, returning an empty string`);
     return '';
   };
 
-  readDir = (path, ext) => {
+  readDir = (path: string, ext: string) => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
-    // Simulate ReadDir by returning all external URL s
+    // Simulate ReadDir by returning all external URLs
     // with the filename matching the extension.
     this._allCopiedExternalUrls.forEach(url => {
       const upperCaseUrl = url.toUpperCase();
@@ -135,29 +168,10 @@ export default class BrowserS3FileSystem {
     return output;
   };
 
-  fileExists = filename => {
-    if (this._isExternalURL(filename)) return true;
+  fileExists = (filename: string) => {
+    if (isURL(filename)) return true;
 
     // Assume all files asked for exists.
     return true;
-  };
-
-  _isExternalURL = filename => {
-    return (
-      filename.substr(0, 7) === 'http://' ||
-      filename.substr(0, 8) === 'https://' ||
-      filename.substr(0, 6) === 'ftp://'
-    );
-  };
-
-  /**
-   * Return the filename associated to the URL on the server, relative to the games directory.
-   * (i.e: Transform g/mydirectory/myfile.png to mydirectory/myfile.png).
-   */
-  _translateURL = filename => {
-    if (filename.substr(0, 2) === 'g/' || filename.substr(0, 2) === 'g\\')
-      filename = filename.substr(2);
-
-    return filename;
   };
 }

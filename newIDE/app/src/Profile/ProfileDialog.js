@@ -86,7 +86,10 @@ export default class ProfileDialog extends Component<Props, State> {
                 </Column>
               ) : (
                 <Column>
-                  <CreateProfile onLogin={userProfile.onLogin} />
+                  <CreateProfile
+                    onLogin={userProfile.onLogin}
+                    onCreateAccount={userProfile.onCreateAccount}
+                  />
                 </Column>
               ))}
             {this.state.currentTab === 'usage' &&

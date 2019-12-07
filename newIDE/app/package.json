@@ -23,7 +23,8 @@
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.7.7",
     "unzipper": "^0.9.11",
-    "webpack": "4.28.3"
+    "webpack": "4.28.3",
+    "workbox-build": "^4.3.1"
   },
   "dependencies": {
     "@blueprintjs/core": "file:src/Utils/BlueprintJsPlaceholder",
@@ -72,13 +73,15 @@
     "wait-promise": "0.4.1"
   },
   "scripts": {
-    "postinstall": "npm run import-resources",
-    "import-resources": "cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-editor.js piskel 5.0.0-beta56 a2c36775109a1c1181d0b9ab9b7c903365c4ecb340118f1237b66236f23e20dd && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.0-beta80 5930c686ccf2b6fd3433b1c9539483473a6aedb8b6a73dd13c07030c95efecb9",
-    "start": "npm run import-resources && react-scripts start",
+    "postinstall": "npm run import-resources && npm run make-version-metadata",
+    "import-resources": "cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js && node import-zipped-editor.js piskel 5.0.0-beta82 e02f67866b338b4cc577e1ffa48f55f52cd520ed751dccc6f0931e3c1b995de0 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.0-beta80 5930c686ccf2b6fd3433b1c9539483473a6aedb8b6a73dd13c07030c95efecb9",
+    "make-version-metadata": "cd scripts && node make-version-metadata.js",
+    "make-service-worker": "cd scripts && node make-service-worker.js",
+    "start": "npm run import-resources && npm run make-version-metadata && react-scripts start",
     "electron-win": "cd ../electron-app && node node_modules/electron/cli.js app",
     "electron-linux": "cd ../electron-app && ./node_modules/electron/dist/electron app",
     "electron-mac": "cd ../electron-app && ./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app",
-    "build": "npm run import-resources && react-scripts build",
+    "build": "npm run import-resources && npm run make-version-metadata && react-scripts build && npm run make-service-worker",
     "format": "prettier --write \"src/!(locales)/**/*.js\"",
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
     "test": "react-scripts test",

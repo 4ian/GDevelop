@@ -1,4 +1,4 @@
-
+/node_modules
 /GDJS.depend
 /GDJS.layout
 /obj
@@ -6,13 +6,4 @@ Platform documentation
 Runtime documentation
 *.~
 *.js~
-*.js~
-*.js~
-*.js~
-*.js~
-*.js~
-*.js~
-*.js~
-*.js~
-
 *.sh~

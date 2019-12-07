@@ -4,7 +4,10 @@ import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import type { ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
-import { getObjectOrObjectGroupListItemKey } from './Keys';
+import {
+  getObjectOrObjectGroupListItemValue,
+  getObjectListItemKey,
+} from './Keys';
 
 type Props = {|
   project: gdProject,
@@ -24,11 +27,10 @@ export const renderObjectListItem = ({
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
-      key={
-        getObjectOrObjectGroupListItemKey(objectName) +
-        (objectWithContext.global ? '-global' : '')
+      key={getObjectListItemKey(objectWithContext)}
+      selected={
+        selectedValue === getObjectOrObjectGroupListItemValue(objectName)
       }
-      selected={selectedValue === getObjectOrObjectGroupListItemKey(objectName)}
       primaryText={objectName}
       leftIcon={
         <ListIcon

@@ -10,6 +10,7 @@ import MiniToolbar from '../../UI/MiniToolbar';
 import ZoomIn from '@material-ui/icons/ZoomIn';
 import ZoomOut from '@material-ui/icons/ZoomOut';
 import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
+import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 
 const MARGIN = 50;
@@ -25,6 +26,12 @@ const styles = {
     overflow: 'scroll',
     height: 200,
     background: 'url("res/transparentback.png") repeat',
+
+    // The container contains the image and the "overlay" that can display
+    // points or polygons that can be drag'n'dropped. `touch-action` must
+    // be set to `none`, otherwise the (mobile) browser will claim the
+    // `pointermove` event for "native" behavior like panning the page.
+    touchAction: 'none',
   },
   spriteThumbnailImage: {
     position: 'relative',
@@ -139,7 +146,8 @@ export default class ImagePreview extends React.Component<Props, State> {
             imageZoomFactor,
           } = this.state;
 
-          const imageLoaded = !!imageWidth && !!imageHeight;
+          const imageLoaded =
+            !!imageWidth && !!imageHeight && !this.state.errored;
 
           const imagePositionTop = 0;
           const imagePositionLeft = Math.max(
@@ -205,9 +213,11 @@ export default class ImagePreview extends React.Component<Props, State> {
                 }}
               >
                 {!!this.state.errored && (
-                  <Text>
-                    <Trans>Unable to load the image</Trans>
-                  </Text>
+                  <PlaceholderMessage>
+                    <Text>
+                      <Trans>Unable to load the image</Trans>
+                    </Text>
+                  </PlaceholderMessage>
                 )}
                 {!this.state.errored && (
                   <img

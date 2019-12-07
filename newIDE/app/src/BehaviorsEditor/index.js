@@ -167,9 +167,11 @@ export default class BehaviorsEditor extends Component {
                     </span>
                   </MiniToolbar>
                   <EmptyMessage>
-                    This behavior is unknown. It might be a behavior that was
-                    defined in an extension and that was later removed. You
-                    should delete it.
+                    <Trans>
+                      This behavior is unknown. It might be a behavior that was
+                      defined in an extension and that was later removed. You
+                      should delete it.
+                    </Trans>
                   </EmptyMessage>
                 </div>
               );

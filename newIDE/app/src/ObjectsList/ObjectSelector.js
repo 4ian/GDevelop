@@ -24,6 +24,7 @@ type Props = {|
   floatingLabelText?: ?string,
   openOnFocus?: boolean,
   hintText?: ?React.Node,
+  margin?: 'none' | 'dense',
 |};
 
 const iconSize = 24;
@@ -94,6 +95,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       allowedObjectType,
       noGroups,
       errorTextIfInvalid,
+      margin,
       ...rest
     } = this.props;
 
@@ -111,6 +113,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
 
     return (
       <SemiControlledAutoComplete
+        margin={margin}
         hintText={t`Choose an object`}
         value={value}
         onChange={onChange}

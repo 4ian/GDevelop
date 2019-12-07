@@ -4,8 +4,11 @@
  */
 
 .gd-events-sheet-dark-theme.events-tree {
-  font-family: -apple-system, '.SFNSText-Regular', 'San Francisco', Roboto,
-    'Segoe UI', 'Helvetica Neue', 'Lucida Grande', sans-serif !important;
+  /* Use the fonts provided by the operating system(s) as possible. */
+  /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
   font-size: 14px !important;
   background: #303030;
 }
@@ -14,7 +17,7 @@
  * Ensure scroll is only on Y direction, preventing the display
  * of horizontal scrollbar.
  */
- .gd-events-sheet-dark-theme .rst__virtualScrollOverride {
+.gd-events-sheet-dark-theme .rst__virtualScrollOverride {
   overflow-x: hidden !important;
 }
 
@@ -34,6 +37,14 @@
 .rst__lineHalfVerticalTop::after,
 .rst__lineHalfVerticalBottom::after {
   background-color: #aaa;
+}
+
+/**
+ * Background and default text color of content of an event
+ */
+.gd-events-sheet-dark-theme .rst__rowContents {
+  background-color: #252525;
+  color: rgb(209, 209, 209);
 }
 
 /**
@@ -139,7 +150,9 @@
   color: #18dcf2;
 }
 
-.gd-events-sheet-dark-theme .instruction-parameter .instruction-invalid-parameter {
+.gd-events-sheet-dark-theme
+  .instruction-parameter
+  .instruction-invalid-parameter {
   color: #ff0000;
   text-decoration: #ff0000 underline wavy;
 }
@@ -195,6 +208,6 @@
 /* Theming icons */
 .gd-events-sheet-dark-theme .icon {
   padding-right: 2px;
-  width:16px;
-  height:16px;
+  width: 16px;
+  height: 16px;
 }

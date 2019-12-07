@@ -7,16 +7,7 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
 import { icon } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
-
-const styles = {
-  container: {
-    display: 'flex',
-    alignItems: 'baseline',
-  },
-  moreButton: {
-    marginLeft: 10,
-  },
-};
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
 type Props = {
   ...ParameterFieldProps,
@@ -41,34 +32,41 @@ export default class VariableField extends Component<Props, {||}> {
       variablesContainer,
     } = this.props;
 
+    const description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
+
     return (
-      <div style={styles.container}>
-        <SemiControlledAutoComplete
-          floatingLabelText={
-            parameterMetadata ? parameterMetadata.getDescription() : undefined
-          }
-          fullWidth
-          value={value}
-          onChange={onChange}
-          dataSource={enumerateVariables(variablesContainer).map(
-            variableName => ({
-              text: variableName,
-              value: variableName,
-            })
-          )}
-          openOnFocus={!isInline}
-          ref={field => (this._field = field)}
-        />
-        {onOpenDialog && !isInline && (
-          <RaisedButton
-            icon={<OpenInNew />}
-            disabled={!this.props.variablesContainer}
-            primary
-            style={styles.moreButton}
-            onClick={onOpenDialog}
+      <TextFieldWithButtonLayout
+        renderTextField={() => (
+          <SemiControlledAutoComplete
+            margin={this.props.isInline ? 'none' : 'dense'}
+            floatingLabelText={description}
+            fullWidth
+            value={value}
+            onChange={onChange}
+            dataSource={enumerateVariables(variablesContainer).map(
+              variableName => ({
+                text: variableName,
+                value: variableName,
+              })
+            )}
+            openOnFocus={!isInline}
+            ref={field => (this._field = field)}
           />
         )}
-      </div>
+        renderButton={style =>
+          onOpenDialog && !isInline ? (
+            <RaisedButton
+              icon={<OpenInNew />}
+              disabled={!this.props.variablesContainer}
+              primary
+              style={style}
+              onClick={onOpenDialog}
+            />
+          ) : null
+        }
+      />
     );
   }
 }

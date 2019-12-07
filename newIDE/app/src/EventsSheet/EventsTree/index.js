@@ -205,6 +205,7 @@ type EventsTreeProps = {|
   searchFocusOffset: ?number,
 
   onEventMoved: () => void,
+  onScroll?: () => void,
 
   screenType: ScreenType,
   windowWidth: WidthType,
@@ -396,6 +397,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         })}
         alt=""
         src={getThumbnail(project, object)}
+        crossOrigin="anonymous"
       />
     );
   };
@@ -496,6 +498,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
           }
           reactVirtualizedListProps={{
             ref: list => (this._list = list),
+            onScroll: this.props.onScroll,
           }}
         />
       </div>

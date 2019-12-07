@@ -38,8 +38,8 @@ import {
   getTagsFromString,
 } from '../../Utils/TagsHelper';
 import {
-  getObjectOrObjectGroupListItemKey,
-  getInstructionListItemKey,
+  getObjectOrObjectGroupListItemValue,
+  getInstructionListItemValue,
 } from './SelectorListItems/Keys';
 
 const styles = {
@@ -272,7 +272,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 objectWithContext.object.getName()
                               ),
                             selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemKey(
+                              ? getObjectOrObjectGroupListItemValue(
                                   chosenObjectName
                                 )
                               : undefined,
@@ -292,7 +292,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             onClick: () =>
                               onChooseObject(groupWithContext.group.getName()),
                             selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemKey(
+                              ? getObjectOrObjectGroupListItemValue(
                                   chosenObjectName
                                 )
                               : undefined,
@@ -318,7 +318,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 instructionMetadata
                               ),
                             selectedValue: chosenInstructionType
-                              ? getInstructionListItemKey(chosenInstructionType)
+                              ? getInstructionListItemValue(
+                                  chosenInstructionType
+                                )
                               : undefined,
                           })
                         )}
@@ -329,7 +331,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           onChoose: onChooseInstruction,
                           iconSize,
                           selectedValue: chosenInstructionType
-                            ? getInstructionListItemKey(chosenInstructionType)
+                            ? getInstructionListItemValue(chosenInstructionType)
                             : undefined,
                           initiallyOpenedPath: this.initialInstructionTypePath,
                           selectedItemRef: this._selectedItem,

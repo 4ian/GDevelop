@@ -1,13 +1,11 @@
+// @flow
 import { isMacLike } from '../../Utils/Platform';
 
-const CTRL_KEY = 17;
-const SHIFT_KEY = 16;
 const LEFT_KEY = 37;
 const UP_KEY = 38;
 const RIGHT_KEY = 39;
 const DOWN_KEY = 40;
 const BACKSPACE_KEY = 8;
-const SPACE_KEY = 32;
 const DELETE_KEY = 46;
 const EQUAL_KEY = 187;
 const MINUS_KEY = 189;
@@ -19,211 +17,164 @@ const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
 const Z_KEY = 90;
-const MID_MOUSE_BUTTON = 1;
 
+type ShortcutCallbacks = {|
+  onDelete?: () => void,
+  onMove?: (number, number) => void,
+  onCopy?: () => void,
+  onCut?: () => void,
+  onPaste?: () => void,
+  onUndo?: () => void,
+  onRedo?: () => void,
+  onSearch?: () => void,
+  onZoomOut?: () => void,
+  onZoomIn?: () => void,
+|};
+
+type ConstructorArgs = {|
+  isActive?: () => boolean,
+  shortcutCallbacks: ShortcutCallbacks,
+|};
+
+/**
+ * Listen to keyboard shorcuts and call callbacks according to them.
+ * Also store the state of the modifier keys (shift, ctrl, alt, meta) to know
+ * if some special operations (multi selection, selection duplication) must
+ * be done.
+ *
+ * `onKeyDown`, `onKeyUp` and other methods handling events (`onDragOver`...)
+ * must be binded to the `div` element containing your component. We're not
+ * using `document` to avoid issues with shortcuts being detected while a
+ * component is not focused.
+ */
 export default class KeyboardShortcuts {
-  constructor({
-    onDelete,
-    onMove,
-    onCopy,
-    onCut,
-    onPaste,
-    onUndo,
-    onRedo,
-    onSearch,
-    onZoomOut,
-    onZoomIn,
-  }) {
-    this.onDelete = onDelete || this._noop;
-    this.onMove = onMove || this._noop;
-    this.onCopy = onCopy || this._noop;
-    this.onCut = onCut || this._noop;
-    this.onPaste = onPaste || this._noop;
-    this.onUndo = onUndo || this._noop;
-    this.onRedo = onRedo || this._noop;
-    this.onZoomOut = onZoomOut || this._noop;
-    this.onZoomIn = onZoomIn || this._noop;
-    this.onSearch = onSearch || this._noop;
-    this.isFocused = false;
-    this.shiftPressed = false;
-    this.rawCtrlPressed = false;
-    this.metaPressed = false;
-    this.spacePressed = false;
-    this.mouseMidButtonPressed = false;
-    this.mount();
+  _shortcutCallbacks: ShortcutCallbacks;
+  _isActive: ?() => boolean;
+  _shiftPressed = false;
+  _ctrlPressed = false;
+  _altPressed = false;
+  _metaPressed = false;
+
+  constructor({ isActive, shortcutCallbacks }: ConstructorArgs) {
+    this._shortcutCallbacks = shortcutCallbacks;
+    this._isActive = isActive;
   }
 
   shouldCloneInstances() {
-    return this._isControlPressed();
+    return this._isControlOrCmdPressed();
   }
 
   shouldMultiSelect() {
-    return this.shiftPressed;
+    return this._shiftPressed;
   }
 
-  shouldFollowAxis() {
-    return this.shiftPressed;
-  }
-
-  shouldNotSnapToGrid() {
-    return this.altPressed;
-  }
-
-  shouldResizeProportionally() {
-    return this.shiftPressed;
-  }
-
-  shouldScrollHorizontally() {
-    return this.altPressed;
-  }
-
-  shouldZoom() {
-    if (isMacLike()) {
-      return this._isControlPressed();
-    } else {
-      if (!this._isControlPressed() && !this.altPressed && !this.shiftPressed) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }
-
-  shouldMoveView() {
-    return this.spacePressed || this.mouseMidButtonPressed;
-  }
-
-  _isControlPressed = () => {
-    // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
-    return this.metaPressed || this.rawCtrlPressed;
+  _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
+    this._metaPressed = evt.metaKey;
+    this._altPressed = evt.altKey;
+    this._ctrlPressed = evt.ctrlKey;
+    this._shiftPressed = evt.shiftKey;
   };
 
-  _onKeyDown = evt => {
-    if (!this.isFocused) return;
-    if (evt.metaKey) this.metaPressed = true;
-    if (evt.altKey) this.altPressed = true;
-    if (evt.which === CTRL_KEY) this.rawCtrlPressed = true;
-    if (evt.which === SHIFT_KEY) this.shiftPressed = true;
-    if (evt.which === SPACE_KEY) this.spacePressed = true;
+  _isControlOrCmdPressed = () => {
+    // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
+    return this._metaPressed || this._ctrlPressed;
+  };
+
+  onDragOver = (evt: DragEvent) => {
+    this._updateModifiersFromEvent(evt);
+  };
+
+  onKeyUp = (evt: KeyboardEvent) => {
+    this._updateModifiersFromEvent(evt);
+  };
+
+  onKeyDown = (evt: KeyboardEvent) => {
+    this._updateModifiersFromEvent(evt);
+
+    if (this._isActive && !this._isActive()) return;
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
+    // $FlowFixMe
     if (evt.target && evt.target.closest(textEditorSelectors)) {
       return; // Something else is currently being edited.
     }
 
-    if (this.onMove) {
+    const {
+      onDelete,
+      onMove,
+      onCopy,
+      onCut,
+      onPaste,
+      onUndo,
+      onRedo,
+      onSearch,
+      onZoomOut,
+      onZoomIn,
+    } = this._shortcutCallbacks;
+
+    if (onMove) {
       if (evt.which === UP_KEY) {
-        this.onMove(0, -1);
+        onMove(0, -1);
       } else if (evt.which === DOWN_KEY) {
-        this.onMove(0, 1);
+        onMove(0, 1);
       } else if (evt.which === LEFT_KEY) {
-        this.onMove(-1, 0);
+        onMove(-1, 0);
       } else if (evt.which === RIGHT_KEY) {
-        this.onMove(1, 0);
+        onMove(1, 0);
       }
     }
-    if (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY) {
-      this.onDelete();
+    if (onDelete && (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY)) {
+      onDelete();
     }
-    if (this._isControlPressed() && evt.which === C_KEY) {
-      this.onCopy();
+    if (onCopy && this._isControlOrCmdPressed() && evt.which === C_KEY) {
+      onCopy();
     }
-    if (this._isControlPressed() && evt.which === X_KEY) {
-      this.onCut();
+    if (onCut && this._isControlOrCmdPressed() && evt.which === X_KEY) {
+      onCut();
     }
-    if (this._isControlPressed() && evt.which === V_KEY) {
-      this.onPaste();
+    if (onPaste && this._isControlOrCmdPressed() && evt.which === V_KEY) {
+      onPaste();
     }
-    if (this._isControlPressed() && evt.which === Z_KEY) {
-      this.onUndo();
+    if (onUndo && this._isControlOrCmdPressed() && evt.which === Z_KEY) {
+      onUndo();
     }
-    if (this._isControlPressed() && this.shiftPressed && evt.which === Z_KEY) {
-      this.onRedo();
+    if (
+      onRedo &&
+      this._isControlOrCmdPressed() &&
+      evt.shiftKey &&
+      evt.which === Z_KEY
+    ) {
+      onRedo();
     }
-    if (this._isControlPressed() && evt.which === Y_KEY) {
-      this.onRedo();
+    if (onRedo && this._isControlOrCmdPressed() && evt.which === Y_KEY) {
+      onRedo();
     }
-    if (this._isControlPressed() && evt.which === F_KEY) {
-      this.onSearch();
+    if (onSearch && this._isControlOrCmdPressed() && evt.which === F_KEY) {
+      onSearch();
     }
 
     if (isMacLike()) {
       //Mac specific shortcuts -- zooming done differently on windows and linux
-      if (this._isControlPressed() && evt.which === MINUS_KEY) {
-        this.onZoomOut();
+      if (
+        onZoomOut &&
+        this._isControlOrCmdPressed() &&
+        evt.which === MINUS_KEY
+      ) {
+        onZoomOut();
       }
-      if (this._isControlPressed() && evt.which === EQUAL_KEY) {
-        this.onZoomIn();
+      if (
+        onZoomIn &&
+        this._isControlOrCmdPressed() &&
+        evt.which === EQUAL_KEY
+      ) {
+        onZoomIn();
       }
-      if (evt.which === NUMPAD_SUBSTRACT) {
-        this.onZoomOut();
+      if (onZoomOut && evt.which === NUMPAD_SUBSTRACT) {
+        onZoomOut();
       }
-      if (evt.which === NUMPAD_ADD) {
-        this.onZoomIn();
-      }
-    }
-  };
-
-  _onKeyUp = evt => {
-    // Always handle key up event, even if we don't have the focus,
-    // for modifier keys to ensure we don't lose track of their pressed/unpressed status.
-
-    if (!evt.metaKey) this.metaPressed = false;
-    if (!evt.altKey) this.altPressed = false;
-    if (evt.which === CTRL_KEY) this.rawCtrlPressed = false;
-    if (evt.which === SHIFT_KEY) this.shiftPressed = false;
-    if (evt.which === SPACE_KEY) this.spacePressed = false;
-  };
-
-  _onMouseDown = evt => {
-    if (!this.isFocused) return;
-
-    if (!isMacLike()) {
-      if (evt.button === MID_MOUSE_BUTTON) {
-        this.mouseMidButtonPressed = true;
-      } else {
-        this.mouseMidButtonPressed = false;
+      if (onZoomIn && evt.which === NUMPAD_ADD) {
+        onZoomIn();
       }
     }
   };
-
-  _onMouseUp = evt => {
-    if (!this.isFocused) return;
-
-    if (!isMacLike() && evt.button === MID_MOUSE_BUTTON) {
-      this.mouseMidButtonPressed = false;
-    }
-  };
-
-  _onKeyPress = evt => {};
-
-  _noop = () => {};
-
-  focus() {
-    this.isFocused = true;
-  }
-
-  blur() {
-    this.isFocused = false;
-  }
-
-  mount() {
-    if (typeof document === 'undefined') return;
-
-    document.addEventListener('keydown', this._onKeyDown, true);
-    document.addEventListener('keyup', this._onKeyUp, true);
-    document.addEventListener('keypress', this._onKeyPress, true);
-    document.addEventListener('mousedown', this._onMouseDown, true);
-    document.addEventListener('mouseup', this._onMouseUp, true);
-  }
-
-  unmount() {
-    if (typeof document === 'undefined') return;
-
-    document.removeEventListener('keydown', this._onKeyDown, true);
-    document.removeEventListener('keyup', this._onKeyUp, true);
-    document.removeEventListener('keypress', this._onKeyPress, true);
-    document.removeEventListener('mousedown', this._onMouseDown, true);
-    document.removeEventListener('mouseup', this._onMouseUp, true);
-  }
 }

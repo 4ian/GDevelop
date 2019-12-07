@@ -9,6 +9,10 @@ const styles = {
     width: 32,
     height: 32,
   },
+  icon: {
+    width: 16,
+    height: 16,
+  },
 };
 
 export default class CloseButton extends Component {
@@ -24,7 +28,7 @@ export default class CloseButton extends Component {
                 }}
                 style={styles.container}
               >
-                <Close htmlColor="white" />
+                <Close htmlColor="white" style={styles.icon} />
               </IconButton>
             )}
           </MosaicWindowContext.Consumer>

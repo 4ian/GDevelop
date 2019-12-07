@@ -9,22 +9,28 @@ import Text from '../UI/Text';
 import BackgroundText from '../UI/BackgroundText';
 
 type Props = {
-  message?: string,
-  onLogin: Function,
+  message?: React.Node,
+  onLogin: () => void,
+  onCreateAccount: () => void,
 };
 
-export default ({ message, onLogin }: Props) => (
+export default ({ message, onLogin, onCreateAccount }: Props) => (
   <Column noMargin>
     <Line>
       <Text>
-        {message ||
-          'You are not connected. Create an account and connect to access to GDevelop online services, like building your game for Android in one click!'}
+        {message || (
+          <Trans>
+            You are not connected. Create an account to access to GDevelop
+            online services and build your game for Android, Windows, macOS and
+            Linux in one click!
+          </Trans>
+        )}
       </Text>
     </Line>
     <Line justifyContent="center" alignItems="baseline">
       <RaisedButton
         label={<Trans>Create my account</Trans>}
-        onClick={onLogin}
+        onClick={onCreateAccount}
         primary
       />
       <Spacer />

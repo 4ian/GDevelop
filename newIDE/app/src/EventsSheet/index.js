@@ -154,19 +154,22 @@ export default class EventsSheet extends React.Component<Props, State> {
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanel;
+  _containerDiv = React.createRef<HTMLDivElement>();
   _keyboardShortcuts = new KeyboardShortcuts({
-    onDelete: () => {
-      if (this.state.inlineEditing || this.state.editedInstruction.instruction)
-        return;
-
-      this.deleteSelection();
+    isActive: () =>
+      !this.state.inlineEditing &&
+      !this.state.editedInstruction.instruction &&
+      !this.state.analyzedEventsContextResult &&
+      !this.state.serializedEventsToExtract,
+    shortcutCallbacks: {
+      onDelete: () => this.deleteSelection(),
+      onCopy: () => this.copySelection(),
+      onCut: () => this.cutSelection(),
+      onPaste: () => this.pasteEventsOrInstructions(),
+      onSearch: () => this._toggleSearchPanel(),
+      onUndo: () => this.undo(),
+      onRedo: () => this.redo(),
     },
-    onCopy: () => this.copySelection(),
-    onCut: () => this.cutSelection(),
-    onPaste: () => this.pasteEventsOrInstructions(),
-    onSearch: () => this._toggleSearchPanel(),
-    onUndo: () => this.undo(),
-    onRedo: () => this.redo(),
   });
 
   eventContextMenu: ContextMenu;
@@ -208,10 +211,6 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
-  }
-
-  componentWillUnmount() {
-    this._keyboardShortcuts.unmount();
   }
 
   updateToolbar() {
@@ -592,7 +591,14 @@ export default class EventsSheet extends React.Component<Props, State> {
         inlineEditing: false,
         inlineEditingAnchorEl: null,
       },
-      () => this._saveChangesToHistory()
+      () => {
+        this._saveChangesToHistory();
+
+        // Deletion of an event/instruction will remove it from the DOM,
+        // potentially losing the focus on the associated DOM elements. Ensure
+        // we keep the focus on the EventsSheet.
+        this._ensureFocused();
+      }
     );
   };
 
@@ -915,6 +921,34 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
+  /**
+   * Call this to ensure that the events sheet stays focused after a potential
+   * lost of focus (for example, after a scroll, the focused element might have
+   * been scrolled out of the view and so removed from the DOM)
+   */
+  _ensureFocused = () => {
+    if (!this._containerDiv || !document) return;
+
+    const containerDivElement = this._containerDiv.current;
+    if (document.activeElement === containerDivElement) {
+      // Focus is already on the container
+      return;
+    }
+    if (containerDivElement) {
+      if (
+        document.activeElement !== document.body &&
+        containerDivElement.contains(document.activeElement)
+      ) {
+        // Focus is already on an element of the container
+        return;
+      }
+
+      // Focus is not on an element of the container, we probably lost the focus
+      // after scrolling or removing an element. Give back the focus to the container.
+      containerDivElement.focus();
+    }
+  };
+
   render() {
     const {
       project,
@@ -953,13 +987,16 @@ export default class EventsSheet extends React.Component<Props, State> {
                       <div
                         className="gd-events-sheet"
                         style={styles.container}
-                        onFocus={() => this._keyboardShortcuts.focus()}
-                        onBlur={() => this._keyboardShortcuts.blur()}
-                        tabIndex={1}
+                        onKeyDown={this._keyboardShortcuts.onKeyDown}
+                        onKeyUp={this._keyboardShortcuts.onKeyUp}
+                        onDragOver={this._keyboardShortcuts.onDragOver}
+                        ref={this._containerDiv}
+                        tabIndex={0}
                       >
                         <EventsTree
                           ref={eventsTree => (this._eventsTree = eventsTree)}
                           key={events.ptr}
+                          onScroll={this._ensureFocused}
                           events={events}
                           project={project}
                           scope={scope}

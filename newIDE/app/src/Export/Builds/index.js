@@ -5,7 +5,8 @@ import BuildsList from './BuildsList';
 import {
   getBuilds,
   type Build,
-  getUrl,
+  type BuildArtifactKeyName,
+  getBuildArtifactUrl,
 } from '../../Utils/GDevelopServices/Build';
 import Window from '../../Utils/Window';
 import BuildsWatcher from './BuildsWatcher';
@@ -74,10 +75,9 @@ export default class Builds extends Component<Props, State> {
     );
   };
 
-  _download = (build: Build, key: string) => {
-    if (!build || !build[key]) return;
-
-    Window.openExternalURL(getUrl(build[key]));
+  _download = (build: Build, key: BuildArtifactKeyName) => {
+    const url = getBuildArtifactUrl(build, key);
+    if (url) Window.openExternalURL(url);
   };
 
   render() {

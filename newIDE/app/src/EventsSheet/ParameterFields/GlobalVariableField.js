@@ -27,7 +27,7 @@ export default class GlobalVariableField extends React.Component<
     const { project, scope } = this.props;
 
     return (
-      <div>
+      <React.Fragment>
         <VariableField
           variablesContainer={project ? project.getVariables() : null}
           parameterMetadata={this.props.parameterMetadata}
@@ -56,7 +56,7 @@ export default class GlobalVariableField extends React.Component<
             }
           />
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }

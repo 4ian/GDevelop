@@ -1381,6 +1381,55 @@ module.exports = {
       }
     ]
   },
+  "geometry-monster": {
+    "description": "A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "health-bar": {
     "description": "The platform example game adapted to add a health bar to the player, that is decreased when the player touches an enemy.",
     "usedExtensions": [
@@ -3317,10 +3366,6 @@ module.exports = {
     "description": "Example of a character animated using a skeletal animation based on Dragon Bones. This is a demo based on an experimental object. Be sure to read the documentation about this as it needs work to be maintained for use in large games.\n",
     "usedExtensions": [
       {
-        "fullName": "Skeleton",
-        "name": "SkeletonObject"
-      },
-      {
         "fullName": "Sprite",
         "name": "Sprite"
       },
@@ -3335,6 +3380,10 @@ module.exports = {
       {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "",
+        "name": ""
       },
       {
         "fullName": "Text object",

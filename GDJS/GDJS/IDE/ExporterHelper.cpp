@@ -501,7 +501,7 @@ bool ExporterHelper::CompleteIndexFile(
       fs.MakeRelative(scriptSrc, exportDir);
     }
 
-    codeFilesIncludes += "\t<script src=\"" + scriptSrc + "\"></script>\n";
+    codeFilesIncludes += "\t<script src=\"" + scriptSrc + "\" crossorigin=\"anonymous\"></script>\n";
   }
 
   str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", customCss)

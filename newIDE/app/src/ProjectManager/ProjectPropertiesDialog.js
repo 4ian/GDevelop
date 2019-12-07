@@ -16,8 +16,8 @@ import {
   validatePackageName,
 } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
-import { Line, Column } from '../UI/Grid';
 import HelpButton from '../UI/HelpButton';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
 
 type Props = {|
   project: gdProject,
@@ -164,6 +164,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               key="help"
             />,
           ]}
+          title={<Trans>Project properties</Trans>}
           open={this.props.open}
           onRequestClose={this.props.onClose}
         >
@@ -237,48 +238,44 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           <SelectField
             fullWidth
             floatingLabelText={<Trans>Project file type</Trans>}
-            value={isFolderProject}
-            onChange={(e, i, value: boolean) =>
-              this.setState({ isFolderProject: value })
+            value={isFolderProject ? 'folder-project' : 'single-file'}
+            onChange={(e, i, value: string) =>
+              this.setState({ isFolderProject: value === 'folder-project' })
             }
           >
             <SelectOption
-              value={false}
+              value={'single-file'}
               primaryText={t`Single file (default)`}
             />
             <SelectOption
-              value={true}
+              value={'folder-project'}
               primaryText={t`Multiple files, saved in folder next to the main file`}
             />
           </SelectField>
-          <Line noMargin>
-            <Column expand noMargin>
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Minimum FPS</Trans>}
-                fullWidth
-                type="number"
-                value={'' + minFPS}
-                onChange={value =>
-                  this.setState({
-                    minFPS: Math.max(0, parseInt(value, 10)),
-                  })
-                }
-              />
-            </Column>
-            <Column expand noMargin>
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Maximum FPS (0 to disable)</Trans>}
-                fullWidth
-                type="number"
-                value={'' + maxFPS}
-                onChange={value =>
-                  this.setState({
-                    maxFPS: Math.max(0, parseInt(value, 10)),
-                  })
-                }
-              />
-            </Column>
-          </Line>
+          <ResponsiveLineStackLayout noMargin>
+            <SemiControlledTextField
+              floatingLabelText={<Trans>Minimum FPS</Trans>}
+              fullWidth
+              type="number"
+              value={'' + minFPS}
+              onChange={value =>
+                this.setState({
+                  minFPS: Math.max(0, parseInt(value, 10)),
+                })
+              }
+            />
+            <SemiControlledTextField
+              floatingLabelText={<Trans>Maximum FPS (0 to disable)</Trans>}
+              fullWidth
+              type="number"
+              value={'' + maxFPS}
+              onChange={value =>
+                this.setState({
+                  maxFPS: Math.max(0, parseInt(value, 10)),
+                })
+              }
+            />
+          </ResponsiveLineStackLayout>
           {maxFPS > 0 && maxFPS < 60 && (
             <DismissableAlertMessage
               identifier="maximum-fps-too-low"

@@ -25,6 +25,7 @@ import LocalEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoad
 import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
+import {LocalGDJSDevelopmentWatcher} from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
@@ -32,6 +33,7 @@ export const create = (authentification: Authentification) => {
 
   let app = null;
   const appArguments = Window.getArguments();
+  const isDev = Window.isDev();
 
   if (appArguments['server-port']) {
     app = (
@@ -65,7 +67,6 @@ export const create = (authentification: Authentification) => {
                     eventsFunctionsExtensionsState
                   }
                   resourceSources={localResourceSources}
-                  authentification={authentification}
                   storageProviders={storageProviders}
                   useStorageProvider={useStorageProvider}
                   storageProviderOperations={currentStorageProviderOperations}
@@ -116,17 +117,17 @@ export const create = (authentification: Authentification) => {
                       startersComponent={LocalStarters}
                     />
                   )}
+                  renderGDJSDevelopmentWatcher={isDev ? () => <LocalGDJSDevelopmentWatcher /> : null}
                   storageProviders={storageProviders}
                   useStorageProvider={useStorageProvider}
                   storageProviderOperations={currentStorageProviderOperations}
                   resourceSources={localResourceSources}
                   resourceExternalEditors={localResourceExternalEditors}
-                  authentification={authentification}
                   extensionsLoader={makeExtensionsLoader({
                     gd,
                     objectsEditorService: ObjectsEditorService,
                     objectsRenderingService: ObjectsRenderingService,
-                    filterExamples: !Window.isDev(),
+                    filterExamples: !isDev,
                   })}
                   initialFileMetadataToOpen={initialFileMetadataToOpen}
                 />

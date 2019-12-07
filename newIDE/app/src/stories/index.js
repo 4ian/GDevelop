@@ -22,9 +22,6 @@ import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
-import LocalExport from '../Export/LocalExporters/LocalExport';
-import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
-import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
@@ -92,6 +89,12 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
+  erroredCordovaBuild,
+  pendingCordovaBuild,
+  pendingElectronBuild,
+  completeCordovaBuild,
+  completeElectronBuild,
+  completeWebBuild,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -107,7 +110,6 @@ import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
-import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Checkbox from '../UI/Checkbox';
@@ -145,7 +147,7 @@ import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import NewObjectDialog from '../ObjectsList/NewObjectDialog';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
@@ -158,6 +160,21 @@ import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStoragePro
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import CreateAccountDialog from '../Profile/CreateAccountDialog';
+import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
+import RaisedButton from '../UI/RaisedButton';
+import Text from '../UI/Text';
+import ToolbarIcon from '../UI/ToolbarIcon';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import IconButton from '../UI/IconButton';
+import FilterList from '@material-ui/icons/FilterList';
+import Brush from '@material-ui/icons/Brush';
+import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import fakeResourceExternalEditors from './FakeResourceExternalEditors';
+import {
+  TextFieldWithButtonLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 
 // No i18n in this file
 
@@ -190,9 +207,116 @@ const {
 
 const Placeholder = () => <div>Placeholder component</div>;
 
+const buildFakeMenuTemplate = () => [
+  {
+    label: 'Option 1',
+    click: action('click option 1'),
+  },
+  { type: 'separator' },
+  {
+    label: 'Option 2',
+    click: action('click option 2'),
+  },
+];
+
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
 ));
+
+storiesOf('UI Building Blocks/Buttons', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Column>
+      <Line>
+        <Text>Buttons:</Text>
+      </Line>
+      <Line>
+        <RaisedButton label="Raised button" onClick={action('onClick')} />
+        <RaisedButton
+          label="Primary Raised button"
+          primary
+          onClick={action('onClick')}
+        />
+      </Line>
+      <Line>
+        <FlatButton label="Flat button" onClick={action('onClick')} />
+        <FlatButton
+          label="Primary Flat button"
+          primary
+          onClick={action('onClick')}
+        />
+      </Line>
+      <Line>
+        <Text>Buttons with menus:</Text>
+      </Line>
+      <Line>
+        <RaisedButton
+          label="Traditional Raised button"
+          onClick={action('onClick')}
+        />
+        <RaisedButtonWithMenu
+          label="Button with menu"
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithMenu
+          label="... and with icon"
+          icon={<Brush />}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
+        <Text>Icons with menu:</Text>
+      </Line>
+      <Line>
+        <ElementWithMenu
+          element={
+            <ToolbarIcon
+              src="res/ribbon_default/bug32.png"
+              tooltip={'ToolbarIcon with menu'}
+            />
+          }
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <ElementWithMenu
+          element={
+            <IconButton>
+              <FilterList />
+            </IconButton>
+          }
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
+        <Text>In a mini toolbar:</Text>
+      </Line>
+      <Line>
+        <MiniToolbar>
+          <MiniToolbarText>Some text:</MiniToolbarText>
+          <IconButton>
+            <Brush />
+          </IconButton>
+          <ElementWithMenu
+            element={
+              <IconButton>
+                <FilterList />
+              </IconButton>
+            }
+            buildMenuTemplate={() => [
+              {
+                label: 'Option 1',
+                click: action('click option 1'),
+              },
+              { type: 'separator' },
+              {
+                label: 'Option 2',
+                click: action('click option 2'),
+              },
+            ]}
+          />
+        </MiniToolbar>
+      </Line>
+    </Column>
+  ));
 
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
@@ -251,6 +375,25 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
           <p>
             State value is {value} ({typeof value})
           </p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('reduced margin, in a MiniToolbar', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <MiniToolbar>
+            <MiniToolbarText>Please enter something:</MiniToolbarText>
+            <SemiControlledTextField
+              margin="none"
+              value={value}
+              onChange={onChange}
+              commitOnBlur
+            />
+          </MiniToolbar>
+          <p>State value is {value}</p>
         </React.Fragment>
       )}
     />
@@ -441,6 +584,255 @@ storiesOf('UI Building Blocks/SearchBar', module)
           click: () => {},
         },
       ]}
+    />
+  ));
+
+storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
+  .addDecorator(muiDecorator)
+  .add('Default', () => (
+    <ResponsiveLineStackLayout>
+      <div>Some Div</div>
+      <span>Some Span</span>
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <FlatButton label="Flat Button" onClick={action('on click')} />
+    </ResponsiveLineStackLayout>
+  ))
+  .add('Default with null items', () => (
+    <ResponsiveLineStackLayout>
+      {null}
+      {null}
+      <div>Some Div</div>
+      {null}
+      {null}
+      <span>Some Span</span>
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <FlatButton label="Flat Button" onClick={action('on click')} />
+      {null}
+      {null}
+    </ResponsiveLineStackLayout>
+  ))
+  .add('alignItems=center', () => (
+    <ResponsiveLineStackLayout alignItems="center">
+      <div>Some Div</div>
+      <span>Some Span</span>
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+    </ResponsiveLineStackLayout>
+  ));
+
+storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
+  .addDecorator(muiDecorator)
+  .add('Empty text field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello world"
+          value=""
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty text field, margin=none', () => (
+    <TextFieldWithButtonLayout
+      margin="none"
+      renderTextField={() => (
+        <SemiControlledTextField
+          margin="none"
+          floatingLabelText="Hello world"
+          value=""
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          floatingLabelText="Hello world"
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field, noFloatingLabelText', () => (
+    <TextFieldWithButtonLayout
+      noFloatingLabelText
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field, margin=none', () => (
+    <TextFieldWithButtonLayout
+      margin="none"
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          margin="none"
+          floatingLabelText="Hello world"
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Empty auto complete field, margin=none, noFloatingLabelText', () => (
+    <TextFieldWithButtonLayout
+      margin="none"
+      noFloatingLabelText
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          margin="none"
+          value={''}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add(
+    'Empty auto complete field, margin=none, noFloatingLabelText, with a small IconButton',
+    () => (
+      <TextFieldWithButtonLayout
+        margin="none"
+        noFloatingLabelText
+        renderTextField={() => (
+          <SemiControlledAutoComplete
+            margin="none"
+            value={''}
+            onChange={() => {}}
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+          />
+        )}
+        renderButton={style => (
+          <IconButton size="small">
+            <Brush />
+          </IconButton>
+        )}
+      />
+    )
+  )
+  .add('Filled text field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello"
+          value="123"
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled text field, full width', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello"
+          value="123"
+          onChange={() => {}}
+          fullWidth
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled multiline text field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledTextField
+          floatingLabelText="Hello"
+          multiLine
+          value={'123\n456\n789\nblablabla bla bla'}
+          onChange={() => {}}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled auto complete field', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          floatingLabelText="Hello world"
+          value={'Choice 5'}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
+    />
+  ))
+  .add('Filled auto complete field, full width', () => (
+    <TextFieldWithButtonLayout
+      renderTextField={() => (
+        <SemiControlledAutoComplete
+          floatingLabelText="Hello world"
+          value={'Choice 5'}
+          onChange={() => {}}
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            text: `Choice ${i}`,
+            value: `Choice ${i}`,
+          }))}
+          fullWidth
+        />
+      )}
+      renderButton={style => (
+        <RaisedButton style={style} label="Button" onClick={() => {}} />
+      )}
     />
   ));
 
@@ -1068,58 +1460,6 @@ storiesOf('PropertiesEditor', module)
       ]}
       instances={[{ name: 'instance1' }, { name: 'instance2' }]}
     />
-  ))
-  .add('row (window width = medium)', () => (
-    <PropertiesEditor
-      schema={[
-        {
-          name: 'Position',
-          type: 'row',
-          children: [
-            {
-              name: 'X',
-              valueType: 'number',
-              getValue: instance => 10,
-              setValue: (instance, newValue) => {},
-            },
-            {
-              name: 'Y',
-              valueType: 'number',
-              getValue: instance => 20.1234,
-              setValue: (instance, newValue) => {},
-            },
-          ],
-        },
-      ]}
-      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
-      windowWidth="medium"
-    />
-  ))
-  .add('row (window width = small)', () => (
-    <PropertiesEditor
-      schema={[
-        {
-          name: 'Position',
-          type: 'row',
-          children: [
-            {
-              name: 'X',
-              valueType: 'number',
-              getValue: instance => 10,
-              setValue: (instance, newValue) => {},
-            },
-            {
-              name: 'Y',
-              valueType: 'number',
-              getValue: instance => 20.1234,
-              setValue: (instance, newValue) => {},
-            },
-          ],
-        },
-      ]}
-      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
-      windowWidth="small"
-    />
   ));
 
 storiesOf('ParameterFields', module)
@@ -1139,7 +1479,7 @@ storiesOf('ParameterFields', module)
           parameterRenderingService={ParameterRenderingService}
           resourceSources={[]}
           onChooseResource={() => Promise.reject('unimplemented')}
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
         />
       )}
     />
@@ -1456,33 +1796,6 @@ storiesOf('ParameterFields', module)
     />
   ));
 
-storiesOf('LocalExport', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <GDI18nProvider language="en">
-      <LocalExport project={project} />
-    </GDI18nProvider>
-  ));
-
-storiesOf('LocalS3Export', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <GDI18nProvider language="en">
-      <LocalS3Export project={project} />
-    </GDI18nProvider>
-  ));
-
-storiesOf('LocalCordovaExport', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <GDI18nProvider language="en">
-      <LocalCordovaExport project={project} />
-    </GDI18nProvider>
-  ));
-
 storiesOf('BuildStepsProgress', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -1491,9 +1804,21 @@ storiesOf('BuildStepsProgress', module)
       exportStep={''}
       build={null}
       onDownload={action('download')}
-      uploadMax={0}
-      uploadProgress={0}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
       errored={false}
+      hasBuildStep
+    />
+  ))
+  .add('BuildStepsProgress (not started) (without build step)', () => (
+    <BuildStepsProgress
+      exportStep={''}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
+      errored={false}
+      hasBuildStep={false}
     />
   ))
   .add('BuildStepsProgress (export)', () => (
@@ -1501,9 +1826,32 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'export'}
       build={null}
       onDownload={action('download')}
-      uploadMax={0}
-      uploadProgress={0}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
       errored={false}
+      hasBuildStep
+    />
+  ))
+  .add('BuildStepsProgress (resources-download)', () => (
+    <BuildStepsProgress
+      exportStep={'resources-download'}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={27}
+      stepCurrentProgress={16}
+      errored={false}
+      hasBuildStep
+    />
+  ))
+  .add('BuildStepsProgress (export) (errored)', () => (
+    <BuildStepsProgress
+      exportStep={'export'}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
+      errored={true}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (compress)', () => (
@@ -1511,9 +1859,10 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'compress'}
       build={null}
       onDownload={action('download')}
-      uploadMax={0}
-      uploadProgress={0}
+      stepMaxProgress={0}
+      stepCurrentProgress={0}
       errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (upload)', () => (
@@ -1521,9 +1870,10 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'upload'}
       build={null}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
       errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (upload) (errored)', () => (
@@ -1531,9 +1881,10 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'upload'}
       build={null}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
       errored
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (waiting-for-build)', () => (
@@ -1541,9 +1892,10 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'waiting-for-build'}
       build={null}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
-      errored
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (build)', () => (
@@ -1558,10 +1910,11 @@ storiesOf('BuildStepsProgress', module)
         createdAt: Date.now(),
       }}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
-      errored
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
       showSeeAllMyBuildsExplanation
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (build) (errored)', () => (
@@ -1577,14 +1930,15 @@ storiesOf('BuildStepsProgress', module)
         createdAt: Date.now(),
       }}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
       errored
+      hasBuildStep
     />
   ))
   .add('BuildStepsProgress (build) (complete)', () => (
     <BuildStepsProgress
-      exportStep={'build'}
+      exportStep={'done'}
       build={{
         id: 'fake-build-id',
         userId: 'fake-user-id',
@@ -1596,9 +1950,21 @@ storiesOf('BuildStepsProgress', module)
         createdAt: Date.now(),
       }}
       onDownload={action('download')}
-      uploadMax={100}
-      uploadProgress={20}
-      errored
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
+      hasBuildStep
+    />
+  ))
+  .add('BuildStepsProgress (done) (without build step)', () => (
+    <BuildStepsProgress
+      exportStep={'done'}
+      build={null}
+      onDownload={action('download')}
+      stepMaxProgress={100}
+      stepCurrentProgress={20}
+      errored={false}
+      hasBuildStep={false}
     />
   ));
 
@@ -1607,38 +1973,26 @@ storiesOf('BuildProgress', module)
   .addDecorator(muiDecorator)
   .add('errored', () => (
     <BuildProgress
-      build={{
-        status: 'error',
-        logsKey: '/fake-error.log',
-      }}
+      build={erroredCordovaBuild}
       onDownload={action('download')}
     />
   ))
   .add('pending (electron-build)', () => (
     <BuildProgress
-      build={{
-        type: 'electron-build',
-        status: 'pending',
-        updatedAt: Date.now(),
-      }}
+      build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
       onDownload={action('download')}
     />
   ))
   .add('pending (cordova-build)', () => (
     <BuildProgress
-      build={{
-        type: 'cordova-build',
-        status: 'pending',
-        updatedAt: Date.now(),
-      }}
+      build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
       onDownload={action('download')}
     />
   ))
   .add('pending and very old (cordova-build)', () => (
     <BuildProgress
       build={{
-        type: 'cordova-build',
-        status: 'pending',
+        ...pendingCordovaBuild,
         updatedAt: Date.now() - 1000 * 3600 * 24,
       }}
       onDownload={action('download')}
@@ -1646,30 +2000,18 @@ storiesOf('BuildProgress', module)
   ))
   .add('complete (cordova-build)', () => (
     <BuildProgress
-      build={{
-        type: 'cordova-build',
-        status: 'complete',
-        logsKey: '/fake-error.log',
-        apkKey: '/fake-game.apk',
-        updatedAt: Date.now(),
-      }}
+      build={completeCordovaBuild}
       onDownload={action('download')}
     />
   ))
   .add('complete (electron-build)', () => (
     <BuildProgress
-      build={{
-        type: 'electron-build',
-        status: 'complete',
-        logsKey: '/fake-error.log',
-        windowsExeKey: '/fake-windows-game.exe',
-        windowsZipKey: '/fake-windows-game.zip',
-        macosZipKey: '/fake-macos-game.zip',
-        linuxAppImageKey: '/fake-linux-game.AppImage',
-        updatedAt: Date.now(),
-      }}
+      build={completeElectronBuild}
       onDownload={action('download')}
     />
+  ))
+  .add('complete (web-build)', () => (
+    <BuildProgress build={completeWebBuild} onDownload={action('download')} />
   ));
 
 storiesOf('LocalFolderPicker', module)
@@ -2022,7 +2364,7 @@ storiesOf('EventsSheet', module)
           onChooseResource={source =>
             action('Choose resource from source', source)
           }
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
@@ -2050,7 +2392,7 @@ storiesOf('EventsSheet', module)
           onChooseResource={source =>
             action('Choose resource from source', source)
           }
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
@@ -2233,7 +2575,7 @@ storiesOf('InstructionEditor', module)
         objectsContainer={testLayout}
         isCondition
         instruction={testInstruction}
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
         onChooseResource={() => {
           action('onChooseResource');
           return Promise.reject();
@@ -2252,7 +2594,7 @@ storiesOf('InstructionEditor', module)
         objectsContainer={testLayout}
         isCondition
         instruction={testInstruction}
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
         onChooseResource={() => {
           action('onChooseResource');
           return Promise.reject();
@@ -2276,7 +2618,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testInstruction}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
         action('onChooseResource');
         return Promise.reject();
@@ -2297,7 +2639,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testInstruction}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
         action('onChooseResource');
         return Promise.reject();
@@ -2318,7 +2660,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={true}
       instruction={testInstruction}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
         action('onChooseResource');
         return Promise.reject();
@@ -2342,7 +2684,7 @@ storiesOf('TextEditor', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ));
@@ -2359,7 +2701,7 @@ storiesOf('TiledSpriteEditor', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ));
@@ -2376,7 +2718,7 @@ storiesOf('PanelSpriteEditor', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ));
@@ -2393,7 +2735,7 @@ storiesOf('SpriteEditor and related editors', module)
         onChooseResource={source =>
           action('Choose resource from source', source)
         }
-        resourceExternalEditors={[]}
+        resourceExternalEditors={fakeResourceExternalEditors}
       />
     </SerializedObjectDisplay>
   ))
@@ -2662,7 +3004,12 @@ storiesOf('Changelog', module)
 storiesOf('CreateProfile', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <CreateProfile onLogin={action('login')} />);
+  .add('default', () => (
+    <CreateProfile
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+    />
+  ));
 
 storiesOf('LimitDisplayer', module)
   .addDecorator(paperDecorator)
@@ -2757,15 +3104,13 @@ storiesOf('SubscriptionPendingDialog', module)
     />
   ));
 
-storiesOf('LoginDialog', module)
+storiesOf('Profile/LoginDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2776,26 +3121,9 @@ storiesOf('LoginDialog', module)
   ))
   .add('login in progress', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
-      onLogin={action('on login')}
-      onForgotPassword={action('on forgot password')}
-      onCloseResetPasswordDialog={action('on close reset password dialog')}
-      resetPasswordDialogOpen={false}
-      forgotPasswordInProgress={false}
-      error={null}
-    />
-  ))
-  .add('create account in progress', () => (
-    <LoginDialog
-      open
-      onClose={action('on close')}
-      loginInProgress={false}
-      createAccountInProgress
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2806,11 +3134,9 @@ storiesOf('LoginDialog', module)
   ))
   .add('weak-password error', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2823,11 +3149,9 @@ storiesOf('LoginDialog', module)
   ))
   .add('invalid-email error', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
@@ -2840,17 +3164,58 @@ storiesOf('LoginDialog', module)
   ))
   .add('Reset password', () => (
     <LoginDialog
-      open
       onClose={action('on close')}
       loginInProgress={false}
-      createAccountInProgress={false}
-      onCreateAccount={action('on create account')}
+      onGoToCreateAccount={action('on go to create account')}
       onLogin={action('on login')}
       onForgotPassword={action('on forgot password')}
       onCloseResetPasswordDialog={action('on close reset password dialog')}
       forgotPasswordInProgress={false}
       resetPasswordDialogOpen
       error={null}
+    />
+  ));
+
+storiesOf('Profile/CreateAccountDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress={false}
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={null}
+    />
+  ))
+  .add('login in progress', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={null}
+    />
+  ))
+  .add('weak-password error', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress={false}
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={{
+        code: 'auth/weak-password',
+      }}
+    />
+  ))
+  .add('invalid-email error', () => (
+    <CreateAccountDialog
+      onClose={action('on close')}
+      createAccountInProgress={false}
+      onGoToLogin={action('on go to create account')}
+      onCreateAccount={action('on login')}
+      error={{
+        code: 'auth/invalid-email',
+      }}
     />
   ));
 
@@ -2884,6 +3249,28 @@ storiesOf('LocalNetworkPreviewDialog', module)
       error={{ message: 'Oops' }}
       onRunPreviewLocally={action('on run preview locally')}
       onExport={action('on export')}
+      onClose={action('on close')}
+    />
+  ));
+
+storiesOf('BrowserPreviewErrorDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('generic error', () => (
+    <BrowserPreviewErrorDialog
+      error={new Error('fake error')}
+      onClose={action('on close')}
+    />
+  ))
+  .add('networking error', () => (
+    <BrowserPreviewErrorDialog
+      error={
+        // $FlowFixMe - mocking an Error with "code field"
+        {
+          code: 'NetworkingError',
+          message: "Oops, you're offline",
+        }
+      }
       onClose={action('on close')}
     />
   ));
@@ -2945,7 +3332,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       initialResourceName="resource-that-does-not-exists-in-the-project"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -2957,7 +3344,20 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      initialResourceName="icon128.png"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource, no margin', () => (
+    <ResourceSelector
+      margin="none"
+      resourceKind="image"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
       initialResourceName="icon128.png"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -2969,7 +3369,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       resourceName="icon128.png"
       onChange={action('on change')}
     />
@@ -2980,8 +3380,35 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       project={project}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
       initialResourceName="fake-audio1.mp3"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('font resource, with reset button', () => (
+    <ResourceSelector
+      canBeReset
+      resourceKind="font"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      initialResourceName="font.otf"
+      onChange={action('on change')}
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('font resource, no margin, with reset button', () => (
+    <ResourceSelector
+      canBeReset
+      margin="none"
+      resourceKind="font"
+      project={project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('Unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      initialResourceName="font.otf"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
     />
@@ -3088,7 +3515,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           onChooseResource={source =>
             action('Choose resource from source', source)
           }
-          resourceExternalEditors={[]}
+          resourceExternalEditors={fakeResourceExternalEditors}
           openInstructionOrExpression={action('open instruction or expression')}
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
@@ -3211,6 +3638,7 @@ storiesOf('ProjectManager', module)
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
+      onOpenProfile={action('onOpenProfile')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
@@ -3249,6 +3677,7 @@ storiesOf('ProjectManager', module)
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
+      onOpenProfile={action('onOpenProfile')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}

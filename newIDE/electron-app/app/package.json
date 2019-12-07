@@ -2,7 +2,7 @@
   "name": "gdevelop",
   "productName": "GDevelop 5",
   "description": "GDevelop 5 IDE running on the Electron runtime",
-  "version": "5.0.0-beta82",
+  "version": "5.0.0-beta83",
   "author": "Florian Rival",
   "license": "MIT",
   "homepage": "http://gdevelop-app.com",

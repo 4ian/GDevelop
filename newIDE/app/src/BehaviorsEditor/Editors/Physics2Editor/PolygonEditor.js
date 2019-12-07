@@ -11,6 +11,7 @@ import {
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Warning from '@material-ui/icons/Warning';
 import IconButton from '../../../UI/IconButton';
+import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import AddCircle from '@material-ui/icons/AddCircle';
 import Delete from '@material-ui/icons/Delete';
 
@@ -89,64 +90,73 @@ export default class PolygonEditor extends React.Component<Props> {
     } = this.props;
 
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHeaderColumn />
-            <TableHeaderColumn>X</TableHeaderColumn>
-            <TableHeaderColumn>Y</TableHeaderColumn>
-            <TableRowColumn />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {vertices.map((value, index) => {
-            return (
-              <TableRow key={`vertexRow${index}`}>
+      <ThemeConsumer>
+        {muiTheme => (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHeaderColumn />
+                <TableHeaderColumn>X</TableHeaderColumn>
+                <TableHeaderColumn>Y</TableHeaderColumn>
+                <TableRowColumn />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {vertices.map((value, index) => {
+                return (
+                  <TableRow
+                    key={`vertexRow${index}`}
+                    style={{
+                      backgroundColor: muiTheme.list.itemsBackgroundColor,
+                    }}
+                  >
+                    <TableRowColumn>
+                      {!this._isPolygonConvex(vertices) && <Warning />}
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <SemiControlledTextField
+                        margin="none"
+                        fullWidth
+                        value={value.x.toString(10)}
+                        onChange={newValue =>
+                          onChangeVertexX(parseFloat(newValue) || 0, index)
+                        }
+                        type="number"
+                      />
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <SemiControlledTextField
+                        margin="none"
+                        fullWidth
+                        value={value.y.toString(10)}
+                        onChange={newValue =>
+                          onChangeVertexY(parseFloat(newValue) || 0, index)
+                        }
+                        type="number"
+                      />
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <IconButton onClick={() => onRemove(index)}>
+                        <Delete />
+                      </IconButton>
+                    </TableRowColumn>
+                  </TableRow>
+                );
+              })}
+              <TableRow>
+                <TableRowColumn />
+                <TableRowColumn />
+                <TableRowColumn />
                 <TableRowColumn>
-                  {!this._isPolygonConvex(vertices) && <Warning />}
-                </TableRowColumn>
-                <TableRowColumn>
-                  <SemiControlledTextField
-                    margin="none"
-                    fullWidth
-                    value={value.x.toString(10)}
-                    onChange={newValue =>
-                      onChangeVertexX(parseFloat(newValue) || 0, index)
-                    }
-                    type="number"
-                  />
-                </TableRowColumn>
-                <TableRowColumn>
-                  <SemiControlledTextField
-                    margin="none"
-                    fullWidth
-                    value={value.y.toString(10)}
-                    onChange={newValue =>
-                      onChangeVertexY(parseFloat(newValue) || 0, index)
-                    }
-                    type="number"
-                  />
-                </TableRowColumn>
-                <TableRowColumn>
-                  <IconButton onClick={() => onRemove(index)}>
-                    <Delete />
+                  <IconButton onClick={onAdd}>
+                    <AddCircle />
                   </IconButton>
                 </TableRowColumn>
               </TableRow>
-            );
-          })}
-          <TableRow>
-            <TableRowColumn />
-            <TableRowColumn />
-            <TableRowColumn />
-            <TableRowColumn>
-              <IconButton onClick={onAdd}>
-                <AddCircle />
-              </IconButton>
-            </TableRowColumn>
-          </TableRow>
-        </TableBody>
-      </Table>
+            </TableBody>
+          </Table>
+        )}
+      </ThemeConsumer>
     );
   }
 }

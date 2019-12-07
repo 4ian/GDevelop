@@ -1,13 +1,12 @@
 // @flow
-import optionalRequire from '../Utils/OptionalRequire';
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+import VersionMetadata from './VersionMetadata';
 const gd = global.gd;
 
 const gdCoreVersionString: string = gd
   ? gd.VersionWrapper.fullString()
   : 'Unknown';
-const ideVersionString: string = app ? app.getVersion() : '5';
 
-export const getIDEVersion = () => ideVersionString;
-export const getGDCoreVersion = () => gdCoreVersionString;
+export const getIDEVersion = (): string => VersionMetadata.version;
+export const getIDEVersionWithHash = (): string =>
+  VersionMetadata.versionWithHash;
+export const getGDCoreVersion = (): string => gdCoreVersionString;

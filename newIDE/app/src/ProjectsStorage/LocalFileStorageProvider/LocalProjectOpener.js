@@ -51,7 +51,6 @@ export const onOpen = (
   fileMetadata: FileMetadata
 ): Promise<{|
   content: Object,
-  fileMetadata: FileMetadata,
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
   const projectPath = path.dirname(filePath);
@@ -66,7 +65,7 @@ export const onOpen = (
       // of large game files.
       maxUnsplitDepth: 3,
     }).then(() => {
-      return { content: object, fileMetadata };
+      return { content: object };
     });
   });
 };

@@ -16,7 +16,7 @@ const mime = {
 
 if (!accessKeyId || !secretAccessKey) {
   console.warn(
-    "⚠️ Either UPLOAD_S3_ACCESS_KEY_ID or UPLOAD_S3_SECRET_ACCESS_KEY are not defined. Upload won't be working."
+    "⚠️ Either UPLOAD_S3_ACCESS_KEY_ID or UPLOAD_S3_SECRET_ACCESS_KEY are not defined. Upload of builds in the web-app won't be working."
   );
   console.info(
     'ℹ️ Copy .env.dist file to .env and fill the values to fix this warning.'

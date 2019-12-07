@@ -4,8 +4,11 @@
  */
 
 .gd-events-sheet-default-theme.events-tree {
-  font-family: -apple-system, '.SFNSText-Regular', 'San Francisco', Roboto,
-    'Segoe UI', 'Helvetica Neue', 'Lucida Grande', sans-serif !important;
+  /* Use the fonts provided by the operating system(s) as possible. */
+  /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
   font-size: 14px !important;
 }
 
@@ -33,6 +36,14 @@
 .rst__lineHalfVerticalTop::after,
 .rst__lineHalfVerticalBottom::after {
   background-color: black;
+}
+
+/**
+ * Background and default text color of content of an event
+ */
+.gd-events-sheet-default-theme .rst__rowContents {
+  background-color: white;
+  color: black;
 }
 
 /**
@@ -132,7 +143,9 @@
   color: rgb(131, 55, 162);
 }
 
-.gd-events-sheet-default-theme .instruction-parameter .instruction-invalid-parameter {
+.gd-events-sheet-default-theme
+  .instruction-parameter
+  .instruction-invalid-parameter {
   color: #bb0000;
   text-decoration: #bb0000 underline wavy;
 }
@@ -189,6 +202,6 @@
 /* Theming icons */
 .gd-events-sheet-default-theme .icon {
   padding-right: 2px;
-  width:16px;
-  height:16px;
+  width: 16px;
+  height: 16px;
 }

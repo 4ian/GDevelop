@@ -181,7 +181,14 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     }
     this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
 
-    //Reference to the current SpriteAnimationFrame that is displayd. Can be null, so ensure that this case is handled properly.
+    /**
+     * Reference to the current SpriteAnimationFrame that is displayd.
+     * Verify is `this._animationFrameDirty === true` before using it, and if so
+     * call `this._updateAnimationFrame()`.
+     * Can be null, so ensure that this case is handled properly.
+     *
+     * @type gdjs.SpriteAnimationFrame
+     */
     this._animationFrame = null;
 
     if (this._renderer)
@@ -189,7 +196,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     else
         this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
 
-    this._updateFrame();
+    this._updateAnimationFrame();
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
     this.onCreated();
@@ -255,14 +262,23 @@ gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
         if ( this._currentFrame < 0 ) this._currentFrame = 0; //May happen if there is no frame.
     }
 
-    if ( oldFrame !== this._currentFrame || this._frameDirty ) this._updateFrame();
+    if ( oldFrame !== this._currentFrame || this._animationFrameDirty ) this._updateAnimationFrame();
     if ( oldFrame !== this._currentFrame ) this.hitBoxesDirty = true;
 
     this._renderer.ensureUpToDate();
 };
 
-gdjs.SpriteRuntimeObject.prototype._updateFrame = function() {
-   this._frameDirty = false;
+/**
+ * Update `this._animationFrame` according to the current animation/direction/frame values
+ * (`this._currentAnimation`, `this._currentDirection`, `this._currentFrame`) and set
+ * `this._animationFrameDirty` back to false.
+ *
+ * Trigger a call to the renderer to change the texture being shown (if the animation/direction/frame
+ * is valid).
+ * If invalid, `this._animationFrame` will be `null` after calling this function.
+ */
+gdjs.SpriteRuntimeObject.prototype._updateAnimationFrame = function() {
+   this._animationFrameDirty = false;
 
    if ( this._currentAnimation < this._animations.length &&
         this._currentDirection < this._animations[this._currentAnimation].directions.length) {
@@ -292,8 +308,10 @@ gdjs.SpriteRuntimeObject.prototype.getRendererObject = function() {
  * hitboxes defined for the current animation frame.
  */
 gdjs.SpriteRuntimeObject.prototype.updateHitBoxes = function() {
-    if ( this._frameDirty ) this._updateFrame(); //Beware, _animationFrame could be invalid if this._frameDirty === true.
-    if ( this._animationFrame === null ) return;
+    if ( this._animationFrameDirty ) {
+        this._updateAnimationFrame();
+    }
+    if ( this._animationFrame === null ) return; //Beware, `this._animationFrame` can still be null.
 
     if ( !this._animationFrame.hasCustomHitBoxes )
         return gdjs.RuntimeObject.prototype.updateHitBoxes.call(this);
@@ -337,7 +355,7 @@ gdjs.SpriteRuntimeObject.prototype.setAnimation = function(newAnimation) {
         this._currentFrame = 0;
         this._frameElapsedTime = 0;
         this._renderer.update(); //TODO: This may be unnecessary.
-        this._frameDirty = true;
+        this._animationFrameDirty = true;
         this.hitBoxesDirty = true;
     }
 };
@@ -411,7 +429,7 @@ gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {
         this.angle = 0;
 
         this._renderer.update(); //TODO: This may be unnecessary.
-        this._frameDirty = true;
+        this._animationFrameDirty = true;
         this.hitBoxesDirty = true;
     }
 };
@@ -442,7 +460,7 @@ gdjs.SpriteRuntimeObject.prototype.setAnimationFrame = function(newFrame) {
 
     if ( newFrame >= 0 && newFrame < direction.frames.length && newFrame !== this._currentFrame ) {
         this._currentFrame = newFrame;
-        this._frameDirty = true;
+        this._animationFrameDirty = true;
         this.hitBoxesDirty = true;
     }
 };
@@ -497,6 +515,7 @@ gdjs.SpriteRuntimeObject.prototype.setAnimationSpeedScale = function(ratio) {
  * @return {number} the position on X axis on the scene of the given point.
  */
 gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     if ( name.length === 0 || this._animationFrame === null ) return this.getX();
 
     var pt = this._animationFrame.getPoint(name);
@@ -512,6 +531,7 @@ gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
  * @return {number} the position on Y axis on the scene of the given point.
  */
 gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     if ( name.length === 0 || this._animationFrame === null ) return this.getY();
 
     var pt = this._animationFrame.getPoint(name);
@@ -609,6 +629,7 @@ gdjs.SpriteRuntimeObject.prototype.getDrawableY = function() {
  * @return {number} X position of the center of the object, relative to `getDrawableX()`.
  */
 gdjs.SpriteRuntimeObject.prototype.getCenterX = function() {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     if ( this._animationFrame === null ) return 0;
 
     if (!this._flippedX) {
@@ -624,6 +645,7 @@ gdjs.SpriteRuntimeObject.prototype.getCenterX = function() {
  * @return {number} Y position of the center of the object, relative to `getDrawableY()`.
  */
 gdjs.SpriteRuntimeObject.prototype.getCenterY = function() {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     if ( this._animationFrame === null ) return 0;
 
     if (!this._flippedY) {
@@ -795,6 +817,7 @@ gdjs.SpriteRuntimeObject.prototype.isFlippedY = function() {
  * @return {number} The width of the object, in pixels.
  */
 gdjs.SpriteRuntimeObject.prototype.getWidth = function() {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     return this._renderer.getWidth();
 };
 
@@ -804,6 +827,7 @@ gdjs.SpriteRuntimeObject.prototype.getWidth = function() {
  * @return {number} The height of the object, in pixels.
  */
 gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
     return this._renderer.getHeight();
 };
 
@@ -813,7 +837,7 @@ gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
  * @param {number} width The new width of the object, in pixels.
  */
 gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
-    if ( this._frameDirty ) this._updateFrame();
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
 
     var unscaledWidth = this._renderer.getUnscaledWidth();
     if (unscaledWidth !== 0) this.setScaleX(newWidth / unscaledWidth);
@@ -825,7 +849,7 @@ gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
  * @param {number} height The new height of the object, in pixels.
  */
 gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
-    if ( this._frameDirty ) this._updateFrame();
+    if ( this._animationFrameDirty ) this._updateAnimationFrame();
 
     var unscaledHeight = this._renderer.getUnscaledHeight();
     if (unscaledHeight !== 0) this.setScaleY(newHeight / unscaledHeight);

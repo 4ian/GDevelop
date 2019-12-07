@@ -26,7 +26,7 @@ type Props = {|
 const styles = {
   container: { flex: 1, display: 'flex', alignItems: 'flex-end' },
   selectorContainer: { flex: 1 },
-  resourceThumbnail: { marginLeft: 10 },
+  resourceThumbnail: { marginLeft: 10, marginBottom: 4 },
 };
 
 const ResourceSelectorWithThumbnail = ({

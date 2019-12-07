@@ -1,6 +1,11 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
-import IconButton from '../UI/IconButton';
+import SemiControlledAutoComplete, {
+  type DataSource,
+} from '../UI/SemiControlledAutoComplete';
+import BackspaceIcon from '@material-ui/icons/Backspace';
 import Add from '@material-ui/icons/Add';
 import Brush from '@material-ui/icons/Brush';
 import {
@@ -9,13 +14,12 @@ import {
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
-import SemiControlledAutoComplete, {
-  type DataSource,
-} from '../UI/SemiControlledAutoComplete';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import { TextFieldWithButtonLayout } from '../UI/Layout';
+import IconButton from '../UI/IconButton';
 
 type Props = {|
   project: gdProject,
@@ -25,21 +29,18 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
   fullWidth?: boolean,
+  canBeReset?: boolean,
   initialResourceName: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
-  margin?: 'none' | 'normal',
+  margin?: 'none' | 'dense',
 |};
 
 type State = {|
   notExistingError: boolean,
   resourceName: string,
 |};
-
-const styles = {
-  container: { display: 'flex', flex: 1, alignItems: 'flex-end' },
-};
 
 export default class ResourceSelector extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -122,7 +123,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
         project.getResourcesManager().addResource(resource);
 
         this._loadFrom(project.getResourcesManager());
-        this._onChangeResourceName(resource.getName());
+        const resourceName: string = resource.getName();
+        this._onChangeResourceName(resourceName);
+
+        // Imperatively set the value of the autocomplete, as it can be (on Windows for example),
+        // still focused. This means that when it's then getting blurred, the value we
+        // set for the resource name would get erased by the one that was getting entered.
+        if (this._autoComplete)
+          this._autoComplete.forceInputValueTo(resourceName);
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
@@ -134,7 +142,23 @@ export default class ResourceSelector extends React.Component<Props, State> {
       });
   };
 
+  _onResetResourceName = () => {
+    this.setState(
+      {
+        resourceName: '',
+        notExistingError: false,
+      },
+      () => {
+        if (this.props.onChange) this.props.onChange(this.state.resourceName);
+      }
+    );
+  };
+
   _onChangeResourceName = (resourceName: string) => {
+    if (resourceName === '') {
+      this._onResetResourceName();
+      return;
+    }
     this.setState(
       {
         resourceName,
@@ -232,35 +256,58 @@ export default class ResourceSelector extends React.Component<Props, State> {
       externalEditor => externalEditor.kind === this.props.resourceKind
     );
     return (
-      <div style={styles.container}>
-        <SemiControlledAutoComplete
-          floatingLabelText={this.props.floatingLabelText}
-          hintText={this.props.hintText}
-          openOnFocus
-          dataSource={this.autoCompleteData || []}
-          value={this.state.resourceName}
-          onChange={this._onChangeResourceName}
-          errorText={errorText}
-          fullWidth={this.props.fullWidth}
-          margin={this.props.margin}
-          ref={autoComplete => (this._autoComplete = autoComplete)}
-        />
-        {!!externalEditors.length && (
-          <ElementWithMenu
-            element={
-              <IconButton>
-                <Brush />
-              </IconButton>
-            }
-            buildMenuTemplate={() =>
-              externalEditors.map(externalEditor => ({
-                label: externalEditor.displayName,
-                click: () => this._editWith(externalEditor),
-              }))
-            }
+      <TextFieldWithButtonLayout
+        noFloatingLabelText={!this.props.floatingLabelText}
+        margin={this.props.margin}
+        renderTextField={() => (
+          <SemiControlledAutoComplete
+            floatingLabelText={this.props.floatingLabelText}
+            hintText={this.props.hintText}
+            openOnFocus
+            dataSource={this.autoCompleteData || []}
+            value={this.state.resourceName}
+            onChange={this._onChangeResourceName}
+            errorText={errorText}
+            fullWidth={this.props.fullWidth}
+            margin={this.props.margin}
+            ref={autoComplete => (this._autoComplete = autoComplete)}
           />
         )}
-      </div>
+        renderButton={style => (
+          <React.Fragment>
+            {this.props.canBeReset && (
+              <IconButton
+                size="small"
+                onClick={() => {
+                  this._onResetResourceName();
+                }}
+              >
+                <BackspaceIcon />
+              </IconButton>
+            )}
+            {!!externalEditors.length ? (
+              <RaisedButtonWithMenu
+                style={style}
+                icon={<Brush />}
+                label={
+                  this.state.resourceName ? (
+                    <Trans>Edit</Trans>
+                  ) : (
+                    <Trans>Create</Trans>
+                  )
+                }
+                primary
+                buildMenuTemplate={() =>
+                  externalEditors.map(externalEditor => ({
+                    label: externalEditor.displayName,
+                    click: () => this._editWith(externalEditor),
+                  }))
+                }
+              />
+            ) : null}
+          </React.Fragment>
+        )}
+      />
     );
   }
 }

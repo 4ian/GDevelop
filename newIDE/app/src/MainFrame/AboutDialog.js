@@ -198,7 +198,9 @@ export default class AboutDialog extends PureComponent<Props, State> {
                         </Trans>
                       </Text>
                     </Line>
-                    <Line>{updateStatusString}</Line>
+                    <Line>
+                      <Text>{updateStatusString}</Text>
+                    </Line>
                     <Line justifyContent="center">
                       {!!updateStatusString && (
                         <FlatButton

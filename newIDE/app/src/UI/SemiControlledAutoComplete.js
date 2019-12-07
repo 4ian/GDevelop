@@ -12,6 +12,7 @@ import Popper from '@material-ui/core/Popper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { computeTextFieldStyleProps } from './TextField';
 
 export type DataSource = Array<
   | {|
@@ -27,7 +28,6 @@ export type DataSource = Array<
 
 const styles = {
   container: {
-    flexGrow: 1,
     position: 'relative',
   },
   inputRoot: {
@@ -126,7 +126,7 @@ type Props = {|
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor | string,
   fullWidth?: boolean,
-  margin?: 'none' | 'normal',
+  margin?: 'none' | 'dense',
   textFieldStyle?: Object,
   openOnFocus?: boolean,
 |};
@@ -142,11 +142,35 @@ type State = {|
  * Supports divider between items and special items with `onClick` prop that when present is called
  * when the item is selected (and value is not changed).
  */
-export default class AutoComplete extends React.Component<Props, State> {
+export default class SemiControlledAutoComplete extends React.Component<
+  Props,
+  State
+> {
   _input = React.createRef<HTMLInputElement>();
   state = {
     inputValue: null,
   };
+
+  /**
+   * Allow to override the value being written in the autocomplete, if any.
+   * Usually you don't want to do that as the point of having a "SemiControlled" auto-complete
+   * is that the value being written by the user is the source of truth.
+   *
+   * In some cases, you want to force a new value when the auto-complete is focused (for example,
+   * if you opened a native dialog selector that is going to make the auto-complete focused/blurred/
+   * focused again, in a manner that depends on the OS).
+   * Call this function to do so.
+   *
+   * @param newValue The new value to set in the auto complete. If the field is not being focused,
+   * nothing will be forced (the value props will be used when the field is focused).
+   */
+  forceInputValueTo(newValue: string) {
+    if (this.state.inputValue !== null) {
+      this.setState({
+        inputValue: newValue,
+      });
+    }
+  }
 
   focus() {
     if (this._input.current) this._input.current.focus();
@@ -247,7 +271,12 @@ export default class AutoComplete extends React.Component<Props, State> {
               };
 
               return (
-                <div style={styles.container}>
+                <div
+                  style={{
+                    ...styles.container,
+                    flexGrow: props.fullWidth ? 1 : undefined,
+                  }}
+                >
                   {renderTextField({
                     disabled: props.disabled,
                     label: props.floatingLabelText,
@@ -273,7 +302,7 @@ export default class AutoComplete extends React.Component<Props, State> {
                     // Style:
                     style: props.textFieldStyle,
                     fullWidth: props.fullWidth,
-                    margin: props.margin || 'normal',
+                    ...computeTextFieldStyleProps(props),
 
                     inputRef: this._input,
                   })}

@@ -44,7 +44,7 @@ gdjs.evtTools.sound.pauseSoundOnChannel = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.continueSoundOnChannel = function(runtimeScene, channel) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    sound && sound.play();
+    if (sound && !sound.playing()) sound.play();
 };
 
 gdjs.evtTools.sound.isSoundOnChannelPlaying = function(runtimeScene, channel) {
@@ -114,7 +114,7 @@ gdjs.evtTools.sound.pauseMusicOnChannel = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.continueMusicOnChannel = function(runtimeScene, channel) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    music && music.play();
+    if (music && !music.playing()) music.play();
 };
 
 gdjs.evtTools.sound.isMusicOnChannelPlaying = function(runtimeScene, channel) {

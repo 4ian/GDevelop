@@ -5,6 +5,9 @@ import Dialog from '../UI/Dialog';
 import ListIcon from '../UI/ListIcon';
 import { List, ListItem } from '../UI/List';
 import Text from '../UI/Text';
+import RaisedButton from '../UI/RaisedButton';
+import { Line } from '../UI/Grid';
+import Window from '../Utils/Window';
 const gd = global.gd;
 
 const styles = {
@@ -57,21 +60,50 @@ const publicImageUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/platformer/shadedDark45.png',
   'https://df5lqcdudryde.cloudfront.net/examples/platformer/shadedDark09.png',
 
-  // Space shooter images (see space-shooter.json in fixtures)
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/playerShip2_blue.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/meteorBrown_med1.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue03.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/enemyBlack1.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/enemyBlue2.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/purpleSpaceBackground.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue09.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue10.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue11.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/enemyGreen3.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed16.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed09.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed10.png',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed11.png',
+  // Subset of space shooter images (see space-shooter.json in fixtures)
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/idle1.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/idle2.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/up1.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/up2.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/down1.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/down2.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/background/space bg.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/background/corridor.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/asteroid/asteroid1.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/asteroid/asteroid2.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/asteroid/asteroid3.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy200.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy201.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy202.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy203.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy204.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy205.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy206.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy207.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy208.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy209.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy210.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy211.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/bullet.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp00.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp01.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp02.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp03.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp04.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion00.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion01.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion02.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion03.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion04.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion05.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy3/enemy3.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy bullet/enemyBullet00.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy bullet/enemyBullet01.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy bullet/enemyBullet02.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/tiles mechanical/tiles mechanical 1.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/tiles mechanical/tiles mechanical 2.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/background/boss background.png',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/gameover.png',
 ];
 
 const publicAudioUrls = [
@@ -80,18 +112,15 @@ const publicAudioUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/platformer/coin.wav',
 
   // Space shooter audio (see space-shooter.json in fixtures)
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_laser1.ogg',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_twoTone.ogg',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_shieldDown.ogg',
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_lose.ogg',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/sfx_shieldDown.ogg',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/sfx_twoTone.ogg',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/sfx_laser1.ogg',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/Heal.wav',
 ];
 
 const publicFontUrls = [
   // Platformer fonts (see platformer.json in fixtures)
   'https://df5lqcdudryde.cloudfront.net/examples/platformer/Bimbo_JVE.ttf',
-
-  // Space shooter fonts (see space-shooter.json in fixtures)
-  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/kenvector_future.ttf',
 ];
 
 const publicVideoUrls = [
@@ -178,6 +207,10 @@ class GenericResourcesChooser extends Component {
     });
   };
 
+  _onOpenWebsite() {
+    Window.openExternalURL('http://gdevelop-app.com');
+  }
+
   render() {
     // Avoid rendering the dialog if it's not opened.
     if (!this.state.open) return null;
@@ -201,10 +234,18 @@ class GenericResourcesChooser extends Component {
         <div style={styles.explanations}>
           <Text>
             <Trans>
-              Adding resources from Dropbox, Google Drive... is coming soon!
-              Download GDevelop desktop version to use your own assets.
+              You can choose a resource from the library below. Adding resources
+              from Dropbox, Google Drive... is coming soon! Download GDevelop
+              for desktop to use your own assets.
             </Trans>
           </Text>
+          <Line justifyContent="center">
+            <RaisedButton
+              primary
+              label={<Trans>Download GDevelop desktop app</Trans>}
+              onClick={this._onOpenWebsite}
+            />
+          </Line>
         </div>
         <List>{this.listItems}</List>
       </Dialog>

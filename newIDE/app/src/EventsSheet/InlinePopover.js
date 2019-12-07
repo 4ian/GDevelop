@@ -2,20 +2,23 @@ import React, { Component } from 'react';
 import Popper from '@material-ui/core/Popper';
 import Background from '../UI/Background';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 
 const styles = {
   popover: {
     paddingBottom: 10,
-    paddingLeft: 5,
-    paddingRight: 5,
+    overflowY: 'auto',
+
+    // Restrict size in case of extra small or large popover (though this should not happen)
+    minHeight: 30,
+    maxHeight: 400,
     maxWidth: 600,
-    height: 80,
-    overflowY: 'hidden',
     minWidth: 300, // Avoid extra small popover for some parameters like relational operator
-  },
-  contentContainer: {
-    overflow: 'hidden',
+
+    // When displayed in an events sheet that has Mosaic windows (see `EditorMosaic`) next to it,
+    // it could be displayed behind them, because they have a z-index of 1 :/ Use a z-index of 2
+    // then. Only one InlinePopover should be shown at a time anyway.
+    zIndex: 2,
   },
 };
 
@@ -30,8 +33,8 @@ export default class InlinePopover extends Component {
           placement="bottom"
         >
           <Background>
-            <Column>
-              <div style={styles.contentContainer}>{this.props.children}</div>
+            <Column expand>
+              <Line>{this.props.children}</Line>
             </Column>
           </Background>
         </Popper>

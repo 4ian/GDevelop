@@ -52,7 +52,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
                       tooltip={t`Project manager`}
                     />
                   )}
-                  {this.props.showProjectIcons && windowWidth !== 'small' && (
+                  {this.props.showProjectIcons && (
                     <ToolbarIcon
                       onClick={this.props.exportProject}
                       src="res/ribbon_default/export32.png"

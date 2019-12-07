@@ -1,12 +1,15 @@
+// @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import LocalExport from './LocalExport';
-import LocalS3Export from './LocalS3Export';
-import LocalOnlineCordovaExport from './LocalOnlineCordovaExport';
-import LocalCordovaExport from './LocalCordovaExport';
-import LocalCocos2dExport from './LocalCocos2dExport';
-import LocalOnlineElectronExport from './LocalOnlineElectronExport';
-import LocalFacebookInstantGamesExport from './LocalFacebookInstantGamesExport';
-import LocalElectronExport from './LocalElectronExport';
+import { type Exporter } from '../ExportDialog';
+import { localCordovaExportPipeline } from './LocalCordovaExport';
+import { localElectronExportPipeline } from './LocalElectronExport';
+import { localHTML5ExportPipeline } from './LocalHTML5Export';
+import { localCocos2dExportPipeline } from './LocalCocos2dExport';
+import { localFacebookInstantGamesExportPipeline } from './LocalFacebookInstantGamesExport';
+import { localOnlineCordovaExportPipeline } from './LocalOnlineCordovaExport.js';
+import { localOnlineElectronExportPipeline } from './LocalOnlineElectronExport.js';
+import { localOnlineWebExportPipeline } from './LocalOnlineWebExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
 import Folder from '@material-ui/icons/Folder';
@@ -14,81 +17,115 @@ import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import Cordova from '../../UI/CustomSvgIcons/Cordova';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
 
-export const getLocalExporters = () => [
+export const getLocalExporters = (): Array<Exporter> => [
   {
-    name: 'Android (& iOS coming soon)',
+    name: <Trans>Android (&amp; iOS coming soon)</Trans>,
     renderIcon: props => <PhoneIphone {...props} />,
     helpPage: '/publishing/android_and_ios',
-    description:
-      'Package your game for Android directly from GDevelop. iOS support is coming soon!',
+    description: (
+      <Trans>
+        Package your game for Android directly from GDevelop. iOS support is
+        coming soon!
+      </Trans>
+    ),
     key: 'localonlinecordovaexport',
-    ExportComponent: LocalOnlineCordovaExport,
+    exportPipeline: localOnlineCordovaExportPipeline,
   },
   {
-    name: 'Facebook Instant Games',
-    renderIcon: props => <Facebook {...props} />,
-    helpPage: '/publishing/publishing-to-facebook-instant-games',
-    description:
-      'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
-    key: 'localfacebookinstantgames',
-    ExportComponent: LocalFacebookInstantGamesExport,
-  },
-  {
-    name: 'Web (upload online)',
+    name: <Trans>Web (upload online)</Trans>,
     renderIcon: props => <Chrome {...props} />,
     helpPage: '/publishing/web',
-    description:
-      'Upload your game online directly from GDevelop and share the link to players. Play to your game using your browser on computers and mobile phones.',
-    key: 'locals3export',
-    ExportComponent: LocalS3Export,
+    description: (
+      <Trans>
+        Upload your game online directly from GDevelop and share the link to
+        players. Play to your game using your browser on computers and mobile
+        phones.
+      </Trans>
+    ),
+    key: 'localonlinewebexport',
+    exportPipeline: localOnlineWebExportPipeline,
   },
   {
-    name: 'Local folder',
+    name: <Trans>Local folder</Trans>,
     renderIcon: props => <Folder {...props} />,
     helpPage: '/publishing/html5_game_in_a_local_folder',
-    description:
-      'Build the game locally as a HTML5 game. You can then export it on website like Itch.io or Kongregate.',
+    description: (
+      <Trans>
+        Build the game locally as a HTML5 game. You can then publish it on
+        website like Kongregate, Game Jolt, itch.io, Poki...
+      </Trans>
+    ),
     key: 'localexport',
-    ExportComponent: LocalExport,
+    exportPipeline: localHTML5ExportPipeline,
     advanced: true,
   },
   {
-    name: 'iOS & Android (manual)',
+    name: <Trans>Facebook Instant Games</Trans>,
+    renderIcon: props => <Facebook {...props} />,
+    helpPage: '/publishing/publishing-to-facebook-instant-games',
+    description: (
+      <Trans>
+        Package your game as a Facebook Instant Games that can be played on
+        Facebook Messenger.
+      </Trans>
+    ),
+    key: 'localfacebookinstantgames',
+    exportPipeline: localFacebookInstantGamesExportPipeline,
+    advanced: true,
+  },
+  {
+    name: <Trans>iOS &amp; Android (manual)</Trans>,
     renderIcon: props => <Cordova {...props} />,
     helpPage: '/publishing/android_and_ios_with_cordova',
-    description:
-      'Build the game locally as a Cordova project, and export it manually to iOS or Android with Cordova developers tools.',
+    description: (
+      <Trans>
+        Build the game locally as a Cordova project, and export it manually to
+        iOS or Android with Cordova developers tools.
+      </Trans>
+    ),
     key: 'localcordovaexport',
-    ExportComponent: LocalCordovaExport,
+    exportPipeline: localCordovaExportPipeline,
     advanced: true,
   },
   {
-    name: 'Windows/macOS/Linux (beta)',
+    name: <Trans>Windows/macOS/Linux</Trans>,
     renderIcon: props => <LaptopMac {...props} />,
     helpPage: '/publishing/windows-macos-linux',
-    description:
-      'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
+    description: (
+      <Trans>
+        Package your game as an app for Windows, macOS or Linux directly from
+        GDevelop.
+      </Trans>
+    ),
     key: 'localonlineelectronexport',
-    ExportComponent: LocalOnlineElectronExport,
+    exportPipeline: localOnlineElectronExportPipeline,
   },
   {
-    name: 'Windows/macOS/Linux (manual)',
+    name: <Trans>Windows/macOS/Linux (manual)</Trans>,
     renderIcon: props => <LaptopMac {...props} />,
     helpPage: '/publishing/windows-macos-linux-with-electron',
-    description:
-      'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
+    description: (
+      <Trans>
+        Build the game locally and export it manually to Windows, macOS or Linux
+        with third-party developer tools.
+      </Trans>
+    ),
     key: 'localelectronexport',
-    ExportComponent: LocalElectronExport,
+    exportPipeline: localElectronExportPipeline,
     advanced: true,
   },
   {
-    name: 'Cocos2d-JS',
+    name: <Trans>Cocos2d-JS</Trans>,
     renderIcon: props => <PhoneIphone {...props} />,
     helpPage: '/publishing/android_and_ios_with_cocos2d-js',
-    description:
-      'Export your game using Cocos2d-JS game engine. The game can be compiled for Android or iOS if you install Cocos2d-JS developer tools.',
+    description: (
+      <Trans>
+        Export your game using Cocos2d-JS game engine. The game can be compiled
+        for Android or iOS if you install Cocos2d-JS developer tools.
+      </Trans>
+    ),
     key: 'localcocos2dexport',
-    ExportComponent: LocalCocos2dExport,
+    exportPipeline: localCocos2dExportPipeline,
     experimental: true,
   },
 ];

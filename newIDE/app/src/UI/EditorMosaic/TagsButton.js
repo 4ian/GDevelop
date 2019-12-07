@@ -10,6 +10,10 @@ const styles = {
     width: 32,
     height: 32,
   },
+  icon: {
+    width: 16,
+    height: 16,
+  },
 };
 
 type Props = {
@@ -22,7 +26,7 @@ export default class TagsButton extends Component<Props, {||}> {
       <ElementWithMenu
         element={
           <IconButton style={styles.container}>
-            <FilterList htmlColor="white" />
+            <FilterList htmlColor="white" style={styles.icon} />
           </IconButton>
         }
         buildMenuTemplate={this.props.buildMenuTemplate}

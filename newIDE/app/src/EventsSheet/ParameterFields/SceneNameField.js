@@ -28,6 +28,7 @@ export default class SceneNameField extends Component<
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }

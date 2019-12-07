@@ -11,6 +11,11 @@ const gdevelopLightBlue = '#4ab0e4';
 
 const systemSelectionColor = '#4c92ff'; //OS X selection
 
+// Use the fonts provided by the operating system(s) as possible.
+// If you update this font list, be sure to do it in all the other places using fonts in the codebase.
+const fontFamily =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
+
 /**
  * The background color of the main window
  */
@@ -31,7 +36,7 @@ const gdevelopTheme = {
     separatorColor: '#cecece',
   },
   closableTabs: {
-    fontFamily: "'Roboto', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontFamily,
     backgroundColor: backgroundColor,
     textColor: '#878787',
     selectedBackgroundColor: gdevelopLightBlue,
@@ -72,6 +77,9 @@ const gdevelopTheme = {
 
 // Theme for Material-UI components
 const muiTheme = createMuiTheme({
+  typography: {
+    fontFamily,
+  },
   palette: {
     type: 'light',
     common: { black: 'rgba(110, 42, 42, 1)', white: '#fff' },
@@ -93,6 +101,12 @@ const muiTheme = createMuiTheme({
     },
   },
   overrides: {
+    MuiTypography: {
+      h6: {
+        // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
+        fontWeight: 400,
+      },
+    },
     MuiInput: {
       underline: {
         '&:before': {

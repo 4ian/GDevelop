@@ -9,7 +9,7 @@ import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
-import { Line } from '../../UI/Grid';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import mapValues from 'lodash/mapValues';
 import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
@@ -134,32 +134,38 @@ export default class RuntimeSceneInspector extends React.Component<
           </Trans>
         </Text>
         {runtimeScene._objects && runtimeScene._objects.items && (
-          <Line noMargin alignItems="center">
-            <SemiControlledAutoComplete
-              hintText={t`Enter the name of the object`}
-              value={this.state.newObjectName}
-              onChange={value => {
-                this.setState({
-                  newObjectName: value,
-                });
-              }}
-              dataSource={Object.keys(runtimeScene._objects.items).map(
-                objectName => ({
-                  text: objectName,
-                  value: objectName,
-                })
-              )}
-              openOnFocus
-              fullWidth
-            />
-            <RaisedButton
-              label={<Trans>Create</Trans>}
-              primary
-              onClick={() => {
-                onCall(['createObject'], [this.state.newObjectName]);
-              }}
-            />
-          </Line>
+          <TextFieldWithButtonLayout
+            noFloatingLabelText
+            renderTextField={() => (
+              <SemiControlledAutoComplete
+                hintText={t`Enter the name of the object`}
+                value={this.state.newObjectName}
+                onChange={value => {
+                  this.setState({
+                    newObjectName: value,
+                  });
+                }}
+                dataSource={Object.keys(runtimeScene._objects.items).map(
+                  objectName => ({
+                    text: objectName,
+                    value: objectName,
+                  })
+                )}
+                openOnFocus
+                fullWidth
+              />
+            )}
+            renderButton={style => (
+              <RaisedButton
+                style={style}
+                label={<Trans>Create</Trans>}
+                primary
+                onClick={() => {
+                  onCall(['createObject'], [this.state.newObjectName]);
+                }}
+              />
+            )}
+          />
         )}
       </div>
     );

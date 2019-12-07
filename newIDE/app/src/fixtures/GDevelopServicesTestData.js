@@ -6,6 +6,7 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import { type Release } from '../Utils/GDevelopServices/Release';
+import { type Build } from '../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../Profile/UserProfileContext';
 
 export const profileForIndieUser: Profile = {
@@ -74,6 +75,7 @@ export const fakeIndieUserProfile: UserProfile = {
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
@@ -89,6 +91,7 @@ export const fakeNoSubscriptionUserProfile: UserProfile = {
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
@@ -104,6 +107,7 @@ export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
@@ -119,6 +123,7 @@ export const fakeNotAuthenticatedUserProfile: UserProfile = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
@@ -147,4 +152,68 @@ export const releaseWithoutDescription: Release = {
   publishedAt: '2019-01-07T23:32:41Z',
   url: 'https://github.com/4ian/GDevelop/releases/tag/v5.0.0-beta60',
   description: null,
+};
+
+export const erroredCordovaBuild: Build = {
+  id: 'errored-build-id',
+  status: 'error',
+  logsKey: '/fake-error.log',
+  createdAt: 1515084391000,
+  updatedAt: 1515084399000,
+  userId: 'fake-user-id',
+  type: 'cordova-build',
+};
+
+export const pendingCordovaBuild: Build = {
+  id: 'pending-build-id',
+  status: 'pending',
+  createdAt: 1515084391000,
+  updatedAt: 1515084399000,
+  userId: 'fake-user-id',
+  type: 'cordova-build',
+};
+
+export const pendingElectronBuild: Build = {
+  id: 'pending-build-id',
+  status: 'pending',
+  createdAt: 1515084391000,
+  updatedAt: 1515084399000,
+  userId: 'fake-user-id',
+  type: 'electron-build',
+};
+
+export const completeCordovaBuild: Build = {
+  id: 'complete-build-id',
+  createdAt: 1515084391000,
+  userId: 'fake-user-id',
+  type: 'cordova-build',
+  status: 'complete',
+  logsKey: '/fake-error.log',
+  apkKey: '/fake-game.apk',
+  updatedAt: Date.now(),
+};
+
+export const completeElectronBuild: Build = {
+  id: 'complete-build-id',
+  createdAt: 1515084391000,
+  userId: 'fake-user-id',
+  type: 'electron-build',
+  status: 'complete',
+  logsKey: '/fake-error.log',
+  windowsExeKey: '/fake-windows-game.exe',
+  windowsZipKey: '/fake-windows-game.zip',
+  macosZipKey: '/fake-macos-game.zip',
+  linuxAppImageKey: '/fake-linux-game.AppImage',
+  updatedAt: Date.now(),
+};
+
+export const completeWebBuild: Build = {
+  id: 'complete-build-id',
+  createdAt: 1515084391000,
+  userId: 'fake-user-id',
+  type: 'web-build',
+  status: 'complete',
+  logsKey: '/fake-error.log',
+  s3Key: 'game-12345',
+  updatedAt: Date.now(),
 };

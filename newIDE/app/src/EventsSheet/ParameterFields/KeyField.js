@@ -109,6 +109,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }

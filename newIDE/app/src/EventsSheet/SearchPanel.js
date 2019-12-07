@@ -6,7 +6,6 @@ import React, { PureComponent } from 'react';
 import Background from '../UI/Background';
 import TextField from '../UI/TextField';
 import { Line, Column, Spacer } from '../UI/Grid';
-import FlatButton from '../UI/FlatButton';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';
@@ -16,6 +15,7 @@ import {
   type SearchInEventsInputs,
   type ReplaceInEventsInputs,
 } from './EventsSearcher';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -102,31 +102,35 @@ export default class SearchPanel extends PureComponent<Props, State> {
     return (
       <Background noFullHeight noExpand>
         <Column>
-          <Line alignItems="baseline">
+          <Line alignItems="baseline" noMargin>
             <TextField
+              margin="dense"
               ref={_searchTextField =>
                 (this.searchTextField = _searchTextField)
               }
-              hintText={t`Text to search`}
+              hintText={t`Text to search in parameters`}
               onChange={(e, searchText) => this.setState({ searchText })}
               value={searchText}
               fullWidth
             />
-            <FlatButton
+            <Spacer />
+            <RaisedButton
               disabled={!searchText}
               primary
               label={<Trans>Search</Trans>}
               onClick={this.launchSearch}
             />
           </Line>
-          <Line alignItems="baseline">
+          <Line alignItems="baseline" noMargin>
             <TextField
-              hintText={t`Text to replace`}
+              margin="dense"
+              hintText={t`Text to replace in parameters`}
               onChange={(e, replaceText) => this.setState({ replaceText })}
               value={replaceText}
               fullWidth
             />
-            <FlatButton
+            <Spacer />
+            <RaisedButton
               disabled={
                 !replaceText ||
                 !searchText ||

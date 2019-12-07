@@ -4,7 +4,7 @@ GDevelop editor and games engines are designed so that all objects, behaviors, a
 are provided by _extensions_. These extensions are composed of two parts:
 
 - the _declaration_ of the extension, traditionally done in a file called `JsExtension.js`.
-- the _implementation_ of the extension for the game engine (also the "Runtime"), containing the functions corresponding to the actions/conditons/expressions and the classes used for the objects or behaviors. The implementation is traditionally in files called `extensionnametools.js`, `objectnameruntimeobject.js` or `objectnameruntimebehavior.js`.
+- the _implementation_ of the extension for the game engine (also called the "Runtime"), containing the functions corresponding to the actions/conditions/expressions and the classes used for the objects or behaviors. The implementation is traditionally in files called `extensionnametools.js`, `objectnameruntimeobject.js` or `objectnameruntimebehavior.js`.
 
 > Note that some GDevelop extensions are declared in C++, in files called `JsExtension.cpp`. If you want to edit them,
 > refer to the paragraph about them at the end.
@@ -27,12 +27,14 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
   When GDevelop is started, the developer console should be opened. Search for the message `Loaded x JS extensions.` that indicates the loading of extensions.
 
-- You can now open an extensions contained in the folder _Extensions_ at the root of the repository. For example, you can open [Extensions/FacebookInstantGames](https://github.com/4ian/GDevelop/tree/master/Extensions/FacebookInstantGames). Edit the JsExtension.js file or a runtime file. After any change, you must import them in GDevelop:
+- You can now open an extension contained in the folder _Extensions_ at the root of the repository. For example, you can open [Extensions/FacebookInstantGames](https://github.com/4ian/GDevelop/tree/master/Extensions/FacebookInstantGames). Edit the JsExtension.js file or a runtime file. Any changes will be automatically imported in the editor.
 
-  ```bash
-  cd scripts
-  node import-GDJS-Runtime.js #This copy extensions declaration and runtime into GDevelop.
-  ```
+  > Verify that changes are imported in the console: you should see a message starting by `GDJS Runtime update`.
+  > If you deactivated the automatic import in the preferences or want to import manually your changes, run `import-GDJS-Runtime.js` script:
+  > ```bash
+  > cd scripts
+  > node import-GDJS-Runtime.js # This copy extensions declaration and runtime into GDevelop.
+  > ```
 
 - Finally, verify that the changes are applied:
 
@@ -118,7 +120,7 @@ Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%
 
 > ℹ️ After doing this, you can actually see your object in GDevelop! Read the next sections to see how to add an editor and a renderer for instances on the scene editor.
 
-#### Declare object editor
+#### Declare an object editor
 
 To add an editor to your object, implement the function `registerEditorConfigurations` in your extension module. For now, only a default editor, displaying the object properties, is supported:
 
@@ -172,7 +174,6 @@ If you have ideas or are creating a new extension, your contribution is welcome!
   - [ ] Add support for events
   - [ ] Document how to add custom icons
   - [ ] Add a button to reload extensions without reloading GDevelop IDE entirely.
-  - [ ] Create a "watcher" script that automatically run `node import-GDJS-Runtime` anytime a change is made.
 
 ## 4) Note on the development of extensions declared in C++ (`JsExtension.cpp` or `Extension.cpp`)
 

@@ -5,7 +5,6 @@
  */
 var shell = require('shelljs');
 var https = require('follow-redirects').https;
-var crypto = require('crypto');
 var fs = require('fs');
 var unzipper = require('unzipper');
 var process = require('process');
@@ -14,7 +13,7 @@ const { hashElement } = require('folder-hash');
 
 const editor = process.argv[2];
 const gitRelease = process.argv[3];
-const folderHash = process.argv[4];
+const expectedFolderHash = process.argv[4];
 const gitUrl = 'https://github.com/4ian/GDevelop';
 const basePath = path.join('../public/external/', editor, editor + '-editor');
 const zipFilePath = basePath + '.zip';
@@ -25,15 +24,22 @@ const zipFilePath = basePath + '.zip';
 const editorHasCorrectHash = () =>
   hashElement(basePath, { algo: 'sha256', encoding: 'hex' }).then(
     folderHashResult => {
-      return folderHashResult.hash === folderHash;
+      const actualFolderHash = folderHashResult.hash;
+      return {
+        isHashCorrect: actualFolderHash === expectedFolderHash,
+        actualFolderHash,
+      };
     },
     () => {
       // Cannot hash the editor folder to see if it's up-to-date, assuming not.
-      return false;
+      return {
+        isHashCorrect: false,
+        actualFolderHash: '',
+      };
     }
   );
 
-editorHasCorrectHash().then(isHashCorrect => {
+editorHasCorrectHash().then(({ isHashCorrect }) => {
   if (isHashCorrect) {
     //Nothing to do
     shell.echo(
@@ -95,15 +101,20 @@ editorHasCorrectHash().then(isHashCorrect => {
                   ' folder'
               );
               shell.rm(zipFilePath);
-              editorHasCorrectHash().then(isHashCorrect => {
-                if (!isHashCorrect) {
-                  shell.echo(
-                    "❌ Can't verify that " +
-                      editor +
-                      '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
-                  );
+              editorHasCorrectHash().then(
+                ({ isHashCorrect, actualFolderHash }) => {
+                  if (!isHashCorrect) {
+                    shell.echo(
+                      "❌ Can't verify that " +
+                        editor +
+                        '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
+                    );
+                    shell.echo(
+                      `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
+                    );
+                  }
                 }
-              });
+              );
             });
         } catch (e) {
           shell.echo(

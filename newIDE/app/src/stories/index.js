@@ -692,28 +692,31 @@ storiesOf('UI Building Blocks/Layout', module)
       )}
     />
   ))
-  .add('Empty auto complete field, margin=none, noFloatingLabelText, with a small IconButton', () => (
-    <TextFieldWithButtonLayout
-      margin="none"
-      noFloatingLabelText
-      renderTextField={() => (
-        <SemiControlledAutoComplete
-          margin="none"
-          value={''}
-          onChange={() => {}}
-          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-            text: `Choice ${i}`,
-            value: `Choice ${i}`,
-          }))}
-        />
-      )}
-      renderButton={style => (
-        <IconButton size="small">
-          <Brush />
-        </IconButton>
-      )}
-    />
-  ))
+  .add(
+    'Empty auto complete field, margin=none, noFloatingLabelText, with a small IconButton',
+    () => (
+      <TextFieldWithButtonLayout
+        margin="none"
+        noFloatingLabelText
+        renderTextField={() => (
+          <SemiControlledAutoComplete
+            margin="none"
+            value={''}
+            onChange={() => {}}
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+          />
+        )}
+        renderButton={style => (
+          <IconButton size="small">
+            <Brush />
+          </IconButton>
+        )}
+      />
+    )
+  )
   .add('Filled text field', () => (
     <TextFieldWithButtonLayout
       renderTextField={() => (

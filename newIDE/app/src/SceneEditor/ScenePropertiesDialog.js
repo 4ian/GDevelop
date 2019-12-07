@@ -145,7 +145,18 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
 
     return (
       <Dialog
+        title={<Trans>Scene properties</Trans>}
         actions={actions}
+        secondaryActions={
+          <RaisedButton
+            label={<Trans>Edit scene variables</Trans>}
+            fullWidth
+            onClick={() => {
+              this.props.onEditVariables();
+              this.props.onClose();
+            }}
+          />
+        }
         open={this.props.open}
         onRequestClose={this.props.onClose}
         maxWidth="sm"
@@ -174,14 +185,6 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
           onChangeComplete={color =>
             this.setState({ backgroundColor: color.rgb })
           }
-        />
-        <RaisedButton
-          label={<Trans>Edit scene variables</Trans>}
-          fullWidth
-          onClick={() => {
-            this.props.onEditVariables();
-            this.props.onClose();
-          }}
         />
         {!some(propertiesEditors) && (
           <EmptyMessage>

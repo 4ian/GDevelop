@@ -276,14 +276,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
         renderButton={style => (
           <React.Fragment>
             {this.props.canBeReset && (
-             <IconButton
+              <IconButton
                 size="small"
-               onClick={() => {
-                 this._onResetResourceName();
-               }}
-             >
-               <BackspaceIcon />
-             </IconButton>
+                onClick={() => {
+                  this._onResetResourceName();
+                }}
+              >
+                <BackspaceIcon />
+              </IconButton>
             )}
             {!!externalEditors.length ? (
               <RaisedButtonWithMenu

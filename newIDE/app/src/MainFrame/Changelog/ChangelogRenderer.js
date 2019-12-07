@@ -23,6 +23,15 @@ type Props = {|
   currentReleaseName: string,
 |};
 
+const markdownCustomRenderers = {
+  // Ensure link are opened in a new page
+  link: props => (
+    <a href={props.href} target="_blank" rel="noopener noreferrer">
+      {props.children}
+    </a>
+  ),
+};
+
 /**
  * Display information about latest releases.
  */
@@ -92,6 +101,7 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
                     'Changes and new features description will be available soon.')
                 }
                 className={muiTheme.markdownRootClassName}
+                renderers={markdownCustomRenderers}
               />
             ) : null
           )}

@@ -9,9 +9,9 @@ var unzipper = require('unzipper');
 var process = require('process');
 var path = require('path');
 
-const editor = process.argv[2];
+const fileName = process.argv[2];
 const relativeExtractPath = process.argv[3];
-const basePath = path.join(relativeExtractPath, editor);
+const basePath = path.join(relativeExtractPath, fileName);
 const zipFilePath = basePath + '.zip';
 
 try {

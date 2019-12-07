@@ -133,13 +133,6 @@ app.on('ready', function() {
     }
   });
 
-  mainWindow.webContents.on('devtools-reload-page', () => {
-    if (isDev) {
-      exec('npm', ['run', 'reload-extensions']);
-      console.info('GD electron was reloaded in dev mode. Executed npm run reload-extensions');
-    }
-  })
-
   //Prevent opening any website or url inside Electron.
   mainWindow.webContents.on('new-window', (e, url) => {
     console.info('Opening in browser (because of new-window): ', url);

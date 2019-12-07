@@ -102,9 +102,9 @@ export default class SearchPanel extends PureComponent<Props, State> {
     return (
       <Background noFullHeight noExpand>
         <Column>
-          <Line alignItems="baseline">
+          <Line alignItems="baseline" noMargin>
             <TextField
-              margin="none"
+              margin="dense"
               ref={_searchTextField =>
                 (this.searchTextField = _searchTextField)
               }
@@ -121,9 +121,9 @@ export default class SearchPanel extends PureComponent<Props, State> {
               onClick={this.launchSearch}
             />
           </Line>
-          <Line alignItems="baseline">
+          <Line alignItems="baseline" noMargin>
             <TextField
-              margin="none"
+              margin="dense"
               hintText={t`Text to replace in parameters`}
               onChange={(e, replaceText) => this.setState({ replaceText })}
               value={replaceText}

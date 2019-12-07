@@ -64,7 +64,7 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
         }}
       >
         <TextField
-          margin="none"
+          margin="dense"
           style={styles.textField}
           type="text"
           hintText={t`Choose a file`}

@@ -158,7 +158,13 @@ export default class TextField extends React.Component<Props, {||}> {
             rows={props.rows}
             rowsMax={props.rowsMax}
             // Styling:
-            margin={props.margin || 'dense'}
+            margin={props.margin === 'none' ? 'none' : 'dense'}
+            hiddenLabel={
+              // For "none", if there is no label, no extra space is taken. For "filled",
+              // even when no label is passed, there is a space for it. Remove this space if no
+              // label is provided.
+              this.props.margin !== 'none' && !props.floatingLabelText
+            }
             fullWidth={props.fullWidth}
             InputProps={{
               disableUnderline:

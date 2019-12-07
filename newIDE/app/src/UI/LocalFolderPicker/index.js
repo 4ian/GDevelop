@@ -92,7 +92,7 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
               }}
             >
               <TextField
-                margin="none"
+                margin="dense"
                 style={styles.textField}
                 type="text"
                 hintText={titleAndMessage.title}

@@ -12,6 +12,7 @@ import Popper from '@material-ui/core/Popper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { computeTextFieldStyleProps } from './TextField';
 
 export type DataSource = Array<
   | {|
@@ -301,8 +302,7 @@ export default class SemiControlledAutoComplete extends React.Component<
                     // Style:
                     style: props.textFieldStyle,
                     fullWidth: props.fullWidth,
-                    variant: props.margin === 'none' ? 'standard' : 'filled',
-                    margin: props.margin || 'dense',
+                    ...computeTextFieldStyleProps(props),
 
                     inputRef: this._input,
                   })}

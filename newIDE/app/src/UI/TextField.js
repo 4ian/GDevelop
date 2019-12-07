@@ -95,6 +95,57 @@ type Props = {|
 |};
 
 /**
+ * Compute the `variant`, `margin` and `hiddenLabel` props for a material-ui `TextField`
+ * to give it the proper style according to its usage.
+ *
+ * 1. A traditional `TextField` is by default "filled"
+ *    (see material-ui component doc: https://material-ui.com/components/text-fields/
+ *     and [Material Design specification](https://material.io/components/text-fields/#specs)).
+ *
+ *   The filled background gives them more emphasize compared compared to a single underline
+ *   (as done in previous GDevelop versions). They have a label indicating what they refer to.
+ *
+ * 2. Sometimes, a floating label would not provide more information and is considered to be
+ *   obvious (thanks to the existing value, dialog title or button label).
+ *
+ *   In this case, not specifying a label is fine (`floatingLabelText` is undefined or empty).
+ *   This will lead to a filled text field without the extra space for the label.
+ *
+ *   A `placeholder` should still be passed so that the user can know what the field is about
+ *     when not filled.
+ *   Example: this is particularly adapted to file/folder pickers (see `LocalFilePicker`,
+ *     `LocalFolderPicker`) or a `SearchPanel`.
+ *
+ * 3. `TextField` in `MiniToolbar` are usually less changed by the user than other text fields
+ *   (for example, they are the animation name or the object name in a Sprite editor.
+ *   These are not changed a lot compared to behaviours or object properties).
+ *
+ *   They also are already in a MiniToolbar that has an "emphasis" with the slightly
+ *   different background color of `MiniToolbar`. Finally, `MiniToolbar` is also small in height.
+ *
+ *   In these cases, use `none` for `margin`.
+ *   This will generate a text field without filled background (just an underline).
+ *
+ * 4. `TextField` can be used with `margin="none"` and also the underline hidden,
+ *   in the very special case of an embedded text field in another form control (like `SearchBar`).
+ */
+export const computeTextFieldStyleProps = (props: {
+  margin?: 'none' | 'dense',
+  floatingLabelText?: React.Node,
+}) => {
+  return {
+    // Use "filled" variant by default, unless `margin` is "none" (see 1. and 2.)
+    variant: props.margin === 'none' ? 'standard' : 'filled',
+    // Use "dense" fields by default, unless `margin` is "none" (see 3.)
+    margin: props.margin === 'none' ? 'none' : 'dense',
+    // For variant "standard", if there is no label, no extra space is taken. For variant "filled",
+    // even when no label is passed, there is a space for it. Remove this space if no
+    // label is provided. (see 2.)
+    hiddenLabel: props.margin !== 'none' && !props.floatingLabelText,
+  };
+};
+
+/**
  * A text field based on Material-UI text field.
  */
 export default class TextField extends React.Component<Props, {||}> {
@@ -128,7 +179,6 @@ export default class TextField extends React.Component<Props, {||}> {
       <I18n>
         {({ i18n }) => (
           <MUITextField
-            variant={props.margin === 'none' ? 'standard' : 'filled'}
             // Value and change handling:
             type={props.type !== undefined ? props.type : undefined}
             value={props.value !== undefined ? props.value : undefined}
@@ -158,13 +208,7 @@ export default class TextField extends React.Component<Props, {||}> {
             rows={props.rows}
             rowsMax={props.rowsMax}
             // Styling:
-            margin={props.margin === 'none' ? 'none' : 'dense'}
-            hiddenLabel={
-              // For "none", if there is no label, no extra space is taken. For "filled",
-              // even when no label is passed, there is a space for it. Remove this space if no
-              // label is provided.
-              this.props.margin !== 'none' && !props.floatingLabelText
-            }
+            {...computeTextFieldStyleProps(props)}
             fullWidth={props.fullWidth}
             InputProps={{
               disableUnderline:

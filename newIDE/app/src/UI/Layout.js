@@ -22,23 +22,26 @@ const textFieldWithButtonLayoutStyles = {
     display: 'flex',
     alignItems: 'flex-start', // Align from the top to stay at the same position when error/multiline
   },
-  filledTextFieldRightButtonMargins: {
+  filledTextFieldWithLabelRightButtonMargins: {
     marginTop: 24, // Properly align with the text field (only dense "filled" text fields supported)
     marginLeft: 10,
   },
+  filledTextFieldWithoutLabelRightButtonMargins: {
+    marginTop: 15, // Properly align with the text field (only dense "filled" text fields supported)
+    marginLeft: 10,
+  },
   standardTextFieldWithLabelRightButtonMargins: {
-    marginTop: 17, // Properly align with the text field (only dense "standard" text fields supported)
+    marginTop: 17, // Properly align with the text field (only "standard" text fields with margin "none" supported)
     marginLeft: 10,
   },
   standardTextFieldWithoutLabelRightButtonMargins: {
-    marginTop: 0, // Properly align with the text field (only dense "standard" text fields supported)
+    marginTop: 0, // Properly align with the text field (only "standard" text fields with margin "none" supported)
     marginLeft: 10,
   },
 };
 
 /**
  * Position a button on the right of a TextField.
- * Only compatible with TextField with a label.
  */
 export const TextFieldWithButtonLayout = ({
   margin,
@@ -54,7 +57,9 @@ export const TextFieldWithButtonLayout = ({
           ? noFloatingLabelText
             ? textFieldWithButtonLayoutStyles.standardTextFieldWithoutLabelRightButtonMargins
             : textFieldWithButtonLayoutStyles.standardTextFieldWithLabelRightButtonMargins
-          : textFieldWithButtonLayoutStyles.filledTextFieldRightButtonMargins
+          : noFloatingLabelText
+          ? textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
+          : textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
       )}
     </div>
   );

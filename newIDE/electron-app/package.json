@@ -9,14 +9,14 @@
   "repository": "github:4ian/GDevelop",
   "private": true,
   "scripts": {
-    "postinstall": "npm run import-zipped-electron-extension && cd app && npm install",
+    "postinstall": "npm run import-zipped-electron-extensions && cd app && npm install",
     "app-build": "node scripts/app-build.js",
     "build": "node scripts/build.js",
     "electron-win": "node node_modules/electron/cli.js app",
     "electron-linux": "./node_modules/electron/dist/electron app",
     "electron-mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app",
     "reload-extensions": "cd ../app/scripts && node import-GDJS-Runtime.js",
-    "import-zipped-electron-extensions": "cd scripts && node import-zipped-electron-extension.js ReactDeveloperTools ../app/extensions/"
+    "import-zipped-electron-extensions": "node scripts/import-zipped-electron-extension.js ReactDeveloperTools app/extensions/"
   },
   "build": {
     "appId": "com.gdevelop-app.ide",
@@ -43,7 +43,8 @@
     "electron": "3.0.9",
     "electron-builder": "19.53.4",
     "minimist": "^1.2.0",
-    "shelljs": "^0.7.7"
+    "shelljs": "^0.7.7",
+    "unzipper": "^0.9.11"
   },
   "dependencies": {
     "electron-is": "^2.4.0"

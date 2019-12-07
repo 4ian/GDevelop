@@ -33,6 +33,7 @@ import {
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { Column, Line } from '../../../UI/Grid';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 
 const gd = global.gd;
 
@@ -46,27 +47,19 @@ const styles = {
   animationTools: {
     flexShrink: 0,
   },
-  addAnimation: {
-    display: 'flex',
-  },
-  buttonRightMargin: {
-    marginRight: 4,
-  },
 };
 
 const AddAnimationLine = ({ onAdd, extraTools }) => (
-  <Column>
-    <Line justifyContent="space-between" expand>
+  <Column expand>
+    <Line justifyContent="space-between">
       {extraTools}
-      <div style={styles.addAnimation}>
-        <RaisedButton
-          label={<Trans>Add an animation</Trans>}
-          primary
-          onClick={onAdd}
-          labelPosition="before"
-          icon={<Add />}
-        />
-      </div>
+      <RaisedButton
+        label={<Trans>Add an animation</Trans>}
+        primary
+        onClick={onAdd}
+        labelPosition="before"
+        icon={<Add />}
+      />
     </Line>
   </Column>
 );
@@ -447,13 +440,12 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           objectName={objectName}
           onSizeUpdated={onSizeUpdated}
           extraBottomTools={
-            <div>
+            <ResponsiveLineStackLayout noMargin>
               <RaisedButton
                 label={<Trans>Edit hitboxes</Trans>}
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
-                style={styles.buttonRightMargin}
               />
               <RaisedButton
                 label={<Trans>Edit points</Trans>}
@@ -461,7 +453,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 onClick={() => this.openPointsEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
               />
-            </div>
+            </ResponsiveLineStackLayout>
           }
         />
         {this.state.pointsEditorOpen && (

@@ -48,6 +48,7 @@ export default class ExternalEventsField extends React.Component<
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }

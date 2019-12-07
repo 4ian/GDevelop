@@ -34,6 +34,7 @@ export default class ObjectField extends React.Component<
   render() {
     return (
       <ObjectSelector
+        margin={this.props.isInline ? 'none' : 'dense'}
         project={this.props.project}
         value={this.props.value}
         onChange={this.props.onChange}

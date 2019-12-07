@@ -1,9 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import {
-  ResponsiveWindowMeasurer,
-  type WidthType,
-} from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
@@ -13,13 +10,18 @@ import FlatButton from '../UI/FlatButton';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
-import IconButton from '../UI/IconButton';
 import {
   type ResourceKind,
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import {
+  TextFieldWithButtonLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
+import RaisedButton from '../UI/RaisedButton';
+import { Column } from '../UI/Grid';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -86,7 +88,6 @@ type MandatoryProps = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
-  windowWidth?: WidthType,
   mode?: 'column' | 'row',
 |};
 
@@ -106,11 +107,6 @@ const styles = {
   columnContainer: {
     display: 'flex',
     flexDirection: 'column',
-  },
-  rowContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'baseline',
   },
   fieldContainer: {
     flex: 1,
@@ -216,32 +212,39 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     } else {
       const { onEditButtonClick, setValue } = field;
       return (
-        <div style={styles.fieldContainer} key={field.name}>
-          <SemiControlledTextField
-            value={getFieldValue(
-              this.props.instances,
-              field,
-              '(Multiple values)'
-            )}
-            id={field.name}
-            floatingLabelText={getFieldLabel(this.props.instances, field)}
-            floatingLabelFixed
-            onChange={newValue => {
-              this.props.instances.forEach(i => setValue(i, newValue || ''));
-              this._onInstancesModified(this.props.instances);
-            }}
-            style={styles.field}
-            disabled={field.disabled}
-          />
-          {onEditButtonClick && (
-            <IconButton
-              disabled={this.props.instances.length !== 1}
-              onClick={() => onEditButtonClick(this.props.instances[0])}
-            >
-              <Edit />
-            </IconButton>
+        <TextFieldWithButtonLayout
+          key={field.name}
+          renderTextField={() => (
+            <SemiControlledTextField
+              value={getFieldValue(
+                this.props.instances,
+                field,
+                '(Multiple values)'
+              )}
+              id={field.name}
+              floatingLabelText={getFieldLabel(this.props.instances, field)}
+              floatingLabelFixed
+              onChange={newValue => {
+                this.props.instances.forEach(i => setValue(i, newValue || ''));
+                this._onInstancesModified(this.props.instances);
+              }}
+              style={styles.field}
+              disabled={field.disabled}
+            />
           )}
-        </div>
+          renderButton={style =>
+            onEditButtonClick ? (
+              <RaisedButton
+                style={style}
+                primary
+                disabled={this.props.instances.length !== 1}
+                icon={<Edit />}
+                label={<Trans>Edit</Trans>}
+                onClick={() => onEditButtonClick(this.props.instances[0])}
+              />
+            ) : null
+          }
+        />
       );
     }
   };
@@ -347,65 +350,52 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
   };
 
   render() {
-    const { mode, windowWidth } = this.props;
+    const { mode } = this.props;
 
-    const renderFields = (windowWidth: WidthType) => (
-      <div
-        style={
-          mode === 'row' && windowWidth !== 'small'
-            ? styles.rowContainer
-            : styles.columnContainer
-        }
-      >
-        {this.props.schema.map(field => {
-          if (field.children) {
-            if (field.type === 'row') {
-              return (
-                <PropertiesEditor
-                  key={field.name}
-                  schema={field.children}
-                  instances={this.props.instances}
-                  mode="row"
-                  windowWidth={windowWidth}
-                />
-              );
-            }
+    const renderContainer =
+      mode === 'row'
+        ? (fields: React.Node) => (
+            <ResponsiveLineStackLayout>{fields}</ResponsiveLineStackLayout>
+          )
+        : (fields: React.Node) => <Column noMargin>{fields}</Column>;
 
+    return renderContainer(
+      this.props.schema.map(field => {
+        if (field.children) {
+          if (field.type === 'row') {
             return (
-              <div key={field.name}>
-                <Subheader>{field.name}</Subheader>
-                <div style={styles.subPropertiesEditorContainer}>
-                  <PropertiesEditor
-                    schema={field.children}
-                    instances={this.props.instances}
-                    mode="column"
-                    windowWidth={windowWidth}
-                  />
-                </div>
-              </div>
+              <PropertiesEditor
+                key={field.name}
+                schema={field.children}
+                instances={this.props.instances}
+                mode="row"
+              />
             );
-          } else if (field.valueType === 'resource') {
-            return this._renderResourceField(field);
-          } else {
-            if (field.getChoices && field.getValue)
-              return this._renderSelectField(field);
-            if (field.getValue) return this._renderInputField(field);
-            if (field.onClick) return this._renderButton(field);
           }
 
-          return null;
-        })}
-      </div>
-    );
+          return (
+            <div key={field.name}>
+              <Subheader>{field.name}</Subheader>
+              <div style={styles.subPropertiesEditorContainer}>
+                <PropertiesEditor
+                  schema={field.children}
+                  instances={this.props.instances}
+                  mode="column"
+                />
+              </div>
+            </div>
+          );
+        } else if (field.valueType === 'resource') {
+          return this._renderResourceField(field);
+        } else {
+          if (field.getChoices && field.getValue)
+            return this._renderSelectField(field);
+          if (field.getValue) return this._renderInputField(field);
+          if (field.onClick) return this._renderButton(field);
+        }
 
-    if (windowWidth) {
-      return renderFields(windowWidth);
-    }
-
-    return (
-      <ResponsiveWindowMeasurer>
-        {windowWidth => renderFields(windowWidth)}
-      </ResponsiveWindowMeasurer>
+        return null;
+      })
     );
   }
 }

@@ -20,17 +20,8 @@ import BackgroundHighlighting, {
 import debounce from 'lodash/debounce';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Paper from '@material-ui/core/Paper';
+import { TextFieldWithButtonLayout } from '../../../UI/Layout';
 const gd = global.gd;
-
-export const textFieldRightButtonMargins = {
-  marginTop: 17, //Properly align with the text field
-  marginLeft: 10,
-};
-
-export const textFieldWithLabelRightButtonMargins = {
-  marginTop: 33, //Properly align with the text field
-  marginLeft: 10,
-};
 
 const styles = {
   container: {
@@ -53,10 +44,14 @@ const styles = {
     lineHeight: 1.4,
   },
   backgroundHighlighting: {
-    marginTop: 22, //Properly align with the text field
+    marginTop: 13, //Properly align with the text field
+    paddingLeft: 12,
+    paddingRight: 12,
   },
   backgroundHighlightingWithDescription: {
-    marginTop: 38, //Properly align with the text field
+    marginTop: 29, //Properly align with the text field
+    paddingLeft: 12,
+    paddingRight: 12,
   },
 };
 
@@ -277,80 +272,85 @@ export default class ExpressionField extends React.Component<Props, State> {
       : styles.backgroundHighlighting;
 
     return (
-      <div style={styles.container}>
-        <div style={styles.textFieldContainer}>
-          <div style={styles.textFieldAndHightlightContainer}>
-            <BackgroundHighlighting
-              value={this.state.validatedValue}
-              style={{ ...styles.input, ...backgroundHighlightingStyle }}
-              highlights={this.state.errorHighlights}
-            />
-            <SemiControlledTextField
-              value={value}
-              floatingLabelText={description}
-              hintText={expressionType === 'string' ? '""' : undefined}
-              inputStyle={styles.input}
-              onChange={this._handleChange}
-              onBlur={this._handleBlur}
-              ref={field => (this._field = field)}
-              onFocus={this._handleFocus}
-              errorText={this.state.errorText}
-              multiLine
-              fullWidth
-            />
-          </div>
-          {this._fieldElement && this.state.popoverOpen && (
-            <ClickAwayListener onClickAway={this._handleRequestClose}>
-              <Popper
-                style={popoverStyle}
-                open={this.state.popoverOpen}
-                anchorEl={this._fieldElement}
-                placement="bottom"
-                disablePortal={
-                  true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */
-                }
-              >
-                <Paper style={styles.expressionSelectorPopoverContent}>
-                  <ExpressionSelector
-                    selectedType=""
-                    onChoose={(type, expression) => {
-                      this._handleExpressionChosen(expression);
-                    }}
-                    expressionType={expressionType}
-                    focusOnMount
-                    scope={scope}
-                  />
-                </Paper>
-              </Popper>
-            </ClickAwayListener>
+      <React.Fragment>
+        <TextFieldWithButtonLayout
+          margin={this.props.isInline ? 'none' : 'dense'}
+          renderTextField={() => (
+            <div style={styles.textFieldContainer}>
+              <div style={styles.textFieldAndHightlightContainer}>
+                <BackgroundHighlighting
+                  value={this.state.validatedValue}
+                  style={{ ...styles.input, ...backgroundHighlightingStyle }}
+                  highlights={this.state.errorHighlights}
+                />
+                <SemiControlledTextField
+                  margin={this.props.isInline ? 'none' : 'dense'}
+                  value={value}
+                  floatingLabelText={description}
+                  hintText={expressionType === 'string' ? '""' : undefined}
+                  inputStyle={styles.input}
+                  onChange={this._handleChange}
+                  onBlur={this._handleBlur}
+                  ref={field => (this._field = field)}
+                  onFocus={this._handleFocus}
+                  errorText={this.state.errorText}
+                  multiLine
+                  fullWidth
+                />
+              </div>
+              {this._fieldElement && this.state.popoverOpen && (
+                <ClickAwayListener onClickAway={this._handleRequestClose}>
+                  <Popper
+                    style={popoverStyle}
+                    open={this.state.popoverOpen}
+                    anchorEl={this._fieldElement}
+                    placement="bottom"
+                    disablePortal={
+                      true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */
+                    }
+                  >
+                    <Paper style={styles.expressionSelectorPopoverContent}>
+                      <ExpressionSelector
+                        selectedType=""
+                        onChoose={(type, expression) => {
+                          this._handleExpressionChosen(expression);
+                        }}
+                        expressionType={expressionType}
+                        focusOnMount
+                        scope={scope}
+                      />
+                    </Paper>
+                  </Popper>
+                </ClickAwayListener>
+              )}
+            </div>
           )}
-        </div>
-        {!this.props.isInline &&
-          this.props.renderExtraButton &&
-          this.props.renderExtraButton({
-            style: description
-              ? textFieldWithLabelRightButtonMargins
-              : textFieldRightButtonMargins,
-          })}
-        {!this.props.isInline && (
-          <RaisedButton
-            icon={<Functions />}
-            label={
-              expressionType === 'string'
-                ? '"ABC"'
-                : expressionType === 'number'
-                ? '123'
-                : ''
-            }
-            primary
-            style={
-              description
-                ? textFieldWithLabelRightButtonMargins
-                : textFieldRightButtonMargins
-            }
-            onClick={this._openExpressionPopover}
-          />
-        )}
+          renderButton={style => (
+            <React.Fragment>
+              {!this.props.isInline &&
+                this.props.renderExtraButton &&
+                this.props.renderExtraButton({
+                  style,
+                })}
+              {!this.props.isInline && (
+                <RaisedButton
+                  icon={<Functions />}
+                  label={
+                    expressionType === 'string'
+                      ? '"ABC"'
+                      : expressionType === 'number'
+                      ? '123'
+                      : ''
+                  }
+                  primary
+                  style={style}
+                  onClick={this._openExpressionPopover}
+                />
+              )}
+            </React.Fragment>
+          )}
+        />
+
         {this.state.parametersDialogOpen && this.state.selectedExpressionInfo && (
           <ExpressionParametersEditorDialog
             open={true}
@@ -380,7 +380,7 @@ export default class ExpressionField extends React.Component<Props, State> {
             parameterRenderingService={parameterRenderingService}
           />
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }

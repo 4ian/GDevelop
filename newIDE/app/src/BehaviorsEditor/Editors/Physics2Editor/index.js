@@ -11,12 +11,13 @@ import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
-import BackgroundText from '../../../UI/BackgroundText';
 import ShapePreview from './ShapePreview.js';
 import PolygonEditor from './PolygonEditor.js';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 import Text from '../../../UI/Text';
 import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import EmptyMessage from '../../../UI/EmptyMessage';
 
 type Props = BehaviorEditorProps;
 
@@ -34,6 +35,7 @@ function NumericProperty(props: {|
 
   return (
     <SemiControlledTextField
+      fullWidth
       value={properties.get(propertyName).getValue()}
       key={propertyName}
       floatingLabelText={properties.get(propertyName).getLabel()}
@@ -105,6 +107,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
         <Line>
           <SelectField
             key={'bodyType'}
+            fullWidth
             floatingLabelText={properties.get('bodyType').getLabel()}
             value={properties.get('bodyType').getValue()}
             onChange={(e, i, newValue: string) => {
@@ -136,53 +139,47 @@ export default class Physics2Editor extends React.Component<Props, State> {
             ]}
           </SelectField>
         </Line>
-        <Line>
-          <Column expand>
-            <Checkbox
-              label={properties.get('bullet').getLabel()}
-              checked={properties.get('bullet').getValue() === 'true'}
-              onCheck={(e, checked) => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'bullet',
-                  checked ? '1' : '0',
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand>
-            <Checkbox
-              label={properties.get('fixedRotation').getLabel()}
-              checked={properties.get('fixedRotation').getValue() === 'true'}
-              onCheck={(e, checked) => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'fixedRotation',
-                  checked ? '1' : '0',
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand>
-            <Checkbox
-              label={properties.get('canSleep').getLabel()}
-              checked={properties.get('canSleep').getValue() === 'true'}
-              onCheck={(e, checked) => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'canSleep',
-                  checked ? '1' : '0',
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
+        <ResponsiveLineStackLayout>
+          <Checkbox
+            label={properties.get('bullet').getLabel()}
+            checked={properties.get('bullet').getValue() === 'true'}
+            onCheck={(e, checked) => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'bullet',
+                checked ? '1' : '0',
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+          <Checkbox
+            label={properties.get('fixedRotation').getLabel()}
+            checked={properties.get('fixedRotation').getValue() === 'true'}
+            onCheck={(e, checked) => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'fixedRotation',
+                checked ? '1' : '0',
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+          <Checkbox
+            label={properties.get('canSleep').getLabel()}
+            checked={properties.get('canSleep').getValue() === 'true'}
+            onCheck={(e, checked) => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'canSleep',
+                checked ? '1' : '0',
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
         <Line>
           <DismissableAlertMessage
             identifier="physics2-shape-collisions"
@@ -199,6 +196,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
         </Line>
         <Line>
           <SelectField
+            fullWidth
             floatingLabelText={properties.get('shape').getLabel()}
             value={properties.get('shape').getValue()}
             onChange={(e, i, newValue: string) => {
@@ -225,9 +223,10 @@ export default class Physics2Editor extends React.Component<Props, State> {
             />
           </SelectField>
         </Line>
-        <Line>
+        <ResponsiveLineStackLayout>
           {shape !== 'Polygon' && (
             <SemiControlledTextField
+              fullWidth
               value={properties
                 .get(shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA')
                 .getValue()}
@@ -254,6 +253,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
           )}
           {shape !== 'Polygon' && shape !== 'Circle' && (
             <SemiControlledTextField
+              fullWidth
               value={properties
                 .get(shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB')
                 .getValue()}
@@ -274,6 +274,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
           )}
           {shape === 'Polygon' && (
             <SelectField
+              fullWidth
               floatingLabelText={properties.get('polygonOrigin').getLabel()}
               value={properties.get('polygonOrigin').getValue()}
               onChange={(e, i, newValue: string) => {
@@ -333,78 +334,94 @@ export default class Physics2Editor extends React.Component<Props, State> {
               this.forceUpdate();
             }}
           />
-        </Line>
+        </ResponsiveLineStackLayout>
         <Line>
-          <div
-            style={{
-              width:
-                '100%' /* This div prevents ImagePreview to overflow outside the parent */,
+          <ResourceSelector
+            floatingLabelText={
+              <Trans>
+                A temporary image to help you visualize the shape/polygon
+              </Trans>
+            }
+            project={this.props.project}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourcesLoader={this.resourcesLoader}
+            resourceKind={'image'}
+            initialResourceName={''}
+            fullWidth
+            onChange={resourceName => {
+              this.setState({ image: resourceName });
+              this.forceUpdate();
             }}
-          >
-            <ImagePreview
-              resourceName={this.state.image}
-              project={this.props.project}
-              resourcesLoader={this.resourcesLoader}
-              renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) => (
-                <ShapePreview
-                  shape={properties.get('shape').getValue()}
-                  dimensionA={parseFloat(
-                    properties.get('shapeDimensionA').getValue()
-                  )}
-                  dimensionB={parseFloat(
-                    properties.get('shapeDimensionB').getValue()
-                  )}
-                  offsetX={parseFloat(
-                    properties.get('shapeOffsetX').getValue()
-                  )}
-                  offsetY={parseFloat(
-                    properties.get('shapeOffsetY').getValue()
-                  )}
-                  polygonOrigin={properties.get('polygonOrigin').getValue()}
-                  vertices={JSON.parse(properties.get('vertices').getValue())}
-                  width={imageWidth}
-                  height={imageHeight}
-                  zoomFactor={imageZoomFactor}
-                  onMoveVertex={(index, newX, newY) => {
-                    let vertices = JSON.parse(
-                      properties.get('vertices').getValue()
-                    );
-                    vertices[index].x = newX;
-                    vertices[index].y = newY;
-                    behavior.updateProperty(
-                      behaviorContent.getContent(),
-                      'vertices',
-                      JSON.stringify(vertices),
-                      project
-                    );
-                    this.forceUpdate();
-                  }}
-                />
-              )}
-            />
-          </div>
+          />
         </Line>
-        <Line alignItems="center">
-          <Column noMargin>
-            <ResourceSelector
-              project={this.props.project}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this.props.onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              resourcesLoader={this.resourcesLoader}
-              resourceKind={'image'}
-              initialResourceName={''}
-              fullWidth
-              onChange={resourceName => {
-                this.setState({ image: resourceName });
-                this.forceUpdate();
+        {!this.state.image && (
+          <Line>
+            <EmptyMessage>
+              <Trans>
+                To preview the shape that the Physics engine will use for this
+                object, choose first a temporary image to use for the preview.
+              </Trans>
+            </EmptyMessage>
+          </Line>
+        )}
+        {this.state.image && (
+          <Line>
+            <div
+              style={{
+                width:
+                  '100%' /* This div prevents ImagePreview to overflow outside the parent */,
               }}
-            />
-          </Column>
-          <BackgroundText>
-            A temporary image to help you visualize the shape/polygon
-          </BackgroundText>
-        </Line>
+            >
+              <ImagePreview
+                resourceName={this.state.image}
+                project={this.props.project}
+                resourcesLoader={this.resourcesLoader}
+                renderOverlay={({
+                  imageWidth,
+                  imageHeight,
+                  imageZoomFactor,
+                }) => (
+                  <ShapePreview
+                    shape={properties.get('shape').getValue()}
+                    dimensionA={parseFloat(
+                      properties.get('shapeDimensionA').getValue()
+                    )}
+                    dimensionB={parseFloat(
+                      properties.get('shapeDimensionB').getValue()
+                    )}
+                    offsetX={parseFloat(
+                      properties.get('shapeOffsetX').getValue()
+                    )}
+                    offsetY={parseFloat(
+                      properties.get('shapeOffsetY').getValue()
+                    )}
+                    polygonOrigin={properties.get('polygonOrigin').getValue()}
+                    vertices={JSON.parse(properties.get('vertices').getValue())}
+                    width={imageWidth}
+                    height={imageHeight}
+                    zoomFactor={imageZoomFactor}
+                    onMoveVertex={(index, newX, newY) => {
+                      let vertices = JSON.parse(
+                        properties.get('vertices').getValue()
+                      );
+                      vertices[index].x = newX;
+                      vertices[index].y = newY;
+                      behavior.updateProperty(
+                        behaviorContent.getContent(),
+                        'vertices',
+                        JSON.stringify(vertices),
+                        project
+                      );
+                      this.forceUpdate();
+                    }}
+                  />
+                )}
+              />
+            </div>
+          </Line>
+        )}
         {shape === 'Polygon' && (
           <Line>
             <PolygonEditor
@@ -465,108 +482,96 @@ export default class Physics2Editor extends React.Component<Props, State> {
             />
           </Line>
         )}
-        <Line>
-          <Column expand>
-            <NumericProperty
-              properties={properties}
-              propertyName={'density'}
-              step={0.1}
-              onUpdate={newValue => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'density',
-                  parseFloat(newValue) > 0 ? newValue : '0',
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand>
-            <NumericProperty
-              properties={properties}
-              propertyName={'gravityScale'}
-              step={0.1}
-              onUpdate={newValue => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'gravityScale',
-                  newValue,
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand>
-            <NumericProperty
-              properties={properties}
-              propertyName={'friction'}
-              step={0.1}
-              onUpdate={newValue => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'friction',
-                  parseFloat(newValue) > 0 ? newValue : '0',
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand>
-            <NumericProperty
-              properties={properties}
-              propertyName={'restitution'}
-              step={0.1}
-              onUpdate={newValue => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'restitution',
-                  parseFloat(newValue) > 0 ? newValue : '0',
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
-        <Line>
-          <Column expand>
-            <NumericProperty
-              properties={properties}
-              propertyName={'linearDamping'}
-              step={0.05}
-              onUpdate={newValue => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'linearDamping',
-                  newValue,
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-          <Column expand>
-            <NumericProperty
-              properties={properties}
-              propertyName={'angularDamping'}
-              step={0.05}
-              onUpdate={newValue => {
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'angularDamping',
-                  newValue,
-                  project
-                );
-                this.forceUpdate();
-              }}
-            />
-          </Column>
-        </Line>
+        <ResponsiveLineStackLayout>
+          <NumericProperty
+            properties={properties}
+            propertyName={'density'}
+            step={0.1}
+            onUpdate={newValue => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'density',
+                parseFloat(newValue) > 0 ? newValue : '0',
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+          <NumericProperty
+            properties={properties}
+            propertyName={'gravityScale'}
+            step={0.1}
+            onUpdate={newValue => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'gravityScale',
+                newValue,
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <NumericProperty
+            properties={properties}
+            propertyName={'friction'}
+            step={0.1}
+            onUpdate={newValue => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'friction',
+                parseFloat(newValue) > 0 ? newValue : '0',
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+          <NumericProperty
+            properties={properties}
+            propertyName={'restitution'}
+            step={0.1}
+            onUpdate={newValue => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'restitution',
+                parseFloat(newValue) > 0 ? newValue : '0',
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
+          <NumericProperty
+            properties={properties}
+            propertyName={'linearDamping'}
+            step={0.05}
+            onUpdate={newValue => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'linearDamping',
+                newValue,
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+          <NumericProperty
+            properties={properties}
+            propertyName={'angularDamping'}
+            step={0.05}
+            onUpdate={newValue => {
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'angularDamping',
+                newValue,
+                project
+              );
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
         <Line>
           <Text>{properties.get('layers').getLabel()}</Text>
           {bits.map((value, index) => {

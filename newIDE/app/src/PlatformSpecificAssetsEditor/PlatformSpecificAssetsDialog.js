@@ -241,6 +241,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
     return (
       <Dialog
+        title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}
         onRequestClose={this.props.onClose}

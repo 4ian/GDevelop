@@ -31,6 +31,7 @@ export default class JsonResourceField extends Component<
 
     return (
       <ResourceSelector
+        margin={this.props.isInline ? 'none' : 'dense'}
         project={this.props.project}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}

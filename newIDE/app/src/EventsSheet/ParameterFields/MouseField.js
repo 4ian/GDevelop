@@ -16,6 +16,7 @@ export default class MouseField extends Component {
 
     return (
       <SelectField
+        margin={this.props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
         value={value}

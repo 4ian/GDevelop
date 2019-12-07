@@ -3,10 +3,11 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
-import { Line, Column, Spacer } from '../../UI/Grid';
+import { Line, Column } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -34,7 +35,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </Line>
-        <Line>
+        <ResponsiveLineStackLayout>
           <ColorField
             floatingLabelText={<Trans>Outline color</Trans>}
             disableAlpha
@@ -76,8 +77,8 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-        </Line>
-        <Line>
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout>
           <ColorField
             floatingLabelText={<Trans>Fill color</Trans>}
             disableAlpha
@@ -108,8 +109,7 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-          <Spacer expand />
-        </Line>
+        </ResponsiveLineStackLayout>
       </Column>
     );
   }

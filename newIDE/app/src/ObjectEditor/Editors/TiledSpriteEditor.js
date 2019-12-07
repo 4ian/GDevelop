@@ -6,6 +6,7 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { Line, Column } from '../../UI/Grid';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { type EditorProps } from './EditorProps.flow';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 export default class TiledSpriteEditor extends React.Component<
@@ -39,7 +40,7 @@ export default class TiledSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Select an image</Trans>}
           />
         </Line>
-        <Line>
+        <ResponsiveLineStackLayout>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}
@@ -62,7 +63,7 @@ export default class TiledSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
-        </Line>
+        </ResponsiveLineStackLayout>
       </Column>
     );
   }

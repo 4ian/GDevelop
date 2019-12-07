@@ -25,7 +25,7 @@ type Props = {|
   type?: 'text' | 'number',
 
   // Some TextField props that can be reused:
-  margin?: 'none' | 'normal',
+  margin?: 'none' | 'dense',
   disabled?: boolean,
   errorText?: React.Node,
   floatingLabelFixed?: boolean,

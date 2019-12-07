@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -13,6 +14,8 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 
 const gd = global.gd;
 
@@ -32,6 +35,7 @@ const styles = {
     width: 32,
     height: 32,
     marginRight: 8,
+    flexSrink: 0,
   },
 };
 
@@ -72,6 +76,30 @@ const getSentenceErrorText = (
   return undefined;
 };
 
+const getFullNameHintText = (type: any): MessageDescriptor => {
+  if (type === gd.EventsFunction.Condition) {
+    return t`Example: Is flashing?`;
+  } else if (type === gd.EventsFunction.Expression) {
+    return t`Example: Life remaining`;
+  } else if (type === gd.EventsFunction.StringExpression) {
+    return t`Example: Equipped shield name`;
+  }
+
+  return t`Example: Flash the object`;
+};
+
+const getDescriptionHintText = (type: any): MessageDescriptor => {
+  if (type === gd.EventsFunction.Condition) {
+    return t`Example: Check if the object is flashing.`;
+  } else if (type === gd.EventsFunction.Expression) {
+    return t`Example: Life remaining for the player.`;
+  } else if (type === gd.EventsFunction.StringExpression) {
+    return t`Example: Name of the shield equipped by the player.`;
+  }
+
+  return t`Example: Make the object flash for 5 seconds.`;
+};
+
 export default class EventsFunctionPropertiesEditor extends React.Component<
   Props,
   State
@@ -93,8 +121,10 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     if (isABehaviorLifecycleFunction) {
       return (
         <EmptyMessage>
-          This is a "lifecycle method". It will be called automatically by the
-          game engine.
+          <Trans>
+            This is a "lifecycle method". It will be called automatically by the
+            game engine.
+          </Trans>
         </EmptyMessage>
       );
     }
@@ -104,11 +134,12 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
         {({ i18n }) => (
           <Column>
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
-            <Line alignItems="center">
-              <img src="res/function32.png" alt="" style={styles.icon} />
-              <Column expand>
+            <ResponsiveLineStackLayout alignItems="center">
+              <Line alignItems="center" noMargin>
+                <img src="res/function32.png" alt="" style={styles.icon} />
                 <SelectField
                   value={type}
+                  floatingLabelText={<Trans>Function type</Trans>}
                   fullWidth
                   disabled={!!freezeEventsFunctionType}
                   onChange={(e, i, value: string) => {
@@ -134,25 +165,27 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     primaryText={t`String Expression`}
                   />
                 </SelectField>
-              </Column>
-              <Column expand>
-                <SemiControlledTextField
-                  commitOnBlur
-                  hintText={t`Full name displayed in editor`}
-                  value={eventsFunction.getFullName()}
-                  onChange={text => {
-                    eventsFunction.setFullName(text);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
-                    this.forceUpdate();
-                  }}
-                  fullWidth
-                />
-              </Column>
-            </Line>
+              </Line>
+              <SemiControlledTextField
+                commitOnBlur
+                floatingLabelText={<Trans>Full name displayed in editor</Trans>}
+                hintText={getFullNameHintText(type)}
+                value={eventsFunction.getFullName()}
+                onChange={text => {
+                  eventsFunction.setFullName(text);
+                  if (onConfigurationUpdated) onConfigurationUpdated();
+                  this.forceUpdate();
+                }}
+                fullWidth
+              />
+            </ResponsiveLineStackLayout>
             <Line noMargin>
               <SemiControlledTextField
                 commitOnBlur
-                hintText={t`Description, displayed in editor`}
+                floatingLabelText={
+                  <Trans>Description, displayed in editor</Trans>
+                }
+                hintText={getDescriptionHintText(type)}
                 fullWidth
                 multiLine
                 value={eventsFunction.getDescription()}
@@ -168,7 +201,8 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               type === gd.EventsFunction.Condition ? (
                 <SemiControlledTextField
                   commitOnBlur
-                  hintText={t`Sentence in Events Sheet (write _PARAMx_ for parameters, e.g: _PARAM1_)`}
+                  floatingLabelText={<Trans>Sentence in Events Sheet</Trans>}
+                  hintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                   fullWidth
                   value={eventsFunction.getSentence()}
                   onChange={text => {

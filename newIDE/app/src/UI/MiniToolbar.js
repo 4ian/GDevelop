@@ -37,7 +37,9 @@ const toolbarTextStyle = {
 };
 
 export const MiniToolbarText = ({ children }) => (
-  <Text style={toolbarTextStyle}>{children}</Text>
+  <Text noShrink style={toolbarTextStyle}>
+    {children}
+  </Text>
 );
 
 export default MiniToolbar;

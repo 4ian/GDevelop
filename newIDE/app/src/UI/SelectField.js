@@ -4,6 +4,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { computeTextFieldStyleProps } from './TextField';
 
 type ValueProps = {|
   value: number | string,
@@ -27,7 +28,7 @@ type Props = {|
     flex?: 1,
     width?: 'auto',
   },
-  margin?: 'none',
+  margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
 
@@ -76,7 +77,7 @@ export default class SelectField extends React.Component<Props, {||}> {
         {({ i18n }) => (
           <TextField
             select
-            margin={props.margin || 'normal'}
+            {...computeTextFieldStyleProps(props)}
             disabled={props.disabled}
             fullWidth={props.fullWidth}
             label={props.floatingLabelText}

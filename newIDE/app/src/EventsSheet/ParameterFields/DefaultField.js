@@ -21,6 +21,7 @@ export default class DefaultField extends React.Component<
 
     return (
       <SemiControlledTextField
+        margin={this.props.isInline ? 'none' : 'dense'}
         commitOnBlur
         value={this.props.value}
         floatingLabelText={description}

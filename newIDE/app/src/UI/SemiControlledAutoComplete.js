@@ -12,6 +12,7 @@ import Popper from '@material-ui/core/Popper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { computeTextFieldStyleProps } from './TextField';
 
 export type DataSource = Array<
   | {|
@@ -27,7 +28,6 @@ export type DataSource = Array<
 
 const styles = {
   container: {
-    flexGrow: 1,
     position: 'relative',
   },
   inputRoot: {
@@ -126,7 +126,7 @@ type Props = {|
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor | string,
   fullWidth?: boolean,
-  margin?: 'none' | 'normal',
+  margin?: 'none' | 'dense',
   textFieldStyle?: Object,
   openOnFocus?: boolean,
 |};
@@ -271,7 +271,12 @@ export default class SemiControlledAutoComplete extends React.Component<
               };
 
               return (
-                <div style={styles.container}>
+                <div
+                  style={{
+                    ...styles.container,
+                    flexGrow: props.fullWidth ? 1 : undefined,
+                  }}
+                >
                   {renderTextField({
                     disabled: props.disabled,
                     label: props.floatingLabelText,
@@ -297,7 +302,7 @@ export default class SemiControlledAutoComplete extends React.Component<
                     // Style:
                     style: props.textFieldStyle,
                     fullWidth: props.fullWidth,
-                    margin: props.margin || 'normal',
+                    ...computeTextFieldStyleProps(props),
 
                     inputRef: this._input,
                   })}

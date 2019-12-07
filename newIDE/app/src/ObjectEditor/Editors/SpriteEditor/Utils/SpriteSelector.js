@@ -7,9 +7,9 @@ import SelectField from '../../../../UI/SelectField';
 import SelectOption from '../../../../UI/SelectOption';
 
 import Toggle from '../../../../UI/Toggle';
-import { Line } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import { getCurrentElements } from './SpriteObjectHelper';
+import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
 
 type Props = {|
   spriteObject: gdSpriteObject,
@@ -70,7 +70,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
 
     return (
       <React.Fragment>
-        <Line>
+        <ResponsiveLineStackLayout>
           <SelectField
             floatingLabelText={<Trans>Animation</Trans>}
             value={this.props.animationIndex}
@@ -127,7 +127,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
               })}
             </SelectField>
           )}
-        </Line>
+        </ResponsiveLineStackLayout>
         <Toggle
           label={setSameForAllAnimationsLabel}
           labelPosition="right"

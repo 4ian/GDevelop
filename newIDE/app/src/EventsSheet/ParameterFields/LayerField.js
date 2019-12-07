@@ -23,6 +23,7 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }

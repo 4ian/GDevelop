@@ -4,7 +4,7 @@ const marginsSize = 4;
 /**
  * A Line in the standard GDevelop grid to position components.
  * Check `Layout` first to see if there is already a layout made
- * specifically for your components (like TextFieldWithButton).
+ * specifically for your components (like `TextFieldWithButton`).
  */
 export const Line = props => (
   <div
@@ -24,7 +24,7 @@ export const Line = props => (
 /**
  * A Column in the standard GDevelop grid to position components.
  * Check `Layout` first to see if there is already a layout made
- * specifically for your components (like TextFieldWithButton).
+ * specifically for your components (like `TextFieldWithButton`).
  */
 export const Column = props => (
   <div
@@ -45,13 +45,14 @@ export const Column = props => (
 /**
  * A Spacer in the standard GDevelop grid to position components.
  * Check `Layout` first to see if there is already a layout made
- * specifically for your components (like TextFieldWithButton).
+ * specifically for your components (like `TextFieldWithButton`).
  */
 export const Spacer = props => (
   <span
     style={{
-      width: props.expand ? '100%' : marginsSize,
+      width: marginsSize,
       height: marginsSize,
+      flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
     }}
   />
 );

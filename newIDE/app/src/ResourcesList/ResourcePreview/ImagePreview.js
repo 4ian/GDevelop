@@ -10,6 +10,7 @@ import MiniToolbar from '../../UI/MiniToolbar';
 import ZoomIn from '@material-ui/icons/ZoomIn';
 import ZoomOut from '@material-ui/icons/ZoomOut';
 import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
+import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 
 const MARGIN = 50;
@@ -145,7 +146,8 @@ export default class ImagePreview extends React.Component<Props, State> {
             imageZoomFactor,
           } = this.state;
 
-          const imageLoaded = !!imageWidth && !!imageHeight;
+          const imageLoaded =
+            !!imageWidth && !!imageHeight && !this.state.errored;
 
           const imagePositionTop = 0;
           const imagePositionLeft = Math.max(
@@ -211,9 +213,11 @@ export default class ImagePreview extends React.Component<Props, State> {
                 }}
               >
                 {!!this.state.errored && (
-                  <Text>
-                    <Trans>Unable to load the image</Trans>
-                  </Text>
+                  <PlaceholderMessage>
+                    <Text>
+                      <Trans>Unable to load the image</Trans>
+                    </Text>
+                  </PlaceholderMessage>
                 )}
                 {!this.state.errored && (
                   <img

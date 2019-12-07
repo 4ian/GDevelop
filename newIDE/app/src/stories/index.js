@@ -171,7 +171,10 @@ import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
-import { TextFieldWithButtonLayout } from '../UI/Layout';
+import {
+  TextFieldWithButtonLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 
 // No i18n in this file
 
@@ -584,7 +587,41 @@ storiesOf('UI Building Blocks/SearchBar', module)
     />
   ));
 
-storiesOf('UI Building Blocks/Layout', module)
+storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
+  .addDecorator(muiDecorator)
+  .add('Default', () => (
+    <ResponsiveLineStackLayout>
+      <div>Some Div</div>
+      <span>Some Span</span>
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <FlatButton label="Flat Button" onClick={action('on click')} />
+    </ResponsiveLineStackLayout>
+  ))
+  .add('Default with null items', () => (
+    <ResponsiveLineStackLayout>
+      {null}
+      {null}
+      <div>Some Div</div>
+      {null}
+      {null}
+      <span>Some Span</span>
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+      <FlatButton label="Flat Button" onClick={action('on click')} />
+      {null}
+      {null}
+    </ResponsiveLineStackLayout>
+  ))
+  .add('alignItems=center', () => (
+    <ResponsiveLineStackLayout alignItems="center">
+      <div>Some Div</div>
+      <span>Some Span</span>
+      <RaisedButton label="Raised Button" onClick={action('on click')} />
+    </ResponsiveLineStackLayout>
+  ));
+
+storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
   .addDecorator(muiDecorator)
   .add('Empty text field', () => (
     <TextFieldWithButtonLayout

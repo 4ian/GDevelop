@@ -39,6 +39,7 @@ exports[`HelpButton renders the button linking to a help page 1`] = `
     <span
       style={
         Object {
+          "flexShrink": 0,
           "height": 4,
           "width": 4,
         }

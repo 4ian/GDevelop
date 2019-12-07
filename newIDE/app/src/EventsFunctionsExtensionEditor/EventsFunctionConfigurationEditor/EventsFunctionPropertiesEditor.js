@@ -121,8 +121,10 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     if (isABehaviorLifecycleFunction) {
       return (
         <EmptyMessage>
-          This is a "lifecycle method". It will be called automatically by the
-          game engine.
+          <Trans>
+            This is a "lifecycle method". It will be called automatically by the
+            game engine.
+          </Trans>
         </EmptyMessage>
       );
     }

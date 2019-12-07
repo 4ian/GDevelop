@@ -80,8 +80,7 @@ export const ResponsiveLineStackLayout = ({
   noMargin,
   children,
 }: ResponsiveLineStackLayoutProps) => {
-  const count = React.Children.count(children);
-
+  let isFirstChild = true;
   return (
     <ResponsiveWindowMeasurer>
       {windowWidth =>
@@ -96,13 +95,17 @@ export const ResponsiveLineStackLayout = ({
             expand={expand}
             noMargin={noMargin}
           >
-            {' '}
             {React.Children.map(children, (child, index) => {
+              if (!child) return null;
+
+              const addSpacers = !isFirstChild;
+              isFirstChild = false;
+
               return (
                 <React.Fragment>
-                  {index !== 0 && <Spacer />}
+                  {addSpacers && <Spacer />}
+                  {addSpacers && <Spacer />}
                   {child}
-                  {index !== count - 1 && <Spacer />}
                 </React.Fragment>
               );
             })}

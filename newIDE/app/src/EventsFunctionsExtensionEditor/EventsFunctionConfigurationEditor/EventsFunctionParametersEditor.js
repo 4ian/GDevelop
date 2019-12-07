@@ -103,9 +103,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
     if (isABehaviorLifecycleFunction) {
       return (
         <EmptyMessage>
-          This is a "lifecycle method". It will be called automatically by the
-          game engine and has two parameters: "Object" (the object the behavior
-          is acting on) and "Behavior" (the behavior itself).
+          <Trans>
+            This is a "lifecycle method". It will be called automatically by the
+            game engine and has two parameters: "Object" (the object the
+            behavior is acting on) and "Behavior" (the behavior itself).
+          </Trans>
         </EmptyMessage>
       );
     }

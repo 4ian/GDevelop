@@ -1143,7 +1143,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objects, ignoreTouch
  * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
  * @return true if the object was moved
  */
-gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists, ignoreTouchingEdges) {
+gdjs.RuntimeObject.prototype.OLDseparateFromObjectsList = function(objectsLists, ignoreTouchingEdges) {
     var moved = false;
     var xMove = 0; var yMove = 0;
     var hitBoxes = this.getHitBoxes();

@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * A basic profiling tool that can be used to measure time spent in sections of the engine.
  * @class Profiler
@@ -144,8 +146,8 @@ gdjs.Profiler.prototype.getStats = function() {
  * Useful for ingame profiling.
  *
  * @param {string} sectionName The name of the section
- * @param {s} profilerSection The section measures
- * @param {*} outputs The array where to push the results
+ * @param {*} profilerSection The section measures
+ * @param {string[]} outputs The array where to push the results
  */
 gdjs.Profiler.getProfilerSectionTexts = function(
   sectionName,

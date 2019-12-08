@@ -293,7 +293,7 @@ gdjs.evtTools.object.OLDseparateObjects = function(objectsLists1, objectsLists2,
         for(var j = 0;j < list.length;++j) {
             /** @type gdjs.RuntimeObject */
             var object = list[j];
-            object.separateFromObjectsList(objectsLists2, ignoreTouchingEdges);
+            object.OLDseparateFromObjectsList(objectsLists2, ignoreTouchingEdges);
         }
     }
 };

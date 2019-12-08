@@ -75,6 +75,19 @@ gdjs.ObjectPositionsManager = function() {
    * @type Object.<number, ObjectPosition>
    */
   this._allObjectPositions = {};
+
+  /**
+   * A map containing all `ObjectPosition`s to be re-insert in the spatial data structure
+   * just after being removed in `update`. They are keyed by `objectNameId`, so that
+   * they can all be inserted at once (bulk insertion).
+   *
+   * Storing this is an *optimization* to avoid deleting and re-creating this object during
+   * every call to `update` (avoid creating garbage).
+   * Don't use this outside of `update`.
+   *
+   * @type Object.<string, ObjectPosition[]>
+   */
+  this._bulkObjectPositionUpdates = {};
 };
 
 /**
@@ -172,22 +185,31 @@ gdjs.ObjectPositionsManager.prototype.markObjectAsDirty = function(object) {
  * has been recreated, in which case the spatial data structure will update it).
  */
 gdjs.ObjectPositionsManager.prototype.update = function() {
+  // "Update" all objects that have been moved by removing them
+  // and adding them again immediately after in the spatial data structure.
   for (var objectId in this._dirtyObjects) {
-    var object = this._dirtyObjects[objectId];
-
     var objectPosition = this._allObjectPositions[objectId];
     if (objectPosition) {
       this._getPositionsRBush(objectPosition.objectNameId).remove(
         objectPosition
       );
     }
+  }
 
-    // Update the position in the spatial data structure.
-    // Note that it's possible for the objectNameId to have changed
-    // (in case of object deletion and creation of another one with a same id)
+  // Prepare the batched "update" insertions.
+  for (var objectNameId in this._bulkObjectPositionUpdates) {
+    // Clear the updates (we avoid recreating a temporary object).
+    this._bulkObjectPositionUpdates[objectNameId].length = 0;
+  }
+
+  for (var objectId in this._dirtyObjects) {
+    var object = this._dirtyObjects[objectId];
+
     var objectNameId = object.getNameId();
 
-    objectPosition = this._allObjectPositions[objectId] = {
+    // Note that it's possible for the objectNameId to have changed
+    // (in case of object deletion and creation of another one with a same id)
+    var objectPosition = this._allObjectPositions[objectId] = {
       object: object,
       objectId: object.id,
       objectNameId: objectNameId,
@@ -198,7 +220,23 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
       hitboxes: object.getHitBoxes(),
       aabb: object.getAABB(),
     };
-    this._getPositionsRBush(objectNameId).insert(objectPosition);
+
+    // Don't use `insert`. Instead, batch the updates, doing
+    // all of them at once using `load` (see later).
+    this._bulkObjectPositionUpdates[objectNameId] = this._bulkObjectPositionUpdates[objectNameId] || [];
+    this._bulkObjectPositionUpdates[objectNameId].push(objectPosition);
+  }
+
+  // Use "load" instead of multiple `insert`s, as bulk insertion leads
+  // to better insertion and query performance (internally if the number
+  // of objects loaded is too small, it will go back to multiple `insert`s)
+  for (var objectNameId in this._bulkObjectPositionUpdates) {
+    var rbush = this._getPositionsRBush(objectNameId);
+    rbush.load(this._bulkObjectPositionUpdates[objectNameId]);
+  }
+
+  // Clear the set of dirty objects.
+  for (var objectId in this._dirtyObjects) {
     delete this._dirtyObjects[objectId];
   }
 

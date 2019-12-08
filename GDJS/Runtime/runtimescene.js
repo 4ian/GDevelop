@@ -466,6 +466,11 @@ gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
     }
 
     this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
+
+    // Update the object positions manager to ensure that, in case events or behaviors
+    // are not triggering themselves an update, we at least call update once per frame. Otherwise,
+    // we risk a **memory leak** by not clearing the object positions waiting to be deleted.
+    this._objectPositionsManager.update();
 };
 
 /**

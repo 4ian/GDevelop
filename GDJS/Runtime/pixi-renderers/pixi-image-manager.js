@@ -13,8 +13,11 @@
  */
 gdjs.PixiImageManager = function(resources)
 {
-    this._resources = resources;
-    this._invalidTexture = PIXI.Texture.fromImage("bunny.png"); //TODO
+	this._resources = resources;
+
+	// The invalid texture is a 8x8 PNG file filled with magenta (#ff00ff), to be
+	// easily spotted if rendered on screen.
+    this._invalidTexture = PIXI.Texture.from("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQoU2P8z/D/PwMewDgyFAAApMMX8Zi0uXAAAAAASUVORK5CYIIA");
     this._loadedTextures = new Hashtable();
 };
 

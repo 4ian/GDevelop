@@ -1,5 +1,6 @@
 require('dotenv').config({ path: __dirname + '/.env' });
 const electron = require('electron');
+const path = require('path');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
@@ -91,6 +92,11 @@ app.on('ready', function() {
     options.fullscreenable = false;
     options.show = false;
   }
+
+  if (isDev)
+    BrowserWindow.addDevToolsExtension(
+      path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.1_0/')
+    );
 
   mainWindow = new BrowserWindow(options);
   if (!isIntegrated) mainWindow.maximize();

@@ -196,6 +196,9 @@ export const LocalGDJSDevelopmentWatcher = () => {
           return;
         }
 
+        // Reload extensions
+        importGDJSRuntime().catch(() => {});
+
         // Create watchers
         paths.forEach(watchPath => {
           let watcher = null;

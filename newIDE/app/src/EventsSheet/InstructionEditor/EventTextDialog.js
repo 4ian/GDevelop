@@ -12,17 +12,10 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 
 const gd = global.gd;
 
-const toolbarItemStyle = {
-  marginRight: 10,
-};
-
 const styles = {
   sizeTextField: {
     width: 90,
-    ...toolbarItemStyle,
   },
-  toolbarItem: toolbarItemStyle,
-  checkbox: toolbarItemStyle,
 };
 
 type Props = {|
@@ -36,6 +29,17 @@ type State = {|
   textColor: RGBColor,
   backgroundColor: RGBColor,
 |};
+
+export const filterEditableWithEventTextDialog = (
+  events: Array<gdBaseEvent>
+): Array<gdBaseEvent> => {
+  return events.filter(event =>
+    [
+      'BuiltinCommonInstructions::Group',
+      'BuiltinCommonInstructions::Comment',
+    ].includes(event.getType())
+  );
+};
 
 export default class EventTextDialog extends React.Component<Props, State> {
   _applyChangesOnEvent = () => {

@@ -4,7 +4,9 @@ import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
-import EventTextDialog from './InstructionEditor/EventTextDialog';
+import EventTextDialog, {
+  filterEditableWithEventTextDialog,
+} from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
@@ -368,10 +370,12 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   openEventTextDialog = () => {
-    const selectedEvents = getSelectedEvents(this.state.selection);
-    if (!selectedEvents.length) return;
+    const editableEvents = filterEditableWithEventTextDialog(
+      getSelectedEvents(this.state.selection)
+    );
+    if (!editableEvents.length) return;
 
-    const event = selectedEvents[selectedEvents.length - 1]; // Get the last selected event.
+    const event = editableEvents[editableEvents.length - 1]; // Get the last selected event.
     this.setState({
       textEditedEvent: event,
     });
@@ -1129,6 +1133,14 @@ export default class EventsSheet extends React.Component<Props, State> {
                           buildMenuTemplate={() => {
                             let contextList = [
                               {
+                                label: 'Edit',
+                                click: () => this.openEventTextDialog(),
+                                visible:
+                                  filterEditableWithEventTextDialog(
+                                    getSelectedEvents(this.state.selection)
+                                  ).length > 0,
+                              },
+                              {
                                 label: 'Copy',
                                 click: () => this.copySelection(),
                                 accelerator: 'CmdOrCtrl+C',
@@ -1206,24 +1218,6 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 click: this._openEventsContextAnalyzer,
                               },
                             ];
-
-                            const edition = {
-                              label: 'Edit',
-                              click: () => this.openEventTextDialog(),
-                            };
-
-                            getSelectedEvents(this.state.selection).forEach(
-                              event => {
-                                if (
-                                  event.getType() ===
-                                    'BuiltinCommonInstructions::Comment' ||
-                                  event.getType() ===
-                                    'BuiltinCommonInstructions::Group'
-                                ) {
-                                  contextList.unshift(edition);
-                                }
-                              }
-                            );
                             return contextList;
                           }}
                         />

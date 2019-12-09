@@ -120,7 +120,7 @@ export const createPathEditorHeader = ({
     headerObject.saveFolderLabel.title =
       'Changing the path is disabled on imported GD animations!';
     headerObject.setFolderButton.removeEventListener('click', selectFolderPath);
-    headerObject.setFolderButton.style.visibility = 'hidden';
+    headerObject.setFolderButton.style.display = 'none';
   };
 
   /**
@@ -151,19 +151,26 @@ export const createPathEditorHeader = ({
 
 const render = headerObject => {
   const pathEditorVisibility = headerObject.state.visible
-    ? 'visibility:visible'
-    : 'visibility:hidden;';
+    ? 'display:visible'
+    : 'display:none;';
   headerObject.rightButtons.style = pathEditorVisibility;
   headerObject.root.style = pathEditorVisibility;
 
-  headerObject.hideButton.textContent = headerObject.state.visible ? '>' : '<';
+  headerObject.hideButton.textContent = headerObject.state.visible
+    ? '>'
+    : '...';
+
+  headerObject.hideButton.title = headerObject.state.visible
+    ? 'Hide save path options'
+    : 'Open save path options';
+
   headerObject.hideButton.style = headerObject.state.visible
-    ? 'opacity: 1'
+    ? 'opacity: 1; margin-right: 3px;'
     : 'opacity:0.5';
 
   headerObject.root.parentElement.style = headerObject.state.visible
     ? 'position: relative; display:flex; width:100%'
-    : 'position: absolute; display:flex; width:100%';
+    : 'position: absolute; display:flex; width:40px; height:40px; right:0';
 
   headerObject.nameInput.value = headerObject.nameInput.value.replace(
     /[^a-zA-Z0-9_-]/g,

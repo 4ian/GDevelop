@@ -11,3 +11,16 @@ export const rgbToHex = (r: number, g: number, b: number) =>
  */
 export const rgbToHexNumber = (r: number, g: number, b: number) =>
   (r << 16) + (g << 8) + b;
+
+/**
+ * Convert a hex color value to an rgb object value.
+ */
+export const hexToRGBColor = (hex: string) => {
+  const hexNumber = parseInt(hex.replace('#', ''), 16);
+  return {
+    r: (hexNumber >> 16) & 0xff,
+    g: (hexNumber >> 8) & 0xff,
+    b: hexNumber & 0xff,
+    a: 255,
+  };
+};

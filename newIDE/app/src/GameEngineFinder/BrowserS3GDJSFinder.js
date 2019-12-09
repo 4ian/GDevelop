@@ -1,7 +1,7 @@
 // @flow
 
 const gdjsRoot =
-  'https://s3-eu-west-1.amazonaws.com/gdevelop-resources/GDJS-5.0.0-beta81';
+  'https://s3-eu-west-1.amazonaws.com/gdevelop-resources/GDJS-5.0.0-beta83';
 
 type FileSet =
   | 'preview'

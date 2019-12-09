@@ -19,6 +19,7 @@ const exampleNames = [
   'basic-ai-with-pathfinding',
   'basic-artificial-intelligence',
   'basic-topdown-car-driving',
+  'bbtext-object-demo',
   'betabox-basics-learning-experience',
   'bomb-the-crate',
   'bouncing-ball-and-rope',

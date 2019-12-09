@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/home/fox/DEV/GDevelop/newIDE/app/resources/examples/yarn-dialogue/yarn-dialogue.json",
+    "projectFile": "/home/fox/DEV/GDevelop/newIDE/app/resources/examples/dialogue-tree-with-yarn/dialogue-tree-with-yarn.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -797,20 +797,20 @@
         "userAdded": true
       },
       {
-        "disablePreload": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/dialogueData/npcs.json",
-        "kind": "json",
-        "metadata": "",
-        "name": "dialogueData/npcs.json",
-        "userAdded": true
-      },
-      {
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/NewObject2-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject2-1.png",
         "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "disablePreload": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/dialogueData/npcs.json",
+        "kind": "json",
+        "metadata": "",
+        "name": "dialogueData/npcs.json",
         "userAdded": false
       }
     ],
@@ -922,10 +922,10 @@
               "name": "avatars"
             },
             {
-              "name": "dialogueTextObject"
+              "name": "questionChoicesText"
             },
             {
-              "name": "questionChoicesText"
+              "name": "DialogueTreeBBtextObject"
             }
           ]
         }
@@ -1599,21 +1599,6 @@
         },
         {
           "angle": 0,
-          "customSize": true,
-          "height": 81,
-          "layer": "GUI",
-          "locked": false,
-          "name": "dialogueTextObject",
-          "width": 533,
-          "x": 110,
-          "y": 115,
-          "zOrder": 43,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
           "customSize": false,
           "height": 0,
           "layer": "GUI",
@@ -1973,6 +1958,21 @@
           "x": 1369,
           "y": 591,
           "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 79,
+          "layer": "GUI",
+          "locked": false,
+          "name": "DialogueTreeBBtextObject",
+          "width": 543,
+          "x": 108,
+          "y": 98,
+          "zOrder": 47,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -5123,25 +5123,6 @@
         },
         {
           "bold": false,
-          "italic": false,
-          "name": "dialogueTextObject",
-          "smoothed": true,
-          "tags": "",
-          "type": "TextObject::Text",
-          "underlined": false,
-          "variables": [],
-          "behaviors": [],
-          "string": "Text",
-          "font": "",
-          "characterSize": 20,
-          "color": {
-            "b": 61,
-            "g": 44,
-            "r": 30
-          }
-        },
-        {
-          "bold": false,
           "italic": true,
           "name": "questionChoicesText",
           "smoothed": true,
@@ -5376,6 +5357,23 @@
               ]
             }
           ]
+        },
+        {
+          "name": "DialogueTreeBBtextObject",
+          "tags": "",
+          "type": "BBText::BBText",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "text": "[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ",
+            "opacity": 255,
+            "fontSize": "20",
+            "visible": true,
+            "color": "#000000",
+            "fontFamily": "Arial",
+            "align": "left",
+            "wordWrap": true
+          }
         }
       ],
       "events": [
@@ -5541,7 +5539,7 @@
           "colorR": 74,
           "creationTime": 0,
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "name": "Other gameplay mechanics",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -5617,16 +5615,6 @@
                   },
                   "parameters": [
                     "textBg"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Cache"
-                  },
-                  "parameters": [
-                    "dialogueTextObject"
                   ],
                   "subInstructions": []
                 }
@@ -6560,6 +6548,16 @@
                     "dialogueData/npcs.json"
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "textHud"
+                  ],
+                  "subInstructions": []
                 }
               ],
               "events": [
@@ -6939,10 +6937,10 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "TextObject::String"
+                    "value": "BBText::SetBBText"
                   },
                   "parameters": [
-                    "dialogueTextObject",
+                    "DialogueTreeBBtextObject",
                     "=",
                     "DialogueTree::ClippedLineText()"
                   ],

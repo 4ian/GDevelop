@@ -308,6 +308,10 @@ module.exports = {
       }
     ]
   },
+  "bbtext-object-demo": {
+    "description": "This shows how to change the bbcode text of a BBText object displayed on the screen.\n",
+    "usedExtensions": []
+  },
   "betabox-basics-learning-experience": {
     "description": "Example level for teaching basic programming skills with extra features and assets.",
     "usedExtensions": [
@@ -953,6 +957,10 @@ module.exports = {
       {
         "fullName": "Panel Sprite (9-patch) Object",
         "name": "PanelSpriteObject"
+      },
+      {
+        "fullName": "BBCode Text Object",
+        "name": "BBText"
       },
       {
         "fullName": "Platform Behavior",
@@ -3359,51 +3367,6 @@ module.exports = {
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
-      }
-    ]
-  },
-  "skeletal-animation-demo": {
-    "description": "Example of a character animated using a skeletal animation based on Dragon Bones. This is a demo based on an experimental object. Be sure to read the documentation about this as it needs work to be maintained for use in large games.\n",
-    "usedExtensions": [
-      {
-        "fullName": "Sprite",
-        "name": "Sprite"
-      },
-      {
-        "fullName": "Platform Behavior",
-        "name": "PlatformBehavior"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
-        "fullName": "",
-        "name": ""
-      },
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Primitive drawing",
-        "name": "PrimitiveDrawing"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
       }
     ]
   },

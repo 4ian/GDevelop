@@ -26,7 +26,10 @@
  */
 .gd-events-sheet-dark-theme .rst__moveHandle {
   background: #494949 !important;
-  border: 1px solid #494949 !important;
+}
+
+.gd-events-sheet-dark-theme .rst__moveHandle:hover {
+  background-color: #767676!important;
 }
 
 /**

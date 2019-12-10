@@ -75,11 +75,12 @@ type Props = {|
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: 18,
+    fontSize?: 14 | 18,
     fontStyle?: 'normal' | 'italic',
     width?: number | '100%',
     flex?: 1,
     top?: number,
+    padding?: number,
   |},
   inputStyle?: {|
     // Allow to customize color (replace by color prop?) // TO VERIFY
@@ -88,7 +89,8 @@ type Props = {|
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',
-    lineHeight?: 1.4,
+    lineHeight?: 1.4 | 1.5,
+    padding?: 0,
   |},
   underlineFocusStyle?: {| borderColor: string |}, // TODO
   underlineShow?: boolean,

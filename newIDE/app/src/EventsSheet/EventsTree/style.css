@@ -11,8 +11,7 @@
  */
 .gd-events-sheet .rst__moveHandle {
     width: 10px;
-    background: #4ab0e4;
-    border: 1px solid #49AFE4;
+    border: none;
     box-shadow: none;
     border-radius: 0;
 }

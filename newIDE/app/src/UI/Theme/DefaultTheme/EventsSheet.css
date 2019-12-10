@@ -25,6 +25,7 @@
  */
 .gd-events-sheet-default-theme .rst__moveHandle {
   background: #4ab0e4 !important;
+  border: 1px solid #49afe4 !important;
 }
 
 /**

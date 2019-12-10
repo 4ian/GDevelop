@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/Cursor on object benchmark.json",
+    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/object-positions-manager-benchmarks/Distance between objects benchmark.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -169,7 +169,7 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "FollowCursorObject",
+          "name": "NewObject3",
           "width": 0,
           "x": 689,
           "y": 110,
@@ -181,7 +181,46 @@
       ],
       "objects": [
         {
-          "name": "Object",
+          "name": "NewObject",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "NewObject",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "NewObject-1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NewObject2",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
@@ -220,7 +259,7 @@
           ]
         },
         {
-          "name": "FollowCursorObject",
+          "name": "NewObject3",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
@@ -282,7 +321,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Repeat",
-              "repeatExpression": "7000",
+              "repeatExpression": "700",
               "conditions": [],
               "actions": [
                 {
@@ -292,9 +331,23 @@
                   },
                   "parameters": [
                     "",
-                    "Object",
+                    "NewObject",
+                    "Random(800)",
                     "Random(600)",
-                    "Random(400)",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "NewObject2",
+                    "Random(800)",
+                    "Random(600)",
                     ""
                   ],
                   "subInstructions": []
@@ -305,7 +358,19 @@
                     "value": "ChangeScale"
                   },
                   "parameters": [
-                    "Object",
+                    "NewObject",
+                    "=",
+                    "0.3"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeScale"
+                  },
+                  "parameters": [
+                    "NewObject2",
                     "=",
                     "0.3"
                   ],
@@ -352,7 +417,19 @@
                 "value": "SetAngle"
               },
               "parameters": [
-                "Object",
+                "NewObject",
+                "=",
+                "Random(360)"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetAngle"
+              },
+              "parameters": [
+                "NewObject2",
                 "=",
                 "Random(360)"
               ],
@@ -373,8 +450,21 @@
                 "value": "AddForceAL"
               },
               "parameters": [
-                "Object",
-                "Object.Angle()",
+                "NewObject",
+                "NewObject.Angle()",
+                "30",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "AddForceAL"
+              },
+              "parameters": [
+                "NewObject2",
+                "NewObject2.Angle()",
                 "30",
                 ""
               ],
@@ -384,100 +474,72 @@
           "events": []
         },
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
           "disabled": false,
           "folded": false,
-          "name": "Cursor is on object",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SourisSurObjet"
-                  },
-                  "parameters": [
-                    "Object",
-                    "NewObject",
-                    "no",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
+              "type": {
+                "inverted": false,
+                "value": "Distance"
+              },
+              "parameters": [
+                "NewObject2",
+                "NewObject",
+                "10",
+                ""
               ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ChangeColor"
-                  },
-                  "parameters": [
-                    "Object",
-                    "\"71;231;0\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
+              "subInstructions": []
             }
           ],
-          "parameters": []
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ChangeColor"
+              },
+              "parameters": [
+                "NewObject2",
+                "\"71;231;0\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
           "disabled": false,
           "folded": false,
-          "name": "Cursor is NOT on object",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "SourisSurObjet"
-                  },
-                  "parameters": [
-                    "Object",
-                    "NewObject",
-                    "no",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
+              "type": {
+                "inverted": true,
+                "value": "Distance"
+              },
+              "parameters": [
+                "NewObject2",
+                "NewObject",
+                "10",
+                ""
               ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ChangeColor"
-                  },
-                  "parameters": [
-                    "Object",
-                    "\"255;255;255\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
+              "subInstructions": []
             }
           ],
-          "parameters": []
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ChangeColor"
+              },
+              "parameters": [
+                "NewObject2",
+                "\"255;255;255\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
@@ -491,7 +553,7 @@
                 "value": "MettreXY"
               },
               "parameters": [
-                "FollowCursorObject",
+                "NewObject3",
                 "=",
                 "MouseX()",
                 "=",

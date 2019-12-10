@@ -30,6 +30,18 @@ type State = {|
   backgroundColor: RGBColor,
 |};
 
+const white: RGBColor = {
+  r: 255,
+  g: 255,
+  b: 255,
+};
+
+const black: RGBColor = {
+  r: 0,
+  g: 0,
+  b: 0,
+};
+
 export const filterEditableWithEventTextDialog = (
   events: Array<gdBaseEvent>
 ): Array<gdBaseEvent> => {
@@ -83,8 +95,8 @@ export default class EventTextDialog extends React.Component<Props, State> {
     const eventType = event.getType();
 
     let textValue: string = '';
-    let textColor: RGBColor = { r: 0, g: 0, b: 0 };
-    let backgroundColor: RGBColor = { r: 0, g: 0, b: 0 };
+    let textColor = black;
+    let backgroundColor = black;
 
     if (eventType === 'BuiltinCommonInstructions::Comment') {
       const commentEvent = gd.asCommentEvent(event);
@@ -107,19 +119,8 @@ export default class EventTextDialog extends React.Component<Props, State> {
         g = groupEvent.getBackgroundColorG(),
         b = groupEvent.getBackgroundColorB();
 
-      const white = {
-        r: 255,
-        g: 255,
-        b: 255,
-      };
-
-      const black = {
-        r: 0,
-        g: 0,
-        b: 0,
-      };
-
-      textColor = (r + g + b) / 3 > 200 ? black : white; //Because text color is not supported by Core
+      // Text color is automatically chosen for groups.
+      textColor = (r + g + b) / 3 > 200 ? black : white;
 
       backgroundColor = {
         r: groupEvent.getBackgroundColorR(),

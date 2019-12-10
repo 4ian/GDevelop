@@ -41,7 +41,7 @@ const styles = {
 
 export default class CommentEvent extends React.Component<
   EventRendererProps,
-  *
+  {||}
 > {
   state = {
     editing: false,

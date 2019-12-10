@@ -4,6 +4,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import classNames from 'classnames';
 import TextField from '../../../UI/TextField';
+import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -20,7 +21,7 @@ const styles = {
     padding: 5,
     overflow: 'hidden',
   },
-  textField: {
+  commentSpan: {
     width: '100%',
     fontSize: 14,
   },
@@ -32,21 +33,18 @@ export default class CommentEvent extends React.Component<
 > {
   state = {
     editing: false,
-    height: '100%',
   };
 
-  _selectable: ?any;
-  _textField: ?any;
+  _selectable: ?HTMLSpanElement;
+  _textField: ?TextField;
 
   edit = () => {
     this.setState(
       {
         editing: true,
-        height: '100%',
       },
       () => {
         if (this._textField) this._textField.focus();
-        this.forceUpdate();
       }
     );
   };
@@ -55,15 +53,8 @@ export default class CommentEvent extends React.Component<
     const commentEvent = gd.asCommentEvent(this.props.event);
     commentEvent.setComment(text);
 
-    this.setState(
-      {
-        height: '100%',
-      },
-      () => {
-        this.props.onUpdate();
-        this.forceUpdate();
-      }
-    );
+    this.props.onUpdate();
+    this.forceUpdate();
   };
 
   endEditing = () => {
@@ -72,7 +63,6 @@ export default class CommentEvent extends React.Component<
     this.setState(
       {
         editing: false,
-        height: '100%',
       },
       () => this.props.onUpdate()
     );
@@ -89,80 +79,76 @@ export default class CommentEvent extends React.Component<
   };
 
   render() {
-    var commentEvent = gd.asCommentEvent(this.props.event);
+    const commentEvent = gd.asCommentEvent(this.props.event);
 
-    const r = commentEvent.getBackgroundColorRed(),
-      g = commentEvent.getBackgroundColorGreen(),
-      b = commentEvent.getBackgroundColorBlue();
+    const backgroundColor = rgbToHex(
+      commentEvent.getBackgroundColorRed(),
+      commentEvent.getBackgroundColorGreen(),
+      commentEvent.getBackgroundColorBlue()
+    );
 
-    const textColors = {
-        red: commentEvent.getTextColorRed(),
-        green: commentEvent.getTextColorGreen(),
-        blue: commentEvent.getTextColorBlue(),
-    };
-
-    const textColor = `rgb(${textColors.red}, ${textColors.green}, ${textColors.blue})`;
+    const textColor = rgbToHex(
+      commentEvent.getTextColorRed(),
+      commentEvent.getTextColorGreen(),
+      commentEvent.getTextColorBlue()
+    );
 
     return (
-      <div>
-        <div
-          className={classNames({
-            [largeSelectableArea]: true,
-            [largeSelectedArea]: this.props.selected,
-          })}
-          style={{
-            ...styles.container,
-            backgroundColor: `rgb(${r}, ${g}, ${b})`,
-            height: this.state.height,
-            minHeight: 35,
-          }}
-          onClick={this.edit}
-        >
-          {this.state.editing ? (
-            <TextField
-              multiLine={true}
-              margin="none"
-              ref={textField => (this._textField = textField)}
-              value={commentEvent.getComment()}
-              hintText={t`<Enter comment>`}
-              onBlur={this.endEditing}
-              onChange={this.onEvent}
-              style={{ ...styles.textField, padding: 5 }}
-              inputStyle={{
-                color: textColor,
-                WebkitTextFillColor: textColor,
-                padding: 0,
-                lineHeight: '1.5em',
-              }}
-              underlineFocusStyle={{
-                borderColor: textColor,
-              }}
-              fullWidth
-              id="comment-title"
-            />
-          ) : (
-            <span
-              ref={selectable => (this._selectable = selectable)}
-              className={classNames({
-                [selectableArea]: true,
-                [disabledText]: this.props.disabled,
-              })}
-              style={{
-                ...styles.textField,
-                color: textColor,
-                boxSizing: 'border-box',
-                alignItems: 'center',
-                height: '100%',
-                padding: 0,
-                whiteSpace: 'initial',
-                lineHeight: '1.5em',
-              }}
-              dangerouslySetInnerHTML={{
-                __html: this._getCommentHTML(),
-              }}
-            />
-          )}
-        </div>
+      <div
+        className={classNames({
+          [largeSelectableArea]: true,
+          [largeSelectedArea]: this.props.selected,
+        })}
+        style={{
+          ...styles.container,
+          backgroundColor: `#${backgroundColor}`,
+          minHeight: 35,
+        }}
+        onClick={this.edit}
+      >
+        {this.state.editing ? (
+          <TextField
+            multiLine
+            margin="none"
+            ref={textField => (this._textField = textField)}
+            value={commentEvent.getComment()}
+            hintText={t`<Enter comment>`}
+            onBlur={this.endEditing}
+            onChange={this.onEvent}
+            style={{ ...styles.commentSpan }}
+            inputStyle={{
+              color: `#${textColor}`,
+              padding: 0,
+              lineHeight: 1.5,
+            }}
+            underlineFocusStyle={{
+              borderColor: `#${textColor}`,
+            }}
+            fullWidth
+            id="comment-title"
+          />
+        ) : (
+          <span
+            ref={selectable => (this._selectable = selectable)}
+            className={classNames({
+              [selectableArea]: true,
+              [disabledText]: this.props.disabled,
+            })}
+            style={{
+              ...styles.commentSpan,
+              color: `#${textColor}`,
+              boxSizing: 'border-box',
+              alignItems: 'center',
+              height: '100%',
+              whiteSpace: 'initial',
+              lineHeight: 1.5,
+              border: 1,
+            }}
+            dangerouslySetInnerHTML={{
+              __html: this._getCommentHTML(),
+            }}
+          />
+        )}
       </div>
     );
   }

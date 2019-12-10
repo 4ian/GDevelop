@@ -75,7 +75,7 @@ type Props = {|
   margin?: 'none' | 'normal',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: number | string,
+    fontSize?: 14 | 18,
     fontStyle?: 'normal' | 'italic',
     width?: number | '100%',
     flex?: 1,
@@ -89,8 +89,8 @@ type Props = {|
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',
-    lineHeight?: number | string,
-    padding?: number | string,
+    lineHeight?: 1.4 | 1.5,
+    padding?: 0,
   |},
   underlineFocusStyle?: {| borderColor: string |}, // TODO
   underlineShow?: boolean,

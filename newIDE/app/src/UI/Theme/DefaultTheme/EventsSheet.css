@@ -25,11 +25,6 @@
  */
 .gd-events-sheet-default-theme .rst__moveHandle {
   background: #4ab0e4 !important;
-  border: none;
-}
-
-.gd-events-sheet-default-theme .rst__moveHandle:hover {
-  background-color: #84d2ff!important;
 }
 
 /**

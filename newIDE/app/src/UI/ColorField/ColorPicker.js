@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { SketchPicker } from 'react-color';
 
-type RGBColor = {|
+export type RGBColor = {|
   r: number,
   g: number,
   b: number,

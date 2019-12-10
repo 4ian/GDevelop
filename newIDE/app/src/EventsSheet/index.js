@@ -4,6 +4,9 @@ import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
+import EventTextDialog, {
+  filterEditableWithEventTextDialog,
+} from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
@@ -133,6 +136,8 @@ type State = {|
 
   serializedEventsToExtract: ?Object,
 
+  textEditedEvent: ?gdBaseEvent,
+
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
@@ -207,6 +212,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     searchFocusOffset: null,
 
     allEventsMetadata: [],
+
+    textEditedEvent: null,
   };
 
   componentDidMount() {
@@ -360,6 +367,24 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
 
     return newEvents;
+  };
+
+  openEventTextDialog = () => {
+    const editableEvents = filterEditableWithEventTextDialog(
+      getSelectedEvents(this.state.selection)
+    );
+    if (!editableEvents.length) return;
+
+    const event = editableEvents[editableEvents.length - 1]; // Get the last selected event.
+    this.setState({
+      textEditedEvent: event,
+    });
+  };
+
+  closeEventTextDialog = () => {
+    this.setState({
+      textEditedEvent: null,
+    });
   };
 
   openInstructionEditor = (
@@ -1107,6 +1132,14 @@ export default class EventsSheet extends React.Component<Props, State> {
                           }
                           buildMenuTemplate={() => [
                             {
+                              label: 'Edit',
+                              click: () => this.openEventTextDialog(),
+                              visible:
+                                filterEditableWithEventTextDialog(
+                                  getSelectedEvents(this.state.selection)
+                                ).length > 0,
+                            },
+                            {
                               label: 'Copy',
                               click: () => this.copySelection(),
                               accelerator: 'CmdOrCtrl+C',
@@ -1303,6 +1336,16 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 serializedEventsToExtract: null,
                               });
                             }}
+                          />
+                        )}
+                        {this.state.textEditedEvent && (
+                          <EventTextDialog
+                            event={this.state.textEditedEvent}
+                            onApply={() => {
+                              this.closeEventTextDialog();
+                              this._saveChangesToHistory();
+                            }}
+                            onClose={this.closeEventTextDialog}
                           />
                         )}
                         <InfoBar

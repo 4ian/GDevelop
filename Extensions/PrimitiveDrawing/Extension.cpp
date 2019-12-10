@@ -144,7 +144,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of center"))
-      .AddParameter("expression", _("X position of center"))
+      .AddParameter("expression", _("Y position of center"))
       .AddParameter("expression", _("Number of points of the star (minimum: 2)"))
       .AddParameter("expression", _("Radius (in pixels)"))
       .AddParameter("expression", _("Inner radius (in pixels, half radius by default)"))

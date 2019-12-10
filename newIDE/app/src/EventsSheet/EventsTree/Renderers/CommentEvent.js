@@ -39,9 +39,13 @@ const styles = {
   },
 };
 
+type State = {|
+  editing: boolean,
+|};
+
 export default class CommentEvent extends React.Component<
   EventRendererProps,
-  {||}
+  State
 > {
   state = {
     editing: false,

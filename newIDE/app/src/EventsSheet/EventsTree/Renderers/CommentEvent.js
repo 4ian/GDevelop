@@ -14,16 +14,28 @@ import {
 import { type EventRendererProps } from './EventRenderer';
 const gd = global.gd;
 
+const commentTextStyle = {
+  width: '100%',
+  fontSize: 14,
+};
+
 const styles = {
   container: {
     display: 'flex',
     flexWrap: 'wrap',
     padding: 5,
     overflow: 'hidden',
+    minHeight: 35,
   },
+  commentTextField: commentTextStyle,
   commentSpan: {
-    width: '100%',
-    fontSize: 14,
+    ...commentTextStyle,
+    boxSizing: 'border-box',
+    alignItems: 'center',
+    height: '100%',
+    whiteSpace: 'initial',
+    lineHeight: 1.5,
+    border: 1,
   },
 };
 
@@ -102,7 +114,6 @@ export default class CommentEvent extends React.Component<
         style={{
           ...styles.container,
           backgroundColor: `#${backgroundColor}`,
-          minHeight: 35,
         }}
         onClick={this.edit}
       >
@@ -115,7 +126,7 @@ export default class CommentEvent extends React.Component<
             hintText={t`<Enter comment>`}
             onBlur={this.endEditing}
             onChange={this.onEvent}
-            style={{ ...styles.commentSpan }}
+            style={styles.commentTextField}
             inputStyle={{
               color: `#${textColor}`,
               padding: 0,
@@ -137,12 +148,6 @@ export default class CommentEvent extends React.Component<
             style={{
               ...styles.commentSpan,
               color: `#${textColor}`,
-              boxSizing: 'border-box',
-              alignItems: 'center',
-              height: '100%',
-              whiteSpace: 'initial',
-              lineHeight: 1.5,
-              border: 1,
             }}
             dangerouslySetInnerHTML={{
               __html: this._getCommentHTML(),

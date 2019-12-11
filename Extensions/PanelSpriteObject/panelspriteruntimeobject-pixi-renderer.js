@@ -90,7 +90,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype._updateLocalPositions = func
   this._borderSprites[0].position.y = obj._tBorder;
 
   //Top-right
-  this._borderSprites[1].position.x = obj._width - this._borderSprites[7].width ;
+  this._borderSprites[1].position.x = obj._width - this._borderSprites[1].width ;
   this._borderSprites[1].position.y = 0;
 
   //Top
@@ -104,15 +104,13 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype._updateLocalPositions = func
   this._borderSprites[4].position.y = obj._tBorder;
   //Bottom-Left
   this._borderSprites[5].position.x = 0;
-  this._borderSprites[5].position.y =
-    obj._height - this._borderSprites[5].height;
+  this._borderSprites[5].position.y = obj._height - this._borderSprites[5].height;
   //Bottom
   this._borderSprites[6].position.x = obj._lBorder;
   this._borderSprites[6].position.y = obj._height - obj._bBorder;
   //Bottom-Right
   this._borderSprites[7].position.x = obj._width - this._borderSprites[7].width;
-  this._borderSprites[7].position.y =
-    obj._height - this._borderSprites[7].height;
+  this._borderSprites[7].position.y = obj._height - this._borderSprites[7].height;
 };
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype._updateSpritesAndTexturesSize = function() {

@@ -237,8 +237,22 @@ gdjs.Polygon.collisionTest._statics = {
 };
 
 /**
- * Do a raycast test.<br>
- * Please note that the polygon must be <b>convex</b>!
+ * Represents the result of a raycast test (see `gdjs.Polygon.raycastTest`)
+ *
+ * @typedef {Object} PolygonRaycastTestResult
+ * @property {boolean} collision True if there is a collision between the ray and the polygon
+ * @property {number} closeX X position of the ray/polygon intersection point closest to the ray start point.
+ * @property {number} closeY Y position of the ray/polygon intersection point closest to the ray start point.
+ * @property {number} closeSqDist The squared distance between the ray start point and the closest intersection point.
+ * @property {number} farX X position of the ray/polygon intersection point farthest to the ray start point.
+ * @property {number} farY Y position of the ray/polygon intersection point farthest to the ray start point.
+ * @property {number} farSqDist The squared distance between the ray start point and the farthest intersection point.
+ */
+
+/**
+ * Do an intersection test between a polygon and a ray.
+ *
+ * Please note that the polygon must be **convex**!
  *
  * For some theory, check <a href="https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments">Find the Intersection Point of Two Line Segments</a>.
  *
@@ -247,10 +261,11 @@ gdjs.Polygon.collisionTest._statics = {
  * @param {number} startY The raycast start point Y
  * @param {number} endX The raycast end point X
  * @param {number} endY The raycast end point Y
- * @return A raycast result with the contact points and distances
+ * @return {PolygonRaycastTestResult} A raycast result with the contact points and distances
  */
 gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 {
+    /** @type PolygonRaycastTestResult */
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
 
@@ -356,6 +371,21 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 
     return result;
 };
+
+/**
+ * Copy a PolygonRaycastTestResult into another.
+ * @param {PolygonRaycastTestResult} source The result to copy
+ * @param {PolygonRaycastTestResult} destination Where to save the results
+ */
+gdjs.Polygon.raycastTest.copyResultTo = function(source, destination) {
+    destination.collision = source.collision;
+    destination.closeX = source.closeX;
+    destination.closeY = source.closeY;
+    destination.closeSqDist = source.closeSqDist;
+    destination.farX = source.farX;
+    destination.farY = source.farY;
+    destination.farSqDist = source.farSqDist;
+}
 
 gdjs.Polygon.raycastTest._statics = {
     p: [0,0],

@@ -75,7 +75,9 @@ gdjs.ObjectPositionsManager = function() {
    * @type Object.<number, ObjectPosition>
    */
   this._allObjectPositions = {};
+};
 
+gdjs.ObjectPositionsManager._statics = {
   /**
    * A map containing all `ObjectPosition`s to be re-insert in the spatial data structure
    * just after being removed in `update`. They are keyed by `objectNameId`, so that
@@ -87,8 +89,8 @@ gdjs.ObjectPositionsManager = function() {
    *
    * @type Object.<string, ObjectPosition[]>
    */
-  this._bulkObjectPositionUpdates = {};
-};
+  bulkObjectPositionUpdates: {},
+}
 
 /**
  * Tool function to move an ObjectPosition, and update the associated object coordinates.
@@ -197,9 +199,11 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   }
 
   // Prepare the batched "update" insertions.
-  for (var objectNameId in this._bulkObjectPositionUpdates) {
+  var bulkObjectPositionUpdates =
+    gdjs.ObjectPositionsManager._statics.bulkObjectPositionUpdates;
+  for (var objectNameId in bulkObjectPositionUpdates) {
     // Clear the updates (we avoid recreating a temporary object).
-    this._bulkObjectPositionUpdates[objectNameId].length = 0;
+    bulkObjectPositionUpdates[objectNameId].length = 0;
   }
 
   for (var objectId in this._dirtyObjects) {
@@ -209,7 +213,7 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
 
     // Note that it's possible for the objectNameId to have changed
     // (in case of object deletion and creation of another one with a same id)
-    var objectPosition = this._allObjectPositions[objectId] = {
+    var objectPosition = (this._allObjectPositions[objectId] = {
       object: object,
       objectId: object.id,
       objectNameId: objectNameId,
@@ -219,20 +223,21 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
       centerY: object.getDrawableY() + object.getCenterY(),
       hitboxes: object.getHitBoxes(),
       aabb: object.getAABB(),
-    };
+    });
 
     // Don't use `insert`. Instead, batch the updates, doing
     // all of them at once using `load` (see later).
-    this._bulkObjectPositionUpdates[objectNameId] = this._bulkObjectPositionUpdates[objectNameId] || [];
-    this._bulkObjectPositionUpdates[objectNameId].push(objectPosition);
+    bulkObjectPositionUpdates[objectNameId] =
+      bulkObjectPositionUpdates[objectNameId] || [];
+    bulkObjectPositionUpdates[objectNameId].push(objectPosition);
   }
 
   // Use "load" instead of multiple `insert`s, as bulk insertion leads
   // to better insertion and query performance (internally if the number
   // of objects loaded is too small, it will go back to multiple `insert`s)
-  for (var objectNameId in this._bulkObjectPositionUpdates) {
+  for (var objectNameId in bulkObjectPositionUpdates) {
     var rbush = this._getPositionsRBush(objectNameId);
-    rbush.load(this._bulkObjectPositionUpdates[objectNameId]);
+    rbush.load(bulkObjectPositionUpdates[objectNameId]);
   }
 
   // Clear the set of dirty objects.
@@ -670,7 +675,7 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
  * @param {number} x X position of the point
  * @param {number} y Y position of the point
  */
-gdjs.ObjectPositionsManager._isPointInside = function(hitBoxes, x, y) {
+gdjs.ObjectPositionsManager._isPointInsideHitboxes = function(hitBoxes, x, y) {
   for (var k = 0, lenk = hitBoxes.length; k < lenk; ++k) {
     if (gdjs.Polygon.isPointInside(hitBoxes[k], x, y)) return true;
   }
@@ -706,7 +711,7 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
   var objectNameIdsSet = this._getAllObjectNameIds(objectIdsSet);
 
   for (var objectNameId in objectNameIdsSet) {
-    // Check if all points for all object positions
+    // Check all points for all object positions
     for (var i = 0; i < points.length; i++) {
       var point = points[i];
       var searchArea = {
@@ -725,7 +730,7 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
         var objectPosition = nearbyObjectPositions[j];
         var isOnObject =
           !accurate ||
-          gdjs.ObjectPositionsManager._isPointInside(
+          gdjs.ObjectPositionsManager._isPointInsideHitboxes(
             objectPosition.hitboxes,
             point[0],
             point[1]
@@ -759,7 +764,159 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
   }
 };
 
+/**
+ * Do an intersection test between hitboxes and a ray.
+ *
+ * @param {gdjs.Polygon[]} hitBoxes Hitboxes to intersect the ray with
+ * @param {number} x X position of the ray starting point
+ * @param {number} y Y position of the ray starting point
+ * @param {number} endX X position of the ray ending point
+ * @param {number} endY Y position of the ray ending point
+ * @param {number} maxSqDist Maximum squared distance for the ray intersection (should be the squared distance between start and end points).
+ * @param {boolean} inverted true to find the position that is the farthest one intersecting with the ray, false to find the closest.
+ * @returns {PolygonRaycastTestResult} The result of the raycasting with the hitboxes.
+ */
+gdjs.ObjectPositionsManager._raycastAgainstHitboxes = function(
+  hitBoxes,
+  x,
+  y,
+  endX,
+  endY,
+  maxSqDist,
+  inverted
+) {
+  var result = gdjs.ObjectPositionsManager._raycastAgainstHitboxes._result;
+  result.collision = false;
+
+  var testSqDist = inverted ? 0 : maxSqDist;
+
+  for (var i = 0; i < hitBoxes.length; i++) {
+    var res = gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
+    if (res.collision) {
+      if (!inverted && res.closeSqDist < testSqDist) {
+        testSqDist = res.closeSqDist;
+        gdjs.Polygon.raycastTest.copyResultTo(res, result);
+      } else if (
+        inverted &&
+        res.farSqDist > testSqDist &&
+        res.farSqDist <= maxSqDist
+      ) {
+        testSqDist = res.farSqDist;
+        gdjs.Polygon.raycastTest.copyResultTo(res, result);
+      }
+    }
+  }
+
+  return result;
+};
+
+/** @type PolygonRaycastTestResult */
+gdjs.ObjectPositionsManager._raycastAgainstHitboxes._result = {
+  collision: false,
+  closeX: 0,
+  closeY: 0,
+  closeSqDist: 0,
+  farX: 0,
+  farY: 0,
+  farSqDist: 0,
+};
+
+/**
+ * Cast a ray from the start position until the end position.
+ *
+ * Filter the set of objects to only keep the closest (or farthest, if `inverted` is true)
+ * object position, intersecting with the ray, to the starting point.
+ * The intersection position of this closest (or farthest) point is stored in `intersectionCoordinates`.
+ *
+ * @param {Object.<number, boolean>} objectIdsSet The set of object ids to intersect the ray with
+ * @param {number} x X position of the ray starting point
+ * @param {number} y Y position of the ray starting point
+ * @param {number} endX X position of the ray ending point
+ * @param {number} endY Y position of the ray ending point
+ * @param {number[]} intersectionCoordinates The two-elements array where to store the intersection X and Y position
+ * @param {boolean} inverted true to find the object that is the farthest one intersecting with the ray, false to find the closest.
+ * @returns {boolean} true if an intersection was found (in which case `objectIdsSet` is filtered and `intersectionCoordinates` updated).
+ */
+gdjs.ObjectPositionsManager.prototype.raycastTest = function(
+  objectIdsSet,
+  x,
+  y,
+  endX,
+  endY,
+  intersectionCoordinates,
+  inverted
+) {
+  this.update();
+
+  /** @type {?number} */
+  var matchObjectId = null;
+  var maxSqDist = (endX - x) * (endX - x) + (endY - y) * (endY - y);
+  var testSqDist = inverted ? 0 : maxSqDist;
+  var searchArea = {
+    minX: x < endX ? x : endX,
+    minY: y < endY ? y : endY,
+    maxX: x > endX ? x : endX,
+    maxY: y > endY ? y : endY,
+  };
+
+  // Get the set of all objectNameIds for the list, to know in which
+  // RBush we have to search them.
+  var objectNameIdsSet = this._getAllObjectNameIds(objectIdsSet);
+
+  for (var objectNameId in objectNameIdsSet) {
+    /** @type ObjectPosition[] */
+    var nearbyObjectPositions = this._getPositionsRBush(objectNameId).search(
+      searchArea
+    );
+
+    for (var j = 0; j < nearbyObjectPositions.length; ++j) {
+      var objectPosition = nearbyObjectPositions[j];
+
+      var result = gdjs.ObjectPositionsManager._raycastAgainstHitboxes(
+        objectPosition.hitboxes,
+        x,
+        y,
+        endX,
+        endY,
+        maxSqDist,
+        inverted
+      );
+
+      if (result.collision) {
+        if (!inverted && result.closeSqDist <= testSqDist) {
+          testSqDist = result.closeSqDist;
+          matchObjectId = objectPosition.objectId;
+          intersectionCoordinates[0] = result.closeX;
+          intersectionCoordinates[1] = result.closeY;
+        } else if (inverted && result.farSqDist >= testSqDist) {
+          testSqDist = result.farSqDist;
+          matchObjectId = objectPosition.objectId;
+          intersectionCoordinates[0] = result.farX;
+          intersectionCoordinates[1] = result.farY;
+        }
+      }
+    }
+  }
+
+  gdjs.ObjectPositionsManager._clearObjectIdsSet(objectIdsSet);
+  if (matchObjectId == null) return false;
+
+  objectIdsSet[matchObjectId] = true;
+  return true;
+};
+
 // Sets utilities:
+
+/**
+ * Clear the set.
+ *
+ * @param {Object.<number, boolean>} objectIdsSet
+ */
+gdjs.ObjectPositionsManager._clearObjectIdsSet = function(objectIdsSet) {
+  for (var objectId in objectIdsSet) {
+    delete objectIdsSet[objectId];
+  }
+};
 
 /**
  * Delete any element of the first set that is not in the second one.

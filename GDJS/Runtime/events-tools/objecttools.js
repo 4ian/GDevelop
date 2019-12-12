@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -186,6 +187,7 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
         var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            // @ts-ignore
             if (negatePredicate ^ predicate(arr[k], extraArg)) {
                 isTrue = true;
                 arr[k].pick = true; //Pick the objects
@@ -389,6 +391,7 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
         for(var j = 0;j < list.length;++j) {
             var object = list[j];
             var distance = object.getSqDistanceTo(x, y);
+            // @ts-ignore
             if( first || (distance < best ^ inverted)) {
                 best = distance;
                 bestObject = object;
@@ -405,16 +408,54 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
     return true;
 };
 
-gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, varX, varY, inverted) {
+/**
+ * @param {Hashtable} objectsLists The lists of objects to intersect the ray with
+ * @param {number} x X position of the ray starting point
+ * @param {number} y Y position of the ray starting point
+ * @param {number} angle Angle of the ray
+ * @param {number} dist Maximum distance ("radius") before stopping the ray
+ * @param {gdjs.Variable} varX Variable where to store the ray/object intersection X position
+ * @param {gdjs.Variable} varY Variable where to store the ray/object intersection Y position
+ * @param {boolean} inverted true to find the object that is the farthest one intersecting with the ray, false to find the closest.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, varX, varY, inverted, runtimeScene) {
     return gdjs.evtTools.object.raycastObjectToPosition(
                 objectsLists,
                 x, y,
                 x + dist*Math.cos(angle*Math.PI/180.0),
                 y + dist*Math.sin(angle*Math.PI/180.0),
-                varX, varY, inverted);
+                varX, varY, inverted, runtimeScene);
 };
 
-gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX, endY, varX, varY, inverted) {
+
+/**
+ * @param {Hashtable} objectsLists The lists of objects to intersect the ray with
+ * @param {number} x X position of the ray starting point
+ * @param {number} y Y position of the ray starting point
+ * @param {number} endX X position of the ray ending point
+ * @param {number} endY Y position of the ray ending point
+ * @param {gdjs.Variable} varX Variable where to store the ray/object intersection X position
+ * @param {gdjs.Variable} varY Variable where to store the ray/object intersection Y position
+ * @param {boolean} inverted true to find the object that is the farthest one intersecting with the ray, false to find the closest.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX, endY, varX, varY, inverted, runtimeScene) {
+    var objectIdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists);
+
+    var intersectionCoordinates = [0, 0];
+    var foundIntersection = runtimeScene.getObjectPositionsManager().raycastTest(objectIdsSet, x, y, endX, endY, intersectionCoordinates, inverted);
+
+    if (!foundIntersection)
+        return false;
+
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists, objectIdsSet);
+    varX.setNumber(intersectionCoordinates[0]);
+    varY.setNumber(intersectionCoordinates[1]);
+    return true;
+}
+
+gdjs.evtTools.object.OLDraycastObjectToPosition = function(objectsLists, x, y, endX, endY, varX, varY, inverted) {
     var matchObject = null;
     var testSqDist = inverted ? 0 : (endX - x)*(endX - x) + (endY - y)*(endY - y);
     var resultX = 0;

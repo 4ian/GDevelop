@@ -92,7 +92,7 @@ describe('gdjs.ObjectPositionsManager', function() {
     return { objectPositionsManager, object0, object1, object2, object3 };
   };
 
-  describe('Basics distance and collision tests', function() {
+  describe('Basics distance, point and collision tests', function() {
     it('can find nearby object positions', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
       const object1IdsSet = { 0: true };
@@ -263,6 +263,68 @@ describe('gdjs.ObjectPositionsManager', function() {
       ).to.be(false);
       expect(object1IdsSet).to.eql({});
       expect(object2IdsSet).to.eql({});
+    });
+  });
+
+  describe('Raycast tests', function() {
+    it('can find the closest intersection between ray and objects', function() {
+      const { objectPositionsManager } = makeObjectPositionsManager();
+      const objectIdsSet = { 0: true, 1: true };
+
+      const intersectionCoordinates = [0, 0];
+      expect(
+        objectPositionsManager.raycastTest(
+          objectIdsSet,
+          0,
+          0,
+          25,
+          25,
+          intersectionCoordinates,
+          false
+        )
+      ).to.be(true);
+      expect(objectIdsSet).to.eql({ 0: true });
+      expect(intersectionCoordinates).to.eql([10, 10]);
+    });
+
+    it('can find the farthest intersection between ray and objects', function() {
+      const { objectPositionsManager } = makeObjectPositionsManager();
+      const objectIdsSet = { 0: true, 1: true };
+
+      const intersectionCoordinates = [0, 0];
+      expect(
+        objectPositionsManager.raycastTest(
+          objectIdsSet,
+          0,
+          0,
+          30,
+          30,
+          intersectionCoordinates,
+          true
+        )
+      ).to.be(true);
+      expect(objectIdsSet).to.eql({ 1: true });
+      expect(intersectionCoordinates).to.eql([20, 20]);
+    });
+
+    it('can find NO intersection between ray and objects', function() {
+      const { objectPositionsManager } = makeObjectPositionsManager();
+      const objectIdsSet = { 0: true, 1: true };
+
+      const intersectionCoordinates = [0, 0];
+      expect(
+        objectPositionsManager.raycastTest(
+          objectIdsSet,
+          0,
+          8,
+          30,
+          8,
+          intersectionCoordinates,
+          false
+        )
+      ).to.be(false);
+      expect(objectIdsSet).to.eql({});
+      expect(intersectionCoordinates).to.eql([0, 0]);
     });
   });
 

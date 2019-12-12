@@ -24,7 +24,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(
       new StretchedSprite(new PIXI.Texture(texture)), //Left
       new PIXI.Sprite(texture), //Bottom-Left
       new StretchedSprite(new PIXI.Texture(texture)), //Bottom
-      new PIXI.Sprite(texture) //Bottom-Right
+      new PIXI.Sprite(texture), //Bottom-Right
     ];
   }
 
@@ -38,7 +38,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(
 
   this._alpha = this._spritesContainer.alpha;
   runtimeScene
-    .getLayer("")
+    .getLayer('')
     .getRenderer()
     .addRendererObject(this._spritesContainer, runtimeObject.getZOrder());
 };
@@ -90,7 +90,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype._updateLocalPositions = func
   this._borderSprites[0].position.y = obj._tBorder;
 
   //Top-right
-  this._borderSprites[1].position.x = obj._width - this._borderSprites[1].width ;
+  this._borderSprites[1].position.x = obj._width - this._borderSprites[1].width;
   this._borderSprites[1].position.y = 0;
 
   //Top
@@ -104,13 +104,15 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype._updateLocalPositions = func
   this._borderSprites[4].position.y = obj._tBorder;
   //Bottom-Left
   this._borderSprites[5].position.x = 0;
-  this._borderSprites[5].position.y = obj._height - this._borderSprites[5].height;
+  this._borderSprites[5].position.y =
+    obj._height - this._borderSprites[5].height;
   //Bottom
   this._borderSprites[6].position.x = obj._lBorder;
   this._borderSprites[6].position.y = obj._height - obj._bBorder;
   //Bottom-Right
   this._borderSprites[7].position.x = obj._width - this._borderSprites[7].width;
-  this._borderSprites[7].position.y = obj._height - this._borderSprites[7].height;
+  this._borderSprites[7].position.y =
+    obj._height - this._borderSprites[7].height;
 };
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype._updateSpritesAndTexturesSize = function() {
@@ -125,26 +127,26 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype._updateSpritesAndTexturesSiz
     0
   );
 
- //Right
+  //Right
   this._borderSprites[0].width = obj._rBorder;
   this._borderSprites[0].height = Math.max(
     obj._height - obj._tBorder - obj._bBorder,
     0
   );
 
-//Top
+  //Top
   this._borderSprites[2].height = obj._tBorder;
   this._borderSprites[2].width = Math.max(
     obj._width - obj._rBorder - obj._lBorder,
     0
   );
-//Left
+  //Left
   this._borderSprites[4].width = obj._lBorder;
   this._borderSprites[4].height = Math.max(
     obj._height - obj._tBorder - obj._bBorder,
     0
   );
-//Bottom
+  //Bottom
   this._borderSprites[6].height = obj._bBorder;
   this._borderSprites[6].width = Math.max(
     obj._width - obj._rBorder - obj._lBorder,
@@ -198,9 +200,9 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        texture.width - obj._rBorder ,
+        texture.width - obj._rBorder,
         obj._tBorder,
-        obj._rBorder ,
+        obj._rBorder,
         texture.height - obj._tBorder - obj._bBorder
       )
     )
@@ -232,9 +234,9 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(
     makeInsideTexture(
       new PIXI.Rectangle(
         obj._lBorder,
-        texture.height - obj._bBorder ,
+        texture.height - obj._bBorder,
         texture.width - obj._lBorder - obj._rBorder,
-        obj._bBorder 
+        obj._bBorder
       )
     )
   );
@@ -301,11 +303,11 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateHeight = function() {
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setColor = function(
   rgbColor
 ) {
-  var colors = rgbColor.split(";");
+  var colors = rgbColor.split(';');
   if (colors.length < 3) return;
 
   this._centerSprite.tint =
-    "0x" +
+    '0x' +
     gdjs.rgbToHex(
       parseInt(colors[0], 10),
       parseInt(colors[1], 10),
@@ -318,7 +320,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setColor = function(
     borderCounter++
   ) {
     this._borderSprites[borderCounter].tint =
-      "0x" +
+      '0x' +
       gdjs.rgbToHex(
         parseInt(colors[0], 10),
         parseInt(colors[1], 10),
@@ -333,9 +335,9 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getColor = function() {
   var rgb = PIXI.utils.hex2rgb(this._centerSprite.tint);
   return (
     Math.floor(rgb[0] * 255) +
-    ";" +
+    ';' +
     Math.floor(rgb[1] * 255) +
-    ";" +
+    ';' +
     Math.floor(rgb[2] * 255)
   );
 };

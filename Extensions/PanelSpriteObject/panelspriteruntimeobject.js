@@ -10,57 +10,73 @@
  * @extends RuntimeObject
  * @memberof gdjs
  */
-gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
-{
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData) {
+  gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-    this._rBorder = objectData.rightMargin;
-    this._lBorder = objectData.leftMargin;
-    this._tBorder = objectData.topMargin;
-    this._bBorder = objectData.bottomMargin;
-    this._tiled = objectData.tiled;
-    this._width = objectData.width;
-    this._height = objectData.height;
-    this.opacity = 255;
+  this._rBorder = objectData.rightMargin;
+  this._lBorder = objectData.leftMargin;
+  this._tBorder = objectData.topMargin;
+  this._bBorder = objectData.bottomMargin;
+  this._tiled = objectData.tiled;
+  this._width = objectData.width;
+  this._height = objectData.height;
+  this.opacity = 255;
 
-    if (this._renderer)
-        gdjs.PanelSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene,
-            objectData.texture, objectData.tiled);
-    else
-        this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(this, runtimeScene,
-            objectData.texture, objectData.tiled);
+  if (this._renderer) {
+    gdjs.PanelSpriteRuntimeObjectRenderer.call(
+      this._renderer,
+      this,
+      runtimeScene,
+      objectData.texture,
+      objectData.tiled
+    );
+  } else {
+    this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(
+      this,
+      runtimeScene,
+      objectData.texture,
+      objectData.tiled
+    );
+  }
 
-    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
-    this.onCreated();
+  // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+  this.onCreated();
 };
 
-gdjs.PanelSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "PanelSpriteObject::PanelSprite";
+gdjs.PanelSpriteRuntimeObject.prototype = Object.create(
+  gdjs.RuntimeObject.prototype
+);
+gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor =
+  'PanelSpriteObject::PanelSprite';
 
 gdjs.PanelSpriteRuntimeObject.prototype.getRendererObject = function() {
-    return this._renderer.getRendererObject();
+  return this._renderer.getRendererObject();
 };
 
-gdjs.PanelSpriteRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
-    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
+gdjs.PanelSpriteRuntimeObject.prototype.onDestroyFromScene = function(
+  runtimeScene
+) {
+  gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-    if (this._renderer.onDestroy) {
-        this._renderer.onDestroy();
-    }
+  if (this._renderer.onDestroy) {
+    this._renderer.onDestroy();
+  }
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype.update = function() {
-    this._renderer.ensureUpToDate();
-}
+  this._renderer.ensureUpToDate();
+};
 
 /**
  * Initialize the extra parameters that could be set for an instance.
  */
-gdjs.PanelSpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-    if ( initialInstanceData.customSize ) {
-        this.setWidth(initialInstanceData.width);
-        this.setHeight(initialInstanceData.height);
-    }
+gdjs.PanelSpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
+  initialInstanceData
+) {
+  if (initialInstanceData.customSize) {
+    this.setWidth(initialInstanceData.width);
+    this.setHeight(initialInstanceData.height);
+  }
 };
 
 /**
@@ -68,8 +84,8 @@ gdjs.PanelSpriteRuntimeObject.prototype.extraInitializationFromInitialInstance =
  * @param {number} x The new x position in pixels.
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setX = function(x) {
-    gdjs.RuntimeObject.prototype.setX.call(this, x);
-    this._renderer.updatePosition();
+  gdjs.RuntimeObject.prototype.setX.call(this, x);
+  this._renderer.updatePosition();
 };
 
 /**
@@ -77,8 +93,8 @@ gdjs.PanelSpriteRuntimeObject.prototype.setX = function(x) {
  * @param {number} y The new y position in pixels.
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setY = function(y) {
-    gdjs.RuntimeObject.prototype.setY.call(this, y);
-    this._renderer.updatePosition();
+  gdjs.RuntimeObject.prototype.setY.call(this, y);
+  this._renderer.updatePosition();
 };
 
 /**
@@ -86,8 +102,11 @@ gdjs.PanelSpriteRuntimeObject.prototype.setY = function(y) {
  * @param {string} textureName The name of the texture.
  * @param {gdjs.RuntimeScene} runtimeScene The scene the object lives in.
  */
-gdjs.PanelSpriteRuntimeObject.prototype.setTexture = function(textureName, runtimeScene) {
-    this._renderer.setTexture(textureName, runtimeScene);
+gdjs.PanelSpriteRuntimeObject.prototype.setTexture = function(
+  textureName,
+  runtimeScene
+) {
+  this._renderer.setTexture(textureName, runtimeScene);
 };
 
 /**
@@ -95,8 +114,8 @@ gdjs.PanelSpriteRuntimeObject.prototype.setTexture = function(textureName, runti
  * @param {number} angle The new angle in degrees.
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setAngle = function(angle) {
-    gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
-    this._renderer.updateAngle();
+  gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
+  this._renderer.updateAngle();
 };
 
 /**
@@ -104,7 +123,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.setAngle = function(angle) {
  * @return {number} The width in pixels
  */
 gdjs.PanelSpriteRuntimeObject.prototype.getWidth = function() {
-    return this._width;
+  return this._width;
 };
 
 /**
@@ -112,7 +131,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.getWidth = function() {
  * @return {number} The height in pixels
  */
 gdjs.PanelSpriteRuntimeObject.prototype.getHeight = function() {
-    return this._height;
+  return this._height;
 };
 
 /**
@@ -120,8 +139,8 @@ gdjs.PanelSpriteRuntimeObject.prototype.getHeight = function() {
  * @param {number} width The new width in pixels.
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setWidth = function(width) {
-    this._width = width;
-    this._renderer.updateWidth();
+  this._width = width;
+  this._renderer.updateWidth();
 };
 
 /**
@@ -129,8 +148,8 @@ gdjs.PanelSpriteRuntimeObject.prototype.setWidth = function(width) {
  * @param {number} height The new height in pixels.
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setHeight = function(height) {
-    this._height = height;
-    this._renderer.updateHeight();
+  this._height = height;
+  this._renderer.updateHeight();
 };
 
 /**
@@ -138,11 +157,11 @@ gdjs.PanelSpriteRuntimeObject.prototype.setHeight = function(height) {
  * @param {number} opacity The new opacity, between 0 (transparent) and 255 (opaque).
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setOpacity = function(opacity) {
-    if ( opacity < 0 ) opacity = 0;
-    if ( opacity > 255 ) opacity = 255;
+  if (opacity < 0) opacity = 0;
+  if (opacity > 255) opacity = 255;
 
-    this.opacity = opacity;
-    this._renderer.updateOpacity();
+  this.opacity = opacity;
+  this._renderer.updateOpacity();
 };
 
 /**
@@ -150,7 +169,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.setOpacity = function(opacity) {
  * @return {number} The opacity, between 0 (transparent) and 255 (opaque).
  */
 gdjs.PanelSpriteRuntimeObject.prototype.getOpacity = function() {
-    return this.opacity;
+  return this.opacity;
 };
 
 /**
@@ -159,7 +178,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.getOpacity = function() {
  * @param {string} rgbColor The color, in RGB format ("128;200;255").
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
-    this._renderer.setColor(rgbColor);
+  this._renderer.setColor(rgbColor);
 };
 
 /**
@@ -168,5 +187,5 @@ gdjs.PanelSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
  * @returns {string} rgbColor The color, in RGB format ("128;200;255").
  */
 gdjs.PanelSpriteRuntimeObject.prototype.getColor = function() {
-    return this._renderer.getColor();
+  return this._renderer.getColor();
 };

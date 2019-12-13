@@ -246,7 +246,7 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   }
 
   // Handle removed objects *after* handling dirty objects.
-  // This is because an object can be mark for deletion, then moved
+  // This is because an object can be marked for deletion, then moved
   // before the end of the frame.
   for (var objectId in this._removedObjectIdsSet) {
     var objectPosition = this._allObjectPositions[objectId];
@@ -266,15 +266,15 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
 /**
  * Returns a set containing all the name identifiers corresponding to the object
  * passed (as a set of object ids).
- * @param {Object.<number, boolean>} objectIdsSet The set of object identifiers
+ * @param {ObjectIdsSet} objectIdsSet The set of object identifiers
  * @returns {Object.<number, boolean>} The set of name identifiers
  */
 gdjs.ObjectPositionsManager.prototype._getAllObjectNameIds = function(
   objectIdsSet
 ) {
-  /** @type Object.<number, boolean> */
-  var objectNameIdsSet = {};
-  for (var objectId in objectIdsSet) {
+  var objectNameIdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
+
+  for (var objectId in objectIdsSet.items) {
     var objectPosition = this._allObjectPositions[objectId];
 
     // Some IDs can be missing in the map of all object positions
@@ -307,8 +307,8 @@ gdjs.ObjectPositionsManager._getObjectPositionsSquaredDistance = function(
 };
 
 /**
- * @param {Object.<number, boolean>} object1IdsSet
- * @param {Object.<number, boolean>} object2IdsSet
+ * @param {ObjectIdsSet} object1IdsSet
+ * @param {ObjectIdsSet} object2IdsSet
  * @param {number} distance
  * @param {boolean} inverted
  */
@@ -322,16 +322,14 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
 
   var squaredDistance = distance * distance;
   var isTrue = false;
-  /** @type {Object.<number, boolean>} */
-  var pickedObject1IdsSet = {};
-  /** @type {Object.<number, boolean>} */
-  var pickedObject2IdsSet = {};
+  var pickedObject1IdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
+  var pickedObject2IdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
 
   // Get the set of all objectNameIds for the second list, to know in which
   // RBush we have to search them.
   var object2NameIdsSet = this._getAllObjectNameIds(object2IdsSet);
 
-  for (var object1Id in object1IdsSet) {
+  for (var object1Id in object1IdsSet.items) {
     var atLeastOneObject = false;
 
     var object1Position = this._allObjectPositions[object1Id];
@@ -360,7 +358,7 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
         // It's possible that we're testing distance between lists containing the same objects
         if (object2Position.objectId === object1Position.objectId) continue;
 
-        if (object2IdsSet[object2Position.objectId]) {
+        if (object2IdsSet.items[object2Position.objectId]) {
           if (
             gdjs.ObjectPositionsManager._getObjectPositionsSquaredDistance(
               object1Position,
@@ -370,8 +368,8 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
             if (!inverted) {
               isTrue = true;
 
-              pickedObject2IdsSet[object2Position.objectId] = true;
-              pickedObject1IdsSet[object1Id] = true;
+              pickedObject2IdsSet.items[object2Position.objectId] = true;
+              pickedObject1IdsSet.items[object1Id] = true;
             }
 
             atLeastOneObject = true;
@@ -383,7 +381,7 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
     if (!atLeastOneObject && inverted) {
       // This is the case when, for example, the object is *not* overlapping *any* other object.
       isTrue = true;
-      pickedObject1IdsSet[object1Id] = true;
+      pickedObject1IdsSet.items[object1Id] = true;
       // In case of inverted === true, objects from the second list are not picked.
     }
   }
@@ -440,8 +438,8 @@ gdjs.ObjectPositionsManager.prototype._checkHitboxesCollision = function(
  * If `inverted` is true, only the first set is filtered with the object ids that are NOT
  * in collision with any object of the second set.
  *
- * @param {Object.<number, boolean>} object1IdsSet
- * @param {Object.<number, boolean>} object2IdsSet
+ * @param {ObjectIdsSet} object1IdsSet
+ * @param {ObjectIdsSet} object2IdsSet
  * @param {boolean} inverted
  * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
  */
@@ -454,16 +452,14 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
   this.update();
 
   var isTrue = false;
-  /** @type {Object.<number, boolean>} */
-  var pickedObject1IdsSet = {};
-  /** @type {Object.<number, boolean>} */
-  var pickedObject2IdsSet = {};
+  var pickedObject1IdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
+  var pickedObject2IdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
 
   // Get the set of all objectNameIds for the second list, to know in which
   // RBush we have to search them.
   var object2NameIdsSet = this._getAllObjectNameIds(object2IdsSet);
 
-  for (var object1Id in object1IdsSet) {
+  for (var object1Id in object1IdsSet.items) {
     var atLeastOneObject = false;
 
     var object1Position = this._allObjectPositions[object1Id];
@@ -492,7 +488,7 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
         // It's possible that we're testing collision between lists containing the same objects
         if (object2Position.objectId === object1Position.objectId) continue;
 
-        if (object2IdsSet[object2Position.objectId]) {
+        if (object2IdsSet.items[object2Position.objectId]) {
           var hitBoxes1 = object1Position.hitboxes;
           var hitBoxes2 = object2Position.hitboxes;
 
@@ -506,8 +502,8 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
             if (!inverted) {
               isTrue = true;
 
-              pickedObject2IdsSet[object2Position.objectId] = true;
-              pickedObject1IdsSet[object1Id] = true;
+              pickedObject2IdsSet.items[object2Position.objectId] = true;
+              pickedObject1IdsSet.items[object1Id] = true;
             }
 
             atLeastOneObject = true;
@@ -519,7 +515,7 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
     if (!atLeastOneObject && inverted) {
       // This is the case when, for example, the object is *not* overlapping *any* other object.
       isTrue = true;
-      pickedObject1IdsSet[object1Id] = true;
+      pickedObject1IdsSet.items[object1Id] = true;
       // In case of inverted === true, objects from the second list are not picked.
     }
   }
@@ -577,8 +573,8 @@ gdjs.ObjectPositionsManager._separateHitboxes = function(
 /**
  * Separate the specified sets of objects.
  *
- * @param {Object.<number, boolean>} object1IdsSet
- * @param {Object.<number, boolean>} object2IdsSet
+ * @param {ObjectIdsSet} object1IdsSet
+ * @param {ObjectIdsSet} object2IdsSet
  * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
  */
 gdjs.ObjectPositionsManager.prototype.separateObjects = function(
@@ -597,7 +593,7 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
   /** @type ObjectPositionCoordinatesUpdate[] */
   var objectPositionUpdates = [];
 
-  for (var object1Id in object1IdsSet) {
+  for (var object1Id in object1IdsSet.items) {
     var moved = false;
     var moveCoordinates = [0, 0];
 
@@ -627,7 +623,7 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
         // It's possible that we're testing collision between lists containing the same objects
         if (object2Position.objectId === object1Position.objectId) continue;
 
-        if (object2IdsSet[object2Position.objectId]) {
+        if (object2IdsSet.items[object2Position.objectId]) {
           moved =
             gdjs.ObjectPositionsManager._separateHitboxes(
               object1Position.hitboxes,
@@ -689,7 +685,7 @@ gdjs.ObjectPositionsManager._isPointInsideHitboxes = function(hitBoxes, x, y) {
  *
  * If `inverted` is true, the objects which are NOT containing ANY point will be picked.
  *
- * @param {Object.<number, boolean>} objectIdsSet The set of object ids to filter
+ * @param {ObjectIdsSet} objectIdsSet The set of object ids to filter
  * @param {number[][]} points Array of point positions (X as first element, Y as second element)
  * @param {boolean} accurate If true, use the hitboxes to check if a point is inside an object
  * @param {boolean} inverted If true, filter to keep only the objects not containing any of the points inside them.
@@ -703,8 +699,7 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
   this.update();
 
   var isAnyObjectContainingAnyPoint = false;
-  /** @type {Object.<number, boolean>} */
-  var pickedObjectIdsSet = {};
+  var pickedObjectIdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
 
   // Get the set of all objectNameIds for the list, to know in which
   // RBush we have to search them.
@@ -728,17 +723,20 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
 
       for (var j = 0; j < nearbyObjectPositions.length; ++j) {
         var objectPosition = nearbyObjectPositions[j];
-        var isOnObject =
-          !accurate ||
-          gdjs.ObjectPositionsManager._isPointInsideHitboxes(
-            objectPosition.hitboxes,
-            point[0],
-            point[1]
-          );
 
-        if (isOnObject) {
-          if (!inverted) isAnyObjectContainingAnyPoint = true;
-          pickedObjectIdsSet[objectPosition.objectId] = true;
+        if (objectIdsSet.items[objectPosition.objectId]) {
+          var isOnObject =
+            !accurate ||
+            gdjs.ObjectPositionsManager._isPointInsideHitboxes(
+              objectPosition.hitboxes,
+              point[0],
+              point[1]
+            );
+
+          if (isOnObject) {
+            if (!inverted) isAnyObjectContainingAnyPoint = true;
+            pickedObjectIdsSet.items[objectPosition.objectId] = true;
+          }
         }
       }
     }
@@ -752,8 +750,7 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
     );
 
     // Return true if there is at least one object not colliding with any point
-    for (var anyObjectId in objectIdsSet) return true;
-    return false;
+    return !gdjs.ObjectPositionsManager._isObjectIdsSetEmpty(objectIdsSet);
   } else {
     // Trim sets and return the result
     gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
@@ -828,7 +825,7 @@ gdjs.ObjectPositionsManager._raycastAgainstHitboxes._result = {
  * object position, intersecting with the ray, to the starting point.
  * The intersection position of this closest (or farthest) point is stored in `intersectionCoordinates`.
  *
- * @param {Object.<number, boolean>} objectIdsSet The set of object ids to intersect the ray with
+ * @param {ObjectIdsSet} objectIdsSet The set of object ids to intersect the ray with
  * @param {number} x X position of the ray starting point
  * @param {number} y Y position of the ray starting point
  * @param {number} endX X position of the ray ending point
@@ -872,27 +869,29 @@ gdjs.ObjectPositionsManager.prototype.raycastTest = function(
     for (var j = 0; j < nearbyObjectPositions.length; ++j) {
       var objectPosition = nearbyObjectPositions[j];
 
-      var result = gdjs.ObjectPositionsManager._raycastAgainstHitboxes(
-        objectPosition.hitboxes,
-        x,
-        y,
-        endX,
-        endY,
-        maxSqDist,
-        inverted
-      );
+      if (objectIdsSet.items[objectPosition.objectId]) {
+        var result = gdjs.ObjectPositionsManager._raycastAgainstHitboxes(
+          objectPosition.hitboxes,
+          x,
+          y,
+          endX,
+          endY,
+          maxSqDist,
+          inverted
+        );
 
-      if (result.collision) {
-        if (!inverted && result.closeSqDist <= testSqDist) {
-          testSqDist = result.closeSqDist;
-          matchObjectId = objectPosition.objectId;
-          intersectionCoordinates[0] = result.closeX;
-          intersectionCoordinates[1] = result.closeY;
-        } else if (inverted && result.farSqDist >= testSqDist) {
-          testSqDist = result.farSqDist;
-          matchObjectId = objectPosition.objectId;
-          intersectionCoordinates[0] = result.farX;
-          intersectionCoordinates[1] = result.farY;
+        if (result.collision) {
+          if (!inverted && result.closeSqDist <= testSqDist) {
+            testSqDist = result.closeSqDist;
+            matchObjectId = objectPosition.objectId;
+            intersectionCoordinates[0] = result.closeX;
+            intersectionCoordinates[1] = result.closeY;
+          } else if (inverted && result.farSqDist >= testSqDist) {
+            testSqDist = result.farSqDist;
+            matchObjectId = objectPosition.objectId;
+            intersectionCoordinates[0] = result.farX;
+            intersectionCoordinates[1] = result.farY;
+          }
         }
       }
     }
@@ -901,36 +900,60 @@ gdjs.ObjectPositionsManager.prototype.raycastTest = function(
   gdjs.ObjectPositionsManager._clearObjectIdsSet(objectIdsSet);
   if (matchObjectId == null) return false;
 
-  objectIdsSet[matchObjectId] = true;
+  objectIdsSet.items[matchObjectId] = true;
   return true;
 };
 
 // Sets utilities:
 
 /**
+ * @typedef {Object} ObjectIdsSet
+ * @property {Object.<number, boolean>} items
+ */
+
+/**
+ * Create a new set of object ids.
+ *
+ * @returns {ObjectIdsSet} A new set.
+ */
+gdjs.ObjectPositionsManager.makeNewObjectIdsSet = function() {
+  return { items: {} };
+};
+
+/**
+ * Check if the given set is empty.
+ *
+ * @param {ObjectIdsSet} objectIdsSet The set to check
+ */
+gdjs.ObjectPositionsManager._isObjectIdsSetEmpty = function(objectIdsSet) {
+  for (var anyObjectId in objectIdsSet.items) return false;
+  return true;
+}
+
+/**
  * Clear the set.
  *
- * @param {Object.<number, boolean>} objectIdsSet
+ * @param {ObjectIdsSet} objectIdsSet
  */
 gdjs.ObjectPositionsManager._clearObjectIdsSet = function(objectIdsSet) {
-  for (var objectId in objectIdsSet) {
-    delete objectIdsSet[objectId];
-  }
+  // This sends the old set items to the garbage collector, but is much
+  // much faster than iterating on all properties and deleting them.
+  objectIdsSet.items = {};
 };
 
 /**
  * Delete any element of the first set that is not in the second one.
  *
- * @param {Object.<number, boolean>} objectIdsSet
- * @param {Object.<number, boolean>} objectIdsSet2
+ * @param {ObjectIdsSet} objectIdsSet
+ * @param {ObjectIdsSet} objectIdsSet2
  */
 gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet = function(
   objectIdsSet,
   objectIdsSet2
 ) {
-  for (var objectId in objectIdsSet) {
-    if (!objectIdsSet2[objectId]) {
-      delete objectIdsSet[objectId];
+  for (var objectId in objectIdsSet.items) {
+    if (!objectIdsSet2.items[objectId]) {
+      delete objectIdsSet.items[objectId];
     }
   }
 };
@@ -938,38 +961,57 @@ gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet = function(
 /**
  * Delete any element of the first set that is in the second one.
  *
- * @param {Object.<number, boolean>} objectIdsSet
- * @param {Object.<number, boolean>} objectIdsSet2
+ * @param {ObjectIdsSet} objectIdsSet
+ * @param {ObjectIdsSet} objectIdsSet2
  */
 gdjs.ObjectPositionsManager._removeIdsFromObjectIdsSet = function(
   objectIdsSet,
   objectIdsSet2
 ) {
-  for (var objectId in objectIdsSet) {
-    if (objectIdsSet2[objectId]) {
-      delete objectIdsSet[objectId];
+  for (var objectId in objectIdsSet.items) {
+    if (objectIdsSet2.items[objectId]) {
+      delete objectIdsSet.items[objectId];
     }
   }
 };
 
 /**
- * Generate a set of object ids from the lists of objects passed. Useful
+ * Generate a new set of object ids from the lists of objects passed. Useful
  * as gdjs.ObjectPositionsManager only deals with ids for genericity.
  *
  * @param {Hashtable} objectsLists The lists of objects
- * @returns {Object.<number, boolean>} A set containing the object ids
+ * @returns {ObjectIdsSet} A set containing the object ids
  */
 gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet = function(
   objectsLists
 ) {
-  /** @type Object.<number, boolean> */
-  var objectIdsSet = {};
+  /** @type ObjectIdsSet */
+  var objectIdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
 
   for (var key in objectsLists.items) {
     var list = objectsLists.items[key];
     for (var i = 0; i < list.length; ++i) {
-      objectIdsSet[list[i].id] = true;
+      objectIdsSet.items[list[i].id] = true;
     }
+  }
+
+  return objectIdsSet;
+};
+
+/**
+ * Generate a new set of object ids from the array of object ids.
+ *
+ * @param {number[]} ids The ids
+ * @returns {ObjectIdsSet} A set containing the object ids
+ */
+gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet = function(
+  ids
+) {
+  /** @type ObjectIdsSet */
+  var objectIdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
+
+  for (var i = 0; i < ids.length; ++i) {
+    objectIdsSet.items[ids[i]] = true;
   }
 
   return objectIdsSet;
@@ -981,7 +1023,7 @@ gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet = function(
  * are using lists of objects.
  *
  * @param {Hashtable} objectsLists The lists of objects
- * @param {Object.<number, boolean>} objectIdsSet A set containing the object ids to keep
+ * @param {ObjectIdsSet} objectIdsSet A set containing the object ids to keep
  */
 gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet = function(
   objectsLists,
@@ -993,7 +1035,7 @@ gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet = function(
 
     for (var i = 0; i < list.length; ++i) {
       var obj = list[i];
-      if (objectIdsSet[obj.id]) {
+      if (objectIdsSet.items[obj.id]) {
         list[finalSize] = obj;
         finalSize++;
       }
@@ -1010,7 +1052,7 @@ gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet = function(
  * are using lists of objects.
  *
  * @param {Hashtable} objectsLists The lists of objects
- * @param {Object.<string, Object.<number, boolean>>} groupedObjectIdsSets A set containing the object ids to keep
+ * @param {Object.<string, ObjectIdsSet>} groupedObjectIdsSets A set containing the object ids to keep
  */
 gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets = function(
   objectsLists,
@@ -1024,7 +1066,7 @@ gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets = function(
       var obj = list[i];
 
       for (var setKey in groupedObjectIdsSets) {
-        if (groupedObjectIdsSets[setKey][obj.id]) {
+        if (groupedObjectIdsSets[setKey].items[obj.id]) {
           list[finalSize] = obj;
           finalSize++;
           break;

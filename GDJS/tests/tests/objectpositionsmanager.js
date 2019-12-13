@@ -95,8 +95,13 @@ describe('gdjs.ObjectPositionsManager', function() {
   describe('Basics distance, point and collision tests', function() {
     it('can find nearby object positions', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 0: true };
-      const object2IdsSet = { 1: true, 2: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -106,14 +111,24 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 0: true });
-      expect(object2IdsSet).to.eql({ 2: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2])
+      );
     });
 
     it('can find collisions between object positions', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 0: true };
-      const object2IdsSet = { 1: true, 2: true, 3: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.collisionTest(
@@ -123,13 +138,22 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 0: true });
-      expect(object2IdsSet).to.eql({ 3: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([3])
+      );
     });
 
     it('can find object positions containing any of the specified points', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const objectIdsSet = { 0: true, 1: true, 2: true, 3: true };
+      const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.pointsTest(
@@ -142,13 +166,23 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(objectIdsSet).to.eql({ 1: true, 2: true, 3: true });
+      expect(objectIdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([1, 2, 3])
+      );
     });
 
     it('can find nearby object positions when using the same ids in both sets', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 1: true, 2: true, 3: true };
-      const object2IdsSet = { 1: true, 2: true, 3: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+        3,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -158,14 +192,28 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 2: true, 3: true });
-      expect(object2IdsSet).to.eql({ 2: true, 3: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+      );
     });
 
     it('can find collisions between object positions when using the same ids in both sets', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 0: true, 1: true, 2: true, 3: true };
-      const object2IdsSet = { 0: true, 1: true, 2: true, 3: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+        2,
+        3,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.collisionTest(
@@ -175,14 +223,24 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 0: true, 2: true, 3: true });
-      expect(object2IdsSet).to.eql({ 0: true, 2: true, 3: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0, 2, 3])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0, 2, 3])
+      );
     });
 
     it('can find object positions that are NOT nearby others', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 0: true, 1: true };
-      const object2IdsSet = { 2: true, 3: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -192,14 +250,24 @@ describe('gdjs.ObjectPositionsManager', function() {
           true
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 1: true });
-      expect(object2IdsSet).to.eql({ 2: true, 3: true }); // Second list is *not* filtered when the test is inverted
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([1])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+      ); // Second list is *not* filtered when the test is inverted
     });
 
     it('can find object positions that are NOT in collision with others', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 0: true, 1: true };
-      const object2IdsSet = { 2: true, 3: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.collisionTest(
@@ -209,13 +277,22 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 1: true });
-      expect(object2IdsSet).to.eql({ 2: true, 3: true }); // Second list is *not* filtered when the test is inverted
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([1])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+      ); // Second list is *not* filtered when the test is inverted
     });
 
     it('can find object positions that are NOT containing any of the specified points', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const objectIdsSet = { 0: true, 1: true, 2: true, 3: true };
+      const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.pointsTest(
@@ -228,13 +305,20 @@ describe('gdjs.ObjectPositionsManager', function() {
           true
         )
       ).to.be(true);
-      expect(objectIdsSet).to.eql({ 0: true });
+      expect(objectIdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
     });
 
     it('can find NO nearby object positions', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 0: true };
-      const object2IdsSet = { 1: true, 2: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -244,14 +328,23 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(false);
-      expect(object1IdsSet).to.eql({});
-      expect(object2IdsSet).to.eql({});
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.makeNewObjectIdsSet()
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.makeNewObjectIdsSet()
+      );
     });
 
     it('can find NO collisions between object positions', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const object1IdsSet = { 1: true };
-      const object2IdsSet = { 2: true, 3: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        2,
+        3,
+      ]);
 
       expect(
         objectPositionsManager.collisionTest(
@@ -261,15 +354,44 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(false);
-      expect(object1IdsSet).to.eql({});
-      expect(object2IdsSet).to.eql({});
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.makeNewObjectIdsSet()
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.makeNewObjectIdsSet()
+      );
+    });
+
+    it('can find NO object positions that are containing the specified points', function() {
+      const { objectPositionsManager } = makeObjectPositionsManager();
+      const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+      ]);
+
+      expect(
+        objectPositionsManager.pointsTest(
+          objectIdsSet,
+          [
+            [8, 8],
+            [22, 22],
+          ],
+          true,
+          false
+        )
+      ).to.be(false);
+      expect(objectIdsSet).to.eql(
+        gdjs.ObjectPositionsManager.makeNewObjectIdsSet()
+      );
     });
   });
 
   describe('Raycast tests', function() {
     it('can find the closest intersection between ray and objects', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const objectIdsSet = { 0: true, 1: true };
+      const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+      ]);
 
       const intersectionCoordinates = [0, 0];
       expect(
@@ -283,13 +405,18 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(objectIdsSet).to.eql({ 0: true });
+      expect(objectIdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
       expect(intersectionCoordinates).to.eql([10, 10]);
     });
 
     it('can find the farthest intersection between ray and objects', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const objectIdsSet = { 0: true, 1: true };
+      const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+      ]);
 
       const intersectionCoordinates = [0, 0];
       expect(
@@ -303,13 +430,18 @@ describe('gdjs.ObjectPositionsManager', function() {
           true
         )
       ).to.be(true);
-      expect(objectIdsSet).to.eql({ 1: true });
+      expect(objectIdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([1])
+      );
       expect(intersectionCoordinates).to.eql([20, 20]);
     });
 
     it('can find NO intersection between ray and objects', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
-      const objectIdsSet = { 0: true, 1: true };
+      const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+      ]);
 
       const intersectionCoordinates = [0, 0];
       expect(
@@ -323,7 +455,9 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(false);
-      expect(objectIdsSet).to.eql({});
+      expect(objectIdsSet).to.eql(
+        gdjs.ObjectPositionsManager.makeNewObjectIdsSet()
+      );
       expect(intersectionCoordinates).to.eql([0, 0]);
     });
   });
@@ -333,8 +467,13 @@ describe('gdjs.ObjectPositionsManager', function() {
       let { objectPositionsManager, object1 } = makeObjectPositionsManager();
 
       // Check that only object2 is 5 pixels away from object0.
-      let object1IdsSet = { 0: true };
-      let object2IdsSet = { 1: true, 2: true };
+      let object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+      ]);
+      let object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -344,8 +483,12 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 0: true });
-      expect(object2IdsSet).to.eql({ 2: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2])
+      );
 
       // Move object1 closer to object0
       object1 = makeFakeObjectWithCoordinates({
@@ -361,8 +504,11 @@ describe('gdjs.ObjectPositionsManager', function() {
       objectPositionsManager.markObjectAsDirty(object1);
 
       // Check that now object1 and object2 are 5 pixels away from object0.
-      object1IdsSet = { 0: true };
-      object2IdsSet = { 1: true, 2: true };
+      object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0]);
+      object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -372,8 +518,12 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 0: true });
-      expect(object2IdsSet).to.eql({ 1: true, 2: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([1, 2])
+      );
     });
 
     it('can find nearby object positions after object are moved or removed', function() {
@@ -400,8 +550,13 @@ describe('gdjs.ObjectPositionsManager', function() {
       objectPositionsManager.markObjectAsRemoved(object2);
 
       // Check that now object1 only is 5 pixels away from object0.
-      const object1IdsSet = { 0: true };
-      const object2IdsSet = { 1: true, 2: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -411,8 +566,12 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 0: true });
-      expect(object2IdsSet).to.eql({ 1: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([1])
+      );
     });
 
     it('can find nearby object positions after an object is removed and added again', function() {
@@ -438,8 +597,13 @@ describe('gdjs.ObjectPositionsManager', function() {
       objectPositionsManager.markObjectAsCreated(object2);
 
       // Check that object2 is still found near object0
-      const object1IdsSet = { 0: true };
-      const object2IdsSet = { 1: true, 2: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        1,
+        2,
+      ]);
 
       expect(
         objectPositionsManager.distanceTest(
@@ -449,8 +613,12 @@ describe('gdjs.ObjectPositionsManager', function() {
           false
         )
       ).to.be(true);
-      expect(object1IdsSet).to.eql({ 0: true });
-      expect(object2IdsSet).to.eql({ 2: true });
+      expect(object1IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([0])
+      );
+      expect(object2IdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2])
+      );
     });
   });
 
@@ -535,8 +703,14 @@ describe('gdjs.ObjectPositionsManager', function() {
       });
       objectPositionsManager.markObjectAsCreated(object4);
 
-      const object1IdsSet = { 0: true, 1: true };
-      const object2IdsSet = { 2: true, 3: true };
+      const object1IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+      ]);
+      const object2IdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        2,
+        3,
+      ]);
 
       objectPositionsManager.separateObjects(
         object1IdsSet,
@@ -582,12 +756,14 @@ describe('gdjs.ObjectPositionsManager', function() {
 
       expect(
         gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists)
-      ).to.eql({
-        [object1.id]: true,
-        [object2.id]: true,
-        [object3.id]: true,
-        [object4.id]: true,
-      });
+      ).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+          object1.id,
+          object2.id,
+          object3.id,
+          object4.id,
+        ])
+      );
     });
 
     it('keepOnlyObjectsFromObjectIdsSet', function() {
@@ -618,10 +794,10 @@ describe('gdjs.ObjectPositionsManager', function() {
 
       gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(
         objectsLists,
-        {
-          [object1.id]: true,
-          [object3.id]: true,
-        }
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+          object1.id,
+          object3.id,
+        ])
       );
 
       expect(objectsLists.get('ObjectA')).to.eql([object1]);
@@ -658,8 +834,12 @@ describe('gdjs.ObjectPositionsManager', function() {
       gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets(
         objectsLists,
         {
-          SomeKey: { [object1.id]: true },
-          'another key (could be any string)': { [object3.id]: true },
+          SomeKey: gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+            object1.id,
+          ]),
+          'another key (could be any string)': gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet(
+            [object3.id]
+          ),
         }
       );
 

@@ -230,10 +230,10 @@ gdjs.evtTools.input.getMouseY = function(runtimeScene, layer, camera) {
 
 /**
  * @param {Hashtable} objectsLists The objects to consider for the test
- * @returns {Object.<string, Object.<number, boolean>>} Sets of object ids keyed by the name of the layer the objects are on.
+ * @returns {Object.<string, ObjectIdsSet>} Sets of object ids keyed by the name of the layer the objects are on.
  */
 gdjs.evtTools.input._objectsListsToObjectIdsSetGroupedPerLayer = function(objectsLists) {
-    /** @type Object.<string, Object.<number, boolean>> */
+    /** @type Object.<string, ObjectIdsSet> */
     var layerObjectIdsSets = {};
 
     for (var key in objectsLists.items) {
@@ -243,8 +243,8 @@ gdjs.evtTools.input._objectsListsToObjectIdsSetGroupedPerLayer = function(object
         var object = list[i];
         var layerName = object.getLayer();
 
-        layerObjectIdsSets[layerName] = layerObjectIdsSets[layerName] || {};
-        layerObjectIdsSets[layerName][object.id] = true;
+        layerObjectIdsSets[layerName] = layerObjectIdsSets[layerName] || gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
+        layerObjectIdsSets[layerName].items[object.id] = true;
       }
     }
 

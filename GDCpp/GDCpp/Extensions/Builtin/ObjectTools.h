@@ -50,6 +50,19 @@ void GD_API SeparateObjects(
 
 /**
  * Only used internally by GD events generated code.
+ *
+ * Complexity could be improved by using a spatial data structure
+ * to store object positions (see GDJS).
+ */
+bool GD_API IsCollidingWithPoint(
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
+    double x,
+    double y,
+    bool conditionInverted,
+    RuntimeScene &scene);
+
+/**
+ * Only used internally by GD events generated code.
  */
 double GD_API PickedObjectsCount(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists);

@@ -386,13 +386,13 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
     }
   }
 
-  // Trim sets
-  gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+  // Replace object ids sets by the picked ids
+  gdjs.ObjectPositionsManager._replaceObjectIdsSetByAnother(
     object1IdsSet,
     pickedObject1IdsSet
   );
   if (!inverted) {
-    gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+    gdjs.ObjectPositionsManager._replaceObjectIdsSetByAnother(
       object2IdsSet,
       pickedObject2IdsSet
     );
@@ -520,13 +520,13 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
     }
   }
 
-  // Trim sets
-  gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+  // Replace object ids sets by the picked ids
+  gdjs.ObjectPositionsManager._replaceObjectIdsSetByAnother(
     object1IdsSet,
     pickedObject1IdsSet
   );
   if (!inverted) {
-    gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+    gdjs.ObjectPositionsManager._replaceObjectIdsSetByAnother(
       object2IdsSet,
       pickedObject2IdsSet
     );
@@ -752,8 +752,8 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
     // Return true if there is at least one object not colliding with any point
     return !gdjs.ObjectPositionsManager._isObjectIdsSetEmpty(objectIdsSet);
   } else {
-    // Trim sets and return the result
-    gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet(
+    // Replace object ids sets by the picked ids and return the result
+    gdjs.ObjectPositionsManager._replaceObjectIdsSetByAnother(
       objectIdsSet,
       pickedObjectIdsSet
     );
@@ -926,6 +926,7 @@ gdjs.ObjectPositionsManager.makeNewObjectIdsSet = function() {
  * @param {ObjectIdsSet} objectIdsSet The set to check
  */
 gdjs.ObjectPositionsManager._isObjectIdsSetEmpty = function(objectIdsSet) {
+  // Avoid using Object.keys, we don't care about listing all the elements of the set.
   for (var anyObjectId in objectIdsSet.items) return false;
   return true;
 }
@@ -942,24 +943,30 @@ gdjs.ObjectPositionsManager._clearObjectIdsSet = function(objectIdsSet) {
 };
 
 /**
- * Delete any element of the first set that is not in the second one.
+ * Replace the content of the first set by the second set, making them pointing to the
+ * same content in memory. You should discard the second set after.
+ *
+ * If you modify one of the set, the other one will be changed to! You should
+ * discard the second set and not reused it.
  *
  * @param {ObjectIdsSet} objectIdsSet
  * @param {ObjectIdsSet} objectIdsSet2
  */
-gdjs.ObjectPositionsManager._keepOnlyIdsFromObjectIdsSet = function(
+gdjs.ObjectPositionsManager._replaceObjectIdsSetByAnother = function(
   objectIdsSet,
   objectIdsSet2
 ) {
-  for (var objectId in objectIdsSet.items) {
-    if (!objectIdsSet2.items[objectId]) {
-      delete objectIdsSet.items[objectId];
-    }
-  }
+  objectIdsSet.items = objectIdsSet2.items;
 };
 
 /**
  * Delete any element of the first set that is in the second one.
+ *
+ * For performance concerns, the second set is assumed to be smaller than the first one (this will
+ * work whatever the case, but will be more performant if the second set is smaller).
+ *
+ * This is actually guaranteed because we only use this function to remove ids from the first set
+ * using the second set which was populated while iterating on the first.
  *
  * @param {ObjectIdsSet} objectIdsSet
  * @param {ObjectIdsSet} objectIdsSet2
@@ -968,8 +975,8 @@ gdjs.ObjectPositionsManager._removeIdsFromObjectIdsSet = function(
   objectIdsSet,
   objectIdsSet2
 ) {
-  for (var objectId in objectIdsSet.items) {
-    if (objectIdsSet2.items[objectId]) {
+  for (var objectId in objectIdsSet2.items) {
+    if (objectIdsSet.items[objectId]) {
       delete objectIdsSet.items[objectId];
     }
   }

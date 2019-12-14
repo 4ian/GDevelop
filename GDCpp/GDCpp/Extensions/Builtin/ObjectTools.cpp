@@ -58,6 +58,20 @@ void GD_API SeparateObjects(
   }
 }
 
+bool GD_API IsCollidingWithPoint(
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
+    double pointX,
+    double pointY,
+    bool conditionInverted,
+    RuntimeScene &scene) {
+  return PickObjectsIf(objectsLists,
+                       conditionInverted,
+                       [pointX, pointY](RuntimeObject *runtimeObject) {
+                         return runtimeObject->IsCollidingWithPoint(pointX,
+                                                                    pointY);
+                       });
+}
+
 bool GD_API ObjectsTurnedToward(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,

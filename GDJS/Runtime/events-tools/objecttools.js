@@ -497,6 +497,29 @@ gdjs.evtTools.object.OLDraycastObjectToPosition = function(objectsLists, x, y, e
 };
 
 /**
+ * @param {Hashtable} objectsLists The lists of objects to test
+ * @param {number} x X position of the point
+ * @param {number} y Y position of the point
+ * @param {boolean} inverted true to find objects containing the point, false to find objects not containing it.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.isCollidingWithPoint = function(objectsLists, x, y, inverted, runtimeScene) {
+    var objectIdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists);
+
+    var isTrue = runtimeScene.getObjectPositionsManager().pointsTest(
+        objectIdsSet, [[x, y]], true /* TODO: Allow to specify if the test should be accurate or not */, inverted);
+
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists, objectIdsSet);
+    return isTrue;
+};
+
+gdjs.evtTools.object.OLDisCollidingWithPoint = function(objectsLists, x, y, inverted, runtimeScene) {
+    return gdjs.evtTools.object.pickObjectsIf(function(obj) {
+        return obj.isCollidingWithPoint(x, y);
+    }, objectsLists, inverted);
+};
+
+/**
  * Do the work of creating a new object
  * @private
  */

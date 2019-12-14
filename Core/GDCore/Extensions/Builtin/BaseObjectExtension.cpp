@@ -625,16 +625,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
-  obj.AddCondition("CollisionPoint",
-                   _("Point inside object"),
-                   _("Test if a point is inside the object collision masks."),
-                   _("_PARAM1_;_PARAM2_ is inside _PARAM0_"),
-                   _("Collision"),
-                   "res/conditions/collisionPoint24.png",
-                   "res/conditions/collisionPoint.png")
-      .AddParameter("object", _("Object"))
+  extension
+      .AddCondition("CollisionPoint",
+                    _("Point inside object"),
+                    _("Test if a point is inside the object collision masks."),
+                    _("_PARAM1_;_PARAM2_ is inside _PARAM0_"),
+                    _("Collision"),
+                    "res/conditions/collisionPoint24.png",
+                    "res/conditions/collisionPoint.png")
+      .AddParameter("objectList", _("Object"))
       .AddParameter("expression", _("X position of the point"))
       .AddParameter("expression", _("Y position of the point"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
   obj.AddCondition(

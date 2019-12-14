@@ -109,7 +109,6 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["Ecarter"]
       .SetFunctionName("SeparateObjectsWithoutForces")
       .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
-  objectConditions["CollisionPoint"].SetFunctionName("IsCollidingWithPoint");
 
   objectExpressions["X"].SetFunctionName("GetX");
   objectExpressions["Y"].SetFunctionName("GetY");
@@ -186,6 +185,7 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["RaycastToPosition"]
       .SetFunctionName("RaycastObjectToPosition")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
+  GetAllConditions()["CollisionPoint"].SetFunctionName("IsCollidingWithPoint");
 
   GetAllExpressions()["Count"]
       .SetFunctionName("PickedObjectsCount")

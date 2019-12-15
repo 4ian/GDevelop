@@ -113,6 +113,12 @@ class ExporterHelper {
                         bool exportForPreview);
 
   /**
+   * \brief Add the project effects include files.
+   */
+  bool ExportEffectIncludes(gd::Project &project,
+                            std::vector<gd::String> &includesFiles);
+
+  /**
    * \brief Copy the external source files used by the game into the export
    * directory, and add them into files to be included.
    *

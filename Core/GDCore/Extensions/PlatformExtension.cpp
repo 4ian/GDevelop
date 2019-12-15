@@ -162,6 +162,13 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
   return behaviorsInfo[nameWithNamespace];
 }
 
+gd::EffectMetadata& PlatformExtension::AddEffect(const gd::String& name) {
+  gd::String nameWithNamespace =
+      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  effectsMetadata[nameWithNamespace] = EffectMetadata(nameWithNamespace);
+  return effectsMetadata[nameWithNamespace];
+}
+
 gd::EventMetadata& PlatformExtension::AddEvent(
     const gd::String& name_,
     const gd::String& fullname_,
@@ -207,6 +214,14 @@ std::vector<gd::String> PlatformExtension::GetExtensionObjectsTypes() const {
   return objects;
 }
 
+std::vector<gd::String> PlatformExtension::GetExtensionEffectTypes() const {
+  std::vector<gd::String> effectNames;
+  for (auto& it : effectsMetadata)
+    effectNames.push_back(it.first);
+
+  return effectNames;
+}
+
 gd::ObjectMetadata& PlatformExtension::GetObjectMetadata(
     const gd::String& objectType) {
   if (objectsInfos.find(objectType) != objectsInfos.end())
@@ -225,6 +240,16 @@ gd::BehaviorMetadata& PlatformExtension::GetBehaviorMetadata(
   std::cout << "Warning: Behavior type \"" << behaviorType
             << "\" not found in an extension!" << std::endl;
   return badBehaviorMetadata;
+}
+
+gd::EffectMetadata& PlatformExtension::GetEffectMetadata(
+    const gd::String& effectName) {
+  if (effectsMetadata.find(effectName) != effectsMetadata.end())
+    return effectsMetadata.find(effectName)->second;
+
+  std::cout << "Warning: Effect with name \"" << effectName
+            << "\" not found in an extension!" << std::endl;
+  return badEffectMetadata;
 }
 
 std::vector<gd::String> PlatformExtension::GetBehaviorsTypes() const {

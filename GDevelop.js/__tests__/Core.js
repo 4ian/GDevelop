@@ -218,9 +218,9 @@ describe('libGD.js', function() {
       const effect = new gd.Effect();
 
       effect.setName('MyEffect');
-      effect.setEffectName('Sepia');
+      effect.setEffectType('Sepia');
       expect(effect.getName()).toBe('MyEffect');
-      expect(effect.getEffectName()).toBe('Sepia');
+      expect(effect.getEffectType()).toBe('Sepia');
 
       effect.setParameter('Brightness', 1);
       effect.setParameter('Darkness', 0.3);
@@ -2248,6 +2248,19 @@ describe('libGD.js', function() {
         expect(autoMetadata.getGroup).not.toBe(undefined);
         expect(autoMetadata.getIconFilename).not.toBe(undefined);
         expect(autoMetadata.getObjectType).not.toBe(undefined);
+      });
+    });
+    describe('gd.EffectMetadata', function() {
+      it('have standard methods to get information', function() {
+        var autoMetadata = gd.MetadataProvider.getEffectMetadata(
+          gd.JsPlatform.get(),
+          'NotExistingEffect'
+        );
+
+        expect(autoMetadata.getType).not.toBe(undefined);
+        expect(autoMetadata.getFullName).not.toBe(undefined);
+        expect(autoMetadata.getDescription).not.toBe(undefined);
+        expect(autoMetadata.getProperties).not.toBe(undefined);
       });
     });
   });

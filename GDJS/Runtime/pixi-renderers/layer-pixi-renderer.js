@@ -68,20 +68,28 @@ gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
   var pixiFilters = [];
   for (var i = 0; i < effects.length; ++i) {
     var effect = effects[i];
-    var filter = gdjs.PixiFiltersTools.getFilter(effect.effectName);
-    if (!filter) {
-      console.log('Filter "' + effect.name + '" not found');
+    var filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
+      effect.effectType
+    );
+    if (!filterCreator) {
+      console.log(
+        'Filter "' +
+          effect.name +
+          '" has an unknown effect type: "' +
+          effect.effectType +
+          '". Was it registered properly? Is the effect type correct?'
+      );
       continue;
     }
 
     /** @type gdjsPixiFiltersToolsFilter */
-    var theFilter = {
-      filter: filter.makeFilter(),
-      updateParameter: filter.updateParameter,
+    var filter = {
+      pixiFilter: filterCreator.makePIXIFilter(),
+      updateParameter: filterCreator.updateParameter,
     };
 
-    pixiFilters.push(theFilter.filter);
-    this._filters[effect.name] = theFilter;
+    pixiFilters.push(filter.pixiFilter);
+    this._filters[effect.name] = filter;
   }
 
   this._pixiContainer.filters = pixiFilters;
@@ -131,27 +139,43 @@ gdjs.LayerPixiRenderer.prototype.removeRendererObject = function(child) {
   this._pixiContainer.removeChild(child);
 };
 
+/**
+ * Update the parameter of an effect.
+ * @param {string} name The effect name
+ * @param {string} parameterName The parameter name
+ * @param {number} value The new value for the parameter
+ */
 gdjs.LayerPixiRenderer.prototype.setEffectParameter = function(
   name,
   parameterName,
   value
 ) {
-  if (!this._filters.hasOwnProperty(name)) return;
+  var filter = this._filters[name];
+  if (!filter) return;
 
-  var theFilter = this._filters[name];
-  theFilter.updateParameter(theFilter.filter, parameterName, value);
+  filter.updateParameter(filter.pixiFilter, parameterName, value);
 };
 
+/**
+ * Enable an effect.
+ * @param {string} name The effect name
+ * @param {boolean} value Set to true to enable, false to disable
+ */
 gdjs.LayerPixiRenderer.prototype.enableEffect = function(name, value) {
-  if (!this._filters.hasOwnProperty(name)) return;
+  var filter = this._filters[name];
+  if (!filter) return;
 
-  var theFilter = this._filters[name];
-  gdjs.PixiFiltersTools.enableEffect(theFilter.filter, value);
+  gdjs.PixiFiltersTools.enableEffect(filter, value);
 };
 
+/**
+ * Check if an effect is enabled.
+ * @param {string} name The effect name
+ * @return {boolean} true if the filter is enabled
+ */
 gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function(name) {
-  if (!this._filters.hasOwnProperty(name)) return false;
+  var filter = this._filters[name];
+  if (!filter) return false;
 
-  var theFilter = this._filters[name];
-  return gdjs.PixiFiltersTools.isEffectEnabled(theFilter.filter);
+  return gdjs.PixiFiltersTools.isEffectEnabled(filter);
 };

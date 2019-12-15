@@ -449,15 +449,15 @@ export const makeTestProject = gd => {
   const effect1 = layerWithEffects.insertNewEffect('MyEffect1', 0);
   const effect2 = layerWithEffects.insertNewEffect('MyEffect2', 1);
 
-  effect1.setEffectName('Sepia');
+  effect1.setEffectType('Sepia');
   effect1.setParameter('opacity', 0.6);
-  effect2.setEffectName('Night');
+  effect2.setEffectType('Night');
   effect2.setParameter('intensity', 0.1);
   effect2.setParameter('opacity', 0.2);
 
-  const layerWithEffectWithoutEffectName = new gd.Layer();
-  layerWithEffectWithoutEffectName.insertNewEffect(
-    'MyEffectWithoutEffectName',
+  const layerWithEffectWithoutEffectType = new gd.Layer();
+  layerWithEffectWithoutEffectType.insertNewEffect(
+    'MyEffectWithoutEffectType',
     0
   );
 
@@ -488,7 +488,7 @@ export const makeTestProject = gd => {
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
     layerWithEffects,
-    layerWithEffectWithoutEffectName,
+    layerWithEffectWithoutEffectType,
     layerWithoutEffects,
   };
 };

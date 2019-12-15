@@ -201,7 +201,7 @@ const {
   testBehaviorEventsFunction,
   testBehaviorLifecycleEventsFunction,
   layerWithEffects,
-  layerWithEffectWithoutEffectName,
+  layerWithEffectWithoutEffectType,
   layerWithoutEffects,
 } = makeTestProject(gd);
 
@@ -3765,18 +3765,21 @@ storiesOf('EffectsList', module)
   .addDecorator(muiDecorator)
   .add('with some effects', () => (
     <EffectsList
+      project={project}
       effectsContainer={layerWithEffects}
       onEffectsUpdated={action('effects updated')}
     />
   ))
-  .add('with an effect without effect name', () => (
+  .add('with an effect without effect type', () => (
     <EffectsList
-      effectsContainer={layerWithEffectWithoutEffectName}
+      project={project}
+      effectsContainer={layerWithEffectWithoutEffectType}
       onEffectsUpdated={action('effects updated')}
     />
   ))
   .add('without effects', () => (
     <EffectsList
+      project={project}
       effectsContainer={layerWithoutEffects}
       onEffectsUpdated={action('effects updated')}
     />

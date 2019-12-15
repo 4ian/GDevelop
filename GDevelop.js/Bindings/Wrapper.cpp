@@ -25,6 +25,7 @@
 #include <GDCore/Events/Parsers/ExpressionParser2Node.h>
 #include <GDCore/IDE/Events/ExpressionValidator.h>
 #include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
+#include <GDCore/Extensions/Metadata/EffectMetadata.h>
 #include <GDCore/Extensions/Metadata/MetadataProvider.h>
 #include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
 #include <GDCore/Project/EventsFunction.h>
@@ -388,6 +389,7 @@ typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor> NamedPropertyD
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
+typedef ExtensionAndMetadata<EffectMetadata> ExtensionAndEffectMetadata;
 typedef ExtensionAndMetadata<InstructionMetadata> ExtensionAndInstructionMetadata;
 typedef ExtensionAndMetadata<InstructionMetadata> ExtensionAndInstructionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
@@ -459,6 +461,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata
+#define STATIC_GetExtensionAndEffectMetadata GetExtensionAndEffectMetadata
 #define STATIC_GetExtensionAndActionMetadata GetExtensionAndActionMetadata
 #define STATIC_GetExtensionAndConditionMetadata GetExtensionAndConditionMetadata
 #define STATIC_GetExtensionAndExpressionMetadata GetExtensionAndExpressionMetadata
@@ -487,6 +490,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetBehaviorMetadata GetBehaviorMetadata
 #define STATIC_GetObjectMetadata GetObjectMetadata
+#define STATIC_GetEffectMetadata GetEffectMetadata
 #define STATIC_GetActionMetadata GetActionMetadata
 #define STATIC_GetConditionMetadata GetConditionMetadata
 #define STATIC_GetExpressionMetadata GetExpressionMetadata

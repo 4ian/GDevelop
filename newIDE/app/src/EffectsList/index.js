@@ -16,28 +16,36 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Add from '@material-ui/icons/Add';
-import {
-  getAllEffectDescriptions,
-  type EffectDescription,
-} from './EffectDescription';
 import PropertiesEditor from '../PropertiesEditor';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import {
+  enumerateEffectsMetadata,
+  type EnumeratedEffectMetadata,
+} from './EnumerateEffects';
 
 type Props = {|
+  project: gdProject,
   effectsContainer: gdEffectsContainer,
   onEffectsUpdated: () => void,
 |};
 
-const getEffectDescription = (
-  allEffectDescriptions: Array<EffectDescription>,
-  effectName: string
-): ?EffectDescription => {
+const getEnumeratedEffectMetadata = (
+  allEffectDescriptions: Array<EnumeratedEffectMetadata>,
+  effectType: string
+): ?EnumeratedEffectMetadata => {
   return allEffectDescriptions.find(
-    effectDescription => effectDescription.name === effectName
+    effectMetadata => effectMetadata.type === effectType
   );
 };
 
+/**
+ * Display a list of effects and allow to add/remove/edit them.
+ *
+ * All available effects are fetched from the project's platform.
+ */
 export default class EffectsList extends React.Component<Props, {||}> {
+  _allEffectMetadata = enumerateEffectsMetadata(this.props.project);
+
   _addEffect = () => {
     const { effectsContainer } = this.props;
 
@@ -61,21 +69,21 @@ export default class EffectsList extends React.Component<Props, {||}> {
     this.props.onEffectsUpdated();
   };
 
-  _chooseEffectName = (
-    allEffectDescriptions: Array<EffectDescription>,
-    effect: gdEffect,
-    newEffectName: string
-  ) => {
-    effect.setEffectName(newEffectName);
-    const effectDescription = getEffectDescription(
-      allEffectDescriptions,
-      newEffectName
+  _chooseEffectType = (effect: gdEffect, newEffectType: string) => {
+    effect.setEffectType(newEffectType);
+    const effectMetadata = getEnumeratedEffectMetadata(
+      this._allEffectMetadata,
+      newEffectType
     );
 
-    if (effectDescription) {
-      effectDescription.parameterDefaultValues.forEach(({ name, value }) => {
-        effect.setParameter(name, value);
-      });
+    if (effectMetadata) {
+      // Set the default values for parameters
+      effect.clearParameters();
+      effectMetadata.parameterDefaultValues.forEach(
+        ({ parameterName, defaultValue }) => {
+          effect.setParameter(parameterName, defaultValue);
+        }
+      );
     }
 
     this.forceUpdate();
@@ -88,8 +96,6 @@ export default class EffectsList extends React.Component<Props, {||}> {
     return (
       <I18n>
         {({ i18n }) => {
-          const allEffectDescriptions = getAllEffectDescriptions(i18n);
-
           return (
             <Column noMargin expand>
               <Line>
@@ -128,10 +134,10 @@ export default class EffectsList extends React.Component<Props, {||}> {
               )}
               {mapFor(0, effectsContainer.getEffectsCount(), (i: number) => {
                 const effect: gdEffect = effectsContainer.getEffectAt(i);
-                const effectName = effect.getEffectName();
-                const effectDescription = getEffectDescription(
-                  allEffectDescriptions,
-                  effectName
+                const effectType = effect.getEffectType();
+                const effectMetadata = getEnumeratedEffectMetadata(
+                  this._allEffectMetadata,
+                  effectType
                 );
 
                 return (
@@ -156,22 +162,18 @@ export default class EffectsList extends React.Component<Props, {||}> {
                       <Column expand>
                         <SelectField
                           margin="none"
-                          value={effectName}
-                          onChange={(e, i, newEffectName: string) =>
-                            this._chooseEffectName(
-                              allEffectDescriptions,
-                              effect,
-                              newEffectName
-                            )
+                          value={effectType}
+                          onChange={(e, i, newEffectType: string) =>
+                            this._chooseEffectType(effect, newEffectType)
                           }
                           fullWidth
                           hintText={t`Choose the effect to apply`}
                         >
-                          {allEffectDescriptions.map(effectDescription => (
+                          {this._allEffectMetadata.map(effectMetadata => (
                             <SelectOption
-                              key={effectDescription.name}
-                              value={effectDescription.name}
-                              primaryText={effectDescription.name}
+                              key={effectMetadata.type}
+                              value={effectMetadata.type}
+                              primaryText={effectMetadata.fullName}
                             />
                           ))}
                         </SelectField>
@@ -192,10 +194,10 @@ export default class EffectsList extends React.Component<Props, {||}> {
                     </MiniToolbar>
                     <Line expand noMargin>
                       <Column expand>
-                        {!!effectName && effectDescription ? (
+                        {!!effectType && effectMetadata ? (
                           <PropertiesEditor
                             instances={[effect]}
-                            schema={effectDescription.schema}
+                            schema={effectMetadata.parametersSchema}
                           />
                         ) : null}
                       </Column>

@@ -43,6 +43,7 @@ declare type gdExpressionMetadata = gdEmscriptenObject;
 declare type gdMapStringExpressionMetadata = gdEmscriptenObject;
 declare type gdObjectMetadata = gdEmscriptenObject;
 declare type gdBehaviorMetadata = gdEmscriptenObject;
+declare type gdEffectMetadata = gdEmscriptenObject;
 
 declare type gdVariable = gdEmscriptenObject;
 declare type gdVariablesContainer = gdEmscriptenObject;

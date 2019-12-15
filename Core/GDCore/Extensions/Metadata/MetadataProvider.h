@@ -10,6 +10,7 @@
 namespace gd {
 class BehaviorMetadata;
 class ObjectMetadata;
+class EffectMetadata;
 class ExpressionMetadata;
 class ExpressionMetadata;
 class Platform;
@@ -69,6 +70,12 @@ class GD_CORE_API MetadataProvider {
    * Get the metadata about an object, and its associated extension.
    */
   static ExtensionAndMetadata<ObjectMetadata> GetExtensionAndObjectMetadata(
+      const gd::Platform& platform, gd::String type);
+
+  /**
+   * Get the metadata about an effect, and its associated extension.
+   */
+  static ExtensionAndMetadata<EffectMetadata> GetExtensionAndEffectMetadata(
       const gd::Platform& platform, gd::String type);
 
   /**
@@ -149,6 +156,12 @@ class GD_CORE_API MetadataProvider {
    * Get the metadata about an object.
    */
   static const ObjectMetadata& GetObjectMetadata(const gd::Platform& platform,
+                                                 gd::String type);
+
+  /**
+   * Get the metadata about an effect.
+   */
+  static const EffectMetadata& GetEffectMetadata(const gd::Platform& platform,
                                                  gd::String type);
 
   /**
@@ -308,6 +321,7 @@ class GD_CORE_API MetadataProvider {
   static PlatformExtension badExtension;
   static BehaviorMetadata badBehaviorInfo;
   static ObjectMetadata badObjectInfo;
+  static EffectMetadata badEffectMetadata;
   static gd::InstructionMetadata badInstructionMetadata;
   static gd::ExpressionMetadata badExpressionMetadata;
   static gd::ExpressionMetadata badStrExpressionMetadata;

@@ -240,9 +240,9 @@ gdjs.CocosTools._effects = {
  * Get the shader and its uniforms name for an effect
  * @memberof gdjs.CocosTools
  */
-gdjs.CocosTools.getEffect = function(effectName) {
-    if (gdjs.CocosTools._effects.hasOwnProperty(effectName))
-        return gdjs.CocosTools._effects[effectName];
+gdjs.CocosTools.getEffect = function(effectType) {
+    if (gdjs.CocosTools._effects.hasOwnProperty(effectType))
+        return gdjs.CocosTools._effects[effectType];
 
     return null;
 }

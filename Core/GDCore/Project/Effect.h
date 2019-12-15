@@ -27,18 +27,22 @@ class GD_CORE_API Effect {
   void SetName(const gd::String& name_) { name = name_; }
   const gd::String& GetName() const { return name; }
 
-  void SetEffectName(const gd::String& effectName_) {
-    effectName = effectName_;
+  void SetEffectType(const gd::String& effectType_) {
+    effectType = effectType_;
   }
-  const gd::String& GetEffectName() const { return effectName; }
+  const gd::String& GetEffectType() const { return effectType; }
 
   void SetParameter(const gd::String& name, double value) {
     parameters[name] = value;
   }
+
   double GetParameter(const gd::String& name) { return parameters[name]; }
+
   const std::map<gd::String, double>& GetAllParameters() const {
     return parameters;
   }
+
+  void ClearParameters() { parameters.clear(); }
 
 #if defined(GD_IDE_ONLY)
   /**
@@ -54,7 +58,7 @@ class GD_CORE_API Effect {
 
  private:
   gd::String name;        ///< The name of the layer
-  gd::String effectName;  ///< The name of the effect to apply
+  gd::String effectType;  ///< The name of the effect to apply // TODO: Rename to effect type
   std::map<gd::String, double> parameters;
 };
 

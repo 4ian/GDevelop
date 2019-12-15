@@ -67,7 +67,7 @@ gdjs.LayerCocosRenderer.prototype._makeShaders = function() {
         console.log('Only a single effect by Layer is supported for now by Cocos2d-JS renderer');
     }
 
-    var effect = gdjs.CocosTools.getEffect(effects[0].effectName);
+    var effect = gdjs.CocosTools.getEffect(effects[0].effectType);
     if (!effect) {
         console.log('Shader \"' + effects[0].name + '\" not found');
         return;

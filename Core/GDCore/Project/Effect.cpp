@@ -12,7 +12,7 @@ namespace gd {
 #if defined(GD_IDE_ONLY)
 void Effect::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
-  element.SetAttribute("effectName", GetEffectName());
+  element.SetAttribute("effectType", GetEffectType());
   SerializerElement& parametersElement = element.AddChild("parameters");
   for (auto& parameter : parameters)
     parametersElement.AddChild(parameter.first).SetValue(parameter.second);
@@ -21,7 +21,7 @@ void Effect::SerializeTo(SerializerElement& element) const {
 
 void Effect::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name"));
-  SetEffectName(element.GetStringAttribute("effectName"));
+  SetEffectType(element.GetStringAttribute("effectType", "", "effectName"));
 
   parameters.clear();
   const SerializerElement& parametersElement = element.GetChild("parameters");

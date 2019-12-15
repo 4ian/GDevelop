@@ -31,10 +31,10 @@ Images resources, GDJS Runtime, extensions will be copied in resources, and [lib
 
 ### Development of the standalone app
 
-You can run the app with Electron. **Make sure that you've run `npm start` (or `yarn start`) in `app` folder before** (see above).
+You can run the standalone app with Electron. **Make sure that you've launched `npm start` (or `yarn start`) in `app` folder before** (see above) and **keep it running** (in development, the app is served from a local server, even for the standalone app).
 
 ```bash
-cd newIDE/app && npm start # Be sure to have run this in a terminal, before the rest!
+cd newIDE/app && npm start # Be sure to have this running in another terminal, before the rest!
 
 # In a new terminal:
 cd newIDE/electron-app

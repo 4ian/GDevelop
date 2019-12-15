@@ -81,7 +81,7 @@ export default class ForEachEvent extends React.Component<
             onClick={this.edit}
           >
             {objectName ? (
-              `Repeat for each ${objectName} object:`
+              `Repeat for each instances of ${objectName}:`
             ) : (
               <i>
                 Click to choose for which objects this event will be repeated

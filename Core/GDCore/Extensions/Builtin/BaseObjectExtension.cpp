@@ -919,11 +919,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddAction("AjoutObjConcern",
-                 _("Pick all objects"),
-                 _("Pick all the specified objects. When you pick all objects, "
+                 _("Pick all instances"),
+                 _("Pick all instances of specified object(s) . When you pick all instances, "
                    "the next conditions and actions of this event work on all "
                    "of them."),
-                 _("Pick all _PARAM1_ objects"),
+                 _("Pick all instances of _PARAM1_"),
                  _("Objects"),
                  "res/actions/add24.png",
                  "res/actions/add.png")

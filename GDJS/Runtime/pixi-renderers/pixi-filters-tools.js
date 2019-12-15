@@ -1,7 +1,8 @@
+// @ts-check
 /**
  * Contains tools related to PIXI filters handling.
  */
-gdjs.PixiFiltersTools = function() {};
+gdjs.PixiFiltersTools = {};
 
 gdjs.PixiFiltersTools.clampValue = function(value, min, max) { return Math.max(min, Math.min(max, value)); };
 gdjs.PixiFiltersTools.clampKernelSize = function(value) { return (([5, 7, 9, 11, 13, 15].indexOf(value) !== -1) ? value : 5); };
@@ -28,12 +29,15 @@ gdjs.NightPixiFilter = function() {
       opacity: { type: '1f', value: 1 }
   };
 
+  // @ts-ignore
   PIXI.Filter.call(this,
     vertexShader,
     fragmentShader,
     uniforms
   );
 }
+
+// @ts-ignore
 gdjs.NightPixiFilter.prototype = Object.create(PIXI.Filter.prototype);
 gdjs.NightPixiFilter.prototype.constructor = gdjs.NightPixiFilter;
 
@@ -57,18 +61,22 @@ gdjs.LightNightPixiFilter = function() {
       opacity: { type: '1f', value: 1 }
   };
 
+  // @ts-ignore
   PIXI.Filter.call(this,
     vertexShader,
     fragmentShader,
     uniforms
   );
 }
+
+// @ts-ignore
 gdjs.LightNightPixiFilter.prototype = Object.create(PIXI.Filter.prototype);
 gdjs.LightNightPixiFilter.prototype.constructor = gdjs.LightNightPixiFilter;
 
-gdjs.PixiFiltersTools._filters = {
+/** Object.<string, gdjsPixiFiltersToolsFilterCreator> */
+gdjs.PixiFiltersTools._filterCreators = {
     Night: {
-        makeFilter: function() {
+        makePIXIFilter: function() {
             var filter = new gdjs.NightPixiFilter();
             return filter;
         },
@@ -80,7 +88,7 @@ gdjs.PixiFiltersTools._filters = {
         },
     },
     LightNight: {
-        makeFilter: function() {
+        makePIXIFilter: function() {
             var filter = new gdjs.LightNightPixiFilter();
             return filter;
         },
@@ -91,7 +99,8 @@ gdjs.PixiFiltersTools._filters = {
         },
     },
     Sepia: {
-        makeFilter: function() {
+        makePIXIFilter: function() {
+            // @ts-ignore
             var colorMatrix = new PIXI.filters.ColorMatrixFilter();
             colorMatrix.sepia();
             return colorMatrix;
@@ -103,7 +112,8 @@ gdjs.PixiFiltersTools._filters = {
         },
     },
     BlackAndWhite: {
-        makeFilter: function() {
+        makePIXIFilter: function() {
+            // @ts-ignore
             var colorMatrix = new PIXI.filters.ColorMatrixFilter();
             colorMatrix.blackAndWhite();
             return colorMatrix;
@@ -115,7 +125,8 @@ gdjs.PixiFiltersTools._filters = {
         },
     },
     Brightness: {
-        makeFilter: function() {
+        makePIXIFilter: function() {
+            // @ts-ignore
             var brightness = new PIXI.filters.ColorMatrixFilter();
             brightness.brightness();
             return brightness;
@@ -127,7 +138,8 @@ gdjs.PixiFiltersTools._filters = {
         },
     },
     Noise: {
-        makeFilter: function() {
+        makePIXIFilter: function() {
+            // @ts-ignore
             var noise = new PIXI.filters.NoiseFilter();
             return noise;
         },
@@ -138,7 +150,8 @@ gdjs.PixiFiltersTools._filters = {
         },
     },
     Blur: {
-        makeFilter: function() {
+        makePIXIFilter: function() {
+            // @ts-ignore
             var blur = new PIXI.filters.BlurFilter();
             return blur;
         },
@@ -159,40 +172,60 @@ gdjs.PixiFiltersTools._filters = {
 
 /**
  * Enable an effect.
- * @param {PIXI.Filter} filter The filter to enable or disable
+ * @param {gdjsPixiFiltersToolsFilter} filter The filter to enable or disable
  * @param {boolean} value Set to true to enable, false to disable
  */
 gdjs.PixiFiltersTools.enableEffect = function(filter, value) {
-    filter.enabled = value;
+    filter.pixiFilter.enabled = value;
 }
 
 /**
- * Effect is enabled.
- * @param {PIXI.Filter} filter The filter to be checked
+ * Check if an effect is enabled.
+ * @param {gdjsPixiFiltersToolsFilter} filter The filter to be checked
  * @return {boolean} true if the filter is enabled
  */
 gdjs.PixiFiltersTools.isEffectEnabled = function(filter) {
-    return filter.enabled;
+    return filter.pixiFilter.enabled;
 }
 
 /**
- * Return the filter with the given name, if any.
+ * Return the creator for the filter with the given name, if any.
  * @param {string} filterName The name of the filter to get
- * @return {?gdjsPixiFiltersToolsFilter} The filter wrapper, if any (null otherwise).
+ * @return {?gdjsPixiFiltersToolsFilterCreator} The filter creator, if any (null otherwise).
  */
-gdjs.PixiFiltersTools.getFilter = function(filterName) {
-    if (gdjs.PixiFiltersTools._filters.hasOwnProperty(filterName))
-        return gdjs.PixiFiltersTools._filters[filterName];
+gdjs.PixiFiltersTools.getFilterCreator = function(filterName) {
+    if (gdjs.PixiFiltersTools._filterCreators.hasOwnProperty(filterName))
+        return gdjs.PixiFiltersTools._filterCreators[filterName];
 
     return null;
+}
+
+/**
+ * Register a new PIXI filter creator, to be used by GDJS.
+ * @param {string} filterName The name of the filter to get
+ * @param {gdjsPixiFiltersToolsFilterCreator} filterCreator The object used to create the filter.
+ */
+gdjs.PixiFiltersTools.registerFilterCreator = function(filterName, filterCreator) {
+    if (gdjs.PixiFiltersTools._filterCreators.hasOwnProperty(filterName))
+        console.warn("Filter \"" + filterName + "\" was already registered in gdjs.PixiFiltersTools. Replacing it with the new one.");
+
+    gdjs.PixiFiltersTools._filterCreators[filterName] = filterCreator;
 }
 
 // Type definitions:
 
 /**
+ * A wrapper allowing to create a PIXI filter and update it using a common interface
+ * @typedef gdjsPixiFiltersToolsFilterCreator
+ * @type {object}
+ * @property {() => any} makePIXIFilter The PIXI filter
+ * @property {(filter: any, parameterName: string, value: number) => void} updateParameter The function to be called to update a parameter
+ */
+
+/**
  * The type of a filter used to manipulate a Pixi filter.
  * @typedef gdjsPixiFiltersToolsFilter
  * @type {object}
- * @property {PIXI.Filter} filter The PIXI filter
- * @property {Function} updateParameter The function to be called to update a parameter
+ * @property {any} pixiFilter The PIXI filter
+ * @property {(filter: any, parameterName: string, value: number) => void} updateParameter The function to be called to update a parameter
  */

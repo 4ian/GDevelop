@@ -21,6 +21,20 @@ module.exports = {
       'MIT'
     );
 
+    // Declare effects:
+    const dumyEffect = extension
+      .addEffect('DummyEffect')
+      .setFullName(_('Dummy effect example'))
+      .setDescription(_('This is an example of an effect ("shader")'))
+      .addIncludeFile('Extensions/ExampleJsExtension/dummyeffect.js');
+    const dumyEffectProperties = dumyEffect.getProperties();
+    dumyEffectProperties.set(
+      'opacity',
+      new gd.PropertyDescriptor(/* defaultValue= */ "1")
+        .setLabel(_('Opacity of the effect (between 0 and 1)'))
+        .setType('number')
+    );
+
     // Declare conditions, actions or expressions:
     extension
       .addCondition(

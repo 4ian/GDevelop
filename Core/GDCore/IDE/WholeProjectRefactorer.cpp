@@ -85,7 +85,7 @@ void WholeProjectRefactorer::ExposeProjectEvents(
 void WholeProjectRefactorer::ExposeProjectEvents(
     gd::Project& project, gd::ArbitraryEventsWorkerWithContext& worker) {
   // See also gd::Project::ExposeResources for a method that traverse the whole
-  // project (this time for resources).
+  // project (this time for resources) and ExposeProjectEffects (this time for effects).
 
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {

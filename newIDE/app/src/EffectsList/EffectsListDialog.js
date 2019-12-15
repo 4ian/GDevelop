@@ -7,13 +7,14 @@ import EffectsList from './index';
 import HelpButton from '../UI/HelpButton';
 
 type Props = {|
+  project: gdProject,
   onApply: () => void,
   effectsContainer: gdEffectsContainer,
 |};
 
 export default class EffectsListDialog extends React.Component<Props, {||}> {
   render() {
-    const { onApply, effectsContainer } = this.props;
+    const { project, onApply, effectsContainer } = this.props;
 
     return (
       <Dialog
@@ -39,6 +40,7 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
         title={<Trans>Effects</Trans>}
       >
         <EffectsList
+          project={project}
           effectsContainer={effectsContainer}
           onEffectsUpdated={
             () =>

@@ -956,8 +956,9 @@ gd::String Project::GetBadObjectNameWarning() {
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that
-  // traverse the whole project (this time for events). Ideally, this method
-  // could be moved outside of gd::Project.
+  // traverse the whole project (this time for events) and ExposeProjectEffects
+  // (this time for effects). Ideally, this method could be moved outside of
+  // gd::Project.
 
   // Add project resources
   worker.ExposeResources(&GetResourcesManager());

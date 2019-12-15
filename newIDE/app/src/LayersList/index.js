@@ -102,6 +102,7 @@ const SortableLayersListBody = SortableContainer(LayersListBody);
 SortableLayersListBody.muiName = 'TableBody';
 
 type Props = {|
+  project: gdProject,
   freezeUpdate: boolean,
   layersContainer: gdLayout,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
@@ -143,6 +144,7 @@ export default class LayersList extends Component<Props, State> {
   };
 
   render() {
+    const { project } = this.props;
     const { effectsEditedLayer } = this.state;
 
     // Force the list to be mounted again if layersContainer
@@ -194,6 +196,7 @@ export default class LayersList extends Component<Props, State> {
         </Column>
         {effectsEditedLayer && (
           <EffectsListDialog
+            project={project}
             effectsContainer={effectsEditedLayer}
             onApply={() =>
               this.setState({

@@ -10,6 +10,7 @@
 #include <streambuf>
 #include <string>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
@@ -110,6 +111,9 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
 
   // Export engine libraries
   AddLibsInclude(true, false, true, includesFiles);
+
+  // Export effects (after engine libraries as they auto-register themselves to the engine)
+  ExportEffectIncludes(exportedProject, includesFiles);
 
   // Generate events code
   if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
@@ -501,7 +505,8 @@ bool ExporterHelper::CompleteIndexFile(
       fs.MakeRelative(scriptSrc, exportDir);
     }
 
-    codeFilesIncludes += "\t<script src=\"" + scriptSrc + "\" crossorigin=\"anonymous\"></script>\n";
+    codeFilesIncludes += "\t<script src=\"" + scriptSrc +
+                         "\" crossorigin=\"anonymous\"></script>\n";
   }
 
   str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", customCss)
@@ -605,7 +610,8 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
                                     std::vector<gd::String> &includesFiles) {
   if (pixiRenderers) {
     for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("pixi-renderer") != gd::String::npos)
+      if (it->find("pixi-renderer") != gd::String::npos ||
+          it->find("pixi-filter") != gd::String::npos)
         includesFiles.erase(it++);
       else
         ++it;
@@ -613,12 +619,25 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
   }
   if (cocosRenderers) {
     for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("cocos-renderer") != gd::String::npos)
+      if (it->find("cocos-renderer") != gd::String::npos ||
+          it->find("cocos-shader") != gd::String::npos)
         includesFiles.erase(it++);
       else
         ++it;
     }
   }
+}
+
+bool ExporterHelper::ExportEffectIncludes(
+    gd::Project &project, std::vector<gd::String> &includesFiles) {
+  std::set<gd::String> effectIncludes;
+
+  gd::EffectsCodeGenerator::GenerateEffectsIncludeFiles(
+      project.GetCurrentPlatform(), project, effectIncludes);
+
+  for (auto &include : effectIncludes) InsertUnique(includesFiles, include);
+
+  return true;
 }
 
 bool ExporterHelper::ExportEventsCode(gd::Project &project,
@@ -642,10 +661,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 
     // Export the code
     if (fs.WriteToFile(filename, eventsOutput)) {
-      for (std::set<gd::String>::iterator include = eventsIncludes.begin();
-           include != eventsIncludes.end();
-           ++include)
-        InsertUnique(includesFiles, *include);
+      for (auto &include : eventsIncludes) InsertUnique(includesFiles, include);
 
       InsertUnique(includesFiles, filename);
     } else {

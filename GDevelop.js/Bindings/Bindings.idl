@@ -586,12 +586,13 @@ interface Effect {
   void SetName([Const] DOMString name_);
   [Const, Ref] DOMString GetName();
 
-  void SetEffectName([Const] DOMString effectName_);
-  [Const, Ref] DOMString GetEffectName();
+  void SetEffectType([Const] DOMString effectType_);
+  [Const, Ref] DOMString GetEffectType();
 
   void SetParameter([Const] DOMString name, float value);
   float GetParameter([Const] DOMString name);
   [Const, Ref] MapStringDouble GetAllParameters();
+  void ClearParameters();
 
   void SerializeTo([Ref] SerializerElement element);
   void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1125,6 +1126,21 @@ interface BehaviorMetadata {
     BehaviorsSharedData GetSharedDataInstance();
 };
 
+interface EffectMetadata {
+    [Ref] EffectMetadata SetFullName([Const] DOMString fullName);
+    [Ref] EffectMetadata SetDescription([Const] DOMString description);
+    [Ref] EffectMetadata SetHelpPath([Const] DOMString helpPath);
+    [Ref] EffectMetadata SetIncludeFile([Const] DOMString includeFile);
+    [Ref] EffectMetadata AddIncludeFile([Const] DOMString includeFile);
+
+    [Const, Ref] DOMString GetType();
+    [Const, Ref] DOMString GetFullName();
+    [Const, Ref] DOMString GetDescription();
+    [Const, Ref] DOMString GetHelpPath();
+
+    [Ref] MapStringPropertyDescriptor GetProperties();
+};
+
 interface EventMetadata {
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
@@ -1185,6 +1201,8 @@ interface PlatformExtension {
         [Const] DOMString icon24x24,
         gdObject instance);
 
+    [Ref] EffectMetadata AddEffect([Const] DOMString name);
+
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetDescription();
@@ -1196,8 +1214,10 @@ interface PlatformExtension {
 
     [Value] VectorString GetExtensionObjectsTypes();
     [Value] VectorString GetBehaviorsTypes();
+    [Value] VectorString GetExtensionEffectTypes();
     [Ref] ObjectMetadata GetObjectMetadata([Const] DOMString type);
     [Ref] BehaviorMetadata GetBehaviorMetadata([Const] DOMString type);
+    [Ref] EffectMetadata GetEffectMetadata([Const] DOMString type);
     [Ref] MapStringEventMetadata GetAllEvents();
     [Ref] MapStringInstructionMetadata GetAllActions();
     [Ref] MapStringInstructionMetadata GetAllConditions();
@@ -1534,6 +1554,11 @@ interface ExtensionAndObjectMetadata {
   [Const, Ref] ObjectMetadata GetMetadata();
 };
 
+interface ExtensionAndEffectMetadata {
+  [Const, Ref] PlatformExtension GetExtension();
+  [Const, Ref] EffectMetadata GetMetadata();
+};
+
 interface ExtensionAndInstructionMetadata {
   [Const, Ref] PlatformExtension GetExtension();
   [Const, Ref] InstructionMetadata GetMetadata();
@@ -1548,6 +1573,7 @@ interface MetadataProvider {
 
     [Value] ExtensionAndBehaviorMetadata STATIC_GetExtensionAndBehaviorMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Value] ExtensionAndObjectMetadata STATIC_GetExtensionAndObjectMetadata([Const, Ref] Platform p, [Const] DOMString type);
+    [Value] ExtensionAndEffectMetadata STATIC_GetExtensionAndEffectMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Value] ExtensionAndInstructionMetadata STATIC_GetExtensionAndActionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Value] ExtensionAndInstructionMetadata STATIC_GetExtensionAndConditionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Value] ExtensionAndExpressionMetadata STATIC_GetExtensionAndExpressionMetadata([Const, Ref] Platform p, [Const] DOMString type);
@@ -1558,6 +1584,7 @@ interface MetadataProvider {
     [Value] ExtensionAndExpressionMetadata STATIC_GetExtensionAndBehaviorStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
     [Const, Ref] BehaviorMetadata STATIC_GetBehaviorMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] ObjectMetadata STATIC_GetObjectMetadata([Const, Ref] Platform p, [Const] DOMString type);
+    [Const, Ref] EffectMetadata STATIC_GetEffectMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] InstructionMetadata STATIC_GetActionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] InstructionMetadata STATIC_GetConditionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetExpressionMetadata([Const, Ref] Platform p, [Const] DOMString type);

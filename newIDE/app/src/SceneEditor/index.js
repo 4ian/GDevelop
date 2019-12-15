@@ -1103,6 +1103,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onClose={this.toggleLayersList}
           />
           <LayersList
+            project={project}
             freezeUpdate={!this.state.layersListOpen}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}

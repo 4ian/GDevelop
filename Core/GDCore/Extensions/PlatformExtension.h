@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/VersionPriv.h"
 
@@ -23,6 +24,7 @@ class InstructionMetadata;
 class ExpressionMetadata;
 class ObjectMetadata;
 class BehaviorMetadata;
+class EffectMetadata;
 class BaseEvent;
 class EventMetadata;
 class EventCodeGenerator;
@@ -207,6 +209,12 @@ class GD_CORE_API PlatformExtension {
       std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance);
 
   /**
+   * \brief Declare a new effect as being part of the extension.
+   * \param name The internal name of the effect (also called effect type).
+   */
+  gd::EffectMetadata& AddEffect(const gd::String& name_);
+
+  /**
    * \brief Declare a new event as being part of the extension.
    * \note This method does nothing when used for GD C++ runtime.
    */
@@ -285,6 +293,12 @@ class GD_CORE_API PlatformExtension {
   CreateFunPtr GetObjectCreationFunctionPtr(gd::String objectType) const;
 
   /**
+   * \brief Return a vector containing all the effect types provided by the
+   * extension.
+   */
+  std::vector<gd::String> GetExtensionEffectTypes() const;
+
+  /**
    * \brief Create a custom event.
    *
    * Return an empty pointer if \a eventType is not provided by the extension.
@@ -317,6 +331,11 @@ class GD_CORE_API PlatformExtension {
    * behaviorType
    */
   BehaviorMetadata& GetBehaviorMetadata(const gd::String& behaviorType);
+
+  /**
+   * \brief Return the metadata for the effect with the given name.
+   */
+  EffectMetadata& GetEffectMetadata(const gd::String& effectName);
 
   /**
    * \brief Return a map containing all the events provided by the extension
@@ -455,6 +474,7 @@ class GD_CORE_API PlatformExtension {
 
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;
+  std::map<gd::String, gd::EffectMetadata> effectsMetadata;
 #if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
@@ -465,6 +485,7 @@ class GD_CORE_API PlatformExtension {
 
   ObjectMetadata badObjectMetadata;
   BehaviorMetadata badBehaviorMetadata;
+  EffectMetadata badEffectMetadata;
 #if defined(GD_IDE_ONLY)
   static std::map<gd::String, gd::InstructionMetadata>
       badConditionsMetadata;  ///< Used when a condition is not found in the

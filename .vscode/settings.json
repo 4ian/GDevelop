@@ -2,6 +2,7 @@
 {
     "files.associations": {
         "*.idl": "java",
+        "Fastfile": "ruby",
         "iosfwd": "cpp",
         "functional": "cpp",
         "type_traits": "cpp",
@@ -80,7 +81,9 @@
         "__hash": "cpp",
         "__debug": "cpp",
         "__threading_support": "cpp",
-        "any": "cpp"
+        "any": "cpp",
+        "array": "cpp",
+        "cinttypes": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

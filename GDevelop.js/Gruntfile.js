@@ -173,7 +173,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-newer');
   grunt.loadNpmTasks('grunt-mkdir');
   grunt.registerTask('build:raw', [
-    'clean',
     'mkdir:embuild',
     'newer:shell:cmake',
     'newer:shell:updateGDBindings',

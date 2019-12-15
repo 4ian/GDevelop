@@ -34,6 +34,9 @@ Images resources, GDJS Runtime, extensions will be copied in resources, and [lib
 You can run the app with Electron. **Make sure that you've run `npm start` (or `yarn start`) in `app` folder before** (see above).
 
 ```bash
+cd newIDE/app && npm start # Be sure to have run this in a terminal, before the rest!
+
+# In a new terminal:
 cd newIDE/electron-app
 npm install # or yarn
 

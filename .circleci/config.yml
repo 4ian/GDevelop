@@ -19,7 +19,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install sdk-1.37.37-64bit && ./emsdk activate sdk-1.37.37-64bit && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install sdk-fastcomp-1.37.37-64bit && ./emsdk activate sdk-fastcomp-1.37.37-64bit && cd ..
 
       - run:
           name: Install Wine for Electron builder

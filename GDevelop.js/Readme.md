@@ -19,8 +19,8 @@ This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Co
 | `git clone https://github.com/juj/emsdk.git` | `git clone https://github.com/juj/emsdk.git` |
 | `cd emsdk`   | `cd emsdk`|
 | `./emsdk update` | `emsdk update` |
-| `./emsdk install sdk-1.37.37-64bit` | `emsdk install sdk-1.37.37-64bit` |
-| `./emsdk activate sdk-1.37.37-64bit` | `emsdk activate sdk-1.37.37-64bit` |
+| `./emsdk install sdk-fastcomp-1.37.37-64bit` | `emsdk install sdk-fastcomp-1.37.37-64bit` |
+| `./emsdk activate sdk-fastcomp-1.37.37-64bit` | `emsdk activate sdk-fastcomp-1.37.37-64bit` |
 | `source ./emsdk_env.sh` | `emsdk_env.bat` |
 
 > For up-to-date information, check again [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html).

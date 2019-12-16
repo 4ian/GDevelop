@@ -15,8 +15,8 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'MyDummyExtension',
-      'My Dummy Extension',
-      'An example of a declaration of an extension',
+      _('My Dummy Extension'),
+      _('An example of a declaration of an extension'),
       'Florian Rival',
       'MIT'
     );

@@ -449,9 +449,9 @@ export const makeTestProject = gd => {
   const effect1 = layerWithEffects.insertNewEffect('MyEffect1', 0);
   const effect2 = layerWithEffects.insertNewEffect('MyEffect2', 1);
 
-  effect1.setEffectType('Sepia');
+  effect1.setEffectType('FakeSepia');
   effect1.setParameter('opacity', 0.6);
-  effect2.setEffectType('Night');
+  effect2.setEffectType('FakeNight');
   effect2.setParameter('intensity', 0.1);
   effect2.setParameter('opacity', 0.2);
 

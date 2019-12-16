@@ -404,6 +404,7 @@ void PlatformExtension::SetNameSpace(gd::String nameSpace_) {
       name == "BuiltinCommonConversions" ||
       name == "BuiltinStringInstructions" ||
       name == "BuiltinMathematicalTools" ||
+      name == "Effects" || // Well-known effects are not namespaced.
       name == "CommonDialogs")  // New name for BuiltinInterface
   {
     nameSpace = "";

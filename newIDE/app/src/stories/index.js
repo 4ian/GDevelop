@@ -175,10 +175,12 @@ import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
 } from '../UI/Layout';
+import { makeTestExtensions } from '../fixtures/TestExtensions';
 
 // No i18n in this file
 
 const gd = global.gd;
+makeTestExtensions(gd);
 const {
   project,
   shapePainterObject,

@@ -63,9 +63,8 @@ install:
 # Install Emscripten (for GDevelop.js)
   - git clone https://github.com/juj/emsdk.git
   - cd emsdk
-  - ./emsdk update
-  - ./emsdk install sdk-1.37.37-64bit
-  - ./emsdk activate sdk-1.37.37-64bit
+  - ./emsdk install sdk-fastcomp-1.37.37-64bit
+  - ./emsdk activate sdk-fastcomp-1.37.37-64bit
   - source ./emsdk_env.sh
   - cd ..
 # Install GDevelop.js dependencies and compile it

@@ -1,6 +1,6 @@
 # Writing extensions for GDevelop 5
 
-GDevelop editor and games engines are designed so that all objects, behaviors, actions, conditions and expressions
+GDevelop editor and games engines are designed so that all objects, behaviors, effects, actions, conditions and expressions
 are provided by _extensions_. These extensions are composed of two parts:
 
 - the _declaration_ of the extension, traditionally done in a file called `JsExtension.js`.
@@ -31,6 +31,7 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
   > Verify that changes are imported in the console: you should see a message starting by `GDJS Runtime update`.
   > If you deactivated the automatic import in the preferences or want to import manually your changes, run `import-GDJS-Runtime.js` script:
+  >
   > ```bash
   > cd scripts
   > node import-GDJS-Runtime.js # This copy extensions declaration and runtime into GDevelop.
@@ -74,6 +75,12 @@ You'll be interested in the constructor (to initialize things), `update` (called
 
 Read about [`gdjs.RuntimeObject`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeObject.html), the base class inherited by all objects.
 
+#### How to create an effect ("shader", PixiJS "filter")
+
+See lots of examples in [Effects](../Extensions/Effects/) (the extension containing lots of effects) and [light-night-pixi-filter.js](../Extensions/Effects/light-night-pixi-filter.js) (an example of a custom filter for PixiJS).
+
+You'll have to store the code for your PixiJS filter in the file, and then call `gdjs.PixiFiltersTools.registerFilterCreator` to tell the game engine how to create and update the filter. Don't forget to then **declare** the effect (see next section).
+
 ### 2.2) Declare your extension to the IDE 👋
 
 > ℹ️ Declaration must be done in a file called `JsExtension.js`. Your extension must be in Extensions folder, in its own directory.
@@ -116,7 +123,7 @@ Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%
 
 - Create a `new gd.ObjectJsImplementation()` and define `updateProperty` and `getProperties` (for the object properties) and `updateInitialInstanceProperty` and `getInitialInstanceProperties` (for the optional properties that are attached to each instance).
 
-> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).  Learn more about [properties here](docs/Properties-schema-and-PropertiesEditor-explanations.md).
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js). Learn more about [properties here](docs/Properties-schema-and-PropertiesEditor-explanations.md).
 
 > ℹ️ After doing this, you can actually see your object in GDevelop! Read the next sections to see how to add an editor and a renderer for instances on the scene editor.
 
@@ -142,6 +149,14 @@ registerEditorConfigurations: function(objectsEditorService) {
 Finally, to have the instances of your object displayed properly on the scene editor, implement the function `registerInstanceRenderers` in your extension module. The function is passed an object called `objectsRenderingService`, containing [RenderedInstance](./app/src/ObjectsRendering/Renderers/RenderedInstance.js), the "base class" for instance renderers, and PIXI, which give you access to [Pixi.js rendering engine](https://github.com/pixijs/pixi.js), used in the editor to render the scene.
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+
+#### Declare effects
+
+Add an effect using [`addEffect`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html) in your _JsExtension.js_ file.
+
+> 👉 See an example in the [Effects extension _JsExtension.js_ file](../Extensions/Effects/JsExtension.js). Learn more about [properties here](docs/Properties-schema-and-PropertiesEditor-explanations.md).
+
+> ℹ️ Don't forget to use `addIncludeFile` to set the file containing your effect implementation in JavaScript.
 
 #### Declare events
 

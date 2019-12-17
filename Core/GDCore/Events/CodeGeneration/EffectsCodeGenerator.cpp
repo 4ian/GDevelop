@@ -22,23 +22,18 @@ void ExposeProjectEffects(
   // WholeProjectRefactorer::ExposeProjectEvents.
 
   // Add layouts effects
-  std::cout << "START ExposeProjectEffects" << std::endl; // TODO: Remove
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
     auto& layout = project.GetLayout(s);
-  std::cout << "Layout" << s<< std::endl; // TODO: Remove
 
     for (std::size_t l = 0; l < layout.GetLayersCount(); ++l) {
       auto& layer = layout.GetLayer(l);
-  std::cout << "Layer" << l<< std::endl; // TODO: Remove
 
       for (std::size_t e = 0; e < layer.GetEffectsCount(); ++e) {
         auto& effect = layer.GetEffect(e);
-  std::cout << "Effect" << e<< std::endl; // TODO: Remove
         worker(effect);
       }
     }
   }
-  std::cout << "END ExposeProjectEffects" << std::endl; // TODO: Remove
 }
 
 void EffectsCodeGenerator::GenerateEffectsIncludeFiles(

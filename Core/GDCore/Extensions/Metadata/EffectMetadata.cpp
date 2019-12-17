@@ -7,23 +7,18 @@
 
 namespace gd {
 
-EffectMetadata::EffectMetadata(const gd::String& type_)
-    : type(type_) {}
+EffectMetadata::EffectMetadata(const gd::String& type_) : type(type_) {}
 
 EffectMetadata& EffectMetadata::SetIncludeFile(const gd::String& includeFile) {
-#if defined(GD_IDE_ONLY)
   includeFiles.clear();
   includeFiles.push_back(includeFile);
-#endif
   return *this;
 }
 
 EffectMetadata& EffectMetadata::AddIncludeFile(const gd::String& includeFile) {
-#if defined(GD_IDE_ONLY)
   if (std::find(includeFiles.begin(), includeFiles.end(), includeFile) ==
       includeFiles.end())
     includeFiles.push_back(includeFile);
-#endif
   return *this;
 }
 

@@ -81,29 +81,40 @@ class GD_CORE_API EffectMetadata {
   }
 
   /**
-   * Get the help path of the effect, relative to the documentation root.
+   * \brief Get the help path of the effect, relative to the documentation root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
 
+  /**
+   * \brief Get the type of the effect (its internal name, like "BlackAndWhite").
+   */
   const gd::String& GetType() const { return type; }
-#if defined(GD_IDE_ONLY)
+
+  /**
+   * \brief Get the user facing name of the effect (like "Black and White").
+   */
   const gd::String& GetFullName() const { return fullname; }
+
+  /**
+   * \brief Get the user friendly description of the effect.
+   */
   const gd::String& GetDescription() const { return description; }
+
+  /**
+   * \brief Get the required include files for this effect.
+   */
   const std::vector<gd::String>& GetIncludeFiles() const {
     return includeFiles;
   }
-#endif
 
  private:
   gd::String extensionNamespace;
   gd::String type;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String fullname;
   gd::String description;
   std::vector<gd::String> includeFiles;
   std::map<gd::String, gd::PropertyDescriptor> properties;
-#endif
 };
 
 }  // namespace gd

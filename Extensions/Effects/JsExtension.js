@@ -138,12 +138,35 @@ module.exports = {
       .setDescription(_('Alter the colors to sepia'))
       .addIncludeFile('Extensions/Effects/sepia-pixi-filter.js');
     const sepiaProperties = sepiaEffect.getProperties();
-    sepiaProperties.set(
-      'opacity',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Opacity (between 0 and 1)'))
-        .setType('number')
-    );
+    sepiaProperties.set('opacity', new gd.PropertyDescriptor(/* defaultValue= */ '1').setLabel(_('Opacity (between 0 and 1)')).setType('number'));
+
+    const setFilterProperties = (propertiesSchema, filterProperties) => {
+      Object.keys(propertiesSchema).forEach(property => {
+        const value = propertiesSchema[property];
+        filterProperties.set(property, new gd.PropertyDescriptor(/* defaultValue= */ value.default).setLabel(value.name + ' (' + value.description + ')').setType('number'));
+      });
+    };
+    const crtPropertiesSchema = {
+      lineWidth: { name: _('Line width'), default: '0.2', description: _('between 0 and 5') },
+      lineContrast: { name: _('Line contrast'), default: '0', description: _('between 0 and 1') },
+      noise: { name: _('Noise'), default: '0.1', description: _('between 0 and 1') },
+      curvature: { name: _('Curvature'), default: '0', description: _('between 0 and 10') },
+      verticalLine: { name: _('vertical line'), default: '0', description: _('0 = false, 1 = true') },
+      noiseSize: { name: _('Noise size'), default: '1', description: _('between 0 and 10') },
+      vignetting: { name: _('Vignetting'), default: '0.3', description: _('between 0 and 1') },
+      vignettingAlpha: { name: _('Vignetting alpha'), default: '1', description: _('between 0 and 1') },
+      vignettingBlur: { name: _('Vignetting blur'), default: '0.3', description: _('between 0 and 1') },
+      time: { name: _('Time'), default: '0.5', description: _('between 0 and 20') },
+      seed: { name: _('Seed'), default: '0', description: _('between 0 and 1') },
+    };
+    const crtEffect = extension
+      .addEffect('Crt')
+      .setFullName(_('Crt'))
+      .setDescription(_('Add Crt effect'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-crt.js')
+      .addIncludeFile('Extensions/Effects/crt-pixi-filter.js');
+    const crtProperties = crtEffect.getProperties();
+    setFilterProperties(crtPropertiesSchema, crtProperties);
 
     return extension;
   },

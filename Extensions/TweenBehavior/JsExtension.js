@@ -21,7 +21,7 @@ module.exports = {
         "Matthias Meike, Florian Rival",
         "Open source (MIT License)"
       )
-      .setExtensionHelpPath("/all-features/tween");
+      .setExtensionHelpPath("/behaviors/tween");
 
     var tweenBehavior = new gd.BehaviorJsImplementation();
 

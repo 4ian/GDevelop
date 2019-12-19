@@ -380,7 +380,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("string", _("To color"), "", false)
-      .addParameter("stringWithSelector", _("Items"), easingChoices, false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(

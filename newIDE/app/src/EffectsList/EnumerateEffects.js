@@ -41,7 +41,9 @@ export const enumerateEffectsMetadata = (
               const property = properties.get(parameterName);
               const valueType = property.getType().toLowerCase();
               const propertyLabel = property.getLabel();
+              const propertyDescription = property.getDescription();
               const getLabel = () => propertyLabel;
+              const getDescription = () => propertyDescription;
 
               if (valueType === 'number') {
                 return {
@@ -52,6 +54,7 @@ export const enumerateEffectsMetadata = (
                   setValue: (effect: gdEffect, newValue: number) =>
                     effect.setDoubleParameter(parameterName, newValue),
                   getLabel,
+                  getDescription,
                 };
               } else if (valueType === 'resource') {
                 // Resource is a "string" (with a selector in the UI)
@@ -65,6 +68,7 @@ export const enumerateEffectsMetadata = (
                   setValue: (effect: gdEffect, newValue: number) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
+                  getDescription,
                 };
               } else if (valueType === 'color') {
                 return {
@@ -75,6 +79,7 @@ export const enumerateEffectsMetadata = (
                   setValue: (effect: gdEffect, newValue: number) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
+                  getDescription,
                 };
               } else {
                 console.error(

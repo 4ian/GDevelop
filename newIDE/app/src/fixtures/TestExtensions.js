@@ -67,6 +67,18 @@ export const makeTestExtensions = gd => {
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel('Intensity (between 0 and 1)')
         .setType('number')
+        .setDescription(
+          'Some interesting description about this intensity parameter that can be used by the effect.'
+        )
+    );
+    variousParametersEffectProperties.set(
+      'someColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel('Some color')
+        .setType('color')
+        .setDescription(
+          'Some interesting description about this intensity parameter that can be used by the effect.'
+        )
     );
     variousParametersEffectProperties.set(
       'image',
@@ -74,6 +86,9 @@ export const makeTestExtensions = gd => {
         .setLabel('An image resource')
         .setType('resource')
         .addExtraInfo('image')
+        .setDescription(
+          'Some interesting description about this image resource that can be used by the effect.'
+        )
     );
 
     platform.addNewExtension(extension);

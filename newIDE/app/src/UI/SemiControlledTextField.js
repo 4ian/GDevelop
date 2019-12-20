@@ -32,6 +32,7 @@ type Props = {|
   floatingLabelText?: React.Node,
   fullWidth?: boolean,
   hintText?: React.Node,
+  helperText?: React.Node,
   id?: string,
   inputStyle?: Object,
   max?: number,

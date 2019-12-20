@@ -146,12 +146,13 @@ module.exports = {
         filterProperties.set(property, new gd.PropertyDescriptor(/* defaultValue= */ value.default).setLabel(value.name + ' (' + value.description + ')').setType('number'));
       });
     };
+
     const crtPropertiesSchema = {
       lineWidth: { name: _('Line width'), default: '0.2', description: _('between 0 and 5') },
       lineContrast: { name: _('Line contrast'), default: '0', description: _('between 0 and 1') },
       noise: { name: _('Noise'), default: '0.1', description: _('between 0 and 1') },
       curvature: { name: _('Curvature'), default: '0', description: _('between 0 and 10') },
-      verticalLine: { name: _('vertical line'), default: '0', description: _('0 = false, 1 = true') },
+      verticalLine: { name: _('Vertical line'), default: '0', description: _('0 = false, 1 = true') },
       noiseSize: { name: _('Noise size'), default: '1', description: _('between 0 and 10') },
       vignetting: { name: _('Vignetting'), default: '0.3', description: _('between 0 and 1') },
       vignettingAlpha: { name: _('Vignetting alpha'), default: '1', description: _('between 0 and 1') },
@@ -167,6 +168,85 @@ module.exports = {
       .addIncludeFile('Extensions/Effects/crt-pixi-filter.js');
     const crtProperties = crtEffect.getProperties();
     setFilterProperties(crtPropertiesSchema, crtProperties);
+
+    const godrayPropertiesSchema = {
+      parallel: { name: _('Parallel'), default: '1', description: _('0 = false, 1 = true') },
+      lacunarity: { name: _('Lacunarity'), default: '2.75', description: _('between 0 and 5') },
+      angle: { name: _('Angle'), default: '30', description: _('between -60 and 60') },
+      gain: { name: _('Gain'), default: '0.6', description: _('between 0 and 1') },
+      time: { name: _('Time'), default: '0.5', description: _('between 0 and 20') },
+      light: { name: _('Light'), default: '30', description: _('between 0 and 60') },
+      x: { name: _('Center X'), default: '100', description: _('between 100 and 1000') },
+      y: { name: _('Center Y'), default: '100', description: _('between -1000 and 100') },
+    };
+    const godrayEffect = extension
+      .addEffect('Godray')
+      .setFullName(_('Godray'))
+      .setDescription(_('Add Godray effect'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-godray.js')
+      .addIncludeFile('Extensions/Effects/god-ray-pixi-filter.js');
+    const godrayProperties = godrayEffect.getProperties();
+    setFilterProperties(godrayPropertiesSchema, godrayProperties);
+
+    const tiltShiftPropertiesSchema = {
+      blur: { name: _('Blur'), default: '30', description: _('between 0 and 200') },
+      gradientBlur: { name: _('Gradient blur'), default: '1000', description: _('between 0 and 2000') },
+    };
+    const tiltShiftEffect = extension
+      .addEffect('TiltShift')
+      .setFullName(_('Tilt Shift'))
+      .setDescription(_('Add Tilt shift effect'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-tilt-shift.js')
+      .addIncludeFile('Extensions/Effects/tilt-shift-pixi-filter.js');
+    const tiltShiftProperties = tiltShiftEffect.getProperties();
+    setFilterProperties(tiltShiftPropertiesSchema, tiltShiftProperties);
+
+    const advancedBloomPropertiesSchema = {
+      threshold: { name: _('Threshold'), default: '0.5', description: _('between 0 and 1') },
+      bloomScale: { name: _('Bloom Scale'), default: '0.7', description: _('between 0 and 2') },
+      brightness: { name: _('Brightness'), default: '0.7', description: _('between 0 and 2') },
+      blur: { name: _('Blur'), default: '4', description: _('between 0 and 20') },
+      quality: { name: _('Quality'), default: '7', description: _('between 0 and 20') },
+    };
+    const advancedBloomEffect = extension
+      .addEffect('AdvancedBloom')
+      .setFullName(_('Advanced Bloom'))
+      .setDescription(_('Add Tilt shift effect'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js') //filter dependency
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-advanced-bloom.js')
+      .addIncludeFile('Extensions/Effects/advanced-bloom-pixi-filter.js');
+    const advancedBloomProperties = advancedBloomEffect.getProperties();
+    setFilterProperties(advancedBloomPropertiesSchema, advancedBloomProperties);
+
+    const kawaseBlurPropertiesSchema = {
+      pixelizeX: { name: _('Pixelize X'), default: '1', description: _('between 0 and 10') },
+      pixelizeY: { name: _('Pixelize Y'), default: '1', description: _('between 0 and 10') },
+      blur: { name: _('Blur'), default: '0.5', description: _('between 0 and 20') },
+      quality: { name: _('Quality'), default: '3', description: _('between 1 and 20') },
+    };
+    const kawaseBlurEffect = extension
+      .addEffect('KawaseBlur')
+      .setFullName(_('Kawase Blur'))
+      .setDescription(_('Add Kawase blur effect'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
+      .addIncludeFile('Extensions/Effects/kawase-blur-pixi-filter.js');
+    const kawaseBlurProperties = kawaseBlurEffect.getProperties();
+    setFilterProperties(kawaseBlurPropertiesSchema, kawaseBlurProperties);
+
+    const zoomBlurPropertiesSchema = {
+      centerX: { name: _('Center X'), default: '0.5', description: _('between 0 and 1, 0.5 = window middle') },
+      centerY: { name: _('Center Y'), default: '0.5', description: _('between 0 and 1, 0.5 = window middle') },
+      innerRadius: { name: _('Inner radius'), default: '0.2', description: _('between 0 and 1, 0.5 = mid-way') },
+      strength: { name: _('strength'), default: '0.3', description: _('between 0. and 5') },
+    };
+    const zoomBlurEffect = extension
+      .addEffect('ZoomBlur')
+      .setFullName(_('Zoom Blur'))
+      .setDescription(_('Add Zoom blur effect'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-zoom-blur.js')
+      .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js');
+    const zoomBlurProperties = zoomBlurEffect.getProperties();
+    setFilterProperties(zoomBlurPropertiesSchema, zoomBlurProperties);
 
     return extension;
   },

@@ -127,6 +127,10 @@ gdjs.LayerCocosRenderer.prototype.updateVisibility = function(visible) {
     this._cocosLayer.setVisible(visible);
 }
 
+gdjs.LayerCocosRenderer.prototype.updateTime = function() {
+    // Unimplemented
+}
+
 gdjs.LayerCocosRenderer.prototype.addRendererObject = function(child, zOrder) {
     this._cocosLayer.addChild(child, zOrder);
 };
@@ -139,7 +143,7 @@ gdjs.LayerCocosRenderer.prototype.removeRendererObject = function(child) {
     this._cocosLayer.removeChild(child);
 };
 
-gdjs.LayerCocosRenderer.prototype.setEffectParameter = function (name, parameterName, value) {
+gdjs.LayerCocosRenderer.prototype.setEffectDoubleParameter = function (name, parameterName, value) {
     for (var i = 0;i < this._shaders.length; ++i) {
         if (this._shaders[i].name === name) {
             var theShader = this._shaders[i];
@@ -152,4 +156,8 @@ gdjs.LayerCocosRenderer.prototype.setEffectParameter = function (name, parameter
             }
         }
     }
+};
+
+gdjs.LayerCocosRenderer.prototype.setEffectStringParameter = function (name, parameterName, value) {
+    // Unimplemented
 };

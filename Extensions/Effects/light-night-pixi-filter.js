@@ -25,13 +25,15 @@ gdjs.LightNightPixiFilter.prototype = Object.create(PIXI.Filter.prototype);
 gdjs.LightNightPixiFilter.prototype.constructor = gdjs.LightNightPixiFilter;
 
 gdjs.PixiFiltersTools.registerFilterCreator('LightNight', {
-  makePIXIFilter: function() {
+  makePIXIFilter: function(layer, effectData) {
     var filter = new gdjs.LightNightPixiFilter();
     return filter;
   },
-  updateParameter: function(filter, parameterName, value) {
+  update: function(filter, layer) {},
+  updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName !== 'opacity') return;
 
     filter.uniforms.opacity = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
   },
+  updateStringParameter: function(filter, parameterName, value) {},
 });

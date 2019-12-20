@@ -277,6 +277,10 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
     this._updateObjectsVisibility();
     if (this._profiler) this._profiler.end("objects (visibility)");
 
+    if (this._profiler) this._profiler.begin("layers (effects update)");
+    this._updateLayers();
+    if (this._profiler) this._profiler.end("layers (effects update)");
+
     if (this._profiler) this._profiler.begin("render");
 
     // Uncomment to enable debug rendering (look for the implementation in the renderer
@@ -315,6 +319,17 @@ gdjs.RuntimeScene.prototype._updateLayersCameraCoordinates = function() {
             this._layersCameraCoordinates[name][1] = theLayer.getCameraY() - theLayer.getCameraHeight();
             this._layersCameraCoordinates[name][2] = theLayer.getCameraX() + theLayer.getCameraWidth();
             this._layersCameraCoordinates[name][3] = theLayer.getCameraY() + theLayer.getCameraHeight();
+        }
+    }
+}
+
+gdjs.RuntimeScene.prototype._updateLayers = function() {
+    for(var name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+            /** @type gdjs.Layer */
+            var theLayer = this._layers.items[name];
+
+            theLayer.update(this);
         }
     }
 }

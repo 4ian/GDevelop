@@ -380,8 +380,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction(
           "SetLayerEffectParameter",
-          _("Effect parameter"),
-          _("Change the parameter of an effect"),
+          _("Effect parameter (number)"),
+          _("Change the value of a parameter of an effect"),
           _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of layer _PARAM1_"),
           _("Layers and cameras/Effects"),
           "res/conditions/camera24.png",
@@ -392,6 +392,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("string", _("Effect"))
       .AddParameter("string", _("Parameter name"))
       .AddParameter("expression", _("New value"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "SetLayerEffectStringParameter",
+          _("Effect parameter (string)"),
+          _("Change the value (string) of a parameter of an effect"),
+          _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of layer _PARAM1_"),
+          _("Layers and cameras/Effects"),
+          "res/conditions/camera24.png",
+          "res/conditions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("string", _("Effect"))
+      .AddParameter("string", _("Parameter name"))
+      .AddParameter("string", _("New value"))
       .MarkAsAdvanced();
 
   extension

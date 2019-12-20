@@ -129,7 +129,7 @@ gdjs.RuntimeObject.prototype.onCreated = function() {
 gdjs.RuntimeObject.prototype.getElapsedTime = function(runtimeScene) {
     //TODO: Memoize?
     var theLayer = runtimeScene.getLayer(this.layer);
-    return theLayer.getElapsedTime(runtimeScene);
+    return theLayer.getElapsedTime();
 }
 
 /**

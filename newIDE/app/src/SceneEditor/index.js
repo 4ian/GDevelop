@@ -1104,6 +1104,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
           <LayersList
             project={project}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
             freezeUpdate={!this.state.layersListOpen}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}

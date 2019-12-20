@@ -19,6 +19,11 @@ import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
 import RaisedButton from '../UI/RaisedButton';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -103,6 +108,9 @@ SortableLayersListBody.muiName = 'TableBody';
 
 type Props = {|
   project: gdProject,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   freezeUpdate: boolean,
   layersContainer: gdLayout,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
@@ -197,6 +205,9 @@ export default class LayersList extends Component<Props, State> {
         {effectsEditedLayer && (
           <EffectsListDialog
             project={project}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
             effectsContainer={effectsEditedLayer}
             onApply={() =>
               this.setState({

@@ -56,6 +56,13 @@ gdjs.LayerPixiRenderer.prototype.updateVisibility = function(visible) {
   this._pixiContainer.visible = !!visible;
 };
 
+gdjs.LayerPixiRenderer.prototype.updateTime = function() {
+  for(var filterName in this._filters) {
+    var filter = this._filters[filterName];
+    filter.update(filter.pixiFilter, this._layer);
+  }
+};
+
 gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
   var effects = this._layer.getEffects();
   if (effects.length === 0) {
@@ -84,8 +91,10 @@ gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
 
     /** @type gdjsPixiFiltersToolsFilter */
     var filter = {
-      pixiFilter: filterCreator.makePIXIFilter(),
-      updateParameter: filterCreator.updateParameter,
+      pixiFilter: filterCreator.makePIXIFilter(this._layer, effect),
+      updateDoubleParameter: filterCreator.updateDoubleParameter,
+      updateStringParameter: filterCreator.updateStringParameter,
+      update: filterCreator.update,
     };
 
     pixiFilters.push(filter.pixiFilter);
@@ -140,12 +149,12 @@ gdjs.LayerPixiRenderer.prototype.removeRendererObject = function(child) {
 };
 
 /**
- * Update the parameter of an effect.
+ * Update the parameter of an effect (with a number).
  * @param {string} name The effect name
  * @param {string} parameterName The parameter name
  * @param {number} value The new value for the parameter
  */
-gdjs.LayerPixiRenderer.prototype.setEffectParameter = function(
+gdjs.LayerPixiRenderer.prototype.setEffectDoubleParameter = function(
   name,
   parameterName,
   value
@@ -153,7 +162,24 @@ gdjs.LayerPixiRenderer.prototype.setEffectParameter = function(
   var filter = this._filters[name];
   if (!filter) return;
 
-  filter.updateParameter(filter.pixiFilter, parameterName, value);
+  filter.updateDoubleParameter(filter.pixiFilter, parameterName, value);
+};
+
+/**
+ * Update the parameter of an effect (with a string).
+ * @param {string} name The effect name
+ * @param {string} parameterName The parameter name
+ * @param {string} value The new value for the parameter
+ */
+gdjs.LayerPixiRenderer.prototype.setEffectStringParameter = function(
+  name,
+  parameterName,
+  value
+) {
+  var filter = this._filters[name];
+  if (!filter) return;
+
+  filter.updateStringParameter(filter.pixiFilter, parameterName, value);
 };
 
 /**

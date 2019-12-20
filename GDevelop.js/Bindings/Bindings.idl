@@ -589,9 +589,12 @@ interface Effect {
   void SetEffectType([Const] DOMString effectType_);
   [Const, Ref] DOMString GetEffectType();
 
-  void SetParameter([Const] DOMString name, float value);
-  float GetParameter([Const] DOMString name);
-  [Const, Ref] MapStringDouble GetAllParameters();
+  void SetDoubleParameter([Const] DOMString name, double value);
+  double GetDoubleParameter([Const] DOMString name);
+  void SetStringParameter([Const] DOMString name, [Const] DOMString value);
+  [Const, Ref] DOMString GetStringParameter([Const] DOMString name);
+  [Const, Ref] MapStringDouble GetAllDoubleParameters();
+  [Const, Ref] MapStringString GetAllStringParameters();
   void ClearParameters();
 
   void SerializeTo([Ref] SerializerElement element);

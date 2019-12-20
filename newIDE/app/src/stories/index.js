@@ -3768,6 +3768,12 @@ storiesOf('EffectsList', module)
   .add('with some effects', () => (
     <EffectsList
       project={project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
       effectsContainer={layerWithEffects}
       onEffectsUpdated={action('effects updated')}
     />
@@ -3775,6 +3781,12 @@ storiesOf('EffectsList', module)
   .add('with an effect without effect type', () => (
     <EffectsList
       project={project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
       effectsContainer={layerWithEffectWithoutEffectType}
       onEffectsUpdated={action('effects updated')}
     />
@@ -3782,6 +3794,12 @@ storiesOf('EffectsList', module)
   .add('without effects', () => (
     <EffectsList
       project={project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
       effectsContainer={layerWithoutEffects}
       onEffectsUpdated={action('effects updated')}
     />

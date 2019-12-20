@@ -21,10 +21,19 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import {
   enumerateEffectsMetadata,
   type EnumeratedEffectMetadata,
+  setEffectDefaultParameters,
 } from './EnumerateEffects';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
 type Props = {|
   project: gdProject,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   effectsContainer: gdEffectsContainer,
   onEffectsUpdated: () => void,
 |};
@@ -77,13 +86,7 @@ export default class EffectsList extends React.Component<Props, {||}> {
     );
 
     if (effectMetadata) {
-      // Set the default values for parameters
-      effect.clearParameters();
-      effectMetadata.parameterDefaultValues.forEach(
-        ({ parameterName, defaultValue }) => {
-          effect.setParameter(parameterName, defaultValue);
-        }
-      );
+      setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
     }
 
     this.forceUpdate();
@@ -198,6 +201,12 @@ export default class EffectsList extends React.Component<Props, {||}> {
                           <PropertiesEditor
                             instances={[effect]}
                             schema={effectMetadata.parametersSchema}
+                            project={this.props.project}
+                            resourceSources={this.props.resourceSources}
+                            onChooseResource={this.props.onChooseResource}
+                            resourceExternalEditors={
+                              this.props.resourceExternalEditors
+                            }
                           />
                         ) : null}
                       </Column>

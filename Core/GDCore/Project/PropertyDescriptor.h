@@ -16,12 +16,15 @@ namespace gd {
 /**
  * \brief Used to describe a property shown in a property grid.
  * \see gd::Object
+ * \see gd::EffectMetadata
  */
 class GD_CORE_API PropertyDescriptor {
  public:
   /**
    * \brief Create a property being a simple gd::String with the specified
-   * value. \param propertyValue The value of the property.
+   * value.
+   *
+   * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
       : currentValue(propertyValue), type("string"), label(""), hidden(false) {}
@@ -61,6 +64,14 @@ class GD_CORE_API PropertyDescriptor {
    */
   PropertyDescriptor& SetLabel(gd::String label_) {
     label = label_;
+    return *this;
+  }
+
+  /**
+   * \brief Change the description displayed to the user, if any.
+   */
+  PropertyDescriptor& SetDescription(gd::String description_) {
+    description = description_;
     return *this;
   }
 
@@ -116,6 +127,7 @@ class GD_CORE_API PropertyDescriptor {
       type;  ///< The type of the property. This is arbitrary and interpreted by
              ///< the class responsible for updating the property grid.
   gd::String label;  //< The user-friendly property name
+  gd::String description;  //< The user-friendly property description
   std::vector<gd::String>
       extraInformation;  ///< Can be used to store for example the available
                          ///< choices, if a property is a displayed as a combo

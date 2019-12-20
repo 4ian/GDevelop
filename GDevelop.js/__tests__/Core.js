@@ -222,18 +222,27 @@ describe('libGD.js', function() {
       expect(effect.getName()).toBe('MyEffect');
       expect(effect.getEffectType()).toBe('Sepia');
 
-      effect.setParameter('Brightness', 1);
-      effect.setParameter('Darkness', 0.3);
-      effect.setParameter('Param3', 6);
+      effect.setDoubleParameter('Brightness', 1);
+      effect.setDoubleParameter('Darkness', 0.3);
+      effect.setDoubleParameter('Param3', 6);
       expect(
         effect
-          .getAllParameters()
+          .getAllDoubleParameters()
           .keys()
           .size()
       ).toBe(3);
-      expect(effect.getParameter('Brightness')).toBe(1);
-      expect(effect.getParameter('Darkness')).toBe(0.3);
-      expect(effect.getParameter('Param3')).toBe(6);
+      expect(effect.getDoubleParameter('Brightness')).toBe(1);
+      expect(effect.getDoubleParameter('Darkness')).toBe(0.3);
+      expect(effect.getDoubleParameter('Param3')).toBe(6);
+
+      effect.setStringParameter('SomeImage', 'myImageResource');
+      expect(effect.getStringParameter('SomeImage')).toBe('myImageResource');
+      expect(
+        effect
+          .getAllStringParameters()
+          .keys()
+          .size()
+      ).toBe(1);
 
       effect.delete();
     });

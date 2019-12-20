@@ -25,7 +25,8 @@ gdjs.Layer = function(layerData, runtimeScene)
     this._cameraX = runtimeScene.getGame().getDefaultWidth()/2;
     this._cameraY = runtimeScene.getGame().getDefaultHeight()/2;
     this._width = runtimeScene.getGame().getDefaultWidth();
-    this._height = runtimeScene.getGame().getDefaultHeight();
+	this._height = runtimeScene.getGame().getDefaultHeight();
+	this._runtimeScene = runtimeScene;
 
     this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
     this.show(!this._hidden);
@@ -34,6 +35,22 @@ gdjs.Layer = function(layerData, runtimeScene)
 
 gdjs.Layer.prototype.getRenderer = function() {
    return this._renderer;
+};
+
+/**
+ * Returns the scene the layer belongs to
+ * @returns {gdjs.RuntimeScene} the scene the layer belongs to
+ */
+gdjs.Layer.prototype.getRuntimeScene = function() {
+   return this._runtimeScene;
+};
+
+/**
+ * Called at each frame, after events are run and before rendering.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene the layer belongs to.
+ */
+gdjs.Layer.prototype.update = function(runtimeScene) {
+	return this._renderer.updateTime();
 };
 
 /**
@@ -212,8 +229,12 @@ gdjs.Layer.prototype.getEffects = function() {
     return this._effects;
 };
 
-gdjs.Layer.prototype.setEffectParameter = function(name, parameterIndex, value) {
-    return this._renderer.setEffectParameter(name, parameterIndex, value);
+gdjs.Layer.prototype.setEffectDoubleParameter = function(name, parameterIndex, value) {
+    return this._renderer.setEffectDoubleParameter(name, parameterIndex, value);
+};
+
+gdjs.Layer.prototype.setEffectStringParameter = function(name, parameterIndex, value) {
+    return this._renderer.setEffectStringParameter(name, parameterIndex, value);
 };
 
 /**
@@ -237,8 +258,11 @@ gdjs.Layer.prototype.isEffectEnabled = function(name) {
 gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
     for (var i = 0; i < this._effects.length; ++i) {
         var effect = this._effects[i];
-        for (var name in effect.parameters) {
-            this.setEffectParameter(effect.name, name, effect.parameters[name]);
+        for (var name in effect.doubleParameters) {
+            this.setEffectDoubleParameter(effect.name, name, effect.doubleParameters[name]);
+        }
+        for (var name in effect.stringParameters) {
+            this.setEffectStringParameter(effect.name, name, effect.stringParameters[name]);
         }
     }
 };
@@ -263,6 +287,6 @@ gdjs.Layer.prototype.getTimeScale = function() {
  * Return the time elapsed since the last frame,
  * in milliseconds, for objects on the layer.
  */
-gdjs.Layer.prototype.getElapsedTime = function(runtimeScene) {
-   return runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
+gdjs.Layer.prototype.getElapsedTime = function() {
+   return this._runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
 }

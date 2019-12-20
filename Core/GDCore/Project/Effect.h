@@ -32,17 +32,34 @@ class GD_CORE_API Effect {
   }
   const gd::String& GetEffectType() const { return effectType; }
 
-  void SetParameter(const gd::String& name, double value) {
-    parameters[name] = value;
+  void SetDoubleParameter(const gd::String& name, double value) {
+    doubleParameters[name] = value;
   }
 
-  double GetParameter(const gd::String& name) { return parameters[name]; }
-
-  const std::map<gd::String, double>& GetAllParameters() const {
-    return parameters;
+  double GetDoubleParameter(const gd::String& name) {
+    return doubleParameters[name];
   }
 
-  void ClearParameters() { parameters.clear(); }
+  void SetStringParameter(const gd::String& name, const gd::String& value) {
+    stringParameters[name] = value;
+  }
+
+  const gd::String& GetStringParameter(const gd::String& name) {
+    return stringParameters[name];
+  }
+
+  const std::map<gd::String, double>& GetAllDoubleParameters() const {
+    return doubleParameters;
+  }
+
+  const std::map<gd::String, gd::String>& GetAllStringParameters() const {
+    return stringParameters;
+  }
+
+  void ClearParameters() {
+    doubleParameters.clear();
+    stringParameters.clear();
+  }
 
 #if defined(GD_IDE_ONLY)
   /**
@@ -58,8 +75,10 @@ class GD_CORE_API Effect {
 
  private:
   gd::String name;        ///< The name of the layer
-  gd::String effectType;  ///< The name of the effect to apply // TODO: Rename to effect type
-  std::map<gd::String, double> parameters;
+  gd::String effectType;  ///< The name of the effect to apply
+                          ///< to effect type
+  std::map<gd::String, double> doubleParameters; ///< Values of parameters being doubles, keyed by names.
+  std::map<gd::String, gd::String> stringParameters; ///< Values of parameters being strings, keyed by names.
 };
 
 }  // namespace gd

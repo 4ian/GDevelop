@@ -34,6 +34,25 @@ module.exports = {
         .setLabel(_('Opacity of the effect (between 0 and 1)'))
         .setType('number')
     );
+    dumyEffectProperties.set(
+      'someImage',
+      new gd.PropertyDescriptor(/* defaultValue= */ "")
+        .setLabel(_('Some image for the effect'))
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(
+          _("Image resource (won't be used, just for demonstration purpose)")
+        )
+    );
+    dumyEffectProperties.set(
+      'someColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ "#0022FF")
+        .setLabel(_('Some color for the effect'))
+        .setType('color')
+        .setLabel(
+          _("Color (won't be used, just for demonstration purpose)")
+        )
+    );
 
     // Declare conditions, actions or expressions:
     extension

@@ -13,18 +13,14 @@ PIXI.DummyPixiFilter = function() {
     '   mat3 nightMatrix = mat3(0.6, 0, 0, 0, 0.7, 0, 0, 0, 1.3);',
     '   gl_FragColor = texture2D(uSampler, vTextureCoord);',
     '   gl_FragColor.rgb = mix(gl_FragColor.rgb, nightMatrix * gl_FragColor.rgb, opacity);',
-    '}'
+    '}',
   ].join('\n');
   var uniforms = {
-      opacity: { type: '1f', value: 1 }
+    opacity: { type: '1f', value: 1 },
   };
 
-  PIXI.Filter.call(this,
-    vertexShader,
-    fragmentShader,
-    uniforms
-  );
-}
+  PIXI.Filter.call(this, vertexShader, fragmentShader, uniforms);
+};
 PIXI.DummyPixiFilter.prototype = Object.create(PIXI.Filter.prototype);
 PIXI.DummyPixiFilter.prototype.constructor = PIXI.DummyPixiFilter;
 
@@ -32,16 +28,43 @@ PIXI.DummyPixiFilter.prototype.constructor = PIXI.DummyPixiFilter;
 // functions to create and manipulate the filter.
 // Don't forget your extension name in the effect type!
 gdjs.PixiFiltersTools.registerFilterCreator('MyDummyExtension::DummyEffect', {
-    // MakePIXIFilter should return a PIXI.Filter, that will be applied on the PIXI.Container (for layers)
-    // or the PIXI.DisplayObject (for objects).
-    makePIXIFilter: function() {
-        var filter = new PIXI.DummyPixiFilter();
-        return filter;
-    },
-    // The function that will be called to update a parameter of the PIXI filter with a new value
-    updateParameter: function(filter, parameterName, value) {
-        if (parameterName !== 'opacity') return;
+  // MakePIXIFilter should return a PIXI.Filter, that will be applied on the PIXI.Container (for layers)
+  // or the PIXI.DisplayObject (for objects).
+  makePIXIFilter: function(layer, effectData) {
+    var filter = new PIXI.DummyPixiFilter();
 
-        filter.uniforms.opacity = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
-    },
+    // If you need to store the time or some state, you can set it up now:
+    // filter._time = 0;
+    // But be careful about the existing member of the filter (consider
+    // updating the filter uniforms directly).
+
+    // You can also access to the effect parameters, classified by type:
+    // `effectData.doubleParameters.opacity`
+    // `effectData.stringParameters.someImage`
+    // `effectData.stringParameters.someColor`
+    console.info(
+      'The PIXI texture found for the Dummy Effect (not actually used):',
+      layer
+        .getRuntimeScene()
+        .getGame()
+        .getImageManager()
+        .getPIXITexture(effectData.stringParameters.someImage)
+    );
+
+    return filter;
+  },
+  // Function called at every frame rendered
+  update: function(filter, layer) {
+    // If your filter depends on the time, you can get the elapsed time
+    // with `layer.getElapsedTime()`.
+    // You can update the uniforms or other state of the filter.
+  },
+  // Function that will be called to update a (number) parameter of the PIXI filter with a new value
+  updateDoubleParameter: function(filter, parameterName, value) {
+    if (parameterName === 'opacity') {
+      filter.uniforms.opacity = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
+    }
+  },
+  // Function that will be called to update a (string) parameter of the PIXI filter with a new value
+  updateStringParameter: function(filter, parameterName, value) {},
 });

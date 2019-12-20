@@ -1,18 +1,23 @@
 gdjs.PixiFiltersTools.registerFilterCreator('Blur', {
-    makePIXIFilter: function() {
-        var blur = new PIXI.filters.BlurFilter();
-        return blur;
-    },
-    updateParameter: function(filter, parameterName, value) {
-        if (parameterName !== 'blur' &&
-            parameterName !== 'quality' &&
-            parameterName !== 'kernelSize' &&
-            parameterName !== 'resolution') return;
+  makePIXIFilter: function(layer, effectData) {
+    var blur = new PIXI.filters.BlurFilter();
+    return blur;
+  },
+  update: function(filter, layer) {},
+  updateDoubleParameter: function(filter, parameterName, value) {
+    if (
+      parameterName !== 'blur' &&
+      parameterName !== 'quality' &&
+      parameterName !== 'kernelSize' &&
+      parameterName !== 'resolution'
+    )
+      return;
 
-        if (parameterName === 'kernelSize'){
-            value = gdjs.PixiFiltersTools.clampKernelSize(value);
-        }
+    if (parameterName === 'kernelSize') {
+      value = gdjs.PixiFiltersTools.clampKernelSize(value);
+    }
 
-        filter[parameterName] = value;
-    },
+    filter[parameterName] = value;
+  },
+  updateStringParameter: function(filter, parameterName, value) {},
 });

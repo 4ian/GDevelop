@@ -54,6 +54,28 @@ export const makeTestExtensions = gd => {
         .setType('number')
     );
 
+    const variousParametersEffect = extension
+      .addEffect('FakeEffectWithVariousParameters')
+      .setFullName('Fake Effect With Various Parameters')
+      .setDescription('A fake effect using different parameters')
+      .addIncludeFile(
+        'Extensions/Effects/fake-effect-with-various-parameters.js'
+      );
+    const variousParametersEffectProperties = variousParametersEffect.getProperties();
+    variousParametersEffectProperties.set(
+      'intensity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel('Intensity (between 0 and 1)')
+        .setType('number')
+    );
+    variousParametersEffectProperties.set(
+      'image',
+      new gd.PropertyDescriptor(/* defaultValue= */ '')
+        .setLabel('An image resource')
+        .setType('resource')
+        .addExtraInfo('image')
+    );
+
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

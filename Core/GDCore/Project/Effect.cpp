@@ -13,20 +13,45 @@ namespace gd {
 void Effect::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("effectType", GetEffectType());
-  SerializerElement& parametersElement = element.AddChild("parameters");
-  for (auto& parameter : parameters)
-    parametersElement.AddChild(parameter.first).SetValue(parameter.second);
+  SerializerElement& doubleParametersElement =
+      element.AddChild("doubleParameters");
+  for (auto& parameter : doubleParameters)
+    doubleParametersElement.AddChild(parameter.first)
+        .SetValue(parameter.second);
+  SerializerElement& stringParametersElement =
+      element.AddChild("stringParameters");
+  for (auto& parameter : stringParameters)
+    stringParametersElement.AddChild(parameter.first)
+        .SetValue(parameter.second);
 }
 #endif
 
 void Effect::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name"));
-  SetEffectType(element.GetStringAttribute("effectType", "", "effectName"));
+  SetEffectType(element.GetStringAttribute(
+      "effectType",
+      "",
+      // Compatibility with GD <= 5.0.0-beta83
+      "effectName"
+      // end of compatibility code
+      ));
 
-  parameters.clear();
-  const SerializerElement& parametersElement = element.GetChild("parameters");
-  for (auto& child : parametersElement.GetAllChildren())
-    SetParameter(child.first, child.second->GetValue().GetDouble());
+  doubleParameters.clear();
+  const SerializerElement& doubleParametersElement =
+      element.GetChild("doubleParameters",
+                       0,
+                       // Compatibility with GD <= 5.0.0-beta83
+                       "parameters"
+                       // end of compatibility code
+      );
+  for (auto& child : doubleParametersElement.GetAllChildren())
+    SetDoubleParameter(child.first, child.second->GetValue().GetDouble());
+
+  stringParameters.clear();
+  const SerializerElement& stringParametersElement =
+      element.GetChild("stringParameters");
+  for (auto& child : stringParametersElement.GetAllChildren())
+    SetStringParameter(child.first, child.second->GetValue().GetString());
 }
 
 }  // namespace gd

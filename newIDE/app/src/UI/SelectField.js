@@ -31,6 +31,7 @@ type Props = {|
   margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
+  helperText?: React.Node,
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
@@ -81,6 +82,7 @@ export default class SelectField extends React.Component<Props, {||}> {
             disabled={props.disabled}
             fullWidth={props.fullWidth}
             label={props.floatingLabelText}
+            helperText={props.helperText}
             value={displayedValue}
             onChange={
               onChange

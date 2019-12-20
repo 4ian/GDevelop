@@ -11,7 +11,7 @@ const styles = {
   picker: {
     position: 'absolute',
     right: '8px',
-    bottom: '12px',
+    top: '26px',
   },
 };
 
@@ -33,6 +33,7 @@ export default class ColorField extends Component {
           fullWidth
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
+          helperText={this.props.helperText}
           type="text"
           hintText={t`Click to choose`}
           onClick={this.onClick}

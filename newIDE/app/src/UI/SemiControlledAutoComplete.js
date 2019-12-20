@@ -124,6 +124,7 @@ type Props = {|
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
+  helperText?: React.Node,
   hintText?: MessageDescriptor | string,
   fullWidth?: boolean,
   margin?: 'none' | 'dense',
@@ -284,7 +285,7 @@ export default class SemiControlledAutoComplete extends React.Component<
 
                     // Error handling:
                     error: !!props.errorText,
-                    helperText: props.errorText,
+                    helperText: props.errorText || props.helperText,
 
                     // Display:
                     InputLabelProps: getLabelProps({ shrink: true }),

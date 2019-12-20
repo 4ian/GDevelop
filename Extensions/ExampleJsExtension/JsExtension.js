@@ -33,6 +33,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ "1")
         .setLabel(_('Opacity of the effect (between 0 and 1)'))
         .setType('number')
+        .setDescription(_("This is an optional description."))
     );
     dumyEffectProperties.set(
       'someImage',
@@ -52,6 +53,7 @@ module.exports = {
         .setLabel(
           _("Color (won't be used, just for demonstration purpose)")
         )
+        .setDescription(_("Another optional description."))
     );
 
     // Declare conditions, actions or expressions:

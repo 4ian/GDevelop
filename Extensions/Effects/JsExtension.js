@@ -145,7 +145,31 @@ module.exports = {
         .setType('number')
     );
 
-    return extension;
+     const displacementEffect = extension
+      .addEffect("Displacement")
+      .setFullName(_("Displacement"))
+      .setDescription(_("Add Displacement effect"))
+      .addIncludeFile("Extensions/Effects/displacement-pixi-filter.js");
+    const displacementProperties = displacementEffect.getProperties();
+    displacementProperties.set(
+      "displacementMapImage",
+      new gd.PropertyDescriptor("")
+        .setType("resource")
+        .addExtraInfo('image')
+        .setLabel(_("Displacement map image for the effect"))
+    );
+    displacementProperties.set(
+      "scaleX",
+      new gd.PropertyDescriptor(/* defaultValue=20 */ "20")
+        .setLabel(_("Scale X"))
+        .setType("number")
+    );
+    displacementProperties.set(
+      "scaleY",
+      new gd.PropertyDescriptor(/* defaultValue=20 */ "20")
+        .setLabel(_("Scale Y"))
+        .setType("number")
+    );
   },
   runExtensionSanityTests: function(gd, extension) {
     return [];

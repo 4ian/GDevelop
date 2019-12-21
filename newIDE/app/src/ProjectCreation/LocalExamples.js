@@ -21,6 +21,12 @@ const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 
+// To add a new example, add it first in resources/examples (at which point you can see it
+// in the desktop version), then run these scripts:
+// * scripts/update-examples-information-from-resources-examples.js (update metadata)
+// * scripts/update-fixtures-from-resources-examples.js (update web-app examples)
+// and upload the examples to `gdevelop-resources` s3.
+
 type Props = {|
   onOpen: (
     storageProvider: StorageProvider,

@@ -310,7 +310,40 @@ module.exports = {
   },
   "bbtext-object-demo": {
     "description": "This shows how to change the bbcode text of a BBText object displayed on the screen.\n",
-    "usedExtensions": []
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "BBCode Text Object",
+        "name": "BBText"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      }
+    ]
   },
   "betabox-basics-learning-experience": {
     "description": "Example level for teaching basic programming skills with extra features and assets.",
@@ -768,6 +801,23 @@ module.exports = {
       }
     ]
   },
+  "count-down-timer": {
+    "description": "Show how to use a variable as a timer and display it on screen like a bomb count down timer.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "create-object-with-mouseclick": {
     "description": "Show how to create an object at the position of the click.",
     "usedExtensions": [
@@ -786,6 +836,35 @@ module.exports = {
       {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
+  "create-random-object": {
+    "description": "Show how to create a object randomly picked in a list.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "Base object",
@@ -1773,6 +1852,39 @@ module.exports = {
       }
     ]
   },
+  "level-selection-unlock": {
+    "description": "Show how to save user progress and progressively unlock levels.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
   "load-image-from-url": {
     "description": "Advanced example showing how to use JavaScript to load an image from an external URL.",
     "usedExtensions": [
@@ -2040,6 +2152,39 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "multi-language-menu": {
+    "description": "Show how to translate a menu (titles, buttons) in multiple languages and add an option for the player to choose the language.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       }
     ]
   },
@@ -3726,6 +3871,39 @@ module.exports = {
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
+      }
+    ]
+  },
+  "unlock-items": {
+    "description": "Show how to save the items unlocked by the user and load them later (when the game is launched again for example, or when starting a saved game).\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
       }
     ]
   },

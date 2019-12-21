@@ -62,6 +62,7 @@ gdjs.PixiFiltersTools.registerFilterCreator = function(filterName, filterCreator
  * @property {(filter: any, layer: gdjs.Layer) => any} update The function to be called to update the filter at every frame
  * @property {(filter: any, parameterName: string, value: number) => void} updateDoubleParameter The function to be called to update a parameter (with a number)
  * @property {(filter: any, parameterName: string, value: string) => void} updateStringParameter The function to be called to update a parameter (with a string)
+ * @property {(filter: any, parameterName: string, value: boolean) => void} updateBooleanParameter The function to be called to update a parameter (with a boolean)
  */
 
 /**
@@ -72,4 +73,5 @@ gdjs.PixiFiltersTools.registerFilterCreator = function(filterName, filterCreator
  * @property {(filter: any, layer: gdjs.Layer) => any} update The function to be called to update the filter at every frame
  * @property {(filter: any, parameterName: string, value: number) => void} updateDoubleParameter The function to be called to update a parameter (with a number)
  * @property {(filter: any, parameterName: string, value: string) => void} updateStringParameter The function to be called to update a parameter (with a string)
+ * @property {(filter: any, parameterName: string, value: boolean) => void} updateBooleanParameter The function to be called to update a parameter (with a boolean)
  */

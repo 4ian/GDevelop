@@ -13,15 +13,23 @@ namespace gd {
 void Effect::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("effectType", GetEffectType());
+
   SerializerElement& doubleParametersElement =
       element.AddChild("doubleParameters");
   for (auto& parameter : doubleParameters)
     doubleParametersElement.AddChild(parameter.first)
         .SetValue(parameter.second);
+
   SerializerElement& stringParametersElement =
       element.AddChild("stringParameters");
   for (auto& parameter : stringParameters)
     stringParametersElement.AddChild(parameter.first)
+        .SetValue(parameter.second);
+
+  SerializerElement& booleanParametersElement =
+      element.AddChild("booleanParameters");
+  for (auto& parameter : booleanParameters)
+    booleanParametersElement.AddChild(parameter.first)
         .SetValue(parameter.second);
 }
 #endif
@@ -52,6 +60,12 @@ void Effect::UnserializeFrom(const SerializerElement& element) {
       element.GetChild("stringParameters");
   for (auto& child : stringParametersElement.GetAllChildren())
     SetStringParameter(child.first, child.second->GetValue().GetString());
+
+  booleanParameters.clear();
+  const SerializerElement& booleanParametersElement =
+      element.GetChild("booleanParameters");
+  for (auto& child : booleanParametersElement.GetAllChildren())
+    SetBooleanParameter(child.first, child.second->GetValue().GetBool());
 }
 
 }  // namespace gd

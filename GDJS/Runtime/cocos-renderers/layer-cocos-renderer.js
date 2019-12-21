@@ -161,3 +161,7 @@ gdjs.LayerCocosRenderer.prototype.setEffectDoubleParameter = function (name, par
 gdjs.LayerCocosRenderer.prototype.setEffectStringParameter = function (name, parameterName, value) {
     // Unimplemented
 };
+
+gdjs.LayerCocosRenderer.prototype.setEffectBooleanParameter = function (name, parameterName, value) {
+    // Unimplemented
+};

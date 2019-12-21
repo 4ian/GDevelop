@@ -94,6 +94,7 @@ gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
       pixiFilter: filterCreator.makePIXIFilter(this._layer, effect),
       updateDoubleParameter: filterCreator.updateDoubleParameter,
       updateStringParameter: filterCreator.updateStringParameter,
+      updateBooleanParameter: filterCreator.updateBooleanParameter,
       update: filterCreator.update,
     };
 
@@ -180,6 +181,23 @@ gdjs.LayerPixiRenderer.prototype.setEffectStringParameter = function(
   if (!filter) return;
 
   filter.updateStringParameter(filter.pixiFilter, parameterName, value);
+};
+
+/**
+ * Enable or disable the parameter of an effect (boolean).
+ * @param {string} name The effect name
+ * @param {string} parameterName The parameter name
+ * @param {boolean} value The new value for the parameter
+ */
+gdjs.LayerPixiRenderer.prototype.setEffectBooleanParameter = function(
+  name,
+  parameterName,
+  value
+) {
+  var filter = this._filters[name];
+  if (!filter) return;
+
+  filter.updateBooleanParameter(filter.pixiFilter, parameterName, value);
 };
 
 /**

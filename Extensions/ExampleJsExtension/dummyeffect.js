@@ -42,6 +42,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('MyDummyExtension::DummyEffect', {
     // `effectData.doubleParameters.opacity`
     // `effectData.stringParameters.someImage`
     // `effectData.stringParameters.someColor`
+    // `effectData.booleanParameters.someBoolean`
     console.info(
       'The PIXI texture found for the Dummy Effect (not actually used):',
       layer
@@ -67,4 +68,6 @@ gdjs.PixiFiltersTools.registerFilterCreator('MyDummyExtension::DummyEffect', {
   },
   // Function that will be called to update a (string) parameter of the PIXI filter with a new value
   updateStringParameter: function(filter, parameterName, value) {},
+  // Function that will be called to update a (boolean) parameter of the PIXI filter with a new value
+  updateBooleanParameter: function(filter, parameterName, value) {},
 });

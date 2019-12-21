@@ -56,6 +56,17 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                 };
+              } else if (valueType === 'boolean') {
+                return {
+                  name: parameterName,
+                  valueType: 'boolean',
+                  getValue: (effect: gdEffect) =>
+                    effect.getBooleanParameter(parameterName),
+                  setValue: (effect: gdEffect, newValue: boolean) =>
+                    effect.setBooleanParameter(parameterName, newValue),
+                  getLabel,
+                  getDescription,
+                };
               } else if (valueType === 'resource') {
                 // Resource is a "string" (with a selector in the UI)
                 const kind = property.getExtraInfo().toJSArray()[0] || '';
@@ -120,6 +131,8 @@ export const setEffectDefaultParameters = (
         parameterName,
         parseFloat(property.getValue()) || 0
       );
+    } else if (valueType === 'boolean') {
+      effect.setBooleanParameter(parameterName, property.getValue() === 'true');
     } else {
       effect.setStringParameter(parameterName, property.getValue());
     }

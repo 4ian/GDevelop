@@ -48,6 +48,14 @@ class GD_CORE_API Effect {
     return stringParameters[name];
   }
 
+  void SetBooleanParameter(const gd::String& name, bool value) {
+    booleanParameters[name] = value;
+  }
+
+  bool GetBooleanParameter(const gd::String& name) {
+    return booleanParameters[name];
+  }
+
   const std::map<gd::String, double>& GetAllDoubleParameters() const {
     return doubleParameters;
   }
@@ -56,9 +64,14 @@ class GD_CORE_API Effect {
     return stringParameters;
   }
 
+  const std::map<gd::String, bool>& GetAllBooleanParameters() const {
+    return booleanParameters;
+  }
+
   void ClearParameters() {
     doubleParameters.clear();
     stringParameters.clear();
+    booleanParameters.clear();
   }
 
 #if defined(GD_IDE_ONLY)
@@ -74,11 +87,11 @@ class GD_CORE_API Effect {
   void UnserializeFrom(const SerializerElement& element);
 
  private:
-  gd::String name;        ///< The name of the layer
-  gd::String effectType;  ///< The name of the effect to apply
-                          ///< to effect type
+  gd::String name;        ///< The name of the layer.
+  gd::String effectType;  ///< The name of the effect to apply.
   std::map<gd::String, double> doubleParameters; ///< Values of parameters being doubles, keyed by names.
   std::map<gd::String, gd::String> stringParameters; ///< Values of parameters being strings, keyed by names.
+  std::map<gd::String, bool> booleanParameters; ///< Values of parameters being booleans, keyed by names.
 };
 
 }  // namespace gd

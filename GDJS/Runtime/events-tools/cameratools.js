@@ -151,6 +151,20 @@ gdjs.evtTools.camera.setLayerEffectStringParameter = function(runtimeScene, laye
 }
 
 /**
+ * Enable or disable a layer effect parameter (boolean).
+ * @param {gdjs.RuntimeScene} runtimeScene The scene
+ * @param {string} layer The name of the layer
+ * @param {string} effect The name of the effect
+ * @param {string} parameter The parameter to update
+ * @param {boolean} value The new value
+ */
+gdjs.evtTools.camera.setLayerEffectBooleanParameter = function(runtimeScene, layer, effect, parameter, value) {
+    if ( !runtimeScene.hasLayer(layer) ) { return; }
+
+    return runtimeScene.getLayer(layer).setEffectBooleanParameter(effect, parameter, value);
+}
+
+/**
  * Enable, or disable, an effect of a layer.
  * @param {gdjs.RuntimeScene} runtimeScene The scene
  * @param {string} layer The name of the layer

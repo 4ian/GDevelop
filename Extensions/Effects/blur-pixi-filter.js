@@ -20,4 +20,5 @@ gdjs.PixiFiltersTools.registerFilterCreator('Blur', {
     filter[parameterName] = value;
   },
   updateStringParameter: function(filter, parameterName, value) {},
+  updateBooleanParameter: function(filter, parameterName, value) {},
 });

@@ -36,4 +36,5 @@ gdjs.PixiFiltersTools.registerFilterCreator('LightNight', {
     filter.uniforms.opacity = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
   },
   updateStringParameter: function(filter, parameterName, value) {},
+  updateBooleanParameter: function(filter, parameterName, value) {},
 });

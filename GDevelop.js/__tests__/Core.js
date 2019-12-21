@@ -244,6 +244,17 @@ describe('libGD.js', function() {
           .size()
       ).toBe(1);
 
+      effect.setBooleanParameter('SomeBoolean', true);
+      expect(effect.getBooleanParameter('SomeBoolean')).toBe(true);
+      effect.setBooleanParameter('SomeBoolean', false);
+      expect(effect.getBooleanParameter('SomeBoolean')).toBe(false);
+      expect(
+        effect
+          .getAllBooleanParameters()
+          .keys()
+          .size()
+      ).toBe(1);
+
       effect.delete();
     });
   });

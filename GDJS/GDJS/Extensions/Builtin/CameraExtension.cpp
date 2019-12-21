@@ -67,6 +67,8 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.setLayerEffectDoubleParameter");
   GetAllActions()["SetLayerEffectStringParameter"].SetFunctionName(
       "gdjs.evtTools.camera.setLayerEffectStringParameter");
+  GetAllActions()["SetLayerEffectBooleanParameter"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerEffectBooleanParameter");
   GetAllActions()["EnableLayerEffect"].SetFunctionName(
       "gdjs.evtTools.camera.enableLayerEffect");
   GetAllConditions()["LayerEffectEnabled"].SetFunctionName(

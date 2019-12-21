@@ -237,6 +237,10 @@ gdjs.Layer.prototype.setEffectStringParameter = function(name, parameterIndex, v
     return this._renderer.setEffectStringParameter(name, parameterIndex, value);
 };
 
+gdjs.Layer.prototype.setEffectBooleanParameter = function(name, parameterIndex, value) {
+    return this._renderer.setEffectBooleanParameter(name, parameterIndex, value);
+};
+
 /**
  * Enable or disable an effect.
  * @param {string} effect The name of the effect to enable or disable.
@@ -263,6 +267,9 @@ gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
         }
         for (var name in effect.stringParameters) {
             this.setEffectStringParameter(effect.name, name, effect.stringParameters[name]);
+        }
+        for (var name in effect.booleanParameters) {
+            this.setEffectBooleanParameter(effect.name, name, effect.booleanParameters[name]);
         }
     }
 };

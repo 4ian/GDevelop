@@ -77,7 +77,7 @@ export const makeTestExtensions = gd => {
         .setLabel('Some color')
         .setType('color')
         .setDescription(
-          'Some interesting description about this intensity parameter that can be used by the effect.'
+          'Some interesting description about this color parameter that can be used by the effect.'
         )
     );
     variousParametersEffectProperties.set(
@@ -89,6 +89,12 @@ export const makeTestExtensions = gd => {
         .setDescription(
           'Some interesting description about this image resource that can be used by the effect.'
         )
+    );
+    variousParametersEffectProperties.set(
+      'someBoolean',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel('Some setting to enable or not for the effect')
+        .setType('boolean')
     );
 
     platform.addNewExtension(extension);

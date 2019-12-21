@@ -42,4 +42,5 @@ gdjs.PixiFiltersTools.registerFilterCreator('Night', {
     );
   },
   updateStringParameter: function(filter, parameterName, value) {},
+  updateBooleanParameter: function(filter, parameterName, value) {},
 });

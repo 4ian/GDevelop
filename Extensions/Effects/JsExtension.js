@@ -160,16 +160,18 @@ module.exports = {
     );
     displacementProperties.set(
       "scaleX",
-      new gd.PropertyDescriptor(/* defaultValue=20 */ "20")
+      new gd.PropertyDescriptor(/* defaultValue= */ "20")
         .setLabel(_("Scale X"))
         .setType("number")
     );
     displacementProperties.set(
       "scaleY",
-      new gd.PropertyDescriptor(/* defaultValue=20 */ "20")
+      new gd.PropertyDescriptor(/* defaultValue= */ "20")
         .setLabel(_("Scale Y"))
         .setType("number")
     );
+
+    return extension;
   },
   runExtensionSanityTests: function(gd, extension) {
     return [];

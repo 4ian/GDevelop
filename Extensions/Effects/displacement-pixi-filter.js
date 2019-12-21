@@ -9,7 +9,12 @@ gdjs.PixiFiltersTools.registerFilterCreator("Displacement", {
 
     return displacementFilter;
   },
-
+  updateBooleanParameters: function(filter, parameterName, value) {
+    return;
+  },
+  updateDoubleParameters: function(filter, parameterName, value) {
+    return;
+  },
   updateStringParameters: function(filter, parameterName, value) {
     if (filter === "scaleX") {
       filter.scale.x = value;

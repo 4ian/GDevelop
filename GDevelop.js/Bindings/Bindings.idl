@@ -959,6 +959,7 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
+    [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata MarkAsSimple();
     [Ref] InstructionMetadata MarkAsAdvanced();
     [Ref] InstructionMetadata MarkAsComplex();
@@ -1004,6 +1005,8 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetOptional(boolean optional_);
     [Const, Ref] DOMString GetDescription();
     [Ref] ParameterMetadata SetDescription([Const] DOMString description_);
+    [Const, Ref] DOMString GetLongDescription();
+    [Ref] ParameterMetadata SetLongDescription([Const] DOMString longDescription_);
     boolean IsCodeOnly();
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();

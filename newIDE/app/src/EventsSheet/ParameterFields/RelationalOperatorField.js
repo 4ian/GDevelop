@@ -24,6 +24,9 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
         margin={this.props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
+        helperText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
         value={this.props.value}
         onChange={(e, i, value: string) => this.props.onChange(value)}
         ref={field => (this._field = field)}

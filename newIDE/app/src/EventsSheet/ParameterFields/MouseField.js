@@ -19,6 +19,9 @@ export default class MouseField extends Component {
         margin={this.props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
+        helperText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
         value={value}
         ref={field => (this._field = field)}
         onChange={(e, i, value) => this.props.onChange(value)}

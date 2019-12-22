@@ -200,7 +200,17 @@ class GD_CORE_API ExpressionMetadata {
    * \see AddParameter
    */
   ExpressionMetadata& SetDefaultValue(gd::String defaultValue_) {
-    if (!parameters.empty()) parameters.back().defaultValue = defaultValue_;
+    if (!parameters.empty()) parameters.back().SetDefaultValue(defaultValue_);
+    return *this;
+  };
+
+  /**
+   * \brief Set the long description shown in the editor for the last added parameter.
+   *
+   * \see AddParameter
+   */
+  ExpressionMetadata &SetParameterLongDescription(gd::String longDescription) {
+    if (!parameters.empty()) parameters.back().SetLongDescription(longDescription);
     return *this;
   };
 

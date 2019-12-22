@@ -35,10 +35,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsAdvanced();
 
@@ -93,10 +94,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsAdvanced();
 
@@ -265,10 +267,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("soundfile", _("Audio file (or audio resource name)"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsSimple();
 
@@ -284,10 +287,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("musicfile", _("Audio file (or audio resource name)"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsSimple();
 

@@ -7,6 +7,7 @@ import SemiControlledAutoComplete, {
 } from '../UI/SemiControlledAutoComplete';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   project: ?gdProject,
@@ -21,9 +22,10 @@ type Props = {|
   errorTextIfInvalid?: React.Node,
 
   fullWidth?: boolean,
-  floatingLabelText?: ?string,
+  floatingLabelText?: React.Node,
+  helperText?: React.Node,
+  hintText?: MessageDescriptor | string,
   openOnFocus?: boolean,
-  hintText?: ?React.Node,
   margin?: 'none' | 'dense',
 |};
 

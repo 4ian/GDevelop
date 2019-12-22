@@ -42,6 +42,11 @@ export default class VariableField extends Component<Props, {||}> {
           <SemiControlledAutoComplete
             margin={this.props.isInline ? 'none' : 'dense'}
             floatingLabelText={description}
+            helperText={
+              parameterMetadata
+                ? parameterMetadata.getLongDescription()
+                : undefined
+            }
             fullWidth
             value={value}
             onChange={onChange}

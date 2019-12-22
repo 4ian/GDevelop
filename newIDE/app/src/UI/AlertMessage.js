@@ -30,8 +30,22 @@ const AlertMessage = ({ kind, children, onHide, renderRightButton }: Props) => (
   <Paper>
     <Line noMargin alignItems="center">
       {kind === 'info' && <Info style={styles.icon} />}
-      {kind === 'warning' && <Warning style={styles.icon} />}
-      {kind === 'error' && <Error style={styles.icon} />}
+      {kind === 'warning' && (
+        <Warning
+          style={{
+            ...styles.icon,
+            color: `orange`,
+          }}
+        />
+      )}
+      {kind === 'error' && (
+        <Error
+          style={{
+            ...styles.icon,
+            color: `red`,
+          }}
+        />
+      )}
       <Text style={styles.content}>{children}</Text>
       {renderRightButton && renderRightButton()}
       {onHide && (

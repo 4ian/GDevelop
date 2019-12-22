@@ -170,7 +170,41 @@ module.exports = {
         .setLabel(_("Scale Y"))
         .setType("number")
     );
-    
+
+    const colorMapEffect = extension
+      .addEffect("ColorMap")
+      .setFullName(_("Color Map"))
+      .setDescription(_("Add Color Map effect"))
+      .addIncludeFile("Extensions/Effects/color-map-pixi-filter.js")
+      .addIncludeFile("Extensions/Effects/pixi-filters/filter-color-map.js");
+    const colorMapProperties = colorMapEffect.getProperties();
+    colorMapProperties.set(
+      "colorMapTexture",
+      new gd.PropertyDescriptor("")
+        .setType("resource")
+        .addExtraInfo("image")
+        .setLabel(_("Color map texture for the effect"))
+        .setDescription(
+          _(
+            "Color map are like LUT, you can change colors of pixels by modifing a reference color image containing each colours. Orignal map file can be found at [TODO INSERT PATH]"
+          )
+        )
+    );
+    colorMapProperties.set(
+      "nearest",
+      new gd.PropertyDescriptor(/* defaultValue= */ "false")
+        .setLabel(_("Nearest"))
+        .setType("boolean")
+        .setDescription(_("Enable antialiasing on gradients."))
+    );
+    colorMapProperties.set(
+      "mix",
+      new gd.PropertyDescriptor(/* defaultValue= */ "100")
+        .setLabel(_("Mix"))
+        .setType("number")
+        .setDescription(_("Mix value of the effect on the layer. (in pourcentage)"))
+    );
+
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

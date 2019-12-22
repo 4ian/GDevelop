@@ -152,11 +152,11 @@ module.exports = {
       .addIncludeFile("Extensions/Effects/displacement-pixi-filter.js");
     const displacementProperties = displacementEffect.getProperties();
     displacementProperties.set(
-      "displacementMapImage",
+      "displacementMapTexture",
       new gd.PropertyDescriptor("")
         .setType("resource")
         .addExtraInfo("image")
-        .setLabel(_("Displacement map image for the effect"))
+        .setLabel(_("Displacement map texture for the effect"))
     );
     displacementProperties.set(
       "scaleX",
@@ -170,7 +170,7 @@ module.exports = {
         .setLabel(_("Scale Y"))
         .setType("number")
     );
-
+    
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

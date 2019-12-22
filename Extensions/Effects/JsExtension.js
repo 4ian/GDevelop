@@ -205,6 +205,22 @@ module.exports = {
         .setDescription(_("Mix value of the effect on the layer. (in pourcentage)"))
     );
 
+    const pixelateEffect = extension
+      .addEffect("Pixelate")
+      .setFullName(_("Pixelate"))
+      .setDescription(_("Pixelize the layer"))
+      .addIncludeFile("Extensions/Effects/pixelate-pixi-filter.js")
+      .addIncludeFile("Extensions/Effects/pixi-filters/filter-pixelate.js");
+    const pixelateProperties = pixelateEffect.getProperties();
+    
+    pixelateProperties.set(
+      "size",
+      new gd.PropertyDescriptor(/* defaultValue= */ "10")
+        .setLabel(_("Size"))
+        .setType("number")
+        .setDescription(_("Size of pixel effect (10 pixels by default)"))
+    );
+
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

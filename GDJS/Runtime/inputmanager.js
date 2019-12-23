@@ -29,6 +29,7 @@ gdjs.InputManager = function()
     this._touches = new Hashtable();
     this._startedTouches = []; //Identifiers of the touches that started during/before the frame.
     this._endedTouches = []; //Identifiers of the touches that ended during/before the frame.
+    this.inputMap = new Hashtable();
 
     this._touchSimulateMouse = true;
 };
@@ -314,4 +315,60 @@ gdjs.InputManager.prototype.isScrollingUp = function() {
  */
 gdjs.InputManager.prototype.isScrollingDown = function() {
     return this.getMouseWheelDelta() < 0;
+};
+
+/**
+ * Map an input name to a key. Use this to add or change a Keymap.
+ * @param {string} inputName The name to map a key to.
+ * @param {number} keyCode The key code to be tested.
+ */
+gdjs.InputManager.prototype.changeInputMap = function(inputName, keyCode) {
+    if (keyCode === undefined){
+        if(this.inputMap.containsKey(inputName)) delete this.inputMap[inputName];
+        return;
+    }
+    if(this.inputMap.containsKey(inputName)) this.inputMap[inputName] = keyCode;
+    else this.inputMap.put(inputName, keyCode);
+};
+
+/**
+ * Return true if the Keymap corresponding to keyCode is pressed. Returns false if input doesn't exists.
+ * @param {string} inputName The Keymap's name.
+ * @return {boolean} Is pressed or not.
+ */
+gdjs.InputManager.prototype.isInputPressed = function(inputName) {
+    if(this.inputMap.containsKey(inputName)){
+        let keyCode = this.inputMap[inputName];
+        return this.isKeyPressed(keyCode);
+    } else return false;
+};
+
+/**
+ * Return true if the Keymap corresponding to keyCode was Released. Returns false if input doesn't exists.
+ * @param {string} inputName The Keymap's name.
+ * @return {boolean} Was released or not.
+ */
+gdjs.InputManager.prototype.wasInputReleased = function(inputName) {
+    if(this.inputMap.containsKey(inputName)){
+        let keyCode = this.inputMap[inputName];
+        return this.wasKeyReleased(keyCode);
+    } else return false;
+};
+
+/**
+ * Return true if the Keymap exists.
+ * @param {string} inputName The Keymap's name.
+ * @return {boolean} Exists?
+ */
+gdjs.InputManager.prototype.inputExists = function(inputName) {
+    return this.inputMap.containsKey(inputName);
+};
+
+/**
+ * Get an Input's key
+ * @param {string} inputName The Keymap's name.
+ * @return {number} The key mapped to the Input.
+ */
+gdjs.InputManager.prototype.getInputKey = function(inputName) {
+    return this.inputMap[inputName];
 };

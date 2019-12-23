@@ -282,3 +282,71 @@ gdjs.evtTools.input.popEndedTouch = function(runtimeScene) {
 gdjs.evtTools.input.touchSimulateMouse = function(runtimeScene, enable) {
     runtimeScene.getGame().getInputManager().touchSimulateMouse(enable);
 };
+
+/**
+ * Return true if the input exists
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene instance.
+ * @param {string} inputName The name of the input to test.
+ * @returns {boolean}
+ * @private
+ */
+gdjs.evtTools.input.inputExists = function(runtimeScene, inputName) {
+    if (runtimeScene.getGame().getInputManager().inputExists(inputName)) return true;
+    else return false;
+};
+
+/**
+ * Return true if the specified input is pressed
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene instance.
+ * @param {string} inputName The name of the input to test.
+ * @returns {boolean}
+ * @private
+ */
+gdjs.evtTools.input.isInputPressed = function(runtimeScene, inputName) {
+    if (this.inputExists(runtimeScene, inputName)) {
+        return runtimeScene.getGame().getInputManager().isInputPressed(inputName);
+    }
+    else return false;
+};
+
+/**
+ * Return true if the specified input was just released
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene instance.
+ * @param {string} inputName The name of the input to test.
+ * @returns {boolean}
+ * @private
+ */
+gdjs.evtTools.input.wasInputReleased = function(runtimeScene, inputName) {
+    if (this.inputExists(runtimeScene, inputName)) {
+        return runtimeScene.getGame().getInputManager().wasInputReleased(inputName);
+    }
+    else return false;
+};
+
+/**
+ * Return true if the specified input was just released
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene instance.
+ * @param {string} inputName The name of the input to test.
+ * @returns {boolean}
+ * @private
+ */
+gdjs.evtTools.input.mapInput = function(runtimeScene, inputName, key) {
+    if (gdjs.evtTools.input.keysNameToCode.hasOwnProperty(key)) key = gdjs.evtTools.input.keysNameToCode[key];
+    else key = undefined;
+    runtimeScene.getGame().getInputManager().changeInputMap(inputName, key)
+};
+
+/**
+ * Get the key the Input was mapped to.
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene instance.
+ * @param {string} inputName The name of the input to test.
+ * @returns {string}
+ * @private
+ */
+gdjs.evtTools.input.getKeyMap = function(runtimeScene, inputName) {
+    if (this.inputExists(runtimeScene, inputName)) {
+        let Kkey = runtimeScene.getGame().getInputManager().getInputKey(inputName)
+        return Object.keys(this.keysNameToCode).find(key => object[key] === Kkey);
+    }
+    else return false;
+};

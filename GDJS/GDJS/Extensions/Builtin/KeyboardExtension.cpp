@@ -29,6 +29,16 @@ KeyboardExtension::KeyboardExtension() {
       "gdjs.evtTools.input.anyKeyPressed");
   GetAllStrExpressions()["LastPressedKey"].SetFunctionName(
       "gdjs.evtTools.input.lastPressedKey");
+  GetAllConditions()["InputMapped"].SetFunctionName(
+      "gdjs.evtTools.input.inputExists");
+  GetAllConditions()["InputPressed"].SetFunctionName(
+      "gdjs.evtTools.input.isInputPressed");
+  GetAllConditions()["InputReleased"].SetFunctionName(
+      "gdjs.evtTools.input.wasInputReleased");
+  GetAllActions()["InputMap"].SetFunctionName(
+      "gdjs.evtTools.input.mapInput");
+  GetAllExpressions()["GetKeyMap"].SetFunctionName(
+      "gdjs.evtTools.input.getKeyMap");
 }
 
 }  // namespace gdjs

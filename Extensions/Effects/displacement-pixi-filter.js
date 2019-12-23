@@ -15,9 +15,7 @@ gdjs.PixiFiltersTools.registerFilterCreator("Displacement", {
 
     return displacementFilter;
   },
-  update: function(filter, layer) {
-    
-  },
+  update: function(filter, layer) {},
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === "scaleX") {
       filter.scale.x = value;

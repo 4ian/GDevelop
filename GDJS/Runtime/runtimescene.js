@@ -522,11 +522,11 @@ gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
  */
 gdjs.RuntimeScene.prototype.addObject = function(obj) {
     if ( !this._objects.containsKey(obj.name) ) {
-        that._objects.put(obj.name, obj.getOriginalData());
-        that._instances.put(obj.name, []); //Also reserve an array for the instances
-        that._instancesCache.put(obj.name, []); //and for cached instances
+        this._objects.put(obj.name, obj.getOriginalData());
+        this._instances.put(obj.name, []); //Also reserve an array for the instances
+        this._instancesCache.put(obj.name, []); //and for cached instances
         //And cache the constructor for the performance sake:
-        that._objectsCtor.put(obj.name, obj);
+        this._objectsCtor.put(obj.name, obj);
     }
 
     if ( !this._instances.containsKey(obj.name) ) {

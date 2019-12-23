@@ -2965,7 +2965,7 @@ describe('libGD.js', function() {
     });
   });
 
-  describe('gd.ParameterMetadataTools', function() {
+  describe('gd.ParameterMetadata', function() {
     it('can tell the type of a parameter', function() {
       expect(gd.ParameterMetadata.isObject('object')).toBe(true);
       expect(gd.ParameterMetadata.isObject('objectPtr')).toBe(true);
@@ -2973,6 +2973,32 @@ describe('libGD.js', function() {
       expect(gd.ParameterMetadata.isBehavior('behavior')).toBe(true);
       expect(gd.ParameterMetadata.isBehavior('behavior34234')).toBe(false);
     });
+    it('can have attributes and be serialized', function() {
+      const parameter1 = new gd.ParameterMetadata();
+      parameter1.setType('objectList');
+      parameter1.setName('MyObjectWithoutType');
+      parameter1.setDescription('The first object to be used');
+      parameter1.setLongDescription('A long description');
+      parameter1.setDefaultValue('Default value');
+      parameter1.setOptional(true);
+
+      const serializerElement = new gd.SerializerElement();
+      parameter1.serializeTo(serializerElement);
+
+      const parameter2 = new gd.ParameterMetadata();
+      parameter2.unserializeFrom(serializerElement);
+
+      expect(parameter1.getType()).toBe('objectList');
+      expect(parameter1.getName()).toBe('MyObjectWithoutType');
+      expect(parameter1.getDescription()).toBe('The first object to be used');
+      expect(parameter1.getLongDescription()).toBe('A long description');
+      expect(parameter1.getDefaultValue()).toBe('Default value');
+      expect(parameter1.isOptional()).toBe(true);
+    });
+  });
+
+
+  describe('gd.ParameterMetadataTools', function() {
 
     it('can create an object container from parameters', function() {
       const project = gd.ProjectHelper.createNewGDJSProject();
@@ -3193,5 +3219,33 @@ describe('libGD.js', function() {
       expect(eventsBasedBehavior.getFullName()).toBe('My descriptive name');
       expect(eventsBasedBehavior.getDescription()).toBe('My description');
     });
+  });
+
+  describe('gd.InstructionMetadata', () => {
+    it('can have parameters', () => {
+      const instructionMetadata = new gd.InstructionMetadata();
+
+      expect(instructionMetadata.getParametersCount()).toBe(0);
+      instructionMetadata.addParameter('type', 'label', '', false);
+      instructionMetadata.setParameterLongDescription("Blabla");
+      expect(instructionMetadata.getParametersCount()).toBe(1);
+      expect(instructionMetadata.getParameter(0).getType()).toBe('type');
+      expect(instructionMetadata.getParameter(0).getDescription()).toBe('label');
+      expect(instructionMetadata.getParameter(0).getLongDescription()).toBe('Blabla');
+    })
+  });
+
+  describe('gd.ExpressionMetadata', () => {
+    it('can have parameters', () => {
+      const expressionMetadata = new gd.ExpressionMetadata();
+
+      expect(expressionMetadata.getParametersCount()).toBe(0);
+      expressionMetadata.addParameter('type', 'label', '', false);
+      expressionMetadata.setParameterLongDescription("Blabla");
+      expect(expressionMetadata.getParametersCount()).toBe(1);
+      expect(expressionMetadata.getParameter(0).getType()).toBe('type');
+      expect(expressionMetadata.getParameter(0).getDescription()).toBe('label');
+      expect(expressionMetadata.getParameter(0).getLongDescription()).toBe('Blabla');
+    })
   });
 });

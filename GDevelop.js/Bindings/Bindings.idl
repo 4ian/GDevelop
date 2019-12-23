@@ -933,6 +933,8 @@ interface ExpressionCodeGenerationInformation {
 };
 
 interface InstructionMetadata {
+    void InstructionMetadata(); // For tests only.
+
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetSentence();
@@ -968,6 +970,8 @@ interface InstructionMetadata {
 };
 
 interface ExpressionMetadata {
+    void ExpressionMetadata(); // For tests only.
+
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetGroup();
@@ -988,6 +992,7 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
+    [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
@@ -1013,6 +1018,9 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface VectorParameterMetadata {

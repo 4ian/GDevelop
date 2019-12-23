@@ -24,6 +24,7 @@
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {
+    this._objectData = objectData;
     this.name = objectData.name || "";
     this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
     this.type = objectData.type || "";
@@ -1454,6 +1455,14 @@ gdjs.RuntimeObject.getNameIdentifier = function(name) {
 
     gdjs.RuntimeObject.getNameIdentifier.identifiers.put(name, newIdentifier);
     return newIdentifier;
+};
+
+/**
+ * Get the objectData passed to the constructor
+ * @return {string} The object Data.
+ */
+gdjs.RuntimeObject.getOriginalData = function() {
+    return this._objectData;
 };
 
 //Notify gdjs the RuntimeObject exists.

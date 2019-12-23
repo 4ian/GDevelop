@@ -15,12 +15,22 @@
  */
 gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
-    this.name = behaviorData.name || "";
+	this._behaviorData = behaviorData; // To be able to access it later
+	this.name = behaviorData.name || "";
     this.type = behaviorData.type || "";
     this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
     this._activated = true;
     this.owner = owner;
 };
+
+/**
+ * Get the behaviorData of the behavior.
+ * @return {string} The behavior Data.
+ */
+gdjs.RuntimeBehavior.prototype.getOriginalData = function() {
+	return this._behaviorData;
+};
+
 /**
  * Get the name of the behavior.
  * @return {string} The behavior's name.

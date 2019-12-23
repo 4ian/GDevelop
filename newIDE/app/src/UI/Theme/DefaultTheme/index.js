@@ -31,6 +31,10 @@ const gdevelopTheme = {
   palette: {
     canvasColor,
   },
+  message: {
+    warning: '#ffa500',
+    error: '#f00',
+  },
   toolbar: {
     backgroundColor: backgroundColor,
     separatorColor: '#cecece',

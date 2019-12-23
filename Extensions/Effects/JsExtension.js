@@ -202,7 +202,9 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ "100")
         .setLabel(_("Mix"))
         .setType("number")
-        .setDescription(_("Mix value of the effect on the layer. (in pourcentage)"))
+        .setDescription(
+          _("Mix value of the effect on the layer. (in percent)")
+        )
     );
 
     const pixelateEffect = extension
@@ -212,13 +214,97 @@ module.exports = {
       .addIncludeFile("Extensions/Effects/pixelate-pixi-filter.js")
       .addIncludeFile("Extensions/Effects/pixi-filters/filter-pixelate.js");
     const pixelateProperties = pixelateEffect.getProperties();
-    
+
     pixelateProperties.set(
       "size",
       new gd.PropertyDescriptor(/* defaultValue= */ "10")
         .setLabel(_("Size"))
         .setType("number")
         .setDescription(_("Size of pixel effect (10 pixels by default)"))
+    );
+
+    const reflectionEffect = extension
+      .addEffect("Reflection")
+      .setFullName(_("Reflection"))
+      .setDescription(_("Reflect the layer"))
+      .addIncludeFile("Extensions/Effects/reflection-pixi-filter.js")
+      .addIncludeFile("Extensions/Effects/pixi-filters/filter-reflection.js");
+    const reflectionProperties = reflectionEffect.getProperties();
+
+    reflectionProperties.set(
+      "mirror",
+      new gd.PropertyDescriptor(/* defaultValue= */ "true")
+        .setLabel(_("mirror"))
+        .setType("boolean")
+        .setDescription(_("True to reflect the image, false for waves-only"))
+    );
+
+    reflectionProperties.set(
+      "boundary",
+      new gd.PropertyDescriptor(/* defaultValue= */ "0.5")
+        .setLabel(_("boundary"))
+        .setType("number")
+        .setDescription(
+          _(
+            "Vertical position of the reflection point, default is 50% (middle) smaller numbers produce a larger reflection, larger numbers produce a smaller reflection."
+          )
+        )
+    );
+
+    reflectionProperties.set(
+      "amplitudeStart",
+      new gd.PropertyDescriptor(/* defaultValue= */ "0")
+        .setLabel(_("Amplitude start"))
+        .setType("number")
+        .setDescription(_("Starting amplitude of waves (0 by default)"))
+    );
+
+    reflectionProperties.set(
+      "amplitudeEnding",
+      new gd.PropertyDescriptor(/* defaultValue= */ "20")
+        .setLabel(_("Amplitude ending"))
+        .setType("number")
+        .setDescription(_("Ending amplitude of waves (20 by default)"))
+    );
+
+    reflectionProperties.set(
+      "waveLengthStart",
+      new gd.PropertyDescriptor(/* defaultValue= */ "30")
+        .setLabel(_("Wave length start"))
+        .setType("number")
+        .setDescription(_("Starting wave length (30 by default)"))
+    );
+
+    reflectionProperties.set(
+      "waveLengthEnding",
+      new gd.PropertyDescriptor(/* defaultValue= */ "100")
+        .setLabel(_("Wave length ending"))
+        .setType("number")
+        .setDescription(_("Ending wave length (100 by default)"))
+    );
+
+    reflectionProperties.set(
+      "alphaStart",
+      new gd.PropertyDescriptor(/* defaultValue= */ "1")
+        .setLabel(_("Alpha start"))
+        .setType("number")
+        .setDescription(_("Starting alpha (1 by default)"))
+    );
+
+    reflectionProperties.set(
+      "alphaEnding",
+      new gd.PropertyDescriptor(/* defaultValue= */ "1")
+        .setLabel(_("Alpha ending"))
+        .setType("number")
+        .setDescription(_("Ending alpha (1 by default)"))
+    );
+
+    reflectionProperties.set(
+      "animated",
+      new gd.PropertyDescriptor(/* defaultValue= */ "false")
+        .setLabel(_("animated"))
+        .setType("boolean")
+        .setDescription(_("Animate position of waves"))
     );
 
     return extension;

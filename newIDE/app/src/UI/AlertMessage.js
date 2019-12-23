@@ -9,6 +9,7 @@ import Error from '@material-ui/icons/Error';
 import { Line } from './Grid';
 import FlatButton from './FlatButton';
 import Text from './Text';
+import ThemeConsumer from './Theme/ThemeConsumer';
 
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
@@ -28,16 +29,34 @@ type Props = {|
  */
 const AlertMessage = ({ kind, children, onHide, renderRightButton }: Props) => (
   <Paper>
-    <Line noMargin alignItems="center">
-      {kind === 'info' && <Info style={styles.icon} />}
-      {kind === 'warning' && <Warning style={styles.icon} />}
-      {kind === 'error' && <Error style={styles.icon} />}
-      <Text style={styles.content}>{children}</Text>
-      {renderRightButton && renderRightButton()}
-      {onHide && (
-        <FlatButton label={<Trans>Hide</Trans>} onClick={() => onHide()} />
+    <ThemeConsumer>
+      {muiTheme => (
+        <Line noMargin alignItems="center">
+          {kind === 'info' && <Info style={styles.icon} />}
+          {kind === 'warning' && (
+            <Warning
+              style={{
+                ...styles.icon,
+                color: muiTheme.message.warning,
+              }}
+            />
+          )}
+          {kind === 'error' && (
+            <Error
+              style={{
+                ...styles.icon,
+                color: muiTheme.message.error,
+              }}
+            />
+          )}
+          <Text style={styles.content}>{children}</Text>
+          {renderRightButton && renderRightButton()}
+          {onHide && (
+            <FlatButton label={<Trans>Hide</Trans>} onClick={() => onHide()} />
+          )}
+        </Line>
       )}
-    </Line>
+    </ThemeConsumer>
   </Paper>
 );
 

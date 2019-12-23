@@ -11,7 +11,7 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function (_, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -21,11 +21,11 @@ module.exports = {
         "Matthias Meike, Florian Rival",
         "Open source (MIT License)"
       )
-      .setExtensionHelpPath("/all-features/tween");
+      .setExtensionHelpPath("/behaviors/tween");
 
     var tweenBehavior = new gd.BehaviorJsImplementation();
 
-    tweenBehavior.updateProperty = function (
+    tweenBehavior.updateProperty = function(
       behaviorContent,
       propertyName,
       newValue
@@ -33,7 +33,7 @@ module.exports = {
       return false;
     };
 
-    tweenBehavior.getProperties = function (behaviorContent) {
+    tweenBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
@@ -45,7 +45,9 @@ module.exports = {
         "TweenBehavior",
         _("Tween"),
         "Tween",
-        _("Smoothly animate position, angle, scale and other properties of the object"),
+        _(
+          "Smoothly animate position, angle, scale and other properties of the object"
+        ),
         "",
         "JsPlatform/Extensions/tween_behavior32.png",
         "TweenBehavior",
@@ -55,7 +57,43 @@ module.exports = {
       .setIncludeFile("Extensions/TweenBehavior/tweenruntimebehavior.js")
       .addIncludeFile("Extensions/TweenBehavior/shifty.js");
 
-      const easingChoices = JSON.stringify(["linear", "easeInQuad", "easeOutQuad", "easeInOutQuad", "easeInCubic", "easeOutCubic", "easeInOutCubic", "easeInQuart", "easeOutQuart", "easeInOutQuart", "easeInQuint", "easeOutQuint", "easeInOutQuint", "easeInSine", "easeOutSine", "easeInOutSine", "easeInExpo", "easeOutExpo", "easeInOutExpo", "easeInCirc", "easeOutCirc", "easeInOutCirc", "easeOutBounce", "easeInBack", "easeOutBack", "easeInOutBack", "elastic", "swingFromTo", "swingFrom", "swingTo", "bounce", "bouncePast", "easeFromTo", "easeFrom", "easeTo"]);
+    const easingChoices = JSON.stringify([
+      "linear",
+      "easeInQuad",
+      "easeOutQuad",
+      "easeInOutQuad",
+      "easeInCubic",
+      "easeOutCubic",
+      "easeInOutCubic",
+      "easeInQuart",
+      "easeOutQuart",
+      "easeInOutQuart",
+      "easeInQuint",
+      "easeOutQuint",
+      "easeInOutQuint",
+      "easeInSine",
+      "easeOutSine",
+      "easeInOutSine",
+      "easeInExpo",
+      "easeOutExpo",
+      "easeInOutExpo",
+      "easeInCirc",
+      "easeOutCirc",
+      "easeInOutCirc",
+      "easeOutBounce",
+      "easeInBack",
+      "easeOutBack",
+      "easeInOutBack",
+      "elastic",
+      "swingFromTo",
+      "swingFrom",
+      "swingTo",
+      "bounce",
+      "bouncePast",
+      "easeFromTo",
+      "easeFrom",
+      "easeTo"
+    ]);
 
     // Behavior related
     behavior
@@ -300,7 +338,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("addObjectScaleYTween");
 
-      behavior
+    behavior
       .addAction(
         "AddTextObjectCharacterSizeTween",
         _("Add text size tween"),
@@ -362,7 +400,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("addObjectOpacityTween");
 
-      behavior
+    behavior
       .addAction(
         "AddObjectColorTween",
         _("Add object color tween"),
@@ -380,7 +418,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("string", _("To color"), "", false)
-      .addParameter("stringWithSelector", _("Items"), easingChoices, false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -393,7 +431,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("addObjectColorTween");
 
-      behavior
+    behavior
       .addCondition(
         "Exists",
         _("Tween exists"),
@@ -524,7 +562,7 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function (gd, extension) {
+  runExtensionSanityTests: function(gd, extension) {
     return [];
   }
 };

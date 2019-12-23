@@ -13,7 +13,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import MiniToolbar from '../UI/MiniToolbar';
+import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Add from '@material-ui/icons/Add';
 import PropertiesEditor from '../PropertiesEditor';
@@ -146,41 +146,43 @@ export default class EffectsList extends React.Component<Props, {||}> {
                 return (
                   <React.Fragment key={i}>
                     <MiniToolbar>
-                      <Column expand noMargin>
-                        <SemiControlledTextField
-                          margin="none"
-                          commitOnBlur
-                          hintText={t`Enter the effect name`}
-                          value={effect.getName()}
-                          onChange={newName => {
-                            if (newName === effect.getName()) return;
+                      <MiniToolbarText>
+                        <Trans>Effect name:</Trans>
+                      </MiniToolbarText>
+                      <SemiControlledTextField
+                        margin="none"
+                        commitOnBlur
+                        hintText={t`Enter the effect name`}
+                        value={effect.getName()}
+                        onChange={newName => {
+                          if (newName === effect.getName()) return;
 
-                            effect.setName(newName);
-                            this.forceUpdate();
-                            this.props.onEffectsUpdated();
-                          }}
-                          fullWidth
-                        />
-                      </Column>
-                      <Column expand>
-                        <SelectField
-                          margin="none"
-                          value={effectType}
-                          onChange={(e, i, newEffectType: string) =>
-                            this._chooseEffectType(effect, newEffectType)
-                          }
-                          fullWidth
-                          hintText={t`Choose the effect to apply`}
-                        >
-                          {this._allEffectMetadata.map(effectMetadata => (
-                            <SelectOption
-                              key={effectMetadata.type}
-                              value={effectMetadata.type}
-                              primaryText={effectMetadata.fullName}
-                            />
-                          ))}
-                        </SelectField>
-                      </Column>
+                          effect.setName(newName);
+                          this.forceUpdate();
+                          this.props.onEffectsUpdated();
+                        }}
+                        fullWidth
+                      />
+                      <MiniToolbarText>
+                        <Trans>Type:</Trans>
+                      </MiniToolbarText>
+                      <SelectField
+                        margin="none"
+                        value={effectType}
+                        onChange={(e, i, newEffectType: string) =>
+                          this._chooseEffectType(effect, newEffectType)
+                        }
+                        fullWidth
+                        hintText={t`Choose the effect to apply`}
+                      >
+                        {this._allEffectMetadata.map(effectMetadata => (
+                          <SelectOption
+                            key={effectMetadata.type}
+                            value={effectMetadata.type}
+                            primaryText={effectMetadata.fullName}
+                          />
+                        ))}
+                      </SelectField>
                       <ElementWithMenu
                         element={
                           <IconButton>

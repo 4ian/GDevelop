@@ -37,7 +37,7 @@ const AlertMessage = ({ kind, children, onHide, renderRightButton }: Props) => (
             <Warning
               style={{
                 ...styles.icon,
-                color : muiTheme.message.warning,
+                color: muiTheme.message.warning,
               }}
             />
           )}

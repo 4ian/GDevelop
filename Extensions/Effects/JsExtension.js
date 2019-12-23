@@ -236,7 +236,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ "true")
         .setLabel(_("mirror"))
         .setType("boolean")
-        .setDescription(_("True to reflect the image, false for waves-only"))
+        .setDescription(_("Reflect the image on the waves"))
     );
 
     reflectionProperties.set(
@@ -304,7 +304,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ "false")
         .setLabel(_("animated"))
         .setType("boolean")
-        .setDescription(_("Animate position of waves"))
+        .setDescription(_("Animate waves"))
     );
 
     return extension;

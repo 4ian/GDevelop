@@ -1434,6 +1434,14 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
     return false;
 }
 
+/**
+ * Get the objectData passed to the constructor
+ * @return {string} The object Data.
+ */
+gdjs.RuntimeObject.prototype.getOriginalData = function() {
+    return this._objectData;
+};
+
 
 /**
  * Get the identifier associated to an object name :<br>
@@ -1455,14 +1463,6 @@ gdjs.RuntimeObject.getNameIdentifier = function(name) {
 
     gdjs.RuntimeObject.getNameIdentifier.identifiers.put(name, newIdentifier);
     return newIdentifier;
-};
-
-/**
- * Get the objectData passed to the constructor
- * @return {string} The object Data.
- */
-gdjs.RuntimeObject.getOriginalData = function() {
-    return this._objectData;
 };
 
 //Notify gdjs the RuntimeObject exists.

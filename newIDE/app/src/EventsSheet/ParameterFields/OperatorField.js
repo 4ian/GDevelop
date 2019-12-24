@@ -54,15 +54,11 @@ export const renderInlineOperator = ({
     );
   }
 
-  if (
-    value !== '=' &&
-    value !== '+' &&
-    value !== '-' &&
-    value !== '*' &&
-    value !== '/'
-  ) {
-    return <InvalidParameterValue>{value}</InvalidParameterValue>;
-  }
+  if (value === '=') return <Trans>set to</Trans>;
+  else if (value === '+') return <Trans>add</Trans>;
+  else if (value === '-') return <Trans>subtract</Trans>;
+  else if (value === '/') return <Trans>divide by</Trans>;
+  else if (value === '*') return <Trans>multiply by</Trans>;
 
-  return value;
+  return <InvalidParameterValue>{value}</InvalidParameterValue>;
 };

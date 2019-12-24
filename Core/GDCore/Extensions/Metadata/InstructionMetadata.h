@@ -386,6 +386,20 @@ class GD_CORE_API InstructionMetadata {
     return *this;
   };
 
+  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type);
+
+  InstructionMetadata &UseStandardRelationalOperatorParameters(const gd::String &type);
+
+  InstructionMetadata &SetIsObjectInstruction() {
+    isObjectInstruction = true;
+    return *this;
+  }
+
+  InstructionMetadata &SetIsBehaviorInstruction() {
+    isBehaviorInstruction = true;
+    return *this;
+  }
+
   /**
    * \brief Consider that the instruction is easy for an user to understand.
    */
@@ -587,6 +601,8 @@ class GD_CORE_API InstructionMetadata {
   int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
                         ///< use) to 10 (complex to understand)
   bool isPrivate;
+  bool isObjectInstruction;
+  bool isBehaviorInstruction;
 };
 
 }  // namespace gd

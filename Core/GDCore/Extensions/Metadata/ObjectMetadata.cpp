@@ -77,7 +77,8 @@ gd::InstructionMetadata& ObjectMetadata::AddCondition(
                                                            group,
                                                            icon,
                                                            smallicon)
-                                           .SetHelpPath(GetHelpPath());
+                                           .SetHelpPath(GetHelpPath())
+                                           .SetIsObjectInstruction();
   return conditionsInfos[nameWithNamespace];
 #endif
 }
@@ -101,7 +102,8 @@ gd::InstructionMetadata& ObjectMetadata::AddAction(
                                                         group,
                                                         icon,
                                                         smallicon)
-                                        .SetHelpPath(GetHelpPath());
+                                        .SetHelpPath(GetHelpPath())
+                                        .SetIsObjectInstruction();
   return actionsInfos[nameWithNamespace];
 #endif
 }

@@ -3,23 +3,24 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
+#include "InstructionMetadata.h"
 #include <algorithm>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
-#include "InstructionMetadata.h"
 
 namespace gd {
 InstructionMetadata::InstructionMetadata()
-    : sentence(
-          "Unknown or unsupported instruction"),  // Avoid translating this
-                                                  // string, so that it's safe
-                                                  // and *fast* to use a
-                                                  // InstructionMetadata.
+    : sentence("Unknown or unsupported instruction"),  // Avoid translating this
+                                                       // string, so that it's
+                                                       // safe and *fast* to use
+                                                       // a InstructionMetadata.
       canHaveSubInstructions(false),
       hidden(true),
       usageComplexity(5),
-      isPrivate(false) {}
+      isPrivate(false),
+      isObjectInstruction(false),
+      isBehaviorInstruction(false) {}
 
 InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
                                          const gd::String& name_,
@@ -40,8 +41,9 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
       extensionNamespace(extensionNamespace_),
       hidden(false),
       usageComplexity(5),
-      isPrivate(false) {
-}
+      isPrivate(false),
+      isObjectInstruction(false),
+      isBehaviorInstruction(false) {}
 
 ParameterMetadata::ParameterMetadata() : optional(false), codeOnly(false) {}
 
@@ -83,6 +85,51 @@ InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
   info.supplementaryInformation = supplementaryInformation;
 
   parameters.push_back(info);
+  return *this;
+}
+
+InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
+    const gd::String& type) {
+  SetManipulatedType(type);
+
+  AddParameter("operator", _("Modification's sign"));
+  AddParameter(type == "number" ? "expression" : type, _("TODO"));
+  size_t operatorParamIndex = parameters.size() - 2;
+  size_t valueParamIndex = parameters.size() - 1;
+
+  if (isObjectInstruction || isBehaviorInstruction) {
+    sentence = "Change " + sentence + " of _PARAM0_: _PARAM" +
+               gd::String::From(operatorParamIndex) + "_ _PARAM" +
+               gd::String::From(valueParamIndex) + "_";  // TODO: translation
+  } else {
+    sentence = "Change " + sentence + ": _PARAM" +
+               gd::String::From(operatorParamIndex) + "_ _PARAM" +
+               gd::String::From(valueParamIndex) + "_";  // TODO: translation
+  }
+
+  return *this;
+}
+
+InstructionMetadata&
+InstructionMetadata::UseStandardRelationalOperatorParameters(
+    const gd::String& type) {
+  SetManipulatedType(type);
+
+  AddParameter("relationalOperator", _("Sign of the test"));
+  AddParameter("expression", _("TODO"));
+  size_t operatorParamIndex = parameters.size() - 2;
+  size_t valueParamIndex = parameters.size() - 1;
+
+  if (isObjectInstruction || isBehaviorInstruction) {
+    sentence = sentence + " of _PARAM0_ _PARAM" +
+               gd::String::From(operatorParamIndex) + "_ _PARAM" +
+               gd::String::From(valueParamIndex) + "_";  // TODO: translation
+  } else {
+    sentence = sentence + " _PARAM" + gd::String::From(operatorParamIndex) +
+               "_ _PARAM" + gd::String::From(valueParamIndex) +
+               "_";  // TODO: translation
+  }
+
   return *this;
 }
 

@@ -7,12 +7,13 @@ const corePath = path.join(__dirname, '../../../Core/GDCore');
 const extensionsPath = path.join(__dirname, '../../../Extensions');
 const newIdeAppSrcPath = path.join(__dirname, '../src');
 const verbose = true;
-const dryRun = true;
+const dryRun = false;
 
 const excludedPaths = ['locales'];
 
 let totalSentenceReplacementCount = 0;
 let totalParameterReplacementCount = 0;
+let totalSimplificationCount = 0;
 
 const sanitizeExtracts = extract => {
   return extract.replace(/"\s+"/g, '').trim();
@@ -96,7 +97,7 @@ const patternsToReplace = [
     },
   },
   {
-    regexp: /_\(\s*(["'])(.*)\s*of(.*)\s+is\s+_PARAM.__PARAM._(([\S\s](?!\s*\),))*).?["']\s*\)/g,
+    regexp: /_\(\s*(["'])(.*)\s*of(.*)[\s"]+is[\s"]+_PARAM.__PARAM._(([\S\s](?!\s*\),))*).?["']\s*\)/g,
     replacer: (match, quote, rawAttribute, rawSubject, rawExtraDetails) => {
       totalSentenceReplacementCount++;
 
@@ -132,7 +133,7 @@ const patternsToReplace = [
     },
   },
   {
-    regexp: /_\(\s*(["'])(.*)\s+is\s+_PARAM.__PARAM._(([\S\s](?!\s*\),))*).?["']\s*\)/g,
+    regexp: /_\(\s*(["'])(.*)[\s"]+is[\s"]+_PARAM.__PARAM._(([\S\s](?!\s*\),))*).?["']\s*\)/g,
     replacer: (match, quote, rawSubject, rawExtraDetails) => {
       totalSentenceReplacementCount++;
 
@@ -151,8 +152,10 @@ const patternsToReplace = [
       return replacement;
     },
   },
+  // Replace AddParameter("operator") or AddParameter("relationalOperator") and related parameter
+  // when used with SetManipulatedType
   {
-    regexp: /.([aA])ddParameter\(\s*(["'])(operator|relationalOperator)["']\s*,\s*_\(\s*["'](.*)["']\s*\)\s*\)\s*.[aA]ddParameter\(\s*["'](.*)["']\s*,\s*_\(["'].*["']\)\s*\)(([\s\S](?!\);))*)\.[sS]etManipulatedType\("(.*)"\)/g,
+    regexp: /.([aA])ddParameter\(\s*(["'])(operator|relationalOperator)["']\s*,\s*_\(\s*["'](.*)["']\s*\)\s*\)\s*.[aA]ddParameter\(\s*["'](.*)["']\s*,\s*_\(["'].*["']\)\s*\)(([\s\S](?!\);))*)\.[sS]etManipulatedType\(['"](.*)['"]\)/g,
     replacer: (match, a, quote, operatorType, operatorLabel, valueType, otherFunctionCalls, unused, type) => {
       totalParameterReplacementCount++;
       const isCamelCase = a === 'a';
@@ -175,7 +178,10 @@ const patternsToReplace = [
       let method = operatorType === 'operator' ? 'UseStandardOperatorParameters' : 'UseStandardRelationalOperatorParameters';
       if (isCamelCase) method = uncapitalize(method);
 
-      const replacement = `.${method}("${type}")${otherFunctionCalls}`;
+      let getCodeExtraInformationMethod = 'GetCodeExtraInformation';
+      if (isCamelCase) getCodeExtraInformationMethod = uncapitalize(getCodeExtraInformationMethod);
+
+      const replacement = `.${method}("${type}")${otherFunctionCalls}.${getCodeExtraInformationMethod}()`;
       if (verbose) {
         console.log('Replaced "' + match + '" by "' + replacement + '"');
       }
@@ -183,6 +189,52 @@ const patternsToReplace = [
       return replacement;
     },
   },
+  // Fix extra useless calls to GetCodeExtraInformation
+  {
+    regexp: /\s+.[gG]etCodeExtraInformation\(\);/g,
+    replacer: (match) => {
+      totalSimplificationCount++;
+
+      const replacement = ';';
+      if (verbose) {
+        console.log('Replaced "' + match + '" by "' + replacement + '"');
+      }
+
+      return replacement;
+    }
+  },
+  // Fix double calls to GetCodeExtraInformation
+  {
+    regexp: /(\s+)\.([gG])etCodeExtraInformation\(\)(([\s\S](?!;))+)\.[gG]etCodeExtraInformation\(\)/g,
+    replacer: (match, spacing, g, otherFunctionCalls) => {
+      totalSimplificationCount++;
+      const isCamelCase = g === 'g';
+
+      let getCodeExtraInformationMethod = 'GetCodeExtraInformation';
+      if (isCamelCase) getCodeExtraInformationMethod = uncapitalize(getCodeExtraInformationMethod);
+
+      const replacement = `${spacing}.${getCodeExtraInformationMethod}()${otherFunctionCalls}`;
+      if (verbose) {
+        console.log('Replaced "' + match + '" by "' + replacement + '"');
+      }
+
+      return replacement;
+    }
+  },
+  // Fix improper calls to GetCodeExtraInformation
+  {
+    regexp: /((\s+)\.[sS]etFunctionName\((([\s\S](?!;))+))\.[gG]etCodeExtraInformation\(\)\s+/g,
+    replacer: (match, otherFunctionCalls) => {
+      totalSimplificationCount++;
+
+      const replacement = otherFunctionCalls;
+      if (verbose) {
+        console.log('Replaced "' + match + '" by "' + replacement + '"');
+      }
+
+      return replacement;
+    }
+  }
 ];
 
 const replacePattern = (source, pattern) => {
@@ -260,6 +312,7 @@ Promise.all([
     ).then(results => {
       shell.echo(`ℹ️ Made ${totalSentenceReplacementCount} sentence replacements.`);
       shell.echo(`ℹ️ Made ${totalParameterReplacementCount} parameter replacements.`);
+      shell.echo(`ℹ️ Made ${totalSimplificationCount} simplification.`);
       if (dryRun) {
         shell.echo(
           `⚠️  This was a dry-run, set dryRun to false to do real changes.`

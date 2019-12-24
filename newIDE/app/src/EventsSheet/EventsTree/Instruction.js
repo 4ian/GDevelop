@@ -38,6 +38,12 @@ const styles = {
 
 export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
 
+const capitalize = (str: string) => {
+  if (!str) return '';
+
+  return str[0].toUpperCase() + str.substr(1);
+};
+
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
   isCondition: boolean,
 }>(reactDndInstructionType);
@@ -106,8 +112,15 @@ export default class Instruction extends React.Component<Props> {
           const isParameter =
             parameterIndex >= 0 && parameterIndex < parametersCount;
 
-          if (!isParameter)
-            return <span key={i}>{formattedTexts.getString(i)}</span>;
+          if (!isParameter) {
+            return (
+              <span key={i}>
+                {i === 0
+                  ? capitalize(formattedTexts.getString(i))
+                  : formattedTexts.getString(i)}
+              </span>
+            );
+          }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
           const parameterType = parameterMetadata.getType();

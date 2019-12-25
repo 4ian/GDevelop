@@ -5,7 +5,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
-import { icon } from '../EventsTree/ClassNames';
+import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
@@ -82,7 +82,12 @@ export const renderVariableWithIcon = (
   tooltip: string = ''
 ) => {
   return (
-    <span title={tooltip}>
+    <span
+      title={tooltip}
+      className={classNames({
+        [nameAndIconContainer]: true,
+      })}
+    >
       <img
         className={classNames({
           [icon]: true,

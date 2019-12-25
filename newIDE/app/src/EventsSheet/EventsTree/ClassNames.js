@@ -24,3 +24,5 @@ export const dropIndicator = 'drop-indicator';
 export const cantDropIndicator = 'cant-drop-indicator';
 
 export const linkContainer = 'link-container';
+
+export const nameAndIconContainer = 'name-and-icon-container';

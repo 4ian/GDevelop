@@ -156,7 +156,7 @@ module.exports = {
       new gd.PropertyDescriptor("")
         .setType("resource")
         .addExtraInfo("image")
-        .setLabel(_("Displacement map texture for the effect"))
+        .setLabel(_("Displacement map texture for the effect. **Download** [basic displacement file](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects)"))
     );
     displacementProperties.set(
       "scaleX",
@@ -186,7 +186,7 @@ module.exports = {
         .setLabel(_("Color map texture for the effect"))
         .setDescription(
           _(
-            "Color map are like LUT, you can change colors of pixels by modifing a reference color image containing each colours. Orignal map file can be found at [TODO INSERT PATH]"
+            "Color map are like LUT, you can change colors of pixels by modifing a reference color image containing each colours. **Download** [original color map file](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects)"
           )
         )
     );

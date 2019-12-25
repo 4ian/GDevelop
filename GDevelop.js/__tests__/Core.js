@@ -1844,7 +1844,7 @@ describe('libGD.js', function() {
         action,
         gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
       );
-      expect(actionSentenceInEnglish).toBe('Delete object MyCharacter');
+      expect(actionSentenceInEnglish).toBe('Delete MyCharacter');
 
       var formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
         action,
@@ -1852,7 +1852,7 @@ describe('libGD.js', function() {
       );
 
       expect(formattedTexts.size()).toBe(2);
-      expect(formattedTexts.getString(0)).toBe('Delete object ');
+      expect(formattedTexts.getString(0)).toBe('Delete ');
       expect(formattedTexts.getString(1)).toBe('MyCharacter');
       expect(formattedTexts.getTextFormatting(0).isBold()).toBe(false);
       expect(formattedTexts.getTextFormatting(1).isBold()).toBe(true);

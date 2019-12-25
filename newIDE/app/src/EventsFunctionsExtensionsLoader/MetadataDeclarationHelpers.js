@@ -331,36 +331,26 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
           i18n._(t`Compare the content of ${propertyLabel}`),
-          i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
         )
       )
-        .addParameter(
-          'relationalOperator',
-          i18n._(t`Sign of the test`),
-          '',
-          false
-        )
-        .addParameter('string', i18n._(t`String to compare against`), '', false)
+        .useStandardRelationalOperatorParameters('string')
         .getCodeExtraInformation()
-        .setFunctionName(getterName)
-        .setManipulatedType('string');
+        .setFunctionName(getterName);
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
           gd.EventsBasedBehavior.getPropertyActionName(propertyName),
           propertyLabel,
-          i18n._(t`Update the content of ${propertyLabel}`),
-          i18n._(
-            t`Do _PARAM2__PARAM3_ to property ${propertyName} of _PARAM0_`
-          ),
+          i18n._(t`Change the content of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
         )
       )
-        .addParameter('operator', i18n._(t`Modification's sign`), '', false)
-        .addParameter('string', i18n._(t`New value`), '', false)
+        .useStandardOperatorParameters('string')
         .getCodeExtraInformation()
         .setFunctionName(setterName)
         .setManipulatedType('string')
@@ -383,44 +373,28 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
           i18n._(t`Compare the value of ${propertyLabel}`),
-          i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
         )
       )
-        .addParameter(
-          'relationalOperator',
-          i18n._(t`Sign of the test`),
-          '',
-          false
-        )
-        .addParameter(
-          'expression',
-          i18n._(t`Value to compare against`),
-          '',
-          false
-        )
+        .useStandardRelationalOperatorParameters('number')
         .getCodeExtraInformation()
-        .setFunctionName(getterName)
-        .setManipulatedType('number');
+        .setFunctionName(getterName);
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
           gd.EventsBasedBehavior.getPropertyActionName(propertyName),
           propertyLabel,
-          i18n._(t`Update the value of ${propertyLabel}`),
-          i18n._(
-            t`Do _PARAM2__PARAM3_ to property ${propertyName} of _PARAM0_`
-          ),
+          i18n._(t`Change the value of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           'res/function.png'
         )
       )
-        .addParameter('operator', i18n._(t`Modification's sign`), '', false)
-        .addParameter('expression', i18n._(t`New value`), '', false)
+        .useStandardOperatorParameters('number')
         .getCodeExtraInformation()
         .setFunctionName(setterName)
-        .setManipulatedType('number')
         .setGetter(getterName);
     } else if (propertyType === 'Boolean') {
       addObjectAndBehaviorParameters(

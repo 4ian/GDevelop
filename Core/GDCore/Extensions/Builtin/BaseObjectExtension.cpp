@@ -84,7 +84,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "MettreXY",
          _("Position of an object"),
          _("Change the position of an object."),
-         _("Do _PARAM1__PARAM2_;_PARAM3__PARAM4_ to the position of _PARAM0_"),
+         _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x axis), _PARAM3_ _PARAM4_ (y axis)"),
          _("Position"),
          "res/actions/position24.png",
          "res/actions/position.png")

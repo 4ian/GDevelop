@@ -42,7 +42,7 @@ export default class VariableField extends Component<Props, {||}> {
           <SemiControlledAutoComplete
             margin={this.props.isInline ? 'none' : 'dense'}
             floatingLabelText={description}
-            helperText={
+            helperMarkdownText={
               parameterMetadata
                 ? parameterMetadata.getLongDescription()
                 : undefined

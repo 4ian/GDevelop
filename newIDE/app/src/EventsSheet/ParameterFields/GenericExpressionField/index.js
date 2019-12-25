@@ -290,7 +290,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   margin={this.props.isInline ? 'none' : 'dense'}
                   value={value}
                   floatingLabelText={description}
-                  helperText={longDescription}
+                  helperMarkdownText={longDescription}
                   hintText={expressionType === 'string' ? '""' : undefined}
                   inputStyle={styles.input}
                   onChange={this._handleChange}

@@ -24,7 +24,7 @@ export default class OperatorField extends Component<ParameterFieldProps> {
         margin={this.props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
-        helperText={
+        helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         value={this.props.value}

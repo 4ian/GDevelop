@@ -39,7 +39,7 @@ export default class StringWithSelectorField extends Component<
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
-        helperText={
+        helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         fullWidth

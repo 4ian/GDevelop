@@ -52,7 +52,7 @@ export default class ExternalEventsField extends React.Component<
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
-        helperText={
+        helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         fullWidth

@@ -12,7 +12,7 @@ import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
-import ReactMarkdown from 'react-markdown';
+import { MarkdownText } from '../UI/MarkdownText';
 import Text from '../UI/Text';
 
 type Props = {|
@@ -104,10 +104,10 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             {!extensionHeader ? (
               <Text>{extensionShortHeader.shortDescription}</Text>
             ) : (
-              <ReactMarkdown
-                escapeHtml
+              <MarkdownText
                 source={extensionHeader.description}
                 className={muiTheme.markdownRootClassName}
+                useParagraphs
               />
             )}
             {!extensionHeader && !error && <PlaceholderLoader />}

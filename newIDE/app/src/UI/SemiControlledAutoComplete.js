@@ -13,6 +13,7 @@ import muiZIndex from '@material-ui/core/styles/zIndex';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { computeTextFieldStyleProps } from './TextField';
+import { MarkdownText } from './MarkdownText';
 
 export type DataSource = Array<
   | {|
@@ -124,7 +125,7 @@ type Props = {|
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
-  helperText?: React.Node,
+  helperMarkdownText?: ?string,
   hintText?: MessageDescriptor | string,
   fullWidth?: boolean,
   margin?: 'none' | 'dense',
@@ -181,6 +182,10 @@ export default class SemiControlledAutoComplete extends React.Component<
     const { props, state } = this;
     const currentInputValue =
       state.inputValue !== null ? state.inputValue : props.value;
+
+    const helperText = props.helperMarkdownText ? (
+      <MarkdownText source={props.helperMarkdownText} />
+    ) : null;
 
     return (
       <I18n>
@@ -285,7 +290,7 @@ export default class SemiControlledAutoComplete extends React.Component<
 
                     // Error handling:
                     error: !!props.errorText,
-                    helperText: props.errorText || props.helperText,
+                    helperText: props.errorText || helperText,
 
                     // Display:
                     InputLabelProps: getLabelProps({ shrink: true }),

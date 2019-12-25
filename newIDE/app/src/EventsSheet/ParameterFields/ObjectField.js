@@ -49,7 +49,7 @@ export default class ObjectField extends React.Component<
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}
-        helperText={this._longDescription}
+        helperMarkdownText={this._longDescription}
         fullWidth
         errorTextIfInvalid={
           this._allowedObjectType ? (

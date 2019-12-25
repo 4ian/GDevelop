@@ -113,7 +113,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
-        helperText={
+        helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         fullWidth

@@ -230,7 +230,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           id={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
-          helperText={getFieldDescription(this.props.instances, field)}
+          helperMarkdownText={getFieldDescription(this.props.instances, field)}
           onChange={newValue => {
             this.props.instances.forEach(i =>
               setValue(i, parseFloat(newValue) || 0)
@@ -249,7 +249,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           key={field.name}
           id={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          helperText={getFieldDescription(this.props.instances, field)}
+          helperMarkdownText={getFieldDescription(this.props.instances, field)}
           disableAlpha
           fullWidth
           color={hexToRGBColor(getFieldValue(this.props.instances, field))}
@@ -274,7 +274,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           value={getFieldValue(this.props.instances, field)}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
-          helperText={getFieldDescription(this.props.instances, field)}
+          helperMarkdownText={getFieldDescription(this.props.instances, field)}
           multiLine
           style={styles.field}
         />
@@ -294,7 +294,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
               id={field.name}
               floatingLabelText={getFieldLabel(this.props.instances, field)}
               floatingLabelFixed
-              helperText={getFieldDescription(this.props.instances, field)}
+              helperMarkdownText={getFieldDescription(
+                this.props.instances,
+                field
+              )}
               onChange={newValue => {
                 this.props.instances.forEach(i => setValue(i, newValue || ''));
                 this._onInstancesModified(this.props.instances);
@@ -336,7 +339,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           value={getFieldValue(this.props.instances, field)}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          helperText={getFieldDescription(this.props.instances, field)}
+          helperMarkdownText={getFieldDescription(this.props.instances, field)}
           onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i =>
               setValue(i, parseFloat(newValue) || 0)
@@ -360,7 +363,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           )}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          helperText={getFieldDescription(this.props.instances, field)}
+          helperMarkdownText={getFieldDescription(this.props.instances, field)}
           onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i => setValue(i, newValue || ''));
             this._onInstancesModified(this.props.instances);
@@ -418,7 +421,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           this._onInstancesModified(this.props.instances);
         }}
         floatingLabelText={getFieldLabel(this.props.instances, field)}
-        helperText={getFieldDescription(this.props.instances, field)}
+        helperMarkdownText={getFieldDescription(this.props.instances, field)}
       />
     );
   };

@@ -33,7 +33,7 @@ type Props = {|
   initialResourceName: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
-  helperText?: React.Node,
+  helperMarkdownText?: ?string,
   hintText?: MessageDescriptor,
   margin?: 'none' | 'dense',
 |};
@@ -263,7 +263,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         renderTextField={() => (
           <SemiControlledAutoComplete
             floatingLabelText={this.props.floatingLabelText}
-            helperText={this.props.helperText}
+            helperMarkdownText={this.props.helperMarkdownText}
             hintText={this.props.hintText}
             openOnFocus
             dataSource={this.autoCompleteData || []}

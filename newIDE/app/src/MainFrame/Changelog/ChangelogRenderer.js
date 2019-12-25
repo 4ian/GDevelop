@@ -8,7 +8,7 @@ import {
 } from '../../Utils/GDevelopServices/Release';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import ReactMarkdown from 'react-markdown';
+import { MarkdownText } from '../../UI/MarkdownText';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import { hasBreakingChange } from '../../Utils/GDevelopServices/Release';
@@ -22,15 +22,6 @@ type Props = {|
   error: ?Error,
   currentReleaseName: string,
 |};
-
-const markdownCustomRenderers = {
-  // Ensure link are opened in a new page
-  link: props => (
-    <a href={props.href} target="_blank" rel="noopener noreferrer">
-      {props.children}
-    </a>
-  ),
-};
 
 /**
  * Display information about latest releases.
@@ -90,9 +81,8 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
           )}
           {releases.map(release =>
             release.name ? (
-              <ReactMarkdown
+              <MarkdownText
                 key={release.name}
-                escapeHtml
                 source={
                   '# Version ' +
                   release.name +
@@ -101,7 +91,7 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
                     'Changes and new features description will be available soon.')
                 }
                 className={muiTheme.markdownRootClassName}
-                renderers={markdownCustomRenderers}
+                useParagraphs
               />
             ) : null
           )}

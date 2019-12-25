@@ -406,18 +406,16 @@ module.exports = {
         'GravityX',
         _('Gravity X'),
         _('Test the world gravity on X.'),
-        _('Gravity on X is _PARAM2__PARAM3_'),
+        _('the gravity on X'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getGravityX')
-      .setManipulatedType('number');
+      .setFunctionName('getGravityX');
 
     aut
       .addExpression(
@@ -437,18 +435,16 @@ module.exports = {
         'GravityY',
         _('Gravity Y'),
         _('Test the world gravity on Y.'),
-        _('Gravity on Y is _PARAM2__PARAM3_'),
+        _('the gravity on Y'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getGravityY')
-      .setManipulatedType('number');
+      .setFunctionName('getGravityY');
 
     aut
       .addExpression(
@@ -485,18 +481,16 @@ module.exports = {
         'TimeScale',
         _('Time scale'),
         _('Test the world time scale.'),
-        _('Time scale is _PARAM2__PARAM3_'),
+        _('the time scale'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getTimeScale')
-      .setManipulatedType('number');
+      .setFunctionName('getTimeScale');
 
     // This action has to be owned by the extension to run only once per objects list, not per instance
     extension
@@ -751,18 +745,17 @@ module.exports = {
         _(
           'Modify an object shape scale. It affects custom shape dimensions and shape offset, if custom dimensions are not set the body will be scaled automatically to the object size.'
         ),
-        _('Do _PARAM2__PARAM3_ to the shape scale of _PARAM0_'),
+        _('the shape scale'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setShapeScale')
-      .setManipulatedType('number')
+      
       .setGetter('getShapeScale');
 
     aut
@@ -770,18 +763,16 @@ module.exports = {
         'Density',
         _('Density'),
         _('Test an object density.'),
-        _('_PARAM0_ density is _PARAM2__PARAM3_'),
+        _('the _PARAM0_ density'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getDensity')
-      .setManipulatedType('number');
+      .setFunctionName('getDensity');
 
     aut
       .addAction(
@@ -790,18 +781,17 @@ module.exports = {
         _(
           "Modify an object density. The body's density and volume determine its mass."
         ),
-        _('Do _PARAM2__PARAM3_ to the density of _PARAM0_'),
+        _('the density'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value (non-negative)'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setDensity')
-      .setManipulatedType('number')
+      
       .setGetter('getDensity');
 
     aut
@@ -822,18 +812,16 @@ module.exports = {
         'Friction',
         _('Friction'),
         _('Test an object friction.'),
-        _('_PARAM0_ friction is _PARAM2__PARAM3_'),
+        _('the _PARAM0_ friction'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getFriction')
-      .setManipulatedType('number');
+      .setFunctionName('getFriction');
 
     aut
       .addAction(
@@ -842,18 +830,17 @@ module.exports = {
         _(
           "Modify an object friction. How much energy is lost from the movement of one object over another. The combined friction from two bodies is calculated as 'sqrt(bodyA.friction * bodyB.friction)'."
         ),
-        _('Do _PARAM2__PARAM3_ to the friction of _PARAM0_'),
+        _('the friction'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value (non-negative)'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setFriction')
-      .setManipulatedType('number')
+      
       .setGetter('getFriction');
 
     aut
@@ -874,18 +861,16 @@ module.exports = {
         'Restitution',
         _('Restitution'),
         _('Test an object restitution.'),
-        _('_PARAM0_ restitution is _PARAM2__PARAM3_'),
+        _('the _PARAM0_ restitution'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getRestitution')
-      .setManipulatedType('number');
+      .setFunctionName('getRestitution');
 
     aut
       .addAction(
@@ -894,18 +879,17 @@ module.exports = {
         _(
           "Modify an object restitution. Energy conservation on collision. The combined restitution from two bodies is calculated as 'max(bodyA.restitution, bodyB.restitution)'."
         ),
-        _('Do _PARAM2__PARAM3_ to the restitution of _PARAM0_'),
+        _('the restitution'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value (non-negative)'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRestitution')
-      .setManipulatedType('number')
+      
       .setGetter('getRestitution');
 
     aut
@@ -926,18 +910,16 @@ module.exports = {
         'LinearDamping',
         _('Linear damping'),
         _('Test an object linear damping.'),
-        _('_PARAM0_ linear damping is _PARAM2__PARAM3_'),
+        _('the _PARAM0_ linear damping'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getLinearDamping')
-      .setManipulatedType('number');
+      .setFunctionName('getLinearDamping');
 
     aut
       .addAction(
@@ -946,18 +928,17 @@ module.exports = {
         _(
           'Modify an object linear damping. How much movement speed is lost across the time.'
         ),
-        _('Do _PARAM2__PARAM3_ to the linear damping of _PARAM0_'),
+        _('the linear damping'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setLinearDamping')
-      .setManipulatedType('number')
+      
       .setGetter('getLinearDamping');
 
     aut
@@ -978,18 +959,16 @@ module.exports = {
         'AngularDamping',
         _('Angular damping'),
         _('Test an object angular damping.'),
-        _('_PARAM0_ angular damping is _PARAM2__PARAM3_'),
+        _('the _PARAM0_ angular damping'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getAngularDamping')
-      .setManipulatedType('number');
+      .setFunctionName('getAngularDamping');
 
     aut
       .addAction(
@@ -998,18 +977,17 @@ module.exports = {
         _(
           'Modify an object angular damping. How much angular speed is lost across the time.'
         ),
-        _('Do _PARAM2__PARAM3_ to the angular damping of _PARAM0_'),
+        _('the angular damping'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setAngularDamping')
-      .setManipulatedType('number')
+      
       .setGetter('getAngularDamping');
 
     aut
@@ -1030,18 +1008,16 @@ module.exports = {
         'GravityScale',
         _('Gravity scale'),
         _('Test an object gravity scale.'),
-        _('_PARAM0_ gravity scale is _PARAM2__PARAM3_'),
+        _('the _PARAM0_ gravity scale'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getGravityScale')
-      .setManipulatedType('number');
+      .setFunctionName('getGravityScale');
 
     aut
       .addAction(
@@ -1050,18 +1026,17 @@ module.exports = {
         _(
           'Modify an object gravity scale. The gravity applied to an object is the world gravity multiplied by the object gravity scale.'
         ),
-        _('Do _PARAM2__PARAM3_ to the gravity scale of _PARAM0_'),
+        _('the gravity scale'),
         _('Body settings'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setGravityScale')
-      .setManipulatedType('number')
+      
       .setGetter('getGravityScale');
 
     aut
@@ -1156,36 +1131,33 @@ module.exports = {
         'LinearVelocityX',
         _('Linear velocity X'),
         _('Test an object linear velocity on X.'),
-        _('Linear velocity on X of _PARAM0_ is _PARAM2__PARAM3_'),
+        _('the linear velocity on X'),
         _('Velocity'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getLinearVelocityX')
-      .setManipulatedType('number');
+      .setFunctionName('getLinearVelocityX');
 
     aut
       .addAction(
         'LinearVelocityX',
         _('Linear velocity X'),
         _('Modify an object linear velocity on X.'),
-        _('Do _PARAM2__PARAM3_ to the linear velocity on X of _PARAM0_'),
+        _('the linear velocity on X'),
         _('Velocity'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value (pixels/second)'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setLinearVelocityX')
-      .setManipulatedType('number')
+      
       .setGetter('getLinearVelocityX');
 
     aut
@@ -1206,36 +1178,33 @@ module.exports = {
         'LinearVelocityY',
         _('Linear velocity Y'),
         _('Test an object linear velocity on Y.'),
-        _('Linear velocity on Y of _PARAM0_ is _PARAM2__PARAM3_'),
+        _('the linear velocity on Y'),
         _('Velocity'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getLinearVelocityY')
-      .setManipulatedType('number');
+      .setFunctionName('getLinearVelocityY');
 
     aut
       .addAction(
         'LinearVelocityY',
         _('Linear velocity Y'),
         _('Modify an object linear velocity on Y.'),
-        _('Do _PARAM2__PARAM3_ to the linear velocity on Y of _PARAM0_'),
+        _('the linear velocity on Y'),
         _('Velocity'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value (pixels/second)'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setLinearVelocityY')
-      .setManipulatedType('number')
+      
       .setGetter('getLinearVelocityY');
 
     aut
@@ -1256,18 +1225,16 @@ module.exports = {
         'LinearVelocityLength',
         _('Linear velocity'),
         _('Test an object linear velocity length.'),
-        _('Linear velocity length of _PARAM0_ is _PARAM2__PARAM3_'),
+        _('the linear velocity length'),
         _('Velocity'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getLinearVelocityLength')
-      .setManipulatedType('number');
+      .setFunctionName('getLinearVelocityLength');
 
     aut
       .addExpression(
@@ -1287,36 +1254,33 @@ module.exports = {
         'AngularVelocity',
         _('Angular velocity'),
         _('Test an object angular velocity.'),
-        _('Angular velocity of _PARAM0_ is _PARAM2__PARAM3_'),
+        _('the angular velocity'),
         _('Velocity'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getAngularVelocity')
-      .setManipulatedType('number');
+      .setFunctionName('getAngularVelocity');
 
     aut
       .addAction(
         'AngularVelocity',
         _('Angular velocity'),
         _('Modify an object angular velocity.'),
-        _('Do _PARAM2__PARAM3_ to the angular velocity of _PARAM0_'),
+        _('the angular velocity'),
         _('Velocity'),
         'res/physics24.png',
         'res/physics16.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value (º/s)'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setAngularVelocity')
-      .setManipulatedType('number')
+      
       .setGetter('getAngularVelocity');
 
     aut
@@ -1619,7 +1583,7 @@ module.exports = {
         'JointReactionForce',
         _('Joint reaction force'),
         _('Test a joint reaction force.'),
-        _('Joint _PARAM2_ reaction force is _PARAM3__PARAM4_'),
+        _('the joint _PARAM2_ reaction force'),
         _('Joints'),
         'res/physics24.png',
         'res/physics16.png'
@@ -1627,11 +1591,9 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getJointReactionForce')
-      .setManipulatedType('number');
+      .setFunctionName('getJointReactionForce');
 
     aut
       .addExpression(
@@ -1652,7 +1614,7 @@ module.exports = {
         'JointReactionTorque',
         _('Joint reaction torque'),
         _('Test a joint reaction torque.'),
-        _('Joint _PARAM2_ reaction torque is _PARAM3__PARAM4_'),
+        _('the joint _PARAM2_ reaction torque'),
         _('Joints'),
         'res/physics24.png',
         'res/physics16.png'
@@ -1660,11 +1622,9 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('relationalOperator', _('Sign of the test'))
-      .addParameter('expression', _('Value'))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('getJointReactionTorque')
-      .setManipulatedType('number');
+      .setFunctionName('getJointReactionTorque');
 
     aut
       .addExpression(
@@ -1758,7 +1718,7 @@ module.exports = {
         'DistanceJointLength',
         _('Distance joint length'),
         _('Modify a distance joint length.'),
-        _('Do _PARAM3__PARAM4_ to the length for distance joint _PARAM2_'),
+        _('the length for distance joint _PARAM2_'),
         _('Joints/Distance'),
         'JsPlatform/Extensions/distance_joint24.png',
         'JsPlatform/Extensions/distance_joint16.png'
@@ -1766,11 +1726,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setDistanceJointLength')
-      .setManipulatedType('number')
+      
       .setGetter('getDistanceJointLength');
 
     aut
@@ -1792,7 +1751,7 @@ module.exports = {
         'DistanceJointFrequency',
         _('Distance joint frequency'),
         _('Modify a distance joint frequency.'),
-        _('Do _PARAM3__PARAM4_ to the frequency for distance joint _PARAM2_'),
+        _('the frequency for distance joint _PARAM2_'),
         _('Joints/Distance'),
         'JsPlatform/Extensions/distance_joint24.png',
         'JsPlatform/Extensions/distance_joint16.png'
@@ -1800,11 +1759,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setDistanceJointFrequency')
-      .setManipulatedType('number')
+      
       .setGetter('getDistanceJointFrequency');
 
     aut
@@ -1826,9 +1784,7 @@ module.exports = {
         'DistanceJointDampingRatio',
         _('Distance joint damping ratio'),
         _('Modify a distance joint damping ratio.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the damping ratio for distance joint _PARAM2_'
-        ),
+        _('the damping ratio for distance joint _PARAM2_'),
         _('Joints/Distance'),
         'JsPlatform/Extensions/distance_joint24.png',
         'JsPlatform/Extensions/distance_joint16.png'
@@ -1836,11 +1792,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setDistanceJointDampingRatio')
-      .setManipulatedType('number')
+      
       .setGetter('getDistanceJointDampingRatio');
 
     aut
@@ -2125,7 +2080,7 @@ module.exports = {
         'RevoluteJointMotorSpeed',
         _('Revolute joint motor speed'),
         _('Modify a revolute joint motor speed.'),
-        _('Do _PARAM3__PARAM4_ to the motor speed for revolute joint _PARAM2_'),
+        _('the motor speed for revolute joint _PARAM2_'),
         _('Joints/Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
@@ -2133,11 +2088,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRevoluteJointMotorSpeed')
-      .setManipulatedType('number')
+      
       .setGetter('getRevoluteJointMotorSpeed');
 
     aut
@@ -2159,9 +2113,7 @@ module.exports = {
         'RevoluteJointMaxMotorTorque',
         _('Revolute joint max motor torque'),
         _('Modify a revolute joint maximum motor torque.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the maximum motor torque for revolute joint _PARAM2_'
-        ),
+        _('the maximum motor torque for revolute joint _PARAM2_'),
         _('Joints/Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
@@ -2169,11 +2121,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRevoluteJointMaxMotorTorque')
-      .setManipulatedType('number')
+      
       .setGetter('getRevoluteJointMaxMotorTorque');
 
     aut
@@ -2443,9 +2394,7 @@ module.exports = {
         'PrismaticJointMotorSpeed',
         _('Prismatic joint motor speed'),
         _('Modify a prismatic joint motor speed.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the motor force for prismatic joint _PARAM2_'
-        ),
+        _('the motor force for prismatic joint _PARAM2_'),
         _('Joints/Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
@@ -2453,11 +2402,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setPrismaticJointMotorSpeed')
-      .setManipulatedType('number')
+      
       .setGetter('getPrismaticJointMotorSpeed');
 
     aut
@@ -2479,9 +2427,7 @@ module.exports = {
         'PrismaticJointMaxMotorForce',
         _('Prismatic joint max motor force'),
         _('Modify a prismatic joint maximum motor force.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the maximum motor force for prismatic joint _PARAM2_'
-        ),
+        _('the maximum motor force for prismatic joint _PARAM2_'),
         _('Joints/Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
@@ -2489,11 +2435,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setPrismaticJointMaxMotorForce')
-      .setManipulatedType('number')
+      
       .setGetter('getPrismaticJointMaxMotorForce');
 
     aut
@@ -2753,7 +2698,7 @@ module.exports = {
         'GearJointRatio',
         _('Gear joint ratio'),
         _('Modify a Gear joint ratio.'),
-        _('Do _PARAM3__PARAM4_ to the ratio for gear joint _PARAM2_'),
+        _('the ratio for gear joint _PARAM2_'),
         _('Joints/Gear'),
         'JsPlatform/Extensions/gear_joint24.png',
         'JsPlatform/Extensions/gear_joint16.png'
@@ -2761,11 +2706,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setGearJointRatio')
-      .setManipulatedType('number')
+      
       .setGetter('getGearJointRatio');
 
     aut
@@ -2880,7 +2824,7 @@ module.exports = {
         'MouseJointMaxForce',
         _('Mouse joint max force'),
         _('Set a mouse joint maximum force.'),
-        _('Do _PARAM3__PARAM4_ to the maximum force for mouse joint _PARAM2_'),
+        _('the maximum force for mouse joint _PARAM2_'),
         _('Joints/Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
@@ -2888,11 +2832,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMouseJointMaxForce')
-      .setManipulatedType('number')
+      
       .setGetter('getMouseJointMaxForce');
 
     aut
@@ -2914,7 +2857,7 @@ module.exports = {
         'MouseJointFrequency',
         _('Mouse joint frequency'),
         _('Set a mouse joint frequency.'),
-        _('Do _PARAM3__PARAM4_ to the frequency for mouse joint _PARAM2_'),
+        _('the frequency for mouse joint _PARAM2_'),
         _('Joints/Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
@@ -2922,11 +2865,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMouseJointFrequency')
-      .setManipulatedType('number')
+      
       .setGetter('getMouseJointFrequency');
 
     aut
@@ -2948,7 +2890,7 @@ module.exports = {
         'MouseJointDampingRatio',
         _('Mouse joint damping ratio'),
         _('Set a mouse joint damping ratio.'),
-        _('Do _PARAM3__PARAM4_ to the damping ratio for mouse joint _PARAM2_'),
+        _('the damping ratio for mouse joint _PARAM2_'),
         _('Joints/Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
@@ -2956,11 +2898,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMouseJointDampingRatio')
-      .setManipulatedType('number')
+      
       .setGetter('getMouseJointDampingRatio');
 
     aut
@@ -3119,7 +3060,7 @@ module.exports = {
         'WheelJointMotorSpeed',
         _('Wheel joint motor speed'),
         _('Modify a wheel joint motor speed.'),
-        _('Do _PARAM3__PARAM4_ to the motor speed for wheel joint _PARAM2_'),
+        _('the motor speed for wheel joint _PARAM2_'),
         _('Joints/Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
@@ -3127,11 +3068,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointMotorSpeed')
-      .setManipulatedType('number')
+      
       .setGetter('getWheelJointMotorSpeed');
 
     aut
@@ -3153,9 +3093,7 @@ module.exports = {
         'WheelJointMaxMotorTorque',
         _('Wheel joint max motor torque'),
         _('Modify a wheel joint maximum motor torque.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the maximum motor torque for wheel joint _PARAM2_'
-        ),
+        _('the maximum motor torque for wheel joint _PARAM2_'),
         _('Joints/Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
@@ -3163,11 +3101,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointMaxMotorTorque')
-      .setManipulatedType('number')
+      
       .setGetter('getWheelJointMaxMotorTorque');
 
     aut
@@ -3203,7 +3140,7 @@ module.exports = {
         'WheelJointFrequency',
         _('Wheel joint frequency'),
         _('Modify a wheel joint frequency.'),
-        _('Do _PARAM3__PARAM4_ to the frequency for wheel joint _PARAM2_'),
+        _('the frequency for wheel joint _PARAM2_'),
         _('Joints/Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
@@ -3211,11 +3148,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointFrequency')
-      .setManipulatedType('number')
+      
       .setGetter('getWheelJointFrequency');
 
     aut
@@ -3237,7 +3173,7 @@ module.exports = {
         'WheelJointDampingRatio',
         _('Wheel joint damping ratio'),
         _('Modify a wheel joint damping ratio.'),
-        _('Do _PARAM3__PARAM4_ to the damping ratio for wheel joint _PARAM2_'),
+        _('the damping ratio for wheel joint _PARAM2_'),
         _('Joints/Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
@@ -3245,11 +3181,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointDampingRatio')
-      .setManipulatedType('number')
+      
       .setGetter('getWheelJointDampingRatio');
 
     aut
@@ -3335,7 +3270,7 @@ module.exports = {
         'WeldJointFrequency',
         _('Weld joint frequency'),
         _('Modify a weld joint frequency.'),
-        _('Do _PARAM3__PARAM4_ to the frequency for weld joint _PARAM2_'),
+        _('the frequency for weld joint _PARAM2_'),
         _('Joints/Weld'),
         'JsPlatform/Extensions/weld_joint24.png',
         'JsPlatform/Extensions/weld_joint16.png'
@@ -3343,11 +3278,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWeldJointFrequency')
-      .setManipulatedType('number')
+      
       .setGetter('getWeldJointFrequency');
 
     aut
@@ -3369,7 +3303,7 @@ module.exports = {
         'WeldJointDampingRatio',
         _('Weld joint damping ratio'),
         _('Modify a weld joint damping ratio.'),
-        _('Do _PARAM3__PARAM4_ to the damping ratio for weld joint _PARAM2_'),
+        _('the damping ratio for weld joint _PARAM2_'),
         _('Joints/Weld'),
         'JsPlatform/Extensions/weld_joint24.png',
         'JsPlatform/Extensions/weld_joint16.png'
@@ -3377,11 +3311,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWeldJointDampingRatio')
-      .setManipulatedType('number')
+      
       .setGetter('getWeldJointDampingRatio');
 
     aut
@@ -3446,7 +3379,7 @@ module.exports = {
         'RopeJointMaxLength',
         _('Rope joint max length'),
         _('Modify a rope joint maximum length.'),
-        _('Do _PARAM3__PARAM4_ to the maximum length for rope joint _PARAM2_'),
+        _('the maximum length for rope joint _PARAM2_'),
         _('Joints/Rope'),
         'JsPlatform/Extensions/rope_joint24.png',
         'JsPlatform/Extensions/rope_joint16.png'
@@ -3454,11 +3387,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRopeJointMaxLength')
-      .setManipulatedType('number')
+      
       .setGetter('getRopeJointMaxLength');
 
     aut
@@ -3516,9 +3448,7 @@ module.exports = {
         'FrictionJointMaxForce',
         _('Friction joint max force'),
         _('Modify a friction joint maximum force.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the maximum force for friction joint _PARAM2_'
-        ),
+        _('the maximum force for friction joint _PARAM2_'),
         _('Joints/Friction'),
         'JsPlatform/Extensions/friction_joint24.png',
         'JsPlatform/Extensions/friction_joint16.png'
@@ -3526,11 +3456,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setFrictionJointMaxForce')
-      .setManipulatedType('number')
+      
       .setGetter('getFrictionJointMaxForce');
 
     aut
@@ -3552,9 +3481,7 @@ module.exports = {
         'FrictionJointMaxTorque',
         _('Friction joint max torque'),
         _('Modify a friction joint maximum torque.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the maximum torque for friction joint _PARAM2_'
-        ),
+        _('the maximum torque for friction joint _PARAM2_'),
         _('Joints/Friction'),
         'JsPlatform/Extensions/friction_joint24.png',
         'JsPlatform/Extensions/friction_joint16.png'
@@ -3562,11 +3489,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setFrictionJointMaxTorque')
-      .setManipulatedType('number')
+      
       .setGetter('getFrictionJointMaxTorque');
 
     aut
@@ -3673,7 +3599,7 @@ module.exports = {
         'MotorJointAngularOffset',
         _('Motor joint angular offset'),
         _('Modify a motor joint angular offset.'),
-        _('Do _PARAM3__PARAM4_ to the angular offset for motor joint _PARAM2_'),
+        _('the angular offset for motor joint _PARAM2_'),
         _('Joints/Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
@@ -3681,11 +3607,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointAngularOffset')
-      .setManipulatedType('number')
+      
       .setGetter('getMotorJointAngularOffset');
 
     aut
@@ -3707,7 +3632,7 @@ module.exports = {
         'MotorJointMaxForce',
         _('Motor joint max force'),
         _('Modify a motor joint maximum force.'),
-        _('Do _PARAM3__PARAM4_ to the maximum force for motor joint _PARAM2_'),
+        _('the maximum force for motor joint _PARAM2_'),
         _('Joints/Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
@@ -3715,11 +3640,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointMaxForce')
-      .setManipulatedType('number')
+      
       .setGetter('getMotorJointMaxForce');
 
     aut
@@ -3741,7 +3665,7 @@ module.exports = {
         'MotorJointMaxTorque',
         _('Motor joint max torque'),
         _('Modify a motor joint maximum torque.'),
-        _('Do _PARAM3__PARAM4_ to the maximum torque for motor joint _PARAM2_'),
+        _('the maximum torque for motor joint _PARAM2_'),
         _('Joints/Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
@@ -3749,11 +3673,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointMaxTorque')
-      .setManipulatedType('number')
+      
       .setGetter('getMotorJointMaxTorque');
 
     aut
@@ -3775,9 +3698,7 @@ module.exports = {
         'MotorJointCorrectionFactor',
         _('Motor joint correction factor'),
         _('Modify a motor joint correction factor.'),
-        _(
-          'Do _PARAM3__PARAM4_ to the correction factor for motor joint _PARAM2_'
-        ),
+        _('the correction factor for motor joint _PARAM2_'),
         _('Joints/Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
@@ -3785,11 +3706,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('operator', _("Modification's sign"))
-      .addParameter('expression', _('Value'))
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointCorrectionFactor')
-      .setManipulatedType('number')
+      
       .setGetter('getMotorJointCorrectionFactor');
 
     aut

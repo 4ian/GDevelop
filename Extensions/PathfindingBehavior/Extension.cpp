@@ -83,242 +83,210 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddAction("CellWidth",
                   _("Width of the cells"),
                   _("Change the width of the cells of the virtual grid."),
-                  _("Do _PARAM2__PARAM3_ to the width of the virtual cells of "
-                    "_PARAM0_"),
+                  _("the width of the virtual cells"),
                   _("Virtual grid"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Width (pixels)"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetCellWidth")
         .SetGetter("GetCellWidth")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition(
            "CellWidth",
            _("Width of the virtual grid"),
            _("Compare the width of the cells of the virtual grid."),
-           _("Width of the virtual cells of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the width of the virtual cells"),
            _("Virtual grid"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Width (pixels)"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetCellWidth")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("CellHeight",
                   _("Height of the cells"),
                   _("Change the height of the cells of the virtual grid."),
-                  _("Do _PARAM2__PARAM3_ to the height of the virtual cells of "
-                    "_PARAM0_"),
+                  _("the height of the virtual cells"),
                   _("Virtual grid"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Height (pixels)"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetCellHeight")
         .SetGetter("GetCellHeight")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition(
            "CellHeight",
            _("Height of the virtual grid"),
            _("Compare the height of the cells of the virtual grid."),
-           _("Height of the virtual cells of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the height of the virtual cells"),
            _("Virtual grid"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Height (pixels)"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetCellHeight")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "Acceleration",
            _("Acceleration"),
            _("Change the acceleration when moving the object"),
-           _("Do _PARAM2__PARAM3_ to the acceleration of _PARAM0_ on the path"),
+           _("the acceleration on the path"),
            _("Path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetAcceleration")
         .SetGetter("GetAcceleration")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("Acceleration",
                      _("Acceleration"),
                      _("Compare the acceleration when moving the object"),
-                     _("Acceleration of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the acceleration"),
                      _("Path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetAcceleration")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "MaxSpeed",
            _("Maximum speed"),
            _("Change the maximum speed when moving the object"),
-           _("Do _PARAM2__PARAM3_ to the max. speed of _PARAM0_ on the path"),
+           _("the max. speed on the path"),
            _("Path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetMaxSpeed")
         .SetGetter("GetMaxSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("MaxSpeed",
                      _("Maximum speed"),
                      _("Compare the maximum speed when moving the object"),
-                     _("Max. speed of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the max. speed"),
                      _("Path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetMaxSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("Speed",
                   _("Speed"),
                   _("Change the speed of the object on the path"),
-                  _("Do _PARAM2__PARAM3_ to the speed of _PARAM0_ on the path"),
+                  _("the speed on the path"),
                   _("Path"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetSpeed")
         .SetGetter("GetSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("Speed",
                      _("Speed"),
                      _("Compare the speed of the object on the path"),
-                     _("Speed of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the speed"),
                      _("Path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("AngularMaxSpeed",
                   _("Angular maximum speed"),
                   _("Change the maximum angular speed when moving the object"),
-                  _("Do _PARAM2__PARAM3_ to the max. angular speed of _PARAM0_ "
-                    "on the path"),
+                  _("the max. angular speed on the path"),
                   _("Path"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetAngularMaxSpeed")
         .SetGetter("GetAngularMaxSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition(
            "AngularMaxSpeed",
            _("Angular maximum speed"),
            _("Compare the maximum angular speed when moving the object"),
-           _("Max. angular speed of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the max. angular speed"),
            _("Path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetAngularMaxSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "AngleOffset",
            _("Rotation offset"),
            _("Change the rotation offset applied when moving the object"),
-           _("Do _PARAM2__PARAM3_ to the rotation offset of _PARAM0_ on the "
-             "path"),
+           _("the rotation offset on the path"),
            _("Path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetAngleOffset")
         .SetGetter("GetAngleOffset")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("AngleOffset",
                      _("Rotation offset"),
                      _("Compare the rotation offset when moving the object"),
-                     _("Rotation offset of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the rotation offset"),
                      _("Path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetAngleOffset")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
@@ -326,36 +294,31 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Extra border"),
            _("Change the size of the extra border applied to the object when "
              "planning a path"),
-           _("Do _PARAM2__PARAM3_ to the extra border of _PARAM0_ on the path"),
+           _("the extra border on the path"),
            _("Path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value (in pixels)"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetExtraBorder")
         .SetGetter("GetExtraBorder")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("ExtraBorder",
                      _("Extra border"),
                      _("Compare the size of the extra border applied to the "
                        "object when planning a path"),
-                     _("Size of the extra border applied to _PARAM0_ is "
-                       "_PARAM2__PARAM3_"),
+                     _("the size of the extra border applied to _PARAM0_"),
                      _("Path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value (in pixels)"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetExtraBorder")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
@@ -617,34 +580,30 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddAction("Cost",
                   _("Cost"),
                   _("Change the cost of going through the object."),
-                  _("Do _PARAM2__PARAM3_ to the cost of _PARAM0_"),
+                  _("the cost"),
                   _("Obstacles"),
                   "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                   "CppPlatform/Extensions/pathfindingobstacleicon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Difficulty"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetCost")
         .SetGetter("GetCost")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddCondition("Cost",
                      _("Cost"),
                      _("Compare the cost of going through the object"),
-                     _("Cost of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the cost"),
                      _("Obstacles"),
                      "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                      "CppPlatform/Extensions/pathfindingobstacleicon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Difficulty"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetCost")
-        .SetManipulatedType("number")
         .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddAction("SetImpassable",

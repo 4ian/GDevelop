@@ -25,27 +25,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddCondition("VarScene",
                     _("Value of a scene variable"),
                     _("Compare the value of a scene variable."),
-                    _("Scene variable _PARAM0_ is _PARAM1__PARAM2_"),
+                    _("the scene variable _PARAM0_"),
                     _("Variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   extension
       .AddCondition("VarSceneTxt",
                     _("Text of a scene variable"),
                     _("Compare the text of a scene variable."),
-                    _("The text of scene variable _PARAM0_ is _PARAM1__PARAM2_"),
+                    _("the text of scene variable _PARAM0_"),
                     _("Variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to compare"))
-      .SetManipulatedType("string");
+      .UseStandardRelationalOperatorParameters("string");
 
   extension
       .AddCondition(
@@ -89,30 +85,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddCondition("VarGlobal",
                     _("Value of a global variable"),
                     _("Compare the value of a global variable."),
-                    _("Global variable _PARAM0_ is _PARAM1__PARAM2_"),
+                    _("the global variable _PARAM0_"),
                     _("Variables/Global variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition(
           "VarGlobalTxt",
           _("Text of a global variable"),
           _("Compare the text of a global variable."),
-          _("The text of the global variable _PARAM0_ is _PARAM1__PARAM2_"),
+          _("the text of the global variable _PARAM0_"),
           _("Variables/Global variables"),
           "res/conditions/var24.png",
           "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to compare"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("string");
+      .UseStandardRelationalOperatorParameters("string")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition("VarGlobalDef",
@@ -131,56 +123,48 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddAction("ModVarScene",
                  _("Value of a scene variable"),
                  _("Modify the value of a scene variable."),
-                 _("Do _PARAM1__PARAM2_ to scene variable _PARAM0_"),
+                 _("the scene variable _PARAM0_"),
                  _("Variables"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   extension
       .AddAction("ModVarSceneTxt",
                  _("String of a scene variable"),
                  _("Modify the text of a scene variable."),
-                 _("Do _PARAM1__PARAM2_ to the text of scene variable _PARAM0_"),
+                 _("the text of scene variable _PARAM0_"),
                  _("Variables"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("string", _("Text"))
-      .SetManipulatedType("string");
+      .UseStandardOperatorParameters("string");
 
   extension
       .AddAction("ModVarGlobal",
                  _("Value of a global variable"),
                  _("Modify the value of a global variable"),
-                 _("Do _PARAM1__PARAM2_ to global variable _PARAM0_"),
+                 _("the global variable _PARAM0_"),
                  _("Variables/Global variables"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddAction(
           "ModVarGlobalTxt",
           _("String of a global variable"),
           _("Modify the text of a global variable."),
-          _("Do _PARAM1__PARAM2_ to the text of global variable _PARAM0_"),
+          _("the text of global variable _PARAM0_"),
           _("Variables/Global variables"),
           "res/actions/var24.png",
           "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("string", _("Text"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("string");
+      .UseStandardOperatorParameters("string")
+      .MarkAsAdvanced();
 
   extension
       .AddAction("VariableRemoveChild",

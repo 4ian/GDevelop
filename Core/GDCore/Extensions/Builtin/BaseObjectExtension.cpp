@@ -27,58 +27,50 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition("PosX",
                    _("Compare X position of an object"),
                    _("Compare the X position of the object."),
-                   _("The X position of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the X position"),
                    _("Position"),
                    "res/conditions/position24.png",
                    "res/conditions/position.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("X position"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddAction("MettreX",
                 _("X position of an object"),
                 _("Change the X position of an object."),
-                _("Do _PARAM1__PARAM2_ to the X position of _PARAM0_"),
+                _("the X position"),
                 _("Position"),
                 "res/actions/position24.png",
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddCondition("PosY",
                    _("Compare Y position of an object"),
                    _("Compare the Y position of an object."),
-                   _("The Y position of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the Y position"),
                    _("Position"),
                    "res/conditions/position24.png",
                    "res/conditions/position.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Y position"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddAction("MettreY",
                 _("Y position of an object"),
                 _("Change the Y position of an object."),
-                _("Do _PARAM1__PARAM2_ to the Y position of _PARAM0_"),
+                _("the Y position"),
                 _("Position"),
                 "res/actions/position24.png",
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddAction(
          "MettreXY",
@@ -117,15 +109,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("SetAngle",
                 _("Angle"),
                 _("Change the angle of rotation of an object."),
-                _("Do _PARAM1__PARAM2_ to angle of _PARAM0_"),
+                _("the angle"),
                 _("Angle"),
                 "res/actions/direction24.png",
                 "res/actions/direction.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddAction("Rotate",
                 _("Rotate"),
@@ -271,15 +261,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("ChangePlan",
                 _("Z order"),
                 _("Modify the Z-order of an object"),
-                _("Do _PARAM1__PARAM2_ to Z-order of _PARAM0_"),
+                _("the z-order"),
                 _("Z order"),
                 "res/actions/planicon24.png",
                 "res/actions/planicon.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddAction("ChangeLayer",
                 _("Layer"),
@@ -297,31 +285,27 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("ModVarObjet",
                 _("Modify a variable of an object"),
                 _("Modify the value of a variable of an object"),
-                _("Do _PARAM2__PARAM3_ to variable _PARAM1_ of _PARAM0_"),
+                _("the variable _PARAM1_"),
                 _("Variables"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddAction(
          "ModVarObjetTxt",
          _("Modify the text of a variable of an object"),
          _("Modify the text of a variable of an object"),
-         _("Do _PARAM2__PARAM3_ to the text of variable _PARAM1_ of _PARAM0_"),
+         _("the text of variable _PARAM1_"),
          _("Variables"),
          "res/actions/var24.png",
          "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("string", _("Text"))
-      .SetManipulatedType("string");
+      .UseStandardOperatorParameters("string");
 
   obj.AddCondition(
          "ObjectVariableChildExists",
@@ -385,30 +369,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition("Angle",
                    _("Angle"),
                    _("Compare the angle of the specified object."),
-                   _("Angle of _PARAM0_ is _PARAM1__PARAM2_ deg."),
+                   _("the angle (in degrees)"),
                    _("Angle"),
                    "res/conditions/direction24.png",
                    "res/conditions/direction.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare (in degrees)"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition("Plan",
                    _("Compare Z order"),
                    _("Compare the Z-order of the specified object."),
-                   _("Z Order of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the z Order"),
                    _("Z order"),
                    "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Z order"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition("Layer",
                    _("Compare layer"),
@@ -458,16 +438,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition("Vitesse",
                    _("Speed"),
                    _("Compare the overall speed of an object"),
-                   _("Overall speed of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the overall speed"),
                    _("Movement"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Speed"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition("AngleOfDisplacement",
                    _("Angle of movement"),
@@ -486,31 +464,27 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition("VarObjet",
                    _("Value of an object's variable"),
                    _("Compare the value of a variable of an object."),
-                   _("Variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("the variable _PARAM1_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddCondition(
          "VarObjetTxt",
          _("Text of an object's variable"),
          _("Compare the text of a variable of an object."),
-         _("The text of variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
+         _("the text of variable _PARAM1_"),
          _("Variables"),
          "res/conditions/var24.png",
          "res/conditions/var.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to test"))
-      .SetManipulatedType("string");
+      .UseStandardRelationalOperatorParameters("string");
 
   obj.AddCondition("VarObjetDef",
                    _("Variable defined"),
@@ -1046,15 +1020,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
             "compare that number to a value. If previous conditions on the "
             "objects have not been used, this condition counts how many of "
             "these objects exist in the current scene."),
-          _("The number of _PARAM0_ objects is _PARAM1__PARAM2_"),
+          _("the number objects"),
           _("Objects"),
           "res/conditions/nbObjet24.png",
           "res/conditions/nbObjet.png")
       .AddParameter("objectList", _("Object"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsSimple();
 
   extension
       .AddCondition(

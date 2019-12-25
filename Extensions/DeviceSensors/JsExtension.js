@@ -48,7 +48,7 @@ module.exports = {
         _(
           "Compare the value of orientation alpha. (Range: 0 to 360°)"
         ),
-        _("Orientation alpha is _PARAM0__PARAM1_"),
+        _("the orientation alpha"),
         _("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_alpha24.png",
         "JsPlatform/Extensions/orientation_alpha32.png"
@@ -68,7 +68,7 @@ module.exports = {
         _(
           "Compare the value of orientation beta. (Range: -180 to 180°)"
         ),
-        _("Orientation beta is _PARAM0__PARAM1_"),
+        _("the orientation beta"),
         _("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_beta24.png",
         "JsPlatform/Extensions/orientation_beta32.png"
@@ -88,7 +88,7 @@ module.exports = {
         _(
           "Compare the value of orientation gamma. (Range: -90 to 90°)"
         ),
-        _("Orientation gamma is _PARAM0__PARAM1_"),
+        _("the orientation gamma"),
         _("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_gamma24.png",
         "JsPlatform/Extensions/orientation_gamma32.png"
@@ -214,7 +214,7 @@ module.exports = {
         _(
           "Compare the value of rotation alpha. (Note: few devices support this sensor)"
         ),
-        _("Rotation alpha is _PARAM0__PARAM1_"),
+        _("the rotation alpha"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_rotation_alpha24.png",
         "JsPlatform/Extensions/motion_rotation_alpha32.png"
@@ -234,7 +234,7 @@ module.exports = {
         _(
           "Compare the value of rotation beta. (Note: few devices support this sensor)"
         ),
-        _("Rotation beta is _PARAM0__PARAM1_"),
+        _("the rotation beta"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_rotation_beta24.png",
         "JsPlatform/Extensions/motion_rotation_beta32.png"
@@ -254,7 +254,7 @@ module.exports = {
         _(
           "Compare the value of rotation gamma. (Note: few devices support this sensor)"
         ),
-        _("Rotation gamma is _PARAM0__PARAM1_"),
+        _("the rotation gamma"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_rotation_gamma24.png",
         "JsPlatform/Extensions/motion_rotation_gamma32.png"
@@ -274,7 +274,7 @@ module.exports = {
         _(
           "Compare the value of acceleration on the X-axis (m/s²)."
         ),
-        _("Acceleration X is _PARAM0__PARAM1_"),
+        _("the acceleration X"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_x24.png",
         "JsPlatform/Extensions/motion_acceleration_x32.png"
@@ -294,7 +294,7 @@ module.exports = {
         _(
           "Compare the value of acceleration on the Y-axis (m/s²)."
         ),
-        _("Acceleration Y is _PARAM0__PARAM1_"),
+        _("the acceleration Y"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_y24.png",
         "JsPlatform/Extensions/motion_acceleration_y32.png"
@@ -314,7 +314,7 @@ module.exports = {
         _(
           "Compare the value of acceleration on the Z-axis (m/s²)."
         ),
-        _("Acceleration Z is _PARAM0__PARAM1_"),
+        _("the acceleration Z"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_z24.png",
         "JsPlatform/Extensions/motion_acceleration_z32.png"

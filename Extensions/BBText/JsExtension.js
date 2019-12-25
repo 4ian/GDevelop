@@ -296,9 +296,9 @@ module.exports = {
         type: 'string',
         paramLabel: _('BBCode text'),
         conditionDescription: _('Compare the value of the BBCode text.'),
-        conditionSentence: _('The BBCode text of _PARAM0_ is _PARAM1__PARAM2_'),
+        conditionSentence: _('the BBCode text'),
         actionDescription: _('Set BBCode text'),
-        actionSentence: _('Do _PARAM1__PARAM2_ to the BBCode text of _PARAM0_'),
+        actionSentence: _('the BBCode text'),
         expressionDescription: _('Get BBCode text'),
         expressionSentence: _('Get BBCode text'),
       },
@@ -322,13 +322,9 @@ module.exports = {
         conditionDescription: _(
           'Compare the value of the base opacity of the text.'
         ),
-        conditionSentence: _(
-          'The base opacity of _PARAM0_ is _PARAM1__PARAM2_'
-        ),
+        conditionSentence: _('the base opacity'),
         actionDescription: _('Set base opacity'),
-        actionSentence: _(
-          'Do _PARAM1__PARAM2_ to the base opacity of _PARAM0_'
-        ),
+        actionSentence: _('the base opacity'),
         expressionDescription: _('Get the base opacity'),
         expressionSentence: _('Get the base opacity'),
       },
@@ -338,13 +334,9 @@ module.exports = {
         type: 'number',
         paramLabel: _('Font size'),
         conditionDescription: _('Compare the base font size of the text.'),
-        conditionSentence: _(
-          'The base font size of _PARAM0_ is _PARAM1__PARAM2_'
-        ),
+        conditionSentence: _('the base font size'),
         actionDescription: _('Set base font size'),
-        actionSentence: _(
-          'Do _PARAM1__PARAM2_ to the base font size of _PARAM0_'
-        ),
+        actionSentence: _('the base font size'),
         expressionDescription: _('Get the base font size'),
         expressionSentence: _('Get the base font size'),
       },
@@ -354,13 +346,9 @@ module.exports = {
         type: 'string',
         paramLabel: _('Font family'),
         conditionDescription: _('Compare the value of font family'),
-        conditionSentence: _(
-          'The base font family of _PARAM0_ is _PARAM1__PARAM2_'
-        ),
+        conditionSentence: _('the base font family'),
         actionDescription: _('Set font family'),
-        actionSentence: _(
-          'Do _PARAM1__PARAM2_ to the base font family of _PARAM0_'
-        ),
+        actionSentence: _('the base font family'),
         expressionDescription: _('Get the base font family'),
         expressionSentence: _('Get the base font family'),
       },
@@ -397,15 +385,11 @@ module.exports = {
         conditionDescription: _(
           'Compare the width, in pixels, after which the text is wrapped on next line.'
         ),
-        conditionSentence: _(
-          'The wrapping width of _PARAM0_ is _PARAM1__PARAM2_'
-        ),
+        conditionSentence: _('the wrapping width'),
         actionDescription: _(
           'Change the width, in pixels, after which the text is wrapped on next line.'
         ),
-        actionSentence: _(
-          'Do _PARAM1__PARAM2_ to the wrapping width of _PARAM0_'
-        ),
+        actionSentence: _('the wrapping width'),
         expressionDescription: _('Get the wrapping width'),
         expressionSentence: _('Get the wrapping width'),
       },

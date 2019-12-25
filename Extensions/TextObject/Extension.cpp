@@ -36,32 +36,28 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction("String",
                 _("Modify the text"),
                 _("Modify the text of a Text object."),
-                _("Do _PARAM1__PARAM2_ to the text of _PARAM0_"),
+                _("the text"),
                 "",
                 "res/actions/text24.png",
                 "res/actions/text.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("string", _("Text"))
+      .UseStandardOperatorParameters("string")
       .SetFunctionName("SetString")
-      .SetManipulatedType("string")
       .SetGetter("GetString")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("String",
                    _("Compare the text"),
                    _("Compare the text of a Text object."),
-                   _("Text of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the text"),
                    "",
                    "res/conditions/text24.png",
                    "res/conditions/text.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to compare"))
+      .UseStandardRelationalOperatorParameters("string")
       .SetFunctionName("GetString")
-      .SetManipulatedType("string")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction("Font",
@@ -80,110 +76,96 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Size",
                 _("Size"),
                 _("Change the size of the text."),
-                _("Do _PARAM1__PARAM2_ to the size of the text of _PARAM0_"),
+                _("the size of the text"),
                 "",
                 "res/actions/characterSize24.png",
                 "res/actions/characterSize.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetCharacterSize")
-      .SetManipulatedType("number")
       .SetGetter("GetCharacterSize")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("Size",
                    _("Size"),
                    _("Compare the size of the text"),
-                   _("The size of the text of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the size of the text"),
                    "",
                    "res/conditions/characterSize24.png",
                    "res/conditions/characterSize.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Size to test"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetCharacterSize")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
                    _("Compare the scale of the text on the X axis"),
-                   _("The X scale of the text _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the X scale of the text _PARAM0_"),
                    "Scale",
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("x-scale to test"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetScaleX")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
          "ScaleX",
          _("Scale on X axis"),
          _("Modify the scale of the text on the X axis (default scale is 1)"),
-         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_ on the X axis"),
+         _("the scale on the X axis"),
          _("Scale"),
          "res/actions/scaleWidth24.png",
          "res/actions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetScaleX")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("ScaleY",
                    _("Scale on Y axis"),
                    _("Compare the scale of the text on the Y axis"),
-                   _("The Y scale of the text _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the Y scale of the text _PARAM0_"),
                    "Scale",
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("y-scale to test"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetScaleY")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
          "ScaleY",
          _("Scale on Y axis"),
          _("Modify the scale of the text on the Y axis (default scale is 1)"),
-         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_ on the Y axis"),
+         _("the scale on the Y axis"),
          _("Scale"),
          "res/actions/scaleHeight24.png",
          "res/actions/scaleHeight.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetScaleY")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
          "Scale",
          _("Scale"),
          _("Modify the scale of the specified object (default scale is 1)"),
-         _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
+         _("the scale"),
          _("Scale"),
          "res/actions/scale24.png",
          "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetScale")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction(
@@ -263,16 +245,14 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Change text opacity"),
                 _("Change the opacity of a Text. 0 is fully transparent, 255 "
                   "is opaque (default)."),
-                _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
+                _("the opacity"),
                 "",
                 "res/actions/opacity24.png",
                 "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetOpacity")
-      .SetManipulatedType("number")
       .SetGetter("GetOpacity")
       .SetIncludeFile("TextObject/TextObject.h");
 
@@ -280,16 +260,14 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Opacity"),
                    _("Compare the opacity of a Text object, between 0 (fully "
                      "transparent) to 255 (opaque)."),
-                   _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the opacity"),
                    "",
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetOpacity")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction("SetSmooth",
@@ -395,32 +373,28 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Angle",
                 _("Angle"),
                 _("Modify the angle of a Text object."),
-                _("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
+                _("the angle"),
                 _("Rotation"),
                 "res/actions/rotate24.png",
                 "res/actions/rotate.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetAngle")
-      .SetManipulatedType("number")
       .SetGetter("GetAngle")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("Angle",
                    _("Angle"),
                    _("Compare the value of the angle of a Text object."),
-                   _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the angle"),
                    _("Rotation"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetAngle")
-      .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("Padding",
@@ -428,30 +402,26 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Compare the number of pixels around a text object. If "
                      "the shadow or the outline around the text are getting "
                      "cropped, raise this value."),
-                   _("The padding of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the padding"),
                    _("Style"),
                    "res/conditions/textPadding24.png",
                    "res/conditions/textPadding.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetPadding",
                 _("Padding"),
                 _("Set the number of pixels around a text object. If the "
                   "shadow or the outline around the text are getting cropped, "
                   "raise this value."),
-                _("Do _PARAM1__PARAM2_ to the padding of _PARAM0_"),
+                _("the padding"),
                 _("Style"),
                 "res/actions/textPadding24.png",
                 "res/actions/textPadding.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddAction("SetTextAlignment",
                 _("Alignment"),
@@ -473,15 +443,13 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("TextAlignment",
                    _("Alignment"),
                    _("Compare the text alignment of a multiline text object."),
-                   _("The alignment of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the alignment"),
                    _("Style"),
                    "res/conditions/textAlign24.png",
                    "res/conditions/textAlign.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to compare"))
-      .SetManipulatedType("string");
+      .UseStandardRelationalOperatorParameters("string");
 
   obj.AddAction(
          "SetWrapping",
@@ -509,28 +477,24 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction("WrappingWidth",
                 _("Wrapping width"),
                 _("Modify the word wrapping width of a Text object."),
-                _("Do _PARAM1__PARAM2_ to the wrapping width of _PARAM0_"),
+                _("the wrapping width"),
                 _("Style"),
                 "res/actions/wordWrap24.png",
                 "res/actions/wordWrap.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddCondition("WrappingWidth",
                    _("Wrapping width"),
                    _("Test the word wrapping width of a Text object."),
-                   _("The wrapping width of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the wrapping width"),
                    _("Style"),
                    "res/conditions/wordWrap24.png",
                    "res/conditions/wordWrap.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddExpression("Padding",
                     _("Padding"),

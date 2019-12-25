@@ -37,34 +37,30 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Additional border"),
                    _("Compare the additional border that the object must cross "
                      "before being deleted."),
-                   _("The additional border of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("the additional border"),
                    "",
                    "CppPlatform/Extensions/destroyoutsideicon24.png",
                    "CppPlatform/Extensions/destroyoutsideicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "DestroyOutside")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetExtraBorder")
-      .SetManipulatedType("number")
       .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
 
   aut.AddAction("ExtraBorder",
                 _("Additional border"),
                 _("Change the additional border that the object must cross "
                   "before being deleted."),
-                _("Do _PARAM2__PARAM3_ to the additional border of _PARAM0_"),
+                _("the additional border"),
                 "",
                 "CppPlatform/Extensions/destroyoutsideicon24.png",
                 "CppPlatform/Extensions/destroyoutsideicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "DestroyOutside")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetExtraBorder")
-      .SetManipulatedType("number")
       .SetGetter("GetExtraBorder")
       .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
 #endif

@@ -368,48 +368,42 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("OutlineSize",
                 _("Outline size"),
                 _("Modify the size of the outline of future drawings."),
-                _("Do _PARAM1__PARAM2_ to the size of the outline of _PARAM0_"),
+                _("the size of the outline"),
                 _("Setup"),
                 "res/actions/outlineSize24.png",
                 "res/actions/outlineSize.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Size in pixels"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetOutlineSize")
-      .SetManipulatedType("number")
       .SetGetter("GetOutlineSize")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddCondition("OutlineSize",
                    _("Outline size"),
                    _("Test the size of the outline."),
-                   _("The size of the outline of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the size of the outline"),
                    _("Setup"),
                    "res/conditions/outlineSize24.png",
                    "res/conditions/outlineSize.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Size to test"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetOutlineSize")
-      .SetManipulatedType("number")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction(
          "FillOpacity",
          _("Fill opacity"),
          _("Modify the opacity level used when filling future drawings."),
-         _("Do _PARAM1__PARAM2_ to the opacity of filling of _PARAM0_"),
+         _("the opacity of filling"),
          _("Setup"),
          "res/actions/opacity24.png",
          "res/actions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetFillOpacity")
-      .SetManipulatedType("number")
       .SetGetter("GetFillOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -417,32 +411,28 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          "FillOpacity",
          _("Fill opacity"),
          _("Test the value of the opacity level used when filling."),
-         _("The opacity level when filling of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("the opacity level when filling"),
          _("Setup"),
          "res/conditions/opacity24.png",
          "res/conditions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetFillOpacity")
-      .SetManipulatedType("number")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction(
          "OutlineOpacity",
          _("Outline opacity"),
          _("Modify the opacity of the outline of future drawings."),
-         _("Do _PARAM1__PARAM2_ to the opacity of the outline of _PARAM0_"),
+         _("the opacity of the outline"),
          _("Setup"),
          "res/actions/opacity24.png",
          "res/actions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetOutlineOpacity")
-      .SetManipulatedType("number")
       .SetGetter("GetOutlineOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -450,16 +440,14 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          "OutlineOpacity",
          _("Outline opacity"),
          _("Test the opacity of the outline."),
-         _("The opacity of the outline of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("the opacity of the outline"),
          _("Setup"),
          "res/conditions/opacity24.png",
          "res/conditions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetOutlineOpacity")
-      .SetManipulatedType("number")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
 #endif

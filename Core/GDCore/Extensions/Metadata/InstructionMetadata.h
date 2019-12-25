@@ -488,7 +488,7 @@ class GD_CORE_API InstructionMetadata {
      *  obj.AddAction("String",
      *                 _("Change the string"),
      *                 _("Change the string of a text"),
-     *                 _("Do _PARAM1__PARAM2_ to the string of _PARAM0_"),
+     *                 _("the string"),
      *                 _("Text"),
      *                 "CppPlatform/Extensions/text24.png",
      *                 "CppPlatform/Extensions/text.png");

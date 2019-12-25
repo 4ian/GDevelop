@@ -132,232 +132,204 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddAction("Acceleration",
                 _("Acceleration"),
                 _("Change the acceleration of the object"),
-                _("Do _PARAM2__PARAM3_ to the acceleration of _PARAM0_"),
+                _("the acceleration"),
                 _("Movement"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetAcceleration")
       .SetGetter("GetAcceleration")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("Acceleration",
                    _("Acceleration"),
                    _("Compare the acceleration of the object"),
-                   _("Acceleration of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("the acceleration"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetAcceleration")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("Deceleration",
                 _("Deceleration"),
                 _("Change the deceleration of the object"),
-                _("Do _PARAM2__PARAM3_ to the deceleration of _PARAM0_"),
+                _("the deceleration"),
                 _("Movement"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetDeceleration")
       .SetGetter("GetDeceleration")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("Deceleration",
                    _("Deceleration"),
                    _("Compare the deceleration of the object"),
-                   _("Deceleration of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("the deceleration"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetDeceleration")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("MaxSpeed",
                 _("Maximum speed"),
                 _("Change the maximum speed of the object"),
-                _("Do _PARAM2__PARAM3_ to the max. speed of _PARAM0_"),
+                _("the max. speed"),
                 _("Movement"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .SetFunctionName("SetMaxSpeed")
       .SetGetter("GetMaxSpeed")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("MaxSpeed",
                    _("Maximum speed"),
                    _("Compare the maximum speed of the object"),
-                   _("Max. speed of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("the max. speed"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetMaxSpeed")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("Speed",
                    _("Speed"),
                    _("Compare the speed of the object"),
-                   _("Speed of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("the speed"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetSpeed")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("AngularMaxSpeed",
                 _("Angular maximum speed"),
                 _("Change the maximum angular speed of the object"),
-                _("Do _PARAM2__PARAM3_ to the max. angular speed of _PARAM0_"),
+                _("the max. angular speed"),
                 _("Movement"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetAngularMaxSpeed")
       .SetGetter("GetAngularMaxSpeed")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("AngularMaxSpeed",
                    _("Angular maximum speed"),
                    _("Compare the maximum angular speed of the object"),
-                   _("Max. angular speed of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("the max. angular speed"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetAngularMaxSpeed")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("AngleOffset",
                 _("Rotation offset"),
                 _("Change the rotation offset applied when moving the object"),
-                _("Do _PARAM2__PARAM3_ to the rotation offset of _PARAM0_"),
+                _("the rotation offset"),
                 _("Movement"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetAngleOffset")
       .SetGetter("GetAngleOffset")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "AngleOffset",
          _("Rotation offset"),
          _("Compare the rotation offset applied when moving the object"),
-         _("Rotation offset of _PARAM0_ is _PARAM2__PARAM3_"),
+         _("the rotation offset"),
          _("Movement"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetAngleOffset")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "Angle",
          _("Angle of movement"),
          _("Compare the angle of the top-down movemement of the object."),
-         _("Angle of movemement of _PARAM0_ is _PARAM2__PARAM3_"),
+         _("the angle of movemement"),
          _("Movement"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetAngle")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "XVelocity",
          _("Speed on X axis"),
          _("Compare the velocity of the top-down movemement of the object on the X axis."),
-         _("Speed of movemement on X axis of _PARAM0_ is _PARAM2__PARAM3_"),
+         _("the speed of movemement on X axis"),
          _("Movement"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetXVelocity")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "YVelocity",
          _("Speed on Y axis"),
          _("Compare the velocity of the top-down movemement of the object on the Y axis."),
-         _("Speed of movemement on Y axis of _PARAM0_ is _PARAM2__PARAM3_"),
+         _("the speed of movemement on Y axis"),
          _("Movement"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("GetYVelocity")
-      .SetManipulatedType("number")
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("AllowDiagonals",

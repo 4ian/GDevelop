@@ -55,7 +55,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCondition("Count",
                     _("Item count"),
                     _("Compare the number of an item in an inventory."),
-                    _("Count of _PARAM2_ in _PARAM1_ is _PARAM3__PARAM4_"),
+                    _("the count of _PARAM2_ in _PARAM1_"),
                     _("Inventories"),
                     "CppPlatform/Extensions/Inventoryicon24.png",
                     "CppPlatform/Extensions/Inventoryicon16.png")
@@ -63,11 +63,9 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Count"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("InventoryTools::Count")
-      .SetIncludeFile("Inventory/InventoryTools.h")
-      .SetManipulatedType("number");
+      .SetIncludeFile("Inventory/InventoryTools.h");
 
   extension
       .AddCondition("Has",

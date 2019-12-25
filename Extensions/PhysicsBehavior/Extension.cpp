@@ -352,50 +352,44 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            "LinearVelocityX",
            _("X component"),
            _("Compare the linear velocity on the X axis of the object."),
-           _("Linear velocity on X axis of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the linear velocity on X axis"),
            _("Displacement"),
            "res/physics24.png",
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityX")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition(
            "LinearVelocityY",
            _("Y component"),
            _("Compare the linear velocity on the Y axis of the object."),
-           _("Linear velocity on Y axis of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the linear velocity on Y axis"),
            _("Displacement"),
            "res/physics24.png",
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityY")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("LinearVelocity",
                      _("Linear speed"),
                      _("Compare the linear velocity of the object."),
-                     _("Linear velocity of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the linear velocity"),
                      _("Displacement"),
                      "res/physics24.png",
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocity")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetAngularVelocity",
@@ -415,33 +409,29 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddCondition("AngularVelocity",
                      _("Angular speed"),
                      _("Compare the angular speed of the object."),
-                     _("Angular speed of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the angular speed"),
                      _("Rotation"),
                      "res/physics24.png",
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularVelocity")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("LinearDamping",
                      _("Linear damping"),
                      _("Compare the linear damping of the object."),
-                     _("Linear damping of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the linear damping"),
                      _("Displacement"),
                      "res/physics24.png",
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearDamping")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition("CollisionWith",
@@ -478,17 +468,15 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddCondition("AngularDamping",
                      _("Angular damping"),
                      _("Test the object's angular damping"),
-                     _("Angular damping of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the angular damping"),
                      _("Displacement"),
                      "res/physics24.png",
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularDamping")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddAction("SetAngularDamping",
@@ -556,36 +544,30 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            "GetPolygonScaleX",
            _("Collision polygon X scale"),
            _("Test the value of the X scale of the collision polygon."),
-           _("The X scale of the collision polygon of _PARAM0_ is "
-             "_PARAM2__PARAM3_"),
+           _("the X scale of the collision polygon"),
            _("Collision polygon"),
            "res/physics24.png",
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleX")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddCondition(
            "GetPolygonScaleY",
            _("Collision polygon Y scale"),
            _("Test the value of the Y scale of the collision polygon."),
-           _("The Y scale of the collision polygon of _PARAM0_ is "
-             "_PARAM2__PARAM3_"),
+           _("the Y scale of the collision polygon"),
            _("Collision polygon"),
            "res/physics24.png",
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleY")
-        .SetManipulatedType("number")
         .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
 
     aut.AddExpression("PolygonScaleX",

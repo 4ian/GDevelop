@@ -164,35 +164,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition("SourisX",
                     _("Cursor X position"),
                     _("Compare the X position of the cursor or of a touch."),
-                    _("Cursor X position is _PARAM1__PARAM2_"),
+                    _("the cursor X position"),
                     _("Mouse and touch"),
                     "res/conditions/mouse24.png",
                     "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("X position"))
+      .UseStandardRelationalOperatorParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0")
-      .SetManipulatedType("number");
+      .SetDefaultValue("0");
 
   extension
       .AddCondition("SourisY",
                     _("Cursor Y position"),
                     _("Compare the Y position of the cursor or of a touch."),
-                    _("Cursor Y position is _PARAM1__PARAM2_"),
+                    _("the cursor Y position"),
                     _("Mouse and touch"),
                     "res/conditions/mouse24.png",
                     "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Y position"))
+      .UseStandardRelationalOperatorParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0")
-      .SetManipulatedType("number");
+      .SetDefaultValue("0");
 
   extension
       .AddCondition("SourisBouton",
@@ -224,37 +220,33 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition("TouchX",
                     _("Touch X position"),
                     _("Compare the X position of a specific touch."),
-                    _("Touch #_PARAM1_ X position is _PARAM2__PARAM3_"),
+                    _("the touch #_PARAM1_ X position"),
                     _("Mouse and touch/Multitouch"),
                     "res/conditions/touch24.png",
                     "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("X position"))
+      .UseStandardRelationalOperatorParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0")
-      .SetManipulatedType("number");
+      .SetDefaultValue("0");
 
   extension
       .AddCondition("TouchY",
                     _("Touch Y position"),
                     _("Compare the Y position of a specific touch."),
-                    _("Touch #_PARAM1_ Y position is _PARAM2__PARAM3_"),
+                    _("the touch #_PARAM1_ Y position"),
                     _("Mouse and touch/Multitouch"),
                     "res/conditions/touch24.png",
                     "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Y position"))
+      .UseStandardRelationalOperatorParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0")
-      .SetManipulatedType("number");
+      .SetDefaultValue("0");
 
   extension
       .AddCondition(

@@ -205,7 +205,7 @@ module.exports = {
         _(
           "Set the volume of the video object, between 0 (muted) and 100 (maximum)."
         ),
-        _("Do _PARAM1__PARAM2_ to the volume of _PARAM0_"),
+        _("the volume"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
@@ -279,17 +279,15 @@ module.exports = {
         "Volume",
         _("Volume"),
         _("Compare the current volume of a video object."),
-        _("Volume of _PARAM0_ is _PARAM1__PARAM2_"),
+        _("the volume"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Value (0-100)"))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName("getVolume")
-      .setManipulatedType("number");
+      .setFunctionName("getVolume");
 
     object
       .addCondition(
@@ -334,34 +332,30 @@ module.exports = {
         "Duration",
         _("Duration"),
         _("Compare the duration of a video object"),
-        _("Duration of _PARAM0_ is _PARAM1__PARAM2_ seconds"),
+        _("the duration (in seconds)"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Value"))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName("getDuration")
-      .setManipulatedType("number");
+      .setFunctionName("getDuration");
 
     object
       .addCondition(
         "CurrentTime",
         _("Current time"),
         _("Compare the current time of a video object"),
-        _("Current time of _PARAM0_ is _PARAM1__PARAM2_ seconds"),
+        _("the current time (in seconds)"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Value"))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName("getCurrentTime")
-      .setManipulatedType("number");
+      .setFunctionName("getCurrentTime");
 
     object
       .addCondition(
@@ -384,7 +378,7 @@ module.exports = {
         _(
           "Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque)."
         ),
-        _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
+        _("the opacity"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
@@ -402,17 +396,15 @@ module.exports = {
         "GetOpacity",
         _("Opacity"),
         _("Compare the opacity of a video object"),
-        _("Opacity of _PARAM0_ is _PARAM1__PARAM2_"),
+        _("the opacity"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Opacity (0-255)"))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName("getOpacity")
-      .setManipulatedType("number");
+      .setFunctionName("getOpacity");
 
     object
       .addExpression(
@@ -433,7 +425,7 @@ module.exports = {
         _(
           "Set playback speed of the specified video object, (1 = the default speed, >1 = faster and <1 = slower)."
         ),
-        _("Do _PARAM1__PARAM2_ to the playback speed of _PARAM0_"),
+        _("the playback speed"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
@@ -451,17 +443,15 @@ module.exports = {
         "GetPlaybackSpeed",
         _("Playback speed "),
         _("Compare the playback speed of a video object"),
-        _("Playback speed of _PARAM0_ is _PARAM1__PARAM2_"),
+        _("the playback speed"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Speed (0-100)"))
+      .useStandardRelationalOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName("getPlaybackSpeed")
-      .setManipulatedType("number");
+      .setFunctionName("getPlaybackSpeed");
 
     object
       .addExpression(

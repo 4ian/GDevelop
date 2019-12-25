@@ -31,32 +31,28 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction("String",
                 _("Text in memory"),
                 _("Modify text in memory of the object"),
-                _("Do _PARAM1__PARAM2_ to the text in memory of _PARAM0_"),
+                _("the text in memory"),
                 "",
                 "CppPlatform/Extensions/textentry24.png",
                 "CppPlatform/Extensions/textentryicon.png")
 
       .AddParameter("object", _("Object"), "TextEntry")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("string", _("Text"))
+      .UseStandardOperatorParameters("string")
       .SetFunctionName("SetString")
-      .SetManipulatedType("string")
       .SetGetter("GetString")
       .SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
   obj.AddCondition("String",
                    _("Text in memory"),
                    _("Test the text of a Text Entry object."),
-                   _("The text of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the text"),
                    "",
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
       .AddParameter("object", _("Object"), "TextEntry")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to test"))
+      .UseStandardRelationalOperatorParameters("string")
       .SetFunctionName("GetString")
-      .SetManipulatedType("string")
       .SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
   obj.AddAction(

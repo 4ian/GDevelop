@@ -120,34 +120,30 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Gravity"),
                      _("Compare the gravity applied on the object (in pixels "
                        "per second per second)."),
-                     _("Gravity of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the gravity"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("GetGravity")
-        .SetManipulatedType("number")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("Gravity",
                   _("Gravity"),
                   _("Change the gravity applied on an object (in pixels per "
                     "second per second)."),
-                  _("Do _PARAM2__PARAM3_ to the gravity of _PARAM0_"),
+                  _("the gravity"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
                   "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("SetGravity")
-        .SetManipulatedType("number")
         .SetGetter("GetGravity")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
@@ -156,17 +152,15 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            _("Maximum falling speed"),
            _("Compare the maximum falling speed of the object (in pixels per "
              "second)."),
-           _("The maximum falling speed of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the maximum falling speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("GetMaxFallingSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
@@ -174,17 +168,15 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            _("Maximum falling speed"),
            _("Change the maximum falling speed of an object (in pixels per "
              "second)."),
-           _("Do _PARAM2__PARAM3_ to the maximum falling speed of _PARAM0_"),
+           _("the maximum falling speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("SetMaxFallingSpeed")
-        .SetManipulatedType("number")
         .SetGetter("GetMaxFallingSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
@@ -192,34 +184,30 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Acceleration"),
                      _("Compare the acceleration of the object (in pixels per "
                        "second per second)."),
-                     _("The acceleration of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the acceleration"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("GetAcceleration")
-        .SetManipulatedType("number")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("Acceleration",
                   _("Acceleration"),
                   _("Change the acceleration of an object (in pixels per "
                     "second per second)."),
-                  _("Do _PARAM2__PARAM3_ to the acceleration of _PARAM0_"),
+                  _("the acceleration"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
                   "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("SetAcceleration")
-        .SetManipulatedType("number")
         .SetGetter("GetAcceleration")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
@@ -227,34 +215,30 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Deceleration"),
                      _("Compare the deceleration of the object (in pixels per "
                        "second per second)."),
-                     _("The deceleration of _PARAM0_ is _PARAM2__PARAM3_"),
+                     _("the deceleration"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("GetDeceleration")
-        .SetManipulatedType("number")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("Deceleration",
                   _("Deceleration"),
                   _("Change the deceleration of an object (in pixels per "
                     "second per second)."),
-                  _("Do _PARAM2__PARAM3_ to the deceleration of _PARAM0_"),
+                  _("the deceleration"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
                   "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("SetDeceleration")
-        .SetManipulatedType("number")
         .SetGetter("GetDeceleration")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
@@ -262,33 +246,29 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            "MaxSpeed",
            _("Maximum speed"),
            _("Compare the maximum speed of the object (in pixels per second)."),
-           _("The maximum speed of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the maximum speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetMaxSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
            "MaxSpeed",
            _("Maximum speed"),
            _("Change the maximum speed of an object (in pixels per second)."),
-           _("Do _PARAM2__PARAM3_ to the maximum speed of _PARAM0_"),
+           _("the maximum speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("SetMaxSpeed")
-        .SetManipulatedType("number")
         .SetGetter("GetMaxSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
@@ -296,33 +276,29 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            "JumpSpeed",
            _("Jump speed"),
            _("Compare the jump speed of the object (in pixels per second)."),
-           _("The jump speed of _PARAM0_ is _PARAM2__PARAM3_"),
+           _("the jump speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("relationalOperator", _("Comparison sign"))
-        .AddParameter("expression", _("Value to compare"))
+        .UseStandardRelationalOperatorParameters("number")
         .MarkAsAdvanced()
         .SetFunctionName("GetJumpSpeed")
-        .SetManipulatedType("number")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction(
            "JumpSpeed",
            _("Jump speed"),
            _("Change the jump speed of an object (in pixels per second)."),
-           _("Do _PARAM2__PARAM3_ to the jump speed of _PARAM0_"),
+           _("the jump speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .UseStandardOperatorParameters("number")
         .SetFunctionName("SetJumpSpeed")
-        .SetManipulatedType("number")
         .SetGetter("GetJumpSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 

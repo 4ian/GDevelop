@@ -152,9 +152,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
-      .AddParameter(
-          "expression",
-          _("Angular speed (in degrees per second)"))
+      .AddParameter("expression", _("Angular speed (in degrees per second)"))
       .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -171,9 +169,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
-      .AddParameter(
-          "expression",
-          _("Angular speed (in degrees per second)"))
+      .AddParameter("expression", _("Angular speed (in degrees per second)"))
       .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
@@ -252,7 +248,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("Arreter",
                 _("Stop the object"),
                 _("Stop the object by deleting all of its forces."),
-                _("Stop object _PARAM0_"),
+                _("Stop _PARAM0_ (remove all forces)"),
                 _("Movement"),
                 "res/actions/arreter24.png",
                 "res/actions/arreter.png")
@@ -263,7 +259,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("Delete",
                 _("Delete an object"),
                 _("Delete the specified object."),
-                _("Delete object _PARAM0_"),
+                _("Delete _PARAM0_"),
                 _("Objects"),
                 "res/actions/delete24.png",
                 "res/actions/delete.png")
@@ -366,7 +362,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("Cache",
                 _("Hide"),
                 _("Hide the specified object."),
-                _("Hide the object _PARAM0_"),
+                _("Hide _PARAM0_"),
                 _("Visibility"),
                 "res/actions/visibilite24.png",
                 "res/actions/visibilite.png")
@@ -377,7 +373,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("Montre",
                 _("Show"),
                 _("Show the specified object"),
-                _("Show object _PARAM0_"),
+                _("Show _PARAM0_"),
                 _("Visibility"),
                 "res/actions/visibilite24.png",
                 "res/actions/visibilite.png")
@@ -429,7 +425,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition("Visible",
                    _("Visibility of an object"),
                    _("Check if an object is visible."),
-                   _("The object _PARAM0_ is visible"),
+                   _("_PARAM0_ is visible (not marked as hidden)"),
                    _("Visibility"),
                    "res/conditions/visibilite24.png",
                    "res/conditions/visibilite.png")

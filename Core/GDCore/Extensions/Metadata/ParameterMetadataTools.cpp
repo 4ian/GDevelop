@@ -67,7 +67,7 @@ void ParameterMetadataTools::IterateOverParameters(
         pNb < parameters.size() ? parameters[pNb].GetPlainString() : "";
     const gd::String& parameterValueOrDefault =
         parameterValue.empty() && parameterMetadata.optional
-            ? parameterMetadata.defaultValue
+            ? parameterMetadata.GetDefaultValue()
             : parameterValue;
 
     fn(parameterMetadata, parameterValueOrDefault, lastObjectName);

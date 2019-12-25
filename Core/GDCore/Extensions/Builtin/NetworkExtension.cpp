@@ -26,29 +26,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "SendRequest",
           _("Send a request to a web page"),
           _("Send a request to the specified web page.\n\nPlease note that for "
-            "the web platform games, the game must be hosted on the same host "
+            "the web games, the game must be hosted on the same host "
             "as specified below, except if the server is configured to answer "
             "to all requests (cross-domain requests)."),
           _("Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_"),
           _("Network"),
           "res/actions/net24.png",
           "res/actions/net.png")
-      .AddParameter("string", _("Host (example: http://www.some-server.org/)"))
-      .AddParameter("string", _("Path to page (Example: /page.php)"))
+      .AddParameter("string", _("Host, with protocol"))
+      .SetParameterLongDescription(
+          _("Example: \"http://example.com/\"."))
+      .AddParameter("string", _("Path"))
+      .SetParameterLongDescription(_("Example: \"/user/123\" or \"/some-page.php\"."))
       .AddParameter("string", _("Request body content"))
-      .AddParameter(
-          "string",
-          _("Method: \"POST\" or \"GET\" (if empty, GET will be used)"),
-          "",
-          true)
+      .AddParameter("string", _("Method: \"POST\" or \"GET\""), "", true)
+      .SetParameterLongDescription(_("If empty, \"GET\" will be used."))
       .SetDefaultValue("\"GET\"")
-      .AddParameter(
-          "string",
-          _("Content type (application/x-www-form-urlencoded by default)"),
-          "",
-          true)
-      .AddParameter(
-          "scenevar", _("Store the response in this scene variable"), "", true)
+      .AddParameter("string", _("Content type"), "", true)
+      .SetParameterLongDescription(
+          _("If empty, \"application/x-www-form-urlencoded\" will be used."))
+      .AddParameter("scenevar", _("Reponse scene variable"), "", true)
+      .SetParameterLongDescription(
+          _("The response of the server will be stored, as a string, in this "
+            "variable. If the server returns JSON, you may want to use the "
+            "action \"Convert JSON to a scene variable\" afterwards, to "
+            "explore the results with a structure variable."))
       .MarkAsComplex();
 
   extension

@@ -30,9 +30,32 @@ module.exports = {
     const dumyEffectProperties = dumyEffect.getProperties();
     dumyEffectProperties.set(
       'opacity',
-      new gd.PropertyDescriptor(/* defaultValue= */ "1")
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel(_('Opacity of the effect (between 0 and 1)'))
         .setType('number')
+        .setDescription(_('This is an optional description.'))
+    );
+    dumyEffectProperties.set(
+      'someImage',
+      new gd.PropertyDescriptor(/* defaultValue= */ '')
+        .setLabel(
+          _("Image resource (won't be used, just for demonstration purpose)")
+        )
+        .setType('resource')
+        .addExtraInfo('image')
+    );
+    dumyEffectProperties.set(
+      'someColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#0022FF')
+        .setLabel(_("Color (won't be used, just for demonstration purpose)"))
+        .setType('color')
+        .setDescription(_('Another optional description.'))
+    );
+    dumyEffectProperties.set(
+      'someBoolean',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel(_('Some setting to enable or not for the effect'))
+        .setType('boolean')
     );
 
     // Declare conditions, actions or expressions:

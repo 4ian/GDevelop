@@ -34,6 +34,10 @@ type Props = {|
   freezeParameters?: boolean,
 |};
 
+type State = {|
+  longDescriptionShownIndexes: { [number]: boolean },
+|};
+
 const styles = {
   parametersContainer: {
     flex: 1,
@@ -64,8 +68,12 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
 
 export default class EventsFunctionParametersEditor extends React.Component<
   Props,
-  {||}
+  State
 > {
+  state = {
+    longDescriptionShownIndexes: {},
+  };
+
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
@@ -85,6 +93,31 @@ export default class EventsFunctionParametersEditor extends React.Component<
     gd.removeFromVectorParameterMetadata(parameters, index);
     this.forceUpdate();
     this.props.onParametersUpdated();
+  };
+
+  _addLongDescription = (index: number) => {
+    // Show the long description field
+    this.setState(state => ({
+      longDescriptionShownIndexes: {
+        ...state.longDescriptionShownIndexes,
+        [index]: true,
+      },
+    }));
+  };
+
+  _removeLongDescription = (index: number) => {
+    const { eventsFunction } = this.props;
+    const parameters = eventsFunction.getParameters();
+    const parameter = parameters.at(index);
+
+    // Reset the long description and hide the field
+    parameter.setLongDescription('');
+    this.setState(state => ({
+      longDescriptionShownIndexes: {
+        ...state.longDescriptionShownIndexes,
+        [index]: false,
+      },
+    }));
   };
 
   render() {
@@ -119,6 +152,14 @@ export default class EventsFunctionParametersEditor extends React.Component<
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
       return !eventsBasedBehavior || index >= 2;
+    };
+    const isParameterLongDescriptionShown = (parameter, index): boolean => {
+      if (!isParameterDescriptionAndTypeShown(index)) return false;
+
+      return (
+        !!parameter.getLongDescription() ||
+        !!this.state.longDescriptionShownIndexes[index]
+      );
     };
     const parametersIndexOffset = getParametersIndexOffset(
       !!eventsBasedBehavior
@@ -166,6 +207,25 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               label: i18n._(t`Delete`),
                               enabled: !isParameterDisabled(i),
                               click: () => this._removeParameter(i),
+                            },
+                            { type: 'separator' },
+                            {
+                              label: i18n._(t`Add a Long Description`),
+                              enabled: !isParameterDisabled(i),
+                              visible: !isParameterLongDescriptionShown(
+                                parameter,
+                                i
+                              ),
+                              click: () => this._addLongDescription(i),
+                            },
+                            {
+                              label: i18n._(t`Remove the Long Description`),
+                              enabled: !isParameterDisabled(i),
+                              visible: isParameterLongDescriptionShown(
+                                parameter,
+                                i
+                              ),
+                              click: () => this._removeLongDescription(i),
                             },
                           ]}
                         />
@@ -257,7 +317,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           <Column expand>
                             <SemiControlledTextField
                               commitOnBlur
-                              floatingLabelText={<Trans>Description</Trans>}
+                              floatingLabelText={<Trans>Label</Trans>}
                               floatingLabelFixed
                               value={parameter.getDescription()}
                               onChange={text => {
@@ -266,7 +326,30 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               }}
                               fullWidth
                               disabled={
-                                false /* Description, if shown, can always be changed */
+                                false /* Label, if shown, can always be changed */
+                              }
+                            />
+                          </Column>
+                        </Line>
+                      )}
+                      {isParameterLongDescriptionShown(parameter, i) && (
+                        <Line expand noMargin>
+                          <Column expand>
+                            <SemiControlledTextField
+                              commitOnBlur
+                              floatingLabelText={
+                                <Trans>Long description</Trans>
+                              }
+                              floatingLabelFixed
+                              value={parameter.getLongDescription()}
+                              onChange={text => {
+                                parameter.setLongDescription(text);
+                                this.forceUpdate();
+                              }}
+                              multiLine
+                              fullWidth
+                              disabled={
+                                false /* Long description, if shown, can always be changed */
                               }
                             />
                           </Column>

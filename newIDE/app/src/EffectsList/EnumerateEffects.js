@@ -5,14 +5,11 @@ import flatten from 'lodash/flatten';
 
 export type EnumeratedEffectMetadata = {|
   extension: gdPlatformExtension,
+  effectMetadata: gdEffectMetadata,
   type: string,
   fullName: string,
   description: string,
   parametersSchema: Schema,
-  parameterDefaultValues: Array<{|
-    parameterName: string,
-    defaultValue: number,
-  |}>,
 |};
 
 /**
@@ -39,49 +36,105 @@ export const enumerateEffectsMetadata = (
           // Convert the effect type properties to a PropertiesEditor Schema.
           const properties = effectMetadata.getProperties();
           const parameterNames = properties.keys().toJSArray();
-          const parametersSchema: Schema = parameterNames.map(
-            (parameterName: string) => {
+          const parametersSchema: Schema = parameterNames
+            .map((parameterName: string) => {
               const property = properties.get(parameterName);
+              const valueType = property.getType().toLowerCase();
               const propertyLabel = property.getLabel();
+              const propertyDescription = property.getDescription();
+              const getLabel = () => propertyLabel;
+              const getDescription = () => propertyDescription;
 
-              if (property.getType() !== 'number') {
-                console.warn(
-                  `Parameter "${parameterName}" of effect type "${effectType}" has a non supported type: ${property.getType()}. Only "number" is supported.`
+              if (valueType === 'number') {
+                return {
+                  name: parameterName,
+                  valueType: 'number',
+                  getValue: (effect: gdEffect) =>
+                    effect.getDoubleParameter(parameterName),
+                  setValue: (effect: gdEffect, newValue: number) =>
+                    effect.setDoubleParameter(parameterName, newValue),
+                  getLabel,
+                  getDescription,
+                };
+              } else if (valueType === 'boolean') {
+                return {
+                  name: parameterName,
+                  valueType: 'boolean',
+                  getValue: (effect: gdEffect) =>
+                    effect.getBooleanParameter(parameterName),
+                  setValue: (effect: gdEffect, newValue: boolean) =>
+                    effect.setBooleanParameter(parameterName, newValue),
+                  getLabel,
+                  getDescription,
+                };
+              } else if (valueType === 'resource') {
+                // Resource is a "string" (with a selector in the UI)
+                const kind = property.getExtraInfo().toJSArray()[0] || '';
+                return {
+                  name: parameterName,
+                  valueType: 'resource',
+                  resourceKind: kind,
+                  getValue: (effect: gdEffect) =>
+                    effect.getStringParameter(parameterName),
+                  setValue: (effect: gdEffect, newValue: number) =>
+                    effect.setStringParameter(parameterName, newValue),
+                  getLabel,
+                  getDescription,
+                };
+              } else if (valueType === 'color') {
+                return {
+                  name: parameterName,
+                  valueType: 'color',
+                  getValue: (effect: gdEffect) =>
+                    effect.getStringParameter(parameterName),
+                  setValue: (effect: gdEffect, newValue: number) =>
+                    effect.setStringParameter(parameterName, newValue),
+                  getLabel,
+                  getDescription,
+                };
+              } else {
+                console.error(
+                  `A property with type=${valueType} could not be mapped to a field for effect ${effectType}. Ensure that this type is correct.`
                 );
+                return null;
               }
-
-              return {
-                name: parameterName,
-                getLabel: () => propertyLabel,
-                valueType: 'number',
-                getValue: (effect: gdEffect) =>
-                  effect.getParameter(parameterName),
-                setValue: (effect: gdEffect, newValue: number) =>
-                  effect.setParameter(parameterName, newValue),
-              };
-            }
-          );
-
-          // Also store the default values for parameters
-          const parameterDefaultValues = parameterNames.map(
-            (parameterName: string) => {
-              const property = properties.get(parameterName);
-              return {
-                parameterName,
-                defaultValue: parseFloat(property.getValue()) || 0,
-              };
-            }
-          );
+            })
+            .filter(Boolean);
 
           return {
             extension,
             type: effectType,
+            effectMetadata,
             fullName: effectMetadata.getFullName(),
             description: effectMetadata.getDescription(),
             parametersSchema,
-            parameterDefaultValues,
           };
         });
     })
   );
+};
+
+export const setEffectDefaultParameters = (
+  effect: gdEffect,
+  effectMetadata: gdEffectMetadata
+) => {
+  effect.clearParameters();
+
+  const properties = effectMetadata.getProperties();
+  const parameterNames = properties.keys().toJSArray();
+  parameterNames.forEach((parameterName: string) => {
+    const property = properties.get(parameterName);
+    const valueType = property.getType().toLowerCase();
+
+    if (valueType === 'number') {
+      effect.setDoubleParameter(
+        parameterName,
+        parseFloat(property.getValue()) || 0
+      );
+    } else if (valueType === 'boolean') {
+      effect.setBooleanParameter(parameterName, property.getValue() === 'true');
+    } else {
+      effect.setStringParameter(parameterName, property.getValue());
+    }
+  });
 };

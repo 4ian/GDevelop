@@ -5,9 +5,17 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import EffectsList from './index';
 import HelpButton from '../UI/HelpButton';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
 type Props = {|
   project: gdProject,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   onApply: () => void,
   effectsContainer: gdEffectsContainer,
 |};
@@ -41,6 +49,9 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
       >
         <EffectsList
           project={project}
+          resourceSources={this.props.resourceSources}
+          onChooseResource={this.props.onChooseResource}
+          resourceExternalEditors={this.props.resourceExternalEditors}
           effectsContainer={effectsContainer}
           onEffectsUpdated={
             () =>

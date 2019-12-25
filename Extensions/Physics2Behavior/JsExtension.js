@@ -2833,7 +2833,7 @@ module.exports = {
         _('Mouse joint target'),
         _('Set a mouse joint target.'),
         _(
-          'Do _PARAM3_;_PARAM4_ to the target position of mouse joint _PARAM2_'
+          'Set the target position of mouse joint _PARAM2_ of _PARAM0_ to _PARAM3_;_PARAM4_'
         ),
         _('Joints/Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',

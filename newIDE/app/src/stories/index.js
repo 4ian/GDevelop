@@ -950,6 +950,19 @@ storiesOf('UI Building Blocks/ColorField', module)
         onChangeComplete={() => {}}
       />
       <ColorField
+        floatingLabelText="This has a helper text"
+        disableAlpha
+        fullWidth
+        color={{
+          r: 100,
+          g: 100,
+          b: 200,
+          a: 255,
+        }}
+        onChangeComplete={() => {}}
+        helperText="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      />
+      <ColorField
         floatingLabelText="This is not full width"
         disableAlpha
         color={{
@@ -3768,6 +3781,12 @@ storiesOf('EffectsList', module)
   .add('with some effects', () => (
     <EffectsList
       project={project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
       effectsContainer={layerWithEffects}
       onEffectsUpdated={action('effects updated')}
     />
@@ -3775,6 +3794,12 @@ storiesOf('EffectsList', module)
   .add('with an effect without effect type', () => (
     <EffectsList
       project={project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
       effectsContainer={layerWithEffectWithoutEffectType}
       onEffectsUpdated={action('effects updated')}
     />
@@ -3782,6 +3807,12 @@ storiesOf('EffectsList', module)
   .add('without effects', () => (
     <EffectsList
       project={project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
       effectsContainer={layerWithoutEffects}
       onEffectsUpdated={action('effects updated')}
     />

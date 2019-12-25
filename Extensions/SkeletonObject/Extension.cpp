@@ -208,7 +208,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("AnimationTime",
                    _("Current time"),
                    _("Check the current animation elapsed time."),
-                   _("Current animation time of _PARAM0_ is _PARAM1_ _PARAM2_"),
+                   _("Current animation time of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Animation"),
                    "JsPlatform/Extensions/skeletonanimationicon24.png",
                    "JsPlatform/Extensions/skeletonanimationicon16.png")

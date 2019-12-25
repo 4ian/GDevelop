@@ -154,7 +154,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
       .AddParameter(
           "expression",
-          _("Angular speed (in degrees per second) (0 for immediate rotation)"))
+          _("Angular speed (in degrees per second)"))
+      .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
       .AddCodeOnlyParameter("currentScene", "");
 
   obj.AddAction(
@@ -172,7 +173,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .AddParameter(
           "expression",
-          _("Angular speed (in degrees per second) (0 for immediate rotation)"))
+          _("Angular speed (in degrees per second)"))
+      .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
@@ -906,11 +908,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  "res/actions/create24.png",
                  "res/actions/create.png")
       .AddCodeOnlyParameter("objectsContext", "")
-      .AddParameter(
-          "objectListWithoutPicking",
-          _("Groups containing objects that can be created by the action"))
-      .AddParameter("string",
-                    _("Text representing the name of the object to create"))
+      .AddParameter("objectListWithoutPicking", _("Group of potential objects"))
+      .SetParameterLongDescription(
+          _("Group containing objects that can be created by the action."))
+      .AddParameter("string", _("Name of the object to create"))
+      .SetParameterLongDescription(_(
+          "Text representing the name of the object to create. If no objects "
+          "with this name are found in the group, no object will be created."))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
@@ -920,7 +924,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddAction("AjoutObjConcern",
                  _("Pick all instances"),
-                 _("Pick all instances of the specified object(s). When you pick all instances, "
+                 _("Pick all instances of the specified object(s). When you "
+                   "pick all instances, "
                    "the next conditions and actions of this event work on all "
                    "of them."),
                  _("Pick all instances of _PARAM1_"),
@@ -1113,12 +1118,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Ray source Y position"))
       .AddParameter("expression", _("Ray angle (in degrees)"))
       .AddParameter("expression", _("Ray maximum distance (in pixels)"))
-      .AddParameter(
-          "scenevar",
-          _("Scene variable where to store the X position of the intersection"))
-      .AddParameter(
-          "scenevar",
-          _("Scene variable where to store the Y position of the intersection"))
+      .AddParameter("scenevar", _("Result X position scene variable"))
+      .SetParameterLongDescription(
+          _("Scene variable where to store the X position of the intersection. "
+            "If no intersection is found, the variable won't be changed."))
+      .AddParameter("scenevar", _("Result Y position scene variable"))
+      .SetParameterLongDescription(
+          _("Scene variable where to store the Y position of the intersection. "
+            "If no intersection is found, the variable won't be changed."))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 
@@ -1141,12 +1148,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Ray source Y position"))
       .AddParameter("expression", _("Ray target X position"))
       .AddParameter("expression", _("Ray target Y position"))
-      .AddParameter(
-          "scenevar",
-          _("Scene variable where to store the X position of the intersection"))
-      .AddParameter(
-          "scenevar",
-          _("Scene variable where to store the Y position of the intersection"))
+      .AddParameter("scenevar", _("Result X position scene variable"))
+      .SetParameterLongDescription(
+          _("Scene variable where to store the X position of the intersection. "
+            "If no intersection is found, the variable won't be changed."))
+      .AddParameter("scenevar", _("Result Y position scene variable"))
+      .SetParameterLongDescription(
+          _("Scene variable where to store the Y position of the intersection. "
+            "If no intersection is found, the variable won't be changed."))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 

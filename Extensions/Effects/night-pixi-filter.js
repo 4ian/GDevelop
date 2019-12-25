@@ -27,11 +27,12 @@ gdjs.NightPixiFilter.prototype = Object.create(PIXI.Filter.prototype);
 gdjs.NightPixiFilter.prototype.constructor = gdjs.NightPixiFilter;
 
 gdjs.PixiFiltersTools.registerFilterCreator('Night', {
-  makePIXIFilter: function() {
+  makePIXIFilter: function(layer, effectData) {
     var filter = new gdjs.NightPixiFilter();
     return filter;
   },
-  updateParameter: function(filter, parameterName, value) {
+  update: function(filter, layer) {},
+  updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName !== 'intensity' && parameterName !== 'opacity') return;
 
     filter.uniforms[parameterName] = gdjs.PixiFiltersTools.clampValue(
@@ -40,4 +41,6 @@ gdjs.PixiFiltersTools.registerFilterCreator('Night', {
       1
     );
   },
+  updateStringParameter: function(filter, parameterName, value) {},
+  updateBooleanParameter: function(filter, parameterName, value) {},
 });

@@ -864,9 +864,9 @@ bool ExpressionParser::PrepareParameter(
     const size_t positionInExpression) {
   if (ParameterMetadata::IsExpression("number", parametersInfo.type)) {
     if (parametersInfo.optional && parameter.GetPlainString().empty())
-      parameter = parametersInfo.defaultValue.empty()
+      parameter = parametersInfo.GetDefaultValue().empty()
                       ? gd::Expression("0")
-                      : gd::Expression(parametersInfo.defaultValue);
+                      : gd::Expression(parametersInfo.GetDefaultValue());
 
     if (!callbacks.OnSubMathExpression(platform, project, layout, parameter)) {
       firstErrorStr = callbacks.firstErrorStr;
@@ -876,9 +876,9 @@ bool ExpressionParser::PrepareParameter(
     }
   } else if (ParameterMetadata::IsExpression("string", parametersInfo.type)) {
     if (parametersInfo.optional && parameter.GetPlainString().empty())
-      parameter = parametersInfo.defaultValue.empty()
+      parameter = parametersInfo.GetDefaultValue().empty()
                       ? gd::Expression("\"\"")
-                      : gd::Expression(parametersInfo.defaultValue);
+                      : gd::Expression(parametersInfo.GetDefaultValue());
 
     if (!callbacks.OnSubTextExpression(platform, project, layout, parameter)) {
       firstErrorStr = callbacks.firstErrorStr;

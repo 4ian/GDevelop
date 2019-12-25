@@ -589,9 +589,15 @@ interface Effect {
   void SetEffectType([Const] DOMString effectType_);
   [Const, Ref] DOMString GetEffectType();
 
-  void SetParameter([Const] DOMString name, float value);
-  float GetParameter([Const] DOMString name);
-  [Const, Ref] MapStringDouble GetAllParameters();
+  void SetDoubleParameter([Const] DOMString name, double value);
+  double GetDoubleParameter([Const] DOMString name);
+  void SetStringParameter([Const] DOMString name, [Const] DOMString value);
+  [Const, Ref] DOMString GetStringParameter([Const] DOMString name);
+  void SetBooleanParameter([Const] DOMString name, boolean value);
+  boolean GetBooleanParameter([Const] DOMString name);
+  [Const, Ref] MapStringDouble GetAllDoubleParameters();
+  [Const, Ref] MapStringString GetAllStringParameters();
+  [Const, Ref] MapStringBoolean GetAllBooleanParameters();
   void ClearParameters();
 
   void SerializeTo([Ref] SerializerElement element);
@@ -625,6 +631,8 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetType();
     [Ref] PropertyDescriptor SetLabel([Const] DOMString label);
     [Const, Ref] DOMString GetLabel();
+    [Ref] PropertyDescriptor SetDescription([Const] DOMString label);
+    [Const, Ref] DOMString GetDescription();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Value] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
@@ -925,6 +933,8 @@ interface ExpressionCodeGenerationInformation {
 };
 
 interface InstructionMetadata {
+    void InstructionMetadata(); // For tests only.
+
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetSentence();
@@ -951,6 +961,7 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
+    [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata MarkAsSimple();
     [Ref] InstructionMetadata MarkAsAdvanced();
     [Ref] InstructionMetadata MarkAsComplex();
@@ -959,6 +970,8 @@ interface InstructionMetadata {
 };
 
 interface ExpressionMetadata {
+    void ExpressionMetadata(); // For tests only.
+
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetGroup();
@@ -979,6 +992,7 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
+    [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
@@ -996,12 +1010,17 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetOptional(boolean optional_);
     [Const, Ref] DOMString GetDescription();
     [Ref] ParameterMetadata SetDescription([Const] DOMString description_);
+    [Const, Ref] DOMString GetLongDescription();
+    [Ref] ParameterMetadata SetLongDescription([Const] DOMString longDescription_);
     boolean IsCodeOnly();
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface VectorParameterMetadata {

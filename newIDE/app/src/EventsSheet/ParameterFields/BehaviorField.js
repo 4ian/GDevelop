@@ -16,6 +16,7 @@ export default class BehaviorField extends React.Component<
 > {
   state = { errorText: null };
   _description: ?string;
+  _longDescription: ?string;
   _behaviorTypeAllowed: ?string;
   _behaviorNames: Array<string> = [];
   _field: ?SemiControlledAutoComplete;
@@ -26,6 +27,10 @@ export default class BehaviorField extends React.Component<
     const { parameterMetadata } = this.props;
     this._description = parameterMetadata
       ? parameterMetadata.getDescription()
+      : undefined;
+
+    this._longDescription = parameterMetadata
+      ? parameterMetadata.getLongDescription()
       : undefined;
 
     this._behaviorTypeAllowed = parameterMetadata
@@ -129,6 +134,7 @@ export default class BehaviorField extends React.Component<
       <SemiControlledAutoComplete
         margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={this._description}
+        helperText={this._longDescription}
         fullWidth
         errorText={
           !this._behaviorNames.length

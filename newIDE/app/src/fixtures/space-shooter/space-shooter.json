@@ -10373,6 +10373,7 @@
               "value": "0.1",
               "type": "Number",
               "label": "Half period (time during which object is invisible), in seconds",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "HalfPeriodTime"
@@ -10381,6 +10382,7 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "IsFlashing"
@@ -10389,6 +10391,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "FlashDuration"
@@ -10698,6 +10701,7 @@
               "value": "0.1",
               "type": "Number",
               "label": "Cooldown, in seconds, before firing again",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "FireCooldown"
@@ -10706,6 +10710,7 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "HasJustFired"
@@ -11322,6 +11327,7 @@
               "value": "100",
               "type": "Number",
               "label": "Health",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "Health"
@@ -11330,6 +11336,7 @@
               "value": "0",
               "type": "Number",
               "label": "Damage cooldown (in seconds) (0 for no cooldown)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "DamageCooldown"
@@ -11338,6 +11345,7 @@
               "value": "100",
               "type": "Number",
               "label": "Maximum health (0 for no maximum)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MaxHealth"
@@ -11346,6 +11354,7 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "IsJustDamaged"
@@ -11354,6 +11363,7 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "CooldownActive"
@@ -11448,6 +11458,7 @@
               "value": "0",
               "type": "Number",
               "label": "Top margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginTop"
@@ -11456,6 +11467,7 @@
               "value": "0",
               "type": "Number",
               "label": "Bottom margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginBottom"
@@ -11464,6 +11476,7 @@
               "value": "0",
               "type": "Number",
               "label": "Left margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginLeft"
@@ -11472,6 +11485,7 @@
               "value": "0",
               "type": "Number",
               "label": "Right margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginRight"
@@ -11555,6 +11569,7 @@
               "value": "0",
               "type": "Number",
               "label": "Speed on X axis",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "SpeedX"
@@ -11563,6 +11578,7 @@
               "value": "0",
               "type": "Number",
               "label": "Speed on Y axis",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "SpeedY"
@@ -11947,6 +11963,7 @@
               "value": "200",
               "type": "Number",
               "label": "Speed on X axis, in pixels per second",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "SpeedX"
@@ -11955,6 +11972,7 @@
               "value": "300",
               "type": "Number",
               "label": "Distance traveled on X axis, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "DistanceX"
@@ -11963,6 +11981,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "InitialX"
@@ -12178,6 +12197,7 @@
               "value": "60",
               "type": "Number",
               "label": "Speed, in degrees per second",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "SineSpeed"
@@ -12186,6 +12206,7 @@
               "value": "100",
               "type": "Number",
               "label": "Amplitude of the movement on X axis (0 to deactivate)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "AmplitudeX"
@@ -12194,6 +12215,7 @@
               "value": "0",
               "type": "Number",
               "label": "Amplitude of the movement on Y axis (0 to deactivate)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "AmplitudeY"
@@ -12202,6 +12224,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "InitialX"
@@ -12210,6 +12233,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "InitialY"
@@ -12218,6 +12242,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "SineProgress"

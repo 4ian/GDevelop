@@ -54,6 +54,49 @@ export const makeTestExtensions = gd => {
         .setType('number')
     );
 
+    const variousParametersEffect = extension
+      .addEffect('FakeEffectWithVariousParameters')
+      .setFullName('Fake Effect With Various Parameters')
+      .setDescription('A fake effect using different parameters')
+      .addIncludeFile(
+        'Extensions/Effects/fake-effect-with-various-parameters.js'
+      );
+    const variousParametersEffectProperties = variousParametersEffect.getProperties();
+    variousParametersEffectProperties.set(
+      'intensity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel('Intensity (between 0 and 1)')
+        .setType('number')
+        .setDescription(
+          'Some interesting description about this intensity parameter that can be used by the effect.'
+        )
+    );
+    variousParametersEffectProperties.set(
+      'someColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel('Some color')
+        .setType('color')
+        .setDescription(
+          'Some interesting description about this color parameter that can be used by the effect.'
+        )
+    );
+    variousParametersEffectProperties.set(
+      'image',
+      new gd.PropertyDescriptor(/* defaultValue= */ '')
+        .setLabel('An image resource')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setDescription(
+          'Some interesting description about this image resource that can be used by the effect.'
+        )
+    );
+    variousParametersEffectProperties.set(
+      'someBoolean',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel('Some setting to enable or not for the effect')
+        .setType('boolean')
+    );
+
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

@@ -55,6 +55,7 @@ type Props = {|
   floatingLabelText?: React.Node,
   name?: string,
   hintText?: MessageDescriptor,
+  helperText?: React.Node,
   id?: string,
 
   // Keyboard focus:
@@ -194,7 +195,7 @@ export default class TextField extends React.Component<Props, {||}> {
             }
             // Error handling:
             error={!!props.errorText}
-            helperText={props.errorText}
+            helperText={props.errorText || props.helperText}
             disabled={props.disabled}
             InputLabelProps={{
               shrink: props.floatingLabelFixed ? true : undefined,

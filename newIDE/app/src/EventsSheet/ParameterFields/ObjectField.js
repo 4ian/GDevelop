@@ -10,6 +10,7 @@ export default class ObjectField extends React.Component<
   {||}
 > {
   _description: ?string;
+  _longDescription: ?string;
   _allowedObjectType: ?string;
   _field: ?ObjectSelector;
 
@@ -20,6 +21,10 @@ export default class ObjectField extends React.Component<
 
     this._description = parameterMetadata
       ? parameterMetadata.getDescription()
+      : undefined;
+
+    this._longDescription = parameterMetadata
+      ? parameterMetadata.getLongDescription()
       : undefined;
 
     this._allowedObjectType = parameterMetadata
@@ -42,6 +47,7 @@ export default class ObjectField extends React.Component<
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}
+        helperText={this._longDescription}
         fullWidth
         errorTextIfInvalid={
           this._allowedObjectType ? (

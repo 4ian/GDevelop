@@ -472,6 +472,9 @@ export const declareEventsFunctionParameters = (
           '', // See below for adding the extra information
           parameter.isOptional()
         );
+        instructionOrExpression.setParameterLongDescription(
+          parameter.getLongDescription()
+        );
       } else {
         instructionOrExpression.addCodeOnlyParameter(
           parameter.getType(),

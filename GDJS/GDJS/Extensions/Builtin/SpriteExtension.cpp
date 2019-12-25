@@ -63,7 +63,6 @@ SpriteExtension::SpriteExtension() {
       .SetGetter("getScaleY");
   spriteActions["ChangeScale"]
       .SetFunctionName("setScale")
-      .SetManipulatedType("number")
       .SetGetter("getScale");
   spriteConditions["ScaleWidth"].SetFunctionName("getScaleX");
   spriteConditions["ScaleHeight"].SetFunctionName("getScaleY");

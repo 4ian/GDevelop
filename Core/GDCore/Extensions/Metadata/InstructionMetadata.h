@@ -140,6 +140,19 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
+   * \brief Get the user friendly, long description for the parameter.
+   */
+  const gd::String &GetLongDescription() const { return longDescription; }
+
+  /**
+   * \brief Set the user friendly, long description for the parameter.
+   */
+  ParameterMetadata &SetLongDescription(const gd::String &longDescription_) {
+    longDescription = longDescription_;
+    return *this;
+  }
+
+  /**
    * \brief Return true if the type of the parameter is "object", "objectPtr" or
    * "objectList".
    *
@@ -207,9 +220,10 @@ class GD_CORE_API ParameterMetadata {
   gd::String description;  ///< Description shown in editor
   bool codeOnly;  ///< True if parameter is relative to code generation only,
                   ///< i.e. must not be shown in editor
+ private:
+  gd::String longDescription;  ///< Long description shown in the editor.
   gd::String defaultValue;  ///< Used as a default value in editor or if an
                             ///< optional parameter is empty.
- private:
   gd::String name;  ///< The name of the parameter to be used in code
                     ///< generation. Optional.
 };
@@ -319,41 +333,56 @@ class GD_CORE_API InstructionMetadata {
   bool IsHidden() const { return hidden; }
 
   /**
-   * \brief Add a parameter to the instruction ( condition or action )
-   * information class. \param type One of the type handled by GDevelop. This
+   * \brief Add a parameter to the instruction metadata.
+   *
+   * \param type One of the type handled by GDevelop. This
    * will also determine the type of the argument used when calling the function
-   * in the generated code. \see EventsCodeGenerator::GenerateParametersCodes
+   * in the generated code.
    * \param description Description for parameter
    * \param optionalObjectType If type is "object", this parameter will describe
-   * which objects are allowed. If it is empty, all objects are allowed. \param
-   * parameterIsOptional true if the parameter must be optional, false
+   * which objects are allowed. If it is empty, all objects are allowed.
+   * \param parameterIsOptional true if the parameter must be optional, false
    * otherwise.
+   *
+   * \see EventsCodeGenerator::GenerateParametersCodes
    */
   InstructionMetadata &AddParameter(const gd::String &type,
-                                    const gd::String &description,
+                                    const gd::String &label,
                                     const gd::String &optionalObjectType = "",
                                     bool parameterIsOptional = false);
 
   /**
    * \brief Add a parameter not displayed in editor.
+   *
    * \param type One of the type handled by GDevelop. This will also determine
-   * the type of the argument used when calling the function in C++ code. \see
-   * EventsCodeGenerator::GenerateParametersCodes \param
-   * supplementaryInformation Can be used if needed. For example, when type ==
-   * "inlineCode", the content of supplementaryInformation is inserted in the
-   * generated C++ code.
+   * the type of the argument used when calling the function in the generated code.
+   * \param supplementaryInformation Depends on `type`. For example, when `type ==
+   * "inlineCode"`, the content of supplementaryInformation is inserted in the
+   * generated code.
+   *
+   * \see EventsCodeGenerator::GenerateParametersCodes
    */
   InstructionMetadata &AddCodeOnlyParameter(
       const gd::String &type, const gd::String &supplementaryInformation);
 
   /**
    * \brief Set the default value used in editor (or if an optional parameter is
-   * empty during code generation) for the latest added parameter.
+   * empty during code generation) for the last added parameter.
    *
    * \see AddParameter
    */
   InstructionMetadata &SetDefaultValue(gd::String defaultValue_) {
-    if (!parameters.empty()) parameters.back().defaultValue = defaultValue_;
+    if (!parameters.empty()) parameters.back().SetDefaultValue(defaultValue_);
+    return *this;
+  };
+
+  /**
+   * \brief Set the long description shown in the editor for the last added parameter.
+   *
+   * \see AddParameter
+   */
+  InstructionMetadata &SetParameterLongDescription(gd::String longDescription) {
+    if (!parameters.empty()) parameters.back().SetLongDescription(longDescription);
     return *this;
   };
 

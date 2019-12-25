@@ -122,10 +122,46 @@ gdjs.evtTools.camera.centerCameraWithinLimits = function(runtimeScene, object, l
     layer.setCameraY(newY, cameraId);
 }
 
-gdjs.evtTools.camera.setLayerEffectParameter = function(runtimeScene, layer, effect, parameter, value) {
+/**
+ * Update a layer effect parameter (with a number).
+ * @param {gdjs.RuntimeScene} runtimeScene The scene
+ * @param {string} layer The name of the layer
+ * @param {string} effect The name of the effect
+ * @param {string} parameter The parameter to update
+ * @param {number} value The new value
+ */
+gdjs.evtTools.camera.setLayerEffectDoubleParameter = function(runtimeScene, layer, effect, parameter, value) {
     if ( !runtimeScene.hasLayer(layer) ) { return; }
 
-    return runtimeScene.getLayer(layer).setEffectParameter(effect, parameter, value);
+    return runtimeScene.getLayer(layer).setEffectDoubleParameter(effect, parameter, value);
+}
+
+/**
+ * Update a layer effect parameter (with a string).
+ * @param {gdjs.RuntimeScene} runtimeScene The scene
+ * @param {string} layer The name of the layer
+ * @param {string} effect The name of the effect
+ * @param {string} parameter The parameter to update
+ * @param {string} value The new value
+ */
+gdjs.evtTools.camera.setLayerEffectStringParameter = function(runtimeScene, layer, effect, parameter, value) {
+    if ( !runtimeScene.hasLayer(layer) ) { return; }
+
+    return runtimeScene.getLayer(layer).setEffectStringParameter(effect, parameter, value);
+}
+
+/**
+ * Enable or disable a layer effect parameter (boolean).
+ * @param {gdjs.RuntimeScene} runtimeScene The scene
+ * @param {string} layer The name of the layer
+ * @param {string} effect The name of the effect
+ * @param {string} parameter The parameter to update
+ * @param {boolean} value The new value
+ */
+gdjs.evtTools.camera.setLayerEffectBooleanParameter = function(runtimeScene, layer, effect, parameter, value) {
+    if ( !runtimeScene.hasLayer(layer) ) { return; }
+
+    return runtimeScene.getLayer(layer).setEffectBooleanParameter(effect, parameter, value);
 }
 
 /**

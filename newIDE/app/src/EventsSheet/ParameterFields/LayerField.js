@@ -27,6 +27,9 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        helperText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
         fullWidth
         value={value}
         onChange={onChange}

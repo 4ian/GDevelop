@@ -448,12 +448,16 @@ export const makeTestProject = gd => {
 
   const effect1 = layerWithEffects.insertNewEffect('MyEffect1', 0);
   const effect2 = layerWithEffects.insertNewEffect('MyEffect2', 1);
+  const effect3 = layerWithEffects.insertNewEffect('MyEffect3', 1);
 
   effect1.setEffectType('FakeSepia');
-  effect1.setParameter('opacity', 0.6);
+  effect1.setDoubleParameter('opacity', 0.6);
   effect2.setEffectType('FakeNight');
-  effect2.setParameter('intensity', 0.1);
-  effect2.setParameter('opacity', 0.2);
+  effect2.setDoubleParameter('intensity', 0.1);
+  effect2.setDoubleParameter('opacity', 0.2);
+  effect3.setEffectType('FakeEffectWithVariousParameters');
+  effect3.setDoubleParameter('intensity', 0.1);
+  effect3.setDoubleParameter('image', 'my-image');
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
   layerWithEffectWithoutEffectType.insertNewEffect(

@@ -83,7 +83,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
       >
         <MiniToolbar alignItems="baseline">
           <MiniToolbarText>
-            <Trans>Object Name:</Trans>
+            <Trans>Object name:</Trans>
           </MiniToolbarText>
           <SemiControlledTextField
             fullWidth

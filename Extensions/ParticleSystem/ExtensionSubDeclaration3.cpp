@@ -119,7 +119,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
   obj.AddCondition("Flow",
                    _("Flow"),
                    _("Test the flow of the emitter."),
-                   _("The flow of _PARAM0_ is _PARAM2_ _PARAM1_"),
+                   _("The flow of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")

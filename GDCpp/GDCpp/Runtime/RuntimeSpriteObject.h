@@ -232,6 +232,18 @@ class GD_API RuntimeSpriteObject : public RuntimeObject {
    * \return The scale factor. 1 is the default scale.
    */
   float GetScaleY() const;
+
+  /**
+   * \brief Change the scale factor of the object on X and Y axis.
+   * \param val The new scale. 1 is the default scale.
+   */
+  void SetScale(double newValue);
+
+  /**
+   * \brief Get the scale of the object (or the average of the X and Y scale in case they are different).
+   * \return The average scale factor on X and Y axes. 1 is the default scale.
+   */
+  double GetScale() const;
   ///@}
 
   /** \name Effects and color
@@ -309,12 +321,6 @@ class GD_API RuntimeSpriteObject : public RuntimeObject {
    * RuntimeSpriteObject::RotateTowardPosition instead.
    */
   void TurnTowardObject(RuntimeObject* object, RuntimeScene& scene);
-
-  /**
-   * Only used internally by GD events generated code: Prefer using
-   * (Get/Set)Scale(X/Y).
-   */
-  void ChangeScale(const gd::String& operatorStr, double newValue);
 
  private:
   // Animations, direction and current frame:

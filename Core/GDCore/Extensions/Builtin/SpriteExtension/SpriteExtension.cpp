@@ -170,7 +170,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetManipulatedType("number");
 
   obj.AddAction("ChangeScaleWidth",
                 _("Scale on X axis"),

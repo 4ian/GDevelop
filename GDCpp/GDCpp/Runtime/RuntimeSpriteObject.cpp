@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
+#include "RuntimeSpriteObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
@@ -17,7 +18,6 @@
 #include "GDCpp/Runtime/RuntimeLayer.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCpp/Runtime/TinyXml/tinyxml.h"
-#include "RuntimeSpriteObject.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #endif
@@ -164,27 +164,13 @@ float RuntimeSpriteObject::GetPointY(const gd::String& name) const {
   return GetY();
 }
 
-void RuntimeSpriteObject::ChangeScale(const gd::String& operatorStr,
-                                      double newScale) {
-  // TODO : Generate appropriate code calling SetScaleX/Y instead of this.
-  if (operatorStr == "=") {
-    SetScaleX(newScale);
-    SetScaleY(newScale);
-  } else if (operatorStr == "+") {
-    SetScaleX(GetScaleX() + newScale);
-    SetScaleY(GetScaleY() + newScale);
-  } else if (operatorStr == "-") {
-    SetScaleX(GetScaleX() - newScale);
-    SetScaleY(GetScaleY() - newScale);
-  } else if (operatorStr == "*") {
-    SetScaleX(GetScaleX() * newScale);
-    SetScaleY(GetScaleY() * newScale);
-  } else if (operatorStr == "/") {
-    SetScaleX(GetScaleX() / newScale);
-    SetScaleY(GetScaleY() / newScale);
-  }
+void RuntimeSpriteObject::SetScale(double newScale) {
+  SetScaleX(newScale);
+  SetScaleY(newScale);
+}
 
-  return;
+double RuntimeSpriteObject::GetScale() const {
+  return (GetScaleX() + GetScaleY())/2.0;
 }
 
 void RuntimeSpriteObject::SetScaleX(float val) {

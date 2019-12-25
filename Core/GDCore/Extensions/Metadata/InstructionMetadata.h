@@ -222,10 +222,10 @@ class GD_CORE_API ParameterMetadata {
                   ///< i.e. must not be shown in editor
  private:
   gd::String longDescription;  ///< Long description shown in the editor.
-  gd::String defaultValue;  ///< Used as a default value in editor or if an
-                            ///< optional parameter is empty.
-  gd::String name;  ///< The name of the parameter to be used in code
-                    ///< generation. Optional.
+  gd::String defaultValue;     ///< Used as a default value in editor or if an
+                               ///< optional parameter is empty.
+  gd::String name;             ///< The name of the parameter to be used in code
+                               ///< generation. Optional.
 };
 
 /**
@@ -355,10 +355,10 @@ class GD_CORE_API InstructionMetadata {
    * \brief Add a parameter not displayed in editor.
    *
    * \param type One of the type handled by GDevelop. This will also determine
-   * the type of the argument used when calling the function in the generated code.
-   * \param supplementaryInformation Depends on `type`. For example, when `type ==
-   * "inlineCode"`, the content of supplementaryInformation is inserted in the
-   * generated code.
+   * the type of the argument used when calling the function in the generated
+   * code. \param supplementaryInformation Depends on `type`. For example, when
+   * `type == "inlineCode"`, the content of supplementaryInformation is inserted
+   * in the generated code.
    *
    * \see EventsCodeGenerator::GenerateParametersCodes
    */
@@ -371,30 +371,50 @@ class GD_CORE_API InstructionMetadata {
    *
    * \see AddParameter
    */
-  InstructionMetadata &SetDefaultValue(gd::String defaultValue_) {
+  InstructionMetadata &SetDefaultValue(const gd::String &defaultValue_) {
     if (!parameters.empty()) parameters.back().SetDefaultValue(defaultValue_);
     return *this;
   };
 
   /**
-   * \brief Set the long description shown in the editor for the last added parameter.
+   * \brief Set the long description shown in the editor for the last added
+   * parameter.
    *
    * \see AddParameter
    */
-  InstructionMetadata &SetParameterLongDescription(gd::String longDescription) {
-    if (!parameters.empty()) parameters.back().SetLongDescription(longDescription);
+  InstructionMetadata &SetParameterLongDescription(
+      const gd::String &longDescription) {
+    if (!parameters.empty())
+      parameters.back().SetLongDescription(longDescription);
     return *this;
   };
 
+  /**
+   * \brief Add the default parameters for an instruction manipulating the
+   * specified type ("string", "number") with the default operators.
+   */
   InstructionMetadata &UseStandardOperatorParameters(const gd::String &type);
 
-  InstructionMetadata &UseStandardRelationalOperatorParameters(const gd::String &type);
+  /**
+   * \brief Add the default parameters for an instruction comparing the
+   * specified type ("string", "number") with the default relational operators.
+   */
+  InstructionMetadata &UseStandardRelationalOperatorParameters(
+      const gd::String &type);
 
+  /**
+   * \brief Mark the instruction as an object instruction. Automatically called
+   * when using `AddAction`/`AddCondition` on an `ObjectMetadata`.
+   */
   InstructionMetadata &SetIsObjectInstruction() {
     isObjectInstruction = true;
     return *this;
   }
 
+  /**
+   * \brief Mark the instruction as a behavior instruction. Automatically called
+   * when using `AddAction`/`AddCondition` on a `BehaviorMetadata`.
+   */
   InstructionMetadata &SetIsBehaviorInstruction() {
     isBehaviorInstruction = true;
     return *this;

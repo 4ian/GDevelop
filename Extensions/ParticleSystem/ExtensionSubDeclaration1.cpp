@@ -324,7 +324,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddAction("ParticleGravityX",
                 _("Gravity value on X axis"),
                 _("Change value of the gravity on X axis."),
-                _("Do _PARAM1__PARAM2_ to the value of gravity on X axis "
+                _("Do _PARAM1__PARAM2_ to the gravity on X axis "
                   "of _PARAM0_"),
                 _("Advanced"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
@@ -338,7 +338,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
          "ParticleGravityX",
          _("Gravity value on X axis"),
          _("Compare value of the gravity on X axis."),
-         _("Value of gravity on X axis of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("Gravity on X axis of _PARAM0_ is _PARAM1__PARAM2_"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -350,7 +350,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddAction("ParticleGravityY",
                 _("Gravity value on Y axis"),
                 _("Change value of the gravity on Y axis."),
-                _("Do _PARAM1__PARAM2_ to the value of gravity on Y axis "
+                _("Do _PARAM1__PARAM2_ to the gravity on Y axis "
                   "of _PARAM0_"),
                 _("Advanced"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
@@ -364,7 +364,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
          "ParticleGravityY",
          _("Gravity value on Y axis"),
          _("Compare value of the gravity on Y axis."),
-         _("Value of gravity on Y axis of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("Gravity on Y axis of _PARAM0_ is _PARAM1__PARAM2_"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -376,7 +376,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddAction("ParticleGravityZ",
                 _("Z Gravity"),
                 _("Change value of the gravity on Z axis."),
-                _("Do _PARAM1__PARAM2_ to the direction of gravity on Z axis "
+                _("Do _PARAM1__PARAM2_ to gravity direction on Z axis "
                   "of_PARAM0_"),
                 _("Advanced"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
@@ -390,7 +390,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
          "ParticleGravityZ",
          _("Direction of gravity on Z axis"),
          _("Test the direction of gravity on Z axis"),
-         _("Direction of gravity on Z axis of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("Gravity direction on Z axis of _PARAM0_ is _PARAM1__PARAM2_"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")

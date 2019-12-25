@@ -137,7 +137,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Gravity"),
                   _("Change the gravity applied on an object (in pixels per "
                     "second per second)."),
-                  _("Do _PARAM2__PARAM3_ to the gravity applied on _PARAM0_"),
+                  _("Do _PARAM2__PARAM3_ to the gravity of _PARAM0_"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
                   "CppPlatform/Extensions/platformerobjecticon16.png")

@@ -93,18 +93,31 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
   SetManipulatedType(type);
 
   AddParameter("operator", _("Modification's sign"));
-  AddParameter(type == "number" ? "expression" : type, _("TODO"));
+  AddParameter(type == "number" ? "expression" : type, _("Value"));
   size_t operatorParamIndex = parameters.size() - 2;
   size_t valueParamIndex = parameters.size() - 1;
 
   if (isObjectInstruction || isBehaviorInstruction) {
-    sentence = "Change " + sentence + " of _PARAM0_: _PARAM" +
-               gd::String::From(operatorParamIndex) + "_ _PARAM" +
-               gd::String::From(valueParamIndex) + "_";  // TODO: translation
+    gd::String templateSentence =
+        _("Change <subject> of _PARAM0_: <operator> <value>");
+
+    sentence =
+        templateSentence.FindAndReplace("<subject>", sentence)
+            .FindAndReplace(
+                "<operator>",
+                "_PARAM" + gd::String::From(operatorParamIndex) + "_")
+            .FindAndReplace("<value>",
+                            "_PARAM" + gd::String::From(valueParamIndex) + "_");
   } else {
-    sentence = "Change " + sentence + ": _PARAM" +
-               gd::String::From(operatorParamIndex) + "_ _PARAM" +
-               gd::String::From(valueParamIndex) + "_";  // TODO: translation
+    gd::String templateSentence = _("Change <subject>: <operator> <value>");
+
+    sentence =
+        templateSentence.FindAndReplace("<subject>", sentence)
+            .FindAndReplace(
+                "<operator>",
+                "_PARAM" + gd::String::From(operatorParamIndex) + "_")
+            .FindAndReplace("<value>",
+                            "_PARAM" + gd::String::From(valueParamIndex) + "_");
   }
 
   return *this;
@@ -116,18 +129,30 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
   SetManipulatedType(type);
 
   AddParameter("relationalOperator", _("Sign of the test"));
-  AddParameter("expression", _("TODO"));
+  AddParameter(type == "number" ? "expression" : type, _("Value to compare"));
   size_t operatorParamIndex = parameters.size() - 2;
   size_t valueParamIndex = parameters.size() - 1;
 
   if (isObjectInstruction || isBehaviorInstruction) {
-    sentence = sentence + " of _PARAM0_ _PARAM" +
-               gd::String::From(operatorParamIndex) + "_ _PARAM" +
-               gd::String::From(valueParamIndex) + "_";  // TODO: translation
+    gd::String templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
+
+    sentence =
+        templateSentence.FindAndReplace("<subject>", sentence)
+            .FindAndReplace(
+                "<operator>",
+                "_PARAM" + gd::String::From(operatorParamIndex) + "_")
+            .FindAndReplace("<value>",
+                            "_PARAM" + gd::String::From(valueParamIndex) + "_");
   } else {
-    sentence = sentence + " _PARAM" + gd::String::From(operatorParamIndex) +
-               "_ _PARAM" + gd::String::From(valueParamIndex) +
-               "_";  // TODO: translation
+    gd::String templateSentence = _("<subject> <operator> <value>");
+
+    sentence =
+        templateSentence.FindAndReplace("<subject>", sentence)
+            .FindAndReplace(
+                "<operator>",
+                "_PARAM" + gd::String::From(operatorParamIndex) + "_")
+            .FindAndReplace("<value>",
+                            "_PARAM" + gd::String::From(valueParamIndex) + "_");
   }
 
   return *this;

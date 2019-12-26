@@ -1,4 +1,4 @@
-gdjs.PixiFiltersTools.registerFilterCreator('Tilt shift', {
+gdjs.PixiFiltersTools.registerFilterCreator('TiltShift', {
   makePIXIFilter: function(layer, effectData) {
     var tiltShiftFilter = new PIXI.filters.TiltShiftFilter();
 

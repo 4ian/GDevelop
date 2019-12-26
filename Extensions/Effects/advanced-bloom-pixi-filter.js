@@ -1,4 +1,4 @@
-gdjs.PixiFiltersTools.registerFilterCreator('Advanced bloom', {
+gdjs.PixiFiltersTools.registerFilterCreator('AdvancedBloom', {
   makePIXIFilter: function(layer, effectData) {
     var advancedBloomFilter = new PIXI.filters.AdvancedBloomFilter();
 

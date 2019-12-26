@@ -1,4 +1,4 @@
-gdjs.PixiFiltersTools.registerFilterCreator('Zoom blur', {
+gdjs.PixiFiltersTools.registerFilterCreator('ZoomBlur', {
   makePIXIFilter: function(layer, effectData) {
     var zoomBlurFilter = new PIXI.filters.ZoomBlurFilter();
 

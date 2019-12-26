@@ -1,4 +1,4 @@
-gdjs.PixiFiltersTools.registerFilterCreator('Kawase blur', {
+gdjs.PixiFiltersTools.registerFilterCreator('KawaseBlur', {
   makePIXIFilter: function(layer, effectData) {
     var kawaseBlurFilter = new PIXI.filters.KawaseBlurFilter();
 

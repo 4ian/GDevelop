@@ -1,12 +1,13 @@
-gdjs.PixiFiltersTools.registerFilterCreator('Crt', {
+gdjs.PixiFiltersTools.registerFilterCreator('CRT', {
   makePIXIFilter: function(layer, effectData) {
-    var crtFilter = new PIXI.filters.CRTFilter({ seed: Math.random() });
+    var crtFilter = new PIXI.filters.CRTFilter();
 
     return crtFilter;
   },
   update: function(filter, layer) {
     if (filter.animated) {
       filter.time += layer.getElapsedTime() / 1000;
+      filter.seed = Math.random();
     }
   },
   updateDoubleParameter: function(filter, parameterName, value) {

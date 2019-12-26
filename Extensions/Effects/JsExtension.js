@@ -148,7 +148,11 @@ module.exports = {
     const displacementEffect = extension
       .addEffect('Displacement')
       .setFullName(_('Displacement'))
-      .setDescription(_('Add Displacement effect'))
+      .setDescription(
+        _(
+          'Uses the pixel values from the specified texture (called the displacement map) to perform a displacement of an object.'
+        )
+      )
       .addIncludeFile('Extensions/Effects/displacement-pixi-filter.js');
     const displacementProperties = displacementEffect.getProperties();
     displacementProperties.set(
@@ -158,27 +162,27 @@ module.exports = {
         .addExtraInfo('image')
         .setLabel(
           _(
-            'Displacement map texture for the effect. **Download** [basic displacement file](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects)'
+            'Displacement map texture for the effect. To get started, **download** [a default displacement map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
           )
         )
     );
     displacementProperties.set(
       'scaleX',
       new gd.PropertyDescriptor(/* defaultValue= */ '20')
-        .setLabel(_('Scale X'))
+        .setLabel(_('Scale on X axis'))
         .setType('number')
     );
     displacementProperties.set(
       'scaleY',
       new gd.PropertyDescriptor(/* defaultValue= */ '20')
-        .setLabel(_('Scale Y'))
+        .setLabel(_('Scale on Y axis'))
         .setType('number')
     );
 
     const colorMapEffect = extension
       .addEffect('ColorMap')
       .setFullName(_('Color Map'))
-      .setDescription(_('Add Color Map effect'))
+      .setDescription(_('Change the color rendered on screen.'))
       .addIncludeFile('Extensions/Effects/color-map-pixi-filter.js')
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-map.js');
     const colorMapProperties = colorMapEffect.getProperties();
@@ -190,69 +194,69 @@ module.exports = {
         .setLabel(_('Color map texture for the effect'))
         .setDescription(
           _(
-            'Color map are like LUT, you can change colors of pixels by modifing a reference color image containing each colours. **Download** [original color map file](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects)'
+            'You can change colors of pixels by modifing a reference color image, containing each colors, called the *Color Map Texture*. To get started, **download** [a default color map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
           )
         )
     );
     colorMapProperties.set(
       'nearest',
       new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('Nearest'))
+        .setLabel(_('Disable anti-aliasing ("nearest" pixel rounding)'))
         .setType('boolean')
-        .setDescription(_('Enable antialiasing on gradients.'))
     );
     colorMapProperties.set(
       'mix',
       new gd.PropertyDescriptor(/* defaultValue= */ '100')
         .setLabel(_('Mix'))
         .setType('number')
-        .setDescription(_('Mix value of the effect on the layer. (in percent)'))
+        .setDescription(_('Mix value of the effect on the layer (in percent)'))
     );
 
     const pixelateEffect = extension
       .addEffect('Pixelate')
       .setFullName(_('Pixelate'))
-      .setDescription(_('Pixelize the layer'))
+      .setDescription(
+        _("Applies a pixelate effect, making display objects appear 'blocky'.")
+      )
       .addIncludeFile('Extensions/Effects/pixelate-pixi-filter.js')
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-pixelate.js');
     const pixelateProperties = pixelateEffect.getProperties();
-
     pixelateProperties.set(
       'size',
       new gd.PropertyDescriptor(/* defaultValue= */ '10')
         .setLabel(_('Size'))
         .setType('number')
-        .setDescription(_('Size of pixel effect (10 pixels by default)'))
+        .setDescription(_('Size of the pixels (10 pixels by default)'))
     );
 
     const reflectionEffect = extension
       .addEffect('Reflection')
       .setFullName(_('Reflection'))
-      .setDescription(_('Reflect the layer'))
+      .setDescription(
+        _(
+          'Applies a reflection effect to simulate the reflection on water with waves.'
+        )
+      )
       .addIncludeFile('Extensions/Effects/reflection-pixi-filter.js')
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-reflection.js');
     const reflectionProperties = reflectionEffect.getProperties();
-
     reflectionProperties.set(
       'mirror',
       new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('mirror'))
+        .setLabel(_('Reflect the image on the waves'))
         .setType('boolean')
-        .setDescription(_('Reflect the image on the waves'))
     );
-
     reflectionProperties.set(
       'boundary',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('boundary'))
+        .setLabel(_('Vertical position of the reflection point'))
         .setType('number')
         .setDescription(
           _(
-            'Vertical position of the reflection point, default is 50% (middle) smaller numbers produce a larger reflection, larger numbers produce a smaller reflection.'
+            'Default is 50% (middle). Smaller numbers produce a larger reflection, larger numbers produce a smaller reflection.'
           )
         )
     );
-
     reflectionProperties.set(
       'amplitudeStart',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
@@ -260,7 +264,6 @@ module.exports = {
         .setType('number')
         .setDescription(_('Starting amplitude of waves (0 by default)'))
     );
-
     reflectionProperties.set(
       'amplitudeEnding',
       new gd.PropertyDescriptor(/* defaultValue= */ '20')
@@ -268,7 +271,6 @@ module.exports = {
         .setType('number')
         .setDescription(_('Ending amplitude of waves (20 by default)'))
     );
-
     reflectionProperties.set(
       'waveLengthStart',
       new gd.PropertyDescriptor(/* defaultValue= */ '30')
@@ -276,7 +278,6 @@ module.exports = {
         .setType('number')
         .setDescription(_('Starting wave length (30 by default)'))
     );
-
     reflectionProperties.set(
       'waveLengthEnding',
       new gd.PropertyDescriptor(/* defaultValue= */ '100')
@@ -284,7 +285,6 @@ module.exports = {
         .setType('number')
         .setDescription(_('Ending wave length (100 by default)'))
     );
-
     reflectionProperties.set(
       'alphaStart',
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
@@ -292,7 +292,6 @@ module.exports = {
         .setType('number')
         .setDescription(_('Starting alpha (1 by default)'))
     );
-
     reflectionProperties.set(
       'alphaEnding',
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
@@ -300,13 +299,11 @@ module.exports = {
         .setType('number')
         .setDescription(_('Ending alpha (1 by default)'))
     );
-
     reflectionProperties.set(
       'animated',
       new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('animated'))
+        .setLabel(_('Animate waves'))
         .setType('boolean')
-        .setDescription(_('Animate waves'))
     );
 
     return extension;

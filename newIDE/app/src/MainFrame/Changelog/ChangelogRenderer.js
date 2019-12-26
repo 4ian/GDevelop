@@ -13,7 +13,6 @@ import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import { hasBreakingChange } from '../../Utils/GDevelopServices/Release';
 import AlertMessage from '../../UI/AlertMessage';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 
@@ -69,41 +68,36 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
     !!currentRelease && hasBreakingChange(currentRelease);
 
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <Column>
-          {currentVersionHasBreakingChange && (
-            <AlertMessage kind="warning">
-              This version of GDevelop has a breaking change. Please make sure
-              to read the changes below to understand if any change or
-              adaptation must be made to your project.
-            </AlertMessage>
-          )}
-          {releases.map(release =>
-            release.name ? (
-              <MarkdownText
-                key={release.name}
-                source={
-                  '# Version ' +
-                  release.name +
-                  '\n---\n' +
-                  (release.description ||
-                    'Changes and new features description will be available soon.')
-                }
-                className={muiTheme.markdownRootClassName}
-                useParagraphs
-              />
-            ) : null
-          )}
-          <Line justifyContent="center">
-            <FlatButton
-              label={<Trans>See all the releases notes</Trans>}
-              onClick={openReleaseNote}
-            />
-          </Line>
-        </Column>
+    <Column>
+      {currentVersionHasBreakingChange && (
+        <AlertMessage kind="warning">
+          This version of GDevelop has a breaking change. Please make sure to
+          read the changes below to understand if any change or adaptation must
+          be made to your project.
+        </AlertMessage>
       )}
-    </ThemeConsumer>
+      {releases.map(release =>
+        release.name ? (
+          <MarkdownText
+            key={release.name}
+            source={
+              '# Version ' +
+              release.name +
+              '\n---\n' +
+              (release.description ||
+                'Changes and new features description will be available soon.')
+            }
+            isStandaloneText
+          />
+        ) : null
+      )}
+      <Line justifyContent="center">
+        <FlatButton
+          label={<Trans>See all the releases notes</Trans>}
+          onClick={openReleaseNote}
+        />
+      </Line>
+    </Column>
   );
 };
 

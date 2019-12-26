@@ -6,6 +6,8 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+.gd-markdown-dark-theme.standalone-text-container {
   font-size: 16px;
   line-height: 1.3;
 }
@@ -30,6 +32,7 @@
 
 .gd-markdown-dark-theme a {
   color: rgb(221, 221, 221);
+  cursor: pointer;
 }
 
 .gd-markdown-dark-theme img {

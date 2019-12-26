@@ -1,9 +1,11 @@
 // @flow
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
+import ThemeContext from './Theme/ThemeContext';
+import classNames from 'classnames';
 
 // Sensible defaults for react-markdown
-const makeMarkdownCustomRenderers = (useParagraphs: boolean) => ({
+const makeMarkdownCustomRenderers = (isStandaloneText: boolean) => ({
   // Ensure link are opened in a new page
   link: props => (
     <a href={props.href} target="_blank" rel="noopener noreferrer">
@@ -12,29 +14,32 @@ const makeMarkdownCustomRenderers = (useParagraphs: boolean) => ({
   ),
   // Add paragraphs only if we explictly opt in.
   paragraph: props =>
-    useParagraphs ? <p>{props.children}</p> : props.children,
+    isStandaloneText ? <p>{props.children}</p> : props.children,
 });
 
 type Props = {|
   source: string,
-  className?: ?string,
-  useParagraphs?: boolean,
+  isStandaloneText?: boolean,
 |};
 
 /**
  * Display a markdown text
  */
 export const MarkdownText = (props: Props) => {
+  const gdevelopTheme = React.useContext(ThemeContext);
   const markdownCustomRenderers = React.useMemo(
-    () => makeMarkdownCustomRenderers(props.useParagraphs || false),
-    [props.useParagraphs]
+    () => makeMarkdownCustomRenderers(props.isStandaloneText || false),
+    [props.isStandaloneText]
   );
 
   return (
     <ReactMarkdown
       escapeHtml
       source={props.source}
-      className={props.className}
+      className={classNames({
+        [gdevelopTheme.markdownRootClassName]: true,
+        'standalone-text-container': props.isStandaloneText,
+      })}
       renderers={markdownCustomRenderers}
     />
   );

@@ -145,6 +145,257 @@ module.exports = {
         .setType('number')
     );
 
+    const crtEffect = extension
+      .addEffect('CRT')
+      .setFullName(_('CRT'))
+      .setDescription(_('Apply an effect resembling old CRT monitors.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-crt.js')
+      .addIncludeFile('Extensions/Effects/crt-pixi-filter.js');
+    const crtProperties = crtEffect.getProperties();
+    crtProperties.set(
+      'lineWidth',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
+        .setLabel(_('Line width (between 0 and 5)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'lineContrast',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Line contrast (between 0 and 1)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'noise',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.1')
+        .setLabel(_('Noise (between 0 and 1)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'curvature',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Curvature (between 0 and 10)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'verticalLine',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Vertical line (true or false)'))
+        .setType('boolean')
+    );
+    crtProperties.set(
+      'noiseSize',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Noise size (between 0 and 10)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'vignetting',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting (between 0 and 1)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'vignettingAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Vignetting alpha (between 0 and 1)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'vignettingBlur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting blur (between 0 and 1)'))
+        .setType('number')
+    );
+    crtProperties.set(
+      'animated',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel(_('Animated (Enable animations)'))
+        .setType('boolean')
+    );
+
+    const godrayEffect = extension
+      .addEffect('Godray')
+      .setFullName(_('Godray'))
+      .setDescription(_('Apply and animate atmospheric light rays.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-godray.js')
+      .addIncludeFile('Extensions/Effects/godray-pixi-filter.js');
+    const godrayProperties = godrayEffect.getProperties();
+    godrayProperties.set(
+      'parallel',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel(_('Parallel (parallel rays)'))
+        .setType('boolean')
+    );
+    godrayProperties.set(
+      'animated',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel(_('Animated (animate rays)'))
+        .setType('boolean')
+    );
+    godrayProperties.set(
+      'lacunarity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2.75')
+        .setLabel(_('Lacunarity (between 0 and 5)'))
+        .setType('number')
+    );
+    godrayProperties.set(
+      'angle',
+      new gd.PropertyDescriptor(/* defaultValue= */ '30')
+        .setLabel(_('Angle (between -60 and 60)'))
+        .setType('number')
+    );
+    godrayProperties.set(
+      'gain',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.6')
+        .setLabel(_('Gain (between 0 and 1)'))
+        .setType('number')
+    );
+    godrayProperties.set(
+      'light',
+      new gd.PropertyDescriptor(/* defaultValue= */ '30')
+        .setLabel(_('Light (between 0 and 60)'))
+        .setType('number')
+    );
+    godrayProperties.set(
+      'x',
+      new gd.PropertyDescriptor(/* defaultValue= */ '100')
+        .setLabel(_('Center X (between 100 and 1000)'))
+        .setType('number')
+    );
+    godrayProperties.set(
+      'y',
+      new gd.PropertyDescriptor(/* defaultValue= */ '100')
+        .setLabel(_('Center Y (between -1000 and 100)'))
+        .setType('number')
+    );
+
+    const tiltShiftEffect = extension
+      .addEffect('TiltShift')
+      .setFullName(_('Tilt shift'))
+      .setDescription(_('Render a tilt-shift-like camera effect.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-tilt-shift.js')
+      .addIncludeFile('Extensions/Effects/tilt-shift-pixi-filter.js');
+    const tiltShiftProperties = tiltShiftEffect.getProperties();
+    tiltShiftProperties.set(
+      'blur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '30')
+        .setLabel(_('Blur (between 0 and 200)'))
+        .setType('number')
+    );
+    tiltShiftProperties.set(
+      'gradientBlur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1000')
+        .setLabel(_('Gradient blur (between 0 and 2000)'))
+        .setType('number')
+    );
+
+    const advancedBloomEffect = extension
+      .addEffect('AdvancedBloom')
+      .setFullName(_('Advanced bloom'))
+      .setDescription(_('Applies a Bloom Effect.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
+      .addIncludeFile(
+        'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
+      )
+      .addIncludeFile('Extensions/Effects/advanced-bloom-pixi-filter.js');
+    const advancedBloomProperties = advancedBloomEffect.getProperties();
+    advancedBloomProperties.set(
+      'threshold',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Threshold (between 0 and 1)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'bloomScale',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.7')
+        .setLabel(_('Bloom Scale (between 0 and 2)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'brightness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.7')
+        .setLabel(_('Brightness (between 0 and 2)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'blur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '4')
+        .setLabel(_('Blur (between 0 and 20)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'quality',
+      new gd.PropertyDescriptor(/* defaultValue= */ '7')
+        .setLabel(_('Quality (between 0 and 20)'))
+        .setType('number')
+    );
+
+    const kawaseBlurEffect = extension
+      .addEffect('KawaseBlur')
+      .setFullName(_('Kawase blur'))
+      .setDescription(
+        _('A much faster blur than Gaussian blur, but more complicated to use.')
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
+      .addIncludeFile('Extensions/Effects/kawase-blur-pixi-filter.js');
+    const kawaseBlurProperties = kawaseBlurEffect.getProperties();
+    kawaseBlurProperties.set(
+      'pixelizeX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Pixelize X (between 0 and 10)'))
+        .setType('number')
+    );
+    kawaseBlurProperties.set(
+      'pixelizeY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Pixelize Y (between 0 and 10)'))
+        .setType('number')
+    );
+    kawaseBlurProperties.set(
+      'blur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Blur (between 0 and 20)'))
+        .setType('number')
+    );
+    kawaseBlurProperties.set(
+      'quality',
+      new gd.PropertyDescriptor(/* defaultValue= */ '3')
+        .setLabel(_('Quality (between 1 and 20)'))
+        .setType('number')
+    );
+
+    const zoomBlurEffect = extension
+      .addEffect('ZoomBlur')
+      .setFullName(_('Zoom blur'))
+      .setDescription(_('Applies a Zoom blur.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-zoom-blur.js')
+      .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js');
+    const zoomBlurProperties = zoomBlurEffect.getProperties();
+    zoomBlurProperties.set(
+      'centerX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
+        .setType('number')
+    );
+    zoomBlurProperties.set(
+      'centerY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+        .setType('number')
+    );
+    zoomBlurProperties.set(
+      'innerRadius',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
+        .setLabel(_('Inner radius (between 0 and 1, 0.5 is mid-way)'))
+        .setType('number')
+    );
+    zoomBlurProperties.set(
+      'strength',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('strength (between 0 and 5)'))
+        .setType('number')
+    );
+
     const displacementEffect = extension
       .addEffect('Displacement')
       .setFullName(_('Displacement'))

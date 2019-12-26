@@ -10,22 +10,22 @@ gdjs.PixiFiltersTools.registerFilterCreator('Godray', {
     }
   },
   updateDoubleParameter: function(filter, parameterName, value) {
-    if (parameterName === 'lacunarity') {
+    else if (parameterName === 'lacunarity') {
       filter.lacunarity = value;
     }
-    if (parameterName === 'angle') {
+    else if (parameterName === 'angle') {
       filter.angle = value;
     }
-    if (parameterName === 'gain') {
+    else if (parameterName === 'gain') {
       filter.gain = value;
     }
-    if (parameterName === 'light') {
+    else if (parameterName === 'light') {
       filter.light = value;
     }
-    if (parameterName === 'x') {
+    else if (parameterName === 'x') {
       filter.x = value;
     }
-    if (parameterName === 'y') {
+    else if (parameterName === 'y') {
       filter.y = value;
     }
   },

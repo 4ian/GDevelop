@@ -14,25 +14,25 @@ gdjs.PixiFiltersTools.registerFilterCreator('Crt', {
     if (parameterName === 'lineWidth') {
       filter.lineWidth = value;
     }
-    if (parameterName === 'lineContrast') {
+    else if (parameterName === 'lineContrast') {
       filter.lineContrast = value;
     }
-    if (parameterName === 'noise') {
+    else if (parameterName === 'noise') {
       filter.noise = value;
     }
-    if (parameterName === 'curvature') {
+    else if (parameterName === 'curvature') {
       filter.curvature = value;
     }
-    if (parameterName === 'noiseSize') {
+    else if (parameterName === 'noiseSize') {
       filter.noiseSize = value;
     }
-    if (parameterName === 'vignetting') {
+    else if (parameterName === 'vignetting') {
       filter.vignetting = value;
     }
-    if (parameterName === 'vignettingAlpha') {
+    else if (parameterName === 'vignettingAlpha') {
       filter.vignettingAlpha = value;
     }
-    if (parameterName === 'vignettingBlur') {
+    else if (parameterName === 'vignettingBlur') {
       filter.vignettingBlur = value;
     }
   },

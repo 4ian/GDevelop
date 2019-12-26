@@ -10,13 +10,13 @@ gdjs.PixiFiltersTools.registerFilterCreator('Zoom blur', {
     if (parameterName === 'centerX') {
       filter.center[0]= Math.round(window.innerWidth * value);
     }
-    if (parameterName === 'centerY') {
+    else if (parameterName === 'centerY') {
       filter.center[1] = Math.round(window.innerHeight * value);
     }
-    if (parameterName === 'innerRadius') {
+    else if (parameterName === 'innerRadius') {
       filter.innerRadius = Math.round(window.innerWidth * value);
     }
-    if (parameterName === 'strength') {
+    else if (parameterName === 'strength') {
       filter.strength = gdjs.PixiFiltersTools.clampValue(value / 10, 0, 20);
     }
   },

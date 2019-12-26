@@ -10,7 +10,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('Tilt shift', {
     if (parameterName === 'blur') {
       filter.blur = value;
     }
-    if (parameterName === 'gradientBlur') {
+    else if (parameterName === 'gradientBlur') {
       filter.gradientBlur = value;
     }
   },

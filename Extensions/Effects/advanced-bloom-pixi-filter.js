@@ -10,16 +10,16 @@ gdjs.PixiFiltersTools.registerFilterCreator('Advanced bloom', {
     if (parameterName === 'threshold') {
       filter.threshold = value;
     }
-    if (parameterName === 'bloomScale') {
+    else if (parameterName === 'bloomScale') {
       filter.bloomScale = value;
     }
-    if (parameterName === 'brightness') {
+    else if (parameterName === 'brightness') {
       filter.brightness = value;
     }
-    if (parameterName === 'blur') {
+    else if (parameterName === 'blur') {
       filter.blur = value;
     }
-    if (parameterName === 'quality') {
+    else if (parameterName === 'quality') {
       filter.quality = value;
     }
   },

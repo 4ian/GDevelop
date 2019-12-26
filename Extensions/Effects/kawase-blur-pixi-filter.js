@@ -10,13 +10,13 @@ gdjs.PixiFiltersTools.registerFilterCreator('Kawase blur', {
     if (parameterName === 'pixelizeX') {
       filter.pixelizeX = value;
     }
-    if (parameterName === 'pixelizeY') {
+    else if (parameterName === 'pixelizeY') {
       filter.pixelizeY = value;
     }
-    if (parameterName === 'blur') {
+    else if (parameterName === 'blur') {
       filter.blur = value;
     }
-    if (parameterName === 'quality') {
+    else if (parameterName === 'quality') {
       filter.quality = value;
     }
   },

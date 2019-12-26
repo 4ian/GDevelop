@@ -146,9 +146,9 @@ module.exports = {
     );
 
     const crtEffect = extension
-      .addEffect('Crt')
-      .setFullName(_('Crt'))
-      .setDescription(_('Add Crt effect'))
+      .addEffect('CRT')
+      .setFullName(_('CRT'))
+      .setDescription(_('Apply an effect resembling old CRT monitors.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-crt.js')
       .addIncludeFile('Extensions/Effects/crt-pixi-filter.js');
     const crtProperties = crtEffect.getProperties();
@@ -216,7 +216,7 @@ module.exports = {
     const godrayEffect = extension
       .addEffect('Godray')
       .setFullName(_('Godray'))
-      .setDescription(_('Add Godray effect'))
+      .setDescription(_('Apply and animate atmospheric light rays.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-godray.js')
       .addIncludeFile('Extensions/Effects/godray-pixi-filter.js');
     const godrayProperties = godrayEffect.getProperties();
@@ -270,9 +270,9 @@ module.exports = {
     );
 
     const tiltShiftEffect = extension
-      .addEffect('Tilt shift')
+      .addEffect('TiltShift')
       .setFullName(_('Tilt shift'))
-      .setDescription(_('Add Tilt shift effect'))
+      .setDescription(_('Render a tilt-shift-like camera effect.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-tilt-shift.js')
       .addIncludeFile('Extensions/Effects/tilt-shift-pixi-filter.js');
     const tiltShiftProperties = tiltShiftEffect.getProperties();
@@ -290,9 +290,9 @@ module.exports = {
     );
 
     const advancedBloomEffect = extension
-      .addEffect('Advanced bloom')
+      .addEffect('AdvancedBloom')
       .setFullName(_('Advanced bloom'))
-      .setDescription(_('Add Advanced bloom effect'))
+      .setDescription(_('Applies a Bloom Effect.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
       .addIncludeFile(
         'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
@@ -331,9 +331,9 @@ module.exports = {
     );
 
     const kawaseBlurEffect = extension
-      .addEffect('Kawase blur')
+      .addEffect('KawaseBlur')
       .setFullName(_('Kawase blur'))
-      .setDescription(_('Add Kawase blur effect'))
+      .setDescription(_('A much faster blur than Gaussian blur, but more complicated to use.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
       .addIncludeFile('Extensions/Effects/kawase-blur-pixi-filter.js');
     const kawaseBlurProperties = kawaseBlurEffect.getProperties();
@@ -363,9 +363,9 @@ module.exports = {
     );
 
     const zoomBlurEffect = extension
-      .addEffect('Zoom blur')
+      .addEffect('ZoomBlur')
       .setFullName(_('Zoom blur'))
-      .setDescription(_('Add Zoom blur effect'))
+      .setDescription(_('Applies a Zoom blur.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-zoom-blur.js')
       .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js');
     const zoomBlurProperties = zoomBlurEffect.getProperties();

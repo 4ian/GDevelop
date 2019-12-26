@@ -160,7 +160,8 @@ module.exports = {
       new gd.PropertyDescriptor('')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(
+        .setLabel(_('Displacement map texture'))
+        .setDescription(
           _(
             'Displacement map texture for the effect. To get started, **download** [a default displacement map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
           )

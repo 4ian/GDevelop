@@ -176,6 +176,8 @@ import {
   ResponsiveLineStackLayout,
 } from '../UI/Layout';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 
 // No i18n in this file
 
@@ -320,6 +322,62 @@ storiesOf('UI Building Blocks/Buttons', module)
     </Column>
   ));
 
+storiesOf('UI Building Blocks/SelectField', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ValueStateHolder
+      initialValue={'1'}
+      render={(value, onChange) => (
+        <SelectField
+          value={value}
+          onChange={(e, i, newValue: string) => onChange(newValue)}
+          fullWidth
+        >
+          <SelectOption value="1" primaryText="Choice 1" />
+          <SelectOption value="2" primaryText="Choice 2" />
+          <SelectOption value="3" primaryText="Choice 3" />
+          <SelectOption value="4" primaryText="Choice 4" />
+        </SelectField>
+      )}
+    />
+  ))
+  .add('default, with (markdown) helper text', () => (
+    <ValueStateHolder
+      initialValue={'1'}
+      render={(value, onChange) => (
+        <SelectField
+          value={value}
+          onChange={(e, i, newValue: string) => onChange(newValue)}
+          fullWidth
+          helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+        >
+          <SelectOption value="1" primaryText="Choice 1" />
+          <SelectOption value="2" primaryText="Choice 2" />
+          <SelectOption value="3" primaryText="Choice 3" />
+          <SelectOption value="4" primaryText="Choice 4" />
+        </SelectField>
+      )}
+    />
+  ))
+  .add('margin=none', () => (
+    <ValueStateHolder
+      initialValue={'1'}
+      render={(value, onChange) => (
+        <SelectField
+          margin="none"
+          value={value}
+          onChange={(e, i, newValue: string) => onChange(newValue)}
+          fullWidth
+        >
+          <SelectOption value="1" primaryText="Choice 1" />
+          <SelectOption value="2" primaryText="Choice 2" />
+          <SelectOption value="3" primaryText="Choice 3" />
+          <SelectOption value="4" primaryText="Choice 4" />
+        </SelectField>
+      )}
+    />
+  ));
+
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -395,6 +453,21 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
               commitOnBlur
             />
           </MiniToolbar>
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('with a (markdown) helper text', () => (
+    <ValueStateHolder
+      initialValue={'Hello World'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledTextField
+            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+            value={value}
+            onChange={onChange}
+          />
           <p>State value is {value}</p>
         </React.Fragment>
       )}
@@ -531,6 +604,25 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
               }))}
             />
           </MiniToolbar>
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('with a (markdown) helper text', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+          />
           <p>State value is {value}</p>
         </React.Fragment>
       )}
@@ -960,7 +1052,7 @@ storiesOf('UI Building Blocks/ColorField', module)
           a: 255,
         }}
         onChangeComplete={() => {}}
-        helperText="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        helperMarkdownText="Lorem ipsum **dolor sit amet**, consectetur _adipiscing elit_, [sed do eiusmod](http://example.com) tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
       />
       <ColorField
         floatingLabelText="This is not full width"

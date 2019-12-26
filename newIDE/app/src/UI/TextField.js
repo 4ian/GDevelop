@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { I18n } from '@lingui/react';
 import MUITextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { MarkdownText } from './MarkdownText';
 
 type ValueProps =
   // Support "text" and "password" type:
@@ -55,7 +56,7 @@ type Props = {|
   floatingLabelText?: React.Node,
   name?: string,
   hintText?: MessageDescriptor,
-  helperText?: React.Node,
+  helperMarkdownText?: ?string,
   id?: string,
 
   // Keyboard focus:
@@ -178,6 +179,10 @@ export default class TextField extends React.Component<Props, {||}> {
     const { props } = this;
     const onChange = props.onChange || undefined;
 
+    const helperText = props.helperMarkdownText ? (
+      <MarkdownText source={props.helperMarkdownText} />
+    ) : null;
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -195,7 +200,7 @@ export default class TextField extends React.Component<Props, {||}> {
             }
             // Error handling:
             error={!!props.errorText}
-            helperText={props.errorText || props.helperText}
+            helperText={props.errorText || helperText}
             disabled={props.disabled}
             InputLabelProps={{
               shrink: props.floatingLabelFixed ? true : undefined,

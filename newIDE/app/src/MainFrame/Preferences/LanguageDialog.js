@@ -88,7 +88,7 @@ export default class LanguageDialog extends Component<Props, State> {
                       }
                       primary={false}
                       onClick={() => {
-                        onClose(false);
+                        onClose(this.state.languageDidChange);
                       }}
                       disabled={isLoadingLanguage}
                       key="close"

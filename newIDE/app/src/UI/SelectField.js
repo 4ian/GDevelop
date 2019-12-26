@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { computeTextFieldStyleProps } from './TextField';
+import { MarkdownText } from './MarkdownText';
 
 type ValueProps = {|
   value: number | string,
@@ -31,7 +32,7 @@ type Props = {|
   margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
-  helperText?: React.Node,
+  helperMarkdownText?: ?string,
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
@@ -73,6 +74,10 @@ export default class SelectField extends React.Component<Props, {||}> {
     }
     const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
 
+    const helperText = props.helperMarkdownText ? (
+      <MarkdownText source={props.helperMarkdownText} />
+    ) : null;
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -82,7 +87,7 @@ export default class SelectField extends React.Component<Props, {||}> {
             disabled={props.disabled}
             fullWidth={props.fullWidth}
             label={props.floatingLabelText}
-            helperText={props.helperText}
+            helperText={helperText}
             value={displayedValue}
             onChange={
               onChange

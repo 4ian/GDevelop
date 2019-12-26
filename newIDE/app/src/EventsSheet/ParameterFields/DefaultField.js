@@ -25,7 +25,7 @@ export default class DefaultField extends React.Component<
         commitOnBlur
         value={this.props.value}
         floatingLabelText={description}
-        helperText={
+        helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         onChange={(text: string) => this.props.onChange(text)}

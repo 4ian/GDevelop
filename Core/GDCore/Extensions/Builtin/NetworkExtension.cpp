@@ -48,9 +48,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
       .AddParameter("scenevar", _("Reponse scene variable"), "", true)
       .SetParameterLongDescription(
           _("The response of the server will be stored, as a string, in this "
-            "variable. If the server returns JSON, you may want to use the "
+            "variable. If the server returns *JSON*, you may want to use the "
             "action \"Convert JSON to a scene variable\" afterwards, to "
-            "explore the results with a structure variable."))
+            "explore the results with a *structure variable*."))
       .MarkAsComplex();
 
   extension

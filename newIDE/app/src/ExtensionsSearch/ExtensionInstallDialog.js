@@ -11,8 +11,7 @@ import {
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
-import ReactMarkdown from 'react-markdown';
+import { MarkdownText } from '../UI/MarkdownText';
 import Text from '../UI/Text';
 
 type Props = {|
@@ -66,62 +65,54 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
     const { extensionHeader, error } = this.state;
 
     return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <Dialog
-            title={
-              extensionHeader
-                ? extensionHeader.fullName
-                : extensionShortHeader.fullName
-            }
-            actions={[
-              <FlatButton
-                key="close"
-                label={<Trans>Back</Trans>}
-                primary={false}
-                onClick={onClose}
-                disabled={isInstalling}
-              />,
-              <LeftLoader isLoading={isInstalling}>
-                <FlatButton
-                  key="install"
-                  label={
-                    alreadyInstalled ? (
-                      <Trans>Re-install/update</Trans>
-                    ) : (
-                      <Trans>Install in project</Trans>
-                    )
-                  }
-                  primary
-                  onClick={onInstall}
-                  disabled={isInstalling}
-                />
-              </LeftLoader>,
-            ]}
-            open
-            onRequestClose={onClose}
-          >
-            {!extensionHeader ? (
-              <Text>{extensionShortHeader.shortDescription}</Text>
-            ) : (
-              <ReactMarkdown
-                escapeHtml
-                source={extensionHeader.description}
-                className={muiTheme.markdownRootClassName}
-              />
-            )}
-            {!extensionHeader && !error && <PlaceholderLoader />}
-            {!extensionHeader && error && (
-              <PlaceholderError onRetry={this._loadExtensionheader}>
-                <Trans>
-                  Can't load the extension registry. Verify your internet
-                  connection or try again later.
-                </Trans>
-              </PlaceholderError>
-            )}
-          </Dialog>
+      <Dialog
+        title={
+          extensionHeader
+            ? extensionHeader.fullName
+            : extensionShortHeader.fullName
+        }
+        actions={[
+          <FlatButton
+            key="close"
+            label={<Trans>Back</Trans>}
+            primary={false}
+            onClick={onClose}
+            disabled={isInstalling}
+          />,
+          <LeftLoader isLoading={isInstalling}>
+            <FlatButton
+              key="install"
+              label={
+                alreadyInstalled ? (
+                  <Trans>Re-install/update</Trans>
+                ) : (
+                  <Trans>Install in project</Trans>
+                )
+              }
+              primary
+              onClick={onInstall}
+              disabled={isInstalling}
+            />
+          </LeftLoader>,
+        ]}
+        open
+        onRequestClose={onClose}
+      >
+        {!extensionHeader ? (
+          <Text>{extensionShortHeader.shortDescription}</Text>
+        ) : (
+          <MarkdownText source={extensionHeader.description} isStandaloneText />
         )}
-      </ThemeConsumer>
+        {!extensionHeader && !error && <PlaceholderLoader />}
+        {!extensionHeader && error && (
+          <PlaceholderError onRetry={this._loadExtensionheader}>
+            <Trans>
+              Can't load the extension registry. Verify your internet connection
+              or try again later.
+            </Trans>
+          </PlaceholderError>
+        )}
+      </Dialog>
     );
   }
 }

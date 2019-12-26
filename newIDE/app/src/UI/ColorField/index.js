@@ -33,7 +33,7 @@ export default class ColorField extends Component {
           fullWidth
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
-          helperText={this.props.helperText}
+          helperMarkdownText={this.props.helperMarkdownText}
           type="text"
           hintText={t`Click to choose`}
           onClick={this.onClick}

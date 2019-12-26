@@ -145,7 +145,17 @@
     opacity: 0.6;
 }
 
+/**
+ * Icon (variable, object icon...)
+ */
 .gd-events-sheet .icon {
     vertical-align: sub;
     object-fit: contain;
+}
+
+/**
+ * Container having an icon next to the associated name
+ */
+.gd-events-sheet .name-and-icon-container {
+    white-space: nowrap;
 }

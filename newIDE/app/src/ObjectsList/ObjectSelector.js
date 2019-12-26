@@ -23,7 +23,7 @@ type Props = {|
 
   fullWidth?: boolean,
   floatingLabelText?: React.Node,
-  helperText?: React.Node,
+  helperMarkdownText?: ?string,
   hintText?: MessageDescriptor | string,
   openOnFocus?: boolean,
   margin?: 'none' | 'dense',

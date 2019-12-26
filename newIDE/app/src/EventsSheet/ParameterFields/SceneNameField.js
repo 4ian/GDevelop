@@ -32,7 +32,7 @@ export default class SceneNameField extends Component<
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
-        helperText={
+        helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         fullWidth

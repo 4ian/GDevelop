@@ -19,7 +19,7 @@ export default class MouseField extends Component {
         margin={this.props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
-        helperText={
+        helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         value={value}

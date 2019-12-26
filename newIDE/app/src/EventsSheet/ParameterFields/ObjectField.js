@@ -1,9 +1,11 @@
 // @flow
 import * as React from 'react';
+import classNames from 'classnames';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
+import { nameAndIconContainer } from '../EventsTree/ClassNames';
 
 export default class ObjectField extends React.Component<
   ParameterFieldProps,
@@ -47,7 +49,7 @@ export default class ObjectField extends React.Component<
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}
-        helperText={this._longDescription}
+        helperMarkdownText={this._longDescription}
         fullWidth
         errorTextIfInvalid={
           this._allowedObjectType ? (
@@ -71,7 +73,12 @@ export const renderInlineObjectWithThumbnail = ({
   renderObjectThumbnail,
 }: ParameterInlineRendererProps) => {
   return (
-    <span title={value}>
+    <span
+      title={value}
+      className={classNames({
+        [nameAndIconContainer]: true,
+      })}
+    >
       {renderObjectThumbnail(value)}
       {value}
     </span>

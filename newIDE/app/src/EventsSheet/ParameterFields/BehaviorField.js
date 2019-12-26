@@ -134,7 +134,7 @@ export default class BehaviorField extends React.Component<
       <SemiControlledAutoComplete
         margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={this._description}
-        helperText={this._longDescription}
+        helperMarkdownText={this._longDescription}
         fullWidth
         errorText={
           !this._behaviorNames.length

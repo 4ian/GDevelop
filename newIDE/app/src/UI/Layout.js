@@ -11,10 +11,17 @@ type TextFieldWithButtonLayoutProps = {|
     marginLeft?: number,
     marginRight?: number,
     margin?: number,
+    flexShrink?: 0,
   |}) => React.Node,
   margin?: 'none' | 'dense',
   noFloatingLabelText?: boolean,
 |};
+
+const buttonCommonStyles = {
+  // Ensure the button is not shrinked, even if the text field
+  // (in particular with a long helper text) is large.
+  flexShrink: 0,
+};
 
 const textFieldWithButtonLayoutStyles = {
   container: {
@@ -23,18 +30,22 @@ const textFieldWithButtonLayoutStyles = {
     alignItems: 'flex-start', // Align from the top to stay at the same position when error/multiline
   },
   filledTextFieldWithLabelRightButtonMargins: {
+    ...buttonCommonStyles,
     marginTop: 24, // Properly align with the text field (only dense "filled" text fields supported)
     marginLeft: 10,
   },
   filledTextFieldWithoutLabelRightButtonMargins: {
+    ...buttonCommonStyles,
     marginTop: 15, // Properly align with the text field (only dense "filled" text fields supported)
     marginLeft: 10,
   },
   standardTextFieldWithLabelRightButtonMargins: {
+    ...buttonCommonStyles,
     marginTop: 17, // Properly align with the text field (only "standard" text fields with margin "none" supported)
     marginLeft: 10,
   },
   standardTextFieldWithoutLabelRightButtonMargins: {
+    ...buttonCommonStyles,
     marginTop: 0, // Properly align with the text field (only "standard" text fields with margin "none" supported)
     marginLeft: 10,
   },

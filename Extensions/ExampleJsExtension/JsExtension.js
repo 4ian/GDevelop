@@ -25,8 +25,7 @@ module.exports = {
     const dumyEffect = extension
       .addEffect('DummyEffect')
       .setFullName(_('Dummy effect example'))
-      .setDescription(_('This is an example of an effect ("shader") [External link on wiki](http://wiki.compilgames.net/doku.php/gdevelop5/) and **bold letters**"
-'))
+      .setDescription(_('This is an example of an effect ("shader") [External link on wiki](http://wiki.compilgames.net/doku.php/gdevelop5/) and **bold letters**'))
       .addIncludeFile('Extensions/ExampleJsExtension/dummyeffect.js');
     const dumyEffectProperties = dumyEffect.getProperties();
     dumyEffectProperties.set(

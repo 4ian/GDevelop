@@ -19,6 +19,7 @@ type Props = {|
     marginLeft?: number,
     marginRight?: number,
     margin?: number,
+    flexShrink?: 0,
   |},
   target?: '_blank',
 |};

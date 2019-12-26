@@ -17,6 +17,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
     marginLeft?: number,
     marginRight?: number,
     margin?: number,
+    flexShrink?: 0,
   |},
   labelPosition?: 'before',
 |};

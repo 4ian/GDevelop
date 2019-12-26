@@ -1,12 +1,30 @@
-gdjs.PixiFiltersTools.registerFilterCreator('AdvancedBloom', {
-  makePIXIFilter: function() {
-    var advancedBloom = new PIXI.filters.AdvancedBloomFilter();
+gdjs.PixiFiltersTools.registerFilterCreator('Advanced bloom', {
+  makePIXIFilter: function(layer, effectData) {
+    var advancedBloomFilter = new PIXI.filters.AdvancedBloomFilter();
 
-    return advancedBloom;
+    return advancedBloomFilter;
   },
-  updateParameter: function(filter, parameterName, value) {
-    if (!['threshold', 'bloomScale', 'brightness', 'blur', 'quality'].includes(parameterName)) return;
-
-    filter[parameterName] = gdjs.PixiFiltersTools.clampValue(value, 0, 20);
+  update: function(filter, layer) {
+  },
+  updateDoubleParameter: function(filter, parameterName, value) {
+    if (parameterName === 'threshold') {
+      filter.threshold = value;
+    }
+    if (parameterName === 'bloomScale') {
+      filter.bloomScale = value;
+    }
+    if (parameterName === 'brightness') {
+      filter.brightness = value;
+    }
+    if (parameterName === 'blur') {
+      filter.blur = value;
+    }
+    if (parameterName === 'quality') {
+      filter.quality = value;
+    }
+  },
+  updateStringParameter: function(filter, parameterName, value) {
+  },
+  updateBooleanParameter: function(filter, parameterName, value) {
   },
 });

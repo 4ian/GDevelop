@@ -1,15 +1,27 @@
-gdjs.PixiFiltersTools.registerFilterCreator('ZoomBlur', {
-  makePIXIFilter: function() {
-    var zoomBlur = new PIXI.filters.ZoomBlurFilter();
+gdjs.PixiFiltersTools.registerFilterCreator('Zoom blur', {
+  makePIXIFilter: function(layer, effectData) {
+    var zoomBlurFilter = new PIXI.filters.ZoomBlurFilter();
 
-    return zoomBlur;
+    return zoomBlurFilter;
   },
-  updateParameter: function(filter, parameterName, value) {
-    if (!['centerX', 'centerY', 'strength', 'innerRadius'].includes(parameterName)) return;
-
-    if (parameterName === 'centerX') filter.center[0]= Math.round(window.innerWidth * value);
-    else if (parameterName === 'centerY') filter.center[1] = Math.round(window.innerHeight * value);
-    else if (parameterName === 'innerRadius') filter.innerRadius = Math.round(window.innerWidth * value);
-    else filter[parameterName] = gdjs.PixiFiltersTools.clampValue(value / 10, 0, 20);
+  update: function(filter, layer) {
+  },
+  updateDoubleParameter: function(filter, parameterName, value) {
+    if (parameterName === 'centerX') {
+      filter.center[0]= Math.round(window.innerWidth * value);
+    }
+    if (parameterName === 'centerY') {
+      filter.center[1] = Math.round(window.innerHeight * value);
+    }
+    if (parameterName === 'innerRadius') {
+      filter.innerRadius = Math.round(window.innerWidth * value);
+    }
+    if (parameterName === 'strength') {
+      filter.strength = gdjs.PixiFiltersTools.clampValue(value / 10, 0, 20);
+    }
+  },
+  updateStringParameter: function(filter, parameterName, value) {
+  },
+  updateBooleanParameter: function(filter, parameterName, value) {
   },
 });

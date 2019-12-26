@@ -1,14 +1,27 @@
-gdjs.PixiFiltersTools.registerFilterCreator('KawaseBlur', {
-  makePIXIFilter: function() {
-    var kawaseBlur = new PIXI.filters.KawaseBlurFilter();
+gdjs.PixiFiltersTools.registerFilterCreator('Kawase blur', {
+  makePIXIFilter: function(layer, effectData) {
+    var kawaseBlurFilter = new PIXI.filters.KawaseBlurFilter();
 
-    return kawaseBlur;
+    return kawaseBlurFilter;
   },
-  updateParameter: function(filter, parameterName, value) {
-    if (!['pixelSizeX', 'pixelSizeY', 'blur', 'quality'].includes(parameterName)) return;
-
-    if (parameterName === 'pixelSizeX') filter.pixelSize.x = gdjs.PixiFiltersTools.clampValue(value, 0, 20);
-    else if (parameterName === 'pixelSizeY') filter.pixelSize.y = gdjs.PixiFiltersTools.clampValue(value, 0, 20);
-    else filter[parameterName] = gdjs.PixiFiltersTools.clampValue(value, 0, 20);
+  update: function(filter, layer) {
+  },
+  updateDoubleParameter: function(filter, parameterName, value) {
+    if (parameterName === 'pixelizeX') {
+      filter.pixelizeX = value;
+    }
+    if (parameterName === 'pixelizeY') {
+      filter.pixelizeY = value;
+    }
+    if (parameterName === 'blur') {
+      filter.blur = value;
+    }
+    if (parameterName === 'quality') {
+      filter.quality = value;
+    }
+  },
+  updateStringParameter: function(filter, parameterName, value) {
+  },
+  updateBooleanParameter: function(filter, parameterName, value) {
   },
 });

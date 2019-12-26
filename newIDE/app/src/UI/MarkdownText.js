@@ -7,6 +7,7 @@ import classNames from 'classnames';
 // Sensible defaults for react-markdown
 const makeMarkdownCustomRenderers = (isStandaloneText: boolean) => ({
   // Ensure link are opened in a new page
+  root: props => (isStandaloneText ? <div {...props} /> : <span {...props} />),
   link: props => (
     <a href={props.href} target="_blank" rel="noopener noreferrer">
       {props.children}

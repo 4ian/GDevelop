@@ -42,7 +42,7 @@ module.exports = {
     const blurEffect = extension
       .addEffect('Blur')
       .setFullName(_('Blur'))
-      .setDescription(_('Blur the rendered image'))
+      .setDescription(_('Blur the rendered image.'))
       .addIncludeFile('Extensions/Effects/blur-pixi-filter.js');
     const blurProperties = blurEffect.getProperties();
     blurProperties.set(
@@ -77,7 +77,7 @@ module.exports = {
     const brightnessEffect = extension
       .addEffect('Brightness')
       .setFullName(_('Brightness'))
-      .setDescription(_('Make the image brighter'))
+      .setDescription(_('Make the image brighter.'))
       .addIncludeFile('Extensions/Effects/brightness-pixi-filter.js');
     const brightnessProperties = brightnessEffect.getProperties();
     brightnessProperties.set(
@@ -90,7 +90,7 @@ module.exports = {
     const lightNightEffect = extension
       .addEffect('LightNight')
       .setFullName(_('Light Night'))
-      .setDescription(_('Alter the colors to simulate night'))
+      .setDescription(_('Alter the colors to simulate night.'))
       .addIncludeFile('Extensions/Effects/light-night-pixi-filter.js');
     const lightNightProperties = lightNightEffect.getProperties();
     lightNightProperties.set(
@@ -103,7 +103,7 @@ module.exports = {
     const nightEffect = extension
       .addEffect('Night')
       .setFullName(_('Dark Night'))
-      .setDescription(_('Alter the colors to simulate a dark night'))
+      .setDescription(_('Alter the colors to simulate a dark night.'))
       .addIncludeFile('Extensions/Effects/night-pixi-filter.js');
     const nightProperties = nightEffect.getProperties();
     nightProperties.set(
@@ -122,7 +122,7 @@ module.exports = {
     const noiseEffect = extension
       .addEffect('Noise')
       .setFullName(_('Noise'))
-      .setDescription(_('Add some noise on the rendered image'))
+      .setDescription(_('Add some noise on the rendered image.'))
       .addIncludeFile('Extensions/Effects/noise-pixi-filter.js');
     const noiseProperties = noiseEffect.getProperties();
     noiseProperties.set(
@@ -135,7 +135,7 @@ module.exports = {
     const sepiaEffect = extension
       .addEffect('Sepia')
       .setFullName(_('Sepia'))
-      .setDescription(_('Alter the colors to sepia'))
+      .setDescription(_('Alter the colors to sepia.'))
       .addIncludeFile('Extensions/Effects/sepia-pixi-filter.js');
     const sepiaProperties = sepiaEffect.getProperties();
     sepiaProperties.set(

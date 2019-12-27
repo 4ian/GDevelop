@@ -18,6 +18,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import Add from '@material-ui/icons/Add';
 import PropertiesEditor from '../PropertiesEditor';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import BackgroundText from '../UI/BackgroundText';
 import {
   enumerateEffectsMetadata,
   type EnumeratedEffectMetadata,
@@ -200,16 +201,23 @@ export default class EffectsList extends React.Component<Props, {||}> {
                     <Line expand noMargin>
                       <Column expand>
                         {!!effectType && effectMetadata ? (
-                          <PropertiesEditor
-                            instances={[effect]}
-                            schema={effectMetadata.parametersSchema}
-                            project={this.props.project}
-                            resourceSources={this.props.resourceSources}
-                            onChooseResource={this.props.onChooseResource}
-                            resourceExternalEditors={
-                              this.props.resourceExternalEditors
-                            }
-                          />
+                          <React.Fragment>
+                            <Line>
+                              <BackgroundText>
+                                {effectMetadata.description}
+                              </BackgroundText>
+                            </Line>
+                            <PropertiesEditor
+                              instances={[effect]}
+                              schema={effectMetadata.parametersSchema}
+                              project={this.props.project}
+                              resourceSources={this.props.resourceSources}
+                              onChooseResource={this.props.onChooseResource}
+                              resourceExternalEditors={
+                                this.props.resourceExternalEditors
+                              }
+                            />
+                          </React.Fragment>
                         ) : null}
                       </Column>
                     </Line>

@@ -40,6 +40,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
+    setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -102,6 +105,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           useGDJSDevelopmentWatcher,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setEventsSheetUseAssignmentOperators(
+    eventsSheetUseAssignmentOperators: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          eventsSheetUseAssignmentOperators,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

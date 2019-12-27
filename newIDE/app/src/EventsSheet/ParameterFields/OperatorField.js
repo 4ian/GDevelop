@@ -45,6 +45,7 @@ export default class OperatorField extends Component<ParameterFieldProps> {
 export const renderInlineOperator = ({
   value,
   InvalidParameterValue,
+  useAssignmentOperators,
 }: ParameterInlineRendererProps) => {
   if (!value) {
     return (
@@ -54,11 +55,19 @@ export const renderInlineOperator = ({
     );
   }
 
-  if (value === '=') return <Trans>set to</Trans>;
-  else if (value === '+') return <Trans>add</Trans>;
-  else if (value === '-') return <Trans>subtract</Trans>;
-  else if (value === '/') return <Trans>divide by</Trans>;
-  else if (value === '*') return <Trans>multiply by</Trans>;
+  if (useAssignmentOperators) {
+    if (value === '=') return <Trans>=</Trans>;
+    else if (value === '+') return <Trans>+=</Trans>;
+    else if (value === '-') return <Trans>-=</Trans>;
+    else if (value === '/') return <Trans>/=</Trans>;
+    else if (value === '*') return <Trans>*=</Trans>;
+  } else {
+    if (value === '=') return <Trans>set to</Trans>;
+    else if (value === '+') return <Trans>add</Trans>;
+    else if (value === '-') return <Trans>subtract</Trans>;
+    else if (value === '/') return <Trans>divide by</Trans>;
+    else if (value === '*') return <Trans>multiply by</Trans>;
+  }
 
   return <InvalidParameterValue>{value}</InvalidParameterValue>;
 };

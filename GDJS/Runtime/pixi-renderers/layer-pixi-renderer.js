@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -13,6 +14,7 @@
  * @param {gdjs.RuntimeScenePixiRenderer} runtimeSceneRenderer The scene renderer
  */
 gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
+  // @ts-ignore
   this._pixiContainer = new PIXI.Container();
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
   this._filters = {};
@@ -71,6 +73,7 @@ gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
 
   this._filters = {};
 
+  // @ts-ignore
   /** @type PIXI.Filter[] */
   var pixiFilters = [];
   for (var i = 0; i < effects.length; ++i) {

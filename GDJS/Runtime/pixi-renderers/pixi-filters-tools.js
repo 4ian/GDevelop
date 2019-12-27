@@ -58,7 +58,7 @@ gdjs.PixiFiltersTools.registerFilterCreator = function(filterName, filterCreator
  * A wrapper allowing to create a PIXI filter and update it using a common interface
  * @typedef gdjsPixiFiltersToolsFilterCreator
  * @type {object}
- * @property {(layer: gdjs.Layer) => any} makePIXIFilter Function to call to create the filter
+ * @property {(layer: gdjs.Layer, effectData: any) => any} makePIXIFilter Function to call to create the filter
  * @property {(filter: any, layer: gdjs.Layer) => any} update The function to be called to update the filter at every frame
  * @property {(filter: any, parameterName: string, value: number) => void} updateDoubleParameter The function to be called to update a parameter (with a number)
  * @property {(filter: any, parameterName: string, value: string) => void} updateStringParameter The function to be called to update a parameter (with a string)

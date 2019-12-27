@@ -65,7 +65,7 @@ gdjs.Layer.prototype.getName = function() {
 /**
  * Change the camera center X position.
  *
- * @param cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  * @return The x position of the camera
  */
 gdjs.Layer.prototype.getCameraX = function(cameraId) {
@@ -75,7 +75,7 @@ gdjs.Layer.prototype.getCameraX = function(cameraId) {
 /**
  * Change the camera center Y position.
  *
- * @param cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  * @return The y position of the camera
  */
 gdjs.Layer.prototype.getCameraY = function(cameraId) {
@@ -86,7 +86,7 @@ gdjs.Layer.prototype.getCameraY = function(cameraId) {
  * Set the camera center X position.
  *
  * @param {number} x The new x position
- * @param {number} cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraX = function(x, cameraId) {
   this._cameraX = x;
@@ -97,17 +97,29 @@ gdjs.Layer.prototype.setCameraX = function(x, cameraId) {
  * Set the camera center Y position.
  *
  * @param {number} y The new y position
- * @param {number} cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraY = function(y, cameraId) {
   this._cameraY = y;
   this._renderer.updatePosition();
 };
 
+/**
+ * Get the camera center X position.
+ *
+ * @param {number=} cameraId The camera number. Currently ignored.
+ * @return {number} The X position of the camera center
+ */
 gdjs.Layer.prototype.getCameraWidth = function(cameraId) {
   return (+this._width * 1) / this._zoomFactor;
 };
 
+/**
+ * Get the camera center Y position.
+ *
+ * @param {number=} cameraId The camera number. Currently ignored.
+ * @return {number} The Y position of the camera center
+ */
 gdjs.Layer.prototype.getCameraHeight = function(cameraId) {
   return (+this._height * 1) / this._zoomFactor;
 };
@@ -134,7 +146,7 @@ gdjs.Layer.prototype.isVisible = function() {
  * Set the zoom of a camera.
  *
  * @param {number} newZoom The new zoom. Must be superior to 0. 1 is the default zoom.
- * @param {number} cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraZoom = function(newZoom, cameraId) {
   this._zoomFactor = newZoom;
@@ -144,7 +156,7 @@ gdjs.Layer.prototype.setCameraZoom = function(newZoom, cameraId) {
 /**
  * Get the zoom of a camera.
  *
- * @param {number} cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  * @return {number} The zoom.
  */
 gdjs.Layer.prototype.getCameraZoom = function(cameraId) {
@@ -154,7 +166,7 @@ gdjs.Layer.prototype.getCameraZoom = function(cameraId) {
 /**
  * Get the rotation of the camera, expressed in degrees.
  *
- * @param {number} cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  * @return {number} The rotation, in degrees.
  */
 gdjs.Layer.prototype.getCameraRotation = function(cameraId) {
@@ -166,7 +178,7 @@ gdjs.Layer.prototype.getCameraRotation = function(cameraId) {
  * The rotation is made around the camera center.
  *
  * @param {number} rotation The new rotation, in degrees.
- * @param {number} cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
   this._cameraRotation = rotation;
@@ -181,7 +193,7 @@ gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
  *
  * @param {number} x The x position, in canvas coordinates.
  * @param {number} y The y position, in canvas coordinates.
- * @param {number} cameraId The camera number. Currently ignored.
+ * @param {number=} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.convertCoords = function(x, y, cameraId) {
   x -= this._width / 2;

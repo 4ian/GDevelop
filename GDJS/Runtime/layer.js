@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -14,27 +15,27 @@
  * @param {gdjs.RuntimeScene} runtimeScene The scene in which the layer is used
  * @memberof gdjs
  */
-gdjs.Layer = function(layerData, runtimeScene)
-{
-    this._name = layerData.name;
-    this._cameraRotation = 0;
-    this._zoomFactor = 1;
-    this._timeScale = 1;
-    this._hidden = !layerData.visibility;
-    this._effects = layerData.effects || [];
-    this._cameraX = runtimeScene.getGame().getDefaultWidth()/2;
-    this._cameraY = runtimeScene.getGame().getDefaultHeight()/2;
-    this._width = runtimeScene.getGame().getDefaultWidth();
-	this._height = runtimeScene.getGame().getDefaultHeight();
-	this._runtimeScene = runtimeScene;
+gdjs.Layer = function(layerData, runtimeScene) {
+  this._name = layerData.name;
+  this._cameraRotation = 0;
+  this._zoomFactor = 1;
+  this._timeScale = 1;
+  this._hidden = !layerData.visibility;
+  this._effects = layerData.effects || [];
+  this._cameraX = runtimeScene.getGame().getDefaultWidth() / 2;
+  this._cameraY = runtimeScene.getGame().getDefaultHeight() / 2;
+  this._width = runtimeScene.getGame().getDefaultWidth();
+  this._height = runtimeScene.getGame().getDefaultHeight();
+  this._runtimeScene = runtimeScene;
 
-    this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
-    this.show(!this._hidden);
-    this.setEffectsDefaultParameters();
+  // @ts-ignore - assume the proper renderer is passed
+  this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
+  this.show(!this._hidden);
+  this.setEffectsDefaultParameters();
 };
 
 gdjs.Layer.prototype.getRenderer = function() {
-   return this._renderer;
+  return this._renderer;
 };
 
 /**
@@ -42,7 +43,7 @@ gdjs.Layer.prototype.getRenderer = function() {
  * @returns {gdjs.RuntimeScene} the scene the layer belongs to
  */
 gdjs.Layer.prototype.getRuntimeScene = function() {
-   return this._runtimeScene;
+  return this._runtimeScene;
 };
 
 /**
@@ -50,7 +51,7 @@ gdjs.Layer.prototype.getRuntimeScene = function() {
  * @param {gdjs.RuntimeScene} runtimeScene The scene the layer belongs to.
  */
 gdjs.Layer.prototype.update = function(runtimeScene) {
-	return this._renderer.updateTime();
+  return this._renderer.updateTime();
 };
 
 /**
@@ -58,7 +59,7 @@ gdjs.Layer.prototype.update = function(runtimeScene) {
  * @return {String} The name of the layer
  */
 gdjs.Layer.prototype.getName = function() {
-	return this._name;
+  return this._name;
 };
 
 /**
@@ -68,7 +69,7 @@ gdjs.Layer.prototype.getName = function() {
  * @return The x position of the camera
  */
 gdjs.Layer.prototype.getCameraX = function(cameraId) {
-	return this._cameraX;
+  return this._cameraX;
 };
 
 /**
@@ -78,7 +79,7 @@ gdjs.Layer.prototype.getCameraX = function(cameraId) {
  * @return The y position of the camera
  */
 gdjs.Layer.prototype.getCameraY = function(cameraId) {
-	return this._cameraY;
+  return this._cameraY;
 };
 
 /**
@@ -88,8 +89,8 @@ gdjs.Layer.prototype.getCameraY = function(cameraId) {
  * @param {number} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraX = function(x, cameraId) {
-	this._cameraX = x;
-	this._renderer.updatePosition();
+  this._cameraX = x;
+  this._renderer.updatePosition();
 };
 
 /**
@@ -99,16 +100,16 @@ gdjs.Layer.prototype.setCameraX = function(x, cameraId) {
  * @param {number} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraY = function(y, cameraId) {
-	this._cameraY = y;
-	this._renderer.updatePosition();
+  this._cameraY = y;
+  this._renderer.updatePosition();
 };
 
 gdjs.Layer.prototype.getCameraWidth = function(cameraId) {
-	return (+this._width)*1/this._zoomFactor;
+  return (+this._width * 1) / this._zoomFactor;
 };
 
 gdjs.Layer.prototype.getCameraHeight = function(cameraId) {
-	return (+this._height)*1/this._zoomFactor;
+  return (+this._height * 1) / this._zoomFactor;
 };
 
 /**
@@ -116,8 +117,8 @@ gdjs.Layer.prototype.getCameraHeight = function(cameraId) {
  * @param {boolean} enable true to show the layer, false to hide it.
  */
 gdjs.Layer.prototype.show = function(enable) {
-	this._hidden = !enable;
-    this._renderer.updateVisibility(enable);
+  this._hidden = !enable;
+  this._renderer.updateVisibility(enable);
 };
 
 /**
@@ -126,7 +127,7 @@ gdjs.Layer.prototype.show = function(enable) {
  * @return true if the layer is visible.
  */
 gdjs.Layer.prototype.isVisible = function() {
-	return !this._hidden;
+  return !this._hidden;
 };
 
 /**
@@ -136,8 +137,8 @@ gdjs.Layer.prototype.isVisible = function() {
  * @param {number} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraZoom = function(newZoom, cameraId) {
-	this._zoomFactor = newZoom;
-	this._renderer.updatePosition();
+  this._zoomFactor = newZoom;
+  this._renderer.updatePosition();
 };
 
 /**
@@ -147,7 +148,7 @@ gdjs.Layer.prototype.setCameraZoom = function(newZoom, cameraId) {
  * @return {number} The zoom.
  */
 gdjs.Layer.prototype.getCameraZoom = function(cameraId) {
-	return this._zoomFactor;
+  return this._zoomFactor;
 };
 
 /**
@@ -157,7 +158,7 @@ gdjs.Layer.prototype.getCameraZoom = function(cameraId) {
  * @return {number} The rotation, in degrees.
  */
 gdjs.Layer.prototype.getCameraRotation = function(cameraId) {
-	return this._cameraRotation;
+  return this._cameraRotation;
 };
 
 /**
@@ -168,8 +169,8 @@ gdjs.Layer.prototype.getCameraRotation = function(cameraId) {
  * @param {number} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
-	this._cameraRotation = rotation;
-	this._renderer.updatePosition();
+  this._cameraRotation = rotation;
+  this._renderer.updatePosition();
 };
 
 /**
@@ -183,95 +184,137 @@ gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
  * @param {number} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.convertCoords = function(x, y, cameraId) {
-	x -= this._width/2;
-	y -= this._height/2;
-	x /= Math.abs(this._zoomFactor);
-	y /= Math.abs(this._zoomFactor);
+  x -= this._width / 2;
+  y -= this._height / 2;
+  x /= Math.abs(this._zoomFactor);
+  y /= Math.abs(this._zoomFactor);
 
-	// Only compute angle and cos/sin once (allow heavy optimization from JS engines).
-	var angleInRadians = this._cameraRotation/180*Math.PI;
-	var tmp = x;
-	var cosValue = Math.cos(angleInRadians);
-	var sinValue = Math.sin(angleInRadians);
-	x = cosValue*x - sinValue*y;
-	y = sinValue*tmp + cosValue*y;
+  // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
+  var angleInRadians = (this._cameraRotation / 180) * Math.PI;
+  var tmp = x;
+  var cosValue = Math.cos(angleInRadians);
+  var sinValue = Math.sin(angleInRadians);
+  x = cosValue * x - sinValue * y;
+  y = sinValue * tmp + cosValue * y;
 
-	return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
+  return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
 };
 
 gdjs.Layer.prototype.convertInverseCoords = function(x, y, cameraId) {
-	x -= this.getCameraX(cameraId);
-	y -= this.getCameraY(cameraId);
+  x -= this.getCameraX(cameraId);
+  y -= this.getCameraY(cameraId);
 
-	// Only compute angle and cos/sin once (allow heavy optimization from JS engines).
-	var angleInRadians = this._cameraRotation/180*Math.PI;
-	var tmp = x;
-	var cosValue = Math.cos(-angleInRadians);
-	var sinValue = Math.sin(-angleInRadians);
-	x = cosValue*x - sinValue*y;
-	y = sinValue*tmp + cosValue*y;
+  // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
+  var angleInRadians = (this._cameraRotation / 180) * Math.PI;
+  var tmp = x;
+  var cosValue = Math.cos(-angleInRadians);
+  var sinValue = Math.sin(-angleInRadians);
+  x = cosValue * x - sinValue * y;
+  y = sinValue * tmp + cosValue * y;
 
-	x *= Math.abs(this._zoomFactor);
-	y *= Math.abs(this._zoomFactor);
+  x *= Math.abs(this._zoomFactor);
+  y *= Math.abs(this._zoomFactor);
 
-	return [x + this._width/2, y + this._height/2];
+  return [x + this._width / 2, y + this._height / 2];
 };
 
 gdjs.Layer.prototype.getWidth = function() {
-    return this._width;
+  return this._width;
 };
 
 gdjs.Layer.prototype.getHeight = function() {
-    return this._height;
+  return this._height;
 };
 
 gdjs.Layer.prototype.getEffects = function() {
-    return this._effects;
+  return this._effects;
 };
 
-gdjs.Layer.prototype.setEffectDoubleParameter = function(name, parameterIndex, value) {
-    return this._renderer.setEffectDoubleParameter(name, parameterIndex, value);
+/**
+ * Change an effect parameter value (for parameters that are numbers).
+ * @param {string} name The name of the effect to update.
+ * @param {string} parameterName The name of the parameter to update.
+ * @param {number} value The new value (number).
+ */
+gdjs.Layer.prototype.setEffectDoubleParameter = function(
+  name,
+  parameterName,
+  value
+) {
+  return this._renderer.setEffectDoubleParameter(name, parameterName, value);
 };
 
-gdjs.Layer.prototype.setEffectStringParameter = function(name, parameterIndex, value) {
-    return this._renderer.setEffectStringParameter(name, parameterIndex, value);
+/**
+ * Change an effect parameter value (for parameters that are strings).
+ * @param {string} name The name of the effect to update.
+ * @param {string} parameterName The name of the parameter to update.
+ * @param {string} value The new value (string).
+ */
+gdjs.Layer.prototype.setEffectStringParameter = function(
+  name,
+  parameterName,
+  value
+) {
+  return this._renderer.setEffectStringParameter(name, parameterName, value);
 };
 
-gdjs.Layer.prototype.setEffectBooleanParameter = function(name, parameterIndex, value) {
-    return this._renderer.setEffectBooleanParameter(name, parameterIndex, value);
+/**
+ * Change an effect parameter value (for parameters that are booleans).
+ * @param {string} name The name of the effect to update.
+ * @param {string} parameterName The name of the parameter to update.
+ * @param {boolean} value The new value (boolean).
+ */
+gdjs.Layer.prototype.setEffectBooleanParameter = function(
+  name,
+  parameterName,
+  value
+) {
+  return this._renderer.setEffectBooleanParameter(name, parameterName, value);
 };
 
 /**
  * Enable or disable an effect.
- * @param {string} effect The name of the effect to enable or disable.
+ * @param {string} name The name of the effect to enable or disable.
  * @param {boolean} enable true to enable, false to disable
  */
 gdjs.Layer.prototype.enableEffect = function(name, enable) {
-    this._renderer.enableEffect(name, enable);
+  this._renderer.enableEffect(name, enable);
 };
 
 /**
  * Check if an effect is enabled
- * @param {string} effect The name of the effect
+ * @param {string} name The name of the effect
  * @return {boolean} true if the effect is enabled, false otherwise.
  */
 gdjs.Layer.prototype.isEffectEnabled = function(name) {
-    return this._renderer.isEffectEnabled(name);
+  return this._renderer.isEffectEnabled(name);
 };
 
 gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
-    for (var i = 0; i < this._effects.length; ++i) {
-        var effect = this._effects[i];
-        for (var name in effect.doubleParameters) {
-            this.setEffectDoubleParameter(effect.name, name, effect.doubleParameters[name]);
-        }
-        for (var name in effect.stringParameters) {
-            this.setEffectStringParameter(effect.name, name, effect.stringParameters[name]);
-        }
-        for (var name in effect.booleanParameters) {
-            this.setEffectBooleanParameter(effect.name, name, effect.booleanParameters[name]);
-        }
+  for (var i = 0; i < this._effects.length; ++i) {
+    var effect = this._effects[i];
+    for (var name in effect.doubleParameters) {
+      this.setEffectDoubleParameter(
+        effect.name,
+        name,
+        effect.doubleParameters[name]
+      );
     }
+    for (var name in effect.stringParameters) {
+      this.setEffectStringParameter(
+        effect.name,
+        name,
+        effect.stringParameters[name]
+      );
+    }
+    for (var name in effect.booleanParameters) {
+      this.setEffectBooleanParameter(
+        effect.name,
+        name,
+        effect.booleanParameters[name]
+      );
+    }
+  }
 };
 
 /**
@@ -280,14 +323,14 @@ gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
  * @param {number} timeScale The new time scale (must be positive).
  */
 gdjs.Layer.prototype.setTimeScale = function(timeScale) {
-	if ( timeScale >= 0 ) this._timeScale = timeScale;
+  if (timeScale >= 0) this._timeScale = timeScale;
 };
 
 /**
  * Get the time scale for the objects on the layer.
  */
 gdjs.Layer.prototype.getTimeScale = function() {
-	return this._timeScale;
+  return this._timeScale;
 };
 
 /**
@@ -295,5 +338,5 @@ gdjs.Layer.prototype.getTimeScale = function() {
  * in milliseconds, for objects on the layer.
  */
 gdjs.Layer.prototype.getElapsedTime = function() {
-   return this._runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
-}
+  return this._runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
+};

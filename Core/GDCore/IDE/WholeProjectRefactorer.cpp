@@ -9,7 +9,9 @@
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
+#include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
+#include "GDCore/IDE/Events/InstructionsParameterMover.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -85,7 +87,8 @@ void WholeProjectRefactorer::ExposeProjectEvents(
 void WholeProjectRefactorer::ExposeProjectEvents(
     gd::Project& project, gd::ArbitraryEventsWorkerWithContext& worker) {
   // See also gd::Project::ExposeResources for a method that traverse the whole
-  // project (this time for resources) and ExposeProjectEffects (this time for effects).
+  // project (this time for resources) and ExposeProjectEffects (this time for
+  // effects).
 
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
@@ -331,9 +334,6 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
   }
 }
 
-/**
- * \brief Refactor the project after an events function is renamed
- */
 void WholeProjectRefactorer::RenameEventsFunction(
     gd::Project& project,
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,
@@ -388,6 +388,76 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
         oldFunctionName,
         newFunctionName);
     ExposeProjectEvents(project, renamer);
+  }
+}
+
+void WholeProjectRefactorer::MoveEventsFunctionParameter(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::String& functionName,
+    std::size_t oldIndex,
+    std::size_t newIndex) {
+  if (!eventsFunctionsExtension.HasEventsFunctionNamed(functionName)) return;
+
+  const gd::EventsFunction& eventsFunction =
+      eventsFunctionsExtension.GetEventsFunction(functionName);
+
+  const gd::String& eventsFunctionType = GetEventsFunctionFullType(
+      eventsFunctionsExtension.GetName(), functionName);
+
+  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
+      eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+    gd::InstructionsParameterMover mover = gd::InstructionsParameterMover(
+        project, eventsFunctionType, oldIndex, newIndex);
+    ExposeProjectEvents(project, mover);
+  } else if (eventsFunction.GetFunctionType() ==
+                 gd::EventsFunction::Expression ||
+             eventsFunction.GetFunctionType() ==
+                 gd::EventsFunction::StringExpression) {
+    gd::ExpressionsParameterMover mover =
+        gd::ExpressionsParameterMover(project.GetCurrentPlatform());
+    mover.SetFreeExpressionMovedParameter(
+        eventsFunctionType, oldIndex, newIndex);
+    ExposeProjectEvents(project, mover);
+  }
+}
+
+void WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::String& functionName,
+    std::size_t oldIndex,
+    std::size_t newIndex) {
+  auto& eventsFunctions = eventsBasedBehavior.GetEventsFunctions();
+  if (!eventsFunctions.HasEventsFunctionNamed(functionName)) return;
+
+  const gd::EventsFunction& eventsFunction =
+      eventsFunctions.GetEventsFunction(functionName);
+
+  const gd::String& eventsFunctionType =
+      GetBehaviorEventsFunctionFullType(eventsFunctionsExtension.GetName(),
+                                        eventsBasedBehavior.GetName(),
+                                        functionName);
+
+  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
+      eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+    gd::InstructionsParameterMover mover = gd::InstructionsParameterMover(
+        project, eventsFunctionType, oldIndex, newIndex);
+    ExposeProjectEvents(project, mover);
+  } else if (eventsFunction.GetFunctionType() ==
+                 gd::EventsFunction::Expression ||
+             eventsFunction.GetFunctionType() ==
+                 gd::EventsFunction::StringExpression) {
+    gd::ExpressionsParameterMover mover =
+        gd::ExpressionsParameterMover(project.GetCurrentPlatform());
+    mover.SetBehaviorExpressionMovedParameter(
+        GetBehaviorFullType(eventsFunctionsExtension.GetName(),
+                            eventsBasedBehavior.GetName()),
+        functionName,
+        oldIndex,
+        newIndex);
+    ExposeProjectEvents(project, mover);
   }
 }
 

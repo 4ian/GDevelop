@@ -79,6 +79,29 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
+   * \brief Refactor the project after an events function parameter
+   * was moved.
+   */
+  static void MoveEventsFunctionParameter(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::String& functionName,
+      std::size_t oldIndex,
+      std::size_t newIndex);
+
+  /**
+   * \brief Refactor the project after the parmaeter of an events function of a
+   * behavior was moved.
+   */
+  static void MoveBehaviorEventsFunctionParameter(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& functionName,
+      std::size_t oldIndex,
+      std::size_t newIndex);
+
+  /**
    * \brief Refactor the project after a property of a behavior is
    * renamed.
    */

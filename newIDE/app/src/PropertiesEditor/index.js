@@ -11,6 +11,7 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
 import ColorField from '../UI/ColorField';
+import { MarkdownText } from '../UI/MarkdownText';
 import { hexToRGBColor } from '../Utils/ColorTransformer';
 
 import {
@@ -218,9 +219,23 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
 
     if (field.valueType === 'boolean') {
       const { setValue } = field;
+      const description = this._getFieldDescription(
+        this.props.instances,
+        field
+      );
+
       return (
         <InlineCheckbox
-          label={getFieldLabel(this.props.instances, field)}
+          label={
+            !description ? (
+              getFieldLabel(this.props.instances, field)
+            ) : (
+              <React.Fragment>
+                {getFieldLabel(this.props.instances, field)} -{' '}
+                <MarkdownText source={description} />
+              </React.Fragment>
+            )
+          }
           key={field.name}
           checked={getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {

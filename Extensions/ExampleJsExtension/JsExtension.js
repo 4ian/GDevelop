@@ -60,6 +60,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ 'true')
         .setLabel(_('Some setting to enable or not for the effect'))
         .setType('boolean')
+        .setDescription(_('And some *optional* description.'))
     );
 
     // Declare conditions, actions or expressions:

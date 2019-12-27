@@ -95,6 +95,7 @@ export const makeTestExtensions = gd => {
       new gd.PropertyDescriptor(/* defaultValue= */ 'true')
         .setLabel('Some setting to enable or not for the effect')
         .setType('boolean')
+        .setDescription('And some *optional* description.')
     );
 
     platform.addNewExtension(extension);

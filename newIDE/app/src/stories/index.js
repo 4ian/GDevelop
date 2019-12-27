@@ -1567,6 +1567,69 @@ storiesOf('PropertiesEditor', module)
       ]}
       instances={[{ name: 'instance1' }, { name: 'instance2' }]}
     />
+  ))
+  .add('with descriptions and extra descriptions', () => (
+    <PropertiesEditor
+      schema={[
+        {
+          name: 'Object name',
+          valueType: 'string',
+          disabled: true,
+          getValue: instance => 'Disabled field',
+          setValue: (instance, newValue) => {},
+          onEditButtonClick: instance => action('edit button clicked'),
+          getDescription: () =>
+            'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+        },
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              valueType: 'number',
+              getValue: instance => 10,
+              setValue: (instance, newValue) => {},
+              getDescription: () =>
+                'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+            },
+            {
+              name: 'Y',
+              valueType: 'number',
+              getValue: instance => 20.1234,
+              setValue: (instance, newValue) => {},
+              getDescription: () =>
+                'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+            },
+          ],
+        },
+        {
+          name: 'Angle',
+          valueType: 'number',
+          getValue: instance => 90.123456,
+          setValue: (instance, newValue) => {},
+          getDescription: () =>
+            'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+        },
+        {
+          name: 'Checked checkbox',
+          valueType: 'boolean',
+          getValue: instance => true,
+          setValue: (instance, newValue) => {},
+          getDescription: () =>
+            'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+        },
+        {
+          name: 'Unchecked checkbox',
+          valueType: 'boolean',
+          getValue: instance => false,
+          setValue: (instance, newValue) => {},
+          getDescription: () =>
+            'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+        },
+      ]}
+      instances={[{ name: 'instance1' }, { name: 'instance2' }]}
+    />
   ));
 
 storiesOf('ParameterFields', module)

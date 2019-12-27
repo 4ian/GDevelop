@@ -47,7 +47,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Change the animation"),
                 _("Change the animation of the object, using the animation "
                   "number in the animations list."),
-                _("the number of current animation"),
+                _("the number of the animation"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
@@ -98,8 +98,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction("PauseAnimation",
                 _("Pause the animation"),
-                _("Pause the current animation of the object"),
-                _("Pause the current animation of _PARAM0_"),
+                _("Pause the animation of the object"),
+                _("Pause the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
@@ -109,8 +109,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction("PlayAnimation",
                 _("Play the animation"),
-                _("Play the current animation of the object"),
-                _("Play the current animation of _PARAM0_"),
+                _("Play the animation of the object"),
+                _("Play the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
@@ -211,8 +211,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddCondition(
          "Animation",
          _("Current animation"),
-         _("Compare the number of the current animation of the object."),
-         _("the number of the current animation"),
+         _("Compare the number of the animation played by the object."),
+         _("the number of the animation"),
          _("Animations and images"),
          "res/conditions/animation24.png",
          "res/conditions/animation.png")
@@ -223,7 +223,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("AnimationName",
                    _("Current animation name"),
-                   _("Check the current animation of the object."),
+                   _("Check the animation by played by the object."),
                    _("The animation of _PARAM0_ is _PARAM1_"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
@@ -249,7 +249,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("Sprite",
                    _("Current frame"),
-                   _("Test the number of the current animation frame."),
+                   _("Compare the index of the current frame in the animation displayed by the specified object. The first frame in an animation starts at index 0."),
                    _("the animation frame"),
                    _("Animations and images"),
                    "res/conditions/sprite24.png",
@@ -261,7 +261,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("AnimStopped",
                    _("Animation paused"),
-                   _("Test if the animation of an object is paused"),
+                   _("Check if the animation of an object is paused."),
                    _("The animation of _PARAM0_ is paused"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",

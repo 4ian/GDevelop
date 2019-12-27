@@ -73,6 +73,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             setAutosaveOnPreview,
             setUseNewInstructionEditorDialog,
             setUseGDJSDevelopmentWatcher,
+            setEventsSheetUseAssignmentOperators,
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -155,6 +156,20 @@ export default class PreferencesDialog extends Component<Props, State> {
                     labelPosition="right"
                     label={
                       <Trans>Display object thumbnails in Events Sheets</Trans>
+                    }
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) =>
+                      setEventsSheetUseAssignmentOperators(check)
+                    }
+                    toggled={values.eventsSheetUseAssignmentOperators}
+                    labelPosition="right"
+                    label={
+                      <Trans>
+                        Display assignment operators in Events Sheets
+                      </Trans>
                     }
                   />
                 </Line>

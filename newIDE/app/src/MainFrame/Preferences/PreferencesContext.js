@@ -30,6 +30,7 @@ export type PreferencesValues = {|
   autosaveOnPreview: boolean,
   useNewInstructionEditorDialog: boolean,
   useGDJSDevelopmentWatcher: boolean,
+  eventsSheetUseAssignmentOperators: boolean,
 |};
 
 export type Preferences = {|
@@ -46,6 +47,7 @@ export type Preferences = {|
   setAutosaveOnPreview: (enabled: boolean) => void,
   setUseNewInstructionEditorDialog: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
+  setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -61,6 +63,7 @@ export const initialPreferences = {
     autosaveOnPreview: true,
     useNewInstructionEditorDialog: false,
     useGDJSDevelopmentWatcher: true,
+    eventsSheetUseAssignmentOperators: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -74,6 +77,7 @@ export const initialPreferences = {
   setAutosaveOnPreview: () => {},
   setUseNewInstructionEditorDialog: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
+  setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

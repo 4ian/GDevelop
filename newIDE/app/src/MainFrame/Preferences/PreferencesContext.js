@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 
 export type AlertMessageIdentifier =
@@ -18,6 +19,77 @@ export type AlertMessageIdentifier =
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation';
 
+export const allAlertMessages: Array<{
+  key: AlertMessageIdentifier,
+  label: React.Node,
+}> = [
+  {
+    key: 'use-non-smoothed-textures',
+    label: <Trans>Using non smoothed textures</Trans>,
+  },
+  {
+    key: 'use-nearest-scale-mode',
+    label: <Trans>Using Nearest Scale Mode</Trans>,
+  },
+  {
+    key: 'maximum-fps-too-low',
+    label: <Trans>Maximum Fps is too low</Trans>,
+  },
+  {
+    key: 'minimum-fps-too-low',
+    label: <Trans>Minimum Fps is too low</Trans>,
+  },
+  {
+    key: 'function-extractor-explanation',
+    label: <Trans>Using function extractor</Trans>,
+  },
+  {
+    key: 'events-based-behavior-explanation',
+    label: <Trans>Using events based behavior</Trans>,
+  },
+  {
+    key: 'empty-events-based-behavior-explanation',
+    label: <Trans>Using empty events based behavior</Trans>,
+  },
+  {
+    key: 'too-much-effects',
+    label: <Trans>Using too much effects</Trans>,
+  },
+  {
+    key: 'effects-usage',
+    label: <Trans>Using effects</Trans>,
+  },
+  {
+    key: 'resource-properties-panel-explanation',
+    label: <Trans>Using the resource properties panel</Trans>,
+  },
+  {
+    key: 'instance-drag-n-drop-explanation',
+    label: <Trans>Using instance drag'n'drop</Trans>,
+  },
+  {
+    key: 'objects-panel-explanation',
+    label: <Trans>Using the objects panel</Trans>,
+  },
+  {
+    key: 'instance-properties-panel-explanation',
+    label: <Trans>Using the instance properties panel</Trans>,
+  },
+  {
+    key: 'physics2-shape-collisions',
+    label: <Trans>Collisions handling with the Physics engine</Trans>,
+  },
+  {
+    key: 'edit-instruction-explanation',
+    label: <Trans>How to edit instructions</Trans>,
+  },
+];
+
+/**
+ * All the preferences of GDevelop. To add a new preference, add it into this
+ * type and add a setter into `Preferences` type. Then, update the
+ * preference dialog.
+ */
 export type PreferencesValues = {|
   language: string,
   autoDownloadUpdates: boolean,
@@ -33,6 +105,9 @@ export type PreferencesValues = {|
   eventsSheetUseAssignmentOperators: boolean,
 |};
 
+/**
+ * Type containing all the preferences of GDevelop and their setters.
+ */
 export type Preferences = {|
   values: PreferencesValues,
   setLanguage: (language: string) => void,

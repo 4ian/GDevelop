@@ -1901,7 +1901,7 @@ class MainFrame extends React.Component<Props, State> {
           />
         )}
         {this.state.preferencesDialogOpen && (
-          <PreferencesDialog open onClose={() => this.openPreferences(false)} />
+          <PreferencesDialog onClose={() => this.openPreferences(false)} />
         )}
         {this.state.languageDialogOpen && (
           <LanguageDialog

@@ -27,7 +27,7 @@ type Props = {|
 // consistency of text in the whole app.
 export default ({ children, style, size, align, noShrink }: Props) => (
   <Typography
-    variant={size === 'title' ? 'h5' : 'body1'}
+    variant={size === 'title' ? 'h6' : 'body1'}
     style={{
       ...style,
       flexShrink: noShrink ? 0 : undefined,

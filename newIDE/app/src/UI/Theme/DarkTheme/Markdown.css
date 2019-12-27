@@ -35,6 +35,13 @@
   cursor: pointer;
 }
 
+.gd-markdown-dark-theme code {
+  font-family: "Lucida Console", Monaco, monospace;
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
 .gd-markdown-dark-theme img {
   max-width: 100%;
 }

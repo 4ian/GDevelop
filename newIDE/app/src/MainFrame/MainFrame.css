@@ -29,9 +29,9 @@ html {
 }
 
 /* Disable selections and web-ish cursors */
-:not(input):not(textarea):not(canvas),
-:not(input):not(textarea):not(canvas)::after,
-:not(input):not(textarea):not(canvas)::before {
+:not(input):not(textarea):not(canvas):not(code),
+:not(input):not(textarea):not(canvas):not(code)::after,
+:not(input):not(textarea):not(canvas):not(code)::before {
     -webkit-user-select: none;
     user-select: none;
     cursor: default;

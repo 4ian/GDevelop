@@ -103,6 +103,7 @@ export type PreferencesValues = {|
   useNewInstructionEditorDialog: boolean,
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
+  showEffectParameterNames: boolean,
 |};
 
 /**
@@ -123,6 +124,7 @@ export type Preferences = {|
   setUseNewInstructionEditorDialog: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
+  setShowEffectParameterNames: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -139,6 +141,7 @@ export const initialPreferences = {
     useNewInstructionEditorDialog: false,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
+    showEffectParameterNames: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -153,6 +156,7 @@ export const initialPreferences = {
   setUseNewInstructionEditorDialog: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
+  setShowEffectParameterNames: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

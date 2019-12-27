@@ -43,6 +43,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
     ),
+    setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
   };
 
   componentDidMount() {
@@ -119,6 +120,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetUseAssignmentOperators,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowEffectParameterNames(showEffectParameterNames: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showEffectParameterNames,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

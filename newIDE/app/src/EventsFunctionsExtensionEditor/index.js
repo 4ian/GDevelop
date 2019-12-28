@@ -236,6 +236,48 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
+  _makeMoveFreeEventsParameter = (i18n: I18nType) => (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: boolean => void
+  ) => {
+    //TODO add verifications and warning box
+
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.moveEventsFunctionParameter(
+      project,
+      eventsFunctionsExtension,
+      eventsFunction.getName(),
+      oldIndex,
+      newIndex
+    );
+
+    done(true);
+  };
+
+  _makeMoveBehaviorEventsParameter = (i18n: I18nType) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: boolean => void
+  ) => {
+    //TODO add verifications and warning box
+
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.moveBehaviorEventsFunctionParameter(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      eventsFunction.getName(),
+      oldIndex,
+      newIndex
+    );
+
+    done(true);
+  };
+
   _onDeleteEventsFunction = (
     eventsFunction: gdEventsFunction,
     cb: boolean => void
@@ -448,6 +490,34 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                           eventsBasedBehavior={selectedEventsBasedBehavior}
                           globalObjectsContainer={this._globalObjectsContainer}
                           objectsContainer={this._objectsContainer}
+                          makeMoveFreeEventsParameter={(
+                            eventsFunction: gdEventsFunction,
+                            oldIndex: number,
+                            newIndex: number,
+                            done: boolean => void
+                          ) =>
+                            this._makeMoveFreeEventsParameter(i18n)(
+                              selectedEventsFunction,
+                              oldIndex,
+                              newIndex,
+                              done
+                            )
+                          }
+                          makeMoveBehaviorEventsParameter={(
+                            eventsBasedBehavior: gdEventsBasedBehavior,
+                            eventsFunction: gdEventsFunction,
+                            oldIndex: number,
+                            newIndex: number,
+                            done: boolean => void
+                          ) =>
+                            this._makeMoveBehaviorEventsParameter(i18n)(
+                              selectedEventsBasedBehavior,
+                              selectedEventsFunction,
+                              oldIndex,
+                              newIndex,
+                              done
+                            )
+                          }
                           helpPagePath={
                             !!selectedEventsBasedBehavior
                               ? '/behaviors/events-based-behaviors'

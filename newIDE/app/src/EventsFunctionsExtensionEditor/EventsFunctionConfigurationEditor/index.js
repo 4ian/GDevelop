@@ -21,6 +21,8 @@ type Props = {|
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
+  makeMoveFreeEventsParameter?: any, //idk which type use so i set any by default
+  makeMoveBehaviorEventsParameter?: any,
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
@@ -55,6 +57,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       freezeParameters,
       helpPagePath,
       renderConfigurationHeader,
+      makeMoveFreeEventsParameter,
+      makeMoveBehaviorEventsParameter,
     } = this.props;
 
     return (
@@ -96,6 +100,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               onParametersUpdated={onParametersOrGroupsUpdated}
               helpPagePath={helpPagePath}
               freezeParameters={freezeParameters}
+              makeMoveFreeEventsParameter={makeMoveFreeEventsParameter}
+              makeMoveBehaviorEventsParameter={makeMoveBehaviorEventsParameter}
             />
           </ScrollView>
         ) : null}

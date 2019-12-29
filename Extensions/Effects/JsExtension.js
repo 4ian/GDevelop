@@ -560,9 +560,9 @@ module.exports = {
 
     const rgbSplitEffect = extension
       .addEffect('RGBSplit')
-      .setFullName(_('RGB split'))
+      .setFullName(_('RGB split (chromatic aberration)'))
       .setDescription(
-        _('Add a RGB split effect also known as Chromatic abberation')
+        _('Applies a RGB split effect also known as chromatic aberration.')
       )
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-rgb-split.js')
       .addIncludeFile('Extensions/Effects/rgb-split-pixi-filter.js');
@@ -570,44 +570,48 @@ module.exports = {
     rgbSplitProperties.set(
       'redX',
       new gd.PropertyDescriptor(/* defaultValue= */ '-10')
-        .setLabel(_('Red X (between -20 and 20)'))
+        .setLabel(_('Red X offset (between -20 and 20)'))
         .setType('number')
     );
     rgbSplitProperties.set(
       'redY',
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Red Y (between -20 and 20)'))
+        .setLabel(_('Red Y offset (between -20 and 20)'))
         .setType('number')
     );
     rgbSplitProperties.set(
       'greenX',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Green X (between -20 and 20)'))
+        .setLabel(_('Green X offset (between -20 and 20)'))
         .setType('number')
     );
     rgbSplitProperties.set(
       'greenY',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Green Y (between -20 and 20)'))
+        .setLabel(_('Green Y offset (between -20 and 20)'))
         .setType('number')
     );
     rgbSplitProperties.set(
       'blueX',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Blue X (between -20 and 20)'))
+        .setLabel(_('Blue X offset (between -20 and 20)'))
         .setType('number')
     );
     rgbSplitProperties.set(
       'blueY',
       new gd.PropertyDescriptor(/* defaultValue= */ '10')
-        .setLabel(_('Blue Y (between -20 and 20)'))
+        .setLabel(_('Blue Y offset (between -20 and 20)'))
         .setType('number')
     );
 
     const adjustmentEffect = extension
       .addEffect('Adjustment')
       .setFullName(_('Adjustment'))
-      .setDescription(_('Add a colour adjustment effect'))
+      .setDescription(
+        _(
+          'Adjust gamma, contrast, saturation, brightness, alpha or color-channel shift.'
+        )
+      )
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-adjustment.js')
       .addIncludeFile('Extensions/Effects/adjustment-pixi-filter.js');
     const adjustmentProperties = adjustmentEffect.getProperties();
@@ -663,7 +667,7 @@ module.exports = {
     const dropShadowEffect = extension
       .addEffect('DropShadow')
       .setFullName(_('Drop shadow'))
-      .setDescription(_('Add Dropshadow effect'))
+      .setDescription(_('Add a shadow around the rendered image.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-drop-shadow.js')
       .addIncludeFile('Extensions/Effects/drop-shadow-pixi-filter.js');
@@ -701,20 +705,20 @@ module.exports = {
     dropShadowProperties.set(
       'color',
       new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
-        .setLabel(_('Color (dropshadow color)'))
+        .setLabel(_('Color of the shadow'))
         .setType('color')
     );
     dropShadowProperties.set(
       'shadowOnly',
       new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('Shadow only (shows only shadow when enabled)'))
+        .setLabel(_('Shadow only (shows only the shadow when enabled)'))
         .setType('boolean')
     );
 
     const outlineEffect = extension
       .addEffect('Outline')
       .setFullName(_('Outline'))
-      .setDescription(_('Add Outline effect'))
+      .setDescription(_('Draws an outline around the rendered image.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-outline.js')
       .addIncludeFile('Extensions/Effects/outline-pixi-filter.js');
     const outlineProperties = outlineEffect.getProperties();
@@ -727,14 +731,14 @@ module.exports = {
     outlineProperties.set(
       'color',
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Color (color of the outline)'))
+        .setLabel(_('Color of the outline'))
         .setType('color')
     );
 
     const glowEffect = extension
       .addEffect('Glow')
       .setFullName(_('Glow'))
-      .setDescription(_('Add Glow effect'))
+      .setDescription(_('Add a glow effect around the rendered image.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-glow.js')
       .addIncludeFile('Extensions/Effects/glow-pixi-filter.js');
     const glowProperties = glowEffect.getProperties();
@@ -759,14 +763,14 @@ module.exports = {
     glowProperties.set(
       'color',
       new gd.PropertyDescriptor(/* defaultValue= */ '#ffffff')
-        .setLabel(_('Color (color of the outline)'))
+        .setLabel(_('Color of the outline)'))
         .setType('color')
     );
 
     const asciiEffect = extension
       .addEffect('Ascii')
-      .setFullName(_('Ascii'))
-      .setDescription(_('Add Ascii effect'))
+      .setFullName(_('ASCII'))
+      .setDescription(_('Render the image with ASCII characters only.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-ascii.js')
       .addIncludeFile('Extensions/Effects/ascii-pixi-filter.js');
     const asciiProperties = asciiEffect.getProperties();
@@ -779,8 +783,8 @@ module.exports = {
 
     const bevelEffect = extension
       .addEffect('Bevel')
-      .setFullName(_('Bevel'))
-      .setDescription(_('Add Bevel effect'))
+      .setFullName(_('Beveled edges'))
+      .setDescription(_('Add beveled edges around the rendered image.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-bevel.js')
       .addIncludeFile('Extensions/Effects/bevel-pixi-filter.js');
     const bevelProperties = bevelEffect.getProperties();

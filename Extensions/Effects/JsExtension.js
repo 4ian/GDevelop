@@ -558,6 +558,279 @@ module.exports = {
         .setType('boolean')
     );
 
+    const rgbSplitEffect = extension
+      .addEffect('RGBSplit')
+      .setFullName(_('RGB split (chromatic aberration)'))
+      .setDescription(
+        _('Applies a RGB split effect also known as chromatic aberration.')
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-rgb-split.js')
+      .addIncludeFile('Extensions/Effects/rgb-split-pixi-filter.js');
+    const rgbSplitProperties = rgbSplitEffect.getProperties();
+    rgbSplitProperties.set(
+      'redX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '-10')
+        .setLabel(_('Red X offset (between -20 and 20)'))
+        .setType('number')
+    );
+    rgbSplitProperties.set(
+      'redY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Red Y offset (between -20 and 20)'))
+        .setType('number')
+    );
+    rgbSplitProperties.set(
+      'greenX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Green X offset (between -20 and 20)'))
+        .setType('number')
+    );
+    rgbSplitProperties.set(
+      'greenY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Green Y offset (between -20 and 20)'))
+        .setType('number')
+    );
+    rgbSplitProperties.set(
+      'blueX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Blue X offset (between -20 and 20)'))
+        .setType('number')
+    );
+    rgbSplitProperties.set(
+      'blueY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '10')
+        .setLabel(_('Blue Y offset (between -20 and 20)'))
+        .setType('number')
+    );
+
+    const adjustmentEffect = extension
+      .addEffect('Adjustment')
+      .setFullName(_('Adjustment'))
+      .setDescription(
+        _(
+          'Adjust gamma, contrast, saturation, brightness, alpha or color-channel shift.'
+        )
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-adjustment.js')
+      .addIncludeFile('Extensions/Effects/adjustment-pixi-filter.js');
+    const adjustmentProperties = adjustmentEffect.getProperties();
+    adjustmentProperties.set(
+      'gamma',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Gamma (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'saturation',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Saturation (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'contrast',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Contrast (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'brightness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Brightness (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'red',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Red (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'green',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Green (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'blue',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.6')
+        .setLabel(_('Blue (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'alpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Alpha (between 0 and 1, 0 is transparent)'))
+        .setType('number')
+    );
+
+    const dropShadowEffect = extension
+      .addEffect('DropShadow')
+      .setFullName(_('Drop shadow'))
+      .setDescription(_('Add a shadow around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-drop-shadow.js')
+      .addIncludeFile('Extensions/Effects/drop-shadow-pixi-filter.js');
+    const dropShadowProperties = dropShadowEffect.getProperties();
+    dropShadowProperties.set(
+      'blur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Blur (between 0 and 20)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'quality',
+      new gd.PropertyDescriptor(/* defaultValue= */ '3')
+        .setLabel(_('Quality (between 1 and 20)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'alpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Alpha (between 0 and 1)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'distance',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Distance (between 0 and 50)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'rotation',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Rotation (between 0 and 360)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'color',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
+        .setLabel(_('Color of the shadow'))
+        .setType('color')
+    );
+    dropShadowProperties.set(
+      'shadowOnly',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
+        .setLabel(_('Shadow only (shows only the shadow when enabled)'))
+        .setType('boolean')
+    );
+
+    const outlineEffect = extension
+      .addEffect('Outline')
+      .setFullName(_('Outline'))
+      .setDescription(_('Draws an outline around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-outline.js')
+      .addIncludeFile('Extensions/Effects/outline-pixi-filter.js');
+    const outlineProperties = outlineEffect.getProperties();
+    outlineProperties.set(
+      'thickness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Thickness (between 0 and 20)'))
+        .setType('number')
+    );
+    outlineProperties.set(
+      'color',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Color of the outline'))
+        .setType('color')
+    );
+
+    const glowEffect = extension
+      .addEffect('Glow')
+      .setFullName(_('Glow'))
+      .setDescription(_('Add a glow effect around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-glow.js')
+      .addIncludeFile('Extensions/Effects/glow-pixi-filter.js');
+    const glowProperties = glowEffect.getProperties();
+    glowProperties.set(
+      'innerStrength',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Inner strength (between 0 and 20)'))
+        .setType('number')
+    );
+    glowProperties.set(
+      'outerStrength',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Outer strength (between 0 and 20)'))
+        .setType('number')
+    );
+    glowProperties.set(
+      'distance',
+      new gd.PropertyDescriptor(/* defaultValue= */ '15')
+        .setLabel(_('Distance (between 10 and 20)'))
+        .setType('number')
+    );
+    glowProperties.set(
+      'color',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#ffffff')
+        .setLabel(_('Color of the outline)'))
+        .setType('color')
+    );
+
+    const asciiEffect = extension
+      .addEffect('Ascii')
+      .setFullName(_('ASCII'))
+      .setDescription(_('Render the image with ASCII characters only.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-ascii.js')
+      .addIncludeFile('Extensions/Effects/ascii-pixi-filter.js');
+    const asciiProperties = asciiEffect.getProperties();
+    asciiProperties.set(
+      'size',
+      new gd.PropertyDescriptor(/* defaultValue= */ '8')
+        .setLabel(_('Size (between 2 and 20)'))
+        .setType('number')
+    );
+
+    const bevelEffect = extension
+      .addEffect('Bevel')
+      .setFullName(_('Beveled edges'))
+      .setDescription(_('Add beveled edges around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-bevel.js')
+      .addIncludeFile('Extensions/Effects/bevel-pixi-filter.js');
+    const bevelProperties = bevelEffect.getProperties();
+    bevelProperties.set(
+      'rotation',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Rotation (between 0 and 360)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'thickness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Outer strength (between 0 and 5)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'distance',
+      new gd.PropertyDescriptor(/* defaultValue= */ '15')
+        .setLabel(_('Distance (between 10 and 20)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'lightAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Light alpha (between 0 and 1)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'lightColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#ffffff')
+        .setLabel(_('Light color (color of the outline)'))
+        .setType('color')
+    );
+    bevelProperties.set(
+      'shadowColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
+        .setLabel(_('Shadow color (color of the outline)'))
+        .setType('color')
+    );
+    bevelProperties.set(
+      'shadowAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Shadow alpha (between 0 and 1)'))
+        .setType('number')
+    );
+
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

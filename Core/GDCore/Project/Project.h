@@ -200,22 +200,36 @@ class GD_CORE_API Project : public ObjectsContainer {
    * the first time. To change the width at runtime, use the functions related
    * to RuntimeScene.renderWindow
    */
-  void SetDefaultWidth(unsigned int width) { windowWidth = width; }
+  void SetGameResolutionSize(unsigned int width, unsigned int height) {
+    windowWidth = width;
+    windowHeight = height;
+  }
 
   /**
-   * Get the default width of the project main window
+   * \brief Returns the default game resolution width.
    */
-  unsigned int GetMainWindowDefaultWidth() const { return windowWidth; }
+  unsigned int GetGameResolutionWidth() const { return windowWidth; }
 
   /**
-   * Change the default height of the project main window
+   * \brief Returns the default game resolution height.
    */
-  void SetDefaultHeight(unsigned int height) { windowHeight = height; }
+  unsigned int GetGameResolutionHeight() const { return windowHeight; }
 
   /**
-   * Return the default height of the project main window
+   * \brief Returns true if the game resolution should be adapted to the window
+   * size at runtime.
    */
-  unsigned int GetMainWindowDefaultHeight() const { return windowHeight; }
+  bool GetAdaptGameResolutionAtRuntime() const {
+    return adaptGameResolutionAtRuntime;
+  }
+
+  /**
+   * \brief Set if the game resolution should be adapted to the window size at
+   * runtime. \see SetSizeOnStartupMode
+   */
+  void SetAdaptGameResolutionAtRuntime(bool adaptGameResolutionAtRuntime_) {
+    adaptGameResolutionAtRuntime = adaptGameResolutionAtRuntime_;
+  }
 
   /**
    * \brief Get how the game size should be adapted to the screen.
@@ -924,6 +938,8 @@ class GD_CORE_API Project : public ObjectsContainer {
                         ///< are below this number )
   bool verticalSync;    ///< If true, must activate vertical synchronization.
   gd::String scaleMode;
+  bool adaptGameResolutionAtRuntime;  ///< Should the game resolution be adapted
+                                      ///< to the window size at runtime
   gd::String
       sizeOnStartupMode;  ///< How to adapt the game size to the screen. Can be
                           ///< "adaptWidth", "adaptHeight" or empty

@@ -6,52 +6,64 @@
 
 /**
  * The renderer for a gdjs.RuntimeGame using Cocos2D-JS.
+ *
  * @class RuntimeGameCocosRenderer
  * @memberof gdjs
+ * @param {gdjs.RuntimeGame} game
+ * @param {boolean} forceFullscreen
  */
-gdjs.RuntimeGameCocosRenderer = function(game, width, height, forceFullscreen)
+gdjs.RuntimeGameCocosRenderer = function(game, forceFullscreen)
 {
     this._directorManager = new gdjs.CocosDirectorManager();
-    this._currentWidth = width; //Current size of the canvas
-    this._currentHeight = height;
+    this._game = game;
 }
 
 gdjs.RuntimeGameRenderer = gdjs.RuntimeGameCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.RuntimeGameCocosRenderer.prototype.getCurrentWidth = function() {
-    return this._currentWidth;
-};
-
-gdjs.RuntimeGameCocosRenderer.prototype.getCurrentHeight = function() {
-    return this._currentHeight;
-};
-
-gdjs.RuntimeGameCocosRenderer.prototype.setSize = function(width, height) {
-    this._currentWidth = width;
-    this._currentHeight = height;
-
-    cc.view.setDesignResolutionSize(width, height, cc.view.getResolutionPolicy());
+gdjs.RuntimeGameCocosRenderer.prototype.updateRendererSize = function() {
+    cc.view.setDesignResolutionSize(this._game.getGameResolutionWidth(),
+        this._game.getGameResolutionHeight(), cc.view.getResolutionPolicy());
 };
 
 /**
  * Set if the aspect ratio must be kept when the game rendering area is resized.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.keepAspectRatio = function(enable) {
-    //TODO
+    // Not supported.
+    console.warn("Aspect ratio is not supported.");
 };
 
 /**
  * Change the margin that must be preserved around the game.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.setMargins = function(top, right, bottom, left) {
-    //TODO
+    // Not supported.
+    console.warn("Margins are not supported.");
 };
 
 /**
  * De/activate fullscreen for the game.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.setFullScreen = function(enable) {
-    //TODO
+    // TODO - not implemented yet
+    console.warn("Fullscreen is not implemented yet.");
+};
+
+/**
+ * Update the window size, if possible.
+ * @param {number} width The new width, in pixels.
+ * @param {number} height The new height, in pixels.
+ */
+gdjs.RuntimeGameCocosRenderer.prototype.setWindowSize = function(width, height) {
+    var electron = this.getElectron();
+    if (electron) { // Use Electron BrowserWindow API
+        var browserWindow = electron.remote.getCurrentWindow();
+        if (browserWindow) {
+            browserWindow.setContentSize(width, height);
+        }
+    } else {
+        console.warn("Window size can't be changed on this platform.");
+    }
 };
 
 gdjs.RuntimeGameCocosRenderer.prototype.setWindowTitle = function(title) {
@@ -86,11 +98,11 @@ gdjs.RuntimeGameCocosRenderer.prototype.convertYPosition = function(y) {
     return this._currentHeight - y;
 }
 
-gdjs.RuntimeGameCocosRenderer.getScreenWidth = function() {
+gdjs.RuntimeGameCocosRenderer.getWindowInnerWidth = function() {
     return cc.view.getFrameSize().width;
 }
 
-gdjs.RuntimeGameCocosRenderer.getScreenHeight = function() {
+gdjs.RuntimeGameCocosRenderer.getWindowInnerHeight = function() {
     return cc.view.getFrameSize().height;
 }
 
@@ -110,6 +122,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.openURL = function(url) {
 
 gdjs.RuntimeGameCocosRenderer.prototype.stopGame = function() {
     // TODO - Not implemented as not useful for most games on mobile and browsers
+    console.warn("Stopping the game is not supported.");
 }
 
 /**

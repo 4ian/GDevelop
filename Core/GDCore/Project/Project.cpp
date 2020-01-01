@@ -59,6 +59,7 @@ Project::Project()
       minFPS(20),
       verticalSync(false),
       scaleMode("linear"),
+      adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
@@ -574,9 +575,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       element.GetChild("properties", 0, "Info");
   SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
   SetVersion(propElement.GetStringAttribute("version", "1.0.0"));
-  SetDefaultWidth(
-      propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt());
-  SetDefaultHeight(
+  SetGameResolutionSize(
+      propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt(),
       propElement.GetChild("windowHeight", 0, "WindowH").GetValue().GetInt());
   SetMaximumFPS(
       propElement.GetChild("maxFPS", 0, "FPSmax").GetValue().GetInt());
@@ -585,6 +585,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetVerticalSyncActivatedByDefault(
       propElement.GetChild("verticalSync").GetValue().GetBool());
   SetScaleMode(propElement.GetStringAttribute("scaleMode", "linear"));
+  SetAdaptGameResolutionAtRuntime(
+      propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
 #if defined(GD_IDE_ONLY)
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
@@ -851,8 +853,8 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("name").SetValue(GetName());
   propElement.SetAttribute("version", GetVersion());
   propElement.AddChild("author").SetValue(GetAuthor());
-  propElement.AddChild("windowWidth").SetValue(GetMainWindowDefaultWidth());
-  propElement.AddChild("windowHeight").SetValue(GetMainWindowDefaultHeight());
+  propElement.AddChild("windowWidth").SetValue(GetGameResolutionWidth());
+  propElement.AddChild("windowHeight").SetValue(GetGameResolutionHeight());
   propElement.AddChild("latestCompilationDirectory")
       .SetValue(GetLastCompilationDirectory());
   propElement.AddChild("maxFPS").SetValue(GetMaximumFPS());
@@ -860,6 +862,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
   propElement.SetAttribute("scaleMode", scaleMode);
+  propElement.SetAttribute("adaptGameResolutionAtRuntime", adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   propElement.SetAttribute("projectFile", gameFile);
   propElement.SetAttribute("folderProject", folderProject);
@@ -1059,6 +1062,7 @@ void Project::Init(const gd::Project& game) {
   minFPS = game.minFPS;
   verticalSync = game.verticalSync;
   scaleMode = game.scaleMode;
+  adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
 
 #if defined(GD_IDE_ONLY)

@@ -3,26 +3,21 @@
  * @class RuntimeGamePixiRenderer
  * @memberof gdjs
  * @param {gdjs.RuntimeGame} game The game that is being rendered
- * @param {number} width The default width of the renderer
- * @param {number} height The default height of the renderer
  * @param {boolean} forceFullscreen If fullscreen should be always activated
  */
-gdjs.RuntimeGamePixiRenderer = function(game, width, height, forceFullscreen)
+gdjs.RuntimeGamePixiRenderer = function(game, forceFullscreen)
 {
     this._game = game;
 
     this._isFullPage = true; //Used to track if the canvas is displayed on the full page.
     this._isFullscreen = false; //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     this._forceFullscreen = forceFullscreen; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
-    
+
     /** @type {PIXI.SystemRenderer} */
     this._pixiRenderer = null;
-    this._currentWidth = width; // Current width of the renderer (not the canvas)
-    this._currentHeight = height; // Current height of the renderer (not the canvas)
-    this._canvasWidth = width; // Current width of the canvas (might be scaled down/up compared to renderer)
-    this._canvasHeight = height; // Current height of the canvas (might be scaled down/up compared to renderer)
+    this._canvasWidth = 0; // Current width of the canvas (might be scaled down/up compared to renderer)
+    this._canvasHeight = 0; // Current height of the canvas (might be scaled down/up compared to renderer)
     this._keepRatio = true;
-    this._reduceIfNeed = true;
     this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
 
     if (navigator.isCocoonJS && !this._forceFullscreen) {
@@ -47,13 +42,13 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(parentEle
 
     //Create the renderer and setup the rendering area
     //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
-    this._pixiRenderer = PIXI.autoDetectRenderer(this._game.getDefaultWidth(), this._game.getDefaultHeight(), {
+    this._pixiRenderer = PIXI.autoDetectRenderer(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight(), {
         preserveDrawingBuffer: true,
     } );
     parentElement.appendChild(this._pixiRenderer.view); // add the renderer view element to the DOM
     this._pixiRenderer.view.style["position"] = "absolute";
     this._pixiRenderer.view.tabindex = "1"; //Ensure that the canvas has the focus.
-    this.resize();
+    this._resizeCanvas();
 
     // Handle scale mode
     if (this._game.getScaleMode() === "nearest") {
@@ -66,86 +61,66 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(parentEle
     //Handle resize
     var that = this;
     window.addEventListener("resize", function() {
-        that.resize();
+        that._game.onWindowInnerSizeChanged();
+        that._resizeCanvas();
         that._game._notifySceneForResize = true;
     });
 
     return this._pixiRenderer;
 };
 
-/**
- * Get the current width of the renderer.
- */
-gdjs.RuntimeGamePixiRenderer.prototype.getCurrentWidth = function() {
-    return this._currentWidth;
-};
+gdjs.RuntimeGamePixiRenderer.getWindowInnerWidth = function() {
+    return (typeof window !== "undefined") ? window.innerWidth : 800;
+}
+
+gdjs.RuntimeGamePixiRenderer.getWindowInnerHeight = function() {
+    return (typeof window !== "undefined") ? window.innerHeight : 800;
+}
 
 /**
- * Get the current height of the renderer.
- */
-gdjs.RuntimeGamePixiRenderer.prototype.getCurrentHeight = function() {
-    return this._currentHeight;
-};
-
-/**
- * Change the size of the canvas displaying the game.
+ * Update the game renderer size according to the "game resolution".
+ * Called when game resolution changes.
+ *
  * Note that if the canvas is fullscreen, it won't be resized, but when going back to
  * non fullscreen mode, the requested size will be used.
- *
- * @param {number} width The new width
- * @param {number} height The new height
  */
-gdjs.RuntimeGamePixiRenderer.prototype.setSize = function(width, height) {
-    this._currentWidth = width;
-    this._currentHeight = height;
-
-    this.resize();
-    this._game._notifySceneForResize = true;
+gdjs.RuntimeGamePixiRenderer.prototype.updateRendererSize = function() {
+    this._resizeCanvas();
 };
 
-
 /**
- * Resize the renderer (according to _currentWidth and _currentHeight)
- * and the canvas, according to _isFullPage, _isFullscreen, _forceFullscreen, _currentWidth,
- * _currentHeight, _marginTop, _marginLeft, _marginRight, _marginBottom, _keepRatio.
+ * Resize the renderer (the "game resolution") and the canvas (which can be larger
+ * or smaller to fill the page, with optional margins).
  *
  * @private
  */
-gdjs.RuntimeGamePixiRenderer.prototype.resize = function() {
-    var keepRatio = this._keepRatio;
+gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function() {
+    console.log("_resizeCanvas");
 
     // Set the Pixi renderer size to the game size.
-    // There is no resizing to be done here: the rendering of the game
-    // should be done to the size set on the game.
-    var rendererWidth = this.getCurrentWidth();
-    var rendererHeight = this.getCurrentHeight();
-    if (this._pixiRenderer.width !== rendererWidth || 
-        this._pixiRenderer.height !== rendererHeight) {
-        this._pixiRenderer.resize(rendererWidth, rendererHeight);
+    // There is no "smart" resizing to be done here: the rendering of the game
+    // should be done with the size set on the game.
+    if (this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
+        this._pixiRenderer.height !== this._game.getGameResolutionHeight()) {
+        this._pixiRenderer.resize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
     }
 
     // Set the canvas size.
     // Resizing is done according to the settings. This is a "CSS" resize
     // only, so won't create visual artifacts during the rendering.
-    var reduceIfNeed = this._reduceIfNeed;
     var isFullPage = this._forceFullscreen || this._isFullPage || this._isFullscreen;
-    var isFullscreen = this._forceFullscreen || this._isFullscreen;
-    var canvasWidth = this.getCurrentWidth();
-    var canvasHeight = this.getCurrentHeight();
-    var marginLeft = this._marginLeft;
-    var marginTop = this._marginTop;
-    var marginRight = this._marginRight;
-    var marginBottom = this._marginBottom;
-    var maxWidth = window.innerWidth-marginLeft-marginRight;
-    var maxHeight = window.innerHeight-marginTop-marginBottom;
+    var canvasWidth = this._game.getGameResolutionWidth();
+    var canvasHeight = this._game.getGameResolutionHeight();
+    var maxWidth = window.innerWidth-this._marginLeft-this._marginRight;
+    var maxHeight = window.innerHeight-this._marginTop-this._marginBottom;
     if (maxWidth < 0) maxWidth = 0;
     if (maxHeight < 0) maxHeight = 0;
 
-    if (isFullPage && !keepRatio) {
+    if (isFullPage && !this._keepRatio) {
         canvasWidth = maxWidth;
         canvasHeight = maxHeight;
-    } else if (isFullPage && keepRatio ||
-        (reduceIfNeed && (canvasWidth > maxWidth || canvasHeight > maxHeight))) {
+    } else if (isFullPage && this._keepRatio ||
+        (canvasWidth > maxWidth || canvasHeight > maxHeight)) {
         var factor = maxWidth/canvasWidth;
         if (canvasHeight*factor > maxHeight) factor = maxHeight/canvasHeight;
 
@@ -153,29 +128,30 @@ gdjs.RuntimeGamePixiRenderer.prototype.resize = function() {
         canvasHeight *= factor;
     }
 
-    this._pixiRenderer.view.style["top"] = ((marginTop+(maxHeight-canvasHeight)/2)+"px");
-    this._pixiRenderer.view.style["left"] = ((marginLeft+(maxWidth-canvasWidth)/2)+"px");
+    this._pixiRenderer.view.style["top"] = ((this._marginTop+(maxHeight-canvasHeight)/2)+"px");
+    this._pixiRenderer.view.style["left"] = ((this._marginLeft+(maxWidth-canvasWidth)/2)+"px");
     this._pixiRenderer.view.style.width = canvasWidth+"px";
     this._pixiRenderer.view.style.height = canvasHeight+"px";
-    
+
     // Store the canvas size for fast access to it.
     this._canvasWidth = canvasWidth;
     this._canvasHeight = canvasHeight;
 };
 
 /**
- * Set if the aspect ratio must be kept when the game rendering area is resized.
+ * Set if the aspect ratio must be kept when the game canvas is resized to fill
+ * the page.
  */
 gdjs.RuntimeGamePixiRenderer.prototype.keepAspectRatio = function(enable) {
     if (this._keepRatio === enable) return;
 
     this._keepRatio = enable;
-    this.resize();
+    this._resizeCanvas();
     this._game._notifySceneForResize = true;
 };
 
 /**
- * Change the margin that must be preserved around the game.
+ * Change the margin that must be preserved around the game canvas.
  */
 gdjs.RuntimeGamePixiRenderer.prototype.setMargins = function(top, right, bottom, left) {
     if (this._marginTop === top && this._marginRight === right && this._marginBottom === bottom &&
@@ -186,8 +162,25 @@ gdjs.RuntimeGamePixiRenderer.prototype.setMargins = function(top, right, bottom,
     this._marginRight = right;
     this._marginBottom = bottom;
     this._marginLeft = left;
-    this.resize();
+    this._resizeCanvas();
     this._game._notifySceneForResize = true;
+};
+
+/**
+ * Update the window size, if possible.
+ * @param {number} width The new width, in pixels.
+ * @param {number} height The new height, in pixels.
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.setWindowSize = function(width, height) {
+    var electron = this.getElectron();
+    if (electron) { // Use Electron BrowserWindow API
+        var browserWindow = electron.remote.getCurrentWindow();
+        if (browserWindow) {
+            browserWindow.setContentSize(width, height);
+        }
+    } else {
+        console.warn("Window size can't be changed on this platform.");
+    }
 };
 
 /**
@@ -227,7 +220,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
             }
         }
 
-        this.resize();
+        this._resizeCanvas();
         this._notifySceneForResize = true;
     }
 };
@@ -253,8 +246,8 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
         }
 
         //Handle the fact that the game is stretched to fill the canvas.
-        pos[0] *= that._game.getDefaultWidth()/that._canvasWidth;
-        pos[1] *= that._game.getDefaultHeight()/that._canvasHeight;
+        pos[0] *= that._game.getGameResolutionWidth()/(that._canvasWidth || 1);
+        pos[1] *= that._game.getGameResolutionHeight()/(that._canvasHeight || 1);
 
         return pos;
     }
@@ -296,15 +289,15 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
         manager.onMouseMove(pos[0], pos[1]);
     };
     renderer.view.onmousedown = function(e){
-        manager.onMouseButtonPressed(e.button === 2 ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
-            e.button === 1 ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON : 
+        manager.onMouseButtonPressed(e.button === 2 ? gdjs.InputManager.MOUSE_RIGHT_BUTTON :
+            e.button === 1 ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON :
             gdjs.InputManager.MOUSE_LEFT_BUTTON);
         if (window.focus !== undefined) window.focus();
         return false;
     };
     renderer.view.onmouseup = function(e){
-        manager.onMouseButtonReleased(e.button === 2 ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
-            e.button === 1 ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON : 
+        manager.onMouseButtonReleased(e.button === 2 ? gdjs.InputManager.MOUSE_RIGHT_BUTTON :
+            e.button === 1 ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON :
             gdjs.InputManager.MOUSE_LEFT_BUTTON);
         return false;
     };
@@ -376,14 +369,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
 
 gdjs.RuntimeGamePixiRenderer.prototype.getPIXIRenderer = function() {
     return this._pixiRenderer;
-}
-
-gdjs.RuntimeGamePixiRenderer.getScreenWidth = function() {
-    return (typeof window !== "undefined") ? window.innerWidth : 800;
-}
-
-gdjs.RuntimeGamePixiRenderer.getScreenHeight = function() {
-    return (typeof window !== "undefined") ? window.innerHeight : 800;
 }
 
 /**

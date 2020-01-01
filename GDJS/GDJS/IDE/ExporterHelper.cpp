@@ -444,10 +444,10 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/main.js")
             .FindAndReplace(
                 "800 /*GDJS_WINDOW_WIDTH*/",
-                gd::String::From<int>(project.GetMainWindowDefaultWidth()))
+                gd::String::From<int>(project.GetGameResolutionWidth()))
             .FindAndReplace(
                 "600 /*GDJS_WINDOW_HEIGHT*/",
-                gd::String::From<int>(project.GetMainWindowDefaultHeight()))
+                gd::String::From<int>(project.GetGameResolutionHeight()))
             .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName);
 
     if (!fs.WriteToFile(exportDir + "/main.js", str)) {

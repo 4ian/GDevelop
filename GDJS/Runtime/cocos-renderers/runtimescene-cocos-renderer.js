@@ -58,7 +58,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype.onSceneUnloaded = function() {
     this._runtimeScene.getGame().getRenderer().getDirectorManager().onSceneUnloaded(this._cocosScene);
 };
 
-gdjs.RuntimeSceneCocosRenderer.prototype.onCanvasResized = function() {
+gdjs.RuntimeSceneCocosRenderer.prototype.onGameResolutionResized = function() {
     // Nothing to do here.
 };
 
@@ -84,7 +84,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype.render = function() {
 
 gdjs.RuntimeSceneCocosRenderer.prototype._renderProfileText = function() {
     if (!this._runtimeScene.getProfiler()) return;
-    
+
     if (!this._profilerText) {
         this._profilerText = new cc.LabelTTF(" ", "Arial", 20);
         this._profilerText.setAnchorPoint(cc.p(0, -1.2));
@@ -94,7 +94,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype._renderProfileText = function() {
     var average = this._runtimeScene.getProfiler().getFramesAverageMeasures();
     var outputs = [];
     gdjs.Profiler.getProfilerSectionTexts("All", average, outputs);
-  
+
     this._profilerText.setString(outputs.join("\n"));
 };
 
@@ -110,13 +110,13 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
         },
         onMouseDown: function(event) {
             that._runtimeScene.getGame().getInputManager().onMouseButtonPressed(
-                event.getButton() === cc.EventMouse.BUTTON_RIGHT ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
+                event.getButton() === cc.EventMouse.BUTTON_RIGHT ? gdjs.InputManager.MOUSE_RIGHT_BUTTON :
                 (event.getButton() === cc.EventMouse.BUTTON_MIDDLE ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON :
                 gdjs.InputManager.MOUSE_LEFT_BUTTON));
         },
         onMouseUp: function(event) {
             that._runtimeScene.getGame().getInputManager().onMouseButtonReleased(
-                event.getButton() === cc.EventMouse.BUTTON_RIGHT ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
+                event.getButton() === cc.EventMouse.BUTTON_RIGHT ? gdjs.InputManager.MOUSE_RIGHT_BUTTON :
                 (event.getButton() === cc.EventMouse.BUTTON_MIDDLE ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON :
                 gdjs.InputManager.MOUSE_LEFT_BUTTON));
         },

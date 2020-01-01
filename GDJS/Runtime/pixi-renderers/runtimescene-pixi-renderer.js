@@ -8,14 +8,14 @@ gdjs.RuntimeScenePixiRenderer = function(runtimeScene, runtimeGameRenderer) {
 
 gdjs.RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer; //Register the class to let the engine use it.
 
-gdjs.RuntimeScenePixiRenderer.prototype.onCanvasResized = function() {
+gdjs.RuntimeScenePixiRenderer.prototype.onGameResolutionResized = function() {
   if (!this._pixiRenderer) return;
 
   var runtimeGame = this._runtimeScene.getGame();
   this._pixiContainer.scale.x =
-    this._pixiRenderer.width / runtimeGame.getDefaultWidth();
+    this._pixiRenderer.width / runtimeGame.getGameResolutionWidth();
   this._pixiContainer.scale.y =
-    this._pixiRenderer.height / runtimeGame.getDefaultHeight();
+    this._pixiRenderer.height / runtimeGame.getGameResolutionHeight();
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.render = function() {

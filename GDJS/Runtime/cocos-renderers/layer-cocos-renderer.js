@@ -21,11 +21,11 @@ gdjs.LayerCocosRenderer = function(layer, runtimeSceneRenderer)
         this._cocosLayer = new CocosLayer();
         runtimeSceneRenderer.getCocosScene().addChild(this._cocosLayer);
     } else {
-        var gameRenderer = runtimeSceneRenderer._runtimeScene.getGame().getRenderer(); //TODO
+        var game = runtimeSceneRenderer._runtimeScene.getGame();
         this._renderTexture = new cc.RenderTexture(
-            gameRenderer.getCurrentWidth(), gameRenderer.getCurrentHeight());
+            game.getGameResolutionWidth(), game.getGameResolutionHeight());
         this._renderTexture.setPosition(cc.p(
-            gameRenderer.getCurrentWidth() / 2, gameRenderer.getCurrentHeight() / 2));
+            game.getGameResolutionWidth() / 2, game.getGameResolutionHeight() / 2));
         this._renderTexture.retain();
 
         this._cocosLayer = new CocosLayer();

@@ -36,8 +36,9 @@ gdjs.RuntimeGame = function(data, spec) {
   this._gameResolutionHeight = data.properties.windowHeight;
   this._originalWidth = this._gameResolutionWidth;
   this._originalHeight = this._gameResolutionHeight;
-  this._resizeMode = data.properties.sizeOnStartupMode; // TODO: action
-  this._adaptGameResolutionAtRuntime = data.properties.adaptGameResolutionAtRuntime; // TODO: action
+  this._resizeMode = data.properties.sizeOnStartupMode;
+  this._adaptGameResolutionAtRuntime =
+    data.properties.adaptGameResolutionAtRuntime;
   /** @type {string} */
   this._scaleMode = data.properties.scaleMode || 'linear';
   this._renderer = new gdjs.RuntimeGameRenderer(
@@ -252,7 +253,8 @@ gdjs.RuntimeGame.prototype.setGameResolutionSize = function(width, height) {
       var width = this._gameResolutionWidth;
       var height = this._gameResolutionHeight;
       if (this._resizeMode === 'adaptWidth') {
-        this._gameResolutionWidth = (this._gameResolutionHeight * windowInnerWidth) / windowInnerHeight;
+        this._gameResolutionWidth =
+          (this._gameResolutionHeight * windowInnerWidth) / windowInnerHeight;
       } else if (this._resizeMode === 'adaptHeight') {
         this._gameResolutionHeight =
           (this._gameResolutionWidth * windowInnerHeight) / windowInnerWidth;
@@ -269,6 +271,52 @@ gdjs.RuntimeGame.prototype.setGameResolutionSize = function(width, height) {
   // scenes know too.
   this._renderer.updateRendererSize();
   this._notifyScenesForGameResolutionResize = true;
+};
+
+/**
+ * Set if the width or the height of the game resolution
+ * should be changed to fit the game window - or if the game
+ * resolution should not be updated automatically.
+ *
+ * @param {string} resizeMode Either "" (don't change game resolution), "adaptWidth" or "adaptHeight".
+ */
+gdjs.RuntimeGame.prototype.setGameResolutionResizeMode = function(resizeMode) {
+  this._resizeMode = resizeMode;
+  this._forceGameResolutionUpdate();
+};
+
+/**
+ * Returns if the width or the height of the game resolution
+ * should be changed to fit the game window - or if the game
+ * resolution should not be updated automatically (empty string).
+ *
+ * @returns {string} Either "" (don't change game resolution), "adaptWidth" or "adaptHeight".
+ */
+gdjs.RuntimeGame.prototype.getGameResolutionResizeMode = function() {
+  return this._resizeMode;
+};
+
+/**
+ * Set if the game resolution should be automatically adapted
+ * when the game window or screen size change. This will only
+ * be the case if the game resolution resize mode is
+ * configured to adapt the width or the height of the game.
+ * @param {boolean} enable true to change the game resolution according to the window/screen size.
+ */
+gdjs.RuntimeGame.prototype.setAdaptGameResolutionAtRuntime = function(enable) {
+  this._adaptGameResolutionAtRuntime = enable;
+  this._forceGameResolutionUpdate();
+};
+
+/**
+ * Returns if the game resolution should be automatically adapted
+ * when the game window or screen size change. This will only
+ * be the case if the game resolution resize mode is
+ * configured to adapt the width or the height of the game.
+ * @returns {boolean} true if the game resolution is automatically changed according to the window/screen size.
+ */
+gdjs.RuntimeGame.prototype.getAdaptGameResolutionAtRuntime = function() {
+  return this._adaptGameResolutionAtRuntime;
 };
 
 /**
@@ -442,7 +490,10 @@ gdjs.RuntimeGame.prototype.onWindowInnerSizeChanged = function() {
  * Enlarge/reduce the width (or the height) of the game to fill the inner window.
  */
 gdjs.RuntimeGame.prototype._forceGameResolutionUpdate = function() {
-  this.setGameResolutionSize(this._gameResolutionWidth, this._gameResolutionHeight)
+  this.setGameResolutionSize(
+    this._gameResolutionWidth,
+    this._gameResolutionHeight
+  );
 };
 
 /**

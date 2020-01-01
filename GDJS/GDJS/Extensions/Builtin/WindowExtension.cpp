@@ -25,6 +25,10 @@ WindowExtension::WindowExtension() {
       "gdjs.evtTools.window.setWindowSize");
   GetAllActions()["SetGameResolutionSize"].SetFunctionName(
       "gdjs.evtTools.window.setGameResolutionSize");
+  GetAllActions()["SetGameResolutionResizeMode"].SetFunctionName(
+      "gdjs.evtTools.window.setGameResolutionResizeMode");
+  GetAllActions()["SetAdaptGameResolutionAtRuntime"].SetFunctionName(
+      "gdjs.evtTools.window.setAdaptGameResolutionAtRuntime");
 
   GetAllStrExpressions()["WindowTitle"].SetFunctionName(
       "gdjs.evtTools.window.getWindowTitle");

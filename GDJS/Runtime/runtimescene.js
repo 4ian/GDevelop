@@ -42,7 +42,7 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
 
-    this.onCanvasResized();
+    this.onGameResolutionResized();
 };
 
 /**
@@ -50,8 +50,17 @@ gdjs.RuntimeScene = function(runtimeGame)
  * See gdjs.RuntimeGame.startGameLoop in particular.
  * @memberof gdjs.RuntimeScene
  */
-gdjs.RuntimeScene.prototype.onCanvasResized = function() {
-    this._renderer.onCanvasResized();
+gdjs.RuntimeScene.prototype.onGameResolutionResized = function() {
+    for(var name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+            /** @type gdjs.Layer */
+            var theLayer = this._layers.items[name];
+
+            theLayer.onGameResolutionResized();
+        }
+    }
+
+    this._renderer.onGameResolutionResized();
 };
 
 /**
@@ -209,7 +218,7 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 
     this._isLoaded = false;
 
-    this.onCanvasResized();
+    this.onGameResolutionResized();
 };
 
 /**

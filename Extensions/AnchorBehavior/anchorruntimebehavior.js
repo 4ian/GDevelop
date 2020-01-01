@@ -46,8 +46,8 @@ gdjs.AnchorRuntimeBehavior.prototype.onActivate = function() {
 
 gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
     var game = runtimeScene.getGame();
-    var rendererWidth = game.getRenderer().getCurrentWidth();
-    var rendererHeight = game.getRenderer().getCurrentHeight();
+    var rendererWidth = game.getGameResolutionWidth();
+    var rendererHeight = game.getGameResolutionHeight();
     var layer = runtimeScene.getLayer(this.owner.getLayer());
 
     if(this._invalidDistances)

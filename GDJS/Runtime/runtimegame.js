@@ -32,22 +32,22 @@ gdjs.RuntimeGame = function(data, spec) {
   this._maxFPS = data ? parseInt(data.properties.maxFPS, 10) : 60;
   this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
-  this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
-  this._defaultHeight = data.properties.windowHeight;
-  this._originalWidth = data.properties.windowWidth; //Original size of the game, won't be changed.
-  this._originalHeight = data.properties.windowHeight;
+  this._gameResolutionWidth = data.properties.windowWidth;
+  this._gameResolutionHeight = data.properties.windowHeight;
+  this._originalWidth = this._gameResolutionWidth;
+  this._originalHeight = this._gameResolutionHeight;
+  this._resizeMode = data.properties.sizeOnStartupMode; // TODO: action
+  this._adaptGameResolutionAtRuntime = data.properties.adaptGameResolutionAtRuntime; // TODO: action
   /** @type {string} */
   this._scaleMode = data.properties.scaleMode || 'linear';
   this._renderer = new gdjs.RuntimeGameRenderer(
     this,
-    this._defaultWidth,
-    this._defaultHeight,
     spec.forceFullscreen || false
   );
 
   //Game loop management (see startGameLoop method)
   this._sceneStack = new gdjs.SceneStack(this);
-  this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
+  this._notifyScenesForGameResolutionResize = false; // When set to true, the scenes are notified that gamre resolution size changed.
   this._paused = false;
 
   //Inputs :
@@ -214,39 +214,61 @@ gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
 };
 
 /**
- * Get the default width of the game: canvas is created with this width,
- * and cameras of layers are created using this width when a scene is started.
- * @returns {number} The default width for cameras of layers
+ * Get the game resolution (the size at which the game is played and rendered) width.
+ * @returns {number} The game resolution width, in pixels.
  */
-gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
-  return this._defaultWidth;
+gdjs.RuntimeGame.prototype.getGameResolutionWidth = function() {
+  return this._gameResolutionWidth;
 };
 
 /**
- * Get the default height of the game: canvas is created with this height,
- * and cameras of layers are created using this height when a scene is started.
- * @returns {number} The default height for cameras of layers
+ * Get the game resolution (the size at which the game is played and rendered) height.
+ * @returns {number} The game resolution height, in pixels.
  */
-gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
-  return this._defaultHeight;
+gdjs.RuntimeGame.prototype.getGameResolutionHeight = function() {
+  return this._gameResolutionHeight;
 };
 
 /**
- * Change the default width of the game: It won't affect the canvas size, but
- * new scene cameras will be created with this size.
- * @param {number} width The new default width
+ * Change the game resolution.
+ *
+ * @param {number} width The new width
+ * @param {number} height The new height
  */
-gdjs.RuntimeGame.prototype.setDefaultWidth = function(width) {
-  this._defaultWidth = width;
-};
+gdjs.RuntimeGame.prototype.setGameResolutionSize = function(width, height) {
+  this._gameResolutionWidth = width;
+  this._gameResolutionHeight = height;
 
-/**
- * Change the default height of the game: It won't affect the canvas size, but
- * new scene cameras will be created with this size.
- * @param {number} height The new default height
- */
-gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
-  this._defaultHeight = height;
+  if (this._adaptGameResolutionAtRuntime) {
+    if (
+      gdjs.RuntimeGameRenderer &&
+      gdjs.RuntimeGameRenderer.getWindowInnerWidth &&
+      gdjs.RuntimeGameRenderer.getWindowInnerHeight
+    ) {
+      var windowInnerWidth = gdjs.RuntimeGameRenderer.getWindowInnerWidth();
+      var windowInnerHeight = gdjs.RuntimeGameRenderer.getWindowInnerHeight();
+
+      // Enlarge either the width or the eight to fill the inner window space.
+      var width = this._gameResolutionWidth;
+      var height = this._gameResolutionHeight;
+      if (this._resizeMode === 'adaptWidth') {
+        this._gameResolutionWidth = (this._gameResolutionHeight * windowInnerWidth) / windowInnerHeight;
+      } else if (this._resizeMode === 'adaptHeight') {
+        this._gameResolutionHeight =
+          (this._gameResolutionWidth * windowInnerHeight) / windowInnerWidth;
+      }
+    }
+  } else {
+    // Don't alter the game resolution. The renderer
+    // will maybe adapt the size of the canvas or whatever is used to render the
+    // game in the window, but this does not change the "game resolution".
+  }
+
+  // Notify the renderer that game resolution changed (so that the renderer size
+  // can be updated, and maybe other things like the canvas size), and let the
+  // scenes know too.
+  this._renderer.updateRendererSize();
+  this._notifyScenesForGameResolutionResize = true;
 };
 
 /**
@@ -349,7 +371,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
     return;
   }
 
-  this.adaptRendererSizeToFillScreen();
+  this._forceGameResolutionUpdate();
 
   //Load the first scene
   var firstSceneName = this._data.firstLayout;
@@ -392,9 +414,9 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
     accumulatedElapsedTime = 0;
 
     //Manage resize events.
-    if (that._notifySceneForResize) {
-      that._sceneStack.onRendererResized();
-      that._notifySceneForResize = false;
+    if (that._notifyScenesForGameResolutionResize) {
+      that._sceneStack.onGameResolutionResized();
+      that._notifyScenesForGameResolutionResize = false;
     }
 
     //Render and step the scene.
@@ -408,38 +430,19 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
 };
 
 /**
- * Enlarge/reduce the width (or the height) of the game to fill the screen.
- * @param {?string} mode `adaptWidth` to change the width, `adaptHeight` to change the height. If not defined, will use the game "sizeOnStartupMode" .
+ * Called by the game renderer when the window containing the game
+ * has changed size (this can result from a resize of the window,
+ * but also other factors like a device orientation change on mobile).
  */
-gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
-  if (
-    !gdjs.RuntimeGameRenderer ||
-    !gdjs.RuntimeGameRenderer.getScreenWidth ||
-    !gdjs.RuntimeGameRenderer.getScreenHeight
-  )
-    return;
+gdjs.RuntimeGame.prototype.onWindowInnerSizeChanged = function() {
+  this._forceGameResolutionUpdate();
+};
 
-  newMode =
-    mode !== undefined ? mode : this._data.properties.sizeOnStartupMode || '';
-
-  var screenWidth = gdjs.RuntimeGameRenderer.getScreenWidth();
-  var screenHeight = gdjs.RuntimeGameRenderer.getScreenHeight();
-
-  // Enlarge either the width or the eight to fill the screen
-  var renderer = this.getRenderer();
-  var width = renderer.getCurrentWidth();
-  var height = renderer.getCurrentHeight();
-  if (newMode === 'adaptWidth') {
-    width = (height * screenWidth) / screenHeight;
-  } else if (newMode === 'adaptHeight') {
-    height = (width * screenHeight) / screenWidth;
-  }
-
-  // Update the renderer size, and also the default size of the game so that
-  // camera of scenes uses this size (otherwise, the rendering would be stretched)
-  renderer.setSize(width, height);
-  this.setDefaultWidth(width);
-  this.setDefaultHeight(height);
+/**
+ * Enlarge/reduce the width (or the height) of the game to fill the inner window.
+ */
+gdjs.RuntimeGame.prototype._forceGameResolutionUpdate = function() {
+  this.setGameResolutionSize(this._gameResolutionWidth, this._gameResolutionHeight)
 };
 
 /**

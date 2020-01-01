@@ -292,10 +292,11 @@ interface Project {
     [Const, Ref] DOMString GetAdMobAppId();
     void SetProjectFile([Const] DOMString file);
     [Const, Ref] DOMString GetProjectFile();
-    void SetDefaultWidth(long width);
-    long GetMainWindowDefaultWidth();
-    void SetDefaultHeight(long height);
-    long GetMainWindowDefaultHeight();
+    void SetGameResolutionSize(long width, long height);
+    long GetGameResolutionWidth();
+    long GetGameResolutionHeight();
+    boolean GetAdaptGameResolutionAtRuntime();
+    void SetAdaptGameResolutionAtRuntime(boolean adaptGameResolutionAtRuntime);
     void SetScaleMode([Const] DOMString scaleMode);
     [Const, Ref] DOMString GetScaleMode();
     void SetSizeOnStartupMode([Const] DOMString orientation);

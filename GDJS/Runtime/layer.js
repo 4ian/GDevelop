@@ -22,20 +22,36 @@ gdjs.Layer = function(layerData, runtimeScene) {
   this._timeScale = 1;
   this._hidden = !layerData.visibility;
   this._effects = layerData.effects || [];
-  this._cameraX = runtimeScene.getGame().getDefaultWidth() / 2;
-  this._cameraY = runtimeScene.getGame().getDefaultHeight() / 2;
-  this._width = runtimeScene.getGame().getDefaultWidth();
-  this._height = runtimeScene.getGame().getDefaultHeight();
+  this._cameraX = runtimeScene.getGame().getGameResolutionWidth() / 2;
+  this._cameraY = runtimeScene.getGame().getGameResolutionHeight() / 2;
+  this._cachedGameResolutionWidth = runtimeScene
+    .getGame()
+    .getGameResolutionWidth();
+  this._cachedGameResolutionHeight = runtimeScene
+    .getGame()
+    .getGameResolutionHeight();
   this._runtimeScene = runtimeScene;
 
   // @ts-ignore - assume the proper renderer is passed
   this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
   this.show(!this._hidden);
-  this.setEffectsDefaultParameters();
+  this._setEffectsDefaultParameters();
 };
 
 gdjs.Layer.prototype.getRenderer = function() {
   return this._renderer;
+};
+
+/**
+ * Called by the RuntimeScene whenever the game resolution size is changed.
+ */
+gdjs.Layer.prototype.onGameResolutionResized = function() {
+  this._cachedGameResolutionWidth = this._runtimeScene
+    .getGame()
+    .getGameResolutionWidth();
+  this._cachedGameResolutionHeight = this._runtimeScene
+    .getGame()
+    .getGameResolutionHeight();
 };
 
 /**
@@ -105,23 +121,25 @@ gdjs.Layer.prototype.setCameraY = function(y, cameraId) {
 };
 
 /**
- * Get the camera center X position.
+ * Get the camera width (which can be different than the game resolution width
+ * if the camera is zoomed).
  *
  * @param {number=} cameraId The camera number. Currently ignored.
- * @return {number} The X position of the camera center
+ * @return {number} The width of the camera
  */
 gdjs.Layer.prototype.getCameraWidth = function(cameraId) {
-  return (+this._width * 1) / this._zoomFactor;
+  return (+this._cachedGameResolutionWidth * 1) / this._zoomFactor;
 };
 
 /**
- * Get the camera center Y position.
+ * Get the camera height (which can be different than the game resolution height
+ * if the camera is zoomed).
  *
  * @param {number=} cameraId The camera number. Currently ignored.
- * @return {number} The Y position of the camera center
+ * @return {number} The height of the camera
  */
 gdjs.Layer.prototype.getCameraHeight = function(cameraId) {
-  return (+this._height * 1) / this._zoomFactor;
+  return (+this._cachedGameResolutionHeight * 1) / this._zoomFactor;
 };
 
 /**
@@ -196,8 +214,8 @@ gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
  * @param {number=} cameraId The camera number. Currently ignored.
  */
 gdjs.Layer.prototype.convertCoords = function(x, y, cameraId) {
-  x -= this._width / 2;
-  y -= this._height / 2;
+  x -= this._cachedGameResolutionWidth / 2;
+  y -= this._cachedGameResolutionHeight / 2;
   x /= Math.abs(this._zoomFactor);
   y /= Math.abs(this._zoomFactor);
 
@@ -227,15 +245,18 @@ gdjs.Layer.prototype.convertInverseCoords = function(x, y, cameraId) {
   x *= Math.abs(this._zoomFactor);
   y *= Math.abs(this._zoomFactor);
 
-  return [x + this._width / 2, y + this._height / 2];
+  return [
+    x + this._cachedGameResolutionWidth / 2,
+    y + this._cachedGameResolutionHeight / 2,
+  ];
 };
 
 gdjs.Layer.prototype.getWidth = function() {
-  return this._width;
+  return this._cachedGameResolutionWidth;
 };
 
 gdjs.Layer.prototype.getHeight = function() {
-  return this._height;
+  return this._cachedGameResolutionHeight;
 };
 
 gdjs.Layer.prototype.getEffects = function() {
@@ -302,7 +323,7 @@ gdjs.Layer.prototype.isEffectEnabled = function(name) {
   return this._renderer.isEffectEnabled(name);
 };
 
-gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
+gdjs.Layer.prototype._setEffectsDefaultParameters = function() {
   for (var i = 0; i < this._effects.length; ++i) {
     var effect = this._effects[i];
     for (var name in effect.doubleParameters) {

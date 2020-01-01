@@ -13,8 +13,8 @@ export default class WindowBorder {
     this.windowRectangle = {
       x: 0,
       y: 0,
-      width: this.project.getMainWindowDefaultWidth(),
-      height: this.project.getMainWindowDefaultHeight(),
+      width: this.project.getGameResolutionWidth(),
+      height: this.project.getGameResolutionHeight(),
     };
   }
 
@@ -23,8 +23,8 @@ export default class WindowBorder {
   }
 
   render() {
-    this.windowRectangle.width = this.project.getMainWindowDefaultWidth();
-    this.windowRectangle.height = this.project.getMainWindowDefaultHeight();
+    this.windowRectangle.width = this.project.getGameResolutionWidth();
+    this.windowRectangle.height = this.project.getGameResolutionHeight();
 
     const displayedRectangle = transformRect(
       this.toCanvasCoordinates,

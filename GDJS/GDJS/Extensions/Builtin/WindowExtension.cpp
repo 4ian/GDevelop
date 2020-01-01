@@ -22,18 +22,25 @@ WindowExtension::WindowExtension() {
   GetAllActions()["SetWindowTitle"].SetFunctionName(
       "gdjs.evtTools.window.setWindowTitle");
   GetAllActions()["SetWindowSize"].SetFunctionName(
-      "gdjs.evtTools.window.setCanvasSize");
+      "gdjs.evtTools.window.setWindowSize");
+  GetAllActions()["SetGameResolutionSize"].SetFunctionName(
+      "gdjs.evtTools.window.setGameResolutionSize");
 
   GetAllStrExpressions()["WindowTitle"].SetFunctionName(
       "gdjs.evtTools.window.getWindowTitle");
   GetAllExpressions()["SceneWindowWidth"].SetFunctionName(
-      "gdjs.evtTools.window.getCanvasWidth");
+      "gdjs.evtTools.window.getGameResolutionWidth");
   GetAllExpressions()["SceneWindowHeight"].SetFunctionName(
-      "gdjs.evtTools.window.getCanvasHeight");
+      "gdjs.evtTools.window.getGameResolutionHeight");
+
+  // TODO: ScreenWidth should be renamed to WindowInnerWidth
   GetAllExpressions()["ScreenWidth"].SetFunctionName(
-      "gdjs.evtTools.window.getWindowWidth");
+      "gdjs.evtTools.window.getWindowInnerWidth");
+  // TODO: ScreenHeight should be renamed to WindowInnerHeight
   GetAllExpressions()["ScreenHeight"].SetFunctionName(
-      "gdjs.evtTools.window.getWindowHeight");
+      "gdjs.evtTools.window.getWindowInnerHeight");
+
+  // TODO: Expression returning the real screen size called ScreenWidth/ScreenHeight should be added.
 
   StripUnimplementedInstructionsAndExpressions();
 }

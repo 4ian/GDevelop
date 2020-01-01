@@ -82,8 +82,8 @@ export default class LocalPreviewLauncher extends React.Component<
     this.setState(
       {
         previewBrowserWindowConfig: {
-          width: project.getMainWindowDefaultWidth(),
-          height: project.getMainWindowDefaultHeight(),
+          width: project.getGameResolutionWidth(),
+          height: project.getGameResolutionHeight(),
           useContentSize: true,
           title: `Preview of ${project.getName()}`,
           backgroundColor: '#000000',

@@ -138,8 +138,8 @@ export default class InstancesEditorContainer extends Component {
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
-      initialViewX: project ? project.getMainWindowDefaultWidth() / 2 : 0,
-      initialViewY: project ? project.getMainWindowDefaultHeight() / 2 : 0,
+      initialViewX: project ? project.getGameResolutionWidth() / 2 : 0,
+      initialViewY: project ? project.getGameResolutionHeight() / 2 : 0,
       width: this.props.width,
       height: this.props.height,
       options: this.props.options,
@@ -601,8 +601,8 @@ export default class InstancesEditorContainer extends Component {
   }
 
   centerView() {
-    const x = this.props.project.getMainWindowDefaultWidth() / 2;
-    const y = this.props.project.getMainWindowDefaultHeight() / 2;
+    const x = this.props.project.getGameResolutionWidth() / 2;
+    const y = this.props.project.getGameResolutionHeight() / 2;
     this.viewPosition.scrollTo(x, y);
   }
 

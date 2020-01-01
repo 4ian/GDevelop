@@ -41,8 +41,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
   extension
       .AddAction("SetWindowMargins",
                  _("Change the window's margins"),
-                 _("This action changes the margins, in pixels, of the game's "
-                   "window."),
+                 _("This action changes the margins, in pixels, between the "
+                   "game frame and the window borders."),
                  _("Set margins of game window to "
                    "_PARAM1_;_PARAM2_;_PARAM3_;_PARAM4_"),
                  _("Game's window"),
@@ -55,21 +55,38 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
       .AddParameter("expression", _("Left"));
 
   extension
-      .AddAction("SetWindowSize",
-                 _("Change the size of the window"),
-                 _("This action changes the size of the game's window."),
-                 _("Change window size: _PARAM1_x_PARAM2_"),
+      .AddAction("SetGameResolutionSize",
+                 _("Change the resolution of the game"),
+                 _("Changes the resolution of the game, effectively changing "
+                   "the game area size. This won't change the size of the "
+                   "window in which the game is running."),
+                 _("Set game resolution to _PARAM1_x_PARAM2_"),
                  _("Game's window"),
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Width"))
+      .AddParameter("expression", _("Height"));
+
+  extension
+      .AddAction(
+          "SetWindowSize",
+          _("Change the size of the game window"),
+          _("This action changes the size of the game window. Note that this "
+            "will only work on platform supporting this operation: games "
+            "running in browsers or on mobile phones can not update their "
+            "window size. Game resolution can still be updated."),
+          _("Set game window size to _PARAM1_x_PARAM2_ (also update game "
+            "resolution: _PARAM3_)"),
+          _("Game's window"),
+          "res/actions/window24.png",
+          "res/actions/window.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
-      .AddParameter(
-          "yesorno",
-          _("Do you want to use this size as the default size for new scene "
-            "cameras\?\n(Yes to change the size of the game's viewable "
-            "area,\nNo to stretch the game to the window's size)."));
+      .AddParameter("yesorno",
+                    _("Also update the game resolution? If not, the game will "
+                      "be stretched or reduced to fit in the window."));
 
   extension
       .AddAction("SetWindowIcon",

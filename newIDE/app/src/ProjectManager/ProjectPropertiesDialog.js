@@ -18,6 +18,7 @@ import {
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
+import Text from '../UI/Text';
 
 type Props = {|
   project: gdProject,
@@ -28,8 +29,9 @@ type Props = {|
 |};
 
 type State = {|
-  windowDefaultWidth: number,
-  windowDefaultHeight: number,
+  gameResolutionWidth: number,
+  gameResolutionHeight: number,
+  adaptGameResolutionAtRuntime: boolean,
   name: string,
   author: string,
   version: string,
@@ -54,8 +56,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
 
   _loadFrom(project: gdProject): State {
     return {
-      windowDefaultWidth: project.getMainWindowDefaultWidth(),
-      windowDefaultHeight: project.getMainWindowDefaultHeight(),
+      gameResolutionWidth: project.getGameResolutionWidth(),
+      gameResolutionHeight: project.getGameResolutionHeight(),
+      adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
       name: project.getName(),
       author: project.getAuthor(),
       version: project.getVersion(),
@@ -84,8 +87,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     const t = str => str; //TODO
     const { project } = this.props;
     const {
-      windowDefaultWidth,
-      windowDefaultHeight,
+      gameResolutionWidth,
+      gameResolutionHeight,
+      adaptGameResolutionAtRuntime,
       name,
       author,
       version,
@@ -99,8 +103,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       maxFPS,
       isFolderProject,
     } = this.state;
-    project.setDefaultWidth(windowDefaultWidth);
-    project.setDefaultHeight(windowDefaultHeight);
+    project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
+    project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
     project.setName(name);
     project.setAuthor(author);
     project.setVersion(version);
@@ -122,8 +126,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
   render() {
     const {
       name,
-      windowDefaultWidth,
-      windowDefaultHeight,
+      gameResolutionWidth,
+      gameResolutionHeight,
+      adaptGameResolutionAtRuntime,
       author,
       version,
       packageName,
@@ -176,28 +181,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             onChange={value => this.setState({ name: value })}
             autoFocus
           />
-          <SemiControlledTextField
-            floatingLabelText={<Trans>Game's window width</Trans>}
-            fullWidth
-            type="number"
-            value={'' + windowDefaultWidth}
-            onChange={value =>
-              this.setState({
-                windowDefaultWidth: Math.max(0, parseInt(value, 10)),
-              })
-            }
-          />
-          <SemiControlledTextField
-            floatingLabelText={<Trans>Game's window height</Trans>}
-            fullWidth
-            type="number"
-            value={'' + windowDefaultHeight}
-            onChange={value =>
-              this.setState({
-                windowDefaultHeight: Math.max(0, parseInt(value, 10)),
-              })
-            }
-          />
           <Checkbox
             label={
               <Trans>
@@ -220,14 +203,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             }}
           />
           <SemiControlledTextField
-            floatingLabelText={<Trans>Author name</Trans>}
-            fullWidth
-            hintText={t`Your name`}
-            type="text"
-            value={author}
-            onChange={value => this.setState({ author: value })}
-          />
-          <SemiControlledTextField
             floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
             fullWidth
             hintText={defaultVersion}
@@ -235,23 +210,100 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             value={version}
             onChange={value => this.setState({ version: value })}
           />
+          <SemiControlledTextField
+            floatingLabelText={
+              <Trans>Package name (for iOS and Android)</Trans>
+            }
+            fullWidth
+            hintText={defaultPackageName}
+            type="text"
+            value={packageName}
+            onChange={value => this.setState({ packageName: value })}
+            errorText={
+              validatePackageName(packageName) ? (
+                undefined
+              ) : (
+                <Trans>
+                  The package name is containing invalid characters or not
+                  following the convention "xxx.yyy.zzz" (numbers allowed after
+                  a letter only).
+                </Trans>
+              )
+            }
+          />
+          <SemiControlledTextField
+            floatingLabelText={<Trans>Author name</Trans>}
+            fullWidth
+            hintText={t`Your name`}
+            type="text"
+            value={author}
+            onChange={value => this.setState({ author: value })}
+          />
+          <Text size="title">
+            <Trans>Resolution and rendering</Trans>
+          </Text>
+          <ResponsiveLineStackLayout noMargin>
+            <SemiControlledTextField
+              floatingLabelText={<Trans>Game resolution width</Trans>}
+              fullWidth
+              type="number"
+              value={'' + gameResolutionWidth}
+              onChange={value =>
+                this.setState({
+                  gameResolutionWidth: Math.max(1, parseInt(value, 10)),
+                })
+              }
+            />
+            <SemiControlledTextField
+              floatingLabelText={<Trans>Game resolution height</Trans>}
+              fullWidth
+              type="number"
+              value={'' + gameResolutionHeight}
+              onChange={value =>
+                this.setState({
+                  gameResolutionHeight: Math.max(1, parseInt(value, 10)),
+                })
+              }
+            />
+          </ResponsiveLineStackLayout>
           <SelectField
             fullWidth
-            floatingLabelText={<Trans>Project file type</Trans>}
-            value={isFolderProject ? 'folder-project' : 'single-file'}
+            floatingLabelText={
+              <Trans>Game resolution resize mode (fullscreen or window)</Trans>
+            }
+            value={sizeOnStartupMode}
             onChange={(e, i, value: string) =>
-              this.setState({ isFolderProject: value === 'folder-project' })
+              this.setState({ sizeOnStartupMode: value })
             }
           >
             <SelectOption
-              value={'single-file'}
-              primaryText={t`Single file (default)`}
+              value=""
+              primaryText={t`No changes to the game size`}
             />
             <SelectOption
-              value={'folder-project'}
-              primaryText={t`Multiple files, saved in folder next to the main file`}
+              value="adaptWidth"
+              primaryText={t`Change width to fit the screen or window size`}
+            />
+            <SelectOption
+              value="adaptHeight"
+              primaryText={t`Change height to fit the screen or window size`}
             />
           </SelectField>
+          <Checkbox
+            label={
+              <Trans>
+                Update resolution during the game to fit the screen or window
+                size
+              </Trans>
+            }
+            disabled={sizeOnStartupMode === ''}
+            checked={adaptGameResolutionAtRuntime}
+            onCheck={(e, checked) => {
+              this.setState({
+                adaptGameResolutionAtRuntime: checked,
+              });
+            }}
+          />
           <ResponsiveLineStackLayout noMargin>
             <SemiControlledTextField
               floatingLabelText={<Trans>Minimum FPS</Trans>}
@@ -305,27 +357,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               </Trans>
             </DismissableAlertMessage>
           )}
-          <SemiControlledTextField
-            floatingLabelText={
-              <Trans>Package name (for iOS and Android)</Trans>
-            }
-            fullWidth
-            hintText={defaultPackageName}
-            type="text"
-            value={packageName}
-            onChange={value => this.setState({ packageName: value })}
-            errorText={
-              validatePackageName(packageName) ? (
-                undefined
-              ) : (
-                <Trans>
-                  The package name is containing invalid characters or not
-                  following the convention "xxx.yyy.zzz" (numbers allowed after
-                  a letter only).
-                </Trans>
-              )
-            }
-          />
           <SelectField
             fullWidth
             floatingLabelText={
@@ -372,27 +403,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               </Trans>
             </DismissableAlertMessage>
           )}
-          <SelectField
-            fullWidth
-            floatingLabelText={<Trans>Fullscreen/game size mode</Trans>}
-            value={sizeOnStartupMode}
-            onChange={(e, i, value: string) =>
-              this.setState({ sizeOnStartupMode: value })
-            }
-          >
-            <SelectOption
-              value=""
-              primaryText={t`No changes to the game size`}
-            />
-            <SelectOption
-              value="adaptWidth"
-              primaryText={t`Change width to fit the screen`}
-            />
-            <SelectOption
-              value="adaptHeight"
-              primaryText={t`Change height to fit the screen`}
-            />
-          </SelectField>
+          <Text size="title">
+            <Trans>AdMob</Trans>
+          </Text>
           <SemiControlledTextField
             floatingLabelText={
               <Trans>AdMob application ID (for iOS and Android)</Trans>
@@ -403,6 +416,26 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             value={adMobAppId}
             onChange={value => this.setState({ adMobAppId: value })}
           />
+          <Text size="title">
+            <Trans>Project files</Trans>
+          </Text>
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Project file type</Trans>}
+            value={isFolderProject ? 'folder-project' : 'single-file'}
+            onChange={(e, i, value: string) =>
+              this.setState({ isFolderProject: value === 'folder-project' })
+            }
+          >
+            <SelectOption
+              value={'single-file'}
+              primaryText={t`Single file (default)`}
+            />
+            <SelectOption
+              value={'folder-project'}
+              primaryText={t`Multiple files, saved in folder next to the main file`}
+            />
+          </SelectField>
         </Dialog>
         <SubscriptionChecker
           ref={subscriptionChecker =>

@@ -365,8 +365,7 @@ void GD_API SetWindowSize(RuntimeScene &scene,
   if (useTheNewSizeForCameraDefaultSize)  // Change future cameras default size
                                           // if wanted.
   {
-    scene.game->SetDefaultWidth(windowWidth);
-    scene.game->SetDefaultHeight(windowHeight);
+    scene.game->SetGameResolutionSize(windowWidth, windowHeight);
   }
 
   // Avoid recreating every tick a new window if the size has not changed!
@@ -392,8 +391,8 @@ void GD_API SetFullScreen(RuntimeScene &scene, bool fullscreen, bool) {
   if (fullscreen && !scene.RenderWindowIsFullScreen()) {
     scene.SetRenderWindowIsFullScreen();
     scene.renderWindow->create(
-        sf::VideoMode(scene.game->GetMainWindowDefaultWidth(),
-                      scene.game->GetMainWindowDefaultHeight(),
+        sf::VideoMode(scene.game->GetGameResolutionWidth(),
+                      scene.game->GetGameResolutionHeight(),
                       32),
         scene.GetWindowDefaultTitle(),
         sf::Style::Close | sf::Style::Fullscreen);
@@ -401,8 +400,8 @@ void GD_API SetFullScreen(RuntimeScene &scene, bool fullscreen, bool) {
   } else if (!fullscreen && scene.RenderWindowIsFullScreen()) {
     scene.SetRenderWindowIsFullScreen(false);
     scene.renderWindow->create(
-        sf::VideoMode(scene.game->GetMainWindowDefaultWidth(),
-                      scene.game->GetMainWindowDefaultHeight(),
+        sf::VideoMode(scene.game->GetGameResolutionWidth(),
+                      scene.game->GetGameResolutionHeight(),
                       32),
         scene.GetWindowDefaultTitle(),
         sf::Style::Close);
@@ -412,7 +411,7 @@ void GD_API SetFullScreen(RuntimeScene &scene, bool fullscreen, bool) {
 }
 unsigned int GD_API GetSceneWindowWidth(RuntimeScene &scene) {
 #if defined(ANDROID)
-  return scene.game->GetMainWindowDefaultWidth();
+  return scene.game->GetGameResolutionWidth();
 #else
   if (scene.renderWindow != NULL) return scene.renderWindow->getSize().x;
 
@@ -422,7 +421,7 @@ unsigned int GD_API GetSceneWindowWidth(RuntimeScene &scene) {
 
 unsigned int GD_API GetSceneWindowHeight(RuntimeScene &scene) {
 #if defined(ANDROID)
-  return scene.game->GetMainWindowDefaultHeight();
+  return scene.game->GetGameResolutionHeight();
 #else
   if (scene.renderWindow != NULL) return scene.renderWindow->getSize().y;
 

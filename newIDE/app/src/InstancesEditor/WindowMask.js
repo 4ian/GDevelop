@@ -33,8 +33,8 @@ export default class WindowBorder {
       return;
     }
 
-    const width = this.project.getMainWindowDefaultWidth();
-    const height = this.project.getMainWindowDefaultHeight();
+    const width = this.project.getGameResolutionWidth();
+    const height = this.project.getGameResolutionHeight();
     this.windowRectangle.x = this.viewPosition.getViewX() - width / 2;
     this.windowRectangle.y = this.viewPosition.getViewY() - height / 2;
     this.windowRectangle.width = width;

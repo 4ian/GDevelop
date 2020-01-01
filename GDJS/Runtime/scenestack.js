@@ -18,9 +18,14 @@ gdjs.SceneStack = function(runtimeGame) {
 	this._stack = [];
 };
 
-gdjs.SceneStack.prototype.onRendererResized = function() {
+/**
+ * Called by the RuntimeGame when the game resolution is changed.
+ * Useful to notify scene and layers that resolution is changed, as they
+ * might be caching it.
+ */
+gdjs.SceneStack.prototype.onGameResolutionResized = function() {
 	for(var i = 0;i < this._stack.length; ++i) {
-		this._stack[i].onCanvasResized();
+		this._stack[i].onGameResolutionResized();
 	}
 };
 

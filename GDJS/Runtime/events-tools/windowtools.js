@@ -33,6 +33,14 @@ gdjs.evtTools.window.setGameResolutionSize = function(runtimeScene, width, heigh
 	runtimeScene.getGame().setGameResolutionSize(width, height);
 };
 
+gdjs.evtTools.window.setGameResolutionResizeMode = function(runtimeScene, resizeMode) {
+	runtimeScene.getGame().setGameResolutionResizeMode(resizeMode);
+};
+
+gdjs.evtTools.window.setAdaptGameResolutionAtRuntime = function(runtimeScene, enable) {
+	runtimeScene.getGame().setAdaptGameResolutionAtRuntime(enable);
+};
+
 gdjs.evtTools.window.setWindowTitle = function(runtimeScene, title) {
     runtimeScene.getGame().getRenderer().setWindowTitle(title);
 };

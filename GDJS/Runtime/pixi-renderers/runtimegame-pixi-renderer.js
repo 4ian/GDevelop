@@ -19,15 +19,6 @@ gdjs.RuntimeGamePixiRenderer = function(game, forceFullscreen)
     this._canvasHeight = 0; // Current height of the canvas (might be scaled down/up compared to renderer)
     this._keepRatio = true;
     this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
-
-    if (navigator.isCocoonJS && !this._forceFullscreen) {
-        this._forceFullscreen = true;
-        console.log("Forcing fullscreen for CocoonJS.");
-    }
-    if ( typeof intel != "undefined" ) {
-        this._forceFullscreen = true;
-        console.log("Forcing fullscreen for Intel XDK.");
-    }
 }
 
 gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to let the engine use it.

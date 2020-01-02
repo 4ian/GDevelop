@@ -22,6 +22,7 @@ export default (
   const propertyFields = mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
+    const propertyDescription = property.getDescription();
     const valueType = property.getType().toLowerCase();
     const getLabel = (instance: Instance) => {
       const propertyName = getProperties(instance)
@@ -36,6 +37,7 @@ export default (
           .join(' ')
       );
     };
+    const getDescription = () => propertyDescription;
 
     if (property.isHidden()) return null;
 
@@ -54,6 +56,7 @@ export default (
           onUpdateProperty(instance, name, '' + newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'string' || valueType === '') {
       return {
@@ -68,6 +71,7 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'boolean') {
       return {
@@ -84,6 +88,7 @@ export default (
           onUpdateProperty(instance, name, newValue ? '1' : '0');
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'choice') {
       // Choice is a "string" (with a selector for the user in the UI)
@@ -104,6 +109,7 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'resource') {
       // Resource is a "string" (with a selector in the UI)
@@ -121,6 +127,7 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'color') {
       return {
@@ -135,6 +142,7 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'textarea') {
       return {
@@ -149,6 +157,7 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
       };
     } else {
       console.error(

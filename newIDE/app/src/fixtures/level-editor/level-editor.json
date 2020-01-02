@@ -8,6 +8,7 @@
   },
   "properties": {
     "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -3858,6 +3859,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Tile object",
+              "longDescription": "",
               "name": "Tile",
               "optional": false,
               "supplementaryInformation": "",

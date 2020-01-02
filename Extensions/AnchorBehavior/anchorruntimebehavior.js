@@ -147,13 +147,13 @@ gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
         var bottomRightCoord = layer.convertInverseCoords(rightPixel, bottomPixel);
 
         //Move and resize the object according to the anchors
-        if(this._rightEdgeAnchor != gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
+        if(this._rightEdgeAnchor !== gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
             this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
-        if(this._bottomEdgeAnchor != gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
+        if(this._bottomEdgeAnchor !== gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
             this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
-        if(this._leftEdgeAnchor != gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
+        if(this._leftEdgeAnchor !== gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
             this.owner.setX(topLeftCoord[0] + this.owner.getX() - this.owner.getDrawableX());
-        if(this._topEdgeAnchor != gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
+        if(this._topEdgeAnchor !== gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
             this.owner.setY(topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY());
     }
 };

@@ -86,8 +86,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.updateRendererSize = function() {
  * @private
  */
 gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function() {
-    console.log("_resizeCanvas");
-
     // Set the Pixi renderer size to the game size.
     // There is no "smart" resizing to be done here: the rendering of the game
     // should be done with the size set on the game.

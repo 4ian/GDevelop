@@ -1,19 +1,20 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
     "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/platformer/platformer.json",
+    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/platformer/platformer.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -1873,6 +1874,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2170,15 +2172,16 @@
         },
         {
           "name": "Platform",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ],
@@ -2283,15 +2286,16 @@
         },
         {
           "name": "Jumpthru",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -2349,16 +2353,17 @@
         {
           "height": 70,
           "name": "TiledGrassPlatform",
+          "tags": "",
           "texture": "grassHalfMid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -2366,31 +2371,33 @@
         {
           "height": 70,
           "name": "TiledCastlePlatform",
+          "tags": "",
           "texture": "castleCenter.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
         },
         {
           "name": "MovingPlatform",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -2447,6 +2454,7 @@
         },
         {
           "name": "GoLeft",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2504,6 +2512,7 @@
         },
         {
           "name": "GoRight",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2562,27 +2571,31 @@
         {
           "height": 70,
           "name": "Ladder",
+          "tags": "",
           "texture": "ladder_mid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Ladder",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Ladder",
               "yGrabOffset": 0
             }
           ]
         },
         {
           "name": "PlayerHitBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -2591,10 +2604,8 @@
               "jumpSpeed": 1000,
               "maxFallingSpeed": 1000,
               "maxSpeed": 250,
-              "name": "PlatformerObject",
               "roundCoordinates": true,
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -2652,6 +2663,7 @@
         },
         {
           "name": "SlimeWalk",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [
@@ -2662,6 +2674,8 @@
           ],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 5000,
               "canGrabPlatforms": false,
               "deceleration": 5000,
@@ -2670,10 +2684,8 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 75,
-              "name": "PlatformerObject",
               "roundCoordinates": false,
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -2815,11 +2827,14 @@
         },
         {
           "name": "Fly",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 500,
               "canGrabPlatforms": false,
               "deceleration": 500,
@@ -2828,10 +2843,8 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 400,
-              "name": "PlatformerObject",
               "roundCoordinates": false,
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -2973,6 +2986,7 @@
         },
         {
           "name": "Cloud",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3126,6 +3140,7 @@
         },
         {
           "name": "BackgroundObjects",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3282,6 +3297,7 @@
           "italic": false,
           "name": "Score",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3297,6 +3313,7 @@
         },
         {
           "name": "Coin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3354,6 +3371,7 @@
         },
         {
           "name": "CoinIcon",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3411,6 +3429,7 @@
         },
         {
           "name": "LeftButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3468,6 +3487,7 @@
         },
         {
           "name": "RightButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3525,18 +3545,19 @@
         },
         {
           "name": "JumpButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
               "bottomEdgeAnchor": 0,
               "leftEdgeAnchor": 2,
-              "name": "Anchor",
               "relativeToOriginalWindowSize": true,
               "rightEdgeAnchor": 0,
-              "topEdgeAnchor": 2,
-              "type": "AnchorBehavior::AnchorBehavior"
+              "topEdgeAnchor": 2
             }
           ],
           "animations": [
@@ -3592,6 +3613,7 @@
         },
         {
           "name": "ArrowButtonsBg",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],

@@ -44,14 +44,30 @@ gdjs.Layer.prototype.getRenderer = function() {
 
 /**
  * Called by the RuntimeScene whenever the game resolution size is changed.
+ * Updates the layer width/height and position.
  */
 gdjs.Layer.prototype.onGameResolutionResized = function() {
+  var oldGameResolutionWidth = this._cachedGameResolutionWidth;
+  var oldGameResolutionHeight = this._cachedGameResolutionHeight;
   this._cachedGameResolutionWidth = this._runtimeScene
     .getGame()
     .getGameResolutionWidth();
   this._cachedGameResolutionHeight = this._runtimeScene
     .getGame()
     .getGameResolutionHeight();
+
+  // Adapt position of the camera center as:
+  // * Most cameras following a player/object on the scene will be updating this
+  // in events anyway.
+  // * Cameras not following a player/object are usually UIs which are intuitively
+  // expected not to "move". Not adapting the center position would make the camera
+  // move from its initial position (which is centered in the screen) - and anchor
+  // behavior would behave counterintuitively.
+  this._cameraX +=
+    (this._cachedGameResolutionWidth - oldGameResolutionWidth) / 2;
+  this._cameraY +=
+    (this._cachedGameResolutionHeight - oldGameResolutionHeight) / 2;
+  this._renderer.updatePosition();
 };
 
 /**

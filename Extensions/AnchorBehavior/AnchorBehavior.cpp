@@ -7,9 +7,9 @@ This project is released under the MIT License.
 #include "AnchorBehavior.h"
 #include <map>
 #include "GDCore/CommonTools.h"
-#include "GDCore/Tools/Localization.h"
-#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Localization.h"
 
 void AnchorBehavior::InitializeContent(gd::SerializerElement& content) {
   content.SetAttribute("relativeToOriginalWindowSize", true);
@@ -51,11 +51,14 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent, gd::Project& project) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Relative to original window size")]
+  properties[_("relativeToOriginalWindowSize")]
       .SetValue(behaviorContent.GetBoolAttribute("relativeToOriginalWindowSize")
                     ? "true"
                     : "false")
-      .SetType("Boolean");
+      .SetType("Boolean")
+      .SetLabel(_("Anchor relatively to original window size"))
+      .SetDescription(_("otherwise, objects are anchored according to the "
+                        "window size when the object is created."));
 
   properties[_("Left edge anchor")]
       .SetValue(GetAnchorAsString(static_cast<HorizontalAnchor>(
@@ -64,7 +67,8 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window left"))
       .AddExtraInfo(_("Window right"))
-      .AddExtraInfo(_("Proportional"));
+      .AddExtraInfo(_("Proportional"))
+      .SetDescription(_("Use this to anchor the object on X axis."));
 
   properties[_("Right edge anchor")]
       .SetValue(GetAnchorAsString(static_cast<HorizontalAnchor>(
@@ -82,7 +86,8 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window top"))
       .AddExtraInfo(_("Window bottom"))
-      .AddExtraInfo(_("Proportional"));
+      .AddExtraInfo(_("Proportional"))
+      .SetDescription(_("Use this to anchor the object on Y axis."));
 
   properties[_("Bottom edge anchor")]
       .SetValue(GetAnchorAsString(static_cast<VerticalAnchor>(
@@ -126,7 +131,7 @@ bool AnchorBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
                                     const gd::String& name,
                                     const gd::String& value,
                                     gd::Project& project) {
-  if (name == _("Relative to original window size"))
+  if (name == _("relativeToOriginalWindowSize"))
     behaviorContent.SetAttribute("relativeToOriginalWindowSize", value == "1");
   else if (name == _("Left edge anchor"))
     behaviorContent.SetAttribute(

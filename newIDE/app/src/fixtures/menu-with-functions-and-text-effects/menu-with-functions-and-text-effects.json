@@ -8,6 +8,7 @@
   },
   "properties": {
     "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -2175,6 +2176,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Menu item text object",
+              "longDescription": "",
               "name": "menuitem",
               "optional": false,
               "supplementaryInformation": "TextObject::Text",

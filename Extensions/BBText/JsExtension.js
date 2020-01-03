@@ -169,8 +169,8 @@ module.exports = {
           gdObject
             .addExpression(
               `Get${property.functionName}`,
+              property.expressionLabel,
               property.expressionDescription,
-              property.expressionSentence,
               '',
               '',
               property.iconPath,
@@ -183,8 +183,8 @@ module.exports = {
           gdObject
             .addStrExpression(
               `Get${property.functionName}`,
+              property.expressionLabel,
               property.expressionDescription,
-              property.expressionSentence,
               '',
               '',
               property.iconPath,
@@ -285,8 +285,8 @@ module.exports = {
         conditionSentence: _('the BBCode text'),
         actionDescription: _('Set BBCode text'),
         actionSentence: _('the BBCode text'),
+        expressionLabel: _('Get BBCode text'),
         expressionDescription: _('Get BBCode text'),
-        expressionSentence: _('Get BBCode text'),
       },
       {
         functionName: 'Color',
@@ -297,8 +297,8 @@ module.exports = {
         conditionSentence: '', // No conditions for a "color" property
         actionDescription: _('Set base color'),
         actionSentence: _('Set base color of _PARAM0_ to _PARAM1_'),
+        expressionLabel: '', // No expression for a "color" property
         expressionDescription: '', // No expression for a "color" property
-        expressionSentence: '', // No expression for a "color" property
       },
       {
         functionName: 'Opacity',
@@ -311,8 +311,8 @@ module.exports = {
         conditionSentence: _('the base opacity'),
         actionDescription: _('Set base opacity'),
         actionSentence: _('the base opacity'),
+        expressionLabel: _('Get the base opacity'),
         expressionDescription: _('Get the base opacity'),
-        expressionSentence: _('Get the base opacity'),
       },
       {
         functionName: 'FontSize',
@@ -323,8 +323,8 @@ module.exports = {
         conditionSentence: _('the base font size'),
         actionDescription: _('Set base font size'),
         actionSentence: _('the base font size'),
+        expressionLabel: _('Get the base font size'),
         expressionDescription: _('Get the base font size'),
-        expressionSentence: _('Get the base font size'),
       },
       {
         functionName: 'FontFamily',
@@ -335,8 +335,8 @@ module.exports = {
         conditionSentence: _('the base font family'),
         actionDescription: _('Set font family'),
         actionSentence: _('the base font family'),
+        expressionLabel: _('Get the base font family'),
         expressionDescription: _('Get the base font family'),
-        expressionSentence: _('Get the base font family'),
       },
       {
         functionName: 'Alignment',
@@ -348,8 +348,8 @@ module.exports = {
         conditionSentence: _('The text alignment of _PARAM0_ is _PARAM1_'),
         actionDescription: _('Change the alignment of the text.'),
         actionSentence: _('Set text alignment of _PARAM0_ to _PARAM1_'),
+        expressionLabel: _('Get the text alignment'),
         expressionDescription: _('Get the text alignment'),
-        expressionSentence: _('Get the text alignment'),
       },
       {
         functionName: 'WordWrap',
@@ -360,8 +360,8 @@ module.exports = {
         conditionSentence: _('Word wrap is enabled'),
         actionDescription: _('Set word wrap'),
         actionSentence: _('Activate word wrap for _PARAM0_: _PARAM1_'),
+        expressionLabel: '',
         expressionDescription: '',
-        expressionSentence: '',
       },
       {
         functionName: 'WrappingWidth',
@@ -376,8 +376,8 @@ module.exports = {
           'Change the width, in pixels, after which the text is wrapped on next line.'
         ),
         actionSentence: _('the wrapping width'),
+        expressionLabel: _('Get the wrapping width'),
         expressionDescription: _('Get the wrapping width'),
-        expressionSentence: _('Get the wrapping width'),
       },
     ];
 

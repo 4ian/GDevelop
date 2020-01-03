@@ -103,7 +103,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
                    _("Compare the scale of the text on the X axis"),
-                   _("the X scale of the text _PARAM0_"),
+                   _("the scale on the X axis"),
                    "Scale",
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
@@ -130,7 +130,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("ScaleY",
                    _("Scale on Y axis"),
                    _("Compare the scale of the text on the Y axis"),
-                   _("the Y scale of the text _PARAM0_"),
+                   _("the scale on the Y axis"),
                    "Scale",
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")

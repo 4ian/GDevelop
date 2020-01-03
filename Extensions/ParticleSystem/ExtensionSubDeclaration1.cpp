@@ -135,7 +135,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddCondition("EmitterAngleA",
                    _("Emission angle 1"),
                    _("Test the value of emission 1st angle of the emitter"),
-                   _("the emission 1st angle"),
+                   _("the 1st emission angle"),
                    _("Advanced"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
@@ -155,7 +155,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddCondition("EmitterAngleB",
                    _("Emission angle 2"),
                    _("Test the emission angle #2 of the emitter."),
-                   _("the emission 2nd angle"),
+                   _("the 2nd emission angle"),
                    _("Advanced"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
@@ -199,7 +199,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddCondition("Friction",
                    _("Friction"),
                    _("Test friction applied to particles."),
-                   _("the particles' friction"),
+                   _("the friction of particles"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
@@ -277,7 +277,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddAction("ParticleGravityX",
                 _("Gravity value on X axis"),
                 _("Change value of the gravity on X axis."),
-                _("the gravity on X axis of _PARAM0_"),
+                _("the gravity on X axis"),
                 _("Advanced"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
@@ -298,7 +298,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
   obj.AddAction("ParticleGravityY",
                 _("Gravity value on Y axis"),
                 _("Change value of the gravity on Y axis."),
-                _("the gravity on Y axis of _PARAM0_"),
+                _("the gravity on Y axis"),
                 _("Advanced"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")

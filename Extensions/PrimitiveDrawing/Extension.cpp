@@ -79,7 +79,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Thickness (in pixels)"))
       .SetFunctionName("DrawLine")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-  
+
    obj.AddAction("LineV2",
                 _("Line"),
                 _("Draw a line on screen"),
@@ -337,7 +337,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("closePath")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");    
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("FillColor",
                 _("Fill color"),
@@ -411,7 +411,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          "FillOpacity",
          _("Fill opacity"),
          _("Test the value of the opacity level used when filling."),
-         _("the opacity level when filling"),
+         _("the opacity of filling"),
          _("Setup"),
          "res/conditions/opacity24.png",
          "res/conditions/opacity.png")

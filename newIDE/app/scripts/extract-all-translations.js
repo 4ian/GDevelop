@@ -15,6 +15,11 @@ if (fs.existsSync(enMessagesJsPath)) {
   shell.echo(`ℹ️ Removing ${enMessagesJsPath} as "en" should not have any translations ("pot" file)`);
   shell.rm(enMessagesJsPath);
 }
+const enIdeMessagesPotPath = path.join(newIdeAppPath, 'src/locales/en/ide-messages.pot');
+if (fs.existsSync(enIdeMessagesPotPath)) {
+  shell.echo(`ℹ️ Removing ${enIdeMessagesPotPath} as "en" should not have any translations ("pot" file)`);
+  shell.rm(enIdeMessagesPotPath);
+}
 
 // Launch "lingui extract" for extracting newIDE translations
 shell.echo('ℹ️ Extracting translations for newIDE...');

@@ -294,7 +294,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Extra border"),
            _("Change the size of the extra border applied to the object when "
              "planning a path"),
-           _("the extra border on the path"),
+           _("the size of the extra border on the path"),
            _("Path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
@@ -310,7 +310,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Extra border"),
                      _("Compare the size of the extra border applied to the "
                        "object when planning a path"),
-                     _("the size of the extra border applied to _PARAM0_"),
+                     _("the size of the extra border on the path"),
                      _("Path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")

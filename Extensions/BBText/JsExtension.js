@@ -24,7 +24,7 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bbtext_object');
+      .setExtensionHelpPath('/objects/bbtext');
 
     var objectBBText = new gd.ObjectJsImplementation();
     objectBBText.updateProperty = function(
@@ -210,11 +210,9 @@ module.exports = {
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
-            .addParameter('operator', _("Modification's sign"), '', false)
-            .addParameter(expressionType, property.paramLabel, '', false)
+            .useStandardOperatorParameters(parameterType)
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
-            .setManipulatedType(parameterType)
             .setGetter(`get${property.functionName}`);
         } else {
           gdObject
@@ -256,21 +254,9 @@ module.exports = {
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
-            .addParameter(
-              'relationalOperator',
-              _('Sign of the test'),
-              '',
-              false
-            )
-            .addParameter(
-              propExpressionType,
-              parameterType + _(' value'),
-              '',
-              false
-            )
+            .useStandardRelationalOperatorParameters(parameterType)
             .getCodeExtraInformation()
-            .setFunctionName(`get${property.functionName}`)
-            .setManipulatedType(parameterType);
+            .setFunctionName(`get${property.functionName}`);
         } else if (parameterType === 'yesorno') {
           gdObject
             .addCondition(

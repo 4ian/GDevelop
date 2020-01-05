@@ -50,7 +50,7 @@ export default class LocalPreviewLauncher extends React.Component<
     networkPreviewPort: null,
     networkPreviewError: null,
     previewGamePath: null,
-    devToolsOpen: true,
+    devToolsOpen: false,
     previewBrowserWindowConfig: null,
   };
   _subscriptionChecker: ?SubscriptionChecker = null;

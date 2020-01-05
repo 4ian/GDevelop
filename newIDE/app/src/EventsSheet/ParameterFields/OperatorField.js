@@ -56,11 +56,11 @@ export const renderInlineOperator = ({
   }
 
   if (useAssignmentOperators) {
-    if (value === '=') return <Trans>=</Trans>;
-    else if (value === '+') return <Trans>+=</Trans>;
-    else if (value === '-') return <Trans>-=</Trans>;
-    else if (value === '/') return <Trans>/=</Trans>;
-    else if (value === '*') return <Trans>*=</Trans>;
+    if (value === '=') return '=';
+    else if (value === '+') return '+=';
+    else if (value === '-') return '-=';
+    else if (value === '/') return '/=';
+    else if (value === '*') return '*=';
   } else {
     if (value === '=') return <Trans>set to</Trans>;
     else if (value === '+') return <Trans>add</Trans>;

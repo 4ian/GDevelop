@@ -30,7 +30,7 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
         secondaryActions={[
           <HelpButton
             key="help"
-            helpPagePath="/interface/scene-editor/layers-effects"
+            helpPagePath="/interface/scene-editor/layer-effects"
           />,
         ]}
         actions={[

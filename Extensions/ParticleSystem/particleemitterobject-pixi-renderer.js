@@ -5,7 +5,11 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-
+/**
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {gdjs.RuntimeObject} runtimeObject
+ * @param {any} objectData
+ */
 gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, objectData){
     var texture = null;
     var graphics = new PIXI.Graphics();
@@ -31,7 +35,12 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
         }
     }
     graphics.endFill();
-    texture = graphics.generateTexture();
+
+    // Render the texture from graphics using the PIXI Renderer.
+    // TODO: could be optimized by generating the texture only once per object type,
+    // instead of at each object creation.
+    var pixiRenderer = runtimeScene.getGame().getRenderer().getPIXIRenderer();
+    texture = pixiRenderer.generateTexture(graphics);
 
     var config = {
         color: {
@@ -221,13 +230,18 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.setFlow = function(flow, tank){
             (flow < 0 ? 0.001 : (tank - this.emitter.totalParticleCount) / flow);
 };
 
-gdjs.ParticleEmitterObjectPixiRenderer.prototype.isTextureValid = function(texture, runtimeScene){
-    return runtimeScene.getGame().getImageManager().getPIXITexture(texture).valid;
+gdjs.ParticleEmitterObjectPixiRenderer.prototype.isTextureNameValid = function(texture, runtimeScene){
+    var invalidPixiTexture = runtimeScene.getGame().getImageManager().getInvalidPIXITexture();
+    var pixiTexture = runtimeScene.getGame().getImageManager().getPIXITexture(texture);
+
+    return pixiTexture.valid && pixiTexture !== invalidPixiTexture;
 };
 
-gdjs.ParticleEmitterObjectPixiRenderer.prototype.setTexture = function(texture, runtimeScene){
+gdjs.ParticleEmitterObjectPixiRenderer.prototype.setTextureName = function(texture, runtimeScene){
+    var invalidPixiTexture = runtimeScene.getGame().getImageManager().getInvalidPIXITexture();
     var pixiTexture = runtimeScene.getGame().getImageManager().getPIXITexture(texture);
-    if(pixiTexture.valid){
+
+    if(pixiTexture.valid && pixiTexture !== invalidPixiTexture){
         this.emitter.particleImages[0] = pixiTexture;
     }
 };

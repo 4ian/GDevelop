@@ -52,7 +52,9 @@ gdjs.CocosImageManager.prototype.getTexture = function(imageName) {
  * especially when compiled to a native game on iOS/Android/macOS.
  */
 gdjs.CocosImageManager.prototype.getInvalidTexture = function() {
-    return "res/HelloWorld.png"; //TODO
+    // TODO: use a valid texture from memory and ensure that each usage of _textureLoaded
+    // is updated to compare the texture with invalid texture.
+    return "res/HelloWorld.png";
 };
 
 gdjs.CocosImageManager.prototype.isPowerOf2 = function(texture) {

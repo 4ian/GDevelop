@@ -263,11 +263,11 @@ gdjs.ParticleEmitterObjectCocosRenderer.prototype.setFlow = function(flow){
     this.renderer.setEmissionRate(flow);
 };
 
-gdjs.ParticleEmitterObjectCocosRenderer.prototype.isTextureValid = function(texture, runtimeScene){
+gdjs.ParticleEmitterObjectCocosRenderer.prototype.isTextureNameValid = function(texture, runtimeScene){
     return runtimeScene.getGame().getImageManager().getTexture(texture)._textureLoaded;
 };
 
-gdjs.ParticleEmitterObjectCocosRenderer.prototype.setTexture = function(texture, runtimeScene){
+gdjs.ParticleEmitterObjectCocosRenderer.prototype.setTextureName = function(texture, runtimeScene){
     var texture = runtimeScene.getGame().getImageManager().getTexture(texture);
     if(texture._textureLoaded){
         if(texture.width === texture.height){

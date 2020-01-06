@@ -35,6 +35,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
     this.rendererType = objectData.rendererType;
     this.rendererParam1 = objectData.rendererParam1;
     this.rendererParam2 = objectData.rendererParam2;
+    /** @type string */
     this.texture = objectData.textureParticleName;
     this.flow = objectData.flow;
     this.tank = objectData.tank;
@@ -49,7 +50,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
     this._colorDirty = true;
     this._sizeDirty = true;
     this._alphaDirty = true;
-    this._textureDirty = true;
+    this._textureDirty = this.texture !== ''; // Don't mark texture as dirty if not using one.
     this._flowDirty = true;
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -112,7 +113,7 @@ gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
         this._renderer.setFlow(this.flow, this.tank);
     }
     if(this._textureDirty){
-        this._renderer.setTexture(this.texture, runtimeScene);
+        this._renderer.setTextureName(this.texture, runtimeScene);
     }
 
     this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
@@ -481,7 +482,7 @@ gdjs.ParticleEmitterObject.prototype.getTexture = function(){
 
 gdjs.ParticleEmitterObject.prototype.setTexture = function(texture, runtimeScene){
     if(this.texture !== texture){
-        if(this._renderer.isTextureValid(texture, runtimeScene)){
+        if(this._renderer.isTextureNameValid(texture, runtimeScene)){
             this.texture = texture;
             this._textureDirty = true;
         }

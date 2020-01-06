@@ -1020,7 +1020,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
             "compare that number to a value. If previous conditions on the "
             "objects have not been used, this condition counts how many of "
             "these objects exist in the current scene."),
-          _("the number objects"),
+          _("the number of _PARAM0_ objects"),
           _("Objects"),
           "res/conditions/nbObjet24.png",
           "res/conditions/nbObjet.png")

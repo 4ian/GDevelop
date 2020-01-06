@@ -357,7 +357,6 @@ export default class ExpressionField extends React.Component<Props, State> {
 
         {this.state.parametersDialogOpen && this.state.selectedExpressionInfo && (
           <ExpressionParametersEditorDialog
-            open={true}
             project={project}
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}

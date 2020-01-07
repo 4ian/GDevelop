@@ -1,4 +1,3 @@
-require('dotenv').config({ path: __dirname + '/.env' });
 const electron = require('electron');
 const path = require('path');
 const app = electron.app; // Module to control application life.
@@ -12,7 +11,6 @@ const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const {
-  uploadGameFolderToBucket,
   uploadArchiveToBucket,
 } = require('./S3Upload');
 const {
@@ -218,20 +216,6 @@ app.on('ready', function() {
   });
 
   // S3Upload events:
-  ipcMain.on('s3-folder-upload', (event, localDir) => {
-    log.info('Received event s3-upload with localDir=', localDir);
-
-    uploadGameFolderToBucket(
-      localDir,
-      throttle((current, max) => {
-        event.sender.send('s3-folder-upload-progress', current, max);
-      }, 200),
-      (err, prefix) => {
-        event.sender.send('s3-folder-upload-done', err, prefix);
-      }
-    );
-  });
-
   ipcMain.on('s3-file-upload', (event, localFile) => {
     log.info('Received event s3-file-upload with localFile=', localFile);
 

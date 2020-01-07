@@ -185,6 +185,33 @@ export const changeUserSubscription = (
     .then(response => response.data);
 };
 
+// TODO: Duplicated for now in S3Upload.js
+export const getUploadOptions = (): Promise<{
+  preview: {
+    ak1: string,
+    ak2: string,
+    sa1: string,
+    sa2: string,
+  },
+  upload: {
+    ak1: string,
+    ak2: string,
+    sa1: string,
+    sa2: string,
+  },
+}> => {
+  const token1 = 'ay+~-';
+  const num = 1960 + 1;
+  const token2 = 'AQ!eRHf';
+  return axios
+    .get(
+      `${GDevelopUsageApi.baseUrl}/upload-options?token=${encodeURIComponent(
+        token1 + num + token2
+      )}`
+    )
+    .then(response => response.data);
+};
+
 export const getRedirectToCheckoutUrl = (
   planId: string,
   uid: string,

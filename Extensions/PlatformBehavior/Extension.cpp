@@ -14,13 +14,14 @@ This project is released under the MIT License.
 #include "ScenePlatformObjectsManager.h"
 
 void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "PlatformBehavior",
-      _("Platform Behavior"),
-      _("This Extension enables the use of controllable objects that can run "
-        "and jump on platforms."),
-      "Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation("PlatformBehavior",
+                               _("Platform Behavior"),
+                               _("This Extension enables the use of "
+                                 "controllable objects that can run "
+                                 "and jump on platforms."),
+                               "Florian Rival",
+                               "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/platformer");
 
   {
@@ -302,14 +303,18 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetGetter("GetJumpSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
-    aut.AddAction("SetCanJump",
-                  _("Allow again jumping"),
-                  _("Allow the object to jump again, even if it is in the air: "
-                    "this can be useful to allow double jump for example."),
-                  _("Allow _PARAM0_ to jump again"),
-                  _("Options"),
-                  "CppPlatform/Extensions/platformerobjecticon24.png",
-                  "CppPlatform/Extensions/platformerobjecticon16.png")
+    aut.AddAction(
+           "SetCanJump",
+           _("Allow again jumping"),
+           _("When this action is executed, the object is able to jump again, "
+             "even if it is in the air: this can be useful to allow a double "
+             "jump for example. This is not a permanent effect: you must call "
+             "again this action everytime you want to allow the object to jump "
+             "(apart if it's on the floor)."),
+           _("Allow _PARAM0_ to jump again"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()

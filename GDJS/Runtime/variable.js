@@ -6,6 +6,7 @@
 
 /**
  * @typedef variableData
+ * @property {string} [name] The name of the variable. Used if a child variable.
  * @property {string | number} [value] The value of the variable, either string or number. Leave blank for structures.
  * @property {variableData} [children] The children of the structure. Leave blank if value is defined.
  */

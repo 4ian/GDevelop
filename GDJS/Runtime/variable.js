@@ -16,9 +16,9 @@
 /**
  * A Variable is an object storing a value (number or a string) or children variables.
  *
- * @memberof gdjs
+ * @memberOf gdjs
  * @class Variable
- * @param {VariableData} varData Object containing the objects parameters
+ * @param {VariableData} [varData] Object containing the objects parameters. Optional.
  */
 gdjs.Variable = function(varData)
 {
@@ -43,9 +43,10 @@ gdjs.Variable = function(varData)
 
 			//Try to guess the type of the value, as GD has no way ( for now ) to specify
 			//the type of a variable.
-			var valueWhenConsideredAsNumber = parseFloat(initialValue, 10);
-			if(valueWhenConsideredAsNumber === valueWhenConsideredAsNumber && valueWhenConsideredAsNumber.toString() === initialValue) { //"Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself"
-				this._value = parseFloat(initialValue, 10);
+			if(typeof initialValue === "number" || typeof parseFloat(initialValue) === "number") {
+				if(typeof initialValue === "string"){
+					this._value = parseFloat(initialValue);
+				} else this._value = initialValue;
 			}
 			else { //We have a string (Maybe empty).
 				if ( initialValue.length === 0 )
@@ -131,7 +132,7 @@ gdjs.Variable.prototype.hasChild = function(childName) {
 gdjs.Variable.prototype.removeChild = function(childName) {
 	if ( !this._isStructure ) return;
 	delete this._children[childName];
-}
+};
 
 /**
  * Remove all the children.
@@ -147,7 +148,7 @@ gdjs.Variable.prototype.clearChildren = function() {
 			delete this._children[child];
 		}
 	}
-}
+};
 
 /**
  * Get the value of the variable, considered as a number
@@ -156,7 +157,7 @@ gdjs.Variable.prototype.clearChildren = function() {
  */
 gdjs.Variable.prototype.getAsNumber = function() {
 	if ( this._numberDirty ) {
-		this._value = parseFloat(this._str, 10);
+		this._value = parseFloat(this._str);
 		if ( this._value !== this._value ) this._value = 0; //Ensure NaN is not returned as a value.
 		this._numberDirty = false;
 	}
@@ -225,12 +226,12 @@ gdjs.Variable.prototype.isNumber = function() {
  */
 gdjs.Variable.prototype.getAllChildren = function() {
 	return this._children;
-}
+};
 
 /**
  * Add the given number to the variable value
  * @method
- * @param {number} number the number to add
+ * @param {number} val the number to add
  */
 gdjs.Variable.prototype.add = function(val) {
 	this.setNumber(this.getAsNumber()+val);
@@ -239,7 +240,7 @@ gdjs.Variable.prototype.add = function(val) {
 /**
  * Subtract the given number to the variable value
  * @method
- * @param {number} number the number to subtract
+ * @param {number} val the number to subtract
  */
 gdjs.Variable.prototype.sub = function(val) {
 	this.setNumber(this.getAsNumber()-val);
@@ -248,7 +249,7 @@ gdjs.Variable.prototype.sub = function(val) {
 /**
  * Multiply the variable value by the given number
  * @method
- * @param {number} number the factor
+ * @param {number} val the factor
  */
 gdjs.Variable.prototype.mul = function(val) {
 	this.setNumber(this.getAsNumber()*val);
@@ -257,7 +258,7 @@ gdjs.Variable.prototype.mul = function(val) {
 /**
  * Divide the variable value by the given number
  * @method
- * @param {number} number the divisor
+ * @param {number} val the divisor
  */
 gdjs.Variable.prototype.div = function(val) {
 	this.setNumber(this.getAsNumber()/val);

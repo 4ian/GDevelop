@@ -17,7 +17,7 @@
  * @memberof gdjs
  * @class Variable
  * @param {Object} varData Optional object used to initialize the variable.
- * @param {variableData} varData.value A representation of a variable.
+ * @param {Array<variableData>} varData.value A representation of a variable.
  */
 gdjs.Variable = function(varData)
 {

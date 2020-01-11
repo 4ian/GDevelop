@@ -5,20 +5,20 @@
  */
 
 /**
- * @typedef {Object} Point Represents a Point in a frame
+ * @typedef {Object} Point Represents a point in a frame
  * @property {number} x X position of the point
  * @property {number} y Y position of the point
  */
 
 /**
- * @typedef {Object} CustomPointData Represents a Custom Point in a frame
+ * @typedef {Object} CustomPointData Represents a custom point in a frame
  * @property {string} name Name of the point
  * @property {number} x X position of the point
  * @property {number} y Y position of the point
  */
 
 /**
- * @typedef {Object} CenterPointData Represents the center Point in a frame
+ * @typedef {Object} CenterPointData Represents the center point in a frame
  * @property {boolean} automatic Is the center automatically computed?
  * @property {number} x X position of the point
  * @property {number} y Y position of the point
@@ -36,7 +36,7 @@
 
 /**
  * @typedef {Object} DirectionData Represents the data of a {@link gdjs.SpriteAnimationDirection}
- * @property {number} timeBetweenFrames Time between each frame (FPS)
+ * @property {number} timeBetweenFrames Time between each frame, in seconds
  * @property {boolean} looping Is the animation looping?
  * @property {Array<gdjs.SpriteAnimationFrame>} sprites The list of frames
  */
@@ -92,8 +92,7 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
     if ( this.points === undefined ){
         /** @type {Hashtable} */
         this.points = new Hashtable();
-    };
-    else this.points.clear();
+    } else this.points.clear();
 
     //Initialize points:
 	for(var i = 0, len = frameData.points.length;i<len;++i) {

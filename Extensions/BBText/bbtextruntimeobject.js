@@ -1,15 +1,14 @@
-//TODO @blurrymind correct the descriptions.
 /**
  * @typedef {Object} BBTextObjectDataType Base parameters for {@link gdjs.BBTextRuntimeObject}
  * @property {Object} content The base parameters of the BBText
  * @property {number} content.opacity The opacity of the BBText
  * @property {boolean} content.visible Is the text visible?
- * @property {string} content.text Text of the object
- * @property {string} content.color The color of the object
- * @property {string} content.fontFamily The Font of the object
- * @property {number} content.fontSize The size of the Text of the object
- * @property {boolean} content.wordWrap Toggle Word Warp
- * @property {string} content.align Align? //TODO correct that
+ * @property {string} content.text Text of the text
+ * @property {string} content.color The color of the text
+ * @property {string} content.fontFamily The font of the text
+ * @property {number} content.fontSize The size of the text
+ * @property {boolean} content.wordWrap Activate word wrap
+ * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
  * 
  * @typedef {ObjectData & BBTextObjectDataType} BBTextObjectData
  */

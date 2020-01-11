@@ -1,4 +1,13 @@
 /**
+ * @typedef {objectData} videoObjectData
+ * @property {Object} content The base parameters of the video
+ * @property {number} content.opacity The opacity of the video
+ * @property {boolean} content.loop Does the video loops itself?
+ * @property {number} content.volume The volume of the video
+ * @property {string} content.videoResource Name od the resource corresponding to the video
+ */
+
+/**
  * An object displaying a video on screen.
  *
  * For the same video resource, only one video is being created in memory (
@@ -10,24 +19,19 @@
  * @class VideoRuntimeObject
  * @extends RuntimeObject
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
- * @param {objectData} objectData The data defining the object
- * @param {Object} objectData.content The base parameters of the video
- * @param {number} objectData.content.opacity The opacity of the video
- * @param {boolean} objectData.content.loop Does the video loops itself?
- * @param {number} objectData.content.volume The volume of the video
- * @param {string} objectData.content.videoResource Name od the resource corresponding to the video
+ * @param {videoObjectData} videoObjectData The data defining the object
  */
-gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
-  gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+gdjs.VideoRuntimeObject = function(runtimeScene, videoObjectData) {
+  gdjs.RuntimeObject.call(this, runtimeScene, videoObjectData);
 
   /** @type number */
-  this._opacity = objectData.content.opacity;
+  this._opacity = videoObjectData.content.opacity;
   /** @type boolean */
-  this._loop = objectData.content.loop;
+  this._loop = videoObjectData.content.loop;
   /** @type number */
-  this._volume = objectData.content.volume;
+  this._volume = videoObjectData.content.volume;
   /** @type string */
-  this._videoResource = objectData.content.videoResource;
+  this._videoResource = videoObjectData.content.videoResource;
 
   // Use a boolean to track if the video was paused because we
   // navigated to another scene, and so should resume if we're back.

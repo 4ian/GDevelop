@@ -16,11 +16,13 @@
  */
 gdjs.VariablesContainer = function(initialVariablesData)
 {
-    if ( this._variables == undefined ) this._variables = new Hashtable();
-    if ( this._variablesArray == undefined ) this._variablesArray = [];
+    if ( this._variables === undefined ) this._variables = new Hashtable();
+    if ( this._variablesArray === undefined ) this._variablesArray = [];
 
-    if ( initialVariablesData != undefined ) this.initFrom(initialVariablesData);
+    if ( initialVariablesData !== undefined ) this.initFrom(initialVariablesData);
 };
+
+gdjs.VariablesContainer._deletedVars = gdjs.VariablesContainer._deletedVars || [];
 
 /**
  * Initialize variables from a container data.<br>
@@ -30,10 +32,10 @@ gdjs.VariablesContainer = function(initialVariablesData)
  * still accessible thanks to getFromIndex.
  *
  * @param {Array<VariableData>} data The Array containing representations of the base variables.
- * @param {Boolean} keepOldVariables If set to true, already existing variables won't be erased.
+ * @param {Boolean} [keepOldVariables] If set to true, already existing variables won't be erased.
  */
 gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
-    if ( keepOldVariables == undefined ) keepOldVariables = false;
+    if ( keepOldVariables === undefined ) keepOldVariables = false;
     if ( !keepOldVariables ) {
         gdjs.VariablesContainer._deletedVars = gdjs.VariablesContainer._deletedVars || [];
         this._variables.keys(gdjs.VariablesContainer._deletedVars);
@@ -58,7 +60,7 @@ gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
             ++i;
 
             //Remove the variable from the list of variables to be deleted.
-            var idx = gdjs.VariablesContainer._deletedVars.indexOf(varData.name)
+            var idx = gdjs.VariablesContainer._deletedVars.indexOf(varData.name);
             if (idx !== -1) gdjs.VariablesContainer._deletedVars[idx] = undefined;
         }
 	}
@@ -71,7 +73,7 @@ gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
         //(Here, remove means flag the variable as not existing, to avoid garbage creation ).
         for(var i =0, len = gdjs.VariablesContainer._deletedVars.length;i<len;++i) {
             var variableName = gdjs.VariablesContainer._deletedVars[i];
-            if ( variableName != undefined )
+            if ( variableName !== undefined )
                 this._variables.get(variableName).setUndefinedInContainer();
         }
     }
@@ -128,11 +130,12 @@ gdjs.VariablesContainer.prototype.get = function(name) {
  * should not happen.
  */
 gdjs.VariablesContainer.prototype.getFromIndex = function(id) {
-	if ( id >= this._variablesArray.length ) { //Add automatically inexisting variables.
+	if ( id >= this._variablesArray.length ) { //Add automatically non-existing variables.
         var variable = new gdjs.Variable();
-        return this._variables.put(name, variable);
-	}
-    else {
+        this._variables.put(name, variable);
+        return variable;
+	} else {
+        /** @type {gdjs.Variable} */
         var variable = this._variablesArray[id];
         if ( variable.isUndefinedInContainer() ) { //Reuse variables removed before.
             gdjs.Variable.call(variable);

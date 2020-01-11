@@ -152,7 +152,7 @@ gdjs.SpriteAnimation = function(imageManager, animData)
  * @param {Object} objectData the data to be used to create the object.
  * @param {string} objectData.name The name of the object (for getting from RuntimeScene.getObjects for example)
  * @param {string} objectData.type The object Type. Used to get the constructor from gdjs
- * @param {Array<{[value]: string | number, [children]: {[value]: string | number}}>} objectData.variables The list of default variables
+ * @param {Array<variableData>} objectData.variables The list of default variables
  * @param {Array<{type: string, name: string}>} objectData.behaviors The list of default behaviors
  * @param {Array<{name: string, useMultipleDirections: boolean, directions: Array<{timeBetweenFrames: number, looping: boolean, sprites: Array<{image: string,originPoint: {x:number, y:number}, centerPoint: {automatic: boolean, x: number, y: number}, points:Array<{x: number, y:number}>, hasCustomCollisionMask: boolean, customCollisionMask: Array<Array<{x: number, y: number}>>}>}>}>} objectData.animations The list of default animations
  */

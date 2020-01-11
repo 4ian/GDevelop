@@ -5,11 +5,18 @@
  */
 
 /**
+ * @typedef variableData
+ * @property {string | number} [value] The value of the variable, either string or number. Leave blank for structures.
+ * @property {variableData} [children] The children of the structure. Leave blank if value is defined.
+ */
+
+/**
  * A Variable is an object storing a value (number or a string) or children variables.
  *
  * @memberof gdjs
  * @class Variable
- * @param {Object} varData optional object used to initialize the variable.
+ * @param {Object} varData Optional object used to initialize the variable.
+ * @param {variableData} varData.value A representation of a variable.
  */
 gdjs.Variable = function(varData)
 {

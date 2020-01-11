@@ -142,6 +142,7 @@ gdjs.SpriteAnimation = function(imageManager, animData)
     this.directions.length = i; //Make sure to delete already existing directions which are not used anymore.
 };
 
+//TODO create correct typedefs for all the data types here
 /**
  * The SpriteRuntimeObject represents an object that can display images.
  *

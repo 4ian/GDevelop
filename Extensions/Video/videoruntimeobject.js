@@ -4,7 +4,7 @@
  * @property {number} content.opacity The opacity of the video
  * @property {boolean} content.loop Does the video loops itself?
  * @property {number} content.volume The volume of the video
- * @property {string} content.videoResource Name od the resource corresponding to the video
+ * @property {string} content.videoResource Name of the resource corresponding to the video
  */
 
 /**

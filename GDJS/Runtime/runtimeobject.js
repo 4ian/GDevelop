@@ -5,7 +5,7 @@
  */
 
 /**
- * @typedef objectData Base parameters for all gdjs.RuntimeObject
+ * @typedef {Object} ObjectData Base parameters for all gdjs.RuntimeObject
  * @property {string} name The name of the object (for getting from RuntimeScene.getObjects for example)
  * @property {string} type The object Type. Used to get the constructor from gdjs
  * @property {Array<VariableData>} variables The list of default variables
@@ -28,7 +28,7 @@
  * @memberof gdjs
  * @class RuntimeObject
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
- * @param {objectData} objectData The data defining the object
+ * @param {ObjectData} objectData The data defining the object
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {

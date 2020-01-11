@@ -9,11 +9,17 @@
  * @class TextEntryRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+ * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
+ * @param {objectData} textEntryObjectData The Optional object Data
  */
-gdjs.TextEntryRuntimeObject = function(runtimeScene, objectData)
+gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, textEntryObjectData);
+
+    /** @type {string} */
     this._str = "";
+
+    /** @type {boolean} */
     this._activated = true;
 
     if (this._renderer)

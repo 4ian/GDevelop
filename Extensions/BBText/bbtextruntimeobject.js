@@ -1,8 +1,24 @@
+//TODO @blurrymind correct the descriptions.
+/**
+ * @typedef {objectData} BBTextObjectData Base parameters for gdjs.BBTextRuntimeObject
+ * @property {Object} content The base parameters of the BBText
+ * @property {number} content.opacity The opacity of the BBText
+ * @property {boolean} content.visible Is the text visible?
+ * @property {string} content.text Text of the object
+ * @property {string} content.color The color of the object
+ * @property {string} content.fontFamily The Font of the object
+ * @property {number} content.fontSize The size of the Text of the object
+ * @property {boolean} content.wordWrap Toggle Word Warp
+ * @property {string} content.align Align? //TODO correct that
+ */
+
 /**
  * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
  * @memberof gdjs
  * @class BBTextRuntimeObject
  * @extends RuntimeObject
+ * @param {gdjs.runtimeScene} runtimeScene The scene where it is called
+ * @param {BBTextObjectData} objectData The optional object parameters
  */
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);

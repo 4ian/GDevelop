@@ -4,40 +4,102 @@
  */
 
 /**
+ * @typedef {objectData} textObjectData Base parameters for gdjs.TextRuntimeObject
+ * @property {number} characterSize The size of the characters
+ * @property {string} font The font name
+ * @property {boolean} bold Is Bold?
+ * @property {boolean} italic Is Italic?
+ * @property {boolean} underlined Is Underlined?
+ * @property {Object} color The text color in an RGB representation
+ * @property {number} color.r The Red level from 0 to 255
+ * @property {number} color.g The Green level from 0 to 255
+ * @property {number} color.b The Blue level from 0 to 255
+ * @property {string} string The text of the object
+ */
+
+/**
  * Displays a text on the screen.
  *
  * @memberof gdjs
  * @class TextRuntimeObject
  * @extends RuntimeObject
+ * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
+ * @param {textObjectData} textObjectData The Optional object Data
  */
-gdjs.TextRuntimeObject = function(runtimeScene, objectData)
+gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 {
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
+    /** @type {number} */
     this._characterSize = Math.max(1, objectData.characterSize);
+
+    /** @type {string} */
     this._fontName = objectData.font;
+
+    /** @type {boolean} */
     this._bold = objectData.bold;
+
+    /** @type {boolean} */
     this._italic = objectData.italic;
+
+    /** @type {boolean} */
     this._underlined = objectData.underlined;
+
+    /** @type {Array<number>} */
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+
+    /** @type {boolean} */
     this._useGradient = false;
+
+    /** @type {Array} */
     this._gradient = [];
+
+    /** @type {string} */
     this._gradientType = '';
+
+    /** @type {number} */
     this.opacity = 255;
+
+    /** @type {string} */
     this._textAlign = 'left';
+
+    /** @type {boolean} */
     this._wrapping = false;
+
+    /** @type {number} */
     this._wrappingWidth = 1;
+
+    /** @type {number} */
     this._outlineThickness = 0;
+
+    /** @type {Array<number>} */
     this._outlineColor = [255,255,255];
+
+    /** @type {boolean} */
     this._shadow = false;
+
+    /** @type {Array<number>} */
     this._shadowColor = [0,0,0];
+
+    /** @type {number} */
     this._shadowDistance = 1;
+
+    /** @type {number} */
     this._shadowBlur = 1;
+
+    /** @type {number} */
     this._shadowAngle = 0;
+
+    /** @type {number} */
     this._padding = 5;
+
+    /** @type {number} */
     this._scaleX = 1;
+
+    /** @type {number} */
     this._scaleY = 1;
 
+    /** @type {string} */
     this._str = objectData.string;
 
     if (this._renderer)

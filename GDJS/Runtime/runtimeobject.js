@@ -5,6 +5,14 @@
  */
 
 /**
+ * @typedef objectData
+ * @property {string} name The name of the object (for getting from RuntimeScene.getObjects for example)
+ * @property {string} type The object Type. Used to get the constructor from gdjs
+ * @property {Array<variableData>} variables The list of default variables
+ * @property {Array<behaviorData>} behaviors The list of default behaviors
+ */
+
+/**
  * RuntimeObject represents an object being used on a RuntimeScene.
  *
  * The constructor can be called on an already existing RuntimeObject:
@@ -20,11 +28,7 @@
  * @memberof gdjs
  * @class RuntimeObject
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
- * @param {Object} objectData The data defining the object
- * @param {string} objectData.name The name of the object (for getting from RuntimeScene.getObjects for example)
- * @param {string} objectData.type The object Type. Used to get the constructor from gdjs
- * @param {Array<variableData>} objectData.variables The list of default variables
- * @param {Array<behaviorData>} objectData.behaviors The list of default behaviors
+ * @param {objectData} objectData The data defining the object
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {

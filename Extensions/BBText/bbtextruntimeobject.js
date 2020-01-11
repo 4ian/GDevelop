@@ -1,6 +1,6 @@
 //TODO @blurrymind correct the descriptions.
 /**
- * @typedef {Object} BBTextObjectDataType Base parameters for gdjs.BBTextRuntimeObject
+ * @typedef {Object} BBTextObjectDataType Base parameters for {@link gdjs.BBTextRuntimeObject}
  * @property {Object} content The base parameters of the BBText
  * @property {number} content.opacity The opacity of the BBText
  * @property {boolean} content.visible Is the text visible?
@@ -11,7 +11,7 @@
  * @property {boolean} content.wordWrap Toggle Word Warp
  * @property {string} content.align Align? //TODO correct that
  * 
- * @typedef {objectData & BBTextObjectDataType} BBTextObjectData
+ * @typedef {ObjectData & BBTextObjectDataType} BBTextObjectData
  */
 
 /**
@@ -19,29 +19,29 @@
  * @memberof gdjs
  * @class BBTextRuntimeObject
  * @extends RuntimeObject
- * @param {gdjs.runtimeScene} runtimeScene The scene where it is called
+ * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
  * @param {BBTextObjectData} objectData The optional object parameters
  */
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  /** @type number */
+  /** @type {number} */
   this._opacity = objectData.content.opacity;
-  /** @type boolean */
+  /** @type {boolean} */
   this._visible = objectData.content.visible;
-  /** @type string */
+  /** @type {string} */
   this._text = objectData.content.text;
-  /** @type string */
+  /** @type {string} */
   this._color = objectData.content.color;
-  /** @type string */
+  /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
-  /** @type number */
+  /** @type {number} */
   this._fontSize = objectData.content.fontSize;
-  /** @type boolean */
+  /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
-  /** @type number */
+  /** @type {number} */
   this._wrappingWidth = 250; // This value is the default wrapping width of the runtime object.
-  /** @type string */
+  /** @type {string} */
   this._align = objectData.content.align;
 
   if (this._renderer)
@@ -67,9 +67,7 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
-gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
-  initialInstanceData
-) {
+gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
   // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
   if (initialInstanceData.customSize)
     this.setWrappingWidth(initialInstanceData.width);

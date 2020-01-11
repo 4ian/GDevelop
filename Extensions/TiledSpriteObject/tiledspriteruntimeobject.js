@@ -4,11 +4,11 @@
  */
 
 /**
- * @typedef {Object} tiledSpriteObjectDataType Base parameters for gdjs.VideoRuntimeObject
+ * @typedef {Object} TiledSpriteObjectDataType Base parameters for gdjs.VideoRuntimeObject
  * @property {number} width The widht of the object
  * @property {number} height The height of the object
  * 
- * @typedef {objectData & tiledSpriteObjectDataType} tiledSpriteObjectData
+ * @typedef {ObjectData & TiledSpriteObjectDataType} TiledSpriteObjectData
  */
 
 /**
@@ -18,7 +18,7 @@
  * @extends RuntimeObject
  * @memberof gdjs
  * @param {gdjs.RuntimeScene} runtimeScene The parent RuntimeScene Instance
- * @param {tiledSpriteObjectData} objectData The optional objectData
+ * @param {TiledSpriteObjectData} objectData The optional objectData
  */
 gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
 {
@@ -30,6 +30,7 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
     if (this._renderer)
         gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, objectData.texture);
     else
+        /** @type {gdjs.TiledSpriteRuntimeObjectRenderer} */
         this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(this, runtimeScene, objectData.texture);
 
     this.setWidth(tiledSpriteObjectData.width);

@@ -10,7 +10,7 @@
  * @extends RuntimeObject
  * @memberof gdjs
  * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {objectData} textEntryObjectData The Optional object Data
+ * @param {ObjectData} textEntryObjectData The Optional object Data
  */
 gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 {
@@ -25,6 +25,7 @@ gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
     if (this._renderer)
         gdjs.TextEntryRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.TextEntryRuntimeObjectRenderer} */
         this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this, runtimeScene);
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

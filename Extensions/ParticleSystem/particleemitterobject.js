@@ -1,9 +1,4 @@
 /**
- * @fileoverview
- * @name Particle-System-Extension
- * @copyright Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
- * @author Florian Rival
- * @license MIT
  * GDevelop - Particle System Extension
  * Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  * This project is released under the MIT License.
@@ -12,7 +7,7 @@
 
 // FIX-ME @4ian correct with real types (thoose are assunmptions only) and add desciptions
 /**
- * @typedef {Object} particleObjectDataType
+ * @typedef {Object} ParticleEmitterObjectDataType
  * @property {number} emissionEditionSimpleMode
  * @property {number} emitterAngleA
  * @property {number} emitterAngleB
@@ -42,7 +37,7 @@
  * @property {number} tank
  * @property {boolean} destroyWhenNoParticles Destroy the object when there is no particles?
  * 
- * @typedef {objectData & particleObjectDataType} particleObjectData
+ * @typedef {ObjectData & ParticleEmitterObjectDataType} ParticleEmitterObjectData
  */
 
 /**
@@ -52,11 +47,12 @@
  * @class ParticleEmitterObject
  * @extends RuntimeObject
  * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {particleObjectData} particleObjectData The Optional object Data
+ * @param {ParticleEmitterObjectData} particleObjectData The Optional object Data
  */
 gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
     gdjs.RuntimeObject.call(this, runtimeScene, particleObjectData);
 
+    /** @type {gdjs.ParticleEmitterObjectRenderer} */
     this._renderer = new gdjs.ParticleEmitterObjectRenderer(runtimeScene, this, particleObjectData);
 
     /** @type {number} */

@@ -4,14 +4,14 @@
  */
 
 /**
- * @typedef Color Represents a color in RGB Format
+ * @typedef {Object} Color Represents a color in RGB Format
  * @property {number} r The Red portion of the color from 0 to 255
  * @property {number} g The Green portion of the color from 0 to 255
  * @property {number} b The Blue portion of the color from 0 to 255
  */
 
 /**
- * @typedef {Object} shapePainterObjectDataType Base parameters for gdjs.ShapePainterRuntimeObject
+ * @typedef {Object} ShapePainterObjectDataType Base parameters for gdjs.ShapePainterRuntimeObject
  * @property {Color} fillColor The color as RGB representation of the inner part of the painted shape
  * @property {Color} outlineColor The color as RGB representation of the outter part of the painted shape
  * @property {number} fillOpacity The opacity of the inner part of the painted shape
@@ -19,7 +19,7 @@
  * @property {number} outlineSize The size of the outter part of the painted shape
  * @property {number} absoluteCoordinates The absolute coordinates
  * 
- * @typedef {objectData & shapePainterObjectDataType} shapePainterObjectData
+ * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
  */
 
 /**
@@ -29,7 +29,7 @@
  * @extends RuntimeObject
  * @memberof gdjs
  * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {shapePainterObjectData} shapePainterObjectData The Optional object Data
+ * @param {ShapePainterObjectData} shapePainterObjectData The Optional object Data
  */
 gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
 {
@@ -56,6 +56,7 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
     if (this._renderer)
         gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.ShapePainterRuntimeObjectRenderer} */
         this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(this, runtimeScene);
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

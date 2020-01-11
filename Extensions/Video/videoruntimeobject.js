@@ -1,5 +1,5 @@
 /**
- * @typedef {Object} VideoObjectDataType Base parameters for gdjs.VideoRuntimeObject
+ * @typedef {Object} VideoObjectDataType Base parameters for {@link gdjs.VideoRuntimeObject}
  * @property {Object} content The base parameters of the video
  * @property {number} content.opacity The opacity of the video
  * @property {boolean} content.loop Does the video loops itself?
@@ -20,7 +20,7 @@
  * @memberof gdjs
  * @class VideoRuntimeObject
  * @extends RuntimeObject
- * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
  * @param {VideoObjectData} videoObjectData The data defining the object
  */
 gdjs.VideoRuntimeObject = function(runtimeScene, videoObjectData) {

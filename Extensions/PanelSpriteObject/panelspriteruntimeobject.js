@@ -5,7 +5,7 @@
 
 //TODO Someone check tiled and texture typing, I am not sure about it.
 /**
- * @typedef {Object} panelSpriteObjectDataType
+ * @typedef {Object} PanelSpriteObjectDataType
  * @property {number} rightMargin The right margin
  * @property {number} leftMargin The left margin
  * @property {number} topMargin The top margin
@@ -15,7 +15,7 @@
  * @property {number} height The objects height
  * @property {PIXI.BaseTexture} texture The objects texture
  * 
- * @typedef {objectData & panelSpriteObjectDataType} panelSpriteObjectData
+ * @typedef {ObjectData & panelSpriteObjectDataType} PanelSpriteObjectData
  */
 
 /**
@@ -25,7 +25,7 @@
  * @extends RuntimeObject
  * @memberof gdjs
  * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {panelSpriteObjectData} panelSpriteObjectData The Optional object Data
+ * @param {PanelSpriteObjectData} panelSpriteObjectData The Optional object Data
  */
 gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);

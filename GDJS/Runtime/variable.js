@@ -30,7 +30,7 @@ gdjs.Variable = function(varData)
 	this._stringDirty = true;
 	/** @type {boolean} */
 	this._isStructure = false;
-	/** @type {Object} */
+	/** @type {Object.<string, gdjs.Variable>} */
 	this._children = {};
 	/** @type {boolean} */
     this._undefinedInContainer = false;
@@ -59,6 +59,7 @@ gdjs.Variable = function(varData)
 
 			if (varData.children !== undefined) {
 	        	for(var i = 0, len = varData.children.length;i<len;++i) {
+					/** @type {variableData} */
 					var childData = varData.children[i];
 					/** @type {gdjs.Variable} */
 					this._children[childData.name] = new gdjs.Variable(childData);

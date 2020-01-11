@@ -9,6 +9,17 @@
  * @memberof gdjs
  * @class VideoRuntimeObject
  * @extends RuntimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
+ * @param {Object} objectData The data defining the object
+ * @param {string} objectData.name The name of the object (for getting from RuntimeScene.getObjects for example)
+ * @param {string} objectData.type The object Type. Used to get the constructor from gdjs
+ * @param {Array<variableData>} objectData.variables The list of default variables
+ * @param {Array<behaviorData>} objectData.behaviors The list of default behaviors
+ * @param {Object} objectData.content The base parameters of the video
+ * @param {number} objectData.content.opacity The opacity of the video
+ * @param {boolean} objectData.content.loop Does the video loops itself?
+ * @param {number} objectData.content.volume The volume of the video
+ * @param {string} objectData.content.videoResource Name od the resource corresponding to the video
  */
 gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);

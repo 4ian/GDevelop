@@ -5,12 +5,18 @@
  */
 
 /**
+ * @typedef behaviorData
+ * @property {string} name The name of the behavior (for getting from an object (object.getBehavior) for example)
+ * @property {string} type The object Type. Used to get the constructor from gdjs
+ */
+
+/**
  * RuntimeBehavior represents a behavior being used by a RuntimeObject.
  *
  * @class RuntimeBehavior
  * @memberof gdjs
  * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object of the behavior
- * @param {Object} behaviorData The object used to setup the behavior
+ * @param {behaviorData} behaviorData The object used to setup the behavior
  * @param {gdjs.RuntimeObject} owner The object owning the behavior
  */
 gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)

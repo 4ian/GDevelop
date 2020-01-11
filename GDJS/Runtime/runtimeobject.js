@@ -24,7 +24,7 @@
  * @param {string} objectData.name The name of the object (for getting from RuntimeScene.getObjects for example)
  * @param {string} objectData.type The object Type. Used to get the constructor from gdjs
  * @param {Array<variableData>} objectData.variables The list of default variables
- * @param {Array<{type: string, name: string}>} objectData.behaviors The list of default behaviors
+ * @param {Array<behaviorData>} objectData.behaviors The list of default behaviors
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {

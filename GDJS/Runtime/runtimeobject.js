@@ -1,3 +1,5 @@
+// @ts-check
+
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -22,10 +24,10 @@
  * However, you should not be calling the constructor on an already existing object
  * which is not a RuntimeObject.
  *
- * A `gdjs.RuntimeObject` should not be instanciated directly, always a child class
+ * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
  * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
  *
- * @memberof gdjs
+ * @memberOf gdjs
  * @class RuntimeObject
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
  * @param {ObjectData} objectData The data defining the object
@@ -72,7 +74,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
         this.clearForces();
 
     //A force returned by getAverageForce method:
-    if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,false);
+    if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,0);
 
     //Behaviors:
     if (this._behaviors === undefined)
@@ -106,6 +108,9 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
     else
         this._timers.clear();
 };
+
+gdjs.RuntimeObject.identifiers = gdjs.RuntimeObject.identifiers || new Hashtable();
+gdjs.RuntimeObject.newId = (gdjs.RuntimeObject.newId || 0);
 
 gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avoiding recreating forces each tick.
 
@@ -324,11 +329,11 @@ gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeS
 
     var newAngle = this.getAngle() + (diffWasPositive ? -1.0 : 1.0)
         * speed * this.getElapsedTime(runtimeScene) / 1000;
-    if (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0 ^ diffWasPositive)
+    if (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0 !== diffWasPositive)
         newAngle = angle;
     this.setAngle(newAngle);
 
-    if (this.getAngle() != newAngle) //Objects like sprite in 8 directions does not handle small increments...
+    if (this.getAngle() !== newAngle) //Objects like sprite in 8 directions does not handle small increments...
         this.setAngle(angle); //...so force them to be in the path angle anyway.
 };
 
@@ -672,11 +677,11 @@ gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, multipl
  * @param {number} len The force length, in pixels.
  * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, multiplier) {
-    if ( obj == null ) return;
+gdjs.RuntimeObject.prototype.addForceTowardObject = function(object, len, multiplier) {
+    if ( object == null ) return;
 
-    this.addForceTowardPosition(obj.getDrawableX() + obj.getCenterX(),
-                                obj.getDrawableY() + obj.getCenterY(),
+    this.addForceTowardPosition(object.getDrawableX() + object.getCenterX(),
+                                object.getDrawableY() + object.getCenterY(),
                                 len, multiplier);
 };
 
@@ -708,7 +713,7 @@ gdjs.RuntimeObject.prototype.updateForces = function(elapsedTime) {
             ++i;
         } else if (multiplier === 0 || force.getLength() <= 0.001) { // Instant or force disappearing
             gdjs.RuntimeObject.forcesGarbage.push(force);
-            this._forces.remove(i);
+            this._forces.splice(i, 1);
         } else { // Deprecated way of updating forces progressively.
             force.setLength(force.getLength() - force.getLength() * ( 1 - multiplier ) * elapsedTime);
             ++i;
@@ -1268,23 +1273,23 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
             if ( this.getDrawableX()+this.getCenterX() < objects[i].getDrawableX()+objects[i].getCenterX() )
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getX();
-                this.addForce( -av - 10, 0, false );
+                this.addForce( -av - 10, 0, 0 );
             }
             else
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getX();
-                this.addForce( -av + 10, 0, false );
+                this.addForce( -av + 10, 0, 0 );
             }
 
             if ( this.getDrawableY()+this.getCenterY() < objects[i].getDrawableY()+objects[i].getCenterY() )
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getY();
-                this.addForce( 0, -av - 10, false );
+                this.addForce( 0, -av - 10, 0 );
             }
             else
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getY();
-                this.addForce( 0, -av + 10, false );
+                this.addForce( 0, -av + 10, 0 );
             }
         }
     }
@@ -1439,7 +1444,7 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
     }
 
     return false;
-}
+};
 
 
 /**
@@ -1449,18 +1454,18 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
  * @static
  */
 gdjs.RuntimeObject.getNameIdentifier = function(name) {
-    gdjs.RuntimeObject.getNameIdentifier.identifiers =
-        gdjs.RuntimeObject.getNameIdentifier.identifiers
+    gdjs.RuntimeObject.identifiers =
+        gdjs.RuntimeObject.identifiers
         || new Hashtable();
 
-    if ( gdjs.RuntimeObject.getNameIdentifier.identifiers.containsKey(name) )
-        return gdjs.RuntimeObject.getNameIdentifier.identifiers.get(name);
+    if ( gdjs.RuntimeObject.identifiers.containsKey(name) )
+        return gdjs.RuntimeObject.identifiers.get(name);
 
-    gdjs.RuntimeObject.getNameIdentifier.newId =
-        (gdjs.RuntimeObject.getNameIdentifier.newId || 0) + 1;
-    var newIdentifier = gdjs.RuntimeObject.getNameIdentifier.newId;
+    gdjs.RuntimeObject.newId =
+        (gdjs.RuntimeObject.newId || 0) + 1;
+    var newIdentifier = gdjs.RuntimeObject.newId;
 
-    gdjs.RuntimeObject.getNameIdentifier.identifiers.put(name, newIdentifier);
+    gdjs.RuntimeObject.identifiers.put(name, newIdentifier);
     return newIdentifier;
 };
 

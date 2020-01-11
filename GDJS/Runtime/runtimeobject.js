@@ -6,10 +6,10 @@
 
 /**
  * @typedef {Object} ObjectData Base parameters for all gdjs.RuntimeObject
- * @property {string} name The name of the object (for getting from RuntimeScene.getObjects for example)
+ * @property {string} name The name of the object. During the game, objects can be queried by their name (see `RuntimeScene.getObjects` for example).
  * @property {string} type The object Type. Used to get the constructor from gdjs
  * @property {Array<VariableData>} variables The list of default variables
- * @property {Array<behaviorData>} behaviors The list of default behaviors
+ * @property {Array<BehaviorData>} behaviors The list of default behaviors
  */
 
 /**

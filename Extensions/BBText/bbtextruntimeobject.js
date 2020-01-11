@@ -20,7 +20,7 @@
  * @class BBTextRuntimeObject
  * @extends RuntimeObject
  * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
- * @param {BBTextObjectData} objectData The optional object parameters
+ * @param {BBTextObjectData} objectData The object data used to initialize the object
  */
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);

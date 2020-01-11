@@ -29,7 +29,7 @@
  * @property {number} sizeParam
  * @property {number} particleAlpha1
  * @property {number} particleAlpha2
- * @property {number} rendererType
+ * @property {string} rendererType
  * @property {number} rendererParam1
  * @property {number} rendererParam1
  * @property {string} textureParticleName Resource name for image in particle
@@ -118,7 +118,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
     /** @type {number} */
     this.alpha2 = particleObjectData.particleAlpha2;
 
-    /** @type {number} */
+    /** @type {string} */
     this.rendererType = particleObjectData.rendererType;
 
     /** @type {number} */

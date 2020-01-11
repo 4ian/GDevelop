@@ -259,7 +259,7 @@ gdjs.VideoRuntimeObject.prototype.getDuration = function() {
 
 /**
  * Check if the video has ended.
- * @returns {boolean} Has the video Ended?
+ * @returns {boolean} Has the video ended?
  */
 gdjs.VideoRuntimeObject.prototype.isEnded = function() {
   return this._renderer.isEnded();
@@ -303,7 +303,7 @@ gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
  * TODO: Investigate how to dispose the video source?
  *
  * @private
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} this objects has to be removed from.
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} that is being unloaded
  */
 gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneUnloaded = function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
@@ -322,7 +322,7 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneUnloaded = function(runtimeScene
 /**
  * When a scene is paused, pause any video being run.
  * @private
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} this objects has to be removed from.
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} that is being paused
  */
 gdjs.VideoRuntimeObject.gdjsCallbackRuntimeScenePaused = function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
@@ -342,7 +342,7 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeScenePaused = function(runtimeScene) 
 /**
  * When a scene is resumed, resume any video previously paused.
  * @private
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} this objects has to be removed from.
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} that is being resumed
  */
 gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneResumed = function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,

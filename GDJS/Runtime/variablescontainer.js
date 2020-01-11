@@ -10,7 +10,7 @@
  *
  * @memberof gdjs
  * @class VariablesContainer
- * @param {Array<VariableData>} [initialVariablesData] Optional Array containing representations of the base variables.
+ * @param {Array<VariableData>} [initialVariablesData] Optional array containing representations of the base variables.
  */
 gdjs.VariablesContainer = function(initialVariablesData)
 {

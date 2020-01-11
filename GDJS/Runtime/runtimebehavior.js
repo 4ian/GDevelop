@@ -5,7 +5,7 @@
  */
 
 /**
- * @typedef behaviorData
+ * @typedef BehaviorData The behavior type. Used by GDJS to find the proper behavior to construct.
  * @property {string} name The name of the behavior (for getting from an object (object.getBehavior) for example)
  * @property {string} type The object Type. Used to get the constructor from gdjs
  */

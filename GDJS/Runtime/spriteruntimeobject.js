@@ -4,8 +4,6 @@
  * This project is released under the MIT License.
  */
 
-// Type Definitions
-
 /**
  * @typedef {Object} Point Represents a Point in a frame
  * @property {number} x X position of the point
@@ -14,14 +12,14 @@
 
 /**
  * @typedef {Object} CustomPointData Represents a Custom Point in a frame
- * @property {string} name Name of the point (To access it later)
+ * @property {string} name Name of the point
  * @property {number} x X position of the point
  * @property {number} y Y position of the point
  */
 
 /**
  * @typedef {Object} CenterPointData Represents the center Point in a frame
- * @property {boolean} automatic Is Automatically found or predefined?
+ * @property {boolean} automatic Is the center automatically computed?
  * @property {number} x X position of the point
  * @property {number} y Y position of the point
  */
@@ -57,8 +55,6 @@
  * 
  * @typedef {ObjectData & SpriteObjectDataType} SpriteObjectData
  */
-
-// Code
 
 /**
  * A frame used by a SpriteAnimation in a {@link gdjs.SpriteRuntimeObject}.

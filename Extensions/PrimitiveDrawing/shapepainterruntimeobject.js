@@ -4,7 +4,7 @@
  */
 
 /**
- * @typedef {Object} Color Represents a color in RGB Format
+ * @typedef {Object} RGBColor Represents a color in RGB Format
  * @property {number} r The Red portion of the color from 0 to 255
  * @property {number} g The Green portion of the color from 0 to 255
  * @property {number} b The Blue portion of the color from 0 to 255
@@ -12,12 +12,12 @@
 
 /**
  * @typedef {Object} ShapePainterObjectDataType Base parameters for gdjs.ShapePainterRuntimeObject
- * @property {Color} fillColor The color as RGB representation of the inner part of the painted shape
- * @property {Color} outlineColor The color as RGB representation of the outter part of the painted shape
+ * @property {RGBColor} fillColor The color as RGB representation of the inner part of the painted shape
+ * @property {RGBColor} outlineColor The color as RGB representation of the outline of the painted shape
  * @property {number} fillOpacity The opacity of the inner part of the painted shape
- * @property {number} outlineOpacity The opacity of the outter part of the painted shape
- * @property {number} outlineSize The size of the outter part of the painted shape
- * @property {number} absoluteCoordinates The absolute coordinates
+ * @property {number} outlineOpacity The opacity of the outline of the painted shape
+ * @property {number} outlineSize The size of the outline of the painted shape
+ * @property {boolean} absoluteCoordinates Use absolute coordinates?
  * 
  * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
  */
@@ -50,7 +50,7 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
     /** @type {number} */
     this._outlineSize = shapePainterObjectData.outlineSize;
 
-    /** @type {number} */
+    /** @type {boolean} */
     this._absoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
 
     if (this._renderer)

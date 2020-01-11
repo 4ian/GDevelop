@@ -107,6 +107,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
     if (this._renderer)
         gdjs.TextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.TextRuntimeObjectRenderer} */
         this._renderer = new gdjs.TextRuntimeObjectRenderer(this, runtimeScene);
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

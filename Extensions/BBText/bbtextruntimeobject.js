@@ -1,6 +1,6 @@
 //TODO @blurrymind correct the descriptions.
 /**
- * @typedef {objectData} BBTextObjectData Base parameters for gdjs.BBTextRuntimeObject
+ * @typedef {Object} BBTextObjectDataType Base parameters for gdjs.BBTextRuntimeObject
  * @property {Object} content The base parameters of the BBText
  * @property {number} content.opacity The opacity of the BBText
  * @property {boolean} content.visible Is the text visible?
@@ -10,6 +10,8 @@
  * @property {number} content.fontSize The size of the Text of the object
  * @property {boolean} content.wordWrap Toggle Word Warp
  * @property {string} content.align Align? //TODO correct that
+ * 
+ * @typedef {objectData & BBTextObjectDataType} BBTextObjectData
  */
 
 /**
@@ -45,6 +47,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   if (this._renderer)
     gdjs.BBTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else
+    /** @type {gdjs.BBTextRuntimeObjectRenderer} */
     this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

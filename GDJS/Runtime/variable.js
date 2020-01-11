@@ -21,12 +21,19 @@
  */
 gdjs.Variable = function(varData)
 {
-    this._value = 0;
-    this._str = "";
-    this._numberDirty = false;
-    this._stringDirty = true;
+	/** @type {number} */
+	this._value = 0;
+	/** @type {string} */
+	this._str = "";
+	/** @type {boolean} */
+	this._numberDirty = false;
+	/** @type {boolean} */
+	this._stringDirty = true;
+	/** @type {boolean} */
 	this._isStructure = false;
-    this._children = {};
+	/** @type {Object} */
+	this._children = {};
+	/** @type {boolean} */
     this._undefinedInContainer = false;
 
 	if ( varData !== undefined ) {
@@ -53,7 +60,8 @@ gdjs.Variable = function(varData)
 
 			if (varData.children !== undefined) {
 	        	for(var i = 0, len = varData.children.length;i<len;++i) {
-			    	var childData = varData.children[i];
+					var childData = varData.children[i];
+					/** @type {gdjs.Variable} */
 					this._children[childData.name] = new gdjs.Variable(childData);
 				}
 			}
@@ -65,6 +73,7 @@ gdjs.Variable = function(varData)
 /**
  * Used (usually by gdjs.VariablesContainer) to set that the variable must be
  * considered as not existing in the container.
+ * @method
  * @private
  */
 gdjs.Variable.prototype.setUndefinedInContainer = function() {
@@ -75,7 +84,8 @@ gdjs.Variable.prototype.setUndefinedInContainer = function() {
  * Check if the variable must be considered as not existing in its container
  * (usually a gdjs.VariablesContainer).
  * @private
- * @return true if the container must consider that the variable does not exist.
+ * @method
+ * @return {boolean} true if the container must consider that the variable does not exist.
  */
 gdjs.Variable.prototype.isUndefinedInContainer = function() {
     return this._undefinedInContainer;
@@ -86,6 +96,7 @@ gdjs.Variable.prototype.isUndefinedInContainer = function() {
  *
  * If the variable has not the specified child, an empty variable with the specified name
  * is added as child.
+ * @method
  * @returns {gdjs.Variable} The child variable
  */
 gdjs.Variable.prototype.getChild = function(childName) {
@@ -101,6 +112,7 @@ gdjs.Variable.prototype.getChild = function(childName) {
  * Return the child in a variable.
  *
  * Check if the variable has the specified children
+ * @method
  * @return {boolean} true if variable has the children with the specified name
  */
 gdjs.Variable.prototype.hasChild = function(childName) {
@@ -111,7 +123,8 @@ gdjs.Variable.prototype.hasChild = function(childName) {
  * Remove the child with the specified name.
  *
  * If the variable has not the specified child, nothing is done.
- * @param childName The name of the child to be removed
+ * @method
+ * @param {string} childName The name of the child to be removed
  */
 gdjs.Variable.prototype.removeChild = function(childName) {
 	if ( !this._isStructure ) return;
@@ -122,6 +135,7 @@ gdjs.Variable.prototype.removeChild = function(childName) {
  * Remove all the children.
  *
  * If the variable is not a structure, nothing is done.
+ * @method
  */
 gdjs.Variable.prototype.clearChildren = function() {
 	if ( !this._isStructure ) return;
@@ -135,6 +149,7 @@ gdjs.Variable.prototype.clearChildren = function() {
 
 /**
  * Get the value of the variable, considered as a number
+ * @method
  * @return {number} The number stored in the variable
  */
 gdjs.Variable.prototype.getAsNumber = function() {
@@ -149,6 +164,7 @@ gdjs.Variable.prototype.getAsNumber = function() {
 
 /**
  * Change the value of the variable, considered as a number
+ * @method
  * @param {number} newValue The new value to be set
  */
 gdjs.Variable.prototype.setNumber = function(newValue) {
@@ -159,6 +175,7 @@ gdjs.Variable.prototype.setNumber = function(newValue) {
 
 /**
  * Get the value of the variable, considered as a string
+ * @method
  * @return {string} The string stored in the variable
  */
 gdjs.Variable.prototype.getAsString = function() {
@@ -172,6 +189,7 @@ gdjs.Variable.prototype.getAsString = function() {
 
 /**
  * Change the value of the variable, considered as a string
+ * @method
  * @param {string} newValue The new string to be set
  */
 gdjs.Variable.prototype.setString = function(newValue) {
@@ -182,6 +200,8 @@ gdjs.Variable.prototype.setString = function(newValue) {
 
 /**
  * Return true if the variable is a structure.
+ * @method
+ * @return {boolean} true if the variable is a structure.
  */
 gdjs.Variable.prototype.isStructure = function() {
 	return this._isStructure;
@@ -189,6 +209,8 @@ gdjs.Variable.prototype.isStructure = function() {
 
 /**
  * Return true if the variable is a number.
+ * @method
+ * @return {boolean} true if the variable is a number.
  */
 gdjs.Variable.prototype.isNumber = function() {
 	return !this._isStructure && !this._numberDirty;
@@ -196,6 +218,7 @@ gdjs.Variable.prototype.isNumber = function() {
 
 /**
  * Return the object containing all the children of the variable
+ * @method
  * @return {Object.<string, gdjs.Variable>} All the children of the variable
  */
 gdjs.Variable.prototype.getAllChildren = function() {
@@ -204,6 +227,7 @@ gdjs.Variable.prototype.getAllChildren = function() {
 
 /**
  * Add the given number to the variable value
+ * @method
  * @param {number} number the number to add
  */
 gdjs.Variable.prototype.add = function(val) {
@@ -212,6 +236,7 @@ gdjs.Variable.prototype.add = function(val) {
 
 /**
  * Subtract the given number to the variable value
+ * @method
  * @param {number} number the number to subtract
  */
 gdjs.Variable.prototype.sub = function(val) {
@@ -220,6 +245,7 @@ gdjs.Variable.prototype.sub = function(val) {
 
 /**
  * Multiply the variable value by the given number
+ * @method
  * @param {number} number the factor
  */
 gdjs.Variable.prototype.mul = function(val) {
@@ -228,6 +254,7 @@ gdjs.Variable.prototype.mul = function(val) {
 
 /**
  * Divide the variable value by the given number
+ * @method
  * @param {number} number the divisor
  */
 gdjs.Variable.prototype.div = function(val) {
@@ -236,6 +263,7 @@ gdjs.Variable.prototype.div = function(val) {
 
 /**
  * Concatenate the given string at the end of the variable value
+ * @method
  * @param {string} str the string to append
  */
 gdjs.Variable.prototype.concatenate = function(str) {

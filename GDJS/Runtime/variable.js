@@ -5,10 +5,10 @@
  */
 
 /**
- * @typedef variableData Data representation of a GDevelop variable
+ * @typedef {Object} VariableData Data representation of a GDevelop variable
  * @property {string} [name] The name of the variable. Used if a child variable.
  * @property {string | number} [value] The value of the variable, either string or number. Leave blank for structures.
- * @property {Array<variableData>} [children] The children of the structure. Leave blank if value is defined.
+ * @property {Array<VariableData>} [children] The children of the structure. Leave blank if value is defined.
  */
 
 /**
@@ -16,7 +16,7 @@
  *
  * @memberof gdjs
  * @class Variable
- * @param {variableData} varData Object containing the objects parameters
+ * @param {VariableData} varData Object containing the objects parameters
  */
 gdjs.Variable = function(varData)
 {
@@ -59,7 +59,7 @@ gdjs.Variable = function(varData)
 
 			if (varData.children !== undefined) {
 	        	for(var i = 0, len = varData.children.length;i<len;++i) {
-					/** @type {variableData} */
+					/** @type {VariableData} */
 					var childData = varData.children[i];
 					/** @type {gdjs.Variable} */
 					this._children[childData.name] = new gdjs.Variable(childData);

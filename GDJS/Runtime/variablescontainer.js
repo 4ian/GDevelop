@@ -10,7 +10,7 @@
  *
  * @memberof gdjs
  * @class VariablesContainer
- * @param {Array<variableData>} [initialVariablesData] Optional Array containing representations of the base variables.
+ * @param {Array<VariableData>} [initialVariablesData] Optional Array containing representations of the base variables.
  */
 gdjs.VariablesContainer = function(initialVariablesData)
 {
@@ -27,7 +27,7 @@ gdjs.VariablesContainer = function(initialVariablesData)
  * if `keepOldVariables` is set to true, already existing variables won't be erased and will be
  * still accessible thanks to getFromIndex.
  *
- * @param {Array<variableData>} data The Array containing representations of the base variables.
+ * @param {Array<VariableData>} data The Array containing representations of the base variables.
  * @param {Boolean} keepOldVariables If set to true, already existing variables won't be erased.
  */
 gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {

@@ -10,10 +10,10 @@
  * @property {number} leftMargin The left margin
  * @property {number} topMargin The top margin
  * @property {number} bottomMargin The bottom margin
- * @property {PIXI.Sprite} [tiled] The tiled PIXI sprite
+ * @property {boolean} [tiled] Is it tiled or not?
  * @property {number} width The objects width
  * @property {number} height The objects height
- * @property {PIXI.BaseTexture} texture The objects texture
+ * @property {string} texture The resource name of the objects texture
  * 
  * @typedef {ObjectData & panelSpriteObjectDataType} PanelSpriteObjectData
  */
@@ -42,7 +42,7 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {
   /** @type {number} */
   this._bBorder = panelSpriteObjectData.bottomMargin;
 
-  /** @type {PIXI.Sprite} */
+  /** @type {boolean} */
   this._tiled = panelSpriteObjectData.tiled;
 
   /** @type {number} */

@@ -4,22 +4,52 @@
  */
 
 /**
+ * @typedef Color Represents a color in RGB Format
+ * @property {number} r The Red portion of the color from 0 to 255
+ * @property {number} g The Green portion of the color from 0 to 255
+ * @property {number} b The Blue portion of the color from 0 to 255
+ */
+
+/**
+ * @typedef {objectData} shapePainterObjectData Base parameters for gdjs.ShapePainterRuntimeObject
+ * @property {Color} fillColor The color as RGB representation of the inner part of the painted shape
+ * @property {Color} outlineColor The color as RGB representation of the outter part of the painted shape
+ * @property {number} fillOpacity The opacity of the inner part of the painted shape
+ * @property {number} outlineOpacity The opacity of the outter part of the painted shape
+ * @property {number} outlineSize The size of the outter part of the painted shape
+ * @property {number} absoluteCoordinates The absolute coordinates
+ */
+
+/**
  * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
  *
  * @class ShapePainterRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+ * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
+ * @param {shapePainterObjectData} shapePainterObjectData The Optional object Data
  */
-gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
+gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, shapePainterObjectData);
 
-    this._fillColor = parseInt(gdjs.rgbToHex(objectData.fillColor.r, objectData.fillColor.g, objectData.fillColor.b), 16);
-    this._outlineColor = parseInt(gdjs.rgbToHex(objectData.outlineColor.r, objectData.outlineColor.g, objectData.outlineColor.b), 16);
-    this._fillOpacity = objectData.fillOpacity;
-    this._outlineOpacity = objectData.outlineOpacity;
-    this._outlineSize = objectData.outlineSize;
-    this._absoluteCoordinates = objectData.absoluteCoordinates;
+    /** @type {number} */
+    this._fillColor = parseInt(gdjs.rgbToHex(shapePainterObjectData.fillColor.r, shapePainterObjectData.fillColor.g, shapePainterObjectData.fillColor.b), 16);
+
+    /** @type {number} */
+    this._outlineColor = parseInt(gdjs.rgbToHex(shapePainterObjectData.outlineColor.r, shapePainterObjectData.outlineColor.g, shapePainterObjectData.outlineColor.b), 16);
+
+    /** @type {number} */
+    this._fillOpacity = shapePainterObjectData.fillOpacity;
+
+    /** @type {number} */
+    this._outlineOpacity = shapePainterObjectData.outlineOpacity;
+
+    /** @type {number} */
+    this._outlineSize = shapePainterObjectData.outlineSize;
+
+    /** @type {number} */
+    this._absoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
 
     if (this._renderer)
         gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);

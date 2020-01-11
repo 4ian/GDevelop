@@ -1,5 +1,5 @@
 /**
- * @typedef {objectData} videoObjectData
+ * @typedef {objectData} videoObjectData Base parameters for gdjs.VideoRuntimeObject
  * @property {Object} content The base parameters of the video
  * @property {number} content.opacity The opacity of the video
  * @property {boolean} content.loop Does the video loops itself?

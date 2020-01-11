@@ -11,13 +11,15 @@
  */
 
 /**
- * @typedef {objectData} shapePainterObjectData Base parameters for gdjs.ShapePainterRuntimeObject
+ * @typedef {Object} shapePainterObjectDataType Base parameters for gdjs.ShapePainterRuntimeObject
  * @property {Color} fillColor The color as RGB representation of the inner part of the painted shape
  * @property {Color} outlineColor The color as RGB representation of the outter part of the painted shape
  * @property {number} fillOpacity The opacity of the inner part of the painted shape
  * @property {number} outlineOpacity The opacity of the outter part of the painted shape
  * @property {number} outlineSize The size of the outter part of the painted shape
  * @property {number} absoluteCoordinates The absolute coordinates
+ * 
+ * @typedef {objectData & shapePainterObjectDataType} shapePainterObjectData
  */
 
 /**

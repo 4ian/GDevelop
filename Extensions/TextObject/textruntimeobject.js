@@ -4,7 +4,7 @@
  */
 
 /**
- * @typedef {objectData} textObjectData Base parameters for gdjs.TextRuntimeObject
+ * @typedef {Object} textObjectDataType Base parameters for gdjs.TextRuntimeObject
  * @property {number} characterSize The size of the characters
  * @property {string} font The font name
  * @property {boolean} bold Is Bold?
@@ -15,6 +15,8 @@
  * @property {number} color.g The Green level from 0 to 255
  * @property {number} color.b The Blue level from 0 to 255
  * @property {string} string The text of the object
+ * 
+ * @typedef {objectData & textObjectDataType} textObjectData
  */
 
 /**

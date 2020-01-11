@@ -4,9 +4,11 @@
  */
 
 /**
- * @typedef {objectData} tiledSpriteObjectData Base parameters for gdjs.VideoRuntimeObject
+ * @typedef {Object} tiledSpriteObjectDataType Base parameters for gdjs.VideoRuntimeObject
  * @property {number} width The widht of the object
  * @property {number} height The height of the object
+ * 
+ * @typedef {objectData & tiledSpriteObjectDataType} tiledSpriteObjectData
  */
 
 /**

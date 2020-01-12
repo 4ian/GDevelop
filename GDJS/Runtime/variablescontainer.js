@@ -31,7 +31,7 @@ gdjs.VariablesContainer._deletedVars = gdjs.VariablesContainer._deletedVars || [
  * if `keepOldVariables` is set to true, already existing variables won't be erased and will be
  * still accessible thanks to getFromIndex.
  *
- * @param {Array<VariableData>} data The Array containing representations of the base variables.
+ * @param {Array<VariableData>} data The array containing data used to initialize variables.
  * @param {Boolean} [keepOldVariables] If set to true, already existing variables won't be erased.
  */
 gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {

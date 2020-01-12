@@ -9,8 +9,8 @@
  * @class TextEntryRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
- * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {ObjectData} textEntryObjectData The Optional object Data
+ * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {ObjectData} shapePainterObjectData The initial properties of the object
  */
 gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 {

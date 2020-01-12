@@ -25,7 +25,7 @@
  * @memberof gdjs
  * @class TextRuntimeObject
  * @extends RuntimeObject
- * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
  * @param {TextObjectData} textObjectData The initial properties of the object
  */
 gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)

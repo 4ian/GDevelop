@@ -33,7 +33,7 @@ Extensions do have the same distinction between the "**IDE**" part and the "**Ru
 In GDevelop, developers can associate and manipulate variables in their games. To represent them, we have two things:
 
 * The **editor** `gd::Variable` that is part of the structure of the game, so living in [GDCore in Variable.h](https://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_variable.html). This is what is shown in the editor, saved on disk in the project file.
-* The **game engine** variable, called `gdjs.Variable` in GDJS. [Documentation is in the GDJS **game engine**](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/gdjs.Variable.html). This JavaScript class is what is used during a game.
+* The **game engine** variable, called `gdjs.Variable` in GDJS. [Documentation is in the GDJS **game engine**](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/gdjs.Variable.html). This JavaScript class is what is used during a game.
 
 The editor `gd::Variable` **know nothing** about the game engine class `gdjs.Variable`. And the `gdjs.Variable` class in the game engine know almost nothing from `gd::Variable` (apart from how it's written in JSON, to be able to load a game default variables).
 
@@ -57,7 +57,7 @@ The game engine is in GDJS/Runtime and is all JavaScript.
 
 ## What about events?
 
-An "**event**" is by default something that [is mostly empty](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_base_event.html). In a more traditional programming language, an event can be seen as a scope or block (example: `{ some code here }` in a C style language like JavaScript, Java or C++).
+An "**event**" is by default something that [is mostly empty](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_base_event.html). In a more traditional programming language, an event can be seen as a scope or block (example: `{ some code here }` in a C style language like JavaScript, Java or C++).
 
 [Default events are defined](https://github.com/4ian/GDevelop/tree/master/Core/GDCore/Events/Builtin) in GDevelop Core.
 In particular, there is StandardEvent, which has conditions and actions. Conditions and actions are both a list of [`gd::Instruction`](https://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_instruction.html). A `gd::Instruction` is either a condition or an action (it depends only on the context where they are used).

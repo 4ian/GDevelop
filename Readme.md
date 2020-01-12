@@ -28,7 +28,7 @@ Overview of the architecture
 
 To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 
-A pre-generated documentation of the Core library, C++ and JS game engines is [available here](http://4ian.github.io/GD-Documentation).
+A pre-generated documentation of the Core library, C++ and JS game engines is [available here](https://docs.gdevelop-app.com).
 
 Links
 -----

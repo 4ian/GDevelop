@@ -50,7 +50,7 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
 > ℹ️ Implement your extension in file called `extensionnametools.js` (for general functions), `objectnameruntimeobject.js` (for objects) or `behaviornameruntimebehavior.js` (for behaviors). See then the next section for declaring these files and the content of the extension to the IDE.
 
-Check the [GDJS game engine documentation here](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed. Files for the game engine should [mostly be written in JavaScript "ES5 flavor" (i.e: usual, classic good old JavaScript) (click to learn more)](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
+Check the [GDJS game engine documentation here](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed. Files for the game engine should [mostly be written in JavaScript "ES5 flavor" (i.e: usual, classic good old JavaScript) (click to learn more)](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
 
 #### How to create functions to be called by events
 
@@ -89,16 +89,16 @@ The API to declare extensions is almost 100% equivalent to the way extensions ar
 
 #### Declare the extension information
 
-Use [`extension.setExtensionInformation`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#ac53e5af617a9ed91c280d652899557c3) to declare basic information about your extension.
+Use [`extension.setExtensionInformation`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#ac53e5af617a9ed91c280d652899557c3) to declare basic information about your extension.
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
 
 #### Declare actions, conditions and expressions
 
-Use [`addAction`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a34e95be54f2dfa80b804e8e4830e7d9c), `addCondition`, `addExpression` or `addStrExpression` to declare actions, conditions or expressions.
+Use [`addAction`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#a34e95be54f2dfa80b804e8e4830e7d9c), `addCondition`, `addExpression` or `addStrExpression` to declare actions, conditions or expressions.
 
-- Chain calls to [`addParameter`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
-- Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
+- Chain calls to [`addParameter`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
+- Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
 
 > You can call these functions on the `extension` object, or on the objects returned by `extension.addObject` (for objects) or `extension.addBehavior` (for behaviors). See below.
 
@@ -108,7 +108,7 @@ Use [`addAction`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/
 
 #### Declare behaviors
 
-Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a75992fed9afce730db56af9d4d8177ca). The last two parameters are the `gd.Behavior` and the `gd.BehaviorsSharedData` object representing the behavior and its (optional) shared data
+Add a behavior using [`addBehavior`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#a75992fed9afce730db56af9d4d8177ca). The last two parameters are the `gd.Behavior` and the `gd.BehaviorsSharedData` object representing the behavior and its (optional) shared data
 
 - For the behavior, create a `new gd.BehaviorJsImplementation()` and define `initializeContent`, `updateProperty` and `getProperties`.
 - For the shared data (which are properties shared between all behaviors of the same type), if you don't have the need for it, just pass `new gd.BehaviorsSharedData()`. If you need shared data, create a `new gd.BehaviorSharedDataJsImplementation()` and define `initializeContent`, `updateProperty` and `getProperties`.
@@ -119,7 +119,7 @@ Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCo
 
 #### Declare objects
 
-Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last parameter is the `gd.Object` representing the object:
+Add an object using [`addObject`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last parameter is the `gd.Object` representing the object:
 
 - Create a `new gd.ObjectJsImplementation()` and define `updateProperty` and `getProperties` (for the object properties) and `updateInitialInstanceProperty` and `getInitialInstanceProperties` (for the optional properties that are attached to each instance).
 
@@ -152,7 +152,7 @@ Finally, to have the instances of your object displayed properly on the scene ed
 
 #### Declare effects
 
-Add an effect using [`addEffect`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html) in your _JsExtension.js_ file.
+Add an effect using [`addEffect`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html) in your _JsExtension.js_ file.
 
 > 👉 See an example in the [Effects extension _JsExtension.js_ file](../Extensions/Effects/JsExtension.js). Learn more about [properties here](docs/Properties-schema-and-PropertiesEditor-explanations.md).
 

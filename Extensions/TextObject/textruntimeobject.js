@@ -20,13 +20,13 @@
  */
 
 /**
- * Displays a text on the screen.
+ * Displays a text.
  *
  * @memberof gdjs
  * @class TextRuntimeObject
  * @extends RuntimeObject
- * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {TextObjectData} textObjectData The Optional object Data
+ * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {TextObjectData} textObjectData The initial properties of the object
  */
 gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 {
@@ -197,7 +197,7 @@ gdjs.TextRuntimeObject.prototype.getString = function() {
 
 /**
  * Set the string displayed by the object.
- * @param {String} str The new text
+ * @param {string} str The new text
  */
 gdjs.TextRuntimeObject.prototype.setString = function(str) {
     if ( str === this._str ) return;
@@ -233,7 +233,7 @@ gdjs.TextRuntimeObject.prototype.isBold = function() {
 
 /**
  * Set bold for the object text.
- * @param enable {Boolean} true to have a bold text, false otherwise.
+ * @param enable {boolean} true to have a bold text, false otherwise.
  */
 gdjs.TextRuntimeObject.prototype.setBold = function(enable) {
     this._bold = enable;
@@ -249,7 +249,7 @@ gdjs.TextRuntimeObject.prototype.isItalic = function() {
 
 /**
  * Set italic for the object text.
- * @param enable {Boolean} true to have an italic text, false otherwise.
+ * @param enable {boolean} true to have an italic text, false otherwise.
  */
 gdjs.TextRuntimeObject.prototype.setItalic = function(enable) {
     this._italic = enable;
@@ -370,7 +370,7 @@ gdjs.TextRuntimeObject.prototype.isWrapping = function() {
 
 /**
  * Set word wrapping for the object text.
- * @param {Boolean} enable true to enable word wrapping, false to disable it.
+ * @param {boolean} enable true to enable word wrapping, false to disable it.
  */
 gdjs.TextRuntimeObject.prototype.setWrapping = function(enable) {
     this._wrapping = enable;

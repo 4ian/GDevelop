@@ -16,7 +16,9 @@
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "plugins": [
-        "plugins/markdown"
+        "plugins/markdown",
+        "../node_modules/jsdoc-plugin-intersection",
+        "../node_modules/jsdoc-autoprivate"
     ],
     "templates": {
         "default"       : {
@@ -24,7 +26,7 @@
         },
         "applicationName": "GDevelop JS Runtime",
         "footer"        : "Made with ♥ by Florian Rival and contributors (gdevelop-app.com)",
-        "copyright"     : "GDevelop Copyright © 2008-2018 Florian Rival",
+        "copyright"     : "GDevelop Copyright © 2008-present Florian Rival",
         "googleAnalytics": "TODO",
         "openGraph": {
             "title": "GDevelop JS Runtime Documentation",

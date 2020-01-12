@@ -9,7 +9,7 @@
  * @property {number} content.fontSize The size of the text
  * @property {boolean} content.wordWrap Activate word wrap if set to true
  * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
- * 
+ *
  * @typedef {ObjectData & BBTextObjectDataType} BBTextObjectData
  */
 

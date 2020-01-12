@@ -8,8 +8,8 @@
  * FontFaceObserverFontManager loads fonts (using fontfaceobserver library)
  * from the game resources (see `loadFonts`), and allow to access to
  * the font families of the loaded fonts during the game (see `getFontFamily`).
- * 
- * @font-face declarations must be have been added separately in the index.html
+ *
+ * "@font-face" declarations must be have been added separately in the index.html
  * (or any CSS file).
  *
  * @class FontFaceObserverFontManager
@@ -30,7 +30,7 @@ gdjs.FontManager = gdjs.FontFaceObserverFontManager; //Register the class to let
  * The font resource must have been loaded before. If that's not the case,
  * a font family will be returned but without guarantee of it being loaded (to
  * keep compatibility with GDevelop 5.0-beta56 and previous).
- * 
+ *
  * @param {string} resourceName The name of the resource to get.
  * @returns {string} The font family to be used for this font resource,
  * or "Arial" if `resourceName` is empty.
@@ -40,8 +40,8 @@ gdjs.FontFaceObserverFontManager.prototype.getFontFamily = function(resourceName
         return this._loadedFontFamily[resourceName];
     }
 
-    return resourceName ? 
-        gdjs.FontFaceObserverFontManager._getFontFamilyFromFilename(resourceName) : 
+    return resourceName ?
+        gdjs.FontFaceObserverFontManager._getFontFamilyFromFilename(resourceName) :
         'Arial';
 }
 
@@ -50,9 +50,9 @@ gdjs.FontFaceObserverFontManager.prototype.getFontFamily = function(resourceName
  * The font resource must have been loaded before. If that's not the case,
  * the resource name will be returned (to
  * keep compatibility with GDevelop 5.0-beta56 and previous).
- * 
+ *
  * Should only be useful for renderers running on a non HTML5/non browser environment.
- * 
+ *
  * @param {string} resourceName The name of the resource to get.
  * @returns {string} The file of the font resource.
  */
@@ -67,7 +67,7 @@ gdjs.FontFaceObserverFontManager.prototype.getFontFile = function(resourceName) 
 /**
  * Return the font family for a given filename.
  * Should be kept in sync with the declaration of "@font-face" during exports.
- * 
+ *
  * @private
  * @param {string} filename The filename of the font
  * @returns {string} The font family to be used for this font resource.

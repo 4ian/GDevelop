@@ -28,7 +28,7 @@
  * @class ShapePainterRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
- * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
  * @param {ShapePainterObjectData} shapePainterObjectData The initial properties of the object
  */
 gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)

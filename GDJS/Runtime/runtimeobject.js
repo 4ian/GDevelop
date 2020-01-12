@@ -109,8 +109,19 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
         this._timers.clear();
 };
 
-gdjs.RuntimeObject.identifiers = gdjs.RuntimeObject.identifiers || new Hashtable();
-gdjs.RuntimeObject.newId = (gdjs.RuntimeObject.newId || 0);
+/**
+ * Please do not use, this is an internal value
+ * @static
+ * @protected
+ */
+gdjs.RuntimeObject._identifiers = gdjs.RuntimeObject._identifiers || new Hashtable();
+
+/**
+ * Please do not use, this is an internal value
+ * @static
+ * @protected
+ */
+gdjs.RuntimeObject._newId = (gdjs.RuntimeObject._newId || 0);
 
 gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avoiding recreating forces each tick.
 
@@ -329,7 +340,8 @@ gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeS
 
     var newAngle = this.getAngle() + (diffWasPositive ? -1.0 : 1.0)
         * speed * this.getElapsedTime(runtimeScene) / 1000;
-    if (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0 !== diffWasPositive)
+    // @ts-ignore
+    if (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0 ^ diffWasPositive)
         newAngle = angle;
     this.setAngle(newAngle);
 
@@ -1454,18 +1466,18 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
  * @static
  */
 gdjs.RuntimeObject.getNameIdentifier = function(name) {
-    gdjs.RuntimeObject.identifiers =
-        gdjs.RuntimeObject.identifiers
+    gdjs.RuntimeObject._identifiers =
+        gdjs.RuntimeObject._identifiers
         || new Hashtable();
 
-    if ( gdjs.RuntimeObject.identifiers.containsKey(name) )
-        return gdjs.RuntimeObject.identifiers.get(name);
+    if ( gdjs.RuntimeObject._identifiers.containsKey(name) )
+        return gdjs.RuntimeObject._identifiers.get(name);
 
-    gdjs.RuntimeObject.newId =
-        (gdjs.RuntimeObject.newId || 0) + 1;
-    var newIdentifier = gdjs.RuntimeObject.newId;
+    gdjs.RuntimeObject._newId =
+        (gdjs.RuntimeObject._newId || 0) + 1;
+    var newIdentifier = gdjs.RuntimeObject._newId;
 
-    gdjs.RuntimeObject.identifiers.put(name, newIdentifier);
+    gdjs.RuntimeObject._identifiers.put(name, newIdentifier);
     return newIdentifier;
 };
 

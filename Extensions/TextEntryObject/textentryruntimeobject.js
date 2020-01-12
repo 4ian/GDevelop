@@ -9,16 +9,23 @@
  * @class TextEntryRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {ObjectData} textEntryObjectData The initial properties of the object
  */
-gdjs.TextEntryRuntimeObject = function(runtimeScene, objectData)
+gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, textEntryObjectData);
+
+    /** @type {string} */
     this._str = "";
+
+    /** @type {boolean} */
     this._activated = true;
 
     if (this._renderer)
         gdjs.TextEntryRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.TextEntryRuntimeObjectRenderer} */
         this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this, runtimeScene);
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

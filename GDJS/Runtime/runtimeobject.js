@@ -1,7 +1,17 @@
+// @ts-check
+
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
+ */
+
+/**
+ * @typedef {Object} ObjectData Object containing initial properties for all objects extending gdjs.RuntimeObject
+ * @property {string} name The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example).
+ * @property {string} type The object type.
+ * @property {Array<VariableData>} variables The list of default variables.
+ * @property {Array<BehaviorData>} behaviors The list of default behaviors.
  */
 
 /**
@@ -14,13 +24,14 @@
  * However, you should not be calling the constructor on an already existing object
  * which is not a RuntimeObject.
  *
- * A `gdjs.RuntimeObject` should not be instanciated directly, always a child class
+ * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
  * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
  *
- * @memberof gdjs
- * @class RuntimeObject
- * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
- * @param objectData The data defining the object
+ * @memberOf gdjs
+ * @name RuntimeObject
+ * @class
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
+ * @param {ObjectData} objectData The initial properties of the object.
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {
@@ -64,7 +75,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
         this.clearForces();
 
     //A force returned by getAverageForce method:
-    if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,false);
+    if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,0);
 
     //Behaviors:
     if (this._behaviors === undefined)
@@ -99,7 +110,26 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
         this._timers.clear();
 };
 
-gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avoiding recreating forces each tick.
+/**
+ * Table containing the id corresponding to an object name. Do not use directly or modify.
+ * @static
+ * @private
+ */
+gdjs.RuntimeObject._identifiers = gdjs.RuntimeObject._identifiers || new Hashtable();
+
+/**
+ * The next available unique identifier for an object. Do not use directly or modify. 
+ * @static
+ * @private
+ */
+gdjs.RuntimeObject._newId = (gdjs.RuntimeObject._newId || 0);
+
+/**
+ * Global container for unused forces, avoiding recreating forces each tick.
+ * @static
+ * @private
+ */
+gdjs.RuntimeObject.forcesGarbage = []; 
 
 //Common members functions related to the object and its runtimeScene :
 
@@ -316,11 +346,12 @@ gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeS
 
     var newAngle = this.getAngle() + (diffWasPositive ? -1.0 : 1.0)
         * speed * this.getElapsedTime(runtimeScene) / 1000;
+    // @ts-ignore
     if (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0 ^ diffWasPositive)
         newAngle = angle;
     this.setAngle(newAngle);
 
-    if (this.getAngle() != newAngle) //Objects like sprite in 8 directions does not handle small increments...
+    if (this.getAngle() !== newAngle) //Objects like sprite in 8 directions does not handle small increments...
         this.setAngle(angle); //...so force them to be in the path angle anyway.
 };
 
@@ -664,11 +695,11 @@ gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, multipl
  * @param {number} len The force length, in pixels.
  * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, multiplier) {
-    if ( obj == null ) return;
+gdjs.RuntimeObject.prototype.addForceTowardObject = function(object, len, multiplier) {
+    if ( object == null ) return;
 
-    this.addForceTowardPosition(obj.getDrawableX() + obj.getCenterX(),
-                                obj.getDrawableY() + obj.getCenterY(),
+    this.addForceTowardPosition(object.getDrawableX() + object.getCenterX(),
+                                object.getDrawableY() + object.getCenterY(),
                                 len, multiplier);
 };
 
@@ -700,7 +731,7 @@ gdjs.RuntimeObject.prototype.updateForces = function(elapsedTime) {
             ++i;
         } else if (multiplier === 0 || force.getLength() <= 0.001) { // Instant or force disappearing
             gdjs.RuntimeObject.forcesGarbage.push(force);
-            this._forces.remove(i);
+            this._forces.splice(i, 1);
         } else { // Deprecated way of updating forces progressively.
             force.setLength(force.getLength() - force.getLength() * ( 1 - multiplier ) * elapsedTime);
             ++i;
@@ -1260,23 +1291,23 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
             if ( this.getDrawableX()+this.getCenterX() < objects[i].getDrawableX()+objects[i].getCenterX() )
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getX();
-                this.addForce( -av - 10, 0, false );
+                this.addForce( -av - 10, 0, 0 );
             }
             else
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getX();
-                this.addForce( -av + 10, 0, false );
+                this.addForce( -av + 10, 0, 0 );
             }
 
             if ( this.getDrawableY()+this.getCenterY() < objects[i].getDrawableY()+objects[i].getCenterY() )
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getY();
-                this.addForce( 0, -av - 10, false );
+                this.addForce( 0, -av - 10, 0 );
             }
             else
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getY();
-                this.addForce( 0, -av + 10, false );
+                this.addForce( 0, -av + 10, 0 );
             }
         }
     }
@@ -1431,28 +1462,29 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
     }
 
     return false;
-}
+};
 
 
 /**
- * Get the identifier associated to an object name :<br>
+ * Get the identifier associated to an object name.
  * Some features may want to compare objects name a large number of time. In this case,
- * it may be more efficient to compare objects name identifier.
+ * it may be more efficient to compare objects name identifiers.
+ *
  * @static
  */
 gdjs.RuntimeObject.getNameIdentifier = function(name) {
-    gdjs.RuntimeObject.getNameIdentifier.identifiers =
-        gdjs.RuntimeObject.getNameIdentifier.identifiers
+    gdjs.RuntimeObject._identifiers =
+        gdjs.RuntimeObject._identifiers
         || new Hashtable();
 
-    if ( gdjs.RuntimeObject.getNameIdentifier.identifiers.containsKey(name) )
-        return gdjs.RuntimeObject.getNameIdentifier.identifiers.get(name);
+    if ( gdjs.RuntimeObject._identifiers.containsKey(name) )
+        return gdjs.RuntimeObject._identifiers.get(name);
 
-    gdjs.RuntimeObject.getNameIdentifier.newId =
-        (gdjs.RuntimeObject.getNameIdentifier.newId || 0) + 1;
-    var newIdentifier = gdjs.RuntimeObject.getNameIdentifier.newId;
+    gdjs.RuntimeObject._newId =
+        (gdjs.RuntimeObject._newId || 0) + 1;
+    var newIdentifier = gdjs.RuntimeObject._newId;
 
-    gdjs.RuntimeObject.getNameIdentifier.identifiers.put(name, newIdentifier);
+    gdjs.RuntimeObject._identifiers.put(name, newIdentifier);
     return newIdentifier;
 };
 

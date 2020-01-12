@@ -4,22 +4,53 @@
  */
 
 /**
+ * @typedef {Object} PanelSpriteObjectDataType
+ * @property {number} rightMargin The right margin
+ * @property {number} leftMargin The left margin
+ * @property {number} topMargin The top margin
+ * @property {number} bottomMargin The bottom margin
+ * @property {boolean} [tiled] Are the central part and borders tiled?
+ * @property {number} width The object width
+ * @property {number} height The object height
+ * @property {string} texture The name of the resource containing the texture to use
+ * 
+ * @typedef {ObjectData & PanelSpriteObjectDataType} PanelSpriteObjectData
+ */
+
+/**
  * The PanelSpriteRuntimeObject displays a tiled texture.
  *
  * @class PanelSpriteRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {PanelSpriteObjectData} panelSpriteObjectData The initial properties of the object
  */
-gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData) {
-  gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {
+  gdjs.RuntimeObject.call(this, runtimeScene, panelSpriteObjectData);
 
-  this._rBorder = objectData.rightMargin;
-  this._lBorder = objectData.leftMargin;
-  this._tBorder = objectData.topMargin;
-  this._bBorder = objectData.bottomMargin;
-  this._tiled = objectData.tiled;
-  this._width = objectData.width;
-  this._height = objectData.height;
+  /** @type {number} */
+  this._rBorder = panelSpriteObjectData.rightMargin;
+
+  /** @type {number} */
+  this._lBorder = panelSpriteObjectData.leftMargin;
+
+  /** @type {number} */
+  this._tBorder = panelSpriteObjectData.topMargin;
+
+  /** @type {number} */
+  this._bBorder = panelSpriteObjectData.bottomMargin;
+
+  /** @type {boolean} */
+  this._tiled = panelSpriteObjectData.tiled;
+
+  /** @type {number} */
+  this._width = panelSpriteObjectData.width;
+
+  /** @type {number} */
+  this._height = panelSpriteObjectData.height;
+
+  /** @type {number} */
   this.opacity = 255;
 
   if (this._renderer) {
@@ -27,15 +58,16 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData) {
       this._renderer,
       this,
       runtimeScene,
-      objectData.texture,
-      objectData.tiled
+      panelSpriteObjectData.texture,
+      panelSpriteObjectData.tiled
     );
   } else {
+    /** @type {gdjs.PanelSpriteRuntimeObjectRenderer} */
     this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(
       this,
       runtimeScene,
-      objectData.texture,
-      objectData.tiled
+      panelSpriteObjectData.texture,
+      panelSpriteObjectData.tiled
     );
   }
 

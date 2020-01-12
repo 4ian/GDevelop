@@ -4,45 +4,110 @@
  */
 
 /**
- * Displays a text on the screen.
+ * @typedef {Object} TextObjectDataType Base parameters for gdjs.TextRuntimeObject
+ * @property {number} characterSize The size of the characters
+ * @property {string} font The font name
+ * @property {boolean} bold Is Bold?
+ * @property {boolean} italic Is Italic?
+ * @property {boolean} underlined Is Underlined?
+ * @property {Object} color The text color in an RGB representation
+ * @property {number} color.r The Red level from 0 to 255
+ * @property {number} color.g The Green level from 0 to 255
+ * @property {number} color.b The Blue level from 0 to 255
+ * @property {string} string The text of the object
+ * 
+ * @typedef {ObjectData & TextObjectDataType} TextObjectData
+ */
+
+/**
+ * Displays a text.
  *
  * @memberof gdjs
  * @class TextRuntimeObject
  * @extends RuntimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {TextObjectData} textObjectData The initial properties of the object
  */
-gdjs.TextRuntimeObject = function(runtimeScene, objectData)
+gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 {
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
+    /** @type {number} */
     this._characterSize = Math.max(1, objectData.characterSize);
+
+    /** @type {string} */
     this._fontName = objectData.font;
+
+    /** @type {boolean} */
     this._bold = objectData.bold;
+
+    /** @type {boolean} */
     this._italic = objectData.italic;
+
+    /** @type {boolean} */
     this._underlined = objectData.underlined;
+
+    /** @type {Array<number>} */
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+
+    /** @type {boolean} */
     this._useGradient = false;
+
+    /** @type {Array} */
     this._gradient = [];
+
+    /** @type {string} */
     this._gradientType = '';
+
+    /** @type {number} */
     this.opacity = 255;
+
+    /** @type {string} */
     this._textAlign = 'left';
+
+    /** @type {boolean} */
     this._wrapping = false;
+
+    /** @type {number} */
     this._wrappingWidth = 1;
+
+    /** @type {number} */
     this._outlineThickness = 0;
+
+    /** @type {Array<number>} */
     this._outlineColor = [255,255,255];
+
+    /** @type {boolean} */
     this._shadow = false;
+
+    /** @type {Array<number>} */
     this._shadowColor = [0,0,0];
+
+    /** @type {number} */
     this._shadowDistance = 1;
+
+    /** @type {number} */
     this._shadowBlur = 1;
+
+    /** @type {number} */
     this._shadowAngle = 0;
+
+    /** @type {number} */
     this._padding = 5;
+
+    /** @type {number} */
     this._scaleX = 1;
+
+    /** @type {number} */
     this._scaleY = 1;
 
+    /** @type {string} */
     this._str = objectData.string;
 
     if (this._renderer)
         gdjs.TextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.TextRuntimeObjectRenderer} */
         this._renderer = new gdjs.TextRuntimeObjectRenderer(this, runtimeScene);
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -132,7 +197,7 @@ gdjs.TextRuntimeObject.prototype.getString = function() {
 
 /**
  * Set the string displayed by the object.
- * @param {String} str The new text
+ * @param {string} str The new text
  */
 gdjs.TextRuntimeObject.prototype.setString = function(str) {
     if ( str === this._str ) return;
@@ -168,7 +233,7 @@ gdjs.TextRuntimeObject.prototype.isBold = function() {
 
 /**
  * Set bold for the object text.
- * @param enable {Boolean} true to have a bold text, false otherwise.
+ * @param enable {boolean} true to have a bold text, false otherwise.
  */
 gdjs.TextRuntimeObject.prototype.setBold = function(enable) {
     this._bold = enable;
@@ -184,7 +249,7 @@ gdjs.TextRuntimeObject.prototype.isItalic = function() {
 
 /**
  * Set italic for the object text.
- * @param enable {Boolean} true to have an italic text, false otherwise.
+ * @param enable {boolean} true to have an italic text, false otherwise.
  */
 gdjs.TextRuntimeObject.prototype.setItalic = function(enable) {
     this._italic = enable;
@@ -305,7 +370,7 @@ gdjs.TextRuntimeObject.prototype.isWrapping = function() {
 
 /**
  * Set word wrapping for the object text.
- * @param {Boolean} enable true to enable word wrapping, false to disable it.
+ * @param {boolean} enable true to enable word wrapping, false to disable it.
  */
 gdjs.TextRuntimeObject.prototype.setWrapping = function(enable) {
     this._wrapping = enable;

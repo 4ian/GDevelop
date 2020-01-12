@@ -125,7 +125,7 @@ gdjs.Polygon.createRectangle = function(width, height) {
  * Based on <a href="http://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection">this</a>
  * and <a href="http://stackoverflow.com/questions/5742329/problem-with-collision-response-sat">this</a> article.
  *
- * @return {boolean} true if polygons are overlapping
+ * @return {{collision: boolean, move_axis: Array<number>}} returnValue.collision is equal to true if polygons are overlapping
  * @param {gdjs.Polygon} p1 The first polygon
  * @param {gdjs.Polygon} p2 The second polygon
  * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the polygons actually overlapping, won't be considered in collision.
@@ -138,17 +138,18 @@ gdjs.Polygon.collisionTest = function(p1, p2, ignoreTouchingEdges) {
 
     var edge = gdjs.Polygon.collisionTest._statics.edge;
     var move_axis = gdjs.Polygon.collisionTest._statics.move_axis;
-		var result = gdjs.Polygon.collisionTest._statics.result;
-		var minDist = Number.MAX_VALUE;
 
-		edge[0] = 0;
-		edge[1] = 0;
-		edge[0] = 0;
-		edge[1] = 0;
+    var result = gdjs.Polygon.collisionTest._statics.result;
+    var minDist = Number.MAX_VALUE;
 
-		result.collision = false;
-		result.move_axis[0] = 0;
-		result.move_axis[1] = 0;
+    edge[0] = 0;
+    edge[1] = 0;
+    edge[0] = 0;
+    edge[1] = 0;
+
+    result.collision = false;
+    result.move_axis[0] = 0;
+    result.move_axis[1] = 0;
 
     //Iterate over all the edges composing the polygons
     for (var i = 0, len1 = p1.vertices.length, len2 = p2.vertices.length; i < len1+len2; i++) {

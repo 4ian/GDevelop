@@ -1,34 +1,52 @@
 /**
+ * @typedef {Object} BBTextObjectDataType Base parameters for {@link gdjs.BBTextRuntimeObject}
+ * @property {Object} content The base parameters of the BBText
+ * @property {number} content.opacity The opacity of the BBText
+ * @property {boolean} content.visible Is the text visible?
+ * @property {string} content.text Content of the text
+ * @property {string} content.color The color of the text
+ * @property {string} content.fontFamily The font of the text
+ * @property {number} content.fontSize The size of the text
+ * @property {boolean} content.wordWrap Activate word wrap if set to true
+ * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
+ * 
+ * @typedef {ObjectData & BBTextObjectDataType} BBTextObjectData
+ */
+
+/**
  * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
  * @memberof gdjs
  * @class BBTextRuntimeObject
  * @extends RuntimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {BBTextObjectData} objectData The object data used to initialize the object
  */
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  /** @type number */
+  /** @type {number} */
   this._opacity = objectData.content.opacity;
-  /** @type boolean */
+  /** @type {boolean} */
   this._visible = objectData.content.visible;
-  /** @type string */
+  /** @type {string} */
   this._text = objectData.content.text;
-  /** @type string */
+  /** @type {string} */
   this._color = objectData.content.color;
-  /** @type string */
+  /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
-  /** @type number */
+  /** @type {number} */
   this._fontSize = objectData.content.fontSize;
-  /** @type boolean */
+  /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
-  /** @type number */
+  /** @type {number} */
   this._wrappingWidth = 250; // This value is the default wrapping width of the runtime object.
-  /** @type string */
+  /** @type {string} */
   this._align = objectData.content.align;
 
   if (this._renderer)
     gdjs.BBTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else
+    /** @type {gdjs.BBTextRuntimeObjectRenderer} */
     this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -48,9 +66,7 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
-gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
-  initialInstanceData
-) {
+gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
   // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
   if (initialInstanceData.customSize)
     this.setWrappingWidth(initialInstanceData.width);

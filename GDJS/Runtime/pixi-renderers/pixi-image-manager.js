@@ -26,7 +26,8 @@ gdjs.ImageManager = gdjs.PixiImageManager; //Register the class to let the engin
 /**
  * Return the PIXI texture associated to the specified resource name.
  * Returns a placeholder texture if not found.
- * @param {string} resourceName The name of the resource to get.
+ * @param {string} resourceName The name of the resource
+ * @returns {PIXI.Texture} The requested texture, or a placeholder if not found.
  */
 gdjs.PixiImageManager.prototype.getPIXITexture = function(resourceName) {
 	if ( this._loadedTextures.containsKey(resourceName) ) {

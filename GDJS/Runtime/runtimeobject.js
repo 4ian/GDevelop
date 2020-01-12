@@ -7,11 +7,11 @@
  */
 
 /**
- * @typedef {Object} ObjectData Base parameters for all gdjs.RuntimeObject
- * @property {string} name The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example)
- * @property {string} type The object Type. Used to get the constructor from gdjs
- * @property {Array<VariableData>} variables The list of default variables
- * @property {Array<BehaviorData>} behaviors The list of default behaviors
+ * @typedef {Object} ObjectData Object containing initial properties for all objects extending gdjs.RuntimeObject
+ * @property {string} name The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example).
+ * @property {string} type The object type.
+ * @property {Array<VariableData>} variables The list of default variables.
+ * @property {Array<BehaviorData>} behaviors The list of default behaviors.
  */
 
 /**
@@ -29,8 +29,8 @@
  *
  * @memberOf gdjs
  * @class RuntimeObject
- * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
- * @param {ObjectData} objectData The data defining the object
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
+ * @param {ObjectData} objectData The initial properties of the object.
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {
@@ -110,20 +110,25 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
 };
 
 /**
- * Please do not use, this is an internal value
+ * Table containing the id corresponding to an object name. Do not use directly or modify.
  * @static
- * @protected
+ * @private
  */
 gdjs.RuntimeObject._identifiers = gdjs.RuntimeObject._identifiers || new Hashtable();
 
 /**
- * Please do not use, this is an internal value
+ * The next available unique identifier for an object. Do not use directly or modify. 
  * @static
- * @protected
+ * @private
  */
 gdjs.RuntimeObject._newId = (gdjs.RuntimeObject._newId || 0);
 
-gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avoiding recreating forces each tick.
+/**
+ * Global container for unused forces, avoiding recreating forces each tick.
+ * @static
+ * @private
+ */
+gdjs.RuntimeObject.forcesGarbage = []; 
 
 //Common members functions related to the object and its runtimeScene :
 
@@ -1460,9 +1465,10 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
 
 
 /**
- * Get the identifier associated to an object name :<br>
+ * Get the identifier associated to an object name.
  * Some features may want to compare objects name a large number of time. In this case,
- * it may be more efficient to compare objects name identifier.
+ * it may be more efficient to compare objects name identifiers.
+ *
  * @static
  */
 gdjs.RuntimeObject.getNameIdentifier = function(name) {

@@ -16,7 +16,7 @@
  * @class RuntimeBehavior
  * @memberof gdjs
  * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object of the behavior
- * @param {behaviorData} behaviorData The object used to setup the behavior
+ * @param {BehaviorData} behaviorData The object used to setup the behavior
  * @param {gdjs.RuntimeObject} owner The object owning the behavior
  */
 gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)

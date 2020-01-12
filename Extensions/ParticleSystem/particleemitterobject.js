@@ -4,11 +4,9 @@
  * This project is released under the MIT License.
 */
 
-
-// FIX-ME @4ian correct with real types (thoose are assunmptions only) and add desciptions
 /**
  * @typedef {Object} ParticleEmitterObjectDataType
- * @property {number} emissionEditionSimpleMode
+ * @property {boolean} emissionEditionSimpleMode
  * @property {number} emitterAngleA
  * @property {number} emitterAngleB
  * @property {number} emitterForceMin
@@ -46,8 +44,8 @@
  * @memberof gdjs
  * @class ParticleEmitterObject
  * @extends RuntimeObject
- * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {ParticleEmitterObjectData} particleObjectData The Optional object Data
+ * @param {gdjs.runtimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {ParticleEmitterObjectData} particleObjectData The initial properties of the object
  */
 gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
     gdjs.RuntimeObject.call(this, runtimeScene, particleObjectData);
@@ -55,7 +53,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
     /** @type {gdjs.ParticleEmitterObjectRenderer} */
     this._renderer = new gdjs.ParticleEmitterObjectRenderer(runtimeScene, this, particleObjectData);
 
-    /** @type {number} */
+    /** @type {boolean} */
     this.singleAngle = particleObjectData.emissionEditionSimpleMode;
 
     /** @type {number} */

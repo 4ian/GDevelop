@@ -1,5 +1,5 @@
 /**
- * @typedef {Object} VideoObjectDataType Base parameters for {@link gdjs.VideoRuntimeObject}
+ * @typedef {Object} VideoObjectDataType The initial properties for {@link gdjs.VideoRuntimeObject}
  * @property {Object} content The base parameters of the video
  * @property {number} content.opacity The opacity of the video
  * @property {boolean} content.loop Does the video loops itself?
@@ -209,7 +209,7 @@ gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
 
 /**
  * Set the volume of the video object.
- * @param {number} volume The new volume.
+ * @param {number} volume The new volume, between o and 100.
  */
 gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
   this._volume =
@@ -219,7 +219,7 @@ gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
 
 /**
  * Get the volume of the video object.
- * @returns {number} The current video's volume
+ * @returns {number} The current video's volume, betwenn 0 and 100.
  */
 gdjs.VideoRuntimeObject.prototype.getVolume = function() {
   return this._normalize(this._renderer.getVolume(), 0, 1) * 100;

@@ -18,7 +18,7 @@
  *
  * @memberOf gdjs
  * @class Variable
- * @param {VariableData} [varData] Object containing the objects parameters. Optional.
+ * @param {VariableData} [varData] The optional initial content of the variable.
  */
 gdjs.Variable = function(varData)
 {

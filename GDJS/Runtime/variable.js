@@ -9,7 +9,7 @@
 /**
  * @typedef {Object} VariableData Data representation of a GDevelop variable
  * @property {string} [name] The name of the variable. Used if a child variable.
- * @property {string | number} [value] The value of the variable, either string or number. Leave blank for structures.
+ * @property {string} [value] The value of the variable, either string or number. Leave blank for structures.
  * @property {Array<VariableData>} [children] The children of the structure. Leave blank if value is defined.
  */
 
@@ -43,28 +43,17 @@ gdjs.Variable = function(varData)
 
 			//Try to guess the type of the value, as GD has no way ( for now ) to specify
 			//the type of a variable.
-			var valueWhenConsideredAsNumber;
-			if(typeof initialValue === "string") {
-				valueWhenConsideredAsNumber = parseFloat(initialValue);
-			} else {
-				valueWhenConsideredAsNumber = NaN;
-			}
+			var valueWhenConsideredAsNumber = parseFloat(initialValue);
 			if(valueWhenConsideredAsNumber === valueWhenConsideredAsNumber && valueWhenConsideredAsNumber.toString() === initialValue) { //"Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself"
-				if(typeof initialValue === "string"){
-					this._value = parseFloat(initialValue);
-				} else this._value = initialValue;
+				this._value = parseFloat(initialValue);
 			}
 			else { //We have a string (Maybe empty).
-				if(typeof initialValue === "string") {
-					if (initialValue.length === 0)
-						this._value = 0;
-					else {
-						this._str = initialValue;
-						this._numberDirty = true;
-						this._stringDirty = false;
-					}
-				} else {
-					this._value = initialValue
+				if ( initialValue.length === 0 )
+					this._value = 0;
+				else {
+					this._str = initialValue;
+					this._numberDirty = true;
+					this._stringDirty = false;
 				}
 			}
 		} else { //Variable is a structure

@@ -197,7 +197,7 @@ gdjs.VideoRuntimeObject.prototype.isMuted = function() {
 };
 
 /**
- * Normalize a value between 0 and 100 to a value between 0 and 1.
+ * Normalize a value between `min` and `max` to a value between 0 and 1.
  * @param {number} val The value to normalize
  * @param {number} max The maximum
  * @param {number} min The minimum
@@ -209,7 +209,7 @@ gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
 
 /**
  * Set the volume of the video object.
- * @param {number} volume The new volume, between o and 100.
+ * @param {number} volume The new volume, between 0 and 100.
  */
 gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
   this._volume =

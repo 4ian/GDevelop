@@ -3,11 +3,11 @@
  * @property {Object} content The base parameters of the BBText
  * @property {number} content.opacity The opacity of the BBText
  * @property {boolean} content.visible Is the text visible?
- * @property {string} content.text Text of the text
+ * @property {string} content.text Content of the text
  * @property {string} content.color The color of the text
  * @property {string} content.fontFamily The font of the text
  * @property {number} content.fontSize The size of the text
- * @property {boolean} content.wordWrap Activate word wrap
+ * @property {boolean} content.wordWrap Activate word wrap if set to true
  * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
  * 
  * @typedef {ObjectData & BBTextObjectDataType} BBTextObjectData

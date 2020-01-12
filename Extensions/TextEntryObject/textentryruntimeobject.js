@@ -10,7 +10,7 @@
  * @extends RuntimeObject
  * @memberof gdjs
  * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
- * @param {ObjectData} shapePainterObjectData The initial properties of the object
+ * @param {ObjectData} textEntryObjectData The initial properties of the object
  */
 gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 {

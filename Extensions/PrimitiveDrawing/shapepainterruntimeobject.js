@@ -5,18 +5,18 @@
 
 /**
  * @typedef {Object} RGBColor Represents a color in RGB Format
- * @property {number} r The Red portion of the color from 0 to 255
- * @property {number} g The Green portion of the color from 0 to 255
- * @property {number} b The Blue portion of the color from 0 to 255
+ * @property {number} r The Red component of the color, from 0 to 255.
+ * @property {number} g The Green component of the color, from 0 to 255.
+ * @property {number} b The Blue component of the color, from 0 to 255.
  */
 
 /**
- * @typedef {Object} ShapePainterObjectDataType Base parameters for gdjs.ShapePainterRuntimeObject
- * @property {RGBColor} fillColor The color as RGB representation of the inner part of the painted shape
- * @property {RGBColor} outlineColor The color as RGB representation of the outline of the painted shape
+ * @typedef {Object} ShapePainterObjectDataType Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}.
+ * @property {RGBColor} fillColor The color (in RGB format) of the inner part of the painted shape
+ * @property {RGBColor} outlineColor The color (in RGB format) of the outline of the painted shape
  * @property {number} fillOpacity The opacity of the inner part of the painted shape
  * @property {number} outlineOpacity The opacity of the outline of the painted shape
- * @property {number} outlineSize The size of the outline of the painted shape
+ * @property {number} outlineSize The size of the outline of the painted shape, in pixels.
  * @property {boolean} absoluteCoordinates Use absolute coordinates?
  * 
  * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
@@ -28,8 +28,8 @@
  * @class ShapePainterRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
- * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {ShapePainterObjectData} shapePainterObjectData The Optional object Data
+ * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {ShapePainterObjectData} shapePainterObjectData The initial properties of the object
  */
 gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
 {

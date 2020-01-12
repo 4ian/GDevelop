@@ -3,19 +3,18 @@
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-//TODO Someone check tiled and texture typing, I am not sure about it.
 /**
  * @typedef {Object} PanelSpriteObjectDataType
  * @property {number} rightMargin The right margin
  * @property {number} leftMargin The left margin
  * @property {number} topMargin The top margin
  * @property {number} bottomMargin The bottom margin
- * @property {boolean} [tiled] Is it tiled or not?
- * @property {number} width The objects width
- * @property {number} height The objects height
- * @property {string} texture The resource name of the objects texture
+ * @property {boolean} [tiled] Are the central part and borders tiled?
+ * @property {number} width The object width
+ * @property {number} height The object height
+ * @property {string} texture The name of the resource containing the texture to use
  * 
- * @typedef {ObjectData & panelSpriteObjectDataType} PanelSpriteObjectData
+ * @typedef {ObjectData & PanelSpriteObjectDataType} PanelSpriteObjectData
  */
 
 /**
@@ -24,8 +23,8 @@
  * @class PanelSpriteRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
- * @param {gdjs.runtimeScene} runtimeScene The parent gdjs.RuntimeScene Instance
- * @param {PanelSpriteObjectData} panelSpriteObjectData The Optional object Data
+ * @param {gdjs.runtimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {PanelSpriteObjectData} panelSpriteObjectData The initial properties of the object
  */
 gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);

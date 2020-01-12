@@ -28,7 +28,8 @@
  * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
  *
  * @memberOf gdjs
- * @class RuntimeObject
+ * @name RuntimeObject
+ * @class
  * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
  * @param {ObjectData} objectData The initial properties of the object.
  */

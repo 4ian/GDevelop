@@ -27,7 +27,7 @@
  * @param {PanelSpriteObjectData} panelSpriteObjectData The initial properties of the object
  */
 gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {
-  gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+  gdjs.RuntimeObject.call(this, runtimeScene, panelSpriteObjectData);
 
   /** @type {number} */
   this._rBorder = panelSpriteObjectData.rightMargin;

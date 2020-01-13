@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/find-diagonals/Box.png",
+        "file": "https://resources.gdevelop-app.com/examples/find-diagonals/Box.png",
         "kind": "image",
         "metadata": "",
         "name": "Box.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/find-diagonals/Diagonals.png",
+        "file": "https://resources.gdevelop-app.com/examples/find-diagonals/Diagonals.png",
         "kind": "image",
         "metadata": "",
         "name": "Diagonals.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/find-diagonals/Square.png",
+        "file": "https://resources.gdevelop-app.com/examples/find-diagonals/Square.png",
         "kind": "image",
         "metadata": "",
         "name": "Square.png",

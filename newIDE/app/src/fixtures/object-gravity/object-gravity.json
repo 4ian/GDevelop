@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/Planeta.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/Planeta.png",
         "kind": "image",
         "metadata": "",
         "name": "Planeta.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/SpaceGuy.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/SpaceGuy.png",
         "kind": "image",
         "metadata": "",
         "name": "SpaceGuy.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight22.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/flatLight22.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight22.png",
@@ -133,7 +133,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight23.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/flatLight23.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight23.png",
@@ -142,7 +142,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight34.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/flatLight34.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight34.png",

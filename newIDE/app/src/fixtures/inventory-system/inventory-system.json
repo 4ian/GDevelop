@@ -112,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_apple.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_apple.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_apple.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_banana.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_banana.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_banana.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_cherry.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_cherry.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_cherry.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_grape.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_grape.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_grape.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_orange.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_orange.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_orange.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_pearl.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_pearl.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_pearl.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_raspberry.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_raspberry.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_raspberry.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_strawberry.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_strawberry.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_strawberry.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_watermelon.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_watermelon.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_watermelon.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/apple.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/apple.png",
         "kind": "image",
         "metadata": "",
         "name": "apple.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/banana.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/banana.png",
         "kind": "image",
         "metadata": "",
         "name": "banana.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/cherry.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/cherry.png",
         "kind": "image",
         "metadata": "",
         "name": "cherry.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/grape.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/grape.png",
         "kind": "image",
         "metadata": "",
         "name": "grape.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/orange.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/orange.png",
         "kind": "image",
         "metadata": "",
         "name": "orange.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/pearl.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/pearl.png",
         "kind": "image",
         "metadata": "",
         "name": "pearl.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/raspberry.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/raspberry.png",
         "kind": "image",
         "metadata": "",
         "name": "raspberry.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/strawberry.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/strawberry.png",
         "kind": "image",
         "metadata": "",
         "name": "strawberry.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/fruits/watermelon.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/fruits/watermelon.png",
         "kind": "image",
         "metadata": "",
         "name": "watermelon.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/slot_animations/inventory_empty.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/slot_animations/inventory_empty.png",
         "kind": "image",
         "metadata": "",
         "name": "inventory_empty.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/bin/bin_close.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/bin/bin_close.png",
         "kind": "image",
         "metadata": "",
         "name": "bin_close.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/bin/bin_open.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/bin/bin_open.png",
         "kind": "image",
         "metadata": "",
         "name": "bin_open.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/background.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/background.png",
         "kind": "image",
         "metadata": "",
         "name": "background.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/button_background.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/button_background.png",
         "kind": "image",
         "metadata": "",
         "name": "button_background.png",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/inventory-system/media/inventory/items/empty_item.png",
+        "file": "https://resources.gdevelop-app.com/examples/inventory-system/media/inventory/items/empty_item.png",
         "kind": "image",
         "metadata": "",
         "name": "empty_item.png",

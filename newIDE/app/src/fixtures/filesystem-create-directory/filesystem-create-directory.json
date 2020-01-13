@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/filesystem-create-directory/dir.png",
+        "file": "https://resources.gdevelop-app.com/examples/filesystem-create-directory/dir.png",
         "kind": "image",
         "metadata": "",
         "name": "dir.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/filesystem-create-directory/selection.png",
+        "file": "https://resources.gdevelop-app.com/examples/filesystem-create-directory/selection.png",
         "kind": "image",
         "metadata": "",
         "name": "selection.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/filesystem-create-directory/select1.png",
+        "file": "https://resources.gdevelop-app.com/examples/filesystem-create-directory/select1.png",
         "kind": "image",
         "metadata": "",
         "name": "select1.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/filesystem-create-directory/file.png",
+        "file": "https://resources.gdevelop-app.com/examples/filesystem-create-directory/file.png",
         "kind": "image",
         "metadata": "",
         "name": "file.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/filesystem-create-directory/create-button.png",
+        "file": "https://resources.gdevelop-app.com/examples/filesystem-create-directory/create-button.png",
         "kind": "image",
         "metadata": "",
         "name": "create-button.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/filesystem-create-directory/hower.png",
+        "file": "https://resources.gdevelop-app.com/examples/filesystem-create-directory/hower.png",
         "kind": "image",
         "metadata": "",
         "name": "hower.png",

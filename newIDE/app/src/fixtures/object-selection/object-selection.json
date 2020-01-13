@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-selection/TankB1.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-selection/TankB1.png",
         "kind": "image",
         "metadata": "",
         "name": "TankB1.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-selection/tankV1.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-selection/tankV1.png",
         "kind": "image",
         "metadata": "",
         "name": "tankV1.png",

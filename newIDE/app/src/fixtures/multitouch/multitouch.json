@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/multitouch/Pointer-Standard.png",
+        "file": "https://resources.gdevelop-app.com/examples/multitouch/Pointer-Standard.png",
         "kind": "image",
         "metadata": "",
         "name": "Pointer-Standard.png",

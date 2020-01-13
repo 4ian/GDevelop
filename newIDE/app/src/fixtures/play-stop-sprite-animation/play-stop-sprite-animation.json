@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/play-stop-sprite-animation/images/p1_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/play-stop-sprite-animation/images/p1_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_stand.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/play-stop-sprite-animation/images/p1_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/play-stop-sprite-animation/images/p1_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk03.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/play-stop-sprite-animation/images/p1_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/play-stop-sprite-animation/images/p1_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk04.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/play-stop-sprite-animation/images/p1_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/play-stop-sprite-animation/images/p1_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk05.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/play-stop-sprite-animation/images/p1_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/play-stop-sprite-animation/images/p1_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk06.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/play-stop-sprite-animation/images/p1_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/play-stop-sprite-animation/images/p1_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk07.png",

@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Bille.png",
+        "file": "https://resources.gdevelop-app.com/examples/magnet/Bille.png",
         "kind": "image",
         "metadata": "",
         "name": "Bille.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Trou.png",
+        "file": "https://resources.gdevelop-app.com/examples/magnet/Trou.png",
         "kind": "image",
         "metadata": "",
         "name": "Trou.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Aimant.png",
+        "file": "https://resources.gdevelop-app.com/examples/magnet/Aimant.png",
         "kind": "image",
         "metadata": "",
         "name": "Aimant.png",
@@ -133,7 +133,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Bois.png",
+        "file": "https://resources.gdevelop-app.com/examples/magnet/Bois.png",
         "kind": "image",
         "metadata": "",
         "name": "Bois.png",
@@ -142,7 +142,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/zoneperdu.png",
+        "file": "https://resources.gdevelop-app.com/examples/magnet/zoneperdu.png",
         "kind": "image",
         "metadata": "",
         "name": "zoneperdu.png",

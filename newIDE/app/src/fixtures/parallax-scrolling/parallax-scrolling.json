@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_stand.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk01.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk01.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk01.png",
@@ -133,7 +133,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk02.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk02.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk02.png",
@@ -142,7 +142,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk03.png",
@@ -151,7 +151,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk04.png",
@@ -160,7 +160,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk05.png",
@@ -169,7 +169,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk06.png",
@@ -178,7 +178,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk07.png",
@@ -187,7 +187,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk08.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk08.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk08.png",
@@ -196,7 +196,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk09.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk09.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk09.png",
@@ -205,7 +205,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk10.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk10.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk10.png",
@@ -214,7 +214,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/player/p1_walk11.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/player/p1_walk11.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk11.png",
@@ -223,7 +223,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/ground/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/ground/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "brickWall.png",
@@ -232,7 +232,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/ground/Grass.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/ground/Grass.png",
         "kind": "image",
         "metadata": "",
         "name": "Grass.png",
@@ -241,7 +241,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/background/Sky_back_layer.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/background/Sky_back_layer.png",
         "kind": "image",
         "metadata": "",
         "name": "Sky_back_layer.png",
@@ -250,7 +250,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax-scrolling/ground/box.png",
+        "file": "https://resources.gdevelop-app.com/examples/parallax-scrolling/ground/box.png",
         "kind": "image",
         "metadata": "",
         "name": "box.png",

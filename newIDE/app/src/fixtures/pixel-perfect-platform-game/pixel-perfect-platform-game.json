@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pixel-perfect-platform-game/Assets/Player_1/P1_hitbox.png",
+        "file": "https://resources.gdevelop-app.com/examples/pixel-perfect-platform-game/Assets/Player_1/P1_hitbox.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\Player_1\\P1_hitbox.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pixel-perfect-platform-game/Assets/block.png",
+        "file": "https://resources.gdevelop-app.com/examples/pixel-perfect-platform-game/Assets/block.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\block.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pixel-perfect-platform-game/Assets/block_tile.png",
+        "file": "https://resources.gdevelop-app.com/examples/pixel-perfect-platform-game/Assets/block_tile.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\block_tile.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pixel-perfect-platform-game/Assets/block_ext.png",
+        "file": "https://resources.gdevelop-app.com/examples/pixel-perfect-platform-game/Assets/block_ext.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\block_ext.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pixel-perfect-platform-game/Assets/arrow.png",
+        "file": "https://resources.gdevelop-app.com/examples/pixel-perfect-platform-game/Assets/arrow.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\arrow.png",
@@ -147,7 +147,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pixel-perfect-platform-game/Assets/PressStart2P-Regular.ttf",
+        "file": "https://resources.gdevelop-app.com/examples/pixel-perfect-platform-game/Assets/PressStart2P-Regular.ttf",
         "kind": "font",
         "metadata": "",
         "name": "Assets/PressStart2P-Regular.ttf",

@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullet-in-parabola/Source.png",
+        "file": "https://resources.gdevelop-app.com/examples/shoot-bullet-in-parabola/Source.png",
         "kind": "image",
         "metadata": "",
         "name": "Source.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullet-in-parabola/Target.png",
+        "file": "https://resources.gdevelop-app.com/examples/shoot-bullet-in-parabola/Target.png",
         "kind": "image",
         "metadata": "",
         "name": "Target.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullet-in-parabola/Bullet.png",
+        "file": "https://resources.gdevelop-app.com/examples/shoot-bullet-in-parabola/Bullet.png",
         "kind": "image",
         "metadata": "",
         "name": "Bullet.png",

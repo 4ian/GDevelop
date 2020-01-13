@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rotate-toward-mouse/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/rotate-toward-mouse/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rotate-toward-mouse/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/rotate-toward-mouse/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rotate-toward-mouse/images/manBlue_machine.png",
+        "file": "https://resources.gdevelop-app.com/examples/rotate-toward-mouse/images/manBlue_machine.png",
         "kind": "image",
         "metadata": "",
         "name": "manBlue_machine.png",

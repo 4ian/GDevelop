@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/objects-timers/player.png",
+        "file": "https://resources.gdevelop-app.com/examples/objects-timers/player.png",
         "kind": "image",
         "metadata": "",
         "name": "player.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/objects-timers/Pea-Happy.png",
+        "file": "https://resources.gdevelop-app.com/examples/objects-timers/Pea-Happy.png",
         "kind": "image",
         "metadata": "",
         "name": "Pea-Happy.png",

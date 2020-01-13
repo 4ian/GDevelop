@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuage_blanc_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/rain/nuage_blanc_1.png",
         "kind": "image",
         "metadata": "",
         "name": "nuage_blanc_1.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuages_gris_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/rain/nuages_gris_1.png",
         "kind": "image",
         "metadata": "",
         "name": "nuages_gris_1.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuages_gris_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/rain/nuages_gris_2.png",
         "kind": "image",
         "metadata": "",
         "name": "nuages_gris_2.png",
@@ -133,7 +133,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuages_gris_3.png",
+        "file": "https://resources.gdevelop-app.com/examples/rain/nuages_gris_3.png",
         "kind": "image",
         "metadata": "",
         "name": "nuages_gris_3.png",
@@ -142,7 +142,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/rain.png",
+        "file": "https://resources.gdevelop-app.com/examples/rain/rain.png",
         "kind": "image",
         "metadata": "",
         "name": "rain.png",
@@ -151,7 +151,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/logo_inrain.png",
+        "file": "https://resources.gdevelop-app.com/examples/rain/logo_inrain.png",
         "kind": "image",
         "metadata": "",
         "name": "logo_inrain.png",

@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/splash-screen/gdlogo.png",
+        "file": "https://resources.gdevelop-app.com/examples/splash-screen/gdlogo.png",
         "kind": "image",
         "metadata": "",
         "name": "gdlogo.png",
@@ -267,7 +267,7 @@
               },
               "parameters": [
                 "",
-                "https://df5lqcdudryde.cloudfront.net/examples/splash-screen/gdjingle.ogg",
+                "https://resources.gdevelop-app.com/examples/splash-screen/gdjingle.ogg",
                 "",
                 "100",
                 "1"

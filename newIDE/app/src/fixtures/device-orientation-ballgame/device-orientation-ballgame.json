@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Bois.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Bois.png",
         "kind": "image",
         "metadata": "",
         "name": "Bois.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Noir.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Noir.png",
         "kind": "image",
         "metadata": "",
         "name": "Noir.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Bille.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Bille.png",
         "kind": "image",
         "metadata": "",
         "name": "Bille.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Trou.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Trou.png",
         "kind": "image",
         "metadata": "",
         "name": "Trou.png",

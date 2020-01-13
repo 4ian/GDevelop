@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/unlock-items/NewObject-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/unlock-items/NewObject-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject-1.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/unlock-items/NewObject-1-0.png",
+        "file": "https://resources.gdevelop-app.com/examples/unlock-items/NewObject-1-0.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject-1-0.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/unlock-items/NewObject-1-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/unlock-items/NewObject-1-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject-1-1.png",

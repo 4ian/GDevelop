@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle0.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle0.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle0.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle1.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle1.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle2.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle2.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle2.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle3.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle3.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle3.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle4.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle4.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle4.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle5.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle5.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle5.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle6.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle6.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle6.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle7.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle7.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle7.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle8.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle8.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle8.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle9.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle9.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle9.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle10.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle10.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle10.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-idle11.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-idle11.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-idle11.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/geometry1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/geometry1.png",
         "kind": "image",
         "metadata": "",
         "name": "geometry1.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/geometry2.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/geometry2.png",
         "kind": "image",
         "metadata": "",
         "name": "geometry2.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/geometry3.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/geometry3.png",
         "kind": "image",
         "metadata": "",
         "name": "geometry3.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/geometry4.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/geometry4.png",
         "kind": "image",
         "metadata": "",
         "name": "geometry4.png",
@@ -246,7 +246,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster.wav",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster.wav",
         "kind": "audio",
         "metadata": "",
         "name": "monster.wav",
@@ -254,7 +254,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/bomb1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/bomb1.png",
         "kind": "image",
         "metadata": "",
         "name": "bomb1.png",
@@ -263,7 +263,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/bomb2.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/bomb2.png",
         "kind": "image",
         "metadata": "",
         "name": "bomb2.png",
@@ -271,7 +271,7 @@
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/killed.wav",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/killed.wav",
         "kind": "audio",
         "metadata": "",
         "name": "killed.wav",
@@ -279,7 +279,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/life-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/life-3.png",
         "kind": "image",
         "metadata": "",
         "name": "life-3.png",
@@ -288,7 +288,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/life-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/life-2.png",
         "kind": "image",
         "metadata": "",
         "name": "life-2.png",
@@ -297,7 +297,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/life-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/life-1.png",
         "kind": "image",
         "metadata": "",
         "name": "life-1.png",
@@ -306,7 +306,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/life-0.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/life-0.png",
         "kind": "image",
         "metadata": "",
         "name": "life-0.png",
@@ -315,7 +315,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/game-over.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/game-over.png",
         "kind": "image",
         "metadata": "",
         "name": "game-over.png",
@@ -324,7 +324,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-try-again-normal.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-try-again-normal.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-try-again-normal.png",
@@ -333,7 +333,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-start-hover.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-start-hover.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-start-hover.png",
@@ -342,7 +342,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-try-again-hover.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-try-again-hover.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-try-again-hover.png",
@@ -351,7 +351,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-try-again-pressed.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-try-again-pressed.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-try-again-pressed.png",
@@ -360,7 +360,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-main-menu-normal.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-main-menu-normal.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-main-menu-normal.png",
@@ -369,7 +369,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-main-menu-hover.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-main-menu-hover.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-main-menu-hover.png",
@@ -378,7 +378,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-main-menu-pressed.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-main-menu-pressed.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-main-menu-pressed.png",
@@ -387,7 +387,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/monster-killed1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/monster-killed1.png",
         "kind": "image",
         "metadata": "",
         "name": "monster-killed1.png",
@@ -396,7 +396,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/game-title.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/game-title.png",
         "kind": "image",
         "metadata": "",
         "name": "game-title.png",
@@ -405,7 +405,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-start-normal.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-start-normal.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-start-normal.png",
@@ -414,7 +414,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geometry-monster/btn-start-pressed.png",
+        "file": "https://resources.gdevelop-app.com/examples/geometry-monster/btn-start-pressed.png",
         "kind": "image",
         "metadata": "",
         "name": "btn-start-pressed.png",

@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player.png",
         "kind": "image",
         "metadata": "",
         "name": "player.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_jump_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_jump_1.png",
         "kind": "image",
         "metadata": "",
         "name": "player_jump_1.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_jump_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_jump_2.png",
         "kind": "image",
         "metadata": "",
         "name": "player_jump_2.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_run_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_run_1.png",
         "kind": "image",
         "metadata": "",
         "name": "player_run_1.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_run_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_run_2.png",
         "kind": "image",
         "metadata": "",
         "name": "player_run_2.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_run_3.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_run_3.png",
         "kind": "image",
         "metadata": "",
         "name": "player_run_3.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_run_4.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_run_4.png",
         "kind": "image",
         "metadata": "",
         "name": "player_run_4.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_run_5.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_run_5.png",
         "kind": "image",
         "metadata": "",
         "name": "player_run_5.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_run_6.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_run_6.png",
         "kind": "image",
         "metadata": "",
         "name": "player_run_6.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_fall_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_fall_1.png",
         "kind": "image",
         "metadata": "",
         "name": "player_fall_1.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/player_fall_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/player_fall_2.png",
         "kind": "image",
         "metadata": "",
         "name": "player_fall_2.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/grassHalfMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/grassHalfMid.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfMid.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/Rock.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/Rock.png",
         "kind": "image",
         "metadata": "",
         "name": "Rock.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/hitbox.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/hitbox.png",
         "kind": "image",
         "metadata": "",
         "name": "hitbox.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/BlackMask.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/BlackMask.png",
         "kind": "image",
         "metadata": "",
         "name": "BlackMask.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/pauseButton.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/pauseButton.png",
         "kind": "image",
         "metadata": "",
         "name": "pauseButton.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/playButton.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/playButton.png",
         "kind": "image",
         "metadata": "",
         "name": "playButton.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/restartButton.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/restartButton.png",
         "kind": "image",
         "metadata": "",
         "name": "restartButton.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/Feet.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/Feet.png",
         "kind": "image",
         "metadata": "",
         "name": "Feet.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialRight.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialRight.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialRight.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialLeft.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialLeft.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialLeft.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialJump.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialJump.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialJump.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialBackground.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialBackground.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialBackground.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialJumpNext.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialJumpNext.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialJumpNext.png",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialArrow.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialArrow.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialArrow.png",
@@ -328,7 +328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialRocks.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialRocks.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialRocks.png",
@@ -337,7 +337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialWarp1.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialWarp1.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialWarp1.png",
@@ -346,7 +346,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialWarp2.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialWarp2.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialWarp2.png",
@@ -355,7 +355,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialFall.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialFall.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialFall.png",
@@ -364,7 +364,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialMoving.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialMoving.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialMoving.png",
@@ -373,7 +373,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/LeftButton.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/LeftButton.png",
         "kind": "image",
         "metadata": "",
         "name": "LeftButton.png",
@@ -382,7 +382,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/RightButton.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/RightButton.png",
         "kind": "image",
         "metadata": "",
         "name": "RightButton.png",
@@ -391,7 +391,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/JumpButton.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/JumpButton.png",
         "kind": "image",
         "metadata": "",
         "name": "JumpButton.png",
@@ -400,7 +400,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/Spring1.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/Spring1.png",
         "kind": "image",
         "metadata": "",
         "name": "Spring1.png",
@@ -409,7 +409,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/Spring2.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/Spring2.png",
         "kind": "image",
         "metadata": "",
         "name": "Spring2.png",
@@ -418,7 +418,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/endless-up-runner/TutorialFall2.png",
+        "file": "https://resources.gdevelop-app.com/examples/endless-up-runner/TutorialFall2.png",
         "kind": "image",
         "metadata": "",
         "name": "TutorialFall2.png",

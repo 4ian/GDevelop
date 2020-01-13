@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Save.png",
+        "file": "https://resources.gdevelop-app.com/examples/facebook-instant-game/Save.png",
         "kind": "image",
         "metadata": "",
         "name": "Save.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Add_lives.png",
+        "file": "https://resources.gdevelop-app.com/examples/facebook-instant-game/Add_lives.png",
         "kind": "image",
         "metadata": "",
         "name": "Add_lives.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Remove_live.png",
+        "file": "https://resources.gdevelop-app.com/examples/facebook-instant-game/Remove_live.png",
         "kind": "image",
         "metadata": "",
         "name": "Remove_live.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Add_score.png",
+        "file": "https://resources.gdevelop-app.com/examples/facebook-instant-game/Add_score.png",
         "kind": "image",
         "metadata": "",
         "name": "Add_score.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Remove_score.png",
+        "file": "https://resources.gdevelop-app.com/examples/facebook-instant-game/Remove_score.png",
         "kind": "image",
         "metadata": "",
         "name": "Remove_score.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Empty_button.png",
+        "file": "https://resources.gdevelop-app.com/examples/facebook-instant-game/Empty_button.png",
         "kind": "image",
         "metadata": "",
         "name": "Empty_button.png",

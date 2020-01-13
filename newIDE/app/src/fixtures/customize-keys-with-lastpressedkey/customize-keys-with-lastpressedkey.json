@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/customize-keys-with-lastpressedkey/green_racer.png",
+        "file": "https://resources.gdevelop-app.com/examples/customize-keys-with-lastpressedkey/green_racer.png",
         "kind": "image",
         "metadata": "",
         "name": "green_racer.png",

@@ -102,7 +102,7 @@
   "resources": {
     "resources": [
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/play-music-on-mobile/Castle-of-Despair.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/play-music-on-mobile/Castle-of-Despair.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "Castle-of-Despair.ogg",

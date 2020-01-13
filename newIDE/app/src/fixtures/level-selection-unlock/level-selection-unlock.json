@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-selection-unlock/images/btnbg-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-selection-unlock/images/btnbg-1.png",
         "kind": "image",
         "metadata": "",
         "name": "images/btnbg-1.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-selection-unlock/images/btnbg-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-selection-unlock/images/btnbg-2.png",
         "kind": "image",
         "metadata": "",
         "name": "images/btnbg-2.png",

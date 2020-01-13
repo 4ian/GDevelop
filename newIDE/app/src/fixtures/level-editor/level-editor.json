@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grass.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grass.png",
         "kind": "image",
         "metadata": "",
         "name": "grass.png",
@@ -118,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/bg_tile.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/bg_tile.png",
         "kind": "image",
         "metadata": "",
         "name": "bg_tile.png",
@@ -127,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassCenter.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassCenter.png",
         "kind": "image",
         "metadata": "",
         "name": "grassCenter.png",
@@ -136,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassCenter_rounded.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassCenter_rounded.png",
         "kind": "image",
         "metadata": "",
         "name": "grassCenter_rounded.png",
@@ -145,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassCliffLeft.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassCliffLeft.png",
         "kind": "image",
         "metadata": "",
         "name": "grassCliffLeft.png",
@@ -154,7 +154,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassCliffLeftAlt.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassCliffLeftAlt.png",
         "kind": "image",
         "metadata": "",
         "name": "grassCliffLeftAlt.png",
@@ -163,7 +163,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassCliffRight.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassCliffRight.png",
         "kind": "image",
         "metadata": "",
         "name": "grassCliffRight.png",
@@ -172,7 +172,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassCliffRightAlt.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassCliffRightAlt.png",
         "kind": "image",
         "metadata": "",
         "name": "grassCliffRightAlt.png",
@@ -181,7 +181,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassHalf.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassHalf.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalf.png",
@@ -190,7 +190,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassHalfLeft.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassHalfLeft.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfLeft.png",
@@ -199,7 +199,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassHalfMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassHalfMid.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfMid.png",
@@ -208,7 +208,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/grassHalfRight.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/grassHalfRight.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfRight.png",
@@ -217,7 +217,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/box.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/box.png",
         "kind": "image",
         "metadata": "",
         "name": "box.png",
@@ -226,7 +226,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/boxAlt.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/boxAlt.png",
         "kind": "image",
         "metadata": "",
         "name": "boxAlt.png",
@@ -235,7 +235,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/level-editor/media/tiles/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/level-editor/media/tiles/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "brickWall.png",

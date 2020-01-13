@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/center-object-within-another/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/center-object-within-another/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/center-object-within-another/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/center-object-within-another/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "brickWall.png",

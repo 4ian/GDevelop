@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another/parent.png",
+        "file": "https://resources.gdevelop-app.com/examples/pin-object-to-another/parent.png",
         "kind": "image",
         "metadata": "",
         "name": "parent.png",
@@ -118,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another/child.png",
+        "file": "https://resources.gdevelop-app.com/examples/pin-object-to-another/child.png",
         "kind": "image",
         "metadata": "",
         "name": "child.png",

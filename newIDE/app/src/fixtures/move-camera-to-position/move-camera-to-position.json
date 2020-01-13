@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-camera-to-position/orange_sprite.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-camera-to-position/orange_sprite.png",
         "kind": "image",
         "metadata": "",
         "name": "orange_sprite.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-camera-to-position/bg_wood.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-camera-to-position/bg_wood.png",
         "kind": "image",
         "metadata": "",
         "name": "bg_wood.png",

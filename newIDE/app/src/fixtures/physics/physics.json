@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics/2DWoodBox.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/physics/2DWoodBox.jpg",
         "kind": "image",
         "metadata": "",
         "name": "2DWoodBox.jpg",
@@ -118,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics/2DSmallWoodBox.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/physics/2DSmallWoodBox.jpg",
         "kind": "image",
         "metadata": "",
         "name": "2DSmallWoodBox.jpg",
@@ -127,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics/BlackSphere.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics/BlackSphere.png",
         "kind": "image",
         "metadata": "",
         "name": "BlackSphere.png",
@@ -136,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics/ConcreteWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics/ConcreteWall.png",
         "kind": "image",
         "metadata": "",
         "name": "ConcreteWall.png",
@@ -145,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics/FullskiesBlueClear0007_1_M.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/physics/FullskiesBlueClear0007_1_M.jpg",
         "kind": "image",
         "metadata": "",
         "name": "FullskiesBlueClear0007_1_M.jpg",

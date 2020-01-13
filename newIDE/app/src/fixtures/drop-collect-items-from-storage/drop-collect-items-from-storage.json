@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/swordGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/swordGold.png",
         "kind": "image",
         "metadata": "",
         "name": "swordGold.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/shieldBronze.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/shieldBronze.png",
         "kind": "image",
         "metadata": "",
         "name": "shieldBronze.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/raygunBig.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/raygunBig.png",
         "kind": "image",
         "metadata": "",
         "name": "raygunBig.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/umbrellaClosed.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/umbrellaClosed.png",
         "kind": "image",
         "metadata": "",
         "name": "umbrellaClosed.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/box-complete.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/box-complete.png",
         "kind": "image",
         "metadata": "",
         "name": "box-complete.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/box-broken.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/box-broken.png",
         "kind": "image",
         "metadata": "",
         "name": "box-broken.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/box-empty.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/box-empty.png",
         "kind": "image",
         "metadata": "",
         "name": "box-empty.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/barrel-complete.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/barrel-complete.png",
         "kind": "image",
         "metadata": "",
         "name": "barrel-complete.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/barrel-broken.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/barrel-broken.png",
         "kind": "image",
         "metadata": "",
         "name": "barrel-broken.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/barrel-empty.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/barrel-empty.png",
         "kind": "image",
         "metadata": "",
         "name": "barrel-empty.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/jug-complete.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/jug-complete.png",
         "kind": "image",
         "metadata": "",
         "name": "jug-complete.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/jug-broken.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/jug-broken.png",
         "kind": "image",
         "metadata": "",
         "name": "jug-broken.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/jug-empty.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/jug-empty.png",
         "kind": "image",
         "metadata": "",
         "name": "jug-empty.png",

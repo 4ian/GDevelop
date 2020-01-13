@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Play.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Play.png",
         "kind": "image",
         "metadata": "",
         "name": "Play.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Pause.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Pause.png",
         "kind": "image",
         "metadata": "",
         "name": "Pause.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Background-gradient.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Background-gradient.png",
         "kind": "image",
         "metadata": "",
         "name": "Background-gradient.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Hand-cursor.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Hand-cursor.png",
         "kind": "image",
         "metadata": "",
         "name": "Hand-cursor.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Fullscreen.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Fullscreen.png",
         "kind": "image",
         "metadata": "",
         "name": "Fullscreen.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Sound_high.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Sound_high.png",
         "kind": "image",
         "metadata": "",
         "name": "Sound_high.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Sound_low.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Sound_low.png",
         "kind": "image",
         "metadata": "",
         "name": "Sound_low.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Sound_muted.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Sound_muted.png",
         "kind": "image",
         "metadata": "",
         "name": "Sound_muted.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Volume_Background_ProgressBar.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Volume_Background_ProgressBar.png",
         "kind": "image",
         "metadata": "",
         "name": "Volume_Background_ProgressBar.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Circle.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Circle.png",
         "kind": "image",
         "metadata": "",
         "name": "Circle.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Placeholder_ProgressBar.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Placeholder_ProgressBar.png",
         "kind": "image",
         "metadata": "",
         "name": "Placeholder_ProgressBar.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/transparent.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/transparent.png",
         "kind": "image",
         "metadata": "",
         "name": "Transparent.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/loop.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/loop.png",
         "kind": "image",
         "metadata": "",
         "name": "Loop.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/notlooped.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/notlooped.png",
         "kind": "image",
         "metadata": "",
         "name": "NotLooped.png",
@@ -228,7 +228,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-1000kbps.mp4",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-1000kbps.mp4",
         "kind": "video",
         "metadata": "",
         "name": "The-Daily-Dweebs-By-Blender-Foundation-1000kbps.mp4",
@@ -236,7 +236,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/notlooped.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/notlooped.png",
         "kind": "image",
         "metadata": "",
         "name": "notlooped.png",
@@ -245,7 +245,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/loop.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/loop.png",
         "kind": "image",
         "metadata": "",
         "name": "loop.png",
@@ -254,7 +254,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/transparent.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/transparent.png",
         "kind": "image",
         "metadata": "",
         "name": "transparent.png",
@@ -262,7 +262,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-Short.mp4",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-Short.mp4",
         "kind": "video",
         "metadata": "",
         "name": "The-Daily-Dweebs-By-Blender-Foundation-Short.mp4",

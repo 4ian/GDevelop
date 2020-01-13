@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-object-with-mouse-joint/Grass.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-object-with-mouse-joint/Grass.png",
         "kind": "image",
         "metadata": "",
         "name": "Grass.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-object-with-mouse-joint/Pea-Happy.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-object-with-mouse-joint/Pea-Happy.png",
         "kind": "image",
         "metadata": "",
         "name": "Pea-Happy.png",

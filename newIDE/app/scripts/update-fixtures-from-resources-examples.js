@@ -14,7 +14,7 @@ const { getExampleNames } = require('./lib/ExamplesLoader');
 const fs = require('fs');
 
 // The base URL where all resources of web-app examples are stored.
-const baseUrl = 'https://df5lqcdudryde.cloudfront.net/examples';
+const baseUrl = 'https://resources.gdevelop-app.com/examples';
 
 const updateResources = (project, baseUrl) => {
   const worker = new gd.ArbitraryResourceWorkerJS();

@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/sprite-fade-in-out/p1_front.png",
+        "file": "https://resources.gdevelop-app.com/examples/sprite-fade-in-out/p1_front.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_front.png",

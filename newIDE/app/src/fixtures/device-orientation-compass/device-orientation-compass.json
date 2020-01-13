@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-compass/img/compass.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-compass/img/compass.png",
         "kind": "image",
         "metadata": "",
         "name": "compass.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-compass/img/needle.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-compass/img/needle.png",
         "kind": "image",
         "metadata": "",
         "name": "needle.png",

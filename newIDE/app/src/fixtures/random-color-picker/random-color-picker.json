@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/random-color-picker/white.png",
+        "file": "https://resources.gdevelop-app.com/examples/random-color-picker/white.png",
         "kind": "image",
         "metadata": "",
         "name": "white.png",

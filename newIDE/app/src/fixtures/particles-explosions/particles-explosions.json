@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/particles-explosions/ExplosionTexture.png",
+        "file": "https://resources.gdevelop-app.com/examples/particles-explosions/ExplosionTexture.png",
         "kind": "image",
         "metadata": "",
         "name": "ExplosionTexture.png",

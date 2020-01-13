@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Follow.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Follow.png",
         "kind": "image",
         "metadata": "",
         "name": "Follow.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Goal.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Goal.png",
         "kind": "image",
         "metadata": "",
         "name": "Goal.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Spikes.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Spikes.png",
         "kind": "image",
         "metadata": "",
         "name": "Spikes.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Background.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Background.jpg",
         "kind": "image",
         "metadata": "",
         "name": "Background.jpg",
@@ -138,7 +138,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Synapsis_-_08_-_From_the_Dunes.mp3",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Synapsis_-_08_-_From_the_Dunes.mp3",
         "kind": "audio",
         "metadata": "",
         "name": "Synapsis_-_08_-_From_the_Dunes.mp3",
@@ -146,7 +146,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Platforms.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Platforms.png",
         "kind": "image",
         "metadata": "",
         "name": "Platforms.png",
@@ -155,7 +155,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/HalfPlatforms.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/HalfPlatforms.png",
         "kind": "image",
         "metadata": "",
         "name": "HalfPlatforms.png",
@@ -163,14 +163,14 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/tetri.ttf",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/tetri.ttf",
         "kind": "font",
         "metadata": "",
         "name": "tetri.ttf",
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/SF Atarian System Bold.ttf",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/SF Atarian System Bold.ttf",
         "kind": "font",
         "metadata": "",
         "name": "SF Atarian System Bold.ttf",
@@ -178,7 +178,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/NewFile-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/NewFile-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewFile-1.png",
@@ -187,7 +187,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/NewFile-1-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/NewFile-1-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewFile-1-1.png",
@@ -196,7 +196,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/pattern.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/pattern.png",
         "kind": "image",
         "metadata": "",
         "name": "pattern.png",
@@ -205,7 +205,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Skin.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Skin.png",
         "kind": "image",
         "metadata": "",
         "name": "Skin.png",
@@ -214,7 +214,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Player-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Player-1.png",
         "kind": "image",
         "metadata": "",
         "name": "Player-1.png",
@@ -223,7 +223,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Player-1-0.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Player-1-0.png",
         "kind": "image",
         "metadata": "",
         "name": "Player-1-0.png",
@@ -232,7 +232,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/geodash/Player.png",
+        "file": "https://resources.gdevelop-app.com/examples/geodash/Player.png",
         "kind": "image",
         "metadata": "",
         "name": "Player.png",

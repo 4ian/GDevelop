@@ -112,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p2_stand.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p2_jump.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p2_walk\\PNG\\p2_walk04.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p2_walk\\PNG\\p2_walk05.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p2_walk\\PNG\\p2_walk06.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p2_walk\\PNG\\p2_walk07.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk08.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p2_walk/PNG/p2_walk08.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p2_walk\\PNG\\p2_walk08.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p3_stand.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_hurt.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_hurt.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p3_hurt.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p3_walk\\PNG\\p3_walk03.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p3_walk\\PNG\\p3_walk04.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p3_walk\\PNG\\p3_walk05.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p3_walk\\PNG\\p3_walk06.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p3_walk/PNG/p3_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p3_walk\\PNG\\p3_walk07.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/stoneCenter.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/stoneCenter.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\stoneCenter.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/snowMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/snowMid.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\snowMid.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/grassMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/grassMid.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\grassMid.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/boxAlt.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/boxAlt.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\boxAlt.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/HUD/hud_keyYellow_disabled.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/HUD/hud_keyYellow_disabled.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\HUD\\hud_keyYellow_disabled.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/HUD/hud_keyYellow.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/HUD/hud_keyYellow.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\HUD\\hud_keyYellow.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/keyYellow.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/keyYellow.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\keyYellow.png",
@@ -300,7 +300,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/coin.wav",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/coin.wav",
         "kind": "audio",
         "metadata": "",
         "name": "coin.wav",
@@ -308,7 +308,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/lock_yellow.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/lock_yellow.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\lock_yellow.png",
@@ -317,7 +317,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/flagGreenHanging.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/flagGreenHanging.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\flagGreenHanging.png",
@@ -326,7 +326,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/flagGreen2.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/flagGreen2.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\flagGreen2.png",
@@ -335,7 +335,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/sign.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/sign.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\sign.png",
@@ -344,7 +344,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/spikes.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/spikes.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\spikes.png",
@@ -352,7 +352,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Sounds/PowerDown12.mp3",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Sounds/PowerDown12.mp3",
         "kind": "audio",
         "metadata": "",
         "name": "platformergraphics\\Sounds\\PowerDown12.mp3",
@@ -360,7 +360,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/liquidLava.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/liquidLava.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\liquidLava.png",
@@ -369,7 +369,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/springboardUp.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/springboardUp.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\springboardUp.png",
@@ -378,7 +378,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/springboardDown.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/springboardDown.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\springboardDown.png",
@@ -387,7 +387,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p1_stand.png",
@@ -396,7 +396,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p1_jump.png",
@@ -405,7 +405,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p1_walk\\PNG\\p1_walk03.png",
@@ -414,7 +414,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p1_walk\\PNG\\p1_walk04.png",
@@ -423,7 +423,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p1_walk\\PNG\\p1_walk05.png",
@@ -432,7 +432,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p1_walk\\PNG\\p1_walk06.png",
@@ -441,7 +441,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/p1_walk/PNG/p1_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\p1_walk\\PNG\\p1_walk07.png",
@@ -450,7 +450,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Player/Hurt-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Player/Hurt-2.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Player\\Hurt-2.png",
@@ -459,7 +459,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\brickWall.png",
@@ -468,7 +468,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/grass.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/grass.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\grass.png",
@@ -477,7 +477,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/ladder_mid.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/ladder_mid.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\ladder_mid.png",
@@ -486,7 +486,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeDead.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeDead.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Enemies\\slimeDead.png",
@@ -495,7 +495,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/bridgeLogs.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/bridgeLogs.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\bridgeLogs.png",
@@ -504,7 +504,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/castleCenter.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/castleCenter.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\castleCenter.png",
@@ -513,7 +513,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\coinGold.png",
@@ -522,7 +522,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/cloud1.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/cloud1.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\cloud1.png",
@@ -531,7 +531,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/cloud2.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/cloud2.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\cloud2.png",
@@ -540,7 +540,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/cloud3.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/cloud3.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\cloud3.png",
@@ -549,7 +549,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/PlayerArea.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/PlayerArea.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\PlayerArea.png",
@@ -558,7 +558,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/health_bar.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/health_bar.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\health_bar.png",
@@ -567,7 +567,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/health_bar_frame.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/health_bar_frame.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\health_bar_frame.png",
@@ -576,7 +576,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Tiles/bridge.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Tiles/bridge.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Tiles\\bridge.png",
@@ -585,7 +585,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/bush.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/bush.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\bush.png",
@@ -594,7 +594,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/cactus.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/cactus.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\cactus.png",
@@ -603,7 +603,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Items/plant.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Items/plant.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Items\\plant.png",
@@ -612,7 +612,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Left.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Left.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Left.png",
@@ -621,7 +621,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Right.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Right.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Right.png",
@@ -630,7 +630,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Enemies/flyDead.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Enemies/flyDead.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Enemies\\flyDead.png",
@@ -639,7 +639,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Enemies/flyFly1.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Enemies/flyFly1.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Enemies\\flyFly1.png",
@@ -648,7 +648,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Enemies/flyFly2.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Enemies/flyFly2.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Enemies\\flyFly2.png",
@@ -657,7 +657,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/BetaBox-Flat-Front-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/BetaBox-Flat-Front-1.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\BetaBox-Flat-Front-1.png",
@@ -666,7 +666,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/shadedDark06.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/shadedDark06.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\shadedDark06.png",
@@ -675,7 +675,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/shadedDark09.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/shadedDark09.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\shadedDark09.png",
@@ -684,7 +684,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/shadedDark45.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/shadedDark45.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\shadedDark45.png",
@@ -693,7 +693,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/shadedDark05.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/shadedDark05.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\shadedDark05.png",
@@ -702,7 +702,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/BetaBox - Flat.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/BetaBox - Flat.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\BetaBox - Flat.png",
@@ -711,7 +711,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeWalk1.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeWalk1.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Enemies\\slimeWalk1.png",
@@ -720,7 +720,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeWalk2.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeWalk2.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Enemies\\slimeWalk2.png",
@@ -729,7 +729,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeDead-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/platformergraphics/Enemies/slimeDead-1.png",
         "kind": "image",
         "metadata": "",
         "name": "platformergraphics\\Enemies\\slimeDead-1.png",
@@ -5036,7 +5036,7 @@
           "variables": [],
           "behaviors": [],
           "string": "x 0",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/Bimbo_JVE.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/Bimbo_JVE.ttf",
           "characterSize": 40,
           "color": {
             "b": 0,
@@ -5388,7 +5388,7 @@
                   },
                   "parameters": [
                     "",
-                    "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/jump.wav",
+                    "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/jump.wav",
                     "",
                     "",
                     ""
@@ -7821,7 +7821,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/betabox-basics-learning-experience/jump.wav",
+                        "https://resources.gdevelop-app.com/examples/betabox-basics-learning-experience/jump.wav",
                         "",
                         "",
                         ""

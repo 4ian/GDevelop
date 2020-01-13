@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeCircle.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeCircle.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeCircle.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeCircleBorder.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeCircleBorder.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeCircleBorder.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeRect.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeRect.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeRect.png",
@@ -133,7 +133,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeRectBorder.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeRectBorder.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeRectBorder.png",
@@ -142,7 +142,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeLine.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeLine.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeLine.png",
@@ -151,7 +151,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/BarSelector.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/BarSelector.png",
         "kind": "image",
         "metadata": "",
         "name": "BarSelector.png",

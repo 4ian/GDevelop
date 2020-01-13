@@ -15,7 +15,7 @@
  * @property {number} color.g The Green level from 0 to 255
  * @property {number} color.b The Blue level from 0 to 255
  * @property {string} string The text of the object
- * 
+ *
  * @typedef {ObjectData & TextObjectDataType} TextObjectData
  */
 
@@ -30,25 +30,25 @@
  */
 gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, textObjectData);
 
     /** @type {number} */
-    this._characterSize = Math.max(1, objectData.characterSize);
+    this._characterSize = Math.max(1, textObjectData.characterSize);
 
     /** @type {string} */
-    this._fontName = objectData.font;
+    this._fontName = textObjectData.font;
 
     /** @type {boolean} */
-    this._bold = objectData.bold;
+    this._bold = textObjectData.bold;
 
     /** @type {boolean} */
-    this._italic = objectData.italic;
+    this._italic = textObjectData.italic;
 
     /** @type {boolean} */
-    this._underlined = objectData.underlined;
+    this._underlined = textObjectData.underlined;
 
     /** @type {Array<number>} */
-    this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+    this._color = [textObjectData.color.r, textObjectData.color.g, textObjectData.color.b];
 
     /** @type {boolean} */
     this._useGradient = false;
@@ -102,7 +102,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
     this._scaleY = 1;
 
     /** @type {string} */
-    this._str = objectData.string;
+    this._str = textObjectData.string;
 
     if (this._renderer)
         gdjs.TextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);

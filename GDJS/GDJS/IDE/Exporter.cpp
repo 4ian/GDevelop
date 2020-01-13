@@ -84,6 +84,9 @@ bool Exporter::ExportWholePixiProject(
     // Export engine libraries
     helper.AddLibsInclude(true, false, false, includesFiles);
 
+    // Export effects (after engine libraries as they auto-register themselves to the engine)
+    helper.ExportEffectIncludes(exportedProject, includesFiles);
+
     // Export events
     if (!helper.ExportEventsCode(
             exportedProject, codeOutputDir, includesFiles, false)) {
@@ -173,6 +176,9 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
 
   // Export engine libraries
   helper.AddLibsInclude(false, true, false, includesFiles);
+
+  // Export effects (after engine libraries as they auto-register themselves to the engine)
+  helper.ExportEffectIncludes(exportedProject, includesFiles);
 
   // Export events
   if (!helper.ExportEventsCode(

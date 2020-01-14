@@ -1,3 +1,4 @@
+/// <reference path="runtimeobject.d.ts"/>
 // @ts-check
 
 /*
@@ -33,23 +34,35 @@
  * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
  * @param {ObjectData} objectData The initial properties of the object.
  */
+// @ts-ignore
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {
+    /** @type {string} */
     this.name = objectData.name || "";
     this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+    /** @type {string} */
     this.type = objectData.type || "";
+    /** @type {number} */
     this.x = 0;
+    /** @type {number} */
     this.y = 0;
+    /** @type {number} */
     this.angle = 0;
+    /** @type {number} */
     this.zOrder = 0;
+    /** @type {boolean} */
     this.hidden = false;
+    /** @type {string} */
     this.layer = "";
+    /** @type {boolean} */
     this.livingOnScene = true;
+    /** @type {number} */
     this.id = runtimeScene.createNewUniqueId();
     this._runtimeScene = runtimeScene; //This could/should be avoided.
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
+        /** @type {Array<gdjs.Polygon>} */
         this._defaultHitBoxes = [];
         this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0,0));
     }
@@ -146,7 +159,7 @@ gdjs.RuntimeObject.prototype.onCreated = function() {
     for(var i =0;i<this._behaviors.length;++i) {
         this._behaviors[i].onCreated();
     }
-}
+};
 
 /**
  * Return the time elapsed since the last frame,
@@ -160,7 +173,7 @@ gdjs.RuntimeObject.prototype.getElapsedTime = function(runtimeScene) {
     //TODO: Memoize?
     var theLayer = runtimeScene.getLayer(this.layer);
     return theLayer.getElapsedTime();
-}
+};
 
 /**
  * Called once during the game loop, before events and rendering.
@@ -218,6 +231,7 @@ gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
  * @return {Object} The internal rendered object (PIXI.DisplayObject...)
  */
 gdjs.RuntimeObject.prototype.getRendererObject = function() {
+    return false;
 };
 
 //Common properties:
@@ -330,9 +344,9 @@ gdjs.RuntimeObject.prototype.getDrawableY = function() {
 };
 
 
-gdjs.RuntimeObject.prototype.rotateTowardPosition = function(x, y, speed, scene) {
+gdjs.RuntimeObject.prototype.rotateTowardPosition = function(x, y, speed, runtimeScene) {
     this.rotateTowardAngle(Math.atan2(y - (this.getDrawableY() + this.getCenterY()),
-        x - (this.getDrawableX() + this.getCenterX()))*180/Math.PI, speed, scene);
+        x - (this.getDrawableX() + this.getCenterX()))*180/Math.PI, speed, runtimeScene);
 };
 
 gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeScene) {
@@ -471,12 +485,12 @@ gdjs.RuntimeObject.prototype.getVariableNumber = gdjs.RuntimeObject.getVariableN
  * Only for usage by events.
  *
  * @param {gdjs.Variable} variable The variable to be accessed
- * @return The specified variable
+ * @return gdjs.Variable specified variable
  * @static
  */
 gdjs.RuntimeObject.returnVariable = function(variable) {
     return variable;
-}
+};
 gdjs.RuntimeObject.prototype.returnVariable = gdjs.RuntimeObject.returnVariable;
 
 /**
@@ -493,11 +507,11 @@ gdjs.RuntimeObject.prototype.getVariableString = gdjs.RuntimeObject.getVariableS
 /**
  * Get the number of children from a variable
  * @param variable The variable to be accessed
- * @return The number of children
+ * @return {number} The number of children
  * @static
  */
 gdjs.RuntimeObject.getVariableChildCount = function(variable) {
-    if (variable.isStructure() == false) return 0;
+    if (variable.isStructure() === false) return 0;
     return Object.keys(variable.getAllChildren()).length;
 };
 
@@ -678,7 +692,7 @@ gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, multiplier) {
  * @param {number} len The force length, in pixels.
  * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, multiplier) {
+gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x, y, len, multiplier) {
 
     var angle = Math.atan2(y - (this.getDrawableY()+this.getCenterY()),
                            x - (this.getDrawableX()+this.getCenterX()));
@@ -783,7 +797,7 @@ gdjs.RuntimeObject.prototype.averageForceAngleIs = function(angle, toleranceInDe
  *
  * You should probably redefine updateHitBoxes instead of this function.
  *
- * @return {Array} An array composed of polygon.
+ * @return {Array<gdjs.Polygon>} An array composed of polygon.
  */
 gdjs.RuntimeObject.prototype.getHitBoxes = function() {
     //Avoid a naive implementation requiring to recreate temporaries each time
@@ -970,11 +984,11 @@ gdjs.RuntimeObject.prototype.hasBehavior = function(name) {
  * De/activate a behavior of the object.
  *
  * @param name {String} The behavior name.
- * @param enable {boolean} true to activate the behavior
+ * @param status {boolean} Set to true for enabled. False for Disabled.
  */
-gdjs.RuntimeObject.prototype.activateBehavior = function(name, enable) {
+gdjs.RuntimeObject.prototype.activateBehavior = function(name, status) {
     if ( this._behaviorsTable.containsKey(name) ) {
-        this._behaviorsTable.get(name).activate(enable);
+        this._behaviorsTable.get(name).activate(status);
     }
 };
 
@@ -1097,7 +1111,7 @@ gdjs.RuntimeObject.prototype.getTimerElapsedTimeInSeconds = function(timerName) 
 
 /**
  * Separate the object from others objects, using their hitboxes.
- * @param objects Objects
+ * @param objects Objects {@link Array<RuntimeObject>}
  * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
  * @return true if the object was moved
  */
@@ -1131,7 +1145,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objects, ignoreTouch
 
 /**
  * Separate the object from others objects, using their hitboxes.
- * @param objectsLists Tables of objects
+ * @param objectsLists Tables of objects {@link Hashtable}
  * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
  * @return true if the object was moved
  */
@@ -1211,7 +1225,7 @@ gdjs.RuntimeObject.prototype.getSqDistanceTo = function(pointX, pointY) {
  * @param {number} distance The distance between the object and the target, in pixels.
  * @param {number} angleInDegrees The angle between the object and the target, in degrees.
  */
-gdjs.RuntimeObject.prototype.putAround = function(x,y,distance,angleInDegrees) {
+gdjs.RuntimeObject.prototype.putAround = function(x, y, distance, angleInDegrees) {
     var angle = angleInDegrees/180*3.14159;
 
     // Offset the position by the center, as PutAround* methods should position the center
@@ -1228,7 +1242,7 @@ gdjs.RuntimeObject.prototype.putAround = function(x,y,distance,angleInDegrees) {
  * @param {number} distance The distance between the object and the target
  * @param {number} angleInDegrees The angle between the object and the target, in degrees.
  */
-gdjs.RuntimeObject.prototype.putAroundObject = function(obj,distance,angleInDegrees) {
+gdjs.RuntimeObject.prototype.putAroundObject = function(obj, distance, angleInDegrees) {
     this.putAround(obj.getDrawableX()+obj.getCenterX(), obj.getDrawableY()+obj.getCenterY(),
                    distance, angleInDegrees);
 };
@@ -1272,9 +1286,7 @@ gdjs.RuntimeObject.prototype.separateObjectsWithoutForces = function(objectsList
  * @deprecated
  * @param objectsLists Tables of objects
  */
-gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, len) {
-
-    if ( len == undefined ) len = 10;
+gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists) {
 
     //Prepare the list of objects to iterate over.
     var objects = gdjs.staticArray(gdjs.RuntimeObject.prototype.separateObjectsWithForces);
@@ -1357,8 +1369,8 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2, ignoreTouchingEdges) {
  * @param {number} y The raycast source Y
  * @param {number} endX The raycast end position X
  * @param {number} endY The raycast end position Y
- * @param closest {boolean} Get the closest or farthest collision mask result?
- * @return A raycast result with the contact points and distances
+ * @param {boolean} closest Get the closest or farthest collision mask result?
+ * @return {any} A raycast result with the contact points and distances
  */
 gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
     // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
@@ -1411,7 +1423,7 @@ gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
     }
     return this.aabb.min[0] <= x && this.aabb.max[0] >= x
         && this.aabb.min[1] <= y && this.aabb.max[1] >= y;
-}
+};
 
 /**
  * Check the distance between two objects.
@@ -1424,7 +1436,7 @@ gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
 /**
  * Return true if the cursor, or any touch, is on the object.
  *
- * @return true if the cursor, or any touch, is on the object.
+ * @return {boolean} true if the cursor, or any touch, is on the object.
  */
 gdjs.RuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
     var inputManager = runtimeScene.getGame().getInputManager();
@@ -1452,7 +1464,7 @@ gdjs.RuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
  * Check if a point is inside the object collision hitboxes.
  * @param pointX The point x coordinate.
  * @param pointY The point y coordinate.
- * @return true if the point is inside the object collision hitboxes.
+ * @return {boolean} true if the point is inside the object collision hitboxes.
  */
 gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
     var hitBoxes = this.getHitBoxes();

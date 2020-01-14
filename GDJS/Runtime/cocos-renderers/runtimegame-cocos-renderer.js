@@ -66,6 +66,21 @@ gdjs.RuntimeGameCocosRenderer.prototype.setWindowSize = function(width, height) 
     }
 };
 
+/**
+ * Center the window on screen.
+ */
+gdjs.RuntimeGameCocosRenderer.prototype.centerWindow = function() {
+    var electron = this.getElectron();
+    if (electron) { // Use Electron BrowserWindow API
+        var browserWindow = electron.remote.getCurrentWindow();
+        if (browserWindow) {
+            browserWindow.center();
+        }
+    } else {
+        // Not supported
+    }
+}
+
 gdjs.RuntimeGameCocosRenderer.prototype.setWindowTitle = function(title) {
     if (typeof document !== 'undefined') document.title = title;
 }

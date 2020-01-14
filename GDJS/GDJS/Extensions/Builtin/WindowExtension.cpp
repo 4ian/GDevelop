@@ -23,6 +23,8 @@ WindowExtension::WindowExtension() {
       "gdjs.evtTools.window.setWindowTitle");
   GetAllActions()["SetWindowSize"].SetFunctionName(
       "gdjs.evtTools.window.setWindowSize");
+  GetAllActions()["CenterWindow"].SetFunctionName(
+      "gdjs.evtTools.window.centerWindow");
   GetAllActions()["SetGameResolutionSize"].SetFunctionName(
       "gdjs.evtTools.window.setGameResolutionSize");
   GetAllActions()["SetGameResolutionResizeMode"].SetFunctionName(

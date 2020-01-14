@@ -29,6 +29,10 @@ gdjs.evtTools.window.setWindowSize = function(runtimeScene, width, height, updat
 	}
 };
 
+gdjs.evtTools.window.centerWindow = function(runtimeScene) {
+	runtimeScene.getGame().getRenderer().centerWindow();
+};
+
 gdjs.evtTools.window.setGameResolutionSize = function(runtimeScene, width, height) {
 	runtimeScene.getGame().setGameResolutionSize(width, height);
 };

@@ -89,6 +89,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
                       "be stretched or reduced to fit in the window."));
 
   extension
+      .AddAction("CenterWindow",
+                 _("Center the game window on the screen"),
+                 _("This action centers the game window on the screen. This "
+                   "only works on Windows, macOS and Linux (not when the game "
+                   "is executed in a web-browser or on iOS/Android)."),
+                 _("Center the game window"),
+                 _("Game's window and resolution"),
+                 "res/actions/window24.png",
+                 "res/actions/window.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
       .AddAction("SetGameResolutionResizeMode",
                  _("Change the game resolution resize mode"),
                  _("Set if the width or the height of the game resolution "

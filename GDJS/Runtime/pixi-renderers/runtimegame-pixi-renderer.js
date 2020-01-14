@@ -173,6 +173,21 @@ gdjs.RuntimeGamePixiRenderer.prototype.setWindowSize = function(width, height) {
 };
 
 /**
+ * Center the window on screen.
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.centerWindow = function() {
+    var electron = this.getElectron();
+    if (electron) { // Use Electron BrowserWindow API
+        var browserWindow = electron.remote.getCurrentWindow();
+        if (browserWindow) {
+            browserWindow.center();
+        }
+    } else {
+        // Not supported
+    }
+}
+
+/**
  * De/activate fullscreen for the game.
  */
 gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {

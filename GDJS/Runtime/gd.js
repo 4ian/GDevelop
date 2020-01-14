@@ -1,3 +1,5 @@
+/// <reference path="gd.d.ts"/>
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -15,8 +17,9 @@ window.gdjs = {
    * Contains functions used by events (this is a convention only, functions can actually
    * by anywhere).
    * @namespace
-   * @memberof gdjs
+   * @memberOf gdjs
    */
+  // @ts-ignore
   evtTools: {},
   callbacksRuntimeSceneLoaded: [],
   callbacksRuntimeSceneUnloaded: [],
@@ -104,7 +107,7 @@ gdjs.registerObjects = function() {
 
   for (var p in this) {
     if (this.hasOwnProperty(p)) {
-      if (gdjs[p].thisIsARuntimeObjectConstructor != undefined) {
+      if (gdjs[p].thisIsARuntimeObjectConstructor !== undefined) {
         gdjs.objectsTypes.put(gdjs[p].thisIsARuntimeObjectConstructor, gdjs[p]);
       }
     }
@@ -129,7 +132,7 @@ gdjs.registerBehaviors = function() {
     if (this.hasOwnProperty(gdjsProperty)) {
       // Search in object inside gdjs.
       var innerObject = gdjs[gdjsProperty];
-      if (innerObject.thisIsARuntimeBehaviorConstructor != undefined) {
+      if (innerObject.thisIsARuntimeBehaviorConstructor !== undefined) {
         gdjs.behaviorsTypes.put(
           innerObject.thisIsARuntimeBehaviorConstructor,
           innerObject
@@ -146,7 +149,7 @@ gdjs.registerBehaviors = function() {
             if (
               innerInnerObject !== null &&
               typeof innerInnerObject === 'function' &&
-              innerInnerObject.thisIsARuntimeBehaviorConstructor != undefined
+              innerInnerObject.thisIsARuntimeBehaviorConstructor !== undefined
             ) {
               gdjs.behaviorsTypes.put(
                 innerInnerObject.thisIsARuntimeBehaviorConstructor,
@@ -179,7 +182,7 @@ gdjs.registerGlobalCallbacks = function() {
 
   var totalprop = 0;
 
-  innerRegisterGlobalCallbacks = function(obj, nestLevel) {
+  const innerRegisterGlobalCallbacks = function(obj, nestLevel) {
     for (var p in obj) {
       if (
         obj.hasOwnProperty(p) &&

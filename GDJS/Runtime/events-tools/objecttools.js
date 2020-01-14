@@ -6,7 +6,7 @@
 
 /**
  * Tools related to objects, for events generated code.
- * @memberof gdjs.evtTools
+ * @memberOf gdjs.evtTools
  * @namespace object
  */
 gdjs.evtTools.object = gdjs.evtTools.object || {};

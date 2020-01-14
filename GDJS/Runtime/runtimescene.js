@@ -8,7 +8,7 @@
  * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
  *
  * @class RuntimeScene
- * @memberof gdjs
+ * @memberOf gdjs
  * @param {gdjs.RuntimeGame} runtimeGame The game associated to this scene.
  */
 gdjs.RuntimeScene = function(runtimeGame)

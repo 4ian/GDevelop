@@ -130,7 +130,7 @@
 .gd-events-sheet-dark-theme .instruction-parameter.objectList,
 .gd-events-sheet-dark-theme .instruction-parameter.objectListWithoutPicking {
   color: #b77cff;
-  font-style: italic;
+  font-weight: bold;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.behavior {

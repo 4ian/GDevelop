@@ -55,23 +55,66 @@ gdjs.PixiFiltersTools.registerFilterCreator = function(filterName, filterCreator
 // Type definitions:
 
 /**
+ * Function to call to create the PIXI filter used at runtime
+ * @callback gdjsPixiFiltersToolsFilterCreatorMakePIXIFilter
+ * @param {gdjs.Layer} layer
+ * @param {Object} effectData
+ * @returns {Object}
+ */
+
+/**
+ * The function to be called to update the filter at every frame
+ * @callback gdjsPixiFiltersToolsUpdate
+ * @param {Object} filter
+ * @param {gdjs.Layer} layer
+ * @returns {Object}
+ */
+
+/**
+ * The function to be called to update a parameter (with a number)
+ * @callback gdjsPixiFiltersToolsUpdateDoubleParameter
+ * @param {Object} filter
+ * @param {string} parameterName
+ * @param {number} value
+ * @returns {void}
+ */
+
+/**
+ * The function to be called to update a parameter (with a string)
+ * @callback gdjsPixiFiltersToolsUpdateStringParameter
+ * @param {Object} filter
+ * @param {string} parameterName
+ * @param {string} value
+ * @returns {void}
+ */
+
+/**
+ * The function to be called to update a parameter (with a boolean)
+ * @callback gdjsPixiFiltersToolsUpdateBooleanParameter
+ * @param {Object} filter
+ * @param {string} parameterName
+ * @param {boolean} value
+ * @returns {void}
+ */
+
+/**
  * A wrapper allowing to create a PIXI filter and update it using a common interface
  * @typedef gdjsPixiFiltersToolsFilterCreator
- * @type {object}
- * @property {(layer: gdjs.Layer, effectData: any) => any} makePIXIFilter Function to call to create the filter
- * @property {(filter: any, layer: gdjs.Layer) => any} update The function to be called to update the filter at every frame
- * @property {(filter: any, parameterName: string, value: number) => void} updateDoubleParameter The function to be called to update a parameter (with a number)
- * @property {(filter: any, parameterName: string, value: string) => void} updateStringParameter The function to be called to update a parameter (with a string)
- * @property {(filter: any, parameterName: string, value: boolean) => void} updateBooleanParameter The function to be called to update a parameter (with a boolean)
+ * @type {Object}
+ * @property {gdjsPixiFiltersToolsFilterCreatorMakePIXIFilter} makePIXIFilter Function to call to create the filter
+ * @property {gdjsPixiFiltersToolsUpdate} update The function to be called to update the filter at every frame
+ * @property {gdjsPixiFiltersToolsUpdateDoubleParameter} updateDoubleParameter The function to be called to update a parameter (with a number)
+ * @property {gdjsPixiFiltersToolsUpdateStringParameter} updateStringParameter The function to be called to update a parameter (with a string)
+ * @property {gdjsPixiFiltersToolsUpdateBooleanParameter} updateBooleanParameter The function to be called to update a parameter (with a boolean)
  */
 
 /**
  * The type of a filter used to manipulate a Pixi filter.
  * @typedef gdjsPixiFiltersToolsFilter
- * @type {object}
+ * @type {Object}
  * @property {any} pixiFilter The PIXI filter
- * @property {(filter: any, layer: gdjs.Layer) => any} update The function to be called to update the filter at every frame
- * @property {(filter: any, parameterName: string, value: number) => void} updateDoubleParameter The function to be called to update a parameter (with a number)
- * @property {(filter: any, parameterName: string, value: string) => void} updateStringParameter The function to be called to update a parameter (with a string)
- * @property {(filter: any, parameterName: string, value: boolean) => void} updateBooleanParameter The function to be called to update a parameter (with a boolean)
+ * @property {gdjsPixiFiltersToolsUpdate} update The function to be called to update the filter at every frame
+ * @property {gdjsPixiFiltersToolsUpdateDoubleParameter} updateDoubleParameter The function to be called to update a parameter (with a number)
+ * @property {gdjsPixiFiltersToolsUpdateStringParameter} updateStringParameter The function to be called to update a parameter (with a string)
+ * @property {gdjsPixiFiltersToolsUpdateBooleanParameter} updateBooleanParameter The function to be called to update a parameter (with a boolean)
  */

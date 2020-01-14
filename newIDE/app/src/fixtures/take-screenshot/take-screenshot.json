@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/take-screenshot/images/Logo_GDevelop.png",
+        "file": "https://resources.gdevelop-app.com/examples/take-screenshot/images/Logo_GDevelop.png",
         "kind": "image",
         "metadata": "",
         "name": "images/Logo_GDevelop.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/take-screenshot/images/button.png",
+        "file": "https://resources.gdevelop-app.com/examples/take-screenshot/images/button.png",
         "kind": "image",
         "metadata": "",
         "name": "images/button.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/take-screenshot/images/ScreenFlash-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/take-screenshot/images/ScreenFlash-1.png",
         "kind": "image",
         "metadata": "",
         "name": "images/ScreenFlash-1.png",
@@ -129,7 +129,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/take-screenshot/sounds/screenshot.wav",
+        "file": "https://resources.gdevelop-app.com/examples/take-screenshot/sounds/screenshot.wav",
         "kind": "audio",
         "metadata": "{\"jfxr\":{\"data\":\"{\\\"_version\\\":1,\\\"_name\\\":\\\"Laser/shoot 6\\\",\\\"_locked\\\":[],\\\"sampleRate\\\":44100,\\\"attack\\\":0,\\\"sustain\\\":0.06,\\\"sustainPunch\\\":80,\\\"decay\\\":0.2,\\\"tremoloDepth\\\":0,\\\"tremoloFrequency\\\":10,\\\"frequency\\\":500,\\\"frequencySweep\\\":0,\\\"frequencyDeltaSweep\\\":0,\\\"repeatFrequency\\\":0,\\\"frequencyJump1Onset\\\":15,\\\"frequencyJump1Amount\\\":90,\\\"frequencyJump2Onset\\\":66,\\\"frequencyJump2Amount\\\":0,\\\"harmonics\\\":0,\\\"harmonicsFalloff\\\":0.5,\\\"waveform\\\":\\\"sine\\\",\\\"interpolateNoise\\\":true,\\\"vibratoDepth\\\":0,\\\"vibratoFrequency\\\":10,\\\"squareDuty\\\":75,\\\"squareDutySweep\\\":55,\\\"flangerOffset\\\":0,\\\"flangerOffsetSweep\\\":0,\\\"bitCrush\\\":16,\\\"bitCrushSweep\\\":0,\\\"lowPassCutoff\\\":22050,\\\"lowPassCutoffSweep\\\":0,\\\"highPassCutoff\\\":0,\\\"highPassCutoffSweep\\\":0,\\\"compression\\\":1,\\\"normalization\\\":true,\\\"amplification\\\":100}\",\"name\":\"screenshot\"}}",
         "name": "sounds/screenshot.wav",

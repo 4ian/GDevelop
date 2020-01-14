@@ -9,7 +9,11 @@
 /**
  * @typedef {Object} VariableData Data representation of a GDevelop variable
  * @property {string} [name] The name of the variable. Used if a child variable.
+<<<<<<< HEAD
  * @property {string | number} [value] The value of the variable, either string or number. Leave blank for structures.
+=======
+ * @property {string} [value] The value of the variable, either string or number. Leave blank for structures.
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @property {Array<VariableData>} [children] The children of the structure. Leave blank if value is defined.
  */
 
@@ -43,6 +47,7 @@ gdjs.Variable = function(varData)
 
 			//Try to guess the type of the value, as GD has no way ( for now ) to specify
 			//the type of a variable.
+<<<<<<< HEAD
 			var valueWhenConsideredAsNumber;
 			if(typeof initialValue === "string") {
 				valueWhenConsideredAsNumber = parseFloat(initialValue);
@@ -53,6 +58,11 @@ gdjs.Variable = function(varData)
 				if(typeof initialValue === "string"){
 					this._value = parseFloat(initialValue);
 				} else this._value = initialValue;
+=======
+			var valueWhenConsideredAsNumber = parseFloat(initialValue);
+			if(valueWhenConsideredAsNumber === valueWhenConsideredAsNumber && valueWhenConsideredAsNumber.toString() === initialValue) { //"Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself"
+				this._value = parseFloat(initialValue);
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
 			}
 			else { //We have a string (Maybe empty).
 				if(typeof initialValue === "string") {

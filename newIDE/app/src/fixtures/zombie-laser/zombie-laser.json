@@ -118,7 +118,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/TopDownSoldier.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/TopDownSoldier.png",
         "kind": "image",
         "metadata": "",
         "name": "TopDownSoldier.png",
@@ -127,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/TopDownWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/TopDownWall.png",
         "kind": "image",
         "metadata": "",
         "name": "TopDownWall.png",
@@ -136,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/TopDownZombie.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/TopDownZombie.png",
         "kind": "image",
         "metadata": "",
         "name": "TopDownZombie.png",
@@ -145,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/Camera.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/Camera.png",
         "kind": "image",
         "metadata": "",
         "name": "Camera.png",
@@ -154,7 +154,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/2DWoodBox.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/2DWoodBox.jpg",
         "kind": "image",
         "metadata": "",
         "name": "2DWoodBox.jpg",
@@ -163,7 +163,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/block.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/block.png",
         "kind": "image",
         "metadata": "",
         "name": "block.png",
@@ -172,7 +172,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/dirtball.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/dirtball.png",
         "kind": "image",
         "metadata": "",
         "name": "dirtball.png",
@@ -181,7 +181,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/Foliage.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/Foliage.png",
         "kind": "image",
         "metadata": "",
         "name": "Foliage.png",
@@ -190,7 +190,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/symbol.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/symbol.png",
         "kind": "image",
         "metadata": "",
         "name": "symbol.png",
@@ -199,7 +199,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/ExplosionTexture.png",
+        "file": "https://resources.gdevelop-app.com/examples/zombie-laser/ExplosionTexture.png",
         "kind": "image",
         "metadata": "",
         "name": "ExplosionTexture.png",

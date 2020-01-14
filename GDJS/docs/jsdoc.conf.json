@@ -1,54 +1,55 @@
 {
-    "tags": {
-        "allowUnknownTags": false
-    },
-    "source": {
-        "include": [
-            "./Runtime/"
-        ],
-        "exclude": [
-            "./Runtime/Cocos2d/",
-            "./Runtime/Cordova/",
-            "./Runtime/Electron/",
-            "./Runtime/FacebookInstantGames/"
-        ],
-        "includePattern": ".+\\.js(doc)?$",
-        "excludePattern": "(^|\\/|\\\\)_"
-    },
-    "plugins": [
-        "plugins/markdown"
+  "tags": {
+    "allowUnknownTags": false
+  },
+  "source": {
+    "include": ["./Runtime/"],
+    "exclude": [
+      "./Runtime/Cocos2d/",
+      "./Runtime/Cordova/",
+      "./Runtime/Electron/",
+      "./Runtime/FacebookInstantGames/"
     ],
-    "templates": {
-        "default"       : {
-            "outputSourceFiles" : true
-        },
-        "applicationName": "GDevelop JS Runtime",
-        "footer"        : "Made with ♥ by Florian Rival and contributors (gdevelop-app.com)",
-        "copyright"     : "GDevelop Copyright © 2008-2018 Florian Rival",
-        "googleAnalytics": "TODO",
-        "openGraph": {
-            "title": "GDevelop JS Runtime Documentation",
-            "type": "website",
-            "image": "",
-            "site_name": "",
-            "url": ""
-        },
-        "meta": {
-            "title": "GDevelop JS Runtime Documentation",
-            "description": "Documentation for the GDevelop JavaScript game engine",
-            "keyword": "docs, documentation, gdevelop, game, engine, html5, javascript"
-        },
-        "linenums"      : true
+    "includePattern": ".+\\.js(doc)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "plugins": [
+    "plugins/markdown",
+    "../node_modules/jsdoc-plugin-intersection",
+    "../node_modules/jsdoc-autoprivate"
+  ],
+  "templates": {
+    "default": {
+      "outputSourceFiles": true,
+      "includeDate": false
     },
-    "markdown"  : {
-        "parser"        : "gfm",
-        "hardwrap"      : false
+    "applicationName": "GDevelop JS Runtime",
+    "footer": "Made with ♥ by Florian Rival and contributors (gdevelop-app.com)",
+    "copyright": "GDevelop Copyright © 2008-present Florian Rival",
+    "googleAnalytics": "TODO",
+    "openGraph": {
+      "title": "GDevelop JS Runtime Documentation",
+      "type": "website",
+      "image": "",
+      "site_name": "",
+      "url": ""
     },
-    "opts": {
-        "encoding"      : "utf8",
-        "recurse"       : true,
-        "private"       : false,
-        "lenient"       : true,
-        "destination"   : "../docs/GDJS Runtime Documentation"
-    }
+    "meta": {
+      "title": "GDevelop JS Runtime Documentation",
+      "description": "Documentation for the GDevelop JavaScript game engine",
+      "keyword": "docs, documentation, gdevelop, game, engine, html5, javascript"
+    },
+    "linenums": true
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": false
+  },
+  "opts": {
+    "encoding": "utf8",
+    "recurse": true,
+    "private": false,
+    "lenient": true,
+    "destination": "../docs/GDJS Runtime Documentation"
+  }
 }

@@ -44,7 +44,11 @@
  * @memberof gdjs
  * @class ParticleEmitterObject
  * @extends RuntimeObject
+<<<<<<< HEAD
  * @param {gdjs.runtimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+=======
+ * @param {gdjs.RuntimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @param {ParticleEmitterObjectData} particleObjectData The initial properties of the object
  */
 gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){

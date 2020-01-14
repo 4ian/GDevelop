@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding-basics/manBlue_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding-basics/manBlue_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "manBlue_stand.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding-basics/tile_205.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding-basics/tile_205.png",
         "kind": "image",
         "metadata": "",
         "name": "tile_205.png",

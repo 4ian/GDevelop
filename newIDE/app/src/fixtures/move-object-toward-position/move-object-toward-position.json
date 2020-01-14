@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-object-toward-position/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-object-toward-position/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-object-toward-position/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-object-toward-position/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",

@@ -9,7 +9,11 @@
  * @property {number} content.fontSize The size of the text
  * @property {boolean} content.wordWrap Activate word wrap if set to true
  * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @typedef {ObjectData & BBTextObjectDataType} BBTextObjectData
  */
 
@@ -18,7 +22,11 @@
  * @memberof gdjs
  * @class BBTextRuntimeObject
  * @extends RuntimeObject
+<<<<<<< HEAD
  * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+=======
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @param {BBTextObjectData} objectData The object data used to initialize the object
  */
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {

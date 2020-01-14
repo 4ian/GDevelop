@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 /// <reference path="runtimeobject.d.ts"/>
+=======
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
 // @ts-check
 
 /*
@@ -588,7 +591,7 @@ gdjs.RuntimeObject.prototype.hide = function(enable) {
 /**
  * Return true if the object is not hidden.
  *
- * @note This is unrelated to the actual visibility of the objec on the screen.
+ * Note: This is unrelated to the actual visibility of the objec on the screen.
  * For this, see `getVisibilityAABB` to get the bounding boxes of the object as displayed
  * on the scene.
  *

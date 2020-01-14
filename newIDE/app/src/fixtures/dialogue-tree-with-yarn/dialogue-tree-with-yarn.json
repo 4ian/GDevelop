@@ -112,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/Left.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Left.png",
         "kind": "image",
         "metadata": "",
         "name": "Left.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/Right.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Right.png",
         "kind": "image",
         "metadata": "",
         "name": "Right.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/PlayerArea.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/PlayerArea.png",
         "kind": "image",
         "metadata": "",
         "name": "PlayerArea.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/shadedDark06.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/shadedDark06.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark06.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/shadedDark05.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/shadedDark05.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark05.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/shadedDark45.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/shadedDark45.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark45.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/shadedDark09.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/shadedDark09.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark09.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/acorn-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/acorn-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\acorn-1.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/acorn-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/acorn-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\acorn-2.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/acorn-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/acorn-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\acorn-3.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-1.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-2.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-3.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-4.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-4.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-4.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-5.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-5.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-5.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-6.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-6.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-6.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-7.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-7.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-7.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-8.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-8.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\ant-8.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/bg-mountains.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/bg-mountains.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\bg-mountains.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/bg-trees.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/bg-trees.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\bg-trees.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/branch-01.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/branch-01.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\branch-01.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/branch-02.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/branch-02.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\branch-02.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/branch-03.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/branch-03.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\branch-03.png",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/branch-04.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/branch-04.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\branch-04.png",
@@ -328,7 +328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/branch-05.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/branch-05.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\branch-05.png",
@@ -337,7 +337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/enemy-death-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/enemy-death-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\enemy-death-1.png",
@@ -346,7 +346,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/enemy-death-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/enemy-death-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\enemy-death-2.png",
@@ -355,7 +355,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/enemy-death-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/enemy-death-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\enemy-death-3.png",
@@ -364,7 +364,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/enemy-death-4.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/enemy-death-4.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\enemy-death-4.png",
@@ -373,7 +373,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/gator-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/gator-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\gator-1.png",
@@ -382,7 +382,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/gator-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/gator-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\gator-2.png",
@@ -391,7 +391,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/gator-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/gator-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\gator-3.png",
@@ -400,7 +400,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/gator-4.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/gator-4.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\gator-4.png",
@@ -409,7 +409,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/grasshopper-fall-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/grasshopper-fall-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\grasshopper-fall-1.png",
@@ -418,7 +418,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/grasshopper-fall-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/grasshopper-fall-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\grasshopper-fall-2.png",
@@ -427,7 +427,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/grasshopper-jump-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/grasshopper-jump-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\grasshopper-jump-1.png",
@@ -436,7 +436,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/grasshopper-jump-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/grasshopper-jump-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\grasshopper-jump-2.png",
@@ -445,7 +445,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/leaves.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/leaves.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\leaves.png",
@@ -454,7 +454,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-crouch-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-crouch-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-crouch-1.png",
@@ -463,7 +463,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-crouch-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-crouch-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-crouch-2.png",
@@ -472,7 +472,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-hurt-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-hurt-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-hurt-1.png",
@@ -481,7 +481,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-hurt-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-hurt-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-hurt-2.png",
@@ -490,7 +490,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-1.png",
@@ -499,7 +499,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-2.png",
@@ -508,7 +508,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-3.png",
@@ -517,7 +517,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-4.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-4.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-4.png",
@@ -526,7 +526,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-5.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-5.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-5.png",
@@ -535,7 +535,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-6.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-6.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-6.png",
@@ -544,7 +544,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-7.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-7.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-7.png",
@@ -553,7 +553,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-idle-8.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-idle-8.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-idle-8.png",
@@ -562,7 +562,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-jump-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-jump-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-jump-1.png",
@@ -571,7 +571,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-jump-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-jump-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-jump-2.png",
@@ -580,7 +580,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-jump-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-jump-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-jump-3.png",
@@ -589,7 +589,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-jump-4.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-jump-4.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-jump-4.png",
@@ -598,7 +598,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-run-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-run-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-run-1.png",
@@ -607,7 +607,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-run-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-run-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-run-2.png",
@@ -616,7 +616,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-run-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-run-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-run-3.png",
@@ -625,7 +625,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-run-4.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-run-4.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-run-4.png",
@@ -634,7 +634,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-run-5.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-run-5.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-run-5.png",
@@ -643,7 +643,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/player-run-6.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/player-run-6.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\player-run-6.png",
@@ -652,7 +652,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/tileset_06.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/tileset_06.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\tileset_06.png",
@@ -661,7 +661,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/tileset_21.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/tileset_21.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\tileset_21.png",
@@ -670,7 +670,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/tileset_28.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/tileset_28.png",
         "kind": "image",
         "metadata": "",
         "name": "other\\tileset_28.png",
@@ -678,21 +678,21 @@
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/sounds/jump.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/sounds/jump.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "other\\sounds\\jump.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/sounds/item.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/sounds/item.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "other\\sounds\\item.ogg",
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/sounds/the_valley.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/sounds/the_valley.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "other\\sounds\\the_valley.ogg",
@@ -700,7 +700,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/otherbg-clouds-1-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/otherbg-clouds-1-1.png",
         "kind": "image",
         "metadata": "",
         "name": "other/otherbg-clouds-1-1.png",
@@ -709,7 +709,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-2.png",
         "kind": "image",
         "metadata": "",
         "name": "other/ant-2.png",
@@ -718,7 +718,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/other/ant-3.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/ant-3.png",
         "kind": "image",
         "metadata": "",
         "name": "other/ant-3.png",
@@ -727,7 +727,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/textBG.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/textBG.png",
         "kind": "image",
         "metadata": "",
         "name": "textBG.png",
@@ -736,7 +736,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/textBG-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/textBG-1.png",
         "kind": "image",
         "metadata": "",
         "name": "textBG-1.png",
@@ -745,7 +745,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/ant-1-0.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/ant-1-0.png",
         "kind": "image",
         "metadata": "",
         "name": "ant-1-0.png",
@@ -754,7 +754,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/ant-2.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/ant-2.png",
         "kind": "image",
         "metadata": "",
         "name": "ant-2.png",
@@ -763,7 +763,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/ant-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/ant-1.png",
         "kind": "image",
         "metadata": "",
         "name": "ant-1.png",
@@ -772,7 +772,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/sign-1-0.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/sign-1-0.png",
         "kind": "image",
         "metadata": "",
         "name": "sign-1-0.png",
@@ -781,7 +781,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/sign-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/sign-1.png",
         "kind": "image",
         "metadata": "",
         "name": "sign-1.png",
@@ -790,7 +790,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/NewObject2-1-0.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/NewObject2-1-0.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject2-1-0.png",
@@ -799,7 +799,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/NewObject2-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/NewObject2-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject2-1.png",
@@ -808,7 +808,7 @@
       },
       {
         "disablePreload": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/dialogueData/npcs.json",
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/dialogueData/npcs.json",
         "kind": "json",
         "metadata": "",
         "name": "dialogueData/npcs.json",
@@ -4515,7 +4515,7 @@
           "variables": [],
           "behaviors": [],
           "string": "x 0",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/Bimbo_JVE.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Bimbo_JVE.ttf",
           "characterSize": 40,
           "color": {
             "b": 0,
@@ -7775,7 +7775,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/dialogue-tree-with-yarn/jump.wav",
+                        "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/jump.wav",
                         "",
                         "",
                         ""

@@ -164,7 +164,7 @@
           "variables": [],
           "behaviors": [],
           "string": "Loading....",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/custom-font/IndieFlower.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/custom-font/IndieFlower.ttf",
           "characterSize": 30,
           "color": {
             "b": 0,
@@ -304,7 +304,7 @@
           "variables": [],
           "behaviors": [],
           "string": "This text is using a custom font from fonts.google.com\nTake a look at the text object properties to see how to setup",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/custom-font/IndieFlower.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/custom-font/IndieFlower.ttf",
           "characterSize": 30,
           "color": {
             "b": 0,

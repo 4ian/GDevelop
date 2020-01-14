@@ -5,15 +5,20 @@ mkdir -p ../docs
 mkdir -p logs
 cd ..
 cd Core/docs
-doxygen > ../../scripts/logs/CoreDoxygenLog.txt 2> ../../scripts/logs/CoreDoxygenWarningLog.txt
+doxygen
+echo ℹ️ Generated Core docs
 cd ../..
 cd GDJS/docs
-doxygen > ../../scripts/logs/GDJSDoxygenLog.txt  2> ../../scripts/logs/GDJSDoxygenWarningLog.txt
+doxygen
+echo ℹ️ Generated GDJS docs
 cd ../..
 cd GDCpp/docs
-doxygen > ../../scripts/logs/GDCppDoxygenLog.txt 2> ../../scripts/logs/GDCppDoxygenWarningLog.txt
+doxygen
+echo ℹ️ Generated GDCpp docs
 cd ../..
 cd GDJS
+npm install
 jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
+echo ℹ️ Generated GDJS Runtime docs
 cd ..
 cd scripts

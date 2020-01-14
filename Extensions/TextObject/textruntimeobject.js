@@ -15,7 +15,11 @@
  * @property {number} color.g The Green level from 0 to 255
  * @property {number} color.b The Blue level from 0 to 255
  * @property {string} string The text of the object
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @typedef {ObjectData & TextObjectDataType} TextObjectData
  */
 
@@ -25,11 +29,16 @@
  * @memberof gdjs
  * @class TextRuntimeObject
  * @extends RuntimeObject
+<<<<<<< HEAD
  * @param {gdjs.runtimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+=======
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @param {TextObjectData} textObjectData The initial properties of the object
  */
 gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 {
+<<<<<<< HEAD
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
     /** @type {number} */
@@ -49,6 +58,27 @@ gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 
     /** @type {Array<number>} */
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+=======
+    gdjs.RuntimeObject.call(this, runtimeScene, textObjectData);
+
+    /** @type {number} */
+    this._characterSize = Math.max(1, textObjectData.characterSize);
+
+    /** @type {string} */
+    this._fontName = textObjectData.font;
+
+    /** @type {boolean} */
+    this._bold = textObjectData.bold;
+
+    /** @type {boolean} */
+    this._italic = textObjectData.italic;
+
+    /** @type {boolean} */
+    this._underlined = textObjectData.underlined;
+
+    /** @type {Array<number>} */
+    this._color = [textObjectData.color.r, textObjectData.color.g, textObjectData.color.b];
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
 
     /** @type {boolean} */
     this._useGradient = false;
@@ -102,7 +132,11 @@ gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
     this._scaleY = 1;
 
     /** @type {string} */
+<<<<<<< HEAD
     this._str = objectData.string;
+=======
+    this._str = textObjectData.string;
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
 
     if (this._renderer)
         gdjs.TextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);

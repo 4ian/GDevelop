@@ -12,20 +12,7 @@ const gdevelopGamesPreviewBucket = 'gd-games-preview';
 
 export const GDevelopGamesPreview = {
   options: {
-    destinationBucket: gdevelopGamesPreviewBucket,
-    region: gdevelopGamesPreviewRegion,
     destinationBucketBaseUrl: `https://s3-${gdevelopGamesPreviewRegion}.amazonaws.com/${gdevelopGamesPreviewBucket}/`,
-  },
-};
-
-const gdevelopBuildUploadRegion = 'eu-west-1';
-const gdevelopBuildUploadBucket = 'gd-games-in';
-
-export const GDevelopBuildUpload = {
-  options: {
-    destinationBucket: gdevelopBuildUploadBucket,
-    region: gdevelopBuildUploadRegion,
-    destinationBucketBaseUrl: `https://s3-${gdevelopBuildUploadRegion}.amazonaws.com/${gdevelopBuildUploadBucket}/`,
   },
 };
 

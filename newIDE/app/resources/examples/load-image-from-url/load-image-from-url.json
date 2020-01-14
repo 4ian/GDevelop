@@ -428,7 +428,7 @@
               "parameters": [
                 "url",
                 "=",
-                "\"http://4ian.github.io/GD-Documentation/GDCore%20Documentation/gdlogo.png\""
+                "\"https://docs.gdevelop-app.com/GDCore%20Documentation/gdlogo.png\""
               ],
               "subInstructions": []
             },

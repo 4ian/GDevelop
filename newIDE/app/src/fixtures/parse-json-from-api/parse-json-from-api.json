@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/parse-json-from-api/sw.png",
+        "file": "https://resources.gdevelop-app.com/examples/parse-json-from-api/sw.png",
         "kind": "image",
         "metadata": "",
         "name": "sw.png",
@@ -268,7 +268,7 @@
           "variables": [],
           "behaviors": [],
           "string": "person",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/parse-json-from-api/Play-Regular.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/parse-json-from-api/Play-Regular.ttf",
           "characterSize": 30,
           "color": {
             "b": 28,
@@ -287,7 +287,7 @@
           "variables": [],
           "behaviors": [],
           "string": "Press any key or left mouse button to get a random Star Wars character from SWAPI",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/parse-json-from-api/Play-Regular.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/parse-json-from-api/Play-Regular.ttf",
           "characterSize": 20,
           "color": {
             "b": 255,

@@ -1,9 +1,8 @@
 // @flow
 import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
-import { GDevelopBuildApi, GDevelopBuildUpload } from './ApiConfigs';
-import { getUploadOptions } from './Usage';
-const awsS3 = require('aws-sdk/clients/s3');
+import { GDevelopBuildApi } from './ApiConfigs';
+import { getSignedUrl } from './Usage';
 
 export type TargetName =
   | 'winExe'
@@ -56,55 +55,27 @@ export const getBuildArtifactUrl = (
   return `https://s3-eu-west-1.amazonaws.com/gd-build/${build[keyName]}`;
 };
 
-let uploadAWSS3Client = null;
-const getAWSS3Client = (): Promise<any> => {
-  if (!uploadAWSS3Client) {
-    return getUploadOptions().then(uploadOptions => {
-      uploadAWSS3Client = new awsS3({
-        accessKeyId: uploadOptions.upload.ak1 + uploadOptions.upload.ak2,
-        secretAccessKey: uploadOptions.upload.sa1 + uploadOptions.upload.sa2,
-        region: GDevelopBuildUpload.options.region,
-        correctClockSkew: true,
-      });
+type UploadOptions = {|
+  signedUrl: string,
+  contentType: string,
+  key: string,
+|};
 
-      return uploadAWSS3Client;
-    });
-  }
-
-  return Promise.resolve(uploadAWSS3Client);
-};
-
-export const uploadBuildFile = (
-  blob: Blob,
-  onProgress: (progress: number, total: number) => void
-): Promise<string> => {
+export const getBuildFileUploadOptions = (): Promise<UploadOptions> => {
   const prefix = 'game-archive-' + makeTimestampedId();
   const filename = 'game-archive.zip';
+  const contentType = 'application/zip';
+  const key = prefix + '/' + filename;
 
-  return getAWSS3Client().then(awsS3Client => {
-    return new Promise((resolve, reject) => {
-      awsS3Client
-        .putObject(
-          {
-            Body: blob,
-            Bucket: GDevelopBuildUpload.options.destinationBucket,
-            Key: prefix + '/' + filename,
-          },
-          (err: ?Error) => {
-            if (err) return reject(err);
-
-            resolve(prefix + '/' + filename);
-          }
-        )
-        .on('httpUploadProgress', progress => {
-          if (!progress || !progress.total) {
-            onProgress(0, 0);
-            return;
-          }
-          onProgress(progress.loaded, progress.total);
-        });
-    });
-  });
+  return getSignedUrl({ uploadType: 'build', key, contentType }).then(
+    ({ signedUrl }) => {
+      return {
+        signedUrl,
+        contentType,
+        key,
+      };
+    }
+  );
 };
 
 export const buildElectron = (

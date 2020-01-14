@@ -7,9 +7,12 @@
   "devDependencies": {
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
+    "jsdoc-plugin-intersection": "^1.0.2",
     "typescript": "3.6.4"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jsdoc-autoprivate": "0.0.1"
+  },
   "scripts": {
     "copy-runtime-to-ide": "echo \"Use scripts/CopyRuntimeToGD.sh (or .bat on Windows)\"",
     "check-types": "tsc"

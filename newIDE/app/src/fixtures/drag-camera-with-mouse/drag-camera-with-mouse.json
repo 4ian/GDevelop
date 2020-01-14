@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drag-camera-with-mouse/green_sprite.png",
+        "file": "https://resources.gdevelop-app.com/examples/drag-camera-with-mouse/green_sprite.png",
         "kind": "image",
         "metadata": "",
         "name": "green_sprite.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drag-camera-with-mouse/orange_sprite.png",
+        "file": "https://resources.gdevelop-app.com/examples/drag-camera-with-mouse/orange_sprite.png",
         "kind": "image",
         "metadata": "",
         "name": "orange_sprite.png",

@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/snap-object-to-grid/Block-Normal.png",
+        "file": "https://resources.gdevelop-app.com/examples/snap-object-to-grid/Block-Normal.png",
         "kind": "image",
         "metadata": "",
         "name": "Block-Normal.png",
@@ -118,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/snap-object-to-grid/Pea-Standard.png",
+        "file": "https://resources.gdevelop-app.com/examples/snap-object-to-grid/Pea-Standard.png",
         "kind": "image",
         "metadata": "",
         "name": "Pea-Standard.png",

@@ -7,7 +7,11 @@
  * @typedef {Object} TiledSpriteObjectDataType Initial properties for a Tiled Sprite object
  * @property {number} width The width of the object
  * @property {number} height The height of the object
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @typedef {ObjectData & TiledSpriteObjectDataType} TiledSpriteObjectData
  */
 
@@ -17,8 +21,13 @@
  * @class TiledSpriteRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+<<<<<<< HEAD
  * @param {gdjs.RuntimeScene} runtimeScene The parent RuntimeScene Instance
  * @param {TiledSpriteObjectData} tiledSpriteObjectData The optional objectData
+=======
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {TiledSpriteObjectData} tiledSpriteObjectData The initial properties of the object
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  */
 gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
 {
@@ -28,10 +37,14 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
     this.opacity = 255;
 
     if (this._renderer)
-        gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, objectData.texture);
+        gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, tiledSpriteObjectData.texture);
     else
         /** @type {gdjs.TiledSpriteRuntimeObjectRenderer} */
+<<<<<<< HEAD
         this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(this, runtimeScene, objectData.texture);
+=======
+        this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(this, runtimeScene, tiledSpriteObjectData.texture);
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
 
     this.setWidth(tiledSpriteObjectData.width);
     this.setHeight(tiledSpriteObjectData.height);

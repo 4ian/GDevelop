@@ -115,7 +115,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/bordure2.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/bordure2.png",
         "kind": "image",
         "metadata": "",
         "name": "bordure2.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV1.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/tankV1.png",
         "kind": "image",
         "metadata": "",
         "name": "tank1",
@@ -133,7 +133,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV2.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/tankV2.png",
         "kind": "image",
         "metadata": "",
         "name": "tank2",
@@ -142,7 +142,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV3.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/tankV3.png",
         "kind": "image",
         "metadata": "",
         "name": "tank3",
@@ -151,7 +151,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV4.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/tankV4.png",
         "kind": "image",
         "metadata": "",
         "name": "tank4",
@@ -160,7 +160,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV5.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/tankV5.png",
         "kind": "image",
         "metadata": "",
         "name": "tank5",
@@ -169,7 +169,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV6.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/tankV6.png",
         "kind": "image",
         "metadata": "",
         "name": "tank6",
@@ -178,7 +178,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV7.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/tankV7.png",
         "kind": "image",
         "metadata": "",
         "name": "tank7",
@@ -187,7 +187,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/bordure.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/bordure.png",
         "kind": "image",
         "metadata": "",
         "name": "bordure.png",
@@ -196,7 +196,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/TankB1.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/TankB1.png",
         "kind": "image",
         "metadata": "",
         "name": "TankB1.png",
@@ -205,7 +205,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/alert.png",
+        "file": "https://resources.gdevelop-app.com/examples/basic-artificial-intelligence/alert.png",
         "kind": "image",
         "metadata": "",
         "name": "alert.png",

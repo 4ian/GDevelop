@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/idle1.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/idle1.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/idle1.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/idle2.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/idle2.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/idle2.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/up1.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/up1.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/up1.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/up2.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/up2.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/up2.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/down1.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/down1.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/down1.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/down2.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/down2.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/down2.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/background/space bg.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/background/space bg.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/background/space bg.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/background/corridor.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/background/corridor.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/background/corridor.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/asteroid/asteroid1.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/asteroid/asteroid1.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/asteroid/asteroid1.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/asteroid/asteroid2.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/asteroid/asteroid2.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/asteroid/asteroid2.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/asteroid/asteroid3.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/asteroid/asteroid3.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/asteroid/asteroid3.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy200.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy200.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy200.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy201.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy201.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy201.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy202.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy202.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy202.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy203.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy203.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy203.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy204.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy204.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy204.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy205.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy205.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy205.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy206.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy206.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy206.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy207.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy207.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy207.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy208.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy208.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy208.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy209.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy209.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy209.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy210.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy210.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy210.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy2/enemy211.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy2/enemy211.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy2/enemy211.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/bullet.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/bullet.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/bullet.png",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp00.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/powerUp/powerUp00.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/powerUp/powerUp00.png",
@@ -328,7 +328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp01.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/powerUp/powerUp01.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/powerUp/powerUp01.png",
@@ -337,7 +337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp02.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/powerUp/powerUp02.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/powerUp/powerUp02.png",
@@ -346,7 +346,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp03.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/powerUp/powerUp03.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/powerUp/powerUp03.png",
@@ -355,7 +355,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/powerUp/powerUp04.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/powerUp/powerUp04.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/powerUp/powerUp04.png",
@@ -364,7 +364,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion00.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/explosion/explosion00.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/explosion/explosion00.png",
@@ -373,7 +373,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion01.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/explosion/explosion01.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/explosion/explosion01.png",
@@ -382,7 +382,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion02.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/explosion/explosion02.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/explosion/explosion02.png",
@@ -391,7 +391,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion03.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/explosion/explosion03.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/explosion/explosion03.png",
@@ -400,7 +400,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion04.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/explosion/explosion04.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/explosion/explosion04.png",
@@ -409,7 +409,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/explosion/explosion05.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/explosion/explosion05.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/explosion/explosion05.png",
@@ -418,7 +418,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy3/enemy3.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy3/enemy3.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy3/enemy3.png",
@@ -427,7 +427,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy bullet/enemyBullet00.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy bullet/enemyBullet00.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy bullet/enemyBullet00.png",
@@ -436,7 +436,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy bullet/enemyBullet01.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy bullet/enemyBullet01.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy bullet/enemyBullet01.png",
@@ -445,7 +445,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy bullet/enemyBullet02.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy bullet/enemyBullet02.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy bullet/enemyBullet02.png",
@@ -454,7 +454,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy1/idle Left.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy1/idle Left.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy1/idle Left.png",
@@ -463,7 +463,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy1/turn left (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy1/turn left (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy1/turn left (1).png",
@@ -472,7 +472,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy1/turn left (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy1/turn left (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy1/turn left (2).png",
@@ -481,7 +481,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy1/turn left (3).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy1/turn left (3).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy1/turn left (3).png",
@@ -490,7 +490,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy1/turn left (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy1/turn left (4).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy1/turn left (4).png",
@@ -499,7 +499,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/enemy1/turn left (5).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/enemy1/turn left (5).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/enemy1/turn left (5).png",
@@ -507,21 +507,21 @@
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/sfx_shieldDown.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/audio/sfx_shieldDown.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/sfx_shieldDown.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/sfx_twoTone.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/audio/sfx_twoTone.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/sfx_twoTone.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/sfx_laser1.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/audio/sfx_laser1.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/sfx_laser1.ogg",
@@ -529,7 +529,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/attack flame00.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/attack flame00.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/attack flame00.png",
@@ -538,7 +538,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/player Ship/attack flame01.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/player Ship/attack flame01.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/player Ship/attack flame01.png",
@@ -546,7 +546,7 @@
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/audio/Heal.wav",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/audio/Heal.wav",
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/Heal.wav",
@@ -554,7 +554,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/life counter.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/life counter.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/life counter.png",
@@ -563,7 +563,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/life bar.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/life bar.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/life bar.png",
@@ -572,7 +572,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/idle1.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/idle1.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/idle1.png",
@@ -581,7 +581,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/idle2.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/idle2.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/idle2.png",
@@ -590,7 +590,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/up (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/up (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/up (1).png",
@@ -599,7 +599,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/up (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/up (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/up (2).png",
@@ -608,7 +608,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/down (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/down (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/down (1).png",
@@ -617,7 +617,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/down (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/down (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/down (2).png",
@@ -626,7 +626,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/robo change00.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/robo change00.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/robo change00.png",
@@ -635,7 +635,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/robo change01.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/robo change01.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/robo change01.png",
@@ -644,7 +644,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/robo change02.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/robo change02.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/robo change02.png",
@@ -653,7 +653,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/robo change03.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/robo change03.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/robo change03.png",
@@ -662,7 +662,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack00.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack00.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack00.png",
@@ -671,7 +671,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack01.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack01.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack01.png",
@@ -680,7 +680,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack02.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack02.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack02.png",
@@ -689,7 +689,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack03.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack03.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack03.png",
@@ -698,7 +698,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack04.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack04.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack04.png",
@@ -707,7 +707,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack05.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack05.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack05.png",
@@ -716,7 +716,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack06.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack06.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack06.png",
@@ -725,7 +725,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/playerMech/mech_attack_area.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/playerMech/mech_attack_area.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/playerMech/mech_attack_area.png",
@@ -734,7 +734,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/tiles mechanical/tiles mechanical 1.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/tiles mechanical/tiles mechanical 1.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/tiles mechanical/tiles mechanical 1.png",
@@ -743,7 +743,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/tiles mechanical/tiles mechanical 2.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/tiles mechanical/tiles mechanical 2.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/tiles mechanical/tiles mechanical 2.png",
@@ -752,7 +752,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/change button.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/change button.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/change button.png",
@@ -761,7 +761,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/idle.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/idle.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/idle.png",
@@ -770,7 +770,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/attack preparation (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/attack preparation (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/attack preparation (1).png",
@@ -779,7 +779,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/attack preparation (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/attack preparation (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/attack preparation (2).png",
@@ -788,7 +788,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/attack preparation (3).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/attack preparation (3).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/attack preparation (3).png",
@@ -797,7 +797,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/attack preparation (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/attack preparation (4).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/attack preparation (4).png",
@@ -806,7 +806,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/attack preparation (5).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/attack preparation (5).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/attack preparation (5).png",
@@ -815,7 +815,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/deploy (6).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/deploy (6).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/deploy (6).png",
@@ -824,7 +824,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/deploy (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/deploy (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/deploy (1).png",
@@ -833,7 +833,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/deploy (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/deploy (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/deploy (2).png",
@@ -842,7 +842,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/deploy (3).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/deploy (3).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/deploy (3).png",
@@ -851,7 +851,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/deploy (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/deploy (4).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/deploy (4).png",
@@ -860,7 +860,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/deploy (5).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/deploy (5).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/deploy (5).png",
@@ -869,7 +869,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/broken (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/broken (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/broken (1).png",
@@ -878,7 +878,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/broken (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/broken (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/broken (2).png",
@@ -887,7 +887,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/broken (3).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/broken (3).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/broken (3).png",
@@ -896,7 +896,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/broken (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/broken (4).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/broken (4).png",
@@ -905,7 +905,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/broken (5).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/broken (5).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/broken (5).png",
@@ -914,7 +914,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/top/broken (6).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/top/broken (6).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/top/broken (6).png",
@@ -923,7 +923,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/deploy (6).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/deploy (6).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/deploy (6).png",
@@ -932,7 +932,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/deploy (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/deploy (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/deploy (1).png",
@@ -941,7 +941,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/deploy (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/deploy (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/deploy (2).png",
@@ -950,7 +950,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/deploy (3).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/deploy (3).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/deploy (3).png",
@@ -959,7 +959,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/deploy (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/deploy (4).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/deploy (4).png",
@@ -968,7 +968,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/deploy (5).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/deploy (5).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/deploy (5).png",
@@ -977,7 +977,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/broken (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/broken (1).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/broken (1).png",
@@ -986,7 +986,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/broken (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/broken (2).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/broken (2).png",
@@ -995,7 +995,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/broken (3).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/broken (3).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/broken (3).png",
@@ -1004,7 +1004,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/broken (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/broken (4).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/broken (4).png",
@@ -1013,7 +1013,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/broken (5).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/broken (5).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/broken (5).png",
@@ -1022,7 +1022,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/arms/bottom/broken (6).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/arms/bottom/broken (6).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/arms/bottom/broken (6).png",
@@ -1031,7 +1031,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/laser/super_laser00.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/laser/super_laser00.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/laser/super_laser00.png",
@@ -1040,7 +1040,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/laser/super_laser01.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/laser/super_laser01.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/laser/super_laser01.png",
@@ -1049,7 +1049,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/background/boss background.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/background/boss background.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/background/boss background.png",
@@ -1058,7 +1058,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/attack preparation (6).png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/attack preparation (6).png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/attack preparation (6).png",
@@ -1067,7 +1067,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/Boss/body/boss body broken.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/Boss/body/boss body broken.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/Boss/body/boss body broken.png",
@@ -1076,7 +1076,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/black rectangle.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/black rectangle.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/black rectangle.png",
@@ -1085,7 +1085,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/assets/gameover.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-shooter/assets/gameover.png",
         "kind": "image",
         "metadata": "",
         "name": "assets/gameover.png",

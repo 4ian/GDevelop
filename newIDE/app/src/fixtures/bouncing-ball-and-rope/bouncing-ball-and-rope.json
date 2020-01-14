@@ -127,7 +127,7 @@
     "resources": [
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Finish.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Finish.png",
         "kind": "image",
         "metadata": "",
         "name": "Finish.png",
@@ -136,7 +136,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/GDevelop.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/GDevelop.png",
         "kind": "image",
         "metadata": "",
         "name": "GDevelop.png",
@@ -145,7 +145,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Back.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Back.jpg",
         "kind": "image",
         "metadata": "",
         "name": "Back.jpg",
@@ -154,7 +154,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Peg.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Peg.png",
         "kind": "image",
         "metadata": "",
         "name": "Peg.png",
@@ -163,7 +163,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Shelf.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Shelf.png",
         "kind": "image",
         "metadata": "",
         "name": "Shelf.png",
@@ -172,7 +172,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Ball.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Ball.png",
         "kind": "image",
         "metadata": "",
         "name": "Ball.png",
@@ -181,7 +181,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Shadow.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Shadow.png",
         "kind": "image",
         "metadata": "",
         "name": "Shadow.png",
@@ -190,7 +190,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/BoundsLine.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/BoundsLine.png",
         "kind": "image",
         "metadata": "",
         "name": "BoundsLine.png",

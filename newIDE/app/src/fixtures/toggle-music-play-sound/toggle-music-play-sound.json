@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/play.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/play.png",
         "kind": "image",
         "metadata": "",
         "name": "play.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/pause.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/pause.png",
         "kind": "image",
         "metadata": "",
         "name": "pause.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/sound_on.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/sound_on.png",
         "kind": "image",
         "metadata": "",
         "name": "sound_on.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/sound_off.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/sound_off.png",
         "kind": "image",
         "metadata": "",
         "name": "sound_off.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/music_play (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/music_play (1).png",
         "kind": "image",
         "metadata": "",
         "name": "music_play (1).png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/music_pause.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/music_pause.png",
         "kind": "image",
         "metadata": "",
         "name": "music_pause.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/volume_background.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/volume_background.png",
         "kind": "image",
         "metadata": "",
         "name": "volume_background.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/volume_slider.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/volume_slider.png",
         "kind": "image",
         "metadata": "",
         "name": "volume_slider.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/slider_button.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/slider_button.png",
         "kind": "image",
         "metadata": "",
         "name": "slider_button.png",
@@ -1141,7 +1141,7 @@
                   },
                   "parameters": [
                     "",
-                    "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/click.ogg",
+                    "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/click.ogg",
                     "",
                     "100",
                     "1"
@@ -1574,7 +1574,7 @@
                           },
                           "parameters": [
                             "",
-                            "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/Castle-of-Despair.ogg",
+                            "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/Castle-of-Despair.ogg",
                             "1",
                             "yes",
                             "100",

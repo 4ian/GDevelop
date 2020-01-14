@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/Background1.jpeg",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/Background1.jpeg",
         "kind": "image",
         "metadata": "",
         "name": "Background1.jpeg",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/playerShip1_red.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/playerShip1_red.png",
         "kind": "image",
         "metadata": "",
         "name": "playerShip1_red.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/enemyGreen2.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/enemyGreen2.png",
         "kind": "image",
         "metadata": "",
         "name": "enemyGreen2.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/enemyBlack5.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/enemyBlack5.png",
         "kind": "image",
         "metadata": "",
         "name": "enemyBlack5.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/enemyBlue1.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/enemyBlue1.png",
         "kind": "image",
         "metadata": "",
         "name": "enemyBlue1.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/spaceStation_028.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/spaceStation_028.png",
         "kind": "image",
         "metadata": "",
         "name": "spaceStation_028.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/laserRed06.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/laserRed06.png",
         "kind": "image",
         "metadata": "",
         "name": "laserRed06.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/laserGreen04.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/laserGreen04.png",
         "kind": "image",
         "metadata": "",
         "name": "laserGreen04.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/Base.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/Base.png",
         "kind": "image",
         "metadata": "",
         "name": "Base.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/GDevelop.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/GDevelop.png",
         "kind": "image",
         "metadata": "",
         "name": "GDevelop.png",
@@ -192,35 +192,35 @@
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/Audio/laser1.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/Audio/laser1.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "laser1.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/Audio/laser8.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/Audio/laser8.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "laser8.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/Audio/twoTone1.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/Audio/twoTone1.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "twoTone1.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/Audio/lowRandom.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/Audio/lowRandom.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "lowRandom.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/Kenney Future Narrow.ttf",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/Kenney Future Narrow.ttf",
         "kind": "font",
         "metadata": "",
         "name": "Kenney Future Narrow.ttf",
@@ -228,7 +228,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/Left.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/Left.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Left.png",
@@ -237,7 +237,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/Right.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/Right.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Right.png",
@@ -246,7 +246,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/space-invaders/GFX/Fire.png",
+        "file": "https://resources.gdevelop-app.com/examples/space-invaders/GFX/Fire.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Fire.png",

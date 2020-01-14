@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Head.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Head.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Head.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Torso.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Torso.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Torso.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Thigh.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Thigh.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Thigh.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Leg.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Leg.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Leg.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Upper Arm.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Upper Arm.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Upper Arm.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Arm.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Arm.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Arm.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/FrontWheel.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/FrontWheel.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\FrontWheel.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/BackWheel.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/BackWheel.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\BackWheel.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Ground.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Ground.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Ground.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Pedal.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Pedal.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Pedal.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Crank.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Crank.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Crank.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Saddle.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Saddle.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Saddle.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/FrontSuspensionBottom.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/FrontSuspensionBottom.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\FrontSuspensionBottom.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/RearSuspension.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/RearSuspension.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\RearSuspension.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Frame.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Frame.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Frame.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Win.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Win.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Win.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Start.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Start.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Start.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Forward.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Forward.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Forward.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Backward.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Backward.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Backward.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Brake.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Brake.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Brake.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Esc.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Esc.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Esc.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Left.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Left.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Left.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Right.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Right.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Right.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/snow.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/snow.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\snow.png",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/cliff.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/cliff.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX/cliff.png",
@@ -328,7 +328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/tree10.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/tree10.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\tree10.png",
@@ -337,7 +337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/bush.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/bush.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\bush.png",
@@ -346,7 +346,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/grass.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/grass.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\grass.png",
@@ -355,7 +355,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/signRight.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/signRight.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\signRight.png",
@@ -364,7 +364,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Shelf.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Shelf.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Shelf.png",
@@ -373,7 +373,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Stone.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/Stone.jpg",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\Stone.jpg",
@@ -382,7 +382,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/cliff.png",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/cliff.png",
         "kind": "image",
         "metadata": "",
         "name": "GFX\\cliff.png",
@@ -390,7 +390,7 @@
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/SF Atarian System.ttf",
+        "file": "https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/GFX/SF Atarian System.ttf",
         "kind": "font",
         "metadata": "",
         "name": "GFX\\SF Atarian System.ttf",

@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/save-load/media/object.png",
+        "file": "https://resources.gdevelop-app.com/examples/save-load/media/object.png",
         "kind": "image",
         "metadata": "",
         "name": "object.png",
@@ -118,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/save-load/media/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/save-load/media/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -127,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/save-load/media/p2_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/save-load/media/p2_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_jump.png",
@@ -136,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/save-load/media/p3_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/save-load/media/p3_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_jump.png",

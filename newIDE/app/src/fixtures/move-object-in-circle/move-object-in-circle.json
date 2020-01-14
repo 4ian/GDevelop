@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-object-in-circle/rect_green.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-object-in-circle/rect_green.png",
         "kind": "image",
         "metadata": "",
         "name": "rect_green.png",

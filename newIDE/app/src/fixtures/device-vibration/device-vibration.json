@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-vibration/img/blue.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-vibration/img/blue.png",
         "kind": "image",
         "metadata": "",
         "name": "blue.png",

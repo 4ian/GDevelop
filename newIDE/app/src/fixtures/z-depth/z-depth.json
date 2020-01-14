@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/player/p1_front.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/player/p1_front.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_front.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile000.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile000.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile000.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile001.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile001.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile001.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile002.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile002.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile002.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile018.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile018.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile018.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile019.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile019.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile019.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile020.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile020.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile020.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile036.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile036.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile036.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile037.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile037.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile037.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile038.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile038.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile038.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile039.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile039.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile039.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile040.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/tiles/rpgTile040.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile040.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile175.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile175.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile175.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile176.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile176.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile176.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile177.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile177.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile177.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile179.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile179.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile179.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile178.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile178.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile178.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile180.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile180.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile180.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile195.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile195.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile195.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile196.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile196.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile196.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile197.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile197.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile197.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile198.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile198.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile198.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile199.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile199.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile199.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile200.png",
+        "file": "https://resources.gdevelop-app.com/examples/z-depth/assets/trees/rpgTile200.png",
         "kind": "image",
         "metadata": "",
         "name": "rpgTile200.png",

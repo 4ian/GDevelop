@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/infinite-scrolling-background/images/background.png",
+        "file": "https://resources.gdevelop-app.com/examples/infinite-scrolling-background/images/background.png",
         "kind": "image",
         "metadata": "",
         "name": "background.png",

@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/change-sprite-animation/images/player_cheer1.png",
+        "file": "https://resources.gdevelop-app.com/examples/change-sprite-animation/images/player_cheer1.png",
         "kind": "image",
         "metadata": "",
         "name": "player_cheer1.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/change-sprite-animation/images/player_duck.png",
+        "file": "https://resources.gdevelop-app.com/examples/change-sprite-animation/images/player_duck.png",
         "kind": "image",
         "metadata": "",
         "name": "player_duck.png",

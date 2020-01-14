@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics-joints-demo/Wall.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics-joints-demo/Wall.png",
         "kind": "image",
         "metadata": "",
         "name": "Wall.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics-joints-demo/Box.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics-joints-demo/Box.png",
         "kind": "image",
         "metadata": "",
         "name": "Box.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics-joints-demo/Circle.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics-joints-demo/Circle.png",
         "kind": "image",
         "metadata": "",
         "name": "Circle.png",

@@ -5,7 +5,9 @@ import assignIn from 'lodash/assignIn';
 import {
   type Build,
   buildCordovaAndroid,
+  getBuildFileUploadOptions,
 } from '../../Utils/GDevelopServices/Build';
+import { uploadLocalFile } from './LocalFileUploader';
 import { type UserProfile } from '../../Profile/UserProfileContext';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
@@ -18,8 +20,6 @@ import {
 import { ExplanationHeader } from '../GenericExporters/OnlineCordovaExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
-const electron = optionalRequire('electron');
-const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd = global.gd;
 
 type ExportState = null;
@@ -121,23 +121,12 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     outputFile: CompressionOutput
   ): Promise<string> => {
-    if (!ipcRenderer) return Promise.reject('No support for upload');
-
-    ipcRenderer.removeAllListeners('s3-file-upload-progress');
-    ipcRenderer.removeAllListeners('s3-file-upload-done');
-
-    return new Promise((resolve, reject) => {
-      ipcRenderer.on(
-        's3-file-upload-progress',
-        (event, stepCurrentProgress, stepMaxProgress) => {
-          context.updateStepProgress(stepCurrentProgress, stepMaxProgress);
-        }
-      );
-      ipcRenderer.on('s3-file-upload-done', (event, err, prefix) => {
-        if (err) return reject(err);
-        resolve(prefix);
-      });
-      ipcRenderer.send('s3-file-upload', outputFile);
+    return getBuildFileUploadOptions().then(uploadOptions => {
+      return uploadLocalFile(
+        outputFile,
+        uploadOptions,
+        context.updateStepProgress
+      ).then(() => uploadOptions.key);
     });
   },
 

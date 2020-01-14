@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/playerShip2_blue.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/playerShip2_blue.png",
         "kind": "image",
         "metadata": "",
         "name": "playerShip2_blue.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/meteorBrown_med1.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/meteorBrown_med1.png",
         "kind": "image",
         "metadata": "",
         "name": "meteorBrown_med1.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserBlue03.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserBlue03.png",
         "kind": "image",
         "metadata": "",
         "name": "laserBlue03.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/enemyBlack1.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/enemyBlack1.png",
         "kind": "image",
         "metadata": "",
         "name": "enemyBlack1.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/enemyBlue2.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/enemyBlue2.png",
         "kind": "image",
         "metadata": "",
         "name": "enemyBlue2.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/purpleSpaceBackground.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/purpleSpaceBackground.png",
         "kind": "image",
         "metadata": "",
         "name": "purpleSpaceBackground.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserBlue09.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserBlue09.png",
         "kind": "image",
         "metadata": "",
         "name": "laserBlue09.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserBlue10.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserBlue10.png",
         "kind": "image",
         "metadata": "",
         "name": "laserBlue10.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserBlue11.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserBlue11.png",
         "kind": "image",
         "metadata": "",
         "name": "laserBlue11.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/enemyGreen3.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/enemyGreen3.png",
         "kind": "image",
         "metadata": "",
         "name": "enemyGreen3.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserRed16.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserRed16.png",
         "kind": "image",
         "metadata": "",
         "name": "laserRed16.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserRed09.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserRed09.png",
         "kind": "image",
         "metadata": "",
         "name": "laserRed09.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserRed10.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserRed10.png",
         "kind": "image",
         "metadata": "",
         "name": "laserRed10.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/laserRed11.png",
+        "file": "https://resources.gdevelop-app.com/examples/simple-space-shooter/laserRed11.png",
         "kind": "image",
         "metadata": "",
         "name": "laserRed11.png",
@@ -1956,7 +1956,7 @@
           "variables": [],
           "behaviors": [],
           "string": "GAME OVER",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/kenvector_future.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/simple-space-shooter/kenvector_future.ttf",
           "characterSize": 60,
           "color": {
             "b": 255,
@@ -2177,7 +2177,7 @@
                           },
                           "parameters": [
                             "",
-                            "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/sfx_laser1.ogg",
+                            "https://resources.gdevelop-app.com/examples/simple-space-shooter/sfx_laser1.ogg",
                             "",
                             "5",
                             ""
@@ -2758,7 +2758,7 @@
                                   },
                                   "parameters": [
                                     "",
-                                    "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/sfx_shieldDown.ogg",
+                                    "https://resources.gdevelop-app.com/examples/simple-space-shooter/sfx_shieldDown.ogg",
                                     "",
                                     "100",
                                     ""
@@ -2954,7 +2954,7 @@
                                   },
                                   "parameters": [
                                     "",
-                                    "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/sfx_twoTone.ogg",
+                                    "https://resources.gdevelop-app.com/examples/simple-space-shooter/sfx_twoTone.ogg",
                                     "",
                                     "20",
                                     ""
@@ -3093,7 +3093,7 @@
                           },
                           "parameters": [
                             "",
-                            "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/sfx_shieldDown.ogg",
+                            "https://resources.gdevelop-app.com/examples/simple-space-shooter/sfx_shieldDown.ogg",
                             "",
                             "20",
                             ""
@@ -3372,7 +3372,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/simple-space-shooter/sfx_lose.ogg",
+                        "https://resources.gdevelop-app.com/examples/simple-space-shooter/sfx_lose.ogg",
                         "",
                         "",
                         ""

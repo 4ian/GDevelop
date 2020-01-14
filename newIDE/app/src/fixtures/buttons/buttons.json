@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/buttons/NormalBt.png",
+        "file": "https://resources.gdevelop-app.com/examples/buttons/NormalBt.png",
         "kind": "image",
         "metadata": "",
         "name": "NormalBt.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/buttons/HoveredBt.png",
+        "file": "https://resources.gdevelop-app.com/examples/buttons/HoveredBt.png",
         "kind": "image",
         "metadata": "",
         "name": "HoveredBt.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/buttons/PressedBt.png",
+        "file": "https://resources.gdevelop-app.com/examples/buttons/PressedBt.png",
         "kind": "image",
         "metadata": "",
         "name": "PressedBt.png",

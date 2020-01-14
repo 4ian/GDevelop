@@ -10,9 +10,7 @@ const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
-const {
-  uploadArchiveToBucket,
-} = require('./S3Upload');
+const { uploadLocalFile } = require('./LocalFileUploader');
 const {
   serveFolder,
   stopServer,
@@ -215,17 +213,27 @@ app.on('ready', function() {
     mainWindow.webContents.send('yarn-changes-saved', newFilePath);
   });
 
-  // S3Upload events:
-  ipcMain.on('s3-file-upload', (event, localFile) => {
-    log.info('Received event s3-file-upload with localFile=', localFile);
+  // LocalFileUploader events:
+  ipcMain.on('local-file-upload', (event, localFilePath, uploadOptions) => {
+    log.info(
+      'Received event local-file-upload with localFilePath=',
+      localFilePath
+    );
 
-    uploadArchiveToBucket(
-      localFile,
+    uploadLocalFile(
+      localFilePath,
+      uploadOptions,
       throttle((current, max) => {
-        event.sender.send('s3-file-upload-progress', current, max);
-      }, 300),
-      (err, prefix) => {
-        event.sender.send('s3-file-upload-done', err, prefix);
+        event.sender.send('local-file-upload-progress', current, max);
+      }, 300)
+    ).then(
+      () => {
+        log.info('Local file upload succesfully done');
+        event.sender.send('local-file-upload-done', null);
+      },
+      uploadError => {
+        log.error('Local file upload errored', uploadError);
+        event.sender.send('local-file-upload-done', uploadError);
       }
     );
   });

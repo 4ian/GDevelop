@@ -170,7 +170,7 @@
           "variables": [],
           "behaviors": [],
           "string": "(...)",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/type-on-text-effect/pixelmix/pixelmix.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/type-on-text-effect/pixelmix/pixelmix.ttf",
           "characterSize": 16,
           "color": {
             "b": 0,
@@ -679,7 +679,7 @@
                   },
                   "parameters": [
                     "",
-                    "https://df5lqcdudryde.cloudfront.net/examples/type-on-text-effect/blip.wav",
+                    "https://resources.gdevelop-app.com/examples/type-on-text-effect/blip.wav",
                     "no",
                     "25",
                     "0.75"

@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/position_placeholder-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/position_placeholder-1.png",
         "kind": "image",
         "metadata": "",
         "name": "images/position_placeholder-1.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_back.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_back.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_back.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_blowfish.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_blowfish.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_blowfish.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_crab.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_crab.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_crab.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_seahorse.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_seahorse.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_seahorse.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_snail.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_snail.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_snail.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_seagrass.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_seagrass.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_seagrass.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_coral.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_coral.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_coral.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_anemone.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_anemone.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_anemone.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/card_plasticbag.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/card_plasticbag.png",
         "kind": "image",
         "metadata": "",
         "name": "images/card_plasticbag.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/board.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/board.png",
         "kind": "image",
         "metadata": "",
         "name": "images/board.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/button.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/button.png",
         "kind": "image",
         "metadata": "",
         "name": "images/button.png",
@@ -210,7 +210,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/fonts/LuckiestGuy.ttf",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/fonts/LuckiestGuy.ttf",
         "kind": "font",
         "metadata": "",
         "name": "fonts/LuckiestGuy.ttf",
@@ -218,7 +218,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/background.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/background.png",
         "kind": "image",
         "metadata": "",
         "name": "images/background.png",
@@ -227,7 +227,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/star.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/star.png",
         "kind": "image",
         "metadata": "",
         "name": "images/star.png",
@@ -236,7 +236,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/images/screen_fade-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/images/screen_fade-1.png",
         "kind": "image",
         "metadata": "",
         "name": "images/screen_fade-1.png",
@@ -244,28 +244,28 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/sounds/cockatrice_playcard.mp3",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/sounds/cockatrice_playcard.mp3",
         "kind": "audio",
         "metadata": "",
         "name": "sounds/cockatrice_playcard.mp3",
         "userAdded": false
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/sounds/cuckoo.wav",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/sounds/cuckoo.wav",
         "kind": "audio",
         "metadata": "",
         "name": "sounds/cuckoo.wav",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/sounds/Rise.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/sounds/Rise.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "sounds/Rise.ogg",
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pairs/sounds/pop.ogg",
+        "file": "https://resources.gdevelop-app.com/examples/pairs/sounds/pop.ogg",
         "kind": "audio",
         "metadata": "",
         "name": "sounds/pop.ogg",

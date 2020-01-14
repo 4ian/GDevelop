@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/particles-various-effects/ExplosionTexture.png",
+        "file": "https://resources.gdevelop-app.com/examples/particles-various-effects/ExplosionTexture.png",
         "kind": "image",
         "metadata": "",
         "name": "Fire",

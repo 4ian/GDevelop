@@ -112,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_stand.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk01.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk01.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk01.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk02.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk02.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk02.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk03.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk04.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk05.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk06.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk07.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk08.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk08.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk08.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk09.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk09.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk09.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk10.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk10.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk10.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p1_walk11.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p1_walk11.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk11.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "brickWall.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/bridge.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/bridge.png",
         "kind": "image",
         "metadata": "",
         "name": "bridge.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/grassHalfMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/grassHalfMid.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfMid.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/castleCenter.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/castleCenter.png",
         "kind": "image",
         "metadata": "",
         "name": "castleCenter.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/bridgeLogs.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/bridgeLogs.png",
         "kind": "image",
         "metadata": "",
         "name": "bridgeLogs.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/Left.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/Left.png",
         "kind": "image",
         "metadata": "",
         "name": "Left.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/Right.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/Right.png",
         "kind": "image",
         "metadata": "",
         "name": "Right.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/ladder_mid.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/ladder_mid.png",
         "kind": "image",
         "metadata": "",
         "name": "ladder_mid.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/Grass.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/Grass.png",
         "kind": "image",
         "metadata": "",
         "name": "grass.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/PlayerArea.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/PlayerArea.png",
         "kind": "image",
         "metadata": "",
         "name": "PlayerArea.png",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/slimeWalk1.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/slimeWalk1.png",
         "kind": "image",
         "metadata": "",
         "name": "slimeWalk1.png",
@@ -328,7 +328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/slimeWalk2.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/slimeWalk2.png",
         "kind": "image",
         "metadata": "",
         "name": "slimeWalk2.png",
@@ -337,7 +337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/slimeDead.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/slimeDead.png",
         "kind": "image",
         "metadata": "",
         "name": "slimeDead.png",
@@ -346,7 +346,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/flyFly1.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/flyFly1.png",
         "kind": "image",
         "metadata": "",
         "name": "flyFly1.png",
@@ -355,7 +355,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/flyFly2.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/flyFly2.png",
         "kind": "image",
         "metadata": "",
         "name": "flyFly2.png",
@@ -364,7 +364,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/flyDead.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/flyDead.png",
         "kind": "image",
         "metadata": "",
         "name": "flyDead.png",
@@ -373,7 +373,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/cloud1.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/cloud1.png",
         "kind": "image",
         "metadata": "",
         "name": "cloud1.png",
@@ -382,7 +382,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/cloud2.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/cloud2.png",
         "kind": "image",
         "metadata": "",
         "name": "cloud2.png",
@@ -391,7 +391,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/cloud3.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/cloud3.png",
         "kind": "image",
         "metadata": "",
         "name": "cloud3.png",
@@ -400,7 +400,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/bush.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/bush.png",
         "kind": "image",
         "metadata": "",
         "name": "bush.png",
@@ -409,7 +409,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/cactus.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/cactus.png",
         "kind": "image",
         "metadata": "",
         "name": "cactus.png",
@@ -418,7 +418,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/plant.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/plant.png",
         "kind": "image",
         "metadata": "",
         "name": "plant.png",
@@ -427,7 +427,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",
@@ -436,7 +436,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/shadedDark06.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/shadedDark06.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark06.png",
@@ -445,7 +445,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/shadedDark05.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/shadedDark05.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark05.png",
@@ -454,7 +454,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/shadedDark45.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/shadedDark45.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark45.png",
@@ -463,7 +463,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/shadedDark09.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/shadedDark09.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark09.png",
@@ -472,7 +472,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p2_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p2_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_stand.png",
@@ -481,7 +481,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p2_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p2_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_jump.png",
@@ -490,7 +490,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p2_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p2_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_walk03.png",
@@ -499,7 +499,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p2_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p2_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_walk04.png",
@@ -508,7 +508,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p2_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p2_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_walk05.png",
@@ -517,7 +517,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p2_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p2_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_walk06.png",
@@ -526,7 +526,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p2_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p2_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p2_walk07.png",
@@ -535,7 +535,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p3_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p3_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_stand.png",
@@ -544,7 +544,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p3_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p3_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_jump.png",
@@ -553,7 +553,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p3_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p3_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_walk03.png",
@@ -562,7 +562,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p3_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p3_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_walk04.png",
@@ -571,7 +571,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p3_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p3_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_walk05.png",
@@ -580,7 +580,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p3_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p3_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_walk06.png",
@@ -589,7 +589,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/p3_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/character-selection/p3_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p3_walk07.png",
@@ -4463,7 +4463,7 @@
           "variables": [],
           "behaviors": [],
           "string": "x 0",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/character-selection/Bimbo_JVE.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/character-selection/Bimbo_JVE.ttf",
           "characterSize": 40,
           "color": {
             "b": 0,
@@ -5033,7 +5033,7 @@
                   },
                   "parameters": [
                     "",
-                    "https://df5lqcdudryde.cloudfront.net/examples/character-selection/jump.wav",
+                    "https://resources.gdevelop-app.com/examples/character-selection/jump.wav",
                     "",
                     "",
                     ""
@@ -6125,7 +6125,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/character-selection/jump.wav",
+                        "https://resources.gdevelop-app.com/examples/character-selection/jump.wav",
                         "",
                         "",
                         ""
@@ -6357,7 +6357,7 @@
               },
               "parameters": [
                 "",
-                "https://df5lqcdudryde.cloudfront.net/examples/character-selection/coin.wav",
+                "https://resources.gdevelop-app.com/examples/character-selection/coin.wav",
                 "",
                 "",
                 ""

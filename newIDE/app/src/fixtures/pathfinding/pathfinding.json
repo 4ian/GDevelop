@@ -112,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Pointer-Standard.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/Pointer-Standard.png",
         "kind": "image",
         "metadata": "",
         "name": "Pointer-Standard.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/3DWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/3DWall.png",
         "kind": "image",
         "metadata": "",
         "name": "3DWall.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Pea-Happy.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/Pea-Happy.png",
         "kind": "image",
         "metadata": "",
         "name": "Pea-Happy.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Target.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/Target.png",
         "kind": "image",
         "metadata": "",
         "name": "Flag-Pole.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Pea-Standard.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/Pea-Standard.png",
         "kind": "image",
         "metadata": "",
         "name": "Pea-Standard.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0001.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0001.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0002.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0002.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0003.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0003.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0004.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0004.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0005.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0005.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0006.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0006.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0007.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0007.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame2-0008.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame2-0008.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10001.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10001.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10001.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10002.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10002.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10002.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10003.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10003.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10003.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10004.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10004.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10004.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10005.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10005.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10005.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10006.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10006.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10006.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10007.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10007.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10007.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10008.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/tank_frame10008.png",
         "kind": "image",
         "metadata": "",
         "name": "tank_frame10008.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/DestroyedTank.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/DestroyedTank.png",
         "kind": "image",
         "metadata": "",
         "name": "DestroyedTank.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/ExplosionTexture.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/ExplosionTexture.png",
         "kind": "image",
         "metadata": "",
         "name": "Fire",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/GrassDead.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/GrassDead.png",
         "kind": "image",
         "metadata": "",
         "name": "GrassDead.png",
@@ -328,7 +328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/NodeMarker.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/NodeMarker.png",
         "kind": "image",
         "metadata": "",
         "name": "NodeMarker.png",
@@ -337,7 +337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/symbol.png",
+        "file": "https://resources.gdevelop-app.com/examples/pathfinding/symbol.png",
         "kind": "image",
         "metadata": "",
         "name": "symbol.png",

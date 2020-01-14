@@ -4,9 +4,10 @@ import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
-  uploadBuildFile,
   buildWeb,
+  getBuildFileUploadOptions,
 } from '../../Utils/GDevelopServices/Build';
+import { uploadBlobFile } from './BrowserFileUploader';
 import { type UserProfile } from '../../Profile/UserProfileContext';
 import { findGDJS } from '../../GameEngineFinder/BrowserS3GDJSFinder';
 import BrowserFileSystem from './BrowserFileSystem';
@@ -132,7 +133,13 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
-    return uploadBuildFile(blobFile, context.updateStepProgress);
+    return getBuildFileUploadOptions().then(uploadOptions => {
+      return uploadBlobFile(
+        blobFile,
+        uploadOptions,
+        context.updateStepProgress
+      ).then(() => uploadOptions.key);
+    });
   },
 
   launchOnlineBuild: (

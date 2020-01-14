@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/custom-mouse-pointer/mouse-pointer.png",
+        "file": "https://resources.gdevelop-app.com/examples/custom-mouse-pointer/mouse-pointer.png",
         "kind": "image",
         "metadata": "",
         "name": "mouse-pointer.png",

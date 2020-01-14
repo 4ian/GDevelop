@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/terrain.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/terrain.png",
         "kind": "image",
         "metadata": "",
         "name": "terrain.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-red.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/brick-red.png",
         "kind": "image",
         "metadata": "",
         "name": "brick-red.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/paddle.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/paddle.png",
         "kind": "image",
         "metadata": "",
         "name": "paddle.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/ball-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/ball-1.png",
         "kind": "image",
         "metadata": "",
         "name": "ball-1.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/ball.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/ball.png",
         "kind": "image",
         "metadata": "",
         "name": "ball.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-green.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/brick-green.png",
         "kind": "image",
         "metadata": "",
         "name": "brick-green.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-yellow.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/brick-yellow.png",
         "kind": "image",
         "metadata": "",
         "name": "brick-yellow.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barrier-left.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/barrier-left.png",
         "kind": "image",
         "metadata": "",
         "name": "barrier-left.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barrier-top.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/barrier-top.png",
         "kind": "image",
         "metadata": "",
         "name": "barrier-top.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barrier-right.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/barrier-right.png",
         "kind": "image",
         "metadata": "",
         "name": "barrier-right.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/NewObject-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/NewObject-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject-1.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/NewObject-1-0.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/NewObject-1-0.png",
         "kind": "image",
         "metadata": "",
         "name": "NewObject-1-0.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barrier-tl.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/barrier-tl.png",
         "kind": "image",
         "metadata": "",
         "name": "barrier-tl.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barrier-y.png",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/barrier-y.png",
         "kind": "image",
         "metadata": "",
         "name": "barrier-y.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barrier.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/breakout/barrier.jpg",
         "kind": "image",
         "metadata": "",
         "name": "barrier.jpg",

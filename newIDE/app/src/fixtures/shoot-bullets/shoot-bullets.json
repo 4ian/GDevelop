@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullets/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/shoot-bullets/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullets/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/shoot-bullets/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullets/images/manBlue_machine.png",
+        "file": "https://resources.gdevelop-app.com/examples/shoot-bullets/images/manBlue_machine.png",
         "kind": "image",
         "metadata": "",
         "name": "manBlue_machine.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullets/images/laserBlue07.png",
+        "file": "https://resources.gdevelop-app.com/examples/shoot-bullets/images/laserBlue07.png",
         "kind": "image",
         "metadata": "",
         "name": "laserBlue07.png",

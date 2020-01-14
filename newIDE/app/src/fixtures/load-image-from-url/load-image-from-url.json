@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/load-image-from-url/Credits.png",
+        "file": "https://resources.gdevelop-app.com/examples/load-image-from-url/Credits.png",
         "kind": "image",
         "metadata": "",
         "name": "Credits.png",
@@ -436,7 +436,7 @@
               "parameters": [
                 "url",
                 "=",
-                "\"http://4ian.github.io/GD-Documentation/GDCore%20Documentation/gdlogo.png\""
+                "\"https://docs.gdevelop-app.com/GDCore%20Documentation/gdlogo.png\""
               ],
               "subInstructions": []
             },

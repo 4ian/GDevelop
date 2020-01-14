@@ -112,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_stand.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk01.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk01.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk01.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk02.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk02.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk02.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk03.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk04.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk05.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk06.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk07.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk08.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk08.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk08.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk09.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk09.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk09.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk10.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk10.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk10.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/p1_walk11.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/p1_walk11.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk11.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "brickWall.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/grassHalfMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/grassHalfMid.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfMid.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/bridgeLogs.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/bridgeLogs.png",
         "kind": "image",
         "metadata": "",
         "name": "bridgeLogs.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/flatDark23.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/flatDark23.png",
         "kind": "image",
         "metadata": "",
         "name": "flatDark23.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/flatDark24.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/flatDark24.png",
         "kind": "image",
         "metadata": "",
         "name": "flatDark24.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/animation-speed-scale/flatDark44.png",
+        "file": "https://resources.gdevelop-app.com/examples/animation-speed-scale/flatDark44.png",
         "kind": "image",
         "metadata": "",
         "name": "flatDark44.png",

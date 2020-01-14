@@ -185,30 +185,17 @@ export const changeUserSubscription = (
     .then(response => response.data);
 };
 
-// TODO: Duplicated for now in S3Upload.js
-export const getUploadOptions = (): Promise<{
-  preview: {
-    ak1: string,
-    ak2: string,
-    sa1: string,
-    sa2: string,
-  },
-  upload: {
-    ak1: string,
-    ak2: string,
-    sa1: string,
-    sa2: string,
-  },
+type UploadType = 'build' | 'preview';
+
+export const getSignedUrl = (params: {|
+  uploadType: UploadType,
+  key: string,
+  contentType: string,
+|}): Promise<{
+  signedUrl: string,
 }> => {
-  const token1 = 'ay+~-';
-  const num = 1960 + 1;
-  const token2 = 'AQ!eRHf';
   return axios
-    .get(
-      `${GDevelopUsageApi.baseUrl}/upload-options?token=${encodeURIComponent(
-        token1 + num + token2
-      )}`
-    )
+    .post(`${GDevelopUsageApi.baseUrl}/upload-options/signed-url`, params)
     .then(response => response.data);
 };
 

@@ -106,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/debrish.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/debrish.png",
         "kind": "image",
         "metadata": "",
         "name": "debrish.png",
@@ -115,7 +115,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/larg_asteroid_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/larg_asteroid_1.png",
         "kind": "image",
         "metadata": "",
         "name": "larg_asteroid_1.png",
@@ -124,7 +124,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/larg_asteroid_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/larg_asteroid_2.png",
         "kind": "image",
         "metadata": "",
         "name": "larg_asteroid_2.png",
@@ -133,7 +133,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/larg_asteroid_3.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/larg_asteroid_3.png",
         "kind": "image",
         "metadata": "",
         "name": "larg_asteroid_3.png",
@@ -142,7 +142,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/medium_asteroid_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/medium_asteroid_1.png",
         "kind": "image",
         "metadata": "",
         "name": "medium_asteroid_1.png",
@@ -151,7 +151,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/medium_asteroid_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/medium_asteroid_2.png",
         "kind": "image",
         "metadata": "",
         "name": "medium_asteroid_2.png",
@@ -160,7 +160,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/medium_asteroid_3.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/medium_asteroid_3.png",
         "kind": "image",
         "metadata": "",
         "name": "medium_asteroid_3.png",
@@ -169,7 +169,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/small_asteroid_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/small_asteroid_1.png",
         "kind": "image",
         "metadata": "",
         "name": "small_asteroid_1.png",
@@ -178,7 +178,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/small_asteroid_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/small_asteroid_2.png",
         "kind": "image",
         "metadata": "",
         "name": "small_asteroid_2.png",
@@ -187,7 +187,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/small_asteroid_3.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/asteroids/small_asteroid_3.png",
         "kind": "image",
         "metadata": "",
         "name": "small_asteroid_3.png",
@@ -196,7 +196,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/ships/ship_1.png",
         "kind": "image",
         "metadata": "",
         "name": "ship_1.png",
@@ -205,7 +205,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_bullet.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/ships/ship_bullet.png",
         "kind": "image",
         "metadata": "",
         "name": "ship_bullet.png",
@@ -214,7 +214,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_part_1.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/ships/ship_part_1.png",
         "kind": "image",
         "metadata": "",
         "name": "ship_part_1.png",
@@ -223,7 +223,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_part_2.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/ships/ship_part_2.png",
         "kind": "image",
         "metadata": "",
         "name": "ship_part_2.png",
@@ -232,7 +232,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_part_3.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/ships/ship_part_3.png",
         "kind": "image",
         "metadata": "",
         "name": "ship_part_3.png",
@@ -241,7 +241,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight22.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/gui/flatLight22.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight22.png",
@@ -250,7 +250,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight23.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/gui/flatLight23.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight23.png",
@@ -259,7 +259,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight34.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/gui/flatLight34.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight34.png",
@@ -268,7 +268,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight35.png",
+        "file": "https://resources.gdevelop-app.com/examples/asteroids/assets/gui/flatLight35.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight35.png",
@@ -2493,7 +2493,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Explosion.ogg",
+                        "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Explosion.ogg",
                         "",
                         "0",
                         "1"
@@ -2507,7 +2507,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Laser_Shoot.ogg",
+                        "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Laser_Shoot.ogg",
                         "",
                         "0",
                         "1"
@@ -2521,7 +2521,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster.ogg",
+                        "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/thruster.ogg",
                         "",
                         "0",
                         "1"
@@ -2535,7 +2535,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster_down.ogg",
+                        "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/thruster_down.ogg",
                         "",
                         "0",
                         "1"
@@ -3204,7 +3204,7 @@
                               },
                               "parameters": [
                                 "",
-                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Explosion.ogg",
+                                "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Explosion.ogg",
                                 "",
                                 "GlobalVariable(sound_volume)",
                                 "1"
@@ -3863,7 +3863,7 @@
                               },
                               "parameters": [
                                 "",
-                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Explosion.ogg",
+                                "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Explosion.ogg",
                                 "",
                                 "GlobalVariable(sound_volume) - 10",
                                 "1"
@@ -4418,7 +4418,7 @@
                               },
                               "parameters": [
                                 "",
-                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Explosion.ogg",
+                                "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Explosion.ogg",
                                 "",
                                 "GlobalVariable(sound_volume) - 20",
                                 "1"
@@ -5544,7 +5544,7 @@
                               },
                               "parameters": [
                                 "",
-                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster_down.ogg",
+                                "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/thruster_down.ogg",
                                 "3",
                                 "no",
                                 "GlobalVariable(sound_volume)",
@@ -5681,7 +5681,7 @@
                               },
                               "parameters": [
                                 "",
-                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster.ogg",
+                                "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/thruster.ogg",
                                 "3",
                                 "yes",
                                 "GlobalVariable(sound_volume)",
@@ -6045,7 +6045,7 @@
                                   },
                                   "parameters": [
                                     "",
-                                    "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster_down.ogg",
+                                    "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/thruster_down.ogg",
                                     "3",
                                     "no",
                                     "GlobalVariable(sound_volume)",
@@ -6205,7 +6205,7 @@
                                   },
                                   "parameters": [
                                     "",
-                                    "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster.ogg",
+                                    "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/thruster.ogg",
                                     "3",
                                     "yes",
                                     "GlobalVariable(sound_volume)",
@@ -6793,7 +6793,7 @@
                               },
                               "parameters": [
                                 "",
-                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Laser_Shoot.ogg",
+                                "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Laser_Shoot.ogg",
                                 "1",
                                 "no",
                                 "GlobalVariable(sound_volume)",
@@ -7052,7 +7052,7 @@
                                       },
                                       "parameters": [
                                         "",
-                                        "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Laser_Shoot.ogg",
+                                        "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Laser_Shoot.ogg",
                                         "1",
                                         "no",
                                         "GlobalVariable(sound_volume)",
@@ -7256,7 +7256,7 @@
                               },
                               "parameters": [
                                 "",
-                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Explosion.ogg",
+                                "https://resources.gdevelop-app.com/examples/asteroids/assets/audio/Explosion.ogg",
                                 "2",
                                 "",
                                 "GlobalVariable(sound_volume)",

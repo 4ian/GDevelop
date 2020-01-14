@@ -127,7 +127,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/player.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/player.png",
         "kind": "image",
         "metadata": "",
         "name": "player.png",
@@ -136,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/desktop-icon-512.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/desktop-icon-512.png",
         "kind": "image",
         "metadata": "",
         "name": "desktop-icon-512.png",
@@ -145,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/android-icon-192.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/android-icon-192.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-192.png",
@@ -154,7 +154,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/android-icon-144.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/android-icon-144.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-144.png",
@@ -163,7 +163,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/android-icon-96.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/android-icon-96.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-96.png",
@@ -172,7 +172,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/android-icon-72.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/android-icon-72.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-72.png",
@@ -181,7 +181,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/android-icon-48.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/android-icon-48.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-48.png",
@@ -190,7 +190,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/android-icon-36.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/android-icon-36.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-36.png",
@@ -199,7 +199,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-180.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-180.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-180.png",
@@ -208,7 +208,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-167.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-167.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-167.png",
@@ -217,7 +217,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-152.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-152.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-152.png",
@@ -226,7 +226,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-144.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-144.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-144.png",
@@ -235,7 +235,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-120.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-120.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-120.png",
@@ -244,7 +244,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-114.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-114.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-114.png",
@@ -253,7 +253,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-100.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-100.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-100.png",
@@ -262,7 +262,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-80.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-80.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-80.png",
@@ -271,7 +271,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-76.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-76.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-76.png",
@@ -280,7 +280,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-72.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-72.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-72.png",
@@ -289,7 +289,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-60.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-60.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-60.png",
@@ -298,7 +298,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-58.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-58.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-58.png",
@@ -307,7 +307,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-57.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-57.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-57.png",
@@ -316,7 +316,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-50.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-50.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-50.png",
@@ -325,7 +325,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-40.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-40.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-40.png",
@@ -334,7 +334,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/ios-icon-29.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/ios-icon-29.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-29.png",
@@ -343,7 +343,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/admob/Button.png",
+        "file": "https://resources.gdevelop-app.com/examples/admob/Button.png",
         "kind": "image",
         "metadata": "",
         "name": "Button.png",

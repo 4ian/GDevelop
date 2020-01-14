@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/menu-with-functions-and-text-effects/images/idle_alpha.png",
+        "file": "https://resources.gdevelop-app.com/examples/menu-with-functions-and-text-effects/images/idle_alpha.png",
         "kind": "image",
         "metadata": "",
         "name": "images\\idle_alpha.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/menu-with-functions-and-text-effects/images/idle_beta.png",
+        "file": "https://resources.gdevelop-app.com/examples/menu-with-functions-and-text-effects/images/idle_beta.png",
         "kind": "image",
         "metadata": "",
         "name": "images\\idle_beta.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/menu-with-functions-and-text-effects/images/idle_delta.png",
+        "file": "https://resources.gdevelop-app.com/examples/menu-with-functions-and-text-effects/images/idle_delta.png",
         "kind": "image",
         "metadata": "",
         "name": "images\\idle_delta.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/menu-with-functions-and-text-effects/images/idle_gamma.png",
+        "file": "https://resources.gdevelop-app.com/examples/menu-with-functions-and-text-effects/images/idle_gamma.png",
         "kind": "image",
         "metadata": "",
         "name": "images\\idle_gamma.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/menu-with-functions-and-text-effects/images/idle_zeta.png",
+        "file": "https://resources.gdevelop-app.com/examples/menu-with-functions-and-text-effects/images/idle_zeta.png",
         "kind": "image",
         "metadata": "",
         "name": "images\\idle_zeta.png",

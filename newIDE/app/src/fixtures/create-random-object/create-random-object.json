@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/black-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/black-1.png",
         "kind": "image",
         "metadata": "",
         "name": "black-1.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/yellow-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/yellow-1.png",
         "kind": "image",
         "metadata": "",
         "name": "yellow-1.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/red-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/red-1.png",
         "kind": "image",
         "metadata": "",
         "name": "red-1.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/green-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/green-1.png",
         "kind": "image",
         "metadata": "",
         "name": "green-1.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/light-blue-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/light-blue-1.png",
         "kind": "image",
         "metadata": "",
         "name": "light-blue-1.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/dark-blue-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/dark-blue-1.png",
         "kind": "image",
         "metadata": "",
         "name": "dark-blue-1.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/purple-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/purple-1.png",
         "kind": "image",
         "metadata": "",
         "name": "purple-1.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/pink-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/pink-1.png",
         "kind": "image",
         "metadata": "",
         "name": "pink-1.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/orange-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/orange-1.png",
         "kind": "image",
         "metadata": "",
         "name": "orange-1.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/create-random-object/brown-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/create-random-object/brown-1.png",
         "kind": "image",
         "metadata": "",
         "name": "brown-1.png",

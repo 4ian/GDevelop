@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/car-body.png",
+        "file": "https://resources.gdevelop-app.com/examples/car-physics/car-body.png",
         "kind": "image",
         "metadata": "",
         "name": "car-body.png",
@@ -118,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/tire.png",
+        "file": "https://resources.gdevelop-app.com/examples/car-physics/tire.png",
         "kind": "image",
         "metadata": "",
         "name": "tire.png",
@@ -127,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/car-physics/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "brickWall.png",
@@ -136,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/flatDark23.png",
+        "file": "https://resources.gdevelop-app.com/examples/car-physics/flatDark23.png",
         "kind": "image",
         "metadata": "",
         "name": "flatDark23.png",
@@ -145,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/flatDark24.png",
+        "file": "https://resources.gdevelop-app.com/examples/car-physics/flatDark24.png",
         "kind": "image",
         "metadata": "",
         "name": "flatDark24.png",

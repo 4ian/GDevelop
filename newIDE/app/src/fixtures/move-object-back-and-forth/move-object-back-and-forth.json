@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/move-object-back-and-forth/box.png",
+        "file": "https://resources.gdevelop-app.com/examples/move-object-back-and-forth/box.png",
         "kind": "image",
         "metadata": "",
         "name": "box.png",

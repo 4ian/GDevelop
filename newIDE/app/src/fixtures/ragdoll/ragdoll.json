@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/ragdoll/Head.png",
+        "file": "https://resources.gdevelop-app.com/examples/ragdoll/Head.png",
         "kind": "image",
         "metadata": "",
         "name": "Head.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/ragdoll/Torso.png",
+        "file": "https://resources.gdevelop-app.com/examples/ragdoll/Torso.png",
         "kind": "image",
         "metadata": "",
         "name": "Torso.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/ragdoll/Thigh.png",
+        "file": "https://resources.gdevelop-app.com/examples/ragdoll/Thigh.png",
         "kind": "image",
         "metadata": "",
         "name": "Thigh.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/ragdoll/Leg.png",
+        "file": "https://resources.gdevelop-app.com/examples/ragdoll/Leg.png",
         "kind": "image",
         "metadata": "",
         "name": "Leg.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/ragdoll/Upper Arm.png",
+        "file": "https://resources.gdevelop-app.com/examples/ragdoll/Upper Arm.png",
         "kind": "image",
         "metadata": "",
         "name": "Upper Arm.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/ragdoll/Arm.png",
+        "file": "https://resources.gdevelop-app.com/examples/ragdoll/Arm.png",
         "kind": "image",
         "metadata": "",
         "name": "Arm.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/ragdoll/Ground-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/ragdoll/Ground-1.png",
         "kind": "image",
         "metadata": "",
         "name": "Ground-1.png",

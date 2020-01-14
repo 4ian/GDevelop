@@ -112,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_stand.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk01.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk01.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk01.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk02.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk02.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk02.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk03.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk04.png",
@@ -166,7 +166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk05.png",
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk06.png",
@@ -184,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk07.png",
@@ -193,7 +193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk08.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk08.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk08.png",
@@ -202,7 +202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk09.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk09.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk09.png",
@@ -211,7 +211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk10.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk10.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk10.png",
@@ -220,7 +220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/p1_walk11.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/p1_walk11.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk11.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/brickWall.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/brickWall.png",
         "kind": "image",
         "metadata": "",
         "name": "brickWall.png",
@@ -238,7 +238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/bridge.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/bridge.png",
         "kind": "image",
         "metadata": "",
         "name": "bridge.png",
@@ -247,7 +247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/grassHalfMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/grassHalfMid.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfMid.png",
@@ -256,7 +256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/castleCenter.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/castleCenter.png",
         "kind": "image",
         "metadata": "",
         "name": "castleCenter.png",
@@ -265,7 +265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/bridgeLogs.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/bridgeLogs.png",
         "kind": "image",
         "metadata": "",
         "name": "bridgeLogs.png",
@@ -274,7 +274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/Left.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/Left.png",
         "kind": "image",
         "metadata": "",
         "name": "Left.png",
@@ -283,7 +283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/Right.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/Right.png",
         "kind": "image",
         "metadata": "",
         "name": "Right.png",
@@ -292,7 +292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/ladder_mid.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/ladder_mid.png",
         "kind": "image",
         "metadata": "",
         "name": "ladder_mid.png",
@@ -301,7 +301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/Grass.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/Grass.png",
         "kind": "image",
         "metadata": "",
         "name": "grass.png",
@@ -310,7 +310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/PlayerArea.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/PlayerArea.png",
         "kind": "image",
         "metadata": "",
         "name": "PlayerArea.png",
@@ -319,7 +319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/slimeWalk1.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/slimeWalk1.png",
         "kind": "image",
         "metadata": "",
         "name": "slimeWalk1.png",
@@ -328,7 +328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/slimeWalk2.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/slimeWalk2.png",
         "kind": "image",
         "metadata": "",
         "name": "slimeWalk2.png",
@@ -337,7 +337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/slimeDead.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/slimeDead.png",
         "kind": "image",
         "metadata": "",
         "name": "slimeDead.png",
@@ -346,7 +346,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/flyFly1.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/flyFly1.png",
         "kind": "image",
         "metadata": "",
         "name": "flyFly1.png",
@@ -355,7 +355,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/flyFly2.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/flyFly2.png",
         "kind": "image",
         "metadata": "",
         "name": "flyFly2.png",
@@ -364,7 +364,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/flyDead.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/flyDead.png",
         "kind": "image",
         "metadata": "",
         "name": "flyDead.png",
@@ -373,7 +373,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/cloud1.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/cloud1.png",
         "kind": "image",
         "metadata": "",
         "name": "cloud1.png",
@@ -382,7 +382,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/cloud2.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/cloud2.png",
         "kind": "image",
         "metadata": "",
         "name": "cloud2.png",
@@ -391,7 +391,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/cloud3.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/cloud3.png",
         "kind": "image",
         "metadata": "",
         "name": "cloud3.png",
@@ -400,7 +400,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/bush.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/bush.png",
         "kind": "image",
         "metadata": "",
         "name": "bush.png",
@@ -409,7 +409,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/cactus.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/cactus.png",
         "kind": "image",
         "metadata": "",
         "name": "cactus.png",
@@ -418,7 +418,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/plant.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/plant.png",
         "kind": "image",
         "metadata": "",
         "name": "plant.png",
@@ -427,7 +427,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",
@@ -436,7 +436,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/shadedDark06.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/shadedDark06.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark06.png",
@@ -445,7 +445,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/shadedDark05.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/shadedDark05.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark05.png",
@@ -454,7 +454,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/shadedDark45.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/shadedDark45.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark45.png",
@@ -463,7 +463,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/shadedDark09.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/shadedDark09.png",
         "kind": "image",
         "metadata": "",
         "name": "shadedDark09.png",
@@ -472,7 +472,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/health_bar_frame.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/health_bar_frame.png",
         "kind": "image",
         "metadata": "",
         "name": "health_bar_frame.png",
@@ -481,7 +481,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/health_bar.png",
+        "file": "https://resources.gdevelop-app.com/examples/health-bar/health_bar.png",
         "kind": "image",
         "metadata": "",
         "name": "health_bar.png",
@@ -3333,7 +3333,7 @@
           "variables": [],
           "behaviors": [],
           "string": "x 0",
-          "font": "https://df5lqcdudryde.cloudfront.net/examples/health-bar/Bimbo_JVE.ttf",
+          "font": "https://resources.gdevelop-app.com/examples/health-bar/Bimbo_JVE.ttf",
           "characterSize": 40,
           "color": {
             "b": 0,
@@ -3931,7 +3931,7 @@
                   },
                   "parameters": [
                     "",
-                    "https://df5lqcdudryde.cloudfront.net/examples/health-bar/jump.wav",
+                    "https://resources.gdevelop-app.com/examples/health-bar/jump.wav",
                     "",
                     "",
                     ""
@@ -5300,7 +5300,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/health-bar/jump.wav",
+                        "https://resources.gdevelop-app.com/examples/health-bar/jump.wav",
                         "",
                         "",
                         ""
@@ -5532,7 +5532,7 @@
               },
               "parameters": [
                 "",
-                "https://df5lqcdudryde.cloudfront.net/examples/health-bar/coin.wav",
+                "https://resources.gdevelop-app.com/examples/health-bar/coin.wav",
                 "",
                 "",
                 ""

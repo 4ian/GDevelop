@@ -23,7 +23,11 @@
  * @class PanelSpriteRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+<<<<<<< HEAD
  * @param {gdjs.runtimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+=======
+ * @param {gdjs.RuntimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+>>>>>>> b25752907f9bbb3b227f3dc01f34ae3e1cf5c876
  * @param {PanelSpriteObjectData} panelSpriteObjectData The initial properties of the object
  */
 gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {

@@ -109,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shooting-bullets-explanation/Bullet.png",
+        "file": "https://resources.gdevelop-app.com/examples/shooting-bullets-explanation/Bullet.png",
         "kind": "image",
         "metadata": "",
         "name": "Tir.png",
@@ -118,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shooting-bullets-explanation/tank1fr1.png",
+        "file": "https://resources.gdevelop-app.com/examples/shooting-bullets-explanation/tank1fr1.png",
         "kind": "image",
         "metadata": "",
         "name": "tank1fr1.png",
@@ -127,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shooting-bullets-explanation/Pointer-Standard.png",
+        "file": "https://resources.gdevelop-app.com/examples/shooting-bullets-explanation/Pointer-Standard.png",
         "kind": "image",
         "metadata": "",
         "name": "Pointer-Standard.png",

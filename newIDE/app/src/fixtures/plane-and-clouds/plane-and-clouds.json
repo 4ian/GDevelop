@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/Plane.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/Plane.png",
         "kind": "image",
         "metadata": "",
         "name": "Plane.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/CloudA.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/CloudA.png",
         "kind": "image",
         "metadata": "",
         "name": "CloudA.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/CloudB.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/CloudB.png",
         "kind": "image",
         "metadata": "",
         "name": "CloudB.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/CloudC.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/CloudC.png",
         "kind": "image",
         "metadata": "",
         "name": "CloudC.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/Smoke.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/Smoke.png",
         "kind": "image",
         "metadata": "",
         "name": "Smoke.png",

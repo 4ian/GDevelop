@@ -1,3 +1,5 @@
+///<reference path="objecttools.d.ts"/>
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -155,7 +157,7 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
     }
 
     return isTrue;
-}
+};
 
 /**
  * Filter objects to keep only the one that fullfil the predicate
@@ -186,6 +188,7 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
         var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            // @ts-ignore
             if (negatePredicate ^ predicate(arr[k], extraArg)) {
                 isTrue = true;
                 arr[k].pick = true; //Pick the objects
@@ -316,6 +319,7 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
         for(var j = 0;j < list.length;++j) {
             var object = list[j];
             var distance = object.getSqDistanceTo(x, y);
+            // @ts-ignore
             if( first || (distance < best ^ inverted)) {
                 best = distance;
                 bestObject = object;

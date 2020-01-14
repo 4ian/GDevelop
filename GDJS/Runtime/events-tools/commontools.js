@@ -1,3 +1,5 @@
+///<reference path="commontools.d.ts"/>
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -5,10 +7,8 @@
  */
 
 /**
- * @memberof gdjs.evtTools
- * @class common
- * @static
- * @private
+ * @memberOf gdjs.evtTools
+ * @namespace common
  */
 gdjs.evtTools.common = gdjs.evtTools.common || {};
 
@@ -31,20 +31,14 @@ gdjs.evtTools.common.getVariableString = function(variable) {
 /**
  * @private
  */
-gdjs.evtTools.common.sceneVariableExists = function(
-  runtimeScene,
-  variableName
-) {
+gdjs.evtTools.common.sceneVariableExists = function(runtimeScene, variableName) {
   return runtimeScene.getVariables().has(variableName);
 };
 
 /**
  * @private
  */
-gdjs.evtTools.common.globalVariableExists = function(
-  runtimeScene,
-  variableName
-) {
+gdjs.evtTools.common.globalVariableExists = function(runtimeScene, variableName) {
   return runtimeScene
     .getGame()
     .getVariables()
@@ -62,7 +56,7 @@ gdjs.evtTools.common.variableChildExists = function(variable, childName) {
  * @private
  */
 gdjs.evtTools.common.variableRemoveChild = function(variable, childName) {
-  return variable.removeChild(childName);
+  variable.removeChild(childName);
 };
 
 /**
@@ -76,7 +70,7 @@ gdjs.evtTools.common.variableClearChildren = function(variable) {
  * @private
  */
 gdjs.evtTools.common.getVariableChildCount = function(variable) {
-  if (variable.isStructure() == false) return 0;
+  if (variable.isStructure() === false) return 0;
   return Object.keys(variable.getAllChildren()).length;
 };
 

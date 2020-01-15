@@ -7,11 +7,31 @@
  */
 
 /**
- * @typedef {Object} ObjectData Object containing initial properties for all objects extending gdjs.RuntimeObject
+ * @typedef {Object} ObjectData Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}.
  * @property {string} name The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example).
  * @property {string} type The object type.
  * @property {Array<VariableData>} variables The list of default variables.
  * @property {Array<BehaviorData>} behaviors The list of default behaviors.
+ */
+
+/**
+ * @typedef {Object} AABB
+ * @property {Array} min The [x,y] coordinates of the top left point
+ * @property {Array} max The [x,y] coordinates of the bottom right point
+ */
+
+/**
+ * @typedef {Object} SerializedObjectData Object containing the properties of an initialized data to restore it later.
+ * @property {string} name The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example).
+ * @property {string} type The object type.
+ * @property {number} x The X position of the object.
+ * @property {number} y The Y position of the object.
+ * @property {number} angle The angle of the object.
+ * @property {number} zOrder The Z order of the object.
+ * @property {boolean} hidden The visibility of the object.
+ * @property {string} layer The current layer of the object.
+ * @property {boolean} livingOnScene Is the object instance in the Scene?
+ * @property {AABB} aabb The AABB Collisions of the Object
  */
 
 /**
@@ -35,27 +55,64 @@
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData)
 {
+    /** @type {string} */
     this.name = objectData.name || "";
+    /**
+     * @type {number}
+     * @protected
+     * @note No serialization as used as internal value that should not be changed by deserialization.
+     */
     this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+    /** @type {string} */
     this.type = objectData.type || "";
+    /** @type {number} */
     this.x = 0;
+    /** @type {number} */
     this.y = 0;
+    /** @type {number} */
     this.angle = 0;
+    /** @type {number} */
     this.zOrder = 0;
+    /** @type {boolean} */
     this.hidden = false;
+    /** @type {string} */
     this.layer = "";
+    /** @type {boolean} */
     this.livingOnScene = true;
+    /**
+     * @type {number}
+     * @note No serialization as used as internal value that should not be changed by deserialization.
+     */
     this.id = runtimeScene.createNewUniqueId();
-    this._runtimeScene = runtimeScene; //This could/should be avoided.
+    /**
+     * @type {gdjs.RuntimeScene}
+     * @note This could/should be avoided.
+     * @note No serialization as runtimeScene would serialize objects as children and we don't want circular references (and to be able to deserialize on other scenes).
+     */
+    this._runtimeScene = runtimeScene;
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
+        /**
+         * @type {Array<gdjs.Polygon>}
+         * @protected
+         * @note No serialization as {@link gdjs.Polygon} has no serializer yet.
+         */
         this._defaultHitBoxes = [];
         this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0,0));
     }
+    /**
+     * @type {Array<gdjs.Polygon>}
+     * @note No serialization as {@link gdjs.Polygon} has no serializer yet.
+     */
     this.hitBoxes = this._defaultHitBoxes;
+    /**
+     * @type {boolean}
+     * @note No serialization as used as internal value that should not be changed by deserialization.
+     */
     this.hitBoxesDirty = true;
     if ( this.aabb === undefined )
+        /** @type {AABB} */
         this.aabb = { min:[0,0], max:[0,0] };
     else {
         this.aabb.min[0] = 0; this.aabb.min[1] = 0;
@@ -64,24 +121,45 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
 
     //Variables:
     if ( !this._variables )
+        /**
+         * @type {gdjs.VariablesContainer}
+         * @note No serialization as {@link gdjs.Variable} and {@link gdjs.VariablesContainer} have no serializer yet.
+         */
         this._variables = new gdjs.VariablesContainer(objectData ? objectData.variables : undefined);
     else
         gdjs.VariablesContainer.call(this._variables, objectData ? objectData.variables : undefined);
 
     //Forces:
     if ( this._forces === undefined )
+        /**
+         * @type {Array<gdjs.Force>}
+         * @note No serialization as {@link gdjs.Force} has no serializer yet.
+         */
         this._forces = [];
     else
         this.clearForces();
 
-    //A force returned by getAverageForce method:
+    /**
+     * A force returned by getAverageForce method.
+     * @type {gdjs.Force}
+     * @note No serialization as {@link gdjs.Force} has no serializer yet.
+     */
     if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,0);
 
     //Behaviors:
     if (this._behaviors === undefined)
-        this._behaviors = []; //Contains the behaviors of the object
+        /**
+         * Contains the behaviors of the object.
+         * @type {Array<gdjs.RuntimeBehavior>}
+         * @note No serialization as {@link gdjs.RuntimeBehavior} has no serializer yet.
+         */
+        this._behaviors = [];
 
     if (this._behaviorsTable === undefined)
+        /**
+         * @type {Hashtable<string, gdjs.RuntimeBehavior>}
+         * @note No serialization as {@link gdjs.RuntimeBehavior} has no serializer yet.
+         */
         this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
     else
         this._behaviorsTable.clear();
@@ -105,6 +183,10 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
 
     //Timers:
     if (this._timers === undefined)
+        /**
+         * @type {Hashtable<string, gdjs.Timer>}
+         * @note No serialization as {@link gdjs.Timer} has no serializer yet.
+         */
         this._timers = new Hashtable();
     else
         this._timers.clear();
@@ -840,12 +922,6 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
 };
 
 /**
- * @typedef {Object} AABB
- * @property {Array} min The [x,y] coordinates of the top left point
- * @property {Array} max The [x,y] coordinates of the bottom right point
- */
-
-/**
  * Get the AABB (axis aligned bounding box) for the object.
  *
  * The default implementation uses either the position/size of the object (when angle is 0) or
@@ -1411,7 +1487,7 @@ gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
     }
     return this.aabb.min[0] <= x && this.aabb.max[0] >= x
         && this.aabb.min[1] <= y && this.aabb.max[1] >= y;
-}
+};
 
 /**
  * Check the distance between two objects.
@@ -1464,6 +1540,49 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
     return false;
 };
 
+/**
+ * Serializes all the relevant internal data.
+ *
+ * Remember to overwrite to add your data while defining a new object,
+ * and call this to automatically handle the default data.
+ *
+ * @returns {SerializedObjectData}
+ */
+gdjs.RuntimeObject.prototype.serialize = function() {
+    return {
+        name: this.name,
+        type: this.type,
+        x: this.getX(),
+        y: this.getY(),
+        angle: this.angle,
+        zOrder: this.getZOrder(),
+        hidden: this.isHidden(),
+        layer: this.getLayer(),
+        livingOnScene: this.livingOnScene,
+        aabb: this.getAABB()
+    };
+};
+
+/**
+ * Deserialize a SerializedObjectData to the current object.
+ *
+ * Remember to overwrite to add your data while defining a new object,
+ * and call this to automatically handle the default data.
+ *
+ * @param {SerializedObjectData} serializedData The serialized data to load.
+ */
+gdjs.RuntimeObject.prototype.deserialize = function(serializedData) {
+    if (this.type !== serializedData.type) console.error("Data for incorrect object type passed to deserializer!");
+    //TODO Check values before assigning
+    this.name = serializedData.name; // Maybe dangerous?
+    this.setX(serializedData.x);
+    this.setY(serializedData.y);
+    this.setAngle(serializedData.angle);
+    this.setZOrder(serializedData.zOrder);
+    this.hide(serializedData.hidden);
+    this.setLayer(serializedData.layer);
+    this.aabb = serializedData.aabb;
+};
 
 /**
  * Get the identifier associated to an object name.

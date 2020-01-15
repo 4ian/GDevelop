@@ -519,3 +519,17 @@ gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
 
   currentScene.stopProfiler();
 };
+
+/**
+ * Shortcut to get a Game's Variable's value.
+ *
+ * @param {string} variableName
+ * @returns {string | number} The value of the variable
+ */
+gdjs.RuntimeObject.prototype.getGameVariable = function(variableName) {
+  var variable = this.getVariables().get(variableName);
+  if (variable.isNumber()){
+    return variable.getAsNumber();
+  }
+  else return variable.getAsString();
+};

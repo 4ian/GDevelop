@@ -795,4 +795,18 @@ gdjs.RuntimeScene.prototype.getAdhocListOfAllInstances = function() {
  */
 gdjs.RuntimeScene.prototype.sceneJustResumed = function() {
     return this._isJustResumed;
-}
+};
+
+/**
+ * Shortcut to get a Scene's Variable's value.
+ *
+ * @param {string} variableName
+ * @returns {string | number} The value of the variable
+ */
+gdjs.RuntimeObject.prototype.getSceneVariable = function(variableName) {
+    var variable = this.getVariables().get(variableName);
+    if (variable.isNumber()){
+        return variable.getAsNumber();
+    }
+    else return variable.getAsString();
+};

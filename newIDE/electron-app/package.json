@@ -31,8 +31,11 @@
       }
     ],
     "mac": {
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "entitlements": "./build/entitlements.mac.inherit.plist"
     },
+    "afterSign": "scripts/electron-builder-after-sign.js",
     "publish": [
       {
         "provider": "github"
@@ -40,8 +43,10 @@
     ]
   },
   "devDependencies": {
+    "dotenv": "^8.2.0",
     "electron": "3.0.9",
     "electron-builder": "20.44.4",
+    "electron-notarize": "^0.2.1",
     "minimist": "^1.2.0",
     "shelljs": "^0.7.7",
     "unzipper": "^0.9.11"

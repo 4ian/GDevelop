@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "electron": "3.0.9",
-    "electron-builder": "19.53.4",
+    "electron-builder": "20.44.4",
     "minimist": "^1.2.0",
     "shelljs": "^0.7.7",
     "unzipper": "^0.9.11"

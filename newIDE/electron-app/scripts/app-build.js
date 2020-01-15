@@ -1,7 +1,7 @@
 var shell = require('shelljs');
 var args = require('minimist')(process.argv.slice(2));
 
-if (!shell.test('-f', './node_modules/.bin/build')) {
+if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
   shell.echo('⚠️ Please run npm install in electron-app folder');
   shell.exit(1);
 }

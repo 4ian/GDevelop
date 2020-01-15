@@ -5,53 +5,53 @@
  */
 
 /**
- * @typedef {Object} Point Represents a point in a frame
- * @property {number} x X position of the point
- * @property {number} y Y position of the point
+ * @typedef {Object} SpritePoint Represents a point in a coordinate system.
+ * @property {number | string} x X position of the point.
+ * @property {(number | string)} y Y position of the point.
  */
 
 /**
- * @typedef {Object} CustomPointData Represents a custom point in a frame
- * @property {string} name Name of the point
- * @property {number} x X position of the point
- * @property {number} y Y position of the point
+ * @typedef {Object} SpriteCustomPointData Represents a custom point in a frame.
+ * @property {string} name Name of the point.
+ * @property {number | string} x X position of the point.
+ * @property {number | string} y Y position of the point.
  */
 
 /**
- * @typedef {Object} CenterPointData Represents the center point in a frame
+ * @typedef {Object} SpriteCenterPointData Represents the center point in a frame.
  * @property {boolean} automatic Is the center automatically computed?
- * @property {number} x X position of the point
- * @property {number} y Y position of the point
+ * @property {number | string} x X position of the point.
+ * @property {number | string} y Y position of the point.
  */
 
 /**
- * @typedef {Object} FrameData Represents a {@link gdjs.SpriteAnimationFrame}
- * @property {string} [image] The resource name of the image used in this frame
- * @property {Array<customPointData>} [points] The points of the frame
- * @property {point} originPoint The origin point
- * @property {centerPointData} centerPoint The center of the frame
+ * @typedef {Object} SpriteFrameData Represents a {@link gdjs.SpriteAnimationFrame}.
+ * @property {string} [image] The resource name of the image used in this frame.
+ * @property {Array<SpriteCustomPointData>} [points] The points of the frame.
+ * @property {SpritePoint} originPoint The origin point.
+ * @property {SpriteCenterPointData} centerPoint The center of the frame.
  * @property {boolean} hasCustomCollisionMask Is The collision mask custom?
- * @property {Array<Array<point>>} [customCollisionMask] The collision mask if it is custom
+ * @property {Array<Array<SpritePoint>>} [customCollisionMask] The collision mask if it is custom.
  */
 
 /**
- * @typedef {Object} DirectionData Represents the data of a {@link gdjs.SpriteAnimationDirection}
- * @property {number} timeBetweenFrames Time between each frame, in seconds
+ * @typedef {Object} SpriteDirectionData Represents the data of a {@link gdjs.SpriteAnimationDirection}.
+ * @property {number | string} timeBetweenFrames Time between each frame, in seconds.
  * @property {boolean} looping Is the animation looping?
- * @property {Array<gdjs.SpriteAnimationFrame>} sprites The list of frames
+ * @property {Array<SpriteFrameData>} sprites The list of frames.
  */
 
 /**
- * @typedef {Object} AnimationData Represents the data of a {@link gdjs.SpriteAnimation}
- * @property {string} [name] The name of the animation
+ * @typedef {Object} SpriteAnimationData Represents the data of a {@link gdjs.SpriteAnimation}.
+ * @property {string} [name] The name of the animation.
  * @property {boolean} useMultipleDirections Does the animation use multiple {@link gdjs.SpriteAnimationDirection}?
- * @property {Array<DirectionData>} directions The list of {@link DirectionData} representing {@link gdjs.SpriteAnimationDirection} instances
+ * @property {Array<SpriteDirectionData>} directions The list of {@link SpriteDirectionData} representing {@link gdjs.SpriteAnimationDirection} instances.
  */
 
 /**
- * @typedef {Object} SpriteObjectDataType
- * @property {boolean} updateIfNotVisible Update the object even if he is not visible?
- * @property {Array<AnimationData>} animations The list of {@link AnimationData} representing {@link gdjs.SpriteAnimation} instances
+ * @typedef {Object} SpriteObjectDataType Represents the data of a {@link gdjs.SpriteRuntimeObject}.
+ * @property {boolean} updateIfNotVisible Update the object even if he is not visible?.
+ * @property {Array<SpriteAnimationData>} animations The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances.
  * 
  * @typedef {ObjectData & SpriteObjectDataType} SpriteObjectData
  */
@@ -62,27 +62,30 @@
  * It contains the texture displayed as well as information like the points position
  * or the collision mask.
  *
- * @memberof gdjs
+ * @memberOf gdjs
  * @class SpriteAnimationFrame
  * @param {gdjs.ImageManager} imageManager The game image manager
- * @param {FrameData} frameData The frame data used to initialize the frame
+ * @param {SpriteFrameData} frameData The frame data used to initialize the frame
  */
 
 gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 {
     /** @type {string} */
     this.image = frameData ? frameData.image : ""; //TODO: Rename in imageName, and do not store it in the object?
-    /** @type {PIXI.Texture} */
+    /**
+     * @type {PIXI.Texture}
+     * @note need to fix type
+     */
     this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(imageManager, this.image);
 
     if ( this.center === undefined ) {
-        /** @type {Point} */
+        /** @type {SpritePoint} */
         this.center = { x:0, y:0 };
-    };
+    }
     if ( this.origin === undefined ) {
-        /** @type {Point} */
+        /** @type {SpritePoint} */
         this.origin = { x:0, y:0 }
-    };
+    }
     /** @type {boolean} */
     this.hasCustomHitBoxes = false;
     if ( this.customHitBoxes === undefined ) {
@@ -96,19 +99,19 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 
     //Initialize points:
 	for(var i = 0, len = frameData.points.length;i<len;++i) {
-        /** @type {CustomPointData} */
+        /** @type {SpriteCustomPointData} */
 		var ptData = frameData.points[i];
 
-        /** @type {Point} */
+        /** @type {SpritePoint} */
         var point = {x:parseFloat(ptData.x), y:parseFloat(ptData.y)};
         this.points.put(ptData.name, point);
     }
-    /** @type {Point} */
+    /** @type {SpritePoint} */
     var origin = frameData.originPoint;
     this.origin.x = parseFloat(origin.x);
     this.origin.y = parseFloat(origin.y);
 
-    /** @type {CenterPointData} */
+    /** @type {SpriteCenterPointData} */
     var center = frameData.centerPoint;
     if ( center.automatic !== true ) {
         this.center.x = parseFloat(center.x);
@@ -123,22 +126,22 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
     if ( frameData.hasCustomCollisionMask ) {
         this.hasCustomHitBoxes = true;
     	for(var i = 0, len = frameData.customCollisionMask.length;i<len;++i) {
-            /** @type {Array<Point>} */
+            /** @type {Array<SpritePoint>} */
     		var polygonData = frameData.customCollisionMask[i];
 
             //Add a polygon, if necessary (Avoid recreating a polygon if it already exists).
             if ( i >= this.customHitBoxes.length ) this.customHitBoxes.push(new gdjs.Polygon());
 
         	for(var j = 0, len2 = polygonData.length;j<len2;++j) {
-                /** @type {Point} */
+                /** @type {SpritePoint} */
         		var pointData = polygonData[j];
 
                 //Add a point, if necessary (Avoid recreating a point if it already exists).
                 if ( j >= this.customHitBoxes[i].vertices.length )
                     this.customHitBoxes[i].vertices.push([0,0]);
 
-                this.customHitBoxes[i].vertices[j][0] = parseFloat(pointData.x, 10);
-                this.customHitBoxes[i].vertices[j][1] = parseFloat(pointData.y, 10);
+                this.customHitBoxes[i].vertices[j][0] = parseFloat(pointData.x);
+                this.customHitBoxes[i].vertices[j][1] = parseFloat(pointData.y);
             }
 
             this.customHitBoxes[i].vertices.length = j;
@@ -155,11 +158,11 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
  * Get a point of the frame.<br>
  * If the point does not exist, the origin is returned.
  * @param {string} name The point's name
- * @return {Point} The requested point. If it doesn't exists returns the origin point.
+ * @return {SpritePoint} The requested point. If it doesn't exists returns the origin point.
  */
 gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
-	if ( name == "Centre" || name == "Center") return this.center;
-	else if ( name == "Origin" ) return this.origin;
+	if ( name === "Centre" || name === "Center") return this.center;
+	else if ( name === "Origin" ) return this.origin;
 
 	return this.points.containsKey(name) ? this.points.get(name) : this.origin;
 };
@@ -168,9 +171,9 @@ gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
  * Represents a direction of an animation of a {@link gdjs.SpriteRuntimeObject}.
  *
  * @class SpriteAnimationDirection
- * @memberof gdjs
+ * @memberOf gdjs
  * @param {gdjs.ImageManager} imageManager The game image manager
- * @param {DirectionData} directionData The direction data used to initialize the direction
+ * @param {SpriteDirectionData} directionData The direction data used to initialize the direction
  */
 gdjs.SpriteAnimationDirection = function(imageManager, directionData)
 {
@@ -185,7 +188,7 @@ gdjs.SpriteAnimationDirection = function(imageManager, directionData)
         this.frames = [];
     }
     for(var i = 0, len = directionData.sprites.length;i<len;++i) {
-        /** @type {frameData} */
+        /** @type {SpriteFrameData} */
         var frameData = directionData.sprites[i];
 
         if ( i < this.frames.length )
@@ -200,9 +203,9 @@ gdjs.SpriteAnimationDirection = function(imageManager, directionData)
  * Represents an animation of a {@link SpriteRuntimeObject}.
  *
  * @class SpriteAnimation
- * @memberof gdjs
+ * @memberOf gdjs
  * @param {gdjs.ImageManager} imageManager The game image manager
- * @param {AnimationData} animData The animation data used to initialize the animation
+ * @param {SpriteAnimationData} animData The animation data used to initialize the animation
  */
 gdjs.SpriteAnimation = function(imageManager, animData)
 {
@@ -214,7 +217,7 @@ gdjs.SpriteAnimation = function(imageManager, animData)
     /** @type {Array<gdjs.SpriteAnimationDirection>} */
     if ( this.directions === undefined ) this.directions = [];
     for(var i = 0, len = animData.directions.length;i<len;++i) {
-        /** @type {DirectionData} */
+        /** @type {SpriteDirectionData} */
         var directionData = animData.directions[i];
 
         if ( i < this.directions.length )
@@ -229,7 +232,7 @@ gdjs.SpriteAnimation = function(imageManager, animData)
  * The SpriteRuntimeObject represents an object that can display images.
  *
  * @class SpriteRuntimeObject
- * @memberof gdjs
+ * @memberOf gdjs
  * @extends gdjs.RuntimeObject
  * @param {gdjs.RuntimeScene} runtimeScene The scene the object belongs to
  * @param {SpriteObjectData} spriteObjectData The object data used to initialize the object
@@ -271,7 +274,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
         this._animations = [];
     }
     for(var i = 0, len = spriteObjectData.animations.length;i<len;++i) {
-        /** @type {AnimationData} */
+        /** @type {SpriteAnimationData} */
         var animData = spriteObjectData.animations[i];
 
         if ( i < this._animations.length )
@@ -310,6 +313,7 @@ gdjs.SpriteRuntimeObject.thisIsARuntimeObjectConstructor = "Sprite"; //Notify gd
 
 /**
  * Initialize the extra parameters that could be set for an instance.
+ * @param {{numberProperties: Array<{name: string, value: any}>, customSize: {width: number, height: number}}} initialInstanceData The extra parameters
  */
 gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
     if ( initialInstanceData.numberProperties ) {
@@ -585,7 +589,7 @@ gdjs.SpriteRuntimeObject.prototype.hasAnimationEnded = function() {
     if ( this._animations[this._currentAnimation].loop ) return false;
     var direction = this._animations[this._currentAnimation].directions[this._currentDirection];
 
-    return this._currentFrame == direction.frames.length-1;
+    return this._currentFrame === direction.frames.length-1;
 };
 
 gdjs.SpriteRuntimeObject.prototype.animationPaused = function() {

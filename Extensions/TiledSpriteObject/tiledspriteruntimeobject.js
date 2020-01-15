@@ -42,6 +42,7 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
 
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TiledSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "TiledSpriteObject::TiledSprite";
+gdjs.registerObject(gdjs.TiledSpriteRuntimeObject, "TiledSpriteObject::TiledSprite");
 
 gdjs.TiledSpriteRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();

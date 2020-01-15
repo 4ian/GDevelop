@@ -47,6 +47,7 @@ gdjs.PathfindingRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 
 gdjs.PathfindingRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.PathfindingRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "PathfindingBehavior::PathfindingBehavior";
+gdjs.registerBehavior(gdjs.PathfindingRuntimeBehavior, "PathfindingBehavior::PathfindingBehavior");
 
 gdjs.PathfindingRuntimeBehavior.prototype.setCellWidth = function(width) {
     this._cellWidth = width;

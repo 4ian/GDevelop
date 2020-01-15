@@ -25,6 +25,7 @@ gdjs.AnchorRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 
 gdjs.AnchorRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.AnchorRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "AnchorBehavior::AnchorBehavior";
+gdjs.registerBehavior(gdjs.AnchorRuntimeBehavior, "AnchorBehavior::AnchorBehavior");
 
 gdjs.AnchorRuntimeBehavior.HorizontalAnchor = {
    NONE: 0,

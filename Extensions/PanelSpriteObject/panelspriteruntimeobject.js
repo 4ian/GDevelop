@@ -80,6 +80,7 @@ gdjs.PanelSpriteRuntimeObject.prototype = Object.create(
 );
 gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor =
   'PanelSpriteObject::PanelSprite';
+gdjs.registerObject(gdjs.PanelSpriteRuntimeObject, "PanelSpriteObject::PanelSprite");
 
 gdjs.PanelSpriteRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

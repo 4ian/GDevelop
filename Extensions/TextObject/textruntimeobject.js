@@ -116,6 +116,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 
 gdjs.TextRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TextRuntimeObject.thisIsARuntimeObjectConstructor = "TextObject::Text";
+gdjs.registerObject(gdjs.TextRuntimeObject, "TextObject::Text");
 
 gdjs.TextRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();

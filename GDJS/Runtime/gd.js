@@ -15,7 +15,7 @@ window.gdjs = {
    * Contains functions used by events (this is a convention only, functions can actually
    * by anywhere).
    * @namespace
-   * @memberof gdjs
+   * @memberOf gdjs
    */
   evtTools: {},
   callbacksRuntimeSceneLoaded: [],
@@ -98,17 +98,33 @@ gdjs.toDegrees = function(angleInRadians) {
  * The name of the type of the object must be complete, with the namespace if any. For
  * example, if you are providing a Text object in the TextObject extension, the full name
  * of the type of the object is "TextObject::Text".
+ *
+ * @deprecated
  */
 gdjs.registerObjects = function() {
   gdjs.objectsTypes.clear();
 
   for (var p in this) {
     if (this.hasOwnProperty(p)) {
-      if (gdjs[p].thisIsARuntimeObjectConstructor != undefined) {
-        gdjs.objectsTypes.put(gdjs[p].thisIsARuntimeObjectConstructor, gdjs[p]);
+      if (gdjs[p].thisIsARuntimeObjectConstructor !== undefined) {
+        gdjs.registerObject(gdjs[p], gdjs[p].thisIsARuntimeObjectConstructor);
       }
     }
   }
+};
+
+/**
+ * Register the runtime objects that can be used in runtimeScene.<br>
+ *
+ * The name of the type of the object must be complete, with the namespace if any. For
+ * example, if you are providing a Text object in the TextObject extension, the full name
+ * of the type of the object is "TextObject::Text".
+ *
+ * @param Ctor The constructor of the Object.
+ * @param objectTypeName The name of the type of the Object.
+ */
+gdjs.registerObject = function(Ctor, objectTypeName){
+  gdjs.objectsTypes.put(objectTypeName, Ctor)
 };
 
 /**
@@ -121,6 +137,8 @@ gdjs.registerObjects = function() {
  * The type of the behavior must be complete, with the namespace of the extension. For
  * example, if you are providing a Draggable behavior in the DraggableBehavior extension,
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
+ *
+ * @deprecated
  */
 gdjs.registerBehaviors = function() {
   gdjs.behaviorsTypes.clear();
@@ -129,7 +147,7 @@ gdjs.registerBehaviors = function() {
     if (this.hasOwnProperty(gdjsProperty)) {
       // Search in object inside gdjs.
       var innerObject = gdjs[gdjsProperty];
-      if (innerObject.thisIsARuntimeBehaviorConstructor != undefined) {
+      if (innerObject.thisIsARuntimeBehaviorConstructor !== undefined) {
         gdjs.behaviorsTypes.put(
           innerObject.thisIsARuntimeBehaviorConstructor,
           innerObject
@@ -146,11 +164,11 @@ gdjs.registerBehaviors = function() {
             if (
               innerInnerObject !== null &&
               typeof innerInnerObject === 'function' &&
-              innerInnerObject.thisIsARuntimeBehaviorConstructor != undefined
+              innerInnerObject.thisIsARuntimeBehaviorConstructor !== undefined
             ) {
-              gdjs.behaviorsTypes.put(
-                innerInnerObject.thisIsARuntimeBehaviorConstructor,
-                innerInnerObject
+              gdjs.registerBehavior(
+                innerInnerObject,
+                innerInnerObject.thisIsARuntimeBehaviorConstructor
               );
             }
           }
@@ -158,6 +176,23 @@ gdjs.registerBehaviors = function() {
       }
     }
   }
+};
+
+/**
+ * Register the runtime behaviors that can be used bt runtimeObject.<br>
+ *
+ * The type of the behavior must be complete, with the namespace of the extension. For
+ * example, if you are providing a Draggable behavior in the DraggableBehavior extension,
+ * the full name of the type of the behavior is "DraggableBehavior::Draggable".
+ *
+ * @param Ctor The constructor of the Object.
+ * @param behaviorTypeName The name of the type of the behavior.
+ */
+gdjs.registerBehavior = function(Ctor, behaviorTypeName){
+  gdjs.behaviorsTypes.put(
+    behaviorTypeName,
+    Ctor
+  );
 };
 
 /**

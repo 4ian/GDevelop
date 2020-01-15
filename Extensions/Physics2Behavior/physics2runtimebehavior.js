@@ -240,6 +240,7 @@ gdjs.Physics2RuntimeBehavior.prototype = Object.create(
 );
 gdjs.Physics2RuntimeBehavior.thisIsARuntimeBehaviorConstructor =
   'Physics2::Physics2Behavior';
+gdjs.registerBehavior(gdjs.Physics2RuntimeBehavior, 'Physics2::Physics2Behavior');
 
 gdjs.Physics2RuntimeBehavior.prototype.b2Vec2 = function(x, y) {
   this._tempb2Vec2.set_x(x);

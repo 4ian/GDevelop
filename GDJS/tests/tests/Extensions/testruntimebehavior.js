@@ -11,7 +11,7 @@ gdjs.TestRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.TestRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.TestRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "TestBehavior::TestBehavior";
+gdjs.registerBehavior("TestBehavior::TestBehavior", gdjs.TestRuntimeBehavior);
 
 gdjs.TestRuntimeBehavior.prototype.onCreated = function() {
     this.owner.getVariables().get("lastState").setString('created');

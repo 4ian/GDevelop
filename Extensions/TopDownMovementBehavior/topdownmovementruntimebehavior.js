@@ -36,8 +36,7 @@ gdjs.TopDownMovementRuntimeBehavior = function(runtimeScene, behaviorData, owner
 };
 
 gdjs.TopDownMovementRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.TopDownMovementRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "TopDownMovementBehavior::TopDownMovementBehavior";
-gdjs.registerBehavior(gdjs.TopDownMovementRuntimeBehavior, "TopDownMovementBehavior::TopDownMovementBehavior");
+gdjs.registerBehavior("TopDownMovementBehavior::TopDownMovementBehavior", gdjs.TopDownMovementRuntimeBehavior);
 
 gdjs.TopDownMovementRuntimeBehavior.prototype.setAcceleration = function(acceleration) {
     this._acceleration = acceleration;

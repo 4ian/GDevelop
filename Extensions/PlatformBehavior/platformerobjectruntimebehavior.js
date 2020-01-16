@@ -63,8 +63,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(runtimeScene, behaviorData, owne
 };
 
 gdjs.PlatformerObjectRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.PlatformerObjectRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "PlatformBehavior::PlatformerObjectBehavior";
-gdjs.registerBehavior(gdjs.PlatformerObjectRuntimeBehavior, "PlatformBehavior::PlatformerObjectBehavior");
+gdjs.registerBehavior("PlatformBehavior::PlatformerObjectBehavior", gdjs.PlatformerObjectRuntimeBehavior);
 
 gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene)
 {

@@ -20,8 +20,7 @@ gdjs.DummyRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.DummyRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.DummyRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "MyDummyExtension::DummyBehavior";
-gdjs.registerBehavior(gdjs.DummyRuntimeBehavior, "MyDummyExtension::DummyBehavior");
+gdjs.registerBehavior("MyDummyExtension::DummyBehavior", gdjs.DummyRuntimeBehavior);
 
 gdjs.DummyRuntimeBehavior.prototype.onDeActivate = function() {
 };

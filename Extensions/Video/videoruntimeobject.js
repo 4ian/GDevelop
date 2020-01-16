@@ -50,8 +50,7 @@ gdjs.VideoRuntimeObject = function(runtimeScene, videoObjectData) {
 };
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor = "Video::VideoObject";
-gdjs.registerObject(gdjs.VideoRuntimeObject, "Video::VideoObject");
+gdjs.registerObject("Video::VideoObject", gdjs.VideoRuntimeObject);
 
 gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

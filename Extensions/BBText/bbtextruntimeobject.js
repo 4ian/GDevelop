@@ -56,8 +56,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
 gdjs.BBTextRuntimeObject.prototype = Object.create(
   gdjs.RuntimeObject.prototype
 );
-gdjs.BBTextRuntimeObject.thisIsARuntimeObjectConstructor = 'BBText::BBText'; //Leave for compatibility
-gdjs.registerObject(gdjs.BBTextRuntimeObject, 'BBText::BBText');
+gdjs.registerObject('BBText::BBText', gdjs.BBTextRuntimeObject);
 
 gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

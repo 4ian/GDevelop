@@ -3,7 +3,7 @@
  * an example to start a new object, take a look at gdjs.DummyRuntimeObject
  * in the Extensions folder.
  *
- * @memberof gdjs
+ * @memberOf gdjs
  * @class TestRuntimeObject
  * @extends RuntimeObject
  */
@@ -16,8 +16,7 @@ gdjs.TestRuntimeObject = function(runtimeScene, objectData) {
 };
 
 gdjs.TestRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.TestRuntimeObject.thisIsARuntimeObjectConstructor =
-  'TestObject::TestObject';
+gdjs.registerObject('TestObject::TestObject', gdjs.TestRuntimeObject);
 
 gdjs.TestRuntimeObject.prototype.getRendererObject = function() {
   return {};

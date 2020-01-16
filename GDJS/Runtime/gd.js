@@ -91,27 +91,6 @@ gdjs.toDegrees = function(angleInRadians) {
   return (angleInRadians * 180) / 3.14159;
 };
 
-/**
- * Register the runtime objects that can be used in runtimeScene.<br>
- * Objects must be part of gdjs and have their property "thisIsARuntimeObjectConstructor"
- * defined and set to the name of the type of the object so as to be recognized.
- * The name of the type of the object must be complete, with the namespace if any. For
- * example, if you are providing a Text object in the TextObject extension, the full name
- * of the type of the object is "TextObject::Text".
- *
- * @deprecated
- */
-gdjs.registerObjects = function() {
-  gdjs.objectsTypes.clear();
-
-  for (var p in this) {
-    if (this.hasOwnProperty(p)) {
-      if (gdjs[p].thisIsARuntimeObjectConstructor !== undefined) {
-        gdjs.registerObject(gdjs[p], gdjs[p].thisIsARuntimeObjectConstructor);
-      }
-    }
-  }
-};
 
 /**
  * Register the runtime objects that can be used in runtimeScene.<br>
@@ -120,62 +99,11 @@ gdjs.registerObjects = function() {
  * example, if you are providing a Text object in the TextObject extension, the full name
  * of the type of the object is "TextObject::Text".
  *
- * @param Ctor The constructor of the Object.
  * @param objectTypeName The name of the type of the Object.
+ * @param Ctor The constructor of the Object.
  */
-gdjs.registerObject = function(Ctor, objectTypeName){
+gdjs.registerObject = function(objectTypeName, Ctor){
   gdjs.objectsTypes.put(objectTypeName, Ctor)
-};
-
-/**
- * Register the runtime behaviors that can be used bt runtimeObject.
- *
- * Behavior must be a property on gdjs (or on a inner object, but not on any object nested below)
- * and have a property "thisIsARuntimeBehaviorConstructor" defined and set
- * to the type of the behavior to be recognized.
- *
- * The type of the behavior must be complete, with the namespace of the extension. For
- * example, if you are providing a Draggable behavior in the DraggableBehavior extension,
- * the full name of the type of the behavior is "DraggableBehavior::Draggable".
- *
- * @deprecated
- */
-gdjs.registerBehaviors = function() {
-  gdjs.behaviorsTypes.clear();
-
-  for (var gdjsProperty in this) {
-    if (this.hasOwnProperty(gdjsProperty)) {
-      // Search in object inside gdjs.
-      var innerObject = gdjs[gdjsProperty];
-      if (innerObject.thisIsARuntimeBehaviorConstructor !== undefined) {
-        gdjs.behaviorsTypes.put(
-          innerObject.thisIsARuntimeBehaviorConstructor,
-          innerObject
-        );
-      } else if (
-        Object.prototype.toString.call(innerObject) !== '[object Array]' &&
-        typeof innerObject === 'object' &&
-        innerObject !== null
-      ) {
-        // Also search inside objects contained in gdjs.
-        for (var innerObjectProperty in innerObject) {
-          if (innerObject.hasOwnProperty(innerObjectProperty)) {
-            var innerInnerObject = innerObject[innerObjectProperty];
-            if (
-              innerInnerObject !== null &&
-              typeof innerInnerObject === 'function' &&
-              innerInnerObject.thisIsARuntimeBehaviorConstructor !== undefined
-            ) {
-              gdjs.registerBehavior(
-                innerInnerObject,
-                innerInnerObject.thisIsARuntimeBehaviorConstructor
-              );
-            }
-          }
-        }
-      }
-    }
-  }
 };
 
 /**
@@ -185,10 +113,10 @@ gdjs.registerBehaviors = function() {
  * example, if you are providing a Draggable behavior in the DraggableBehavior extension,
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
- * @param Ctor The constructor of the Object.
  * @param behaviorTypeName The name of the type of the behavior.
+ * @param Ctor The constructor of the Object.
  */
-gdjs.registerBehavior = function(Ctor, behaviorTypeName){
+gdjs.registerBehavior = function(behaviorTypeName, Ctor){
   gdjs.behaviorsTypes.put(
     behaviorTypeName,
     Ctor

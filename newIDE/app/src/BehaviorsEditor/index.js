@@ -17,21 +17,6 @@ import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 const gd = global.gd;
 
-const styles = {
-  addBehaviorLine: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  addBehaviorText: {
-    justifyContent: 'flex-end',
-  },
-  behaviorTitle: {
-    flex: 1,
-  },
-  behaviorTools: {
-    flexShrink: 0,
-  },
-};
 const AddBehaviorLine = ({ onAdd }) => (
   <Column>
     <Line justifyContent="flex-end" expand>
@@ -154,17 +139,17 @@ export default class BehaviorsEditor extends Component {
               return (
                 <div key={index}>
                   <MiniToolbar>
-                    <span style={styles.behaviorTitle}>
+                    <MiniToolbarText>
                       <Trans>Unknown behavior</Trans>{' '}
+                    </MiniToolbarText>
+                    <Column noMargin expand>
                       <TextField value={behaviorName} disabled />
-                    </span>
-                    <span style={styles.behaviorTools}>
-                      <IconButton
-                        onClick={() => this._onRemoveBehavior(behaviorName)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </span>
+                    </Column>
+                    <IconButton
+                      onClick={() => this._onRemoveBehavior(behaviorName)}
+                    >
+                      <Delete />
+                    </IconButton>
                   </MiniToolbar>
                   <EmptyMessage>
                     <Trans>

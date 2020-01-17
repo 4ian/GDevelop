@@ -23,7 +23,7 @@ gdjs.DraggableRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.DraggableRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.DraggableRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "DraggableBehavior::Draggable";
+gdjs.registerBehavior("DraggableBehavior::Draggable", gdjs.DraggableRuntimeBehavior);
 
 gdjs.DraggableRuntimeBehavior.prototype.onDeActivate = function() {
     this._endDrag();

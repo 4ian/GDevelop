@@ -145,7 +145,7 @@ gdjs.PhysicsRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.PhysicsRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.PhysicsRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "PhysicsBehavior::PhysicsBehavior";
+gdjs.registerBehavior("PhysicsBehavior::PhysicsBehavior", gdjs.PhysicsRuntimeBehavior);
 
 gdjs.PhysicsRuntimeBehavior.prototype.onDeActivate = function() {
 	if ( this._box2DBody !== null ) {

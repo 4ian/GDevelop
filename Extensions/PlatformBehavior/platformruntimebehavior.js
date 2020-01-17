@@ -100,7 +100,7 @@ gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.PlatformRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.PlatformRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "PlatformBehavior::PlatformBehavior";
+gdjs.registerBehavior("PlatformBehavior::PlatformBehavior", gdjs.PlatformRuntimeBehavior);
 
 gdjs.PlatformRuntimeBehavior.LADDER = 2;
 gdjs.PlatformRuntimeBehavior.JUMPTHRU = 1;

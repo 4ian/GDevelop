@@ -33,7 +33,7 @@ gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 };
 
 gdjs.TextEntryRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.TextEntryRuntimeObject.thisIsARuntimeObjectConstructor = "TextEntryObject::TextEntry";
+gdjs.registerObject("TextEntryObject::TextEntry", gdjs.TextEntryRuntimeObject);
 
 gdjs.TextEntryRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
     gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);

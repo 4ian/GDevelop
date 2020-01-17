@@ -18,7 +18,7 @@ gdjs.DestroyOutsideRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.DestroyOutsideRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.DestroyOutsideRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "DestroyOutsideBehavior::DestroyOutside";
+gdjs.registerBehavior("DestroyOutsideBehavior::DestroyOutside", gdjs.DestroyOutsideRuntimeBehavior);
 
 gdjs.DestroyOutsideRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 

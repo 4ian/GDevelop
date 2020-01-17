@@ -93,13 +93,13 @@ gdjs.toDegrees = function(angleInRadians) {
 
 
 /**
- * Register the runtime objects that can be used in runtimeScene.<br>
+ * Register a runtime object (class extending {@link gdjs.RuntimeObject}) that can be used in a scene.
  *
  * The name of the type of the object must be complete, with the namespace if any. For
  * example, if you are providing a Text object in the TextObject extension, the full name
  * of the type of the object is "TextObject::Text".
  *
- * @param objectTypeName The name of the type of the Object.
+ * @param {string} objectTypeName The name of the type of the Object.
  * @param Ctor The constructor of the Object.
  */
 gdjs.registerObject = function(objectTypeName, Ctor){
@@ -107,13 +107,14 @@ gdjs.registerObject = function(objectTypeName, Ctor){
 };
 
 /**
- * Register the runtime behaviors that can be used bt runtimeObject.<br>
+ * Register a runtime behavior (class extending {@link gdjs.RuntimeBehavior}) that can be used by a 
+ * {@link gdjs.RuntimeObject}.
  *
  * The type of the behavior must be complete, with the namespace of the extension. For
  * example, if you are providing a Draggable behavior in the DraggableBehavior extension,
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
- * @param behaviorTypeName The name of the type of the behavior.
+ * @param {string} behaviorTypeName The name of the type of the behavior.
  * @param Ctor The constructor of the Object.
  */
 gdjs.registerBehavior = function(behaviorTypeName, Ctor){
@@ -188,7 +189,7 @@ gdjs.registerGlobalCallbacks = function() {
 /**
  * Get the constructor of an object.
  *
- * @param name {String} The name of the type of the object.
+ * @param {string} name The name of the type of the object.
  */
 gdjs.getObjectConstructor = function(name) {
   if (name !== undefined && gdjs.objectsTypes.containsKey(name))
@@ -201,7 +202,7 @@ gdjs.getObjectConstructor = function(name) {
 /**
  * Get the constructor of a behavior.
  *
- * @param name {String} The name of the type of the behavior.
+ * @param {string} name The name of the type of the behavior.
  */
 gdjs.getBehaviorConstructor = function(name) {
   if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))

@@ -1,25 +1,66 @@
-var shell = require('shelljs');
-var path = require('path');
-var isWin = /^win/.test(process.platform);
+const shell = require('shelljs');
+const path = require('path');
+const copy = require('recursive-copy');
 
-var destFolder = path.join(__dirname, '..', 'resources', 'GDJS', 'Runtime');
-var destFolder2 = path.join(__dirname, '..', 'node_modules', 'GDJS-for-web-app-only', 'Runtime');
-var gdjsScriptsFolder = path.join(__dirname, '../../../GDJS/scripts');
+const gdevelopRootPath = path.join(__dirname, '..', '..', '..');
+const destinationPaths = [
+  path.join(__dirname, '..', 'resources', 'GDJS', 'Runtime'),
+  path.join(
+    __dirname,
+    '..',
+    'node_modules',
+    'GDJS-for-web-app-only',
+    'Runtime'
+  ),
+];
 
-if (isWin) {
-  shell.exec('CopyRuntimeToGD.bat ' + "\"" + destFolder + "\"", {
-    cwd: gdjsScriptsFolder,
-  });
-  shell.exec('CopyRuntimeToGD.bat ' + "\"" + destFolder2 + "\"", {
-    cwd: gdjsScriptsFolder,
-  });
-} else {
-  shell.rm('-rf', destFolder);
-  shell.rm('-rf', destFolder2);
-  shell.exec('./CopyRuntimeToGD.sh ' + destFolder, {
-    cwd: gdjsScriptsFolder,
-  });
-  shell.exec('./CopyRuntimeToGD.sh ' + destFolder2, {
-    cwd: gdjsScriptsFolder,
-  });
-}
+var copyOptions = {
+  overwrite: true,
+  expand: true,
+  dot: true,
+  junk: true,
+};
+
+destinationPaths.forEach(destinationPath => {
+  shell.echo(
+    `ℹ️ Copying GDJS and extensions runtime files (*.js) to "${destinationPath}"...`
+  );
+
+  shell.rm('-rf', destinationPath);
+  shell.mkdir('-p', destinationPath);
+
+  copy(
+    path.join(gdevelopRootPath, 'GDJS', 'Runtime'),
+    destinationPath,
+    copyOptions
+  )
+    .then(function(results) {
+      console.info(
+        `✅ GDJS and extensions runtime copy succeeded (${
+          results.length
+        } file(s) copied`
+      );
+    })
+    .catch(function(error) {
+      console.error('❌ Copy failed: ' + error);
+    });
+
+  copy(
+    path.join(gdevelopRootPath, 'Extensions'),
+    path.join(destinationPath, 'Extensions'),
+    {
+      ...copyOptions,
+      filter: ['**/*.js'],
+    }
+  )
+    .then(function(results) {
+      console.info(
+        `✅ GDJS and extensions runtime copy succeeded (${
+          results.length
+        } file(s) copied`
+      );
+    })
+    .catch(function(error) {
+      console.error('❌ Copy failed: ' + error);
+    });
+});

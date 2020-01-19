@@ -37,6 +37,13 @@ ${extension.getDescription()}
 };
 
 /** @returns {DocumentationText} */
+const generateExtensionSeparatorText = () => {
+  return {
+    text: '\n---\n\n',
+  };
+};
+
+/** @returns {DocumentationText} */
 const generateObjectHeaderText = ({ extension, objectMetadata }) => {
   const additionalText =
     extension.getFullName() !== objectMetadata.getFullName()
@@ -65,6 +72,20 @@ ${behaviorMetadata.getDescription()}
   };
 };
 
+/** @returns {DocumentationText} */
+const generateObjectNoExpressionsText = () => {
+  return {
+    text: `_No expressions for this object._\n`,
+  };
+};
+
+/** @returns {DocumentationText} */
+const generateBehaviorNoExpressionsText = () => {
+  return {
+    text: `_No expressions for this behavior._\n`,
+  };
+};
+
 /** @returns {ReferenceText} */
 const generateExpressionReferenceText = ({
   expressionType,
@@ -74,7 +95,17 @@ const generateExpressionReferenceText = ({
 }) => {
   // TODO: Add parameters and put this as a table row?
   // Find the methods available on expressionMetadata in GDevelop.js/Bindings/Bindings.idl
-  const text = `* \`${expressionType}\`: **${expressionMetadata.getFullName()}**
+  let expressionUsage = '';
+  if (objectMetadata) {
+    expressionUsage = 'Object.' + expressionType;
+  } else if (behaviorMetadata) {
+    expressionUsage =
+      'Object.' + behaviorMetadata.getDefaultName() + '::' + expressionType;
+  } else {
+    expressionUsage = expressionType;
+  }
+
+  const text = `* \`${expressionUsage}\`: **${expressionMetadata.getFullName()}**
 
   ${expressionMetadata.getDescription()}`;
 
@@ -101,6 +132,8 @@ const generateExpressionsReferenceTexts = ({
       return generateExpressionReferenceText({
         expressionType,
         expressionMetadata,
+        objectMetadata,
+        behaviorMetadata,
       });
     })
     .filter(Boolean);
@@ -115,12 +148,14 @@ const sortExpressionReferenceTexts = (expressionText1, expressionText2) => {
   return 0;
 };
 
-/** @returns {Array<Text>} */
+/** @returns {Array<DocumentationText>} */
 const generateAllDocumentationTexts = () => {
   const platformExtensions = gd.JsPlatform.get().getAllPlatformExtensions();
+  const platformExtensionsCount = platformExtensions.size();
 
+  /** @type {Array<DocumentationText>} */
   let allExpressionsReferenceTexts = [];
-  mapVector(platformExtensions, extension => {
+  mapVector(platformExtensions, (extension, extensionIndex) => {
     const extensionExpressions = extension.getAllExpressions();
     const extensionStrExpressions = extension.getAllStrExpressions();
 
@@ -150,7 +185,9 @@ const generateAllDocumentationTexts = () => {
       allExtensionObjectsReferenceTexts = [
         generateObjectHeaderText({ extension, objectMetadata }),
         ...allExtensionObjectsReferenceTexts,
-        ...objectReferenceTexts,
+        ...(objectReferenceTexts.length
+          ? objectReferenceTexts
+          : [generateObjectNoExpressionsText()]),
       ];
     });
     let allExtensionBehaviorsReferenceTexts = [];
@@ -177,7 +214,9 @@ const generateAllDocumentationTexts = () => {
       allExtensionBehaviorsReferenceTexts = [
         generateBehaviorHeaderText({ extension, behaviorMetadata }),
         ...allExtensionBehaviorsReferenceTexts,
-        ...behaviorReferenceTexts,
+        ...(behaviorReferenceTexts.length
+          ? behaviorReferenceTexts
+          : [generateBehaviorNoExpressionsText()]),
       ];
     });
 
@@ -196,8 +235,8 @@ const generateAllDocumentationTexts = () => {
     const hasFreeExpressionsReferenceTexts =
       allExtensionFreeExpressionsReferenceTexts.length > 0;
 
-    allExpressionsReferenceTexts = [
-      ...allExpressionsReferenceTexts,
+    // Merge all the extension expression texts
+    let allExtensionReferenceTexts = [
       hasFreeExpressionsReferenceTexts
         ? generateExtensionHeaderText({ extension })
         : null,
@@ -205,6 +244,20 @@ const generateAllDocumentationTexts = () => {
       ...allExtensionObjectsReferenceTexts,
       ...allExtensionBehaviorsReferenceTexts,
     ].filter(Boolean);
+
+    // Add a separator if needed
+    const isLastExtension = extensionIndex === platformExtensionsCount - 1;
+    if (!isLastExtension && allExtensionReferenceTexts.length > 0) {
+      allExtensionReferenceTexts = [
+        ...allExtensionReferenceTexts,
+        generateExtensionSeparatorText(),
+      ];
+    }
+
+    allExpressionsReferenceTexts = [
+      ...allExpressionsReferenceTexts,
+      ...allExtensionReferenceTexts,
+    ];
   });
 
   return allExpressionsReferenceTexts;
@@ -221,7 +274,7 @@ const writeFile = content => {
 };
 
 const noopTranslationFunction = str => str;
-const extensionsLoader = makeExtensionsLoader({ gd, filterExamples: false });
+const extensionsLoader = makeExtensionsLoader({ gd, filterExamples: true });
 extensionsLoader
   .loadAllExtensions(noopTranslationFunction)
   .then(loadingResults => {
@@ -231,7 +284,7 @@ extensionsLoader
   })
   .then(allDocumentationTexts => {
     const texts = allDocumentationTexts
-      .map(({ expressionType, text }) => {
+      .map(({ text }) => {
         return text;
       })
       .join('\n\n');

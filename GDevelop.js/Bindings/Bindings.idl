@@ -1053,6 +1053,7 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetIconFilename();
+    [Const, Ref] DOMString GetHelpPath();
 
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -1093,6 +1094,7 @@ interface BehaviorMetadata {
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetGroup();
     [Const, Ref] DOMString GetIconFilename();
+    [Const, Ref] DOMString GetHelpPath();
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,

@@ -11,7 +11,8 @@ const shell = require('shelljs');
 shell.exec('node import-GDJS-Runtime.js');
 gd.initializePlatforms();
 
-const outputFile = 'reference.md';
+const gdevelopWikiUrlRoot = 'http://wiki.compilgames.net/doku.php/gdevelop5';
+const outputFile = 'expressions-reference.dokuwiki.md';
 
 // Types definitions used in this script:
 
@@ -26,12 +27,51 @@ const outputFile = 'reference.md';
  * @prop {string} text The text to render (in Markdown/Dokuwiki syntax)
  */
 
+const sanitize = str => {
+  return (
+    str
+      // Disallow new lines in descriptions:
+      .replace(/\n/g, '')
+      // Replace a few description parts that can conflict with DokuWiki/Markdown:
+      .replace(/\)\*x/, ') * x')
+      .replace(/x\^n/, '"x to the power n"')
+  );
+};
+
+const translateTypeToHumanReadableType = type => {
+  if (type === 'expression') return 'number';
+  if (type === 'objectList') return 'object';
+  if (type === 'objectPtr') return 'object';
+  if (type === 'stringWithSelector') return 'string';
+
+  return type;
+};
+
+const generateFileHeaderText = () => {
+  return {
+    text: `# Expressions reference
+
+Expressions can be entered when you see a field with one of these buttons:
+
+{{ :gdevelop5:field_expressions.png?nolink |}}
+
+  * The left button indicates a "string expression" (a text)
+  * The right button indicates a "numerical expression" (a number)
+
+This page is a reference of all expressions that can be used in GDevelop, grouped by the extension,
+object or behavior they belong too. When \`Object\` is written, you should enter an object name. **[[gdevelop5:all-features:expressions|Learn more here about how to write expressions.]]**
+
+<note>Expressions are sometime also called functions, like in mathematics.</note>
+`,
+  };
+};
+
 /** @returns {DocumentationText} */
 const generateExtensionHeaderText = ({ extension }) => {
   return {
     text: `## ${extension.getFullName()}
 
-${extension.getDescription()}
+${extension.getDescription()} ${generateReadMoreLink(extension.getHelpPath())}
 `,
   };
 };
@@ -43,16 +83,33 @@ const generateExtensionSeparatorText = () => {
   };
 };
 
+/** @returns {string} */
+const generateReadMoreLink = helpPagePath => {
+  if (!helpPagePath) return '';
+
+  return `[[${gdevelopWikiUrlRoot}${helpPagePath}|Learn more...]]`;
+};
+
 /** @returns {DocumentationText} */
 const generateObjectHeaderText = ({ extension, objectMetadata }) => {
+  // Skip the header for the base object. The "Base object" extension
+  // will already have an header and explanation.
+  if (objectMetadata.getName() === '') {
+    return { text: '' };
+  }
+
   const additionalText =
     extension.getFullName() !== objectMetadata.getFullName()
       ? `(from extension ${extension.getFullName()})`
       : '';
-  return {
-    text: `## ${objectMetadata.getFullName()} ${additionalText}
 
-${objectMetadata.getDescription()}
+  const helpPath = objectMetadata.getHelpPath() || extension.getHelpPath();
+
+  return {
+    text: `
+## ${objectMetadata.getFullName()} ${additionalText}
+
+${objectMetadata.getDescription()} ${generateReadMoreLink(helpPath)}
 `,
   };
 };
@@ -64,10 +121,13 @@ const generateBehaviorHeaderText = ({ extension, behaviorMetadata }) => {
       ? `(from extension ${extension.getFullName()})`
       : '';
 
-  return {
-    text: `## ${behaviorMetadata.getFullName()} ${additionalText}
+  const helpPath = behaviorMetadata.getHelpPath() || extension.getHelpPath();
 
-${behaviorMetadata.getDescription()}
+  return {
+    text: `
+## ${behaviorMetadata.getFullName()} ${additionalText}
+
+${behaviorMetadata.getDescription()} ${generateReadMoreLink(helpPath)}
 `,
   };
 };
@@ -86,15 +146,49 @@ const generateBehaviorNoExpressionsText = () => {
   };
 };
 
+/** @returns {DocumentationText} */
+const generateExpressionsTableHeader = () => {
+  // We don't put a header for the last column
+  return {
+    text: `^ Expression ^ Description ^  ^`,
+  };
+};
+
 /** @returns {ReferenceText} */
-const generateExpressionReferenceText = ({
+const generateExpressionReferenceRowsText = ({
   expressionType,
   expressionMetadata,
   objectMetadata,
   behaviorMetadata,
 }) => {
-  // TODO: Add parameters and put this as a table row?
-  // Find the methods available on expressionMetadata in GDevelop.js/Bindings/Bindings.idl
+  let parameterRows = [];
+  let parameterStrings = [];
+  mapVector(expressionMetadata.getParameters(), (parameterMetadata, index) => {
+    if ((!!objectMetadata && index < 1) || (!!behaviorMetadata && index < 2)) {
+      return; // Skip the first (or first twos) parameters by convention.
+    }
+    if (parameterMetadata.isCodeOnly()) return;
+
+    const sanitizedDescription = sanitize(
+      [
+        parameterMetadata.getDescription(),
+        parameterMetadata.getLongDescription(),
+        parameterMetadata.isOptional() ? '_Optional_.' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')
+    );
+
+    const humanReadableType = translateTypeToHumanReadableType(
+      parameterMetadata.getType()
+    );
+
+    parameterRows.push(
+      `|:::| _${humanReadableType}_ | ${sanitizedDescription} |`
+    );
+    parameterStrings.push(humanReadableType);
+  });
+
   let expressionUsage = '';
   if (objectMetadata) {
     expressionUsage = 'Object.' + expressionType;
@@ -104,10 +198,14 @@ const generateExpressionReferenceText = ({
   } else {
     expressionUsage = expressionType;
   }
+  expressionUsage += '(' + parameterStrings.join(', ') + ')';
 
-  const text = `* \`${expressionUsage}\`: **${expressionMetadata.getFullName()}**
+  const sanitizedExpression = sanitize(expressionMetadata.getDescription());
 
-  ${expressionMetadata.getDescription()}`;
+  let text = `| \`${expressionUsage}\` | ${sanitizedExpression} ||`;
+  if (parameterRows.length) {
+    text += '\n' + parameterRows.join('\n');
+  }
 
   return {
     expressionType,
@@ -116,7 +214,7 @@ const generateExpressionReferenceText = ({
 };
 
 /** @returns {Array<ReferenceText>} */
-const generateExpressionsReferenceTexts = ({
+const generateExpressionsReferenceRowsTexts = ({
   expressionsMetadata,
   objectMetadata,
   behaviorMetadata,
@@ -129,7 +227,7 @@ const generateExpressionsReferenceTexts = ({
 
       if (!expressionMetadata.isShown()) return null;
 
-      return generateExpressionReferenceText({
+      return generateExpressionReferenceRowsText({
         expressionType,
         expressionMetadata,
         objectMetadata,
@@ -154,7 +252,7 @@ const generateAllDocumentationTexts = () => {
   const platformExtensionsCount = platformExtensions.size();
 
   /** @type {Array<DocumentationText>} */
-  let allExpressionsReferenceTexts = [];
+  let allExpressionsReferenceTexts = [generateFileHeaderText()];
   mapVector(platformExtensions, (extension, extensionIndex) => {
     const extensionExpressions = extension.getAllExpressions();
     const extensionStrExpressions = extension.getAllStrExpressions();
@@ -168,26 +266,27 @@ const generateAllDocumentationTexts = () => {
     let allExtensionObjectsReferenceTexts = [];
     objectTypes.forEach(objectType => {
       const objectMetadata = extension.getObjectMetadata(objectType);
-      const objectReferenceTexts = [
-        ...generateExpressionsReferenceTexts({
+      const objectReferenceRowsTexts = [
+        ...generateExpressionsReferenceRowsTexts({
           expressionsMetadata: extension.getAllExpressionsForObject(objectType),
           objectMetadata,
         }),
-        ...generateExpressionsReferenceTexts({
+        ...generateExpressionsReferenceRowsTexts({
           expressionsMetadata: extension.getAllStrExpressionsForObject(
             objectType
           ),
           objectMetadata,
         }),
       ];
-      objectReferenceTexts.sort(sortExpressionReferenceTexts);
+      objectReferenceRowsTexts.sort(sortExpressionReferenceTexts);
 
       allExtensionObjectsReferenceTexts = [
-        generateObjectHeaderText({ extension, objectMetadata }),
         ...allExtensionObjectsReferenceTexts,
-        ...(objectReferenceTexts.length
-          ? objectReferenceTexts
-          : [generateObjectNoExpressionsText()]),
+        generateObjectHeaderText({ extension, objectMetadata }),
+        objectReferenceRowsTexts.length
+          ? generateExpressionsTableHeader()
+          : generateObjectNoExpressionsText(),
+        ...objectReferenceRowsTexts,
       ];
     });
     let allExtensionBehaviorsReferenceTexts = [];
@@ -195,52 +294,56 @@ const generateAllDocumentationTexts = () => {
     // Behavior expressions
     behaviorTypes.forEach(behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const behaviorReferenceTexts = [
-        ...generateExpressionsReferenceTexts({
+      const behaviorReferenceRowsTexts = [
+        ...generateExpressionsReferenceRowsTexts({
           expressionsMetadata: extension.getAllExpressionsForBehavior(
             behaviorType
           ),
           behaviorMetadata,
         }),
-        ...generateExpressionsReferenceTexts({
+        ...generateExpressionsReferenceRowsTexts({
           expressionsMetadata: extension.getAllStrExpressionsForBehavior(
             behaviorType
           ),
           behaviorMetadata,
         }),
       ];
-      behaviorReferenceTexts.sort(sortExpressionReferenceTexts);
+      behaviorReferenceRowsTexts.sort(sortExpressionReferenceTexts);
 
       allExtensionBehaviorsReferenceTexts = [
-        generateBehaviorHeaderText({ extension, behaviorMetadata }),
         ...allExtensionBehaviorsReferenceTexts,
-        ...(behaviorReferenceTexts.length
-          ? behaviorReferenceTexts
-          : [generateBehaviorNoExpressionsText()]),
+        generateBehaviorHeaderText({ extension, behaviorMetadata }),
+        behaviorReferenceRowsTexts.length
+          ? generateExpressionsTableHeader()
+          : generateBehaviorNoExpressionsText(),
+        ...behaviorReferenceRowsTexts,
       ];
     });
 
     // Free (non objects/non behaviors) expressions
-    const allExtensionFreeExpressionsReferenceTexts = [
-      ...generateExpressionsReferenceTexts({
+    const allExtensionFreeExpressionsReferenceRowsTexts = [
+      ...generateExpressionsReferenceRowsTexts({
         expressionsMetadata: extensionStrExpressions,
       }),
-      ...generateExpressionsReferenceTexts({
+      ...generateExpressionsReferenceRowsTexts({
         expressionsMetadata: extensionExpressions,
       }),
     ];
-    allExtensionFreeExpressionsReferenceTexts.sort(
+    allExtensionFreeExpressionsReferenceRowsTexts.sort(
       sortExpressionReferenceTexts
     );
     const hasFreeExpressionsReferenceTexts =
-      allExtensionFreeExpressionsReferenceTexts.length > 0;
+      allExtensionFreeExpressionsReferenceRowsTexts.length > 0;
 
     // Merge all the extension expression texts
     let allExtensionReferenceTexts = [
-      hasFreeExpressionsReferenceTexts
-        ? generateExtensionHeaderText({ extension })
-        : null,
-      ...allExtensionFreeExpressionsReferenceTexts,
+      ...(hasFreeExpressionsReferenceTexts
+        ? [
+            generateExtensionHeaderText({ extension }),
+            generateExpressionsTableHeader(),
+          ]
+        : []),
+      ...allExtensionFreeExpressionsReferenceRowsTexts,
       ...allExtensionObjectsReferenceTexts,
       ...allExtensionBehaviorsReferenceTexts,
     ].filter(Boolean);
@@ -287,10 +390,10 @@ extensionsLoader
       .map(({ text }) => {
         return text;
       })
-      .join('\n\n');
+      .join('\n');
     return writeFile(texts);
   })
   .then(
-    () => console.info('Done.'),
-    err => console.error('Error while writing output', err)
+    () => console.info(`✅ Done. File generated: ${outputFile}`),
+    err => console.error('❌ Error while writing output', err)
   );

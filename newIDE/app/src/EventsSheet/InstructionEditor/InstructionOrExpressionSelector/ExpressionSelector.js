@@ -40,6 +40,7 @@ export default class ExpressionSelector extends Component<Props, {||}> {
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
         iconSize={16}
+        helpPagePath="/all-features/expressions-reference"
         {...otherProps}
       />
     );

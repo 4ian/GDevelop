@@ -58,7 +58,7 @@ const contributors = [
   { name: 'ale26reg', description: 'Contributions to GDevelop' },
   { name: 'dos1', description: 'Contributions to GDevelop' },
   {
-    name: 'Bouh',
+    name: 'Aurélien Vivet',
     description:
       'Numerous contributions to GDevelop (Video extension, advanced shapes, bugfixes, new conditions, examples...)',
     link: 'https://www.witly.fr',

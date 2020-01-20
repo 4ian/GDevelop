@@ -23,7 +23,7 @@ const buildTypesConfig = {
   },
   'electron-build': {
     estimatedTimeInSeconds: (build: Build) =>
-      150 * (build.targets ? build.targets.length : 0),
+      90 + 130 * (build.targets ? build.targets.length : 0),
     completeDescription: '',
   },
   'web-build': {

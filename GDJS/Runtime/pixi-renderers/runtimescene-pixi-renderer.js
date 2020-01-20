@@ -43,6 +43,8 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function() {
   var average = this._runtimeScene.getProfiler().getFramesAverageMeasures();
   var outputs = [];
   gdjs.Profiler.getProfilerSectionTexts("All", average, outputs);
+  gdjs.Profiler.getProfilerCounterTexts(average.counters, outputs);
+  gdjs.Profiler.getProfilerTimingTexts(average.timings, outputs);
 
   this._profilerText.text = outputs.join("\n");
 };

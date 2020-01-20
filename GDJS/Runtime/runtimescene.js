@@ -40,8 +40,13 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
     /** @type gdjs.Profiler */
-    this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
+    this._profiler = null;
     this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
+
+    // Uncomment to manually launch profiling on the scene.
+    // Also uncomment the profiler display in `gdjs.RuntimeScenePixiRenderer` if needed.
+    // this.startProfiler(null);
+    // window.gdjsProfiler = this._profiler;
 
     this.onGameResolutionResized();
 };
@@ -756,13 +761,14 @@ gdjs.RuntimeScene.prototype.getProfiler = function() {
 /**
  * Start a new profiler to measures the time passed in sections of the engine
  * in the scene.
- * @param {Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
+ * @param {?Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
  */
 gdjs.RuntimeScene.prototype.startProfiler = function(onProfilerStopped) {
     if (this._profiler) return;
 
     this._profiler = new gdjs.Profiler();
     this._onProfilerStopped = onProfilerStopped;
+    this._objectPositionsManager.setProfiler(this._profiler);
 }
 
 /**
@@ -775,6 +781,7 @@ gdjs.RuntimeScene.prototype.stopProfiler = function() {
     var onProfilerStopped = this._onProfilerStopped;
     this._profiler = null;
     this._onProfilerStopped = null;
+    this._objectPositionsManager.setProfiler(null);
 
     if (onProfilerStopped) {
         onProfilerStopped(oldProfiler);

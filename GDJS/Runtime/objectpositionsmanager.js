@@ -75,6 +75,9 @@ gdjs.ObjectPositionsManager = function() {
    * @type Object.<number, ObjectPosition>
    */
   this._allObjectPositions = {};
+
+  /** @type {?gdjs.Profiler} */
+  this._profiler = null;
 };
 
 gdjs.ObjectPositionsManager._statics = {
@@ -90,6 +93,14 @@ gdjs.ObjectPositionsManager._statics = {
    * @type Object.<string, ObjectPosition[]>
    */
   bulkObjectPositionUpdates: {},
+}
+
+/**
+ * Set the profiler used to report counters of this ObjectPositionsManager.
+ * @param {?gdjs.Profiler} profiler The profiler to use, or null to use none.
+ */
+gdjs.ObjectPositionsManager.prototype.setProfiler = function(profiler) {
+  this._profiler = profiler;
 }
 
 /**
@@ -187,6 +198,10 @@ gdjs.ObjectPositionsManager.prototype.markObjectAsDirty = function(object) {
  * has been recreated, in which case the spatial data structure will update it).
  */
 gdjs.ObjectPositionsManager.prototype.update = function() {
+  if (this._profiler) {
+    var startTime = performance.now();
+  }
+
   // "Update" all objects that have been moved by removing them
   // and adding them again immediately after in the spatial data structure.
   for (var objectId in this._dirtyObjects) {
@@ -258,6 +273,12 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
 
     delete this._allObjectPositions[objectId];
     delete this._removedObjectIdsSet[objectId];
+  }
+
+  if (this._profiler) {
+    var endTime = performance.now();
+    this._profiler.incrementCallCounter('ObjectPositionsManager.update');
+    this._profiler.addTime('ObjectPositionsManager.update', endTime - startTime);
   }
 };
 

@@ -19,6 +19,8 @@ gdjs.Profiler = function() {
       parent: null,
       time: 0,
       subsections: {},
+      counters: {},
+      timings: {},
     });
   }
 
@@ -34,6 +36,8 @@ gdjs.Profiler.prototype.beginFrame = function() {
     time: 0,
     lastStartTime: this._getTimeNow(),
     subsections: {},
+    counters: {},
+    timings: {},
   };
   this._currentSection = this._currentFrameMeasure;
 };
@@ -60,6 +64,25 @@ gdjs.Profiler.prototype.end = function(sectionName) {
 
   // Pop the section
   this._currentSection = this._currentSection.parent;
+};
+
+/**
+ * Increment a counter for the current frame.
+ * @param {string} counterName The name of the counter
+ */
+gdjs.Profiler.prototype.incrementCallCounter = function(counterName) {
+  this._currentFrameMeasure.counters[counterName] =
+    (this._currentFrameMeasure.counters[counterName] || 0) + 1;
+};
+
+/**
+ * Increment some timing for the current frame.
+ * @param {string} timingName The name of the timing
+ * @param {number} timeInMs The time in milliseconds
+ */
+gdjs.Profiler.prototype.addTime = function(timingName, timeInMs) {
+  this._currentFrameMeasure.timings[timingName] =
+    (this._currentFrameMeasure.timings[timingName] || 0) + timeInMs;
 };
 
 gdjs.Profiler.prototype.endFrame = function() {
@@ -118,6 +141,8 @@ gdjs.Profiler.prototype.getFramesAverageMeasures = function() {
     parent: null,
     time: 0,
     subsections: {},
+    counters: {},
+    timings: {},
   };
 
   for (var i = 0; i < this._framesCount; ++i) {
@@ -127,6 +152,24 @@ gdjs.Profiler.prototype.getFramesAverageMeasures = function() {
       this._framesCount,
       i
     );
+
+    // Compute the sum for the counters and timings
+    for(var counterName in this._framesMeasures[i].counters) {
+      framesAverageMeasures.counters[counterName] = (framesAverageMeasures.counters[counterName] || 0) +
+        this._framesMeasures[i].counters[counterName];
+    }
+    for(var timingName in this._framesMeasures[i].timings) {
+      framesAverageMeasures.timings[timingName] = (framesAverageMeasures.timings[timingName] || 0) +
+        this._framesMeasures[i].timings[timingName];
+    }
+  }
+
+  // Compute average for counters and timings
+  for(var counterName in framesAverageMeasures.counters) {
+    framesAverageMeasures.counters[counterName] /= this._framesCount;
+  }
+  for(var timingName in framesAverageMeasures.timings) {
+    framesAverageMeasures.timings[timingName] /= this._framesCount;
   }
 
   return framesAverageMeasures;
@@ -172,4 +215,36 @@ gdjs.Profiler.getProfilerSectionTexts = function(
     }
   }
   outputs.push.apply(outputs, subsectionsOutputs);
+};
+
+/**
+ * Convert counters into texts.
+ * Useful for ingame profiling.
+ *
+ * @param {Object.<string, number>} counters The counters that were measured
+ * @param {string[]} outputs The array where to push the results
+ */
+gdjs.Profiler.getProfilerCounterTexts = function(
+  counters,
+  outputs
+) {
+  for (var counterName in counters) {
+    outputs.push(counterName + ": " + counters[counterName]);
+  }
+};
+
+/**
+ * Convert timings into texts.
+ * Useful for ingame profiling.
+ *
+ * @param {Object.<string, number>} timings The timings that were measured
+ * @param {string[]} outputs The array where to push the results
+ */
+gdjs.Profiler.getProfilerTimingTexts = function(
+  timings,
+  outputs
+) {
+  for (var timingName in timings) {
+    outputs.push(timingName + ": " + timings[timingName].toFixed(2) + "ms");
+  }
 };

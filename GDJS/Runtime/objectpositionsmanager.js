@@ -6,7 +6,7 @@
  * @typedef {Object} ObjectPosition
  * @property {ObjectWithCoordinatesInterface} object
  * @property {number} objectId
- * @property {string} objectNameId
+ * @property {number} objectNameId
  * @property {number} x
  * @property {number} y
  * @property {number} centerX
@@ -34,7 +34,7 @@
  *
  * @typedef ObjectWithCoordinatesInterface
  * @property {number} id
- * @property {() => string} getNameId
+ * @property {() => number} getNameId
  * @property {() => number} getX
  * @property {() => number} getY
  * @property {() => number} getDrawableX
@@ -58,13 +58,13 @@
  * @class gdjs.ObjectPositionsManager
  */
 gdjs.ObjectPositionsManager = function() {
-  /** @type Object.<number, ObjectWithCoordinatesInterface> */
+  /** @type {Object.<number, ObjectWithCoordinatesInterface>} */
   this._dirtyCoordinatesObjects = {};
 
-  /** @type Object.<number, ObjectWithCoordinatesInterface> */
+  /** @type {Object.<number, ObjectWithCoordinatesInterface>} */
   this._dirtyObjects = {};
 
-  /** @type Object.<number, boolean> */
+  /** @type {Object.<number, boolean>} */
   this._removedObjectIdsSet = {};
 
   this._positionsRBushes = {};
@@ -132,7 +132,7 @@ gdjs.ObjectPositionsManager.prototype.getCounters = function() {
 
 /**
  * Get the spatial data structure handling objects with the given name identifier.
- * @param {string} nameId The name identifier of the objects.
+ * @param {number | string} nameId The name identifier of the objects.
  */
 gdjs.ObjectPositionsManager.prototype._getPositionsRBush = function(nameId) {
   var positionsRBush = this._positionsRBushes[nameId];
@@ -201,9 +201,9 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   // Prepare the batched "update" insertions.
   var bulkObjectPositionUpdates =
     gdjs.ObjectPositionsManager._statics.bulkObjectPositionUpdates;
-  for (var objectNameId in bulkObjectPositionUpdates) {
+  for (var key in bulkObjectPositionUpdates) {
     // Clear the updates (we avoid recreating a temporary object).
-    bulkObjectPositionUpdates[objectNameId].length = 0;
+    bulkObjectPositionUpdates[key].length = 0;
   }
 
   for (var objectId in this._dirtyObjects) {
@@ -235,9 +235,9 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   // Use "load" instead of multiple `insert`s, as bulk insertion leads
   // to better insertion and query performance (internally if the number
   // of objects loaded is too small, it will go back to multiple `insert`s)
-  for (var objectNameId in bulkObjectPositionUpdates) {
-    var rbush = this._getPositionsRBush(objectNameId);
-    rbush.load(bulkObjectPositionUpdates[objectNameId]);
+  for (var key in bulkObjectPositionUpdates) {
+    var rbush = this._getPositionsRBush(key);
+    rbush.load(bulkObjectPositionUpdates[key]);
   }
 
   // Clear the set of dirty objects.

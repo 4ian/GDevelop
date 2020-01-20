@@ -166,7 +166,7 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  * @param  {Function} predicate The function applied to each object: must return true if the object fulfill the predicate.
  * @param  {Hashtable} objectsLists The lists of objects to trim
  * @param  {boolean} negatePredicate If set to true, the result of the predicate is negated.
- * @param  {*} extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
+ * @param  {any=} extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
  * @return {boolean} true if at least one object fulfill the predicate.
  */
 gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate, extraArg) {

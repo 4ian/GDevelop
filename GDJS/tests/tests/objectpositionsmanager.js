@@ -733,21 +733,25 @@ describe('gdjs.ObjectPositionsManager', function() {
         name: 'ObjectA',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object2 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectA',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object3 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectB',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object4 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectC',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var objectsLists = new Hashtable();
       objectsLists.put('ObjectA', [object1, object2]);
@@ -771,21 +775,25 @@ describe('gdjs.ObjectPositionsManager', function() {
         name: 'ObjectA',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object2 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectA',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object3 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectB',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object4 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectC',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var objectsLists = new Hashtable();
       objectsLists.put('ObjectA', [object1, object2]);
@@ -810,21 +818,25 @@ describe('gdjs.ObjectPositionsManager', function() {
         name: 'ObjectA',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object2 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectA',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object3 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectB',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var object4 = new gdjs.RuntimeObject(runtimeScene, {
         name: 'ObjectC',
         type: '',
         behaviors: [],
+        variables: [],
       });
       var objectsLists = new Hashtable();
       objectsLists.put('ObjectA', [object1, object2]);

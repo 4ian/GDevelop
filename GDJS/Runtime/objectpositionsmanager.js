@@ -149,9 +149,9 @@ gdjs.ObjectPositionsManager.prototype._getPositionsRBush = function(nameId) {
   var positionsRBush = this._positionsRBushes[nameId];
   if (positionsRBush) return positionsRBush;
 
-  // TODO: use the default AABB format of RBush?
+  // TODO: update RBush to avoid using eval-like Function.
   // @ts-ignore - TODO: types for rbush
-  return (this._positionsRBushes[nameId] = rbush(9, [
+  return (this._positionsRBushes[nameId] = new rbush(9, [
     '.aabb.min[0]',
     '.aabb.min[1]',
     '.aabb.max[0]',

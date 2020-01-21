@@ -510,10 +510,10 @@ gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {
 
     var anim = this._animations[this._currentAnimation];
     if ( !anim.hasMultipleDirections ) {
+        // "Classic" setAngle implementation
         if ( this.angle === newValue ) return;
 
-        this.angle = newValue;
-        this.hitBoxesDirty = true;
+        gdjs.RuntimeObject.prototype.setAngle.call(this, newValue);
         this._renderer.updateAngle();
     }
     else {
@@ -531,7 +531,10 @@ gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {
 
         this._renderer.update(); //TODO: This may be unnecessary.
         this._animationFrameDirty = true;
+
+        // Reimplement what RuntimeObject.prototype.setAngle does:
         this.hitBoxesDirty = true;
+        this._runtimeScene.getObjectPositionsManager().markObjectAsDirty(this);
     }
 };
 
@@ -795,11 +798,11 @@ gdjs.SpriteRuntimeObject.prototype.setAngle = function(angle) {
     }
 
     if ( !this._animations[this._currentAnimation].hasMultipleDirections ) {
+        // "Classic" setAngle implementation
         if (this.angle === angle) return;
 
-        this.angle = angle;
+        gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
         this._renderer.updateAngle();
-        this.hitBoxesDirty = true;
     } else {
         angle = angle % 360;
         if ( angle < 0 ) angle += 360;

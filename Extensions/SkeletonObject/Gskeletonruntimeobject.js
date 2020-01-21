@@ -68,6 +68,7 @@ gdjs.SkeletonRuntimeObject.prototype.setY = function(y){
 gdjs.SkeletonRuntimeObject.prototype.setAngle = function(angle){
     this.angle = angle;
     this.rootArmature.setRot(angle);
+    gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getRendererObject = function(){

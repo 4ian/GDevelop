@@ -45,7 +45,7 @@ bool GD_API HitBoxesCollision(
 void GD_API SeparateObjects(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
-    bool ignoreTouchingEdges = false,
+    bool ignoreTouchingEdges,
     RuntimeScene &scene);
 
 /**

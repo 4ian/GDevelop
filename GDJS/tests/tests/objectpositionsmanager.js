@@ -146,7 +146,7 @@ describe('gdjs.ObjectPositionsManager', function() {
       );
     });
 
-    it('can find object positions containing any of the specified points', function() {
+    it('can find object positions containing any of the specified points (accurate = true)', function() {
       const { objectPositionsManager } = makeObjectPositionsManager();
       const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
         0,
@@ -163,6 +163,31 @@ describe('gdjs.ObjectPositionsManager', function() {
             [22, 22],
           ],
           true,
+          false
+        )
+      ).to.be(true);
+      expect(objectIdsSet).to.eql(
+        gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([1, 2, 3])
+      );
+    });
+
+    it('can find object positions containing any of the specified points (accurate = false)', function() {
+      const { objectPositionsManager } = makeObjectPositionsManager();
+      const objectIdsSet = gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([
+        0,
+        1,
+        2,
+        3,
+      ]);
+
+      expect(
+        objectPositionsManager.pointsTest(
+          objectIdsSet,
+          [
+            [8, 8],
+            [22, 22],
+          ],
+          false,
           false
         )
       ).to.be(true);
@@ -722,6 +747,131 @@ describe('gdjs.ObjectPositionsManager', function() {
       // so new Y position is 8 - 5 = 3).
       expect(newObject0X).to.be(7);
       expect(newObject0Y).to.be(3);
+    });
+  });
+
+  describe('ObjectPositionsContainer', function() {
+    const objectPosition2 = gdjs.ObjectPositionsManager.objectWithCoordinatesToObjectPosition(
+      makeFakeObjectWithCoordinates({
+        id: 2,
+        nameId: objectNameId2,
+        x: 8,
+        y: 8,
+        width: 5,
+        height: 5,
+        setX: noop,
+        setY: noop,
+      })
+    );
+    const objectPosition3 = gdjs.ObjectPositionsManager.objectWithCoordinatesToObjectPosition(
+      makeFakeObjectWithCoordinates({
+        id: 3,
+        nameId: objectNameId2,
+        x: 15,
+        y: 15,
+        width: 5,
+        height: 5,
+        setX: noop,
+        setY: noop,
+      })
+    );
+
+    it('can search object positions (gdjs.RTreeObjectPositionsContainer)', function() {
+      const objectPositionsContainer = new gdjs.RTreeObjectPositionsContainer();
+      objectPositionsContainer.load([objectPosition2, objectPosition3]);
+
+      // Search in a large area for 2 objects
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 20, maxY: 20 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+        )
+      ).to.eql([objectPosition2, objectPosition3]);
+
+      // Search in a large area for only 1 of the objects
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 20, maxY: 20 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([3])
+        )
+      ).to.eql([objectPosition3]);
+
+      // Search in an area containing only one object
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 10, maxY: 10 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+        )
+      ).to.eql([objectPosition2]);
+
+      // Search in an area containing only one object, but don't
+      // search for this object
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 10, maxY: 10 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([3])
+        )
+      ).to.eql([]);
+
+      // Remove an object
+      objectPositionsContainer.remove(objectPosition2);
+
+      // Search in the large area, find only the remaining object
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 20, maxY: 20 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+        )
+      ).to.eql([objectPosition3]);
+    });
+
+    it('can search object positions (gdjs.ListObjectPositionsContainer)', function() {
+      const objectPositionsContainer = new gdjs.ListObjectPositionsContainer();
+      objectPositionsContainer.load([objectPosition2, objectPosition3]);
+
+      // Search in a large area for 2 objects
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 20, maxY: 20 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+        )
+      ).to.eql([objectPosition2, objectPosition3]);
+
+      // Search in a large area for only 1 of the objects
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 20, maxY: 20 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([3])
+        )
+      ).to.eql([objectPosition3]);
+
+      // Search in an area containing only one object
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 10, maxY: 10 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+        )
+      ).to.eql([objectPosition2]);
+
+      // Search in an area containing only one object, but don't
+      // search for this object
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 10, maxY: 10 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([3])
+        )
+      ).to.eql([]);
+
+      // Remove an object
+      objectPositionsContainer.remove(objectPosition2);
+
+      // Search in the large area, find only the remaining object
+      expect(
+        objectPositionsContainer.search(
+          { minX: 0, minY: 0, maxX: 20, maxY: 20 },
+          gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet([2, 3])
+        )
+      ).to.eql([objectPosition3]);
     });
   });
 

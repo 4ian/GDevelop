@@ -48,6 +48,141 @@
  */
 
 /**
+ * Keep reference to object positions without storing them in a spatial data structure.
+ * This provides no optimization when searching for objects in an area (though there is still
+ * a basic AABB overlap test), but calls to `load`/`remove` are faster than with a spatial
+ * data structure.
+ *
+ * @class
+ */
+gdjs.ListObjectPositionsContainer = function() {
+  /**
+   * A reference to the map containing all ObjectPositions.
+   * @type {Object.<number, ObjectPosition>}
+   */
+  this._objectPositions = {};
+};
+
+/**
+ * Search an area and returns the list of {@link ObjectPosition}.
+ * Only object positions with ids in the `objectIdsSet` will be returned.
+ *
+ * @param {{minX: number, minY: number, maxX: number, maxY: number}} searchArea
+ * @param {ObjectIdsSet} objectIdsSet
+ * @returns {ObjectPosition[]}
+ */
+gdjs.ListObjectPositionsContainer.prototype.search = function(
+  searchArea,
+  objectIdsSet
+) {
+  /** @type {Array<ObjectPosition>} */
+  var result = [];
+  for (var objectId in objectIdsSet.items) {
+    var objectPosition = this._objectPositions[objectId];
+
+    // It is not guaranteed that the objectIdsSet contains ids
+    // that are stored in this gdjs.ListObjectPositionsContainer!
+    if (!objectPosition) continue;
+
+    // Even if there is no spatial data structure being used,
+    // do a quick AABB overlap check.
+    if (
+      objectPosition.aabb.max[0] < searchArea.minX ||
+      objectPosition.aabb.max[1] < searchArea.minY ||
+      objectPosition.aabb.min[0] > searchArea.maxX ||
+      objectPosition.aabb.min[1] > searchArea.maxY
+    ) {
+      // AABB are not overlapping, discard this object position.
+    } else {
+      result.push(objectPosition);
+    }
+  }
+
+  return result;
+};
+
+/**
+ * Add a list of {@link ObjectPosition} to the container.
+ * @param {ObjectPosition[]} objectPositions
+ */
+gdjs.ListObjectPositionsContainer.prototype.load = function(objectPositions) {
+  for(var i = 0;i<objectPositions.length;i++) {
+    var objectPosition = objectPositions[i];
+    this._objectPositions[objectPosition.objectId] = objectPosition;
+  }
+};
+
+/**
+ * Remove an {@link ObjectPosition} from the container.
+ * @param {ObjectPosition} objectPosition
+ */
+gdjs.ListObjectPositionsContainer.prototype.remove = function(
+  objectPosition
+) {
+  delete this._objectPositions[objectPosition.objectId];
+};
+
+/**
+ * Store object positions in a RTree, allowing for a fast `search` in exchange for
+ * a more complex `load`/`remove`.
+ * @class
+ */
+gdjs.RTreeObjectPositionsContainer = function() {
+  // TODO: update RBush to avoid using eval-like Function.
+  // @ts-ignore - rbush is not typed
+  this._rbush = new rbush(9, [
+    '.aabb.min[0]',
+    '.aabb.min[1]',
+    '.aabb.max[0]',
+    '.aabb.max[1]',
+  ]);
+};
+
+/**
+ * Search an area and returns the list of {@link ObjectPosition}.
+ * Only object positions with ids in the `objectIdsSet` will be returned.
+ *
+ * @param {{minX: number, minY: number, maxX: number, maxY: number}} searchArea The area to search
+ * @param {ObjectIdsSet} objectIdsSet The ids of objects to filter the results with.
+ * @returns {ObjectPosition[]}
+ */
+gdjs.RTreeObjectPositionsContainer.prototype.search = function(
+  searchArea,
+  objectIdsSet
+) {
+  /** @type {ObjectPosition[]} */
+  var objectPositions = this._rbush.search(searchArea);
+
+  // Filter the RBush results to keep only the object from the set. This is important
+  // because the RBush will return *all* object positions corresponding to the search.
+  var filteredObjectPositions = [];
+  for (var i = 0; i < objectPositions.length; ++i) {
+    var objectPosition = objectPositions[i];
+    if (objectIdsSet.items[objectPosition.objectId]) {
+      filteredObjectPositions.push(objectPosition);
+    }
+  }
+
+  return filteredObjectPositions;
+};
+
+/**
+ * Add a list of {@link ObjectPosition} to the container.
+ * @param {ObjectPosition[]} objectPositions
+ */
+gdjs.RTreeObjectPositionsContainer.prototype.load = function(objectPositions) {
+  this._rbush.load(objectPositions);
+};
+
+/**
+ * Remove an {@link ObjectPosition} from the container.
+ * @param {ObjectPosition} objectPosition
+ */
+gdjs.RTreeObjectPositionsContainer.prototype.remove = function(objectPosition) {
+  this._rbush.remove(objectPosition);
+};
+
+/**
  * Store the coordinates, AABB and hitboxes of objects of a scene, and
  * allow to query objects near a position/near another object, detect
  * collisions and separate colliding objects.
@@ -67,12 +202,12 @@ gdjs.ObjectPositionsManager = function() {
   /** @type {Object.<number, boolean>} */
   this._removedObjectIdsSet = {};
 
-  this._positionsRBushes = {};
+  this._objectPositionsContainers = {};
 
   /**
-   * A map containing all ObjectPosition handled in the spatial data structure,
-   * keyed by their object id.
-   * @type Object.<number, ObjectPosition>
+   * A map containing all ObjectPosition handled by the manager (i.e:
+   * all the objects of the scene), keyed by their object id.
+   * @type {Object.<number, ObjectPosition>}
    */
   this._allObjectPositions = {};
 
@@ -93,7 +228,7 @@ gdjs.ObjectPositionsManager._statics = {
    * @type Object.<string, ObjectPosition[]>
    */
   bulkObjectPositionUpdates: {},
-}
+};
 
 /**
  * Set the profiler used to report counters of this ObjectPositionsManager.
@@ -101,7 +236,7 @@ gdjs.ObjectPositionsManager._statics = {
  */
 gdjs.ObjectPositionsManager.prototype.setProfiler = function(profiler) {
   this._profiler = profiler;
-}
+};
 
 /**
  * Tool function to move an ObjectPosition, and update the associated object coordinates.
@@ -136,7 +271,8 @@ gdjs.ObjectPositionsManager._moveObjectPosition = function(
 
 gdjs.ObjectPositionsManager.prototype.getCounters = function() {
   return {
-    positionsRBushesCount: Object.keys(this._positionsRBushes).length,
+    objectPositionContainersCount: Object.keys(this._objectPositionsContainers)
+      .length,
     allObjectPositionsCount: Object.keys(this._allObjectPositions).length,
   };
 };
@@ -145,18 +281,20 @@ gdjs.ObjectPositionsManager.prototype.getCounters = function() {
  * Get the spatial data structure handling objects with the given name identifier.
  * @param {number | string} nameId The name identifier of the objects.
  */
-gdjs.ObjectPositionsManager.prototype._getPositionsRBush = function(nameId) {
-  var positionsRBush = this._positionsRBushes[nameId];
-  if (positionsRBush) return positionsRBush;
+gdjs.ObjectPositionsManager.prototype._getObjectPositionsContainer = function(
+  nameId
+) {
+  var objectPositionsContainer = this._objectPositionsContainers[nameId];
+  if (objectPositionsContainer) return objectPositionsContainer;
 
-  // TODO: update RBush to avoid using eval-like Function.
-  // @ts-ignore - TODO: types for rbush
-  return (this._positionsRBushes[nameId] = new rbush(9, [
-    '.aabb.min[0]',
-    '.aabb.min[1]',
-    '.aabb.max[0]',
-    '.aabb.max[1]',
-  ]));
+  // TODO: make this configurable
+  // return (this._objectPositionsContainers[
+  //   nameId
+  // ] = new gdjs.ListObjectPositionsContainer());
+
+  return (this._objectPositionsContainers[
+    nameId
+  ] = new gdjs.RTreeObjectPositionsContainer());
 };
 
 // Object tracking methods:
@@ -191,6 +329,29 @@ gdjs.ObjectPositionsManager.prototype.markObjectAsDirty = function(object) {
 };
 
 /**
+ * Create an ObjectPosition from an ObjectWithCoordinatesInterface.
+ * Only used internally or for tests.
+ *
+ * @param {ObjectWithCoordinatesInterface} object
+ * @returns {ObjectPosition}
+ */
+gdjs.ObjectPositionsManager.objectWithCoordinatesToObjectPosition = function(
+  object
+) {
+  return {
+    object: object,
+    objectId: object.id,
+    objectNameId: object.getNameId(),
+    x: object.getX(),
+    y: object.getY(),
+    centerX: object.getDrawableX() + object.getCenterX(),
+    centerY: object.getDrawableY() + object.getCenterY(),
+    hitboxes: object.getHitBoxes(),
+    aabb: object.getAABB(),
+  };
+};
+
+/**
  * Update the ObjectPositionsManager with the latest changes on objects.
  * This will query the objects for their coordinates, AABB and hitboxes
  * if they have been marked as dirty - and update them in the spatial data structure.
@@ -207,7 +368,7 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   for (var objectId in this._dirtyObjects) {
     var objectPosition = this._allObjectPositions[objectId];
     if (objectPosition) {
-      this._getPositionsRBush(objectPosition.objectNameId).remove(
+      this._getObjectPositionsContainer(objectPosition.objectNameId).remove(
         objectPosition
       );
     }
@@ -224,24 +385,17 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   for (var objectId in this._dirtyObjects) {
     var object = this._dirtyObjects[objectId];
 
-    var objectNameId = object.getNameId();
-
     // Note that it's possible for the objectNameId to have changed
     // (in case of object deletion and creation of another one with a same id)
-    var objectPosition = (this._allObjectPositions[objectId] = {
-      object: object,
-      objectId: object.id,
-      objectNameId: objectNameId,
-      x: object.getX(),
-      y: object.getY(),
-      centerX: object.getDrawableX() + object.getCenterX(),
-      centerY: object.getDrawableY() + object.getCenterY(),
-      hitboxes: object.getHitBoxes(),
-      aabb: object.getAABB(),
-    });
+    var objectPosition = (this._allObjectPositions[
+      objectId
+    ] = gdjs.ObjectPositionsManager.objectWithCoordinatesToObjectPosition(
+      object
+    ));
 
     // Don't use `insert`. Instead, batch the updates, doing
     // all of them at once using `load` (see later).
+    var objectNameId = object.getNameId();
     bulkObjectPositionUpdates[objectNameId] =
       bulkObjectPositionUpdates[objectNameId] || [];
     bulkObjectPositionUpdates[objectNameId].push(objectPosition);
@@ -251,8 +405,7 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   // to better insertion and query performance (internally if the number
   // of objects loaded is too small, it will go back to multiple `insert`s)
   for (var key in bulkObjectPositionUpdates) {
-    var rbush = this._getPositionsRBush(key);
-    rbush.load(bulkObjectPositionUpdates[key]);
+    this._getObjectPositionsContainer(key).load(bulkObjectPositionUpdates[key]);
   }
 
   // Clear the set of dirty objects.
@@ -266,7 +419,7 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   for (var objectId in this._removedObjectIdsSet) {
     var objectPosition = this._allObjectPositions[objectId];
     if (objectPosition) {
-      this._getPositionsRBush(objectPosition.objectNameId).remove(
+      this._getObjectPositionsContainer(objectPosition.objectNameId).remove(
         objectPosition
       );
     }
@@ -278,7 +431,10 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
   if (this._profiler) {
     var endTime = performance.now();
     this._profiler.incrementCallCounter('ObjectPositionsManager.update');
-    this._profiler.addTime('ObjectPositionsManager.update', endTime - startTime);
+    this._profiler.addTime(
+      'ObjectPositionsManager.update',
+      endTime - startTime
+    );
   }
 };
 
@@ -293,7 +449,8 @@ gdjs.ObjectPositionsManager.prototype.update = function() {
 gdjs.ObjectPositionsManager.prototype._getAllObjectNameIds = function(
   objectIdsSet
 ) {
-  var objectNameIdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
+  /** @type {Object.<number, boolean>} */
+  var objectNameIdsSet = {};
 
   for (var objectId in objectIdsSet.items) {
     var objectPosition = this._allObjectPositions[objectId];
@@ -369,9 +526,9 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
 
     for (var object2NameId in object2NameIdsSet) {
       /** @type ObjectPosition[] */
-      var nearbyObjectPositions = this._getPositionsRBush(object2NameId).search(
-        searchArea
-      );
+      var nearbyObjectPositions = this._getObjectPositionsContainer(
+        object2NameId
+      ).search(searchArea, object2IdsSet);
 
       for (var j = 0; j < nearbyObjectPositions.length; ++j) {
         var object2Position = nearbyObjectPositions[j];
@@ -379,22 +536,20 @@ gdjs.ObjectPositionsManager.prototype.distanceTest = function(
         // It's possible that we're testing distance between lists containing the same objects
         if (object2Position.objectId === object1Position.objectId) continue;
 
-        if (object2IdsSet.items[object2Position.objectId]) {
-          if (
-            gdjs.ObjectPositionsManager._getObjectPositionsSquaredDistance(
-              object1Position,
-              object2Position
-            ) < squaredDistance
-          ) {
-            if (!inverted) {
-              isTrue = true;
+        if (
+          gdjs.ObjectPositionsManager._getObjectPositionsSquaredDistance(
+            object1Position,
+            object2Position
+          ) < squaredDistance
+        ) {
+          if (!inverted) {
+            isTrue = true;
 
-              pickedObject2IdsSet.items[object2Position.objectId] = true;
-              pickedObject1IdsSet.items[object1Id] = true;
-            }
-
-            atLeastOneObject = true;
+            pickedObject2IdsSet.items[object2Position.objectId] = true;
+            pickedObject1IdsSet.items[object1Id] = true;
           }
+
+          atLeastOneObject = true;
         }
       }
     }
@@ -499,9 +654,10 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
 
     for (var object2NameId in object2NameIdsSet) {
       /** @type ObjectPosition[] */
-      var nearbyObjectPositions = this._getPositionsRBush(object2NameId).search(
-        searchArea
-      );
+      // TODO: don't do it for each object1Id!!
+      var nearbyObjectPositions = this._getObjectPositionsContainer(
+        object2NameId
+      ).search(searchArea, object2IdsSet);
 
       for (var j = 0; j < nearbyObjectPositions.length; ++j) {
         var object2Position = nearbyObjectPositions[j];
@@ -509,26 +665,24 @@ gdjs.ObjectPositionsManager.prototype.collisionTest = function(
         // It's possible that we're testing collision between lists containing the same objects
         if (object2Position.objectId === object1Position.objectId) continue;
 
-        if (object2IdsSet.items[object2Position.objectId]) {
-          var hitBoxes1 = object1Position.hitboxes;
-          var hitBoxes2 = object2Position.hitboxes;
+        var hitBoxes1 = object1Position.hitboxes;
+        var hitBoxes2 = object2Position.hitboxes;
 
-          if (
-            this._checkHitboxesCollision(
-              hitBoxes1,
-              hitBoxes2,
-              ignoreTouchingEdges
-            )
-          ) {
-            if (!inverted) {
-              isTrue = true;
+        if (
+          this._checkHitboxesCollision(
+            hitBoxes1,
+            hitBoxes2,
+            ignoreTouchingEdges
+          )
+        ) {
+          if (!inverted) {
+            isTrue = true;
 
-              pickedObject2IdsSet.items[object2Position.objectId] = true;
-              pickedObject1IdsSet.items[object1Id] = true;
-            }
-
-            atLeastOneObject = true;
+            pickedObject2IdsSet.items[object2Position.objectId] = true;
+            pickedObject1IdsSet.items[object1Id] = true;
           }
+
+          atLeastOneObject = true;
         }
       }
     }
@@ -634,9 +788,9 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
 
     for (var object2NameId in object2NameIdsSet) {
       /** @type ObjectPosition[] */
-      var nearbyObjectPositions = this._getPositionsRBush(object2NameId).search(
-        searchArea
-      );
+      var nearbyObjectPositions = this._getObjectPositionsContainer(
+        object2NameId
+      ).search(searchArea, object2IdsSet);
 
       for (var j = 0; j < nearbyObjectPositions.length; ++j) {
         var object2Position = nearbyObjectPositions[j];
@@ -644,15 +798,13 @@ gdjs.ObjectPositionsManager.prototype.separateObjects = function(
         // It's possible that we're testing collision between lists containing the same objects
         if (object2Position.objectId === object1Position.objectId) continue;
 
-        if (object2IdsSet.items[object2Position.objectId]) {
-          moved =
-            gdjs.ObjectPositionsManager._separateHitboxes(
-              object1Position.hitboxes,
-              object2Position.hitboxes,
-              ignoreTouchingEdges,
-              moveCoordinates
-            ) || moved;
-        }
+        moved =
+          gdjs.ObjectPositionsManager._separateHitboxes(
+            object1Position.hitboxes,
+            object2Position.hitboxes,
+            ignoreTouchingEdges,
+            moveCoordinates
+          ) || moved;
       }
     }
 
@@ -738,26 +890,24 @@ gdjs.ObjectPositionsManager.prototype.pointsTest = function(
       };
 
       /** @type ObjectPosition[] */
-      var nearbyObjectPositions = this._getPositionsRBush(objectNameId).search(
-        searchArea
-      );
+      var nearbyObjectPositions = this._getObjectPositionsContainer(
+        objectNameId
+      ).search(searchArea, objectIdsSet);
 
       for (var j = 0; j < nearbyObjectPositions.length; ++j) {
         var objectPosition = nearbyObjectPositions[j];
 
-        if (objectIdsSet.items[objectPosition.objectId]) {
-          var isOnObject =
-            !accurate ||
-            gdjs.ObjectPositionsManager._isPointInsideHitboxes(
-              objectPosition.hitboxes,
-              point[0],
-              point[1]
-            );
+        var isOnObject =
+          !accurate ||
+          gdjs.ObjectPositionsManager._isPointInsideHitboxes(
+            objectPosition.hitboxes,
+            point[0],
+            point[1]
+          );
 
-          if (isOnObject) {
-            if (!inverted) isAnyObjectContainingAnyPoint = true;
-            pickedObjectIdsSet.items[objectPosition.objectId] = true;
-          }
+        if (isOnObject) {
+          if (!inverted) isAnyObjectContainingAnyPoint = true;
+          pickedObjectIdsSet.items[objectPosition.objectId] = true;
         }
       }
     }
@@ -883,36 +1033,34 @@ gdjs.ObjectPositionsManager.prototype.raycastTest = function(
 
   for (var objectNameId in objectNameIdsSet) {
     /** @type ObjectPosition[] */
-    var nearbyObjectPositions = this._getPositionsRBush(objectNameId).search(
-      searchArea
-    );
+    var nearbyObjectPositions = this._getObjectPositionsContainer(
+      objectNameId
+    ).search(searchArea, objectIdsSet);
 
     for (var j = 0; j < nearbyObjectPositions.length; ++j) {
       var objectPosition = nearbyObjectPositions[j];
 
-      if (objectIdsSet.items[objectPosition.objectId]) {
-        var result = gdjs.ObjectPositionsManager._raycastAgainstHitboxes(
-          objectPosition.hitboxes,
-          x,
-          y,
-          endX,
-          endY,
-          maxSqDist,
-          inverted
-        );
+      var result = gdjs.ObjectPositionsManager._raycastAgainstHitboxes(
+        objectPosition.hitboxes,
+        x,
+        y,
+        endX,
+        endY,
+        maxSqDist,
+        inverted
+      );
 
-        if (result.collision) {
-          if (!inverted && result.closeSqDist <= testSqDist) {
-            testSqDist = result.closeSqDist;
-            matchObjectId = objectPosition.objectId;
-            intersectionCoordinates[0] = result.closeX;
-            intersectionCoordinates[1] = result.closeY;
-          } else if (inverted && result.farSqDist >= testSqDist) {
-            testSqDist = result.farSqDist;
-            matchObjectId = objectPosition.objectId;
-            intersectionCoordinates[0] = result.farX;
-            intersectionCoordinates[1] = result.farY;
-          }
+      if (result.collision) {
+        if (!inverted && result.closeSqDist <= testSqDist) {
+          testSqDist = result.closeSqDist;
+          matchObjectId = objectPosition.objectId;
+          intersectionCoordinates[0] = result.closeX;
+          intersectionCoordinates[1] = result.closeY;
+        } else if (inverted && result.farSqDist >= testSqDist) {
+          testSqDist = result.farSqDist;
+          matchObjectId = objectPosition.objectId;
+          intersectionCoordinates[0] = result.farX;
+          intersectionCoordinates[1] = result.farY;
         }
       }
     }
@@ -950,7 +1098,7 @@ gdjs.ObjectPositionsManager._isObjectIdsSetEmpty = function(objectIdsSet) {
   // Avoid using Object.keys, we don't care about listing all the elements of the set.
   for (var anyObjectId in objectIdsSet.items) return false;
   return true;
-}
+};
 
 /**
  * Clear the set.
@@ -1032,9 +1180,7 @@ gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet = function(
  * @param {number[]} ids The ids
  * @returns {ObjectIdsSet} A set containing the object ids
  */
-gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet = function(
-  ids
-) {
+gdjs.ObjectPositionsManager.idsArrayToObjectIdsSet = function(ids) {
   /** @type ObjectIdsSet */
   var objectIdsSet = gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
 

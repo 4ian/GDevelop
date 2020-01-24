@@ -71,6 +71,8 @@ gdjs.Profiler.prototype.end = function(sectionName) {
  * @param {string} counterName The name of the counter
  */
 gdjs.Profiler.prototype.incrementCallCounter = function(counterName) {
+  if (!this._currentFrameMeasure) return;
+
   this._currentFrameMeasure.counters[counterName] =
     (this._currentFrameMeasure.counters[counterName] || 0) + 1;
 };
@@ -81,6 +83,8 @@ gdjs.Profiler.prototype.incrementCallCounter = function(counterName) {
  * @param {number} timeInMs The time in milliseconds
  */
 gdjs.Profiler.prototype.addTime = function(timingName, timeInMs) {
+  if (!this._currentFrameMeasure) return;
+
   this._currentFrameMeasure.timings[timingName] =
     (this._currentFrameMeasure.timings[timingName] || 0) + timeInMs;
 };

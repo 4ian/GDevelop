@@ -85,7 +85,8 @@ module.exports = {
       objectProperties.set(
         'fontFamily',
         new gd.PropertyDescriptor(objectContent.fontFamily)
-          .setType('string')
+          .setType("resource")
+          .addExtraInfo("font")
           .setLabel(_('Base font family'))
       );
 

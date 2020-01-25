@@ -89,6 +89,9 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
             style={styles.checkbox}
           />
+          <MiniToolbarText>
+            <Trans>Font:</Trans>
+          </MiniToolbarText>
           <ResourceSelector
             margin="none"
             project={project}

@@ -13,7 +13,10 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   if (this._pixiObject === undefined) {
     this._pixiObject = new MultiStyleText(runtimeObject._text, {
       default: {
-        fontFamily: runtimeObject._fontFamily,
+        fontFamily: runtimeScene
+          .getGame()
+          .getFontManager()
+          .getFontFamily(runtimeObject._fontFamily),
         fontSize: runtimeObject._fontSize + 'px',
         fill: runtimeObject._color,
         tagStyle: 'bbcode',

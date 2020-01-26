@@ -522,7 +522,7 @@ module.exports = {
         .getValue();
 
       this._pixiResourcesLoader
-        .loadFontFamily(this.project, fontFamily)
+        .loadFontFamily(this._project, fontFamily)
         .then(fontFamily => {
           // Once the font is loaded, we can use the given fontFamily.
           this._pixiObject.textStyles.default.fontFamily = fontFamily;

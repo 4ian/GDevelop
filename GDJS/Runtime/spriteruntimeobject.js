@@ -72,10 +72,6 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 {
     /** @type {string} */
     this.image = frameData ? frameData.image : ""; //TODO: Rename in imageName, and do not store it in the object?
-    /**
-     * @type {PIXI.Texture}
-     * @note need to fix type
-     */
     this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(imageManager, this.image);
 
     if ( this.center === undefined ) {

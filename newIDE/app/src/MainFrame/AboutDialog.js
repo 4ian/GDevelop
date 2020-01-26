@@ -86,6 +86,7 @@ const contributors = [
     name: 'Thomas Flecy',
     description: 'Contributions to GDevelop (original sound object extension)',
   },
+  { name: 'Arthur Pacaud (arthuro555)', description: 'Contributions to GDevelop and Moderation on the Forum', link: 'https://forum.gdevelop-app.com/u/arthuro555/summary' },
 
   // Community members:
   {

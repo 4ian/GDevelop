@@ -6,22 +6,22 @@
 
 /**
  * @typedef {Object} SpritePoint Represents a point in a coordinate system.
- * @property {number | string} x X position of the point.
- * @property {(number | string)} y Y position of the point.
+ * @property {number} x X position of the point.
+ * @property {number)} y Y position of the point.
  */
 
 /**
  * @typedef {Object} SpriteCustomPointData Represents a custom point in a frame.
  * @property {string} name Name of the point.
- * @property {number | string} x X position of the point.
- * @property {number | string} y Y position of the point.
+ * @property {number} x X position of the point.
+ * @property {number} y Y position of the point.
  */
 
 /**
  * @typedef {Object} SpriteCenterPointData Represents the center point in a frame.
  * @property {boolean} automatic Is the center automatically computed?
- * @property {number | string} x X position of the point.
- * @property {number | string} y Y position of the point.
+ * @property {number} x X position of the point.
+ * @property {number} y Y position of the point.
  */
 
 /**
@@ -36,7 +36,7 @@
 
 /**
  * @typedef {Object} SpriteDirectionData Represents the data of a {@link gdjs.SpriteAnimationDirection}.
- * @property {number | string} timeBetweenFrames Time between each frame, in seconds.
+ * @property {number} timeBetweenFrames Time between each frame, in seconds.
  * @property {boolean} looping Is the animation looping?
  * @property {Array<SpriteFrameData>} sprites The list of frames.
  */
@@ -103,19 +103,19 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 		var ptData = frameData.points[i];
 
         /** @type {SpritePoint} */
-        var point = {x:parseFloat(ptData.x), y:parseFloat(ptData.y)};
+        var point = {x: ptData.x, y: ptData.y};
         this.points.put(ptData.name, point);
     }
     /** @type {SpritePoint} */
     var origin = frameData.originPoint;
-    this.origin.x = parseFloat(origin.x);
-    this.origin.y = parseFloat(origin.y);
+    this.origin.x = origin.x;
+    this.origin.y = origin.y;
 
     /** @type {SpriteCenterPointData} */
     var center = frameData.centerPoint;
     if ( center.automatic !== true ) {
-        this.center.x = parseFloat(center.x);
-        this.center.y = parseFloat(center.y);
+        this.center.x = center.x;
+        this.center.y = center.y;
     }
     else {
         this.center.x = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameWidth(this.texture)/2;
@@ -140,8 +140,8 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
                 if ( j >= this.customHitBoxes[i].vertices.length )
                     this.customHitBoxes[i].vertices.push([0,0]);
 
-                this.customHitBoxes[i].vertices[j][0] = parseFloat(pointData.x);
-                this.customHitBoxes[i].vertices[j][1] = parseFloat(pointData.y);
+                this.customHitBoxes[i].vertices[j][0] = pointData.x;
+                this.customHitBoxes[i].vertices[j][1] = pointData.y;
             }
 
             this.customHitBoxes[i].vertices.length = j;
@@ -178,7 +178,7 @@ gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
 gdjs.SpriteAnimationDirection = function(imageManager, directionData)
 {
     /** @type {number} */
-    this.timeBetweenFrames = directionData ? parseFloat(directionData.timeBetweenFrames) :
+    this.timeBetweenFrames = directionData ? directionData.timeBetweenFrames :
         1.0;
     /** @type {boolean} */
     this.loop = !!directionData.looping;
@@ -313,7 +313,7 @@ gdjs.SpriteRuntimeObject.thisIsARuntimeObjectConstructor = "Sprite"; //Notify gd
 
 /**
  * Initialize the extra parameters that could be set for an instance.
- * @param {{numberProperties: Array<{name: string, value: any}>, customSize: {width: number, height: number}}} initialInstanceData The extra parameters
+ * @param {{numberProperties: Array<{name: string, value: number}>, customSize: {width: number, height: number}}} initialInstanceData The extra parameters
  */
 gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
     if ( initialInstanceData.numberProperties ) {

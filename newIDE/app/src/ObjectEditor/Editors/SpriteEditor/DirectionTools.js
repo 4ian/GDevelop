@@ -151,16 +151,8 @@ export default class DirectionTools extends Component<Props, State> {
         <span style={styles.spacer} />
         <div style={styles.repeatContainer}>
           <Checkbox
-            checkedIcon={<Repeat />}
-            uncheckedIcon={<Repeat />}
             checked={direction.isLooping()}
-            label={
-              direction.isLooping() ? (
-                <Trans>Loop</Trans>
-              ) : (
-                <Trans>Don't loop</Trans>
-              )
-            }
+            label={<Trans>Loop</Trans>}
             onCheck={(e, check) => this.setLooping(check)}
           />
         </div>

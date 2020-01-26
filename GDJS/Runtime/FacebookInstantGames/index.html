@@ -24,7 +24,7 @@
 
         /* GDJS_CUSTOM_STYLE */
     </style>
-    
+
     <!-- Facebook Instant Games SDK (see https://developers.facebook.com/docs/games/instant-games/getting-started/quickstart) -->
     <script src="https://connect.facebook.net/en_US/fbinstant.6.0.js"></script>
 
@@ -40,8 +40,6 @@
 
     (function() {
         //Initialization
-        gdjs.registerObjects();
-        gdjs.registerBehaviors();
         gdjs.registerGlobalCallbacks();
 
         var game = new gdjs.RuntimeGame(gdjs.projectData, {}/*GDJS_ADDITIONAL_SPEC*/);
@@ -54,7 +52,7 @@
         game.getRenderer().bindStandardEvents(game.getInputManager(), window, document);
 
         FBInstant.initializeAsync()
-        .then(function() {        
+        .then(function() {
             //Load all assets and start the game
             game.loadAllAssets(function() {
                 FBInstant.startGameAsync()

@@ -148,7 +148,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
               <Text>
-                <Trans>Filter by</Trans>
+                <Trans>Filter by:</Trans>
               </Text>
               <Spacer />
               <InlineCheckbox
@@ -163,6 +163,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={this.state.searchInActions}
                 onCheck={(e, checked) =>
                   this.setState({ searchInActions: checked })
+                }
+              />
+              <InlineCheckbox
+                label={<Trans>Comments</Trans>}
+                checked={this.state.searchInComments}
+                onCheck={(e, checked) =>
+                  this.setState({ searchInComments: checked })
                 }
               />
               {/* <InlineCheckbox //TODO: Implement search/replace in selection

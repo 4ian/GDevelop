@@ -12,6 +12,21 @@ using namespace std;
 
 namespace gd {
 
+vector<const gd::EventsList*> CommentEvent::GetAllCommentsVectors()
+    const {
+  vector<const gd::EventsList*> allComments;
+  allComments.push_back(&comments);
+
+  return allComments;
+}
+
+vector<gd::EventsList*> CommentEvent::GetAllCommentsVectors() {
+  vector<gd::EventsList*> allComments;
+  allComments.push_back(&comments);
+
+  return allComments;
+}
+
 void CommentEvent::SerializeTo(SerializerElement &element) const {
   element.AddChild("color")
       .SetAttribute("r", r)

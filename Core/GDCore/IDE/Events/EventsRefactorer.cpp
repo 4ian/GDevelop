@@ -595,7 +595,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     gd::String search,
     bool matchCase,
     bool inConditions,
-    bool inActions) {
+    bool inActions,
+    bool inComments) {
   vector<EventsSearchResult> results;
 
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -631,6 +632,21 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       }
     }
 
+    if (inComments) {
+      vector<gd::EventsList*> commentsVectors =
+          events[i].GetAllCommentsVectors();
+      for (std::size_t j = 0; j < commentsVectors.size(); ++j) {
+        if (!eventAddedInResults &&
+            SearchStringInComments(
+                project, layout, *commentsVectors[j], search, matchCase)) {
+          results.push_back(EventsSearchResult(
+              std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+              &events,
+              i));
+        }
+      }
+    }
+
     if (events[i].CanHaveSubEvents()) {
       vector<EventsSearchResult> subResults =
           SearchInEvents(project,
@@ -639,7 +655,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                          search,
                          matchCase,
                          inConditions,
-                         inActions);
+                         inActions,
+                         inComments);
       std::copy(
           subResults.begin(), subResults.end(), std::back_inserter(results));
     }
@@ -706,6 +723,27 @@ bool EventsRefactorer::SearchStringInConditions(
                                  search,
                                  matchCase))
       return true;
+  }
+
+  return false;
+}
+
+bool EventsRefactorer::SearchStringInComments(gd::ObjectsContainer& project,
+                                             gd::ObjectsContainer& layout,
+                                             gd::EventsList& comments,
+                                             gd::String search,
+                                             bool matchCase) {
+  for (std::size_t aId = 0; aId < comments.GetEventsCount(); ++aId) {
+
+
+        size_t foundPosition =
+            matchCase
+                ? comments[aId].GetEvent().GetComment().find(search)
+                : comments[aId].GetEvent().GetComment().FindCaseInsensitive(search);
+
+        if (foundPosition != gd::String::npos) return true;
+
+    
   }
 
   return false;

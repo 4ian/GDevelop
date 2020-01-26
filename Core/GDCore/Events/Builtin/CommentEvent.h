@@ -7,6 +7,7 @@
 #define COMMENTEVENT_H
 
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/EventsList.h"
 namespace gd {
 class Layout;
 class Project;
@@ -45,6 +46,9 @@ class GD_CORE_API CommentEvent : public gd::BaseEvent {
   const gd::String& GetComment() const { return com1; }
   void SetComment(const gd::String& comment) { com1 = comment; }
 
+  virtual std::vector<const gd::EventsList*> GetAllCommentsVectors() const;
+  virtual std::vector<gd::EventsList*> GetAllCommentsVectors();
+
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element);
@@ -59,6 +63,11 @@ class GD_CORE_API CommentEvent : public gd::BaseEvent {
 
   gd::String com1;  ///< Comment
   gd::String com2;  ///< Optional second column comment, deprecated
+
+private:
+  gd::EventsList comments;
+  EventsList events;
+
 };
 
 }  // namespace gd

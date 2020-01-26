@@ -118,6 +118,20 @@ class GD_CORE_API BaseEvent {
   };
 
   /**
+   * Event must be able to return all comments std::vector they have.
+   * Used to preprocess the comments.
+   */
+  virtual std::vector<gd::EventsList*> GetAllCommentsVectors() {
+    std::vector<gd::EventsList*> noComments;
+    return noComments;
+  };
+  virtual std::vector<const gd::EventsList*> GetAllCommentsVectors()
+      const {
+    std::vector<const gd::EventsList*> noComments;
+    return noComments;
+  };
+
+  /**
    * Event must be able to return all expressions they have.
    * Used to preprocess the expressions.
    */

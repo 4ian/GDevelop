@@ -103,7 +103,8 @@ class GD_CORE_API EventsRefactorer {
                                                         gd::String search,
                                                         bool matchCase,
                                                         bool inConditions,
-                                                        bool inAction);
+                                                        bool inAction, //here this shouldn't have a 's' to action ?
+                                                        bool inComments);
 
   /**
    * Replace all occurrences of a gd::String in events
@@ -200,6 +201,11 @@ class GD_CORE_API EventsRefactorer {
   static bool SearchStringInConditions(gd::ObjectsContainer& project,
                                        gd::ObjectsContainer& layout,
                                        gd::InstructionsList& conditions,
+                                       gd::String search,
+                                       bool matchCase);
+  static bool SearchStringInComments(gd::ObjectsContainer& project,
+                                       gd::ObjectsContainer& layout,
+                                       gd::EventsList& comments,
                                        gd::String search,
                                        bool matchCase);
 

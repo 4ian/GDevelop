@@ -20,19 +20,6 @@
  * @property {Array} max The [x,y] coordinates of the bottom right point
  */
 
-/**
- * @typedef {Object} SerializedObjectData Object containing the properties of an initialized data to restore it later.
- * @property {string} name The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example).
- * @property {string} type The object type.
- * @property {number} x The X position of the object.
- * @property {number} y The Y position of the object.
- * @property {number} angle The angle of the object.
- * @property {number} zOrder The Z order of the object.
- * @property {boolean} hidden The visibility of the object.
- * @property {string} layer The current layer of the object.
- * @property {boolean} livingOnScene Is the object instance in the Scene?
- * @property {AABB} aabb The AABB Collisions of the Object
- */
 
 /**
  * RuntimeObject represents an object being used on a RuntimeScene.
@@ -1538,50 +1525,6 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
     }
 
     return false;
-};
-
-/**
- * Serializes all the relevant internal data.
- *
- * Remember to overwrite to add your data while defining a new object,
- * and call this to automatically handle the default data.
- *
- * @returns {SerializedObjectData}
- */
-gdjs.RuntimeObject.prototype.serialize = function() {
-    return {
-        name: this.name,
-        type: this.type,
-        x: this.getX(),
-        y: this.getY(),
-        angle: this.angle,
-        zOrder: this.getZOrder(),
-        hidden: this.isHidden(),
-        layer: this.getLayer(),
-        livingOnScene: this.livingOnScene,
-        aabb: this.getAABB()
-    };
-};
-
-/**
- * Deserialize a SerializedObjectData to the current object.
- *
- * Remember to overwrite to add your data while defining a new object,
- * and call this to automatically handle the default data.
- *
- * @param {SerializedObjectData} serializedData The serialized data to load.
- */
-gdjs.RuntimeObject.prototype.deserialize = function(serializedData) {
-    if (this.type !== serializedData.type) console.error("Data for incorrect object type passed to deserializer!");
-    //TODO Check values before assigning
-    this.name = serializedData.name; // Maybe dangerous?
-    this.setX(serializedData.x);
-    this.setY(serializedData.y);
-    this.setAngle(serializedData.angle);
-    this.setZOrder(serializedData.zOrder);
-    this.hide(serializedData.hidden);
-    this.setLayer(serializedData.layer);
-    this.aabb = serializedData.aabb;
 };
 
 /**

@@ -520,7 +520,17 @@ module.exports = {
         .getProperties(this.project)
         .get('fontFamily')
         .getValue();
-      this._pixiObject.textStyles.default.fontFamily = this._pixiResourcesLoader.loadFontFamily(this.project, fontFamily);
+
+      this._pixiResourcesLoader
+        .loadFontFamily(this.project, fontFamily)
+        .then(fontFamily => {
+          // Once the font is loaded, we can use the given fontFamily.
+          this._pixiObject.textStyles.default.fontFamily = fontFamily;
+        })
+        .catch(err => {
+          // Ignore errors
+          console.warn('Unable to load font family', err);
+        });
 
       const wordWrap = this._associatedObject
         .getProperties(this.project)

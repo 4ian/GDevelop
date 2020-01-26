@@ -520,10 +520,7 @@ module.exports = {
         .getProperties(this.project)
         .get('fontFamily')
         .getValue();
-      this._pixiObject.textStyles.default.fontFamily = this._pixiResourcesLoader.getFontFamily(
-        this.project,
-        fontFamily
-      );
+      this._pixiObject.textStyles.default.fontFamily = this._pixiResourcesLoader.loadFontFamily(this.project, fontFamily);
 
       const wordWrap = this._associatedObject
         .getProperties(this.project)

@@ -144,7 +144,6 @@ gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
  */
 gdjs.RuntimeBehavior.prototype.onDestroy = function() {
 
-}
+};
 
-//Notify gdjs this.the runtimeBehavior exists.
-gdjs.RuntimeBehavior.thisIsARuntimeBehaviorConstructor = "";
+gdjs.registerBehavior("", gdjs.RuntimeBehavior);

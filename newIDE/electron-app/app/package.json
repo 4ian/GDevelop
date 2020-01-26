@@ -2,7 +2,7 @@
   "name": "gdevelop",
   "productName": "GDevelop 5",
   "description": "GDevelop 5 IDE running on the Electron runtime",
-  "version": "5.0.0-beta87",
+  "version": "5.0.0-beta88",
   "author": "Florian Rival",
   "license": "MIT",
   "homepage": "http://gdevelop-app.com",
@@ -15,13 +15,12 @@
     "electron-editor-context-menu": "^1.1.1",
     "electron-is": "^2.4.0",
     "electron-log": "^2.2.14",
-    "electron-updater": "^2.18.2",
+    "electron-updater": "4.2.0",
     "fs-extra": "^3.0.1",
     "jimp": "^0.2.28",
     "live-server": "^1.2.0",
     "lodash.throttle": "^4.1.1",
     "minimist": "^1.2.0",
-    "recursive-readdir": "^2.2.1",
     "ws": "^5.1.1"
   }
 }

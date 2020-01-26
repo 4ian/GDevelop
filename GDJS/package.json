@@ -14,7 +14,6 @@
     "jsdoc-autoprivate": "0.0.1"
   },
   "scripts": {
-    "copy-runtime-to-ide": "echo \"Use scripts/CopyRuntimeToGD.sh (or .bat on Windows)\"",
     "check-types": "tsc"
   }
 }

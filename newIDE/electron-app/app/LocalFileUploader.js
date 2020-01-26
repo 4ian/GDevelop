@@ -3,7 +3,6 @@ const path = require('path');
 const axios = require('axios');
 const async = require('async');
 const { makeTimestampedId } = require('./Utils/TimestampedId');
-const recursive = require('recursive-readdir');
 const isDev = require('electron-is').dev();
 const log = require('electron-log');
 const { Transform } = require('stream');

@@ -33,7 +33,7 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
     this.onCreated();
 };
 gdjs.SkeletonRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.SkeletonRuntimeObject.thisIsARuntimeObjectConstructor = "SkeletonObject::Skeleton";
+gdjs.registerObject("SkeletonObject::Skeleton", gdjs.SkeletonRuntimeObject);
 
 gdjs.SkeletonRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
     if(initialInstanceData.customSize){

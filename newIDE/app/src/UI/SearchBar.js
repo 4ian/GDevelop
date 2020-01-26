@@ -9,6 +9,7 @@ import Close from '@material-ui/icons/Close';
 import Search from '@material-ui/icons/Search';
 import FilterList from '@material-ui/icons/FilterList';
 import ElementWithMenu from './Menu/ElementWithMenu';
+import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
@@ -26,6 +27,8 @@ type Props = {|
   value: string,
   /** If tags are supported, the function to list the tags menu */
   buildTagsMenuTemplate?: () => any,
+  /** If defined, a help icon button redirecting to this page will be shown */
+  helpPagePath?: ?string,
 |};
 
 type State = {|
@@ -72,7 +75,11 @@ const getStyles = (props: Props, state: State) => {
       style: {
         opacity: !disabled ? 0.54 : 0.38,
       },
-      iconStyle: {},
+    },
+    iconButtonHelp: {
+      style: {
+        opacity: !disabled ? 0.54 : 0.38,
+      },
     },
     input: {
       width: '100%',
@@ -146,7 +153,7 @@ export default class SearchBar extends React.PureComponent<Props, State> {
   render() {
     const styles = getStyles(this.props, this.state);
     const { value } = this.state;
-    const { disabled, style, buildTagsMenuTemplate } = this.props;
+    const { disabled, style, buildTagsMenuTemplate, helpPagePath } = this.props;
 
     return (
       <Paper
@@ -178,10 +185,17 @@ export default class SearchBar extends React.PureComponent<Props, State> {
                 style={styles.iconButtonFilter.style}
                 disabled={disabled}
               >
-                <FilterList style={styles.iconButtonFilter.iconStyle} />
+                <FilterList />
               </IconButton>
             }
             buildMenuTemplate={buildTagsMenuTemplate}
+          />
+        )}
+        {helpPagePath && (
+          <HelpIcon
+            disabled={disabled}
+            helpPagePath={helpPagePath}
+            style={styles.iconButtonHelp.style}
           />
         )}
         <IconButton style={styles.iconButtonSearch.style} disabled={disabled}>

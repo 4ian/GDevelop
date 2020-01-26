@@ -7,6 +7,20 @@ import Window from '../../Utils/Window';
 
 type PropsType = {
   helpPagePath: ?string,
+  disabled?: boolean,
+  style?: {|
+    padding?: number,
+    width?: number,
+    height?: number,
+    transform?: string,
+    transition?: string,
+    opacity?: number,
+    margin?: number,
+    marginRight?: number,
+    marginLeft?: number,
+    marginTop?: number,
+    marginBottom?: number,
+  |},
 };
 
 /**
@@ -19,6 +33,8 @@ export default (props: PropsType) => {
   return (
     <IconButton
       onClick={() => Window.openExternalURL(getHelpLink(helpPagePath))}
+      disabled={props.disabled}
+      style={props.style}
     >
       <HelpOutline />
     </IconButton>

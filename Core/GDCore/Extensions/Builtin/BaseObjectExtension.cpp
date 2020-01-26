@@ -14,8 +14,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("BuiltinObject",
-                               _("Base object"),
-                               _("Base object"),
+                               _("Features for all objects"),
+                               _("Common features that can be used for all objects in GDevelop."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/base_object/events");

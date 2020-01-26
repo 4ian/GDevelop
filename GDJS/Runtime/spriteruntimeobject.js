@@ -304,7 +304,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
 };
 
 gdjs.SpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.SpriteRuntimeObject.thisIsARuntimeObjectConstructor = "Sprite"; //Notify gdjs of the object existence.
+gdjs.registerObject("Sprite", gdjs.SpriteRuntimeObject); //Notify gdjs of the object existence.
 
 //Others initialization and internal state management :
 

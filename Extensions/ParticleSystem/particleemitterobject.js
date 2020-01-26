@@ -164,7 +164,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
     this.onCreated();
 };
 gdjs.ParticleEmitterObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.ParticleEmitterObject.thisIsARuntimeObjectConstructor = "ParticleSystem::ParticleEmitter";
+gdjs.registerObject("ParticleSystem::ParticleEmitter", gdjs.ParticleEmitterObject);
 
 gdjs.ParticleEmitterObject.prototype.setX = function(x){
     if(this.x !== x) this._posDirty = true;

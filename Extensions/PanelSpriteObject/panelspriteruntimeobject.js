@@ -78,8 +78,7 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {
 gdjs.PanelSpriteRuntimeObject.prototype = Object.create(
   gdjs.RuntimeObject.prototype
 );
-gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor =
-  'PanelSpriteObject::PanelSprite';
+gdjs.registerObject("PanelSpriteObject::PanelSprite", gdjs.PanelSpriteRuntimeObject);
 
 gdjs.PanelSpriteRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

@@ -40,8 +40,7 @@
  * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
  * @param {ObjectData} objectData The initial properties of the object.
  */
-gdjs.RuntimeObject = function(runtimeScene, objectData)
-{
+gdjs.RuntimeObject = function(runtimeScene, objectData) {
     /** @type {string} */
     this.name = objectData.name || "";
     /**
@@ -1550,5 +1549,4 @@ gdjs.RuntimeObject.getNameIdentifier = function(name) {
     return newIdentifier;
 };
 
-//Notify gdjs the RuntimeObject exists.
-gdjs.RuntimeObject.thisIsARuntimeObjectConstructor = "";
+gdjs.registerObject("", gdjs.RuntimeObject);

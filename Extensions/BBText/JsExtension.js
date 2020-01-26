@@ -85,7 +85,8 @@ module.exports = {
       objectProperties.set(
         'fontFamily',
         new gd.PropertyDescriptor(objectContent.fontFamily)
-          .setType('string')
+          .setType('resource')
+          .addExtraInfo('font')
           .setLabel(_('Base font family'))
       );
 
@@ -519,7 +520,10 @@ module.exports = {
         .getProperties(this.project)
         .get('fontFamily')
         .getValue();
-      this._pixiObject.textStyles.default.fontFamily = fontFamily;
+      this._pixiObject.textStyles.default.fontFamily = this._pixiResourcesLoader.getFontFamily(
+        this.project,
+        fontFamily
+      );
 
       const wordWrap = this._associatedObject
         .getProperties(this.project)

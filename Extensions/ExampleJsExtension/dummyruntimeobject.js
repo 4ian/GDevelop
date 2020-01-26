@@ -22,8 +22,7 @@ gdjs.DummyRuntimeObject = function(runtimeScene, objectData) {
 };
 
 gdjs.DummyRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.DummyRuntimeObject.thisIsARuntimeObjectConstructor =
-  "MyDummyExtension::DummyObject"; //Replace by your extension + object name.
+gdjs.registerObject("MyDummyExtension::DummyObject", gdjs.DummyRuntimeObject); //Replace by your extension + object name.
 
 gdjs.DummyRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

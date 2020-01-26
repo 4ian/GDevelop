@@ -17,7 +17,7 @@
  * video will have the same state for this video (paused/playing, current time,
  * volume, etc...).
  *
- * @memberof gdjs
+ * @memberOf gdjs
  * @class VideoRuntimeObject
  * @extends RuntimeObject
  * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
@@ -50,7 +50,7 @@ gdjs.VideoRuntimeObject = function(runtimeScene, videoObjectData) {
 };
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor = "Video::VideoObject";
+gdjs.registerObject("Video::VideoObject", gdjs.VideoRuntimeObject);
 
 gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

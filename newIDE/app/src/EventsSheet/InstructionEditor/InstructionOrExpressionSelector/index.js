@@ -34,6 +34,7 @@ type Props = {|
   useSubheaders?: boolean,
   searchPlaceholderObjectName?: ?string,
   searchPlaceholderIsCondition?: ?boolean,
+  helpPagePath?: ?string,
   style?: Object,
 |};
 type State = {|
@@ -81,6 +82,7 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
       searchPlaceholderObjectName,
       searchPlaceholderIsCondition,
       useSubheaders,
+      helpPagePath,
       style,
     } = this.props;
     const { searchText } = this.state;
@@ -120,6 +122,7 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
                     : t`Search ${searchPlaceholderObjectName} actions`
                   : undefined
               }
+              helpPagePath={helpPagePath}
               ref={searchBar => (this._searchBar = searchBar)}
             />
             <ScrollView

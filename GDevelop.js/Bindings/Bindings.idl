@@ -1646,29 +1646,6 @@ interface MetadataProvider {
     boolean STATIC_HasBehaviorStrExpression([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
 };
 
-interface ParserCallbacks {
-    [Const, Ref] DOMString GetFirstError();
-    unsigned long GetFirstErrorPosition();
-};
-
-interface ExpressionParser {
-    void ExpressionParser([Const] DOMString expression);
-
-    boolean ParseMathExpression([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Ref] ParserCallbacks callbacks);
-    boolean ParseStringExpression([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Ref] ParserCallbacks callbacks);
-
-    [Const, Ref] DOMString GetFirstError();
-    unsigned long GetFirstErrorPosition();
-};
-
-interface CallbacksForExpressionCorrectnessTesting {
-    void CallbacksForExpressionCorrectnessTesting([Const, Ref] Project project, [Const, Ref] Layout layout);
-
-    //Inherited from ParserCallbacks:
-    [Const, Ref] DOMString GetFirstError();
-    unsigned long GetFirstErrorPosition();
-};
-
 interface ExpressionParserDiagnostic {
     boolean IsError();
     [Const, Ref] DOMString GetMessage();
@@ -1704,11 +1681,6 @@ interface ExpressionParser2 {
     void ExpressionParser2([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer);
 
     [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString type, [Const] DOMString expression);
-};
-
-interface ExpressionCodeGenerator {
-    void STATIC_UseOldExpressionParser(boolean enable);
-    boolean STATIC_IsUsingOldExpressionParser();
 };
 
 enum EventsFunction_FunctionType {

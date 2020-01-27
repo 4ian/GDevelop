@@ -35,10 +35,6 @@ namespace gd {
  * \brief Internal class used to generate code from events
  */
 class GD_CORE_API EventsCodeGenerator {
-  // Compatiblity with old ExpressionParser
-  friend class CallbacksForGeneratingExpressionCode;
-  friend class VariableCodeGenerationCallbacks;
-  // end of compatibility code
   friend class ExpressionCodeGenerator;
 
  public:

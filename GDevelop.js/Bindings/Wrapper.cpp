@@ -20,7 +20,6 @@
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 
-#include <GDCore/Events/Parsers/ExpressionParser.h>
 #include <GDCore/Events/Parsers/ExpressionParser2.h>
 #include <GDCore/Events/Parsers/ExpressionParser2Node.h>
 #include <GDCore/IDE/Events/ExpressionValidator.h>
@@ -42,7 +41,6 @@
 #include <GDCore/IDE/Events/EventsTypesLister.h>
 #include <GDCore/IDE/Events/EventsRefactorer.h>
 #include <GDCore/IDE/Events/EventsRemover.h>
-#include <GDCore/IDE/Events/ExpressionsCorrectnessTesting.h>
 #include <GDCore/IDE/Events/InstructionSentenceFormatter.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/EventsListUnfolder.h>
@@ -541,9 +539,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_MoveBehaviorEventsFunctionParameter MoveBehaviorEventsFunctionParameter
 #define STATIC_RenameBehaviorProperty RenameBehaviorProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
-
-#define STATIC_UseOldExpressionParser UseOldExpressionParser
-#define STATIC_IsUsingOldExpressionParser IsUsingOldExpressionParser
 
 #define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
 #define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName

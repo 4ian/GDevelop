@@ -516,21 +516,27 @@ module.exports = {
         .getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
 
-      const fontFamily = this._associatedObject
+      const fontResourceName = this._associatedObject
         .getProperties(this.project)
         .get('fontFamily')
         .getValue();
 
-      this._pixiResourcesLoader
-        .loadFontFamily(this._project, fontFamily)
-        .then(fontFamily => {
-          // Once the font is loaded, we can use the given fontFamily.
-          this._pixiObject.textStyles.default.fontFamily = fontFamily;
-        })
-        .catch(err => {
-          // Ignore errors
-          console.warn('Unable to load font family', err);
-        });
+      if (this._fontName !== fontResourceName) {
+        console.log('load font');
+
+        this._fontName = fontResourceName;
+
+        this._pixiResourcesLoader
+          .loadFontFamily(this._project, fontResourceName)
+          .then(fontFamily => {
+            // Once the font is loaded, we can use the given fontFamily.
+            this._pixiObject.textStyles.default.fontFamily = fontResourceName;
+          })
+          .catch(err => {
+            // Ignore errors
+            console.warn('Unable to load font family', err);
+          });
+      }
 
       const wordWrap = this._associatedObject
         .getProperties(this.project)

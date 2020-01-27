@@ -5,7 +5,6 @@ import React, { Component } from 'react';
 import Timer from '@material-ui/icons/Timer';
 import FlatButton from '../../../UI/FlatButton';
 import Checkbox from '../../../UI/Checkbox';
-import Repeat from '@material-ui/icons/Repeat';
 import Brush from '@material-ui/icons/Brush';
 import PlayArrow from '@material-ui/icons/PlayArrow';
 import TextField from '../../../UI/TextField';

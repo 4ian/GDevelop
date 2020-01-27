@@ -521,16 +521,14 @@ module.exports = {
         .get('fontFamily')
         .getValue();
 
-      if (this._fontName !== fontResourceName) {
-        console.log('load font');
-
-        this._fontName = fontResourceName;
+      if (this._fontResourceName !== fontResourceName) {
+        this._fontResourceName = fontResourceName;
 
         this._pixiResourcesLoader
           .loadFontFamily(this._project, fontResourceName)
           .then(fontFamily => {
             // Once the font is loaded, we can use the given fontFamily.
-            this._pixiObject.textStyles.default.fontFamily = fontResourceName;
+            this._pixiObject.textStyles.default.fontFamily = fontFamily;
           })
           .catch(err => {
             // Ignore errors

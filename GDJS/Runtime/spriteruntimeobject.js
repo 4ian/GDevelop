@@ -7,7 +7,7 @@
 /**
  * @typedef {Object} SpritePoint Represents a point in a coordinate system.
  * @property {number} x X position of the point.
- * @property {number)} y Y position of the point.
+ * @property {number} y Y position of the point.
  */
 
 /**

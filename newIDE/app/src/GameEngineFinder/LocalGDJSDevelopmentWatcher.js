@@ -196,7 +196,7 @@ export const LocalGDJSDevelopmentWatcher = () => {
           return;
         }
 
-        // Reload extensions
+        // Reload extensions when the component is first mounted
         importGDJSRuntime().catch(() => {});
 
         // Create watchers

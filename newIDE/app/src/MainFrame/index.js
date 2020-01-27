@@ -131,6 +131,7 @@ type State = {|
   platformSpecificAssetsDialogOpen: boolean,
   helpFinderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
+  gdjsDevelopmentWatcherEnabled: boolean,
 |};
 
 type Props = {
@@ -184,6 +185,7 @@ class MainFrame extends React.Component<Props, State> {
     platformSpecificAssetsDialogOpen: false,
     helpFinderDialogOpen: false,
     eventsFunctionsExtensionsError: null,
+    gdjsDevelopmentWatcherEnabled: false,
   };
   toolbar = null;
   _resourceSourceDialogs = {};
@@ -198,7 +200,19 @@ class MainFrame extends React.Component<Props, State> {
 
     const { initialFileMetadataToOpen } = this.props;
 
-    this._loadExtensions();
+    this._loadExtensions()
+      .catch(() => {
+        /* Ignore errors */
+      })
+      .then(() => {
+        // Enable the GDJS development watcher *after* the extensions are loaded,
+        // to avoid the watcher interfering with the extension loading (by updating GDJS,
+        // which could lead in the extension loading failing for some extensions as file
+        // are removed/copied).
+        this.setState({
+          gdjsDevelopmentWatcherEnabled: true,
+        });
+      });
     if (initialFileMetadataToOpen) {
       this._openInitialFileMetadata(/* isAfterUserInteraction= */ false);
     } else if (this.props.introDialog && !Window.isDev())
@@ -237,19 +251,19 @@ class MainFrame extends React.Component<Props, State> {
     // extensions so that they declare all objects/actions/condition/etc...
     // using the new language.
     gd.JsPlatform.get().reloadBuiltinExtensions();
-    this._loadExtensions();
+    this._loadExtensions().catch(() => {});
   }
 
-  _loadExtensions = () => {
+  _loadExtensions = (): Promise<void> => {
     const { extensionsLoader, i18n } = this.props;
     if (!extensionsLoader) {
       console.info(
         'No extensions loader specified, skipping extensions loading.'
       );
-      return;
+      return Promise.reject(new Error('No extension loader specified.'));
     }
 
-    extensionsLoader
+    return extensionsLoader
       .loadAllExtensions(getNotNullTranslationFunction(i18n))
       .then(loadingResults => {
         const successLoadingResults = loadingResults.filter(
@@ -1962,7 +1976,9 @@ class MainFrame extends React.Component<Props, State> {
         )}
         <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         <ChangelogDialogContainer />
-        {renderGDJSDevelopmentWatcher && renderGDJSDevelopmentWatcher()}
+        {this.state.gdjsDevelopmentWatcherEnabled &&
+          renderGDJSDevelopmentWatcher &&
+          renderGDJSDevelopmentWatcher()}
       </div>
     );
   }

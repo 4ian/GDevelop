@@ -12,19 +12,27 @@ using namespace std;
 
 namespace gd {
 
-vector<const gd::EventsList*> CommentEvent::GetAllCommentsVectors()
+vector<const gd::String*> CommentEvent::GetAllSearchableStrings( BaseEvent &event)
     const {
-  vector<const gd::EventsList*> allComments;
-  allComments.push_back(&comments);
+  vector<const gd::String*> allSearchableStrings;
 
-  return allComments;
+  stringCom1 = event.GetChild("comment", 0, "Com1").GetValue().GetString();
+  stringCom2 = event.GetChild("comment", 0, "Com2").GetValue().GetString();///< Com2 is deprecated
+  allSearchableStrings.push_back(&stringCom1);
+  allSearchableStrings.push_back(&stringCom2);
+
+  return allSearchableStrings;
 }
 
-vector<gd::EventsList*> CommentEvent::GetAllCommentsVectors() {
-  vector<gd::EventsList*> allComments;
-  allComments.push_back(&comments);
+vector<gd::String*> CommentEvent::GetAllSearchableStrings( BaseEvent &event) {
+  vector<const gd::String*> allSearchableStrings;
 
-  return allComments;
+  stringCom1 = event.GetChild("comment", 0, "Com1").GetValue().GetString();
+  stringCom2 = event.GetChild("comment", 0, "Com2").GetValue().GetString();///< Com2 is deprecated
+  allSearchableStrings.push_back(&stringCom1);
+  allSearchableStrings.push_back(&stringCom2);
+
+  return allSearchableStrings;
 }
 
 void CommentEvent::SerializeTo(SerializerElement &element) const {

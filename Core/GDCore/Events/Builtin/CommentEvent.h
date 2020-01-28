@@ -11,7 +11,7 @@
 namespace gd {
 class Layout;
 class Project;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -46,8 +46,8 @@ class GD_CORE_API CommentEvent : public gd::BaseEvent {
   const gd::String& GetComment() const { return com1; }
   void SetComment(const gd::String& comment) { com1 = comment; }
 
-  virtual std::vector<const gd::EventsList*> GetAllCommentsVectors() const;
-  virtual std::vector<gd::EventsList*> GetAllCommentsVectors();
+  virtual std::vector<const gd::String*> GetAllSearchableStrings(BaseEvent &event) const;
+  virtual std::vector<gd::String*> GetAllSearchableStrings( BaseEvent &event);
 
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
@@ -64,10 +64,9 @@ class GD_CORE_API CommentEvent : public gd::BaseEvent {
   gd::String com1;  ///< Comment
   gd::String com2;  ///< Optional second column comment, deprecated
 
-private:
-  gd::EventsList comments;
-  EventsList events;
-
+ private:
+  gd::String stringCom1;
+  gd::String stringCom2;
 };
 
 }  // namespace gd

@@ -633,12 +633,12 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     }
 
     if (inComments) {
-      vector<gd::EventsList*> commentsVectors =
-          events[i].GetAllCommentsVectors();
-      for (std::size_t j = 0; j < commentsVectors.size(); ++j) {
+      vector<gd::EventsList*> stringsVectors = events[i].GetAllSearchableStrings();
+      
+      for (std::size_t j = 0; j < stringsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInComments(
-                project, layout, *commentsVectors[j], search, matchCase)) {
+                project, layout, *stringsVectors[j], search, matchCase)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -728,22 +728,20 @@ bool EventsRefactorer::SearchStringInConditions(
   return false;
 }
 
-bool EventsRefactorer::SearchStringInComments(gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
-                                             gd::EventsList& comments,
-                                             gd::String search,
-                                             bool matchCase) {
-  for (std::size_t aId = 0; aId < comments.GetEventsCount(); ++aId) {
-
-
-        size_t foundPosition =
-            matchCase
-                ? comments[aId].GetEvent().GetComment().find(search)
-                : comments[aId].GetEvent().GetComment().FindCaseInsensitive(search);
-
-        if (foundPosition != gd::String::npos) return true;
-
-    
+bool EventsRefactorer::GetAllSearchableStrings(gd::ObjectsContainer& project,
+                                               gd::ObjectsContainer& layout,
+                                               gd::EventsList& events,
+                                               gd::String search,
+                                               bool matchCase) {
+  // See later for "BuiltinCommonInstructions::Group" when Comment works
+  if (event.GetType() == = "BuiltinCommonInstructions::Comment") {
+    for (gd::String str : events[id].GetAllSearchableStrings()) {
+      if (matchCase) {
+        if (str.find(search) != gd::String::npos) return true;
+      } else {
+        if (str.FindCaseInsensitive(search) != gd::String::npos) return true;
+      }
+    }
   }
 
   return false;

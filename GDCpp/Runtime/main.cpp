@@ -191,7 +191,7 @@ int main( int argc, char *p_argv[] )
     sceneStack.OnLoadScene([&codeLibraryName](RuntimeScene & scene) {
         if (!codeLibraryName.empty() &&
             !scene.GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
-            "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())))
+            "GDSceneEvents"+gd::SceneNameMangler::Get()->GetMangledSceneName(scene.GetName())))
         {
             return false;
         }

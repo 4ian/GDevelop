@@ -296,7 +296,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   gd::String jsonVersion =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
   gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
-      gd::SceneNameMangler::GetMangledSceneName(project.GetName())
+      gd::SceneNameMangler::Get()->GetMangledSceneName(project.GetName())
           .LowerCase()
           .FindAndReplace(" ", "-")));
 
@@ -421,7 +421,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
   gd::String jsonVersion =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
   gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
-      gd::SceneNameMangler::GetMangledSceneName(project.GetName())
+      gd::SceneNameMangler::Get()->GetMangledSceneName(project.GetName())
           .LowerCase()
           .FindAndReplace(" ", "-")));
 

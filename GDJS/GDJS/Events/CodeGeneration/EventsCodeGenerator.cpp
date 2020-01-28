@@ -97,7 +97,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
   output += "gdjs['" +
-            gd::SceneNameMangler::GetMangledSceneName(scene.GetName()) +
+            gd::SceneNameMangler::Get()->GetMangledSceneName(scene.GetName()) +
             "Code']" + " = " + codeGenerator.GetCodeNamespace() + ";\n";
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
@@ -1057,7 +1057,7 @@ gd::String EventsCodeGenerator::GenerateBooleanFullName(
 gd::String EventsCodeGenerator::GetCodeNamespace() {
   if (HasProjectAndLayout()) {
     return "gdjs." +
-           gd::SceneNameMangler::GetMangledSceneName(GetLayout().GetName()) +
+           gd::SceneNameMangler::Get()->GetMangledSceneName(GetLayout().GetName()) +
            "Code";
   } else if (!codeNamespace.empty()) {
     return codeNamespace;

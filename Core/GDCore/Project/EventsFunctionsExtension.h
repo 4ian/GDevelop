@@ -8,8 +8,8 @@
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
 #include <vector>
-#include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 namespace gd {
@@ -59,7 +59,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   }
 
   const gd::String& GetShortDescription() const { return shortDescription; };
-  EventsFunctionsExtension& SetShortDescription(const gd::String& shortDescription_) {
+  EventsFunctionsExtension& SetShortDescription(
+      const gd::String& shortDescription_) {
     shortDescription = shortDescription_;
     return *this;
   }
@@ -97,15 +98,15 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   /**
    * \brief Return a reference to the list of the events based behaviors.
    */
-  SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors() {
+  gd::SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors() {
     return eventsBasedBehaviors;
   }
 
   /**
    * \brief Return a const reference to the list of the events based behaviors.
    */
-  const SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors()
-      const {
+  const gd::SerializableWithNameList<EventsBasedBehavior>&
+  GetEventsBasedBehaviors() const {
     return eventsBasedBehaviors;
   }
 
@@ -139,7 +140,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String fullName;
   gd::String tags;
   gd::String author;
-  SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
+  gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 
 }  // namespace gd

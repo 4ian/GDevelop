@@ -121,13 +121,8 @@ class GD_CORE_API BaseEvent {
    * Event must be able to return all strings std::vector they have.
    * Used to preprocess the strings in an event.
    */
-  virtual std::vector<gd::String*> GetAllSearchableStrings() {
-    std::vector<gd::String*> noSearchableStrings;
-    return noSearchableStrings;
-  };
-  virtual std::vector<const gd::String*> GetAllSearchableStrings()
-      const {
-    std::vector<const gd::String*> noSearchableStrings;
+  virtual std::vector<gd::String> GetAllSearchableStrings() const {
+    std::vector<gd::String> noSearchableStrings;
     return noSearchableStrings;
   };
 

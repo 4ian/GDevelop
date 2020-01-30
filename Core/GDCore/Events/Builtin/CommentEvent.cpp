@@ -12,25 +12,11 @@ using namespace std;
 
 namespace gd {
 
-vector<const gd::String*> CommentEvent::GetAllSearchableStrings( BaseEvent &event)
-    const {
-  vector<const gd::String*> allSearchableStrings;
+vector<gd::String> CommentEvent::GetAllSearchableStrings() const {
+  vector<gd::String> allSearchableStrings;
 
-  stringCom1 = event.GetChild("comment", 0, "Com1").GetValue().GetString();
-  stringCom2 = event.GetChild("comment", 0, "Com2").GetValue().GetString();///< Com2 is deprecated
-  allSearchableStrings.push_back(&stringCom1);
-  allSearchableStrings.push_back(&stringCom2);
-
-  return allSearchableStrings;
-}
-
-vector<gd::String*> CommentEvent::GetAllSearchableStrings( BaseEvent &event) {
-  vector<const gd::String*> allSearchableStrings;
-
-  stringCom1 = event.GetChild("comment", 0, "Com1").GetValue().GetString();
-  stringCom2 = event.GetChild("comment", 0, "Com2").GetValue().GetString();///< Com2 is deprecated
-  allSearchableStrings.push_back(&stringCom1);
-  allSearchableStrings.push_back(&stringCom2);
+  allSearchableStrings.push_back(com1);
+  allSearchableStrings.push_back(com2);  ///< Com2 is deprecated
 
   return allSearchableStrings;
 }

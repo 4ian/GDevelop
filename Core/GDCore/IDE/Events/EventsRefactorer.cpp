@@ -633,12 +633,12 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     }
 
     if (inComments) {
-      vector<gd::EventsList*> stringsVectors = events[i].GetAllSearchableStrings();
+      vector<gd::String> stringsVectors = events[i].GetAllSearchableStrings();
       
       for (std::size_t j = 0; j < stringsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInComments(
-                project, layout, *stringsVectors[j], search, matchCase)) {
+                project, layout, stringsVectors[j], search, matchCase)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -733,9 +733,8 @@ bool EventsRefactorer::GetAllSearchableStrings(gd::ObjectsContainer& project,
                                                gd::EventsList& events,
                                                gd::String search,
                                                bool matchCase) {
-  // See later for "BuiltinCommonInstructions::Group" when Comment works
-  if (event.GetType() == = "BuiltinCommonInstructions::Comment") {
-    for (gd::String str : events[id].GetAllSearchableStrings()) {
+  for (gd::BaseEvent event : events) {
+    for (gd::String str : event.GetAllSearchableStrings()) {
       if (matchCase) {
         if (str.find(search) != gd::String::npos) return true;
       } else {

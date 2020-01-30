@@ -728,7 +728,7 @@ bool EventsRefactorer::SearchStringInConditions(
   return false;
 }
 
-bool EventsRefactorer::GetAllSearchableStrings(gd::ObjectsContainer& project,
+bool EventsRefactorer::SearchStringInComments(gd::ObjectsContainer& project,
                                                gd::ObjectsContainer& layout,
                                                gd::EventsList& events,
                                                gd::String search,

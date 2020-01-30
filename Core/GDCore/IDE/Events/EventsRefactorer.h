@@ -203,7 +203,7 @@ class GD_CORE_API EventsRefactorer {
                                        gd::InstructionsList& conditions,
                                        gd::String search,
                                        bool matchCase);
-  static bool GetAllSearchableStrings(gd::ObjectsContainer& project,
+  static bool SearchStringInComments(gd::ObjectsContainer& project,
                                        gd::ObjectsContainer& layout,
                                        gd::EventsList& events,
                                        gd::String search,

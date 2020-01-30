@@ -39,7 +39,6 @@ include_directories(${GDJS_include_dir})
 #Defines
 ###
 add_definitions( -DGD_IDE_ONLY )
-add_definitions( -DGD_NO_WX_GUI ) #When compiling for the web, we do not want any GUI related feature.
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 	add_definitions( -DDEBUG )
 	IF(WIN32)

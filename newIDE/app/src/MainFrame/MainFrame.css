@@ -1,5 +1,9 @@
 html {
+  /* Disable browser zooming/auto panning */
   touch-action: none;
+  
+  /* Prevent larger texts in landscape mode on Safari iOS */
+  -webkit-text-size-adjust: 100%;
 }
 
 #root {

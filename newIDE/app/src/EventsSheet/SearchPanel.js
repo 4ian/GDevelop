@@ -31,6 +31,7 @@ type State = {|
   matchCase: boolean,
   searchInActions: boolean,
   searchInConditions: boolean,
+  searchInComments: boolean,
   searchInSelection: boolean,
 |};
 
@@ -42,6 +43,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     matchCase: false,
     searchInActions: true,
     searchInConditions: true,
+    searchInComments: true,
     searchInSelection: false,
   };
 
@@ -58,6 +60,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInComments,
     } = this.state;
     this.props.onSearchInEvents({
       searchInSelection,
@@ -65,6 +68,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInComments,
     });
   };
 
@@ -76,6 +80,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInComments,
     } = this.state;
 
     this.launchSearch();
@@ -87,6 +92,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInComments,
     });
   };
 

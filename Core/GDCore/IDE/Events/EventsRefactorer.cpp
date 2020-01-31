@@ -633,18 +633,18 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     }
 
     if (inComments) {
-      vector<gd::String> stringsVectors = events[i].GetAllSearchableStrings();
+      ///vector<gd::String> stringsVectors = events[i].GetAllSearchableStrings();
       
-      for (std::size_t j = 0; j < stringsVectors.size(); ++j) {
+      ///for (std::size_t j = 0; j < stringsVectors.size(); ++j) {
         if (!eventAddedInResults &&
-            SearchStringInComments(
-                project, layout, stringsVectors[j], search, matchCase)) {
+            SearchStringInEvents(
+                project, layout, events[i], search, matchCase)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
               i));
         }
-      }
+      ///}
     }
 
     if (events[i].CanHaveSubEvents()) {
@@ -728,12 +728,12 @@ bool EventsRefactorer::SearchStringInConditions(
   return false;
 }
 
-bool EventsRefactorer::SearchStringInComments(gd::ObjectsContainer& project,
+bool EventsRefactorer::SearchStringInEvents(gd::ObjectsContainer& project,
                                                gd::ObjectsContainer& layout,
-                                               gd::EventsList& events,
+                                               gd::BaseEvent& event,
                                                gd::String search,
                                                bool matchCase) {
-  for (gd::BaseEvent event : events) {
+  ///for (gd::BaseEvent event : events) {
     for (gd::String str : event.GetAllSearchableStrings()) {
       if (matchCase) {
         if (str.find(search) != gd::String::npos) return true;
@@ -741,7 +741,7 @@ bool EventsRefactorer::SearchStringInComments(gd::ObjectsContainer& project,
         if (str.FindCaseInsensitive(search) != gd::String::npos) return true;
       }
     }
-  }
+  ///}
 
   return false;
 }

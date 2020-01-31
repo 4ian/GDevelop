@@ -203,9 +203,9 @@ class GD_CORE_API EventsRefactorer {
                                        gd::InstructionsList& conditions,
                                        gd::String search,
                                        bool matchCase);
-  static bool SearchStringInComments(gd::ObjectsContainer& project,
+  static bool SearchStringInEvents(gd::ObjectsContainer& project,
                                        gd::ObjectsContainer& layout,
-                                       gd::EventsList& events,
+                                       gd::BaseEvent& events,
                                        gd::String search,
                                        bool matchCase);
 

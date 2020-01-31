@@ -14,6 +14,7 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
 import { showErrorBox } from './UI/Messages/MessageBox';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
+const initializeGDevelopJs = global.initializeGDevelopJs;
 
 // No i18n in this file
 
@@ -35,23 +36,28 @@ class Bootstrapper extends Component<{}, State> {
     installFullstory();
     GD_STARTUP_TIMES.push(["bootstrapperComponentDidMount", performance.now()]);
 
-    if (electron) {
-      import(/* webpackChunkName: "local-app" */ './LocalApp')
-        .then(module =>
-          this.setState({
-            App: module.create(this.authentification),
-          })
-        )
-        .catch(this.handleLoadError);
-    } else {
-      import(/* webpackChunkName: "browser-app" */ './BrowserApp')
-        .then(module =>
-          this.setState({
-            App: module.create(this.authentification),
-          })
-        )
-        .catch(this.handleLoadError);
-    }
+    initializeGDevelopJs().then(gd => {
+      global.gd = gd;
+      GD_STARTUP_TIMES.push(["libGD.js initialization done", performance.now()]);
+
+      if (electron) {
+        import(/* webpackChunkName: "local-app" */ './LocalApp')
+          .then(module =>
+            this.setState({
+              App: module.create(this.authentification),
+            })
+          )
+          .catch(this.handleLoadError);
+      } else {
+        import(/* webpackChunkName: "browser-app" */ './BrowserApp')
+          .then(module =>
+            this.setState({
+              App: module.create(this.authentification),
+            })
+          )
+          .catch(this.handleLoadError);
+      }
+    })
   }
 
   handleLoadError(err) {

@@ -50,11 +50,13 @@ list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/Di
 list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/mongoose/mongoose.c" "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/mongoose/mongoose.h")
 gd_add_clang_utils(GDJS "${formatted_source_files}")
 
-add_library(
-        GDJS
-        SHARED
-        ${source_files}
-)
+
+IF(EMSCRIPTEN)
+	# Emscripten treats all libraries as static libraries
+	add_library(GDJS STATIC ${source_files})
+ELSE()
+	add_library(GDJS SHARED ${source_files})
+ENDIF()
 IF(EMSCRIPTEN)
 	set_target_properties(GDJS PROPERTIES SUFFIX ".bc")
 ELSEIF(WIN32)

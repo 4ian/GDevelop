@@ -184,7 +184,7 @@ interface VariablesContainer {
     [Ref] Variable Get([Const] DOMString name);
     [Ref] Variable GetAt(unsigned long index);
     [Const, Ref] DOMString GetNameAt(unsigned long index);
-    [Ref] Variable Insert([Const] DOMString name, [Const, Ref] Variable var, unsigned long index);
+    [Ref] Variable Insert([Const] DOMString name, [Const, Ref] Variable variable, unsigned long index);
     [Ref] Variable InsertNew([Const] DOMString name, unsigned long index);
     void Remove([Const] DOMString name);
     boolean Rename([Const] DOMString oldName, [Const] DOMString newName);
@@ -1782,7 +1782,7 @@ interface NamedPropertyDescriptorsList {
 interface EventsFunctionsExtension {
     void EventsFunctionsExtension();
 
-    [Ref] EventsFunctionsExtension SetNamespace([Const] DOMString namespace);
+    [Ref] EventsFunctionsExtension SetNamespace([Const] DOMString namespace_);
     [Const, Ref] DOMString GetNamespace();
     [Ref] EventsFunctionsExtension SetVersion([Const] DOMString version);
     [Const, Ref] DOMString GetVersion();

@@ -1,10 +1,15 @@
-const initGDevelopJS = require('../../Binaries/Output/libGD.js/Release/libGD.js');
+const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 const path = require('path');
 const extend = require('extend');
 
 describe('libGD.js', function() {
   let gd = null;
-  beforeAll(() => (gd = initGDevelopJS()));
+  beforeAll(done =>
+    initializeGDevelopJs().then(module => {
+      gd = module;
+      done();
+    })
+  );
 
   describe('gd.VersionWrapper', function() {
     it('can return the version number of the library', function() {
@@ -1833,8 +1838,6 @@ describe('libGD.js', function() {
 
   describe('InstructionSentenceFormatter', function() {
     it('should translate instructions (plain text or into a vector of text with formatting)', function() {
-      var instrFormatter = gd.InstructionSentenceFormatter.get();
-      instrFormatter.loadTypesFormattingFromConfig();
       var action = new gd.Instruction(); //Create a simple instruction
       action.setType('Delete');
       action.setParametersCount(2);
@@ -1854,12 +1857,9 @@ describe('libGD.js', function() {
       expect(formattedTexts.size()).toBe(2);
       expect(formattedTexts.getString(0)).toBe('Delete ');
       expect(formattedTexts.getString(1)).toBe('MyCharacter');
-      expect(formattedTexts.getTextFormatting(0).isBold()).toBe(false);
-      expect(formattedTexts.getTextFormatting(1).isBold()).toBe(true);
       expect(formattedTexts.getTextFormatting(0).getUserData()).not.toBe(0);
       expect(formattedTexts.getTextFormatting(1).getUserData()).toBe(0);
 
-      instrFormatter.delete();
       action.delete();
     });
   });

@@ -11,13 +11,10 @@ ENDIF()
 if(NOT EMSCRIPTEN)
 	error("You're trying to compile libGD.js without emscripten.")
 endif()
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --memory-init-file 0" ) #Less efficient, but output a single JS file
-# SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -s ASSERTIONS=2 -s SAFE_HEAP=1" ) #Debug
-# SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g4 -s DEMANGLE_SUPPORT=1" ) #Debug
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -s ALLOW_MEMORY_GROWTH=1 -s ASM_JS=2" ) #Release
-# SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -s WASM=1" ) # WASM
-# Note: "-s ASM_JS=2" results in 2x faster library (noticeable on operations like export)
-# on Chrome (see https://github.com/kripken/emscripten/wiki/Chrome-Perf-Issues)
+
+# Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O2") # Optimizations during compilation
+#SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --profiling") # Profiling support
 
 #Common directories:
 ###
@@ -62,18 +59,27 @@ add_definitions( -DGD_EXTENSION_API= )
 ###
 include_directories(.)
 
-add_library(
-        GD
-        SHARED
-        "Bindings/Wrapper.cpp"
-        "Bindings/BehaviorJsImplementation.cpp"
-        "Bindings/ObjectJsImplementation.cpp"
-        "Bindings/BehaviorSharedDataJsImplementation.cpp"
+add_executable(
+	GD
+	"Bindings/Wrapper.cpp"
+	"Bindings/BehaviorJsImplementation.cpp"
+	"Bindings/ObjectJsImplementation.cpp"
+	"Bindings/BehaviorSharedDataJsImplementation.cpp"
 )
-set_target_properties(GD PROPERTIES SUFFIX ".raw.js")
-set(LIBRARY_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/libGD.js/${CMAKE_BUILD_TYPE})
-set(ARCHIVE_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/libGD.js/${CMAKE_BUILD_TYPE})
-set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/libGD.js/${CMAKE_BUILD_TYPE})
+#target_link_libraries(GD "-O0") # Disable optimizations at linking time for much faster builds.
+target_link_libraries(GD "-O2")
+target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/glue.js")
+target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/postjs.js")
+target_link_libraries(GD "-s MODULARIZE=1")
+target_link_libraries(GD "-s 'EXPORT_NAME=\"initializeGDevelopJs\"'") # Global function name for browsers
+target_link_libraries(GD "-s TOTAL_MEMORY=48MB") # Get some initial memory size that is a bit bigger than the default.
+target_link_libraries(GD "-s ALLOW_MEMORY_GROWTH=1")
+target_link_libraries(GD "-s ERROR_ON_UNDEFINED_SYMBOLS=0")
+target_link_libraries(GD "-s \"EXTRA_EXPORTED_RUNTIME_METHODS=['addOnPreMain', 'calledRun', 'UTF8ToString']\"")
+target_link_libraries(GD "-s WASM=0") #Disable Wasm for now. Enable when confident running well on iOS
+
+# Even if we're building an "executable", prefix it by lib as it's used as a library.
+set_target_properties(GD PROPERTIES PREFIX "lib")
 
 #Linker files
 ###
@@ -96,5 +102,4 @@ target_link_libraries(GD SystemInfo)
 target_link_libraries(GD Shopify)
 target_link_libraries(GD PathfindingBehavior)
 target_link_libraries(GD PhysicsBehavior)
-# target_link_libraries(GD FacebookInstantGames) - Pure JS extension
 target_link_libraries(GD ParticleSystem)

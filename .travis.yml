@@ -24,7 +24,7 @@ addons:
     - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/commit/$(git rev-parse HEAD)
     - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/latest
     paths:
-    - Binaries/Output/libGD.js/Release
+    - Binaries/embuild/GDevelop.js
   apt:
     sources:
     - ubuntu-toolchain-r-test
@@ -63,8 +63,8 @@ install:
 # Install Emscripten (for GDevelop.js)
   - git clone https://github.com/juj/emsdk.git
   - cd emsdk
-  - ./emsdk install sdk-fastcomp-1.37.37-64bit
-  - ./emsdk activate sdk-fastcomp-1.37.37-64bit
+  - ./emsdk install 1.39.6
+  - ./emsdk activate 1.39.6
   - source ./emsdk_env.sh
   - cd ..
 # Install GDevelop.js dependencies and compile it

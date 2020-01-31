@@ -1,8 +1,11 @@
-const initGDevelopJS = require('../../Binaries/Output/libGD.js/Release/libGD.js');
+const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 
 describe('libGD.js - GDJS related tests', function() {
   let gd = null;
-  beforeAll(() => (gd = initGDevelopJS()));
+  beforeAll((done) => (initializeGDevelopJs().then(module => {
+    gd = module;
+    done();
+  })));
 
   describe('EventsCodeGenerator', function() {
     it('can generate code for a layout with generateSceneEventsCompleteCode', function() {

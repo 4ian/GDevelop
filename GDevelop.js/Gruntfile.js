@@ -1,14 +1,11 @@
+// TODO: This could be rewritten as one (or more) pure Node.js script(s)
+// without Grunt, and called from package.json.
 module.exports = function(grunt) {
   const fs = require('fs');
   const isWin = /^win/.test(process.platform);
 
-  const buildOutputPath = '../Binaries/Output/libGD.js/Release/';
+  const buildOutputPath = '../Binaries/embuild/GDevelop.js/';
   const buildPath = '../Binaries/embuild';
-
-  const emscriptenPath = process.env.EMSCRIPTEN;
-  const emscriptenMemoryProfiler = emscriptenPath + '/src/memoryprofiler.js';
-  const cmakeToolchainpath =
-    emscriptenPath + '/cmake/Modules/Platform/Emscripten.cmake';
 
   let cmakeBinary = 'emconfigure cmake';
   let makeBinary = 'emmake make';
@@ -39,48 +36,7 @@ module.exports = function(grunt) {
     cmakeArgs = '-G "MinGW Makefiles"';
   }
 
-  //Sanity checks
-  if (!process.env.EMSCRIPTEN) {
-    console.error('🔴 EMSCRIPTEN env. variable is not set');
-    console.log(
-      '⚠️ Please set Emscripten environment by launching `emsdk_env` script (or `emsdk_env.bat` on Windows).'
-    );
-    return;
-  }
-  if (!fs.existsSync(emscriptenMemoryProfiler)) {
-    console.error(
-      '🔴 Unable to find memoryprofiler.js inside Emscripten sources'
-    );
-    console.log(
-      "⚠️ Building with profiler (build:with-profiler task) won't work"
-    );
-  }
-
   grunt.initConfig({
-    concat: {
-      options: {
-        separator: ';',
-      },
-      'without-profiler': {
-        src: [
-          'Bindings/prejs.js',
-          buildOutputPath + 'libGD.raw.js',
-          'Bindings/glue.js',
-          'Bindings/postjs.js',
-        ],
-        dest: buildOutputPath + 'libGD.js',
-      },
-      'with-profiler': {
-        src: [
-          'Bindings/prejs.js',
-          buildOutputPath + 'libGD.raw.js',
-          'Bindings/glue.js',
-          emscriptenMemoryProfiler,
-          'Bindings/postjs.js',
-        ],
-        dest: buildOutputPath + 'libGD.js',
-      },
-    },
     mkdir: {
       embuild: {
         options: {
@@ -118,35 +74,10 @@ module.exports = function(grunt) {
         },
       },
     },
-    uglify: {
-      build: {
-        files: [
-          {
-            src: [buildOutputPath + 'libGD.js'],
-            dest: buildOutputPath + 'libGD.min.js',
-          },
-        ],
-      },
-    },
     clean: {
       options: { force: true },
       build: {
-        src: [buildPath, buildOutputPath + 'libGD.js', buildOutputPath + 'libGD.min.js'],
-      },
-    },
-    compress: {
-      main: {
-        options: {
-          mode: 'gzip',
-        },
-        files: [
-          {
-            expand: true,
-            src: [buildOutputPath + '/libGD.js'],
-            dest: '.',
-            ext: '.js.gz',
-          },
-        ],
+        src: [buildPath, buildOutputPath + 'libGD.js', buildOutputPath + 'libGD.js.mem'],
       },
     },
     copy: {
@@ -154,7 +85,7 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            src: [buildOutputPath + '/libGD.js'],
+            src: [buildOutputPath + '/libGD.*'],
             dest: '../newIDE/app/public',
             flatten: true,
           },
@@ -165,9 +96,6 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-string-replace');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-newer');
@@ -180,14 +108,6 @@ module.exports = function(grunt) {
   ]);
   grunt.registerTask('build', [
     'build:raw',
-    'concat:without-profiler',
-    'compress',
-    'copy:newIDE',
-  ]);
-  grunt.registerTask('build:with-profiler', [
-    'build:raw',
-    'concat:with-profiler',
-    'compress',
     'copy:newIDE',
   ]);
 };

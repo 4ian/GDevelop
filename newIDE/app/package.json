@@ -84,7 +84,7 @@
     "build": "npm run import-resources && npm run make-version-metadata && react-scripts build && npm run make-service-worker",
     "format": "prettier --write \"src/!(locales)/**/*.js\"",
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
-    "test": "react-scripts test",
+    "test": "react-scripts test --env=node",
     "flow": "flow",
     "storybook": "start-storybook -p 9009 -s public",
     "analyze-test-coverage": "react-scripts test --coverage",

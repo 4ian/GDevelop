@@ -25,8 +25,6 @@ import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 const gd = global.gd;
-const instrFormatter = gd.InstructionSentenceFormatter.get();
-instrFormatter.loadTypesFormattingFromConfig();
 
 const styles = {
   container: {
@@ -90,6 +88,10 @@ type Props = {|
 const Instruction = (props: Props) => {
   const { instruction, isCondition, onClick, onMoveToInstruction } = props;
 
+  const instrFormatter = React.useMemo(
+    () => gd.InstructionSentenceFormatter.get(),
+    []
+  );
   const preferences = React.useContext(PreferencesContext);
   const useAssignmentOperators =
     preferences.values.eventsSheetUseAssignmentOperators;

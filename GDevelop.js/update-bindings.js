@@ -9,14 +9,13 @@ var debug = false; //If true, add additional checks in bindings files.
 var fs = require('fs');
 var exec = require('child_process').exec;
 
-if (!process.env.EMSCRIPTEN) {
-  console.error('EMSCRIPTEN env. variable is not set');
+if (!process.env.EMSDK) {
+  console.error('EMSDK env. variable is not set');
   console.log(
     'Please set Emscripten environment by launching `emsdk_env` script'
   );
 }
-var emscriptenPath = process.env.EMSCRIPTEN;
-var webIdlBinderPath = emscriptenPath + '/tools/webidl_binder.py';
+var webIdlBinderPath = process.env.EMSDK + '/upstream/emscripten/tools/webidl_binder.py';
 
 generateGlueFromBinding(function(err) {
   if (err) return fatalError(err);

@@ -44,9 +44,6 @@
 /Binaries/**/JsPlatform/*.dll.a
 /Binaries/Output/Release_Windows/newIDE
 *.autosave
-/Binaries/Output/libGD.js/Release
-/Binaries/Output/libGD.js/Debug
-/Binaries/Output/libGD.js/libGD.raw.js
 !/GDCpp/scripts/bcp.exe
 !/scripts/libgettextlib-0-17.dll
 !/scripts/libgettextsrc-0-17.dll

@@ -25,7 +25,7 @@ gd::String GetTranslation(const char* str) {  // TODO: Inline?
         // }
         ensureCache.prepare();
 
-        var translatedStr = getTranslation(Pointer_stringify($0));
+        var translatedStr = getTranslation(UTF8ToString($0));
         return ensureString(translatedStr);
       },
       str);

@@ -39,9 +39,8 @@ const serializedEvents = [
 ];
 
 describe('EventsFunctionExtractor', () => {
-  const { project, testLayout } = makeTestProject(gd);
-
   it('configures the events function with the proper parameters', () => {
+    const { project, testLayout } = makeTestProject(gd);
     const eventsFunction = new gd.EventsFunction();
 
     setupFunctionFromEvents({

@@ -596,7 +596,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     bool matchCase,
     bool inConditions,
     bool inActions,
-    bool inComments) {
+    bool inEventStrings) {
   vector<EventsSearchResult> results;
 
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -632,19 +632,14 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       }
     }
 
-    if (inComments) {
-      ///vector<gd::String> stringsVectors = events[i].GetAllSearchableStrings();
-      
-      ///for (std::size_t j = 0; j < stringsVectors.size(); ++j) {
-        if (!eventAddedInResults &&
-            SearchStringInEvents(
-                project, layout, events[i], search, matchCase)) {
-          results.push_back(EventsSearchResult(
-              std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
-              &events,
-              i));
-        }
-      ///}
+    if (inEventStrings) {
+      if (!eventAddedInResults &&
+          SearchStringInEvents(project, layout, events[i], search, matchCase)) {
+        results.push_back(EventsSearchResult(
+            std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+            &events,
+            i));
+      }
     }
 
     if (events[i].CanHaveSubEvents()) {
@@ -656,7 +651,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                          matchCase,
                          inConditions,
                          inActions,
-                         inComments);
+                         inEventStrings);
       std::copy(
           subResults.begin(), subResults.end(), std::back_inserter(results));
     }
@@ -729,19 +724,17 @@ bool EventsRefactorer::SearchStringInConditions(
 }
 
 bool EventsRefactorer::SearchStringInEvents(gd::ObjectsContainer& project,
-                                               gd::ObjectsContainer& layout,
-                                               gd::BaseEvent& event,
-                                               gd::String search,
-                                               bool matchCase) {
-  ///for (gd::BaseEvent event : events) {
-    for (gd::String str : event.GetAllSearchableStrings()) {
-      if (matchCase) {
-        if (str.find(search) != gd::String::npos) return true;
-      } else {
-        if (str.FindCaseInsensitive(search) != gd::String::npos) return true;
-      }
+                                            gd::ObjectsContainer& layout,
+                                            gd::BaseEvent& event,
+                                            gd::String search,
+                                            bool matchCase) {
+  for (gd::String str : event.GetAllSearchableStrings()) {
+    if (matchCase) {
+      if (str.find(search) != gd::String::npos) return true;
+    } else {
+      if (str.FindCaseInsensitive(search) != gd::String::npos) return true;
     }
-  ///}
+  }
 
   return false;
 }

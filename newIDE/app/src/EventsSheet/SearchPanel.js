@@ -154,7 +154,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
               <Text>
-                <Trans>Filter by:</Trans>
+                <Trans>Search in:</Trans>
               </Text>
               <Spacer />
               <InlineCheckbox

@@ -104,7 +104,7 @@ class GD_CORE_API EventsRefactorer {
                                                         bool matchCase,
                                                         bool inConditions,
                                                         bool inActions,
-                                                        bool inComments);
+                                                        bool inEventStrings);
 
   /**
    * Replace all occurrences of a gd::String in events

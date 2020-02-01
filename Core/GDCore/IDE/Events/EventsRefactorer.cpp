@@ -595,7 +595,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     gd::String search,
     bool matchCase,
     bool inConditions,
-    bool inActions) {
+    bool inActions,
+    bool inEventStrings) {
   vector<EventsSearchResult> results;
 
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -631,6 +632,16 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       }
     }
 
+    if (inEventStrings) {
+      if (!eventAddedInResults &&
+          SearchStringInEvent(project, layout, events[i], search, matchCase)) {
+        results.push_back(EventsSearchResult(
+            std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+            &events,
+            i));
+      }
+    }
+
     if (events[i].CanHaveSubEvents()) {
       vector<EventsSearchResult> subResults =
           SearchInEvents(project,
@@ -639,7 +650,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                          search,
                          matchCase,
                          inConditions,
-                         inActions);
+                         inActions,
+                         inEventStrings);
       std::copy(
           subResults.begin(), subResults.end(), std::back_inserter(results));
     }
@@ -706,6 +718,22 @@ bool EventsRefactorer::SearchStringInConditions(
                                  search,
                                  matchCase))
       return true;
+  }
+
+  return false;
+}
+
+bool EventsRefactorer::SearchStringInEvent(gd::ObjectsContainer& project,
+                                            gd::ObjectsContainer& layout,
+                                            gd::BaseEvent& event,
+                                            gd::String search,
+                                            bool matchCase) {
+  for (gd::String str : event.GetAllSearchableStrings()) {
+    if (matchCase) {
+      if (str.find(search) != gd::String::npos) return true;
+    } else {
+      if (str.FindCaseInsensitive(search) != gd::String::npos) return true;
+    }
   }
 
   return false;

@@ -106,6 +106,8 @@ class GD_CORE_API GroupEvent : public gd::BaseEvent {
   virtual const gd::EventsList& GetSubEvents() const { return events; };
   virtual gd::EventsList& GetSubEvents() { return events; };
 
+  virtual std::vector<gd::String> GetAllSearchableStrings() const;
+
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element);

@@ -19,6 +19,14 @@ namespace gd {
 GroupEvent::GroupEvent()
     : BaseEvent(), creationTime(0), colorR(74), colorG(176), colorB(228) {}
 
+vector<gd::String> GroupEvent::GetAllSearchableStrings() const {
+  vector<gd::String> allSearchableStrings;
+
+  allSearchableStrings.push_back(name);
+
+  return allSearchableStrings;
+}
+
 void GroupEvent::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   element.SetAttribute("source", source);

@@ -31,6 +31,7 @@ type State = {|
   matchCase: boolean,
   searchInActions: boolean,
   searchInConditions: boolean,
+  searchInEventStrings: boolean,
   searchInSelection: boolean,
 |};
 
@@ -42,6 +43,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     matchCase: false,
     searchInActions: true,
     searchInConditions: true,
+    searchInEventStrings: true,
     searchInSelection: false,
   };
 
@@ -58,6 +60,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInEventStrings,
     } = this.state;
     this.props.onSearchInEvents({
       searchInSelection,
@@ -65,6 +68,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInEventStrings,
     });
   };
 
@@ -76,6 +80,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInEventStrings,
     } = this.state;
 
     this.launchSearch();
@@ -87,6 +92,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
+      searchInEventStrings,
     });
   };
 
@@ -148,7 +154,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
               <Text>
-                <Trans>Filter by</Trans>
+                <Trans>Search in:</Trans>
               </Text>
               <Spacer />
               <InlineCheckbox
@@ -163,6 +169,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={this.state.searchInActions}
                 onCheck={(e, checked) =>
                   this.setState({ searchInActions: checked })
+                }
+              />
+              <InlineCheckbox
+                label={<Trans>Texts</Trans>}
+                checked={this.state.searchInEventStrings}
+                onCheck={(e, checked) =>
+                  this.setState({ searchInEventStrings: checked })
                 }
               />
               {/* <InlineCheckbox //TODO: Implement search/replace in selection

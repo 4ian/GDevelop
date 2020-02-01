@@ -11,7 +11,7 @@ export type SearchInEventsInputs = {|
   matchCase: boolean,
   searchInConditions: boolean,
   searchInActions: boolean,
-  searchInComments: boolean,
+  searchInEventStrings: boolean,
 |};
 
 export type ReplaceInEventsInputs = {|
@@ -21,7 +21,7 @@ export type ReplaceInEventsInputs = {|
   matchCase: boolean,
   searchInConditions: boolean,
   searchInActions: boolean,
-  searchInComments: boolean,
+  searchInEventStrings: boolean,
 |};
 
 type State = {|
@@ -79,7 +79,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     matchCase,
     searchInConditions,
     searchInActions,
-    searchInComments,
+    searchInEventStrings,
   }: ReplaceInEventsInputs) => {
     const { globalObjectsContainer, objectsContainer, events } = this.props;
 
@@ -99,7 +99,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       matchCase,
       searchInConditions,
       searchInActions,
-      searchInComments
+      searchInEventStrings
     );
   };
 
@@ -110,7 +110,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       matchCase,
       searchInConditions,
       searchInActions,
-      searchInComments,
+      searchInEventStrings,
     }: SearchInEventsInputs,
     cb: () => void
   ) => {
@@ -131,7 +131,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       matchCase,
       searchInConditions,
       searchInActions,
-      searchInComments
+      searchInEventStrings
     );
 
     if (this.state.eventsSearchResults) {

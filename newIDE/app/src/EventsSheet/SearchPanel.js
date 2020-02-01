@@ -31,7 +31,7 @@ type State = {|
   matchCase: boolean,
   searchInActions: boolean,
   searchInConditions: boolean,
-  searchInComments: boolean,
+  searchInEventStrings: boolean,
   searchInSelection: boolean,
 |};
 
@@ -43,7 +43,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     matchCase: false,
     searchInActions: true,
     searchInConditions: true,
-    searchInComments: true,
+    searchInEventStrings: true,
     searchInSelection: false,
   };
 
@@ -60,7 +60,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
-      searchInComments,
+      searchInEventStrings,
     } = this.state;
     this.props.onSearchInEvents({
       searchInSelection,
@@ -68,7 +68,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
-      searchInComments,
+      searchInEventStrings,
     });
   };
 
@@ -80,7 +80,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
-      searchInComments,
+      searchInEventStrings,
     } = this.state;
 
     this.launchSearch();
@@ -92,7 +92,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       matchCase,
       searchInActions,
       searchInConditions,
-      searchInComments,
+      searchInEventStrings,
     });
   };
 
@@ -172,10 +172,10 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 }
               />
               <InlineCheckbox
-                label={<Trans>Comments</Trans>}
-                checked={this.state.searchInComments}
+                label={<Trans>Texts</Trans>}
+                checked={this.state.searchInEventStrings}
                 onCheck={(e, checked) =>
-                  this.setState({ searchInComments: checked })
+                  this.setState({ searchInEventStrings: checked })
                 }
               />
               {/* <InlineCheckbox //TODO: Implement search/replace in selection

@@ -634,7 +634,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
 
     if (inEventStrings) {
       if (!eventAddedInResults &&
-          SearchStringInEvents(project, layout, events[i], search, matchCase)) {
+          SearchStringInEvent(project, layout, events[i], search, matchCase)) {
         results.push_back(EventsSearchResult(
             std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
             &events,

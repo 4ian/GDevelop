@@ -1910,6 +1910,34 @@ describe('libGD.js', function() {
 
       list.delete();
     });
+
+    it('can move an event to another list without invalidating it/copying it in memory', function() {
+      var list1 = new gd.EventsList();
+      var list2 = new gd.EventsList();
+
+      var list1ParentEvent = list1.insertEvent(new gd.StandardEvent(), 0);
+      var list2ParentEvent = list2.insertEvent(new gd.StandardEvent(), 0);
+      var originalSubEvent = list1ParentEvent
+        .getSubEvents()
+        .insertEvent(new gd.StandardEvent(), 0);
+      var originalSubEventPtr = originalSubEvent.ptr;
+
+      expect(
+        list1ParentEvent
+          .getSubEvents()
+          .moveEventToAnotherEventsList(
+            originalSubEvent,
+            list2ParentEvent.getSubEvents(),
+            0
+          )
+      ).toBe(true);
+      expect(list2ParentEvent.getSubEvents().getEventsCount()).toBe(1);
+      var movedSubEvent = list2ParentEvent.getSubEvents().getEventAt(0);
+      expect(movedSubEvent.ptr).toBe(originalSubEventPtr);
+
+      list1.delete();
+      list2.delete();
+    });
   });
 
   describe('gd.BaseEvent', function() {
@@ -2902,9 +2930,7 @@ describe('libGD.js', function() {
     });
   });
 
-
   describe('gd.ParameterMetadataTools', function() {
-
     it('can create an object container from parameters', function() {
       const project = gd.ProjectHelper.createNewGDJSProject();
 
@@ -3132,12 +3158,16 @@ describe('libGD.js', function() {
 
       expect(instructionMetadata.getParametersCount()).toBe(0);
       instructionMetadata.addParameter('type', 'label', '', false);
-      instructionMetadata.setParameterLongDescription("Blabla");
+      instructionMetadata.setParameterLongDescription('Blabla');
       expect(instructionMetadata.getParametersCount()).toBe(1);
       expect(instructionMetadata.getParameter(0).getType()).toBe('type');
-      expect(instructionMetadata.getParameter(0).getDescription()).toBe('label');
-      expect(instructionMetadata.getParameter(0).getLongDescription()).toBe('Blabla');
-    })
+      expect(instructionMetadata.getParameter(0).getDescription()).toBe(
+        'label'
+      );
+      expect(instructionMetadata.getParameter(0).getLongDescription()).toBe(
+        'Blabla'
+      );
+    });
   });
 
   describe('gd.ExpressionMetadata', () => {
@@ -3146,11 +3176,13 @@ describe('libGD.js', function() {
 
       expect(expressionMetadata.getParametersCount()).toBe(0);
       expressionMetadata.addParameter('type', 'label', '', false);
-      expressionMetadata.setParameterLongDescription("Blabla");
+      expressionMetadata.setParameterLongDescription('Blabla');
       expect(expressionMetadata.getParametersCount()).toBe(1);
       expect(expressionMetadata.getParameter(0).getType()).toBe('type');
       expect(expressionMetadata.getParameter(0).getDescription()).toBe('label');
-      expect(expressionMetadata.getParameter(0).getLongDescription()).toBe('Blabla');
-    })
+      expect(expressionMetadata.getParameter(0).getLongDescription()).toBe(
+        'Blabla'
+      );
+    });
   });
 });

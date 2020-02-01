@@ -1272,6 +1272,7 @@ interface EventsList {
     void RemoveEvent([Const, Ref] BaseEvent event);
     unsigned long GetEventsCount();
     boolean Contains([Const, Ref] BaseEvent event, boolean recursive);
+    boolean MoveEventToAnotherEventsList([Const, Ref] BaseEvent eventToMove, [Ref] EventsList newEventsList, unsigned long newPosition);
     boolean IsEmpty();
     void Clear();
 

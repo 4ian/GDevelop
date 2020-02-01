@@ -52,7 +52,8 @@ class GD_CORE_API EventsList {
    * \brief Insert the specified event to the list.
    * \note The event passed by parameter is not copied.
    * \param event The smart pointer to the event that must be inserted into the
-   * list \param position Insertion position. If the position is invalid, the
+   * list
+   * \param position Insertion position. If the position is invalid, the
    * object is inserted at the end of the objects list.
    */
   void InsertEvent(std::shared_ptr<gd::BaseEvent> event,
@@ -142,6 +143,25 @@ class GD_CORE_API EventsList {
    */
   bool Contains(const gd::BaseEvent& eventToSearch,
                 bool recursive = true) const;
+
+  /**
+   * Move the specified event, that must be in the events list, to another
+   * events list *without* invalidating the event (i.e: without
+   * destroying/cloning it) in memory.
+   *
+   * \warning newEventsList is supposed not to be contained inside the event
+   * (you should not try
+   * to move an event inside one of its children/grand children events).
+   *
+   * \param eventToMove The event to be moved
+   * \param newEventsList The new events list
+   * \param newPosition The position in the new events list
+   * \return true if the move was made, false otherwise (for example, if
+   * eventToMove is not found in the list)
+   */
+  bool MoveEventToAnotherEventsList(const gd::BaseEvent& eventToMove,
+                                    gd::EventsList& newEventsList,
+                                    std::size_t newPosition);
   ///@}
 
   /** \name std::vector API compatibility

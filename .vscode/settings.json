@@ -83,7 +83,8 @@
         "__threading_support": "cpp",
         "any": "cpp",
         "array": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "numeric": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

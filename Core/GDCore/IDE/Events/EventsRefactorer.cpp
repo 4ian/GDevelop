@@ -723,7 +723,7 @@ bool EventsRefactorer::SearchStringInConditions(
   return false;
 }
 
-bool EventsRefactorer::SearchStringInEvents(gd::ObjectsContainer& project,
+bool EventsRefactorer::SearchStringInEvent(gd::ObjectsContainer& project,
                                             gd::ObjectsContainer& layout,
                                             gd::BaseEvent& event,
                                             gd::String search,

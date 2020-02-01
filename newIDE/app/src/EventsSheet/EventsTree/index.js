@@ -364,7 +364,11 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     // references to the event in memory - so things refering to this event like the
     // selection in EventsSheet remain valid. This might not be needed anymore
     // if events drag'n'drop is reworked to be similar to instructions drag'n'drop.
-    eventsList.moveEventToAnotherEventsList(event, targetEventsList, targetPosition);
+    eventsList.moveEventToAnotherEventsList(
+      event,
+      targetEventsList,
+      targetPosition
+    );
 
     this.forceEventsUpdate();
     this.props.onEventMoved();

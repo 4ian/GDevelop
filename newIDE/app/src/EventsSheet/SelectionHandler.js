@@ -5,6 +5,7 @@ import values from 'lodash/values';
 export type InstructionsListContext = {|
   isCondition: boolean,
   instrsList: gdInstructionsList,
+  quick?: any,
 |};
 
 export type InstructionContext = {|

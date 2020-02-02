@@ -4,6 +4,7 @@ import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
+import NewInstructionEditorMenu from './InstructionEditor/NewInstructionEditorMenu';
 import EventTextDialog, {
   filterEditableWithEventTextDialog,
 } from './InstructionEditor/EventTextDialog';
@@ -185,6 +186,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
 
     editedInstruction: {
+      quick: null,
       isCondition: true,
       instruction: null,
       instrsList: null,
@@ -397,8 +399,11 @@ export default class EventsSheet extends React.Component<Props, State> {
       );
     }
 
+    console.log(instructionContext, this.state);
     this.setState({
+      inlineEditingAnchorEl: instructionContext.domEvent,
       editedInstruction: {
+        quick: instructionContext.quick,
         instrsList: instructionContext.instrsList,
         isCondition: instructionContext.isCondition,
         instruction: instructionContext.instruction
@@ -896,8 +901,11 @@ export default class EventsSheet extends React.Component<Props, State> {
       objectsContainer,
     } = this.props;
 
+    const NewInstruction = this.state.editedInstruction.quick
+      ? NewInstructionEditorMenu
+      : NewInstructionEditorDialog;
     const Dialog = newInstructionEditorDialog
-      ? NewInstructionEditorDialog
+      ? NewInstruction
       : InstructionEditorDialog;
 
     return this.state.editedInstruction.instruction ? (
@@ -911,6 +919,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         isNewInstruction={
           this.state.editedInstruction.indexInList === undefined
         }
+        anchorEl={this.state.editedInstruction.quick}
         open={true}
         onCancel={() => this.closeInstructionEditor()}
         onSubmit={() => {

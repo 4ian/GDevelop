@@ -69,6 +69,19 @@ export default class InstructionsList extends React.Component<Props, State> {
       });
   };
 
+  onQuickAddNewInstruction = (e: any) => {
+    if (e.button !== 2) return;
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (this.props.onAddNewInstruction)
+      this.props.onAddNewInstruction({
+        instrsList: this.props.instrsList,
+        isCondition: this.props.areConditions,
+        quick: e.currentTarget,
+      });
+  };
+
   _onPasteInstructions = () => {
     this.props.onPasteInstructions({
       instrsList: this.props.instrsList,
@@ -184,6 +197,7 @@ export default class InstructionsList extends React.Component<Props, State> {
                   style={styles.addButton}
                   className="add-link"
                   onClick={this.onAddNewInstruction}
+                  onMouseDownCapture={this.onQuickAddNewInstruction}
                   onContextMenu={e => {
                     e.stopPropagation();
                     onInstructionsListContextMenu(

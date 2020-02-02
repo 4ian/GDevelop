@@ -87,7 +87,7 @@
     "test": "react-scripts test --env=node",
     "flow": "flow",
     "storybook": "start-storybook -p 9009 -s public",
-    "analyze-test-coverage": "react-scripts test --coverage",
+    "analyze-test-coverage": "react-scripts test --env=node --coverage",
     "analyze-flow-coverage": "flow-coverage-report",
     "analyze-source-map": "source-map-explorer build/static/js/main.*",
     "extract-all-translations": "node scripts/extract-all-translations.js",

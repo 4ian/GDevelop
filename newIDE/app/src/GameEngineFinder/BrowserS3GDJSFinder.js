@@ -1,7 +1,5 @@
 // @flow
-
-const gdjsRoot =
-  'https://s3-eu-west-1.amazonaws.com/gdevelop-resources/GDJS-5.0.0-beta86';
+import { getIDEVersion } from '../Version';
 
 type FileSet =
   | 'preview'
@@ -44,6 +42,10 @@ export const findGDJS = (
   gdjsRoot: string,
   filesContent: Array<TextFileDescriptor>,
 |}> => {
+  // Get GDJS for this version. If you updated the version,
+  // run `newIDE/web0app/scripts/deploy-GDJS-Runtime` script.
+  const gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
+
   return Promise.all(
     filesToDownload[fileSet].map(relativeFilePath => {
       const url = gdjsRoot + relativeFilePath;

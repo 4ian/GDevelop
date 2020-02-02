@@ -8,9 +8,12 @@
   "license": "MIT",
   "scripts": {
     "build:app": "cd ../app && npm run build",
+    "deploy:gdjs-runtime": "node scripts/deploy-GDJS-Runtime.js",
+    "deploy:purge-cache": "node scripts/deploy-purge-cache.js",
     "deploy": "node scripts/deploy.js"
   },
   "devDependencies": {
+    "axios": "0.19.2",
     "gh-pages": "^1.0.0",
     "git-rev": "^0.2.1",
     "is-git-clean": "^1.1.0",

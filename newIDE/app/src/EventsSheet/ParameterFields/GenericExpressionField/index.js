@@ -97,7 +97,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   focus() {
     if (this._field) {
       this._field.focus();
-      this._doValidation();
+      this._enqueueValidation();
     }
   }
 

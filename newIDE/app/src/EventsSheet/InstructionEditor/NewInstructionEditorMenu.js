@@ -35,7 +35,8 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    height: '300px',
+    height: '400px',
+    width: '400px',
   },
 };
 
@@ -330,7 +331,6 @@ export default class NewInstructionEditorMenu extends React.Component<
           vertical: 'top',
           horizontal: 'left',
         }}
-        style={{ opacity: 0.95 }}
       >
         <SelectColumns
           columnsRenderer={{

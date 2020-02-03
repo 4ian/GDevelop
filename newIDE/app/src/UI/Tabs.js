@@ -34,6 +34,7 @@ export class Tabs<TabName> extends React.Component<TabsProps<TabName>, {||}> {
 type TabProps = {|
   label: React.Node,
   value: string,
+  tabIndex?: string,
 |};
 
 /**

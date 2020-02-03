@@ -29,6 +29,8 @@ type Props = {|
   buildTagsMenuTemplate?: () => any,
   /** If defined, a help icon button redirecting to this page will be shown */
   helpPagePath?: ?string,
+  /** If defined, the tabIndex value is applied to all buttons. Useful for taking them out of the focus order when desired via -1 */
+  buttonsTabIndex?: string,
 |};
 
 type State = {|
@@ -153,7 +155,13 @@ export default class SearchBar extends React.PureComponent<Props, State> {
   render() {
     const styles = getStyles(this.props, this.state);
     const { value } = this.state;
-    const { disabled, style, buildTagsMenuTemplate, helpPagePath } = this.props;
+    const {
+      disabled,
+      style,
+      buildTagsMenuTemplate,
+      helpPagePath,
+      buttonsTabIndex,
+    } = this.props;
 
     return (
       <Paper
@@ -184,6 +192,7 @@ export default class SearchBar extends React.PureComponent<Props, State> {
               <IconButton
                 style={styles.iconButtonFilter.style}
                 disabled={disabled}
+                tabIndex={buttonsTabIndex}
               >
                 <FilterList />
               </IconButton>
@@ -194,17 +203,23 @@ export default class SearchBar extends React.PureComponent<Props, State> {
         {helpPagePath && (
           <HelpIcon
             disabled={disabled}
+            tabIndex={buttonsTabIndex}
             helpPagePath={helpPagePath}
             style={styles.iconButtonHelp.style}
           />
         )}
-        <IconButton style={styles.iconButtonSearch.style} disabled={disabled}>
+        <IconButton
+          style={styles.iconButtonSearch.style}
+          disabled={disabled}
+          tabIndex={buttonsTabIndex}
+        >
           <Search style={styles.iconButtonSearch.iconStyle} />
         </IconButton>
         <IconButton
           onClick={this.handleCancel}
           style={styles.iconButtonClose.style}
           disabled={disabled}
+          tabIndex={buttonsTabIndex}
         >
           <Close style={styles.iconButtonClose.iconStyle} />
         </IconButton>

@@ -118,6 +118,7 @@ type State = {|
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     indexInList: ?number,
+    quick?: any,
   },
   editedParameter: {
     // TODO: This could be adapted to be a ParameterContext

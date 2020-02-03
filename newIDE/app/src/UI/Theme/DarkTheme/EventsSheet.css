@@ -125,7 +125,7 @@
   color: #e8dc59;
 }
 
-.name-and-icon-container:empty,
+.gd-events-sheet-dark-theme .name-and-icon-container:empty,
 .gd-events-sheet-dark-theme .instruction-parameter:empty {
   display: inline-flex;
   background-color: rgba(238, 255, 0, 0.05);

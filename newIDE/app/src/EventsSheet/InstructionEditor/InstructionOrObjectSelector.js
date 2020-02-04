@@ -224,17 +224,14 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   }
                   style={styles.searchBar}
                   ref={this._searchBar}
-                  buttonsTabIndex="-1"
                 />
                 {!isSearching && (
                   <Tabs value={currentTab} onChange={onChangeTab}>
                     <Tab
-                      tabIndex="-1"
                       label={<Trans>Objects</Trans>}
                       value={('objects': TabName)}
                     />
                     <Tab
-                      tabIndex="-1"
                       label={
                         isCondition ? (
                           <Trans>Other conditions</Trans>

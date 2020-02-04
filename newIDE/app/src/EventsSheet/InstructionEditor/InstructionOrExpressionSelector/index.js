@@ -124,7 +124,6 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
               }
               helpPagePath={helpPagePath}
               ref={searchBar => (this._searchBar = searchBar)}
-              buttonsTabIndex="-1"
             />
             <ScrollView
               ref={

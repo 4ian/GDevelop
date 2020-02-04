@@ -226,7 +226,7 @@ export default class NewInstructionEditorMenu extends React.Component<
     const { instruction } = this.props;
     const { chosenObjectName } = this.state;
     instruction.setType(type);
-    this._chooseObject(chosenObjectName);
+    if (chosenObjectName) this._chooseObject(chosenObjectName);
     this._onSubmitInstruction();
   };
 
@@ -339,7 +339,7 @@ export default class NewInstructionEditorMenu extends React.Component<
           getColumns={() => {
             if (step === 'object-or-free-instructions') {
               return ['instruction-or-object-selector'];
-            } else if (step === 'object-instructions') {
+            } else {
               return ['object-instruction-selector'];
             }
           }}

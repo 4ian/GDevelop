@@ -152,7 +152,7 @@ export default class NewInstructionEditorMenu extends React.Component<
   }
 
   _chooseFreeInstruction = (type: string) => {
-    const { instruction, onSubmit } = this.props;
+    const { instruction } = this.props;
     instruction.setType(type);
     this.setState(
       {

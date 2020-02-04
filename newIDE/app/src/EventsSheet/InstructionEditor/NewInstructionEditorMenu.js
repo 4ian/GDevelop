@@ -160,7 +160,7 @@ export default class NewInstructionEditorMenu extends React.Component<
         chosenObjectInstructionsInfo: null,
         chosenObjectInstructionsInfoTree: null,
       },
-      () => onSubmit()
+      () => this._onSubmitInstruction()
     );
   };
 

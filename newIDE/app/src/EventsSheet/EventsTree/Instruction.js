@@ -70,8 +70,7 @@ type Props = {|
   onSubInstructionClick: InstructionContext => void,
   onSubInstructionDoubleClick: InstructionContext => void,
   onSubInstructionsListContextMenu: (
-    x: number,
-    y: number,
+    any,
     instructionsListContext: InstructionsListContext
   ) => void,
   onSubParameterClick: Function,

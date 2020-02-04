@@ -70,7 +70,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
-  anchorEl?: any,
+  inlineInstructionEditorAnchorEl?: any,
 |};
 type State = {|
   step: StepName,

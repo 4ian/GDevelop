@@ -33,11 +33,7 @@ type Props = {
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (
-    x: number,
-    y: number,
-    InstructionsListContext
-  ) => void,
+  onInstructionsListContextMenu: (any, InstructionsListContext) => void,
   onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
@@ -66,19 +62,6 @@ export default class InstructionsList extends React.Component<Props, State> {
       this.props.onAddNewInstruction({
         instrsList: this.props.instrsList,
         isCondition: this.props.areConditions,
-      });
-  };
-
-  onQuickAddNewInstruction = (e: any) => {
-    if (e.button !== 2) return;
-    e.stopPropagation();
-    e.preventDefault();
-
-    if (this.props.onAddNewInstruction)
-      this.props.onAddNewInstruction({
-        instrsList: this.props.instrsList,
-        isCondition: this.props.areConditions,
-        quick: e.currentTarget,
       });
   };
 
@@ -197,12 +180,10 @@ export default class InstructionsList extends React.Component<Props, State> {
                   style={styles.addButton}
                   className="add-link"
                   onClick={this.onAddNewInstruction}
-                  onMouseDownCapture={this.onQuickAddNewInstruction}
                   onContextMenu={e => {
                     e.stopPropagation();
                     onInstructionsListContextMenu(
-                      e.clientX,
-                      e.clientY,
+                      e.currentTarget,
                       instructionsListContext
                     );
                   }}
@@ -211,7 +192,6 @@ export default class InstructionsList extends React.Component<Props, State> {
                 </button>
                 {canPaste && (
                   <span>
-                    {' '}
                     <button
                       style={styles.addButton}
                       className="add-link"

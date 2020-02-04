@@ -5,7 +5,6 @@ import values from 'lodash/values';
 export type InstructionsListContext = {|
   isCondition: boolean,
   instrsList: gdInstructionsList,
-  quick?: any,
   domEvent?: any,
 |};
 
@@ -15,7 +14,6 @@ export type InstructionContext = {|
   instruction: gdInstruction,
   indexInList: number,
   domEvent?: any,
-  quick?: any,
 |};
 
 export type ParameterContext = {|

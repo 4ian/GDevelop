@@ -118,7 +118,6 @@ type State = {|
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     indexInList: ?number,
-    quick?: any,
   },
   editedParameter: {
     // TODO: This could be adapted to be a ParameterContext
@@ -132,6 +131,7 @@ type State = {|
 
   inlineEditing: boolean,
   inlineEditingAnchorEl: ?any,
+  inlineInstructionEditorAnchorEl: ?any,
   inlineEditingChangesMade: boolean,
 
   analyzedEventsContextResult: ?EventsContextResult,
@@ -187,7 +187,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
 
     editedInstruction: {
-      quick: null,
       isCondition: true,
       instruction: null,
       instrsList: null,
@@ -204,6 +203,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     inlineEditing: false,
     inlineEditingAnchorEl: null,
+    inlineInstructionEditorAnchorEl: null,
     inlineEditingChangesMade: false,
 
     analyzedEventsContextResult: null,
@@ -390,8 +390,19 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
+  openInstructionsListContextMenu = (
+    inlineInstructionEditorAnchorEl: any,
+    instructionsListContext: InstructionsListContext
+  ) => {
+    this.openInstructionEditor(
+      instructionsListContext,
+      inlineInstructionEditorAnchorEl
+    );
+  };
+
   openInstructionEditor = (
-    instructionContext: InstructionContext | InstructionsListContext
+    instructionContext: InstructionContext | InstructionsListContext,
+    inlineInstructionEditorAnchorEl?: any = null
   ) => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
@@ -400,11 +411,10 @@ export default class EventsSheet extends React.Component<Props, State> {
       );
     }
 
-    console.log(instructionContext, this.state);
     this.setState({
+      inlineInstructionEditorAnchorEl,
       inlineEditingAnchorEl: instructionContext.domEvent,
       editedInstruction: {
-        quick: instructionContext.quick,
         instrsList: instructionContext.instrsList,
         isCondition: instructionContext.isCondition,
         instruction: instructionContext.instruction
@@ -521,26 +531,6 @@ export default class EventsSheet extends React.Component<Props, State> {
       () => {
         this.updateToolbar();
         this.instructionContextMenu.open(x, y);
-      }
-    );
-  };
-
-  openInstructionsListContextMenu = (
-    x: number,
-    y: number,
-    instructionsListContext: InstructionsListContext
-  ) => {
-    this.setState(
-      {
-        selection: selectInstructionsList(
-          this.state.selection,
-          instructionsListContext,
-          false
-        ),
-      },
-      () => {
-        this.updateToolbar();
-        this.instructionsListContextMenu.open(x, y);
       }
     );
   };
@@ -902,7 +892,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       objectsContainer,
     } = this.props;
 
-    const NewInstruction = this.state.editedInstruction.quick
+    const NewInstruction = this.state.inlineInstructionEditorAnchorEl
       ? NewInstructionEditorMenu
       : NewInstructionEditorDialog;
     const Dialog = newInstructionEditorDialog
@@ -920,7 +910,9 @@ export default class EventsSheet extends React.Component<Props, State> {
         isNewInstruction={
           this.state.editedInstruction.indexInList === undefined
         }
-        anchorEl={this.state.editedInstruction.quick}
+        inlineInstructionEditorAnchorEl={
+          this.state.inlineInstructionEditorAnchorEl
+        }
         open={true}
         onCancel={() => this.closeInstructionEditor()}
         onSubmit={() => {

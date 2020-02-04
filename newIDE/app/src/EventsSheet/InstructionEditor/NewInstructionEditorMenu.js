@@ -53,7 +53,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   style?: Object,
-  anchorEl?: any,
+  inlineInstructionEditorAnchorEl?: any,
   isNewInstruction: boolean,
   onCancel: () => void,
   onSubmit: () => void,
@@ -84,7 +84,6 @@ const setupInstruction = (
   instructionMetadata: gdInstructionMetadata,
   objectName: ?string
 ) => {
-  console.log(instruction, instructionMetadata, objectName);
   instruction.setParametersCount(instructionMetadata.getParametersCount());
 
   if (objectName) {
@@ -271,7 +270,7 @@ export default class NewInstructionEditorMenu extends React.Component<
       open,
       instruction,
       isCondition,
-      anchorEl,
+      inlineInstructionEditorAnchorEl,
     } = this.props;
     const {
       step,
@@ -322,7 +321,7 @@ export default class NewInstructionEditorMenu extends React.Component<
       <Popover
         open={open}
         onClose={onCancel}
-        anchorEl={anchorEl}
+        anchorEl={inlineInstructionEditorAnchorEl}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',

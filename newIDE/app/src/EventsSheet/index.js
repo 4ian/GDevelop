@@ -411,7 +411,6 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     this.setState({
       inlineInstructionEditorAnchorEl,
-      inlineEditingAnchorEl: instructionContext.domEvent,
       editedInstruction: {
         instrsList: instructionContext.instrsList,
         isCondition: instructionContext.isCondition,

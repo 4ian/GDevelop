@@ -2346,16 +2346,16 @@ describe('libGD.js', function() {
         return '/tmp/';
       };
       fs.fileNameFrom = function(fullpath) {
-        return path.basename(fullpath);
+        return path.posix.basename(fullpath);
       };
       fs.dirNameFrom = function(fullpath) {
-        return path.dirname(fullpath);
+        return path.posix.dirname(fullpath);
       };
       fs.makeAbsolute = function(relativePath, baseDirectory) {
-        return path.resolve(baseDirectory, relativePath);
+        return path.posix.resolve(baseDirectory, relativePath);
       };
       fs.makeRelative = function(absolutePath, baseDirectory) {
-        return path.relative(baseDirectory, absolutePath);
+        return path.posix.relative(baseDirectory, absolutePath);
       };
 
       // Check that ResourcesMergingHelper can update the filenames
@@ -2421,19 +2421,19 @@ describe('libGD.js', function() {
         return '/tmp/';
       };
       fs.fileNameFrom = function(fullPath) {
-        return path.basename(fullPath);
+        return path.posix.basename(fullPath);
       };
       fs.dirNameFrom = function(fullPath) {
-        return path.dirname(fullPath);
+        return path.posix.dirname(fullPath);
       };
       fs.makeAbsolute = function(relativePath, baseDirectory) {
-        return path.resolve(baseDirectory, relativePath);
+        return path.posix.resolve(baseDirectory, relativePath);
       };
       fs.makeRelative = function(absolutePath, baseDirectory) {
-        return path.relative(baseDirectory, absolutePath);
+        return path.posix.relative(baseDirectory, absolutePath);
       };
       fs.isAbsolute = function(fullPath) {
-        return path.isAbsolute(fullPath);
+        return path.posix.isAbsolute(fullPath);
       };
       fs.dirExists = function(directoryPath) {
         return true; // Fake that all directory required exist.
@@ -2443,7 +2443,6 @@ describe('libGD.js', function() {
       // files are properly copied.
       fs.copyFile = jest.fn();
       fs.copyFile.mockImplementation(function(srcPath, destPath) {
-        console.log(srcPath, destPath);
         return true;
       });
 

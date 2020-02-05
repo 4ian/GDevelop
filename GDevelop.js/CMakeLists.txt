@@ -66,7 +66,7 @@ add_executable(
 	"Bindings/ObjectJsImplementation.cpp"
 	"Bindings/BehaviorSharedDataJsImplementation.cpp"
 )
-MESSAGE(STATUS "DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS: ${DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS}")
+
 IF(DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS)
 	# Disable optimizations at linking time for much faster builds.
 	MESSAGE(STATUS "Disabling optimization at link time for (slightly) faster build")

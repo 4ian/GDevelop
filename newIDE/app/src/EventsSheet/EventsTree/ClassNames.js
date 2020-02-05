@@ -13,6 +13,7 @@ export const subInstructionsContainer = 'sub-instructions-container';
 export const smallWidthContainer = 'small-width-container';
 export const instructionParameter = 'instruction-parameter';
 export const instructionInvalidParameter = 'instruction-invalid-parameter';
+export const instructionMissingParameter = 'instruction-missing-parameter';
 export const disabledText = 'disabled-text';
 
 export const background = 'background';

@@ -61,11 +61,11 @@ export default class GlobalVariableField extends React.Component<
   }
 }
 
-export const renderInlineGlobalVariable = ({
-  value,
-}: ParameterInlineRendererProps) => {
+export const renderInlineGlobalVariable = (
+  props: ParameterInlineRendererProps
+) => {
   return renderVariableWithIcon(
-    value,
+    props,
     'res/types/globalvar.png',
     'global variable'
   );

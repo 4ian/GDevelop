@@ -70,8 +70,14 @@ export default class ObjectField extends React.Component<
 
 export const renderInlineObjectWithThumbnail = ({
   value,
+  parameterMetadata,
   renderObjectThumbnail,
+  MissingParameterValue,
 }: ParameterInlineRendererProps) => {
+  if (!value && !parameterMetadata.isOptional()) {
+    return <MissingParameterValue />;
+  }
+
   return (
     <span
       title={value}

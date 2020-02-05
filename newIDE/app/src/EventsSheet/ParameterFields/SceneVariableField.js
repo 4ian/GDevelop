@@ -68,11 +68,11 @@ export default class SceneVariableField extends React.Component<
   }
 }
 
-export const renderInlineSceneVariable = ({
-  value,
-}: ParameterInlineRendererProps) => {
+export const renderInlineSceneVariable = (
+  props: ParameterInlineRendererProps
+) => {
   return renderVariableWithIcon(
-    value,
+    props,
     'res/types/scenevar.png',
     'scene variable'
   );

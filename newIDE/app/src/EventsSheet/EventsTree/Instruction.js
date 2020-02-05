@@ -20,6 +20,7 @@ import InstructionsList from './InstructionsList';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
+import MissingParameterValue from './MissingParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -163,6 +164,7 @@ const Instruction = (props: Props) => {
                 parameterMetadata,
                 renderObjectThumbnail,
                 InvalidParameterValue,
+                MissingParameterValue,
                 useAssignmentOperators,
               })}
             </span>

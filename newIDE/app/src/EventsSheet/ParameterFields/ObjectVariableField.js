@@ -81,11 +81,11 @@ export default class ObjectVariableField extends React.Component<
   }
 }
 
-export const renderInlineObjectVariable = ({
-  value,
-}: ParameterInlineRendererProps) => {
+export const renderInlineObjectVariable = (
+  props: ParameterInlineRendererProps
+) => {
   return renderVariableWithIcon(
-    value,
+    props,
     'res/types/objectvar.png',
     'object variable'
   );

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
 export default class DefaultField extends React.Component<
   ParameterFieldProps,
@@ -35,3 +36,15 @@ export default class DefaultField extends React.Component<
     );
   }
 }
+
+export const renderInlineDefaultField = ({
+  value,
+  parameterMetadata,
+  MissingParameterValue,
+}: ParameterInlineRendererProps) => {
+  if (!value && !parameterMetadata.isOptional()) {
+    return <MissingParameterValue />;
+  }
+
+  return value;
+};

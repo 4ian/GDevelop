@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
 type Props = {
   ...ParameterFieldProps,
@@ -77,10 +78,18 @@ export default class VariableField extends Component<Props, {||}> {
 }
 
 export const renderVariableWithIcon = (
-  value: string,
+  {
+    value,
+    parameterMetadata,
+    MissingParameterValue,
+  }: ParameterInlineRendererProps,
   iconPath: string,
-  tooltip: string = ''
+  tooltip: string
 ) => {
+  if (!value && !parameterMetadata.isOptional()) {
+    return <MissingParameterValue />;
+  }
+
   return (
     <span
       title={tooltip}

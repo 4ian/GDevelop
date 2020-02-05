@@ -1,9 +1,7 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import Popover from '@material-ui/core/Popover';
 
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
-import FlatButton from '../../UI/FlatButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -13,7 +11,6 @@ import InstructionParametersEditor from './InstructionParametersEditor';
 import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
-import { Column } from '../../UI/Grid';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -28,14 +25,9 @@ import {
   enumerateInstructions,
   getObjectParameterIndex,
 } from './InstructionOrExpressionSelector/EnumerateInstructions';
-import HelpButton from '../../UI/HelpButton';
-import Background from '../../UI/Background';
 import { type EventsScope } from '../EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
-import {
-  ResponsiveWidthMeasurer,
-  type WidthType,
-} from '../../UI/Reponsive/ResponsiveWidthMeasurer';
+
 const gd = global.gd;
 
 const styles = {
@@ -43,13 +35,12 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    height: '400px',
+    width: '400px',
   },
 };
 
-type StepName =
-  | 'object-or-free-instructions'
-  | 'object-instructions'
-  | 'parameters';
+type StepName = 'object-or-free-instructions' | 'object-instructions';
 
 type Props = {|
   project: gdProject,
@@ -62,6 +53,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   style?: Object,
+  inlineInstructionEditorAnchorEl?: any,
   isNewInstruction: boolean,
   onCancel: () => void,
   onSubmit: () => void,
@@ -70,7 +62,6 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
-  inlineInstructionEditorAnchorEl?: any,
 |};
 type State = {|
   step: StepName,
@@ -87,7 +78,28 @@ const findInstruction = (
   return list.find(({ type }) => type === instructionType);
 };
 
-export default class NewInstructionEditorDialog extends React.Component<
+// TODO move to utils
+const setupInstruction = (
+  instruction: gdInstruction,
+  instructionMetadata: gdInstructionMetadata,
+  objectName: ?string
+) => {
+  instruction.setParametersCount(instructionMetadata.getParametersCount());
+
+  if (objectName) {
+    const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
+    if (objectParameterIndex === -1) {
+      console.error(
+        `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
+      );
+      return;
+    }
+
+    instruction.setParameter(objectParameterIndex, objectName);
+  }
+};
+
+export default class NewInstructionEditorMenu extends React.Component<
   Props,
   State
 > {
@@ -120,9 +132,7 @@ export default class NewInstructionEditorDialog extends React.Component<
               instruction.getParameter(objectParameterIndex),
               false /* Even if the instruction is invalid for the object, show it as it's what we have already */
             ),
-            step: isNewInstruction
-              ? 'object-or-free-instructions'
-              : 'parameters',
+            step: 'object-or-free-instructions',
             currentInstructionOrObjectSelectorTab: 'objects',
           };
         }
@@ -134,7 +144,7 @@ export default class NewInstructionEditorDialog extends React.Component<
       chosenObjectName: null,
       chosenObjectInstructionsInfo: null,
       chosenObjectInstructionsInfoTree: null,
-      step: isNewInstruction ? 'object-or-free-instructions' : 'parameters',
+      step: 'object-or-free-instructions',
       currentInstructionOrObjectSelectorTab: isNewInstruction
         ? 'objects'
         : 'free-instructions',
@@ -150,7 +160,7 @@ export default class NewInstructionEditorDialog extends React.Component<
         chosenObjectInstructionsInfo: null,
         chosenObjectInstructionsInfoTree: null,
       },
-      () => this._stepToParameters()
+      () => this._onSubmitInstruction()
     );
   };
 
@@ -202,39 +212,22 @@ export default class NewInstructionEditorDialog extends React.Component<
     };
   }
 
+  _onSubmitInstruction = () => {
+    const { instruction, onSubmit } = this.props;
+    const { chosenObjectName } = this.state;
+    const instructionMetadata = this._getInstructionMetadata();
+    if (instructionMetadata) {
+      setupInstruction(instruction, instructionMetadata, chosenObjectName);
+    }
+    onSubmit();
+  };
+
   _chooseObjectInstruction = (type: string) => {
     const { instruction } = this.props;
+    const { chosenObjectName } = this.state;
     instruction.setType(type);
-    this._stepToParameters();
-  };
-
-  _stepBackFrom = (origin: StepName, width: WidthType) => {
-    if (origin === 'parameters' && this.state.chosenObjectName) {
-      return this.setState({
-        // "medium" displays 2 columns, so "Back" button should go back to the first screen.
-        step:
-          width === 'medium'
-            ? 'object-or-free-instructions'
-            : 'object-instructions',
-      });
-    } else {
-      return this.setState({
-        step: 'object-or-free-instructions',
-      });
-    }
-  };
-
-  _stepToParameters = () => {
-    this.setState(
-      {
-        step: 'parameters',
-      },
-      () => {
-        if (this._instructionParametersEditor) {
-          this._instructionParametersEditor.focus();
-        }
-      }
-    );
+    if (chosenObjectName) this._chooseObject(chosenObjectName);
+    this._onSubmitInstruction();
   };
 
   // TODO: This was copied from InstructionParametersEditor. Move this to a helper
@@ -271,14 +264,13 @@ export default class NewInstructionEditorDialog extends React.Component<
   render() {
     const {
       project,
-      scope,
       globalObjectsContainer,
       objectsContainer,
       onCancel,
-      onSubmit,
       open,
       instruction,
       isCondition,
+      inlineInstructionEditorAnchorEl,
     } = this.props;
     const {
       step,
@@ -289,54 +281,23 @@ export default class NewInstructionEditorDialog extends React.Component<
     } = this.state;
     const instructionType: string = instruction.getType();
 
-    const instructionMetadata = this._getInstructionMetadata();
-    const instructionHelpPage = instructionMetadata
-      ? instructionMetadata.getHelpPath()
-      : undefined;
-
     const renderInstructionOrObjectSelector = () => (
-      <Background noFullHeight key="instruction-or-object-selector">
-        <InstructionOrObjectSelector
-          style={styles.fullHeightSelector}
-          project={project}
-          currentTab={currentInstructionOrObjectSelectorTab}
-          onChangeTab={this._changeTab}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          isCondition={isCondition}
-          chosenInstructionType={
-            !chosenObjectName ? instructionType : undefined
-          }
-          onChooseInstruction={this._chooseFreeInstruction}
-          chosenObjectName={chosenObjectName}
-          onChooseObject={this._chooseObject}
-          focusOnMount={!instructionType}
-          onSearchStartOrReset={this._forceUpdate}
-        />
-      </Background>
-    );
-
-    const renderParameters = () => (
-      <Column expand justifyContent="center" key="parameters">
-        <InstructionParametersEditor
-          project={project}
-          scope={scope}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          objectName={chosenObjectName}
-          isCondition={isCondition}
-          instruction={instruction}
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this.props.onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
-          openInstructionOrExpression={this.props.openInstructionOrExpression}
-          ref={instructionParametersEditor =>
-            (this._instructionParametersEditor = instructionParametersEditor)
-          }
-          focusOnMount={!!instructionType}
-          noHelpButton
-        />
-      </Column>
+      <InstructionOrObjectSelector
+        key="instruction-or-object-selector"
+        style={styles.fullHeightSelector}
+        project={project}
+        currentTab={currentInstructionOrObjectSelectorTab}
+        onChangeTab={this._changeTab}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
+        isCondition={isCondition}
+        chosenInstructionType={!chosenObjectName ? instructionType : undefined}
+        onChooseInstruction={this._chooseFreeInstruction}
+        chosenObjectName={chosenObjectName}
+        onChooseObject={this._chooseObject}
+        focusOnMount={!instructionType}
+        onSearchStartOrReset={this._forceUpdate}
+      />
     );
 
     const renderObjectInstructionSelector = () =>
@@ -357,97 +318,33 @@ export default class NewInstructionEditorDialog extends React.Component<
       ) : null;
 
     return (
-      <ResponsiveWidthMeasurer>
-        {width => (
-          <Dialog
-            actions={[
-              <FlatButton
-                label={<Trans>Cancel</Trans>}
-                primary={false}
-                onClick={onCancel}
-                key="cancel"
-              />,
-              <FlatButton
-                label={<Trans>Ok</Trans>}
-                primary={true}
-                keyboardFocused={false}
-                disabled={!instructionType}
-                onClick={onSubmit}
-                key="ok"
-              />,
-            ]}
-            secondaryActions={[
-              width !== 'large' && step !== 'object-or-free-instructions' ? (
-                <FlatButton
-                  label={<Trans>Back</Trans>}
-                  primary={false}
-                  onClick={() => this._stepBackFrom(step, width)}
-                  key="back"
-                />
-              ) : null,
-              <HelpButton
-                key="help"
-                helpPagePath={instructionHelpPage || '/events'}
-                label={
-                  !instructionHelpPage ||
-                  (width === 'small' ||
-                    step === 'object-or-free-instructions') ? (
-                    <Trans>Help</Trans>
-                  ) : this.props.isCondition ? (
-                    <Trans>Help for this condition</Trans>
-                  ) : (
-                    <Trans>Help for this action</Trans>
-                  )
-                }
-              />,
-            ]}
-            open={open}
-            onRequestClose={onCancel}
-            maxWidth={false}
-            noMargin
-            flexRowBody
-          >
-            <SelectColumns
-              columnsRenderer={{
-                'instruction-or-object-selector': renderInstructionOrObjectSelector,
-                'object-instruction-selector': renderObjectInstructionSelector,
-                parameters: renderParameters,
-              }}
-              getColumns={() => {
-                if (width === 'large') {
-                  if (chosenObjectName) {
-                    return [
-                      'instruction-or-object-selector',
-                      'object-instruction-selector',
-                      'parameters',
-                    ];
-                  } else {
-                    return ['instruction-or-object-selector', 'parameters'];
-                  }
-                } else if (width === 'medium') {
-                  if (step === 'object-or-free-instructions') {
-                    return ['instruction-or-object-selector'];
-                  } else {
-                    if (chosenObjectName) {
-                      return ['object-instruction-selector', 'parameters'];
-                    } else {
-                      return ['parameters'];
-                    }
-                  }
-                } else {
-                  if (step === 'object-or-free-instructions') {
-                    return ['instruction-or-object-selector'];
-                  } else if (step === 'object-instructions') {
-                    return ['object-instruction-selector'];
-                  } else {
-                    return ['parameters'];
-                  }
-                }
-              }}
-            />
-          </Dialog>
-        )}
-      </ResponsiveWidthMeasurer>
+      <Popover
+        open={open}
+        onClose={onCancel}
+        anchorEl={inlineInstructionEditorAnchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <SelectColumns
+          columnsRenderer={{
+            'instruction-or-object-selector': renderInstructionOrObjectSelector,
+            'object-instruction-selector': renderObjectInstructionSelector,
+          }}
+          getColumns={() => {
+            if (step === 'object-or-free-instructions') {
+              return ['instruction-or-object-selector'];
+            } else {
+              return ['object-instruction-selector'];
+            }
+          }}
+        />
+      </Popover>
     );
   }
 }

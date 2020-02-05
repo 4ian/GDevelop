@@ -33,11 +33,7 @@ type Props = {
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (
-    x: number,
-    y: number,
-    InstructionsListContext
-  ) => void,
+  onInstructionsListContextMenu: (any, InstructionsListContext) => void,
   onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
@@ -187,8 +183,7 @@ export default class InstructionsList extends React.Component<Props, State> {
                   onContextMenu={e => {
                     e.stopPropagation();
                     onInstructionsListContextMenu(
-                      e.clientX,
-                      e.clientY,
+                      e.currentTarget,
                       instructionsListContext
                     );
                   }}
@@ -197,7 +192,6 @@ export default class InstructionsList extends React.Component<Props, State> {
                 </button>
                 {canPaste && (
                   <span>
-                    {' '}
                     <button
                       style={styles.addButton}
                       className="add-link"

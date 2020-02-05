@@ -29,7 +29,7 @@
 }
 
 .gd-events-sheet-dark-theme .rst__moveHandle:hover {
-  background-color: #767676!important;
+  background-color: #767676 !important;
 }
 
 /**
@@ -123,6 +123,15 @@
 
 .gd-events-sheet-dark-theme .instruction-parameter.expression {
   color: #e8dc59;
+}
+
+.gd-events-sheet-dark-theme .name-and-icon-container:empty,
+.gd-events-sheet-dark-theme .instruction-parameter:empty {
+  display: inline-flex;
+  background-color: rgba(238, 255, 0, 0.05);
+  border-bottom: 1px dashed #ff0071;
+  min-width: 25px;
+  min-height: 14px;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.object,

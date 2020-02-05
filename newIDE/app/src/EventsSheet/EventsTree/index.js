@@ -60,11 +60,7 @@ type EventsContainerProps = {|
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (
-    x: number,
-    y: number,
-    InstructionsListContext
-  ) => void,
+  onInstructionsListContextMenu: (any, InstructionsListContext) => void,
   onParameterClick: ParameterContext => void,
 
   onEventClick: (eventContext: EventContext) => void,
@@ -183,11 +179,7 @@ type EventsTreeProps = {|
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (
-    x: number,
-    y: number,
-    InstructionsListContext
-  ) => void,
+  onInstructionsListContextMenu: (any, InstructionsListContext) => void,
   onParameterClick: ParameterContext => void,
 
   onEventClick: (eventContext: EventContext) => void,

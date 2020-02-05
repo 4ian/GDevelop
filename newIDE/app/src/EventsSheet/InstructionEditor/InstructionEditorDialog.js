@@ -31,6 +31,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  inlineInstructionEditorAnchorEl?: any,
 |};
 type State = {||};
 

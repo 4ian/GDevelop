@@ -4,6 +4,7 @@ import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
+import NewInstructionEditorMenu from './InstructionEditor/NewInstructionEditorMenu';
 import EventTextDialog, {
   filterEditableWithEventTextDialog,
 } from './InstructionEditor/EventTextDialog';
@@ -41,7 +42,6 @@ import {
   clearSelection,
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
-  selectInstructionsList,
 } from './SelectionHandler';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
@@ -130,6 +130,7 @@ type State = {|
 
   inlineEditing: boolean,
   inlineEditingAnchorEl: ?any,
+  inlineInstructionEditorAnchorEl: ?any,
   inlineEditingChangesMade: boolean,
 
   analyzedEventsContextResult: ?EventsContextResult,
@@ -179,7 +180,6 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
-  instructionsListContextMenu: ContextMenu;
 
   state = {
     history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
@@ -201,6 +201,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     inlineEditing: false,
     inlineEditingAnchorEl: null,
+    inlineInstructionEditorAnchorEl: null,
     inlineEditingChangesMade: false,
 
     analyzedEventsContextResult: null,
@@ -387,8 +388,19 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
+  openInstructionsListContextMenu = (
+    inlineInstructionEditorAnchorEl: any,
+    instructionsListContext: InstructionsListContext
+  ) => {
+    this.openInstructionEditor(
+      instructionsListContext,
+      inlineInstructionEditorAnchorEl
+    );
+  };
+
   openInstructionEditor = (
-    instructionContext: InstructionContext | InstructionsListContext
+    instructionContext: InstructionContext | InstructionsListContext,
+    inlineInstructionEditorAnchorEl?: any = null
   ) => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
@@ -398,6 +410,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     }
 
     this.setState({
+      inlineInstructionEditorAnchorEl,
       editedInstruction: {
         instrsList: instructionContext.instrsList,
         isCondition: instructionContext.isCondition,
@@ -515,26 +528,6 @@ export default class EventsSheet extends React.Component<Props, State> {
       () => {
         this.updateToolbar();
         this.instructionContextMenu.open(x, y);
-      }
-    );
-  };
-
-  openInstructionsListContextMenu = (
-    x: number,
-    y: number,
-    instructionsListContext: InstructionsListContext
-  ) => {
-    this.setState(
-      {
-        selection: selectInstructionsList(
-          this.state.selection,
-          instructionsListContext,
-          false
-        ),
-      },
-      () => {
-        this.updateToolbar();
-        this.instructionsListContextMenu.open(x, y);
       }
     );
   };
@@ -896,8 +889,11 @@ export default class EventsSheet extends React.Component<Props, State> {
       objectsContainer,
     } = this.props;
 
+    const NewInstruction = this.state.inlineInstructionEditorAnchorEl
+      ? NewInstructionEditorMenu
+      : NewInstructionEditorDialog;
     const Dialog = newInstructionEditorDialog
-      ? NewInstructionEditorDialog
+      ? NewInstruction
       : InstructionEditorDialog;
 
     return this.state.editedInstruction.instruction ? (
@@ -910,6 +906,9 @@ export default class EventsSheet extends React.Component<Props, State> {
         isCondition={this.state.editedInstruction.isCondition}
         isNewInstruction={
           this.state.editedInstruction.indexInList === undefined
+        }
+        inlineInstructionEditorAnchorEl={
+          this.state.inlineInstructionEditorAnchorEl
         }
         open={true}
         onCancel={() => this.closeInstructionEditor()}
@@ -1266,34 +1265,6 @@ export default class EventsSheet extends React.Component<Props, State> {
                               visible: hasSelectedAtLeastOneCondition(
                                 this.state.selection
                               ),
-                            },
-                          ]}
-                        />
-                        <ContextMenu
-                          ref={instructionsListContextMenu =>
-                            (this.instructionsListContextMenu = instructionsListContextMenu)
-                          }
-                          buildMenuTemplate={() => [
-                            {
-                              label: 'Paste',
-                              click: () => this.pasteInstructions(),
-                              enabled:
-                                hasClipboardConditions() ||
-                                hasClipboardActions(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Undo',
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: 'Redo',
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
                             },
                           ]}
                         />

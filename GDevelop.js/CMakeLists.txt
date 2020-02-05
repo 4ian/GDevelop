@@ -66,8 +66,14 @@ add_executable(
 	"Bindings/ObjectJsImplementation.cpp"
 	"Bindings/BehaviorSharedDataJsImplementation.cpp"
 )
-#target_link_libraries(GD "-O0") # Disable optimizations at linking time for much faster builds.
-target_link_libraries(GD "-O2")
+MESSAGE(STATUS "DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS: ${DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS}")
+IF(DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS)
+	# Disable optimizations at linking time for much faster builds.
+	MESSAGE(STATUS "Disabling optimization at link time for (slightly) faster build")
+	target_link_libraries(GD "-O0")
+ELSE()
+	target_link_libraries(GD "-O2")
+ENDIF()
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/glue.js")
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/postjs.js")
 target_link_libraries(GD "-s MODULARIZE=1")

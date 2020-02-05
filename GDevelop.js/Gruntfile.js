@@ -3,13 +3,14 @@
 module.exports = function(grunt) {
   const fs = require('fs');
   const isWin = /^win/.test(process.platform);
+  const isDev = grunt.option('dev') || false;
 
   const buildOutputPath = '../Binaries/embuild/GDevelop.js/';
   const buildPath = '../Binaries/embuild';
 
   let cmakeBinary = 'emconfigure cmake';
   let makeBinary = 'emmake make';
-  let cmakeArgs = '';
+  let cmakeGeneratorArg = '';
 
   // Use more specific paths on Windows
   if (isWin) {
@@ -25,7 +26,9 @@ module.exports = function(grunt) {
     // Find CMake in usual folders or fallback to PATH.
     if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake.exe')) {
       cmakeBinary = 'emconfigure "C:\\Program Files\\CMake\\bin\\cmake"';
-    } else if (fs.existsSync('C:\\Program Files (x86)\\CMake\\bin\\cmake.exe')) {
+    } else if (
+      fs.existsSync('C:\\Program Files (x86)\\CMake\\bin\\cmake.exe')
+    ) {
       cmakeBinary = 'emconfigure "C:\\Program Files (x86)\\CMake\\bin\\cmake"';
     } else {
       console.log(
@@ -33,7 +36,7 @@ module.exports = function(grunt) {
       );
     }
 
-    cmakeArgs = '-G "MinGW Makefiles"';
+    cmakeGeneratorArg = '-G "MinGW Makefiles"';
   }
 
   grunt.initConfig({
@@ -49,7 +52,17 @@ module.exports = function(grunt) {
       cmake: {
         src: [buildPath + '/CMakeCache.txt', 'CMakeLists.txt'],
         command:
-          cmakeBinary + ' ' + cmakeArgs + ' ../.. -DFULL_VERSION_NUMBER=FALSE',
+          cmakeBinary +
+          ' ' +
+          [
+            cmakeGeneratorArg,
+            '../..',
+            '-DFULL_VERSION_NUMBER=FALSE',
+            // Disable optimizations at linking time for much faster builds.
+            isDev
+              ? '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=TRUE'
+              : '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=FALSE',
+          ].join(' '),
         options: {
           execOptions: {
             cwd: buildPath,
@@ -77,7 +90,11 @@ module.exports = function(grunt) {
     clean: {
       options: { force: true },
       build: {
-        src: [buildPath, buildOutputPath + 'libGD.js', buildOutputPath + 'libGD.js.mem'],
+        src: [
+          buildPath,
+          buildOutputPath + 'libGD.js',
+          buildOutputPath + 'libGD.js.mem',
+        ],
       },
     },
     copy: {
@@ -102,12 +119,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mkdir');
   grunt.registerTask('build:raw', [
     'mkdir:embuild',
-    'newer:shell:cmake',
+    'shell:cmake',
     'newer:shell:updateGDBindings',
     'shell:make',
   ]);
-  grunt.registerTask('build', [
-    'build:raw',
-    'copy:newIDE',
-  ]);
+  grunt.registerTask('build', ['build:raw', 'copy:newIDE']);
 };

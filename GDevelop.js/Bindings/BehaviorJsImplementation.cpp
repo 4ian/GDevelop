@@ -65,7 +65,7 @@ bool BehaviorJsImplementation::UpdateProperty(gd::SerializerElement& behaviorCon
           throw 'updateProperty is not defined on a BehaviorJsImplementation.';
 
         self['updateProperty'](
-            wrapPointer($1, Module['SerializerElement']), Pointer_stringify($2), Pointer_stringify($3));
+            wrapPointer($1, Module['SerializerElement']), UTF8ToString($2), UTF8ToString($3));
       },
       (int)this,
       (int)&behaviorContent,

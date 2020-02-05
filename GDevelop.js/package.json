@@ -33,8 +33,13 @@
     "jest": "^23.5.0"
   },
   "jest": {
+    "testEnvironment": "node",
     "transformIgnorePatterns": [
-      "../Binaries/Output/libGD.js/Release/libGD.js"
+      "../Binaries/embuild/GDevelop.js/libGD.js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/emsdk/",
+      "<rootDir>/node_modules/"
     ]
   }
 }

@@ -14,16 +14,14 @@ This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Co
 
 - Install [Emscripten](https://github.com/kripken/emscripten), as explained on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 
-| Linux/macOS | Windows |
-|-------------|---------|
+| Linux/macOS                                  | Windows                                      |
+| -------------------------------------------- | -------------------------------------------- |
 | `git clone https://github.com/juj/emsdk.git` | `git clone https://github.com/juj/emsdk.git` |
-| `cd emsdk`   | `cd emsdk`|
-| `./emsdk update` | `emsdk update` |
-| `./emsdk install sdk-fastcomp-1.37.37-64bit` | `emsdk install sdk-fastcomp-1.37.37-64bit` |
-| `./emsdk activate sdk-fastcomp-1.37.37-64bit` | `emsdk activate sdk-fastcomp-1.37.37-64bit` |
-| `source ./emsdk_env.sh` | `emsdk_env.bat` |
-
-> For up-to-date information, check again [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html).
+| `cd emsdk`                                   | `cd emsdk`                                   |
+| `./emsdk update`                             | `emsdk update`                               |
+| `./emsdk install 1.39.6`                     | `emsdk install 1.39.6`                       |
+| `./emsdk activate 1.39.6`                    | `emsdk activate 1.39.6`                      |
+| `source ./emsdk_env.sh`                      | `emsdk_env.bat`                              |
 
 - Launch the build from GDevelop.js folder:
 
@@ -33,7 +31,9 @@ This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Co
     npm run build
 ```
 
-Output is created in _/path/to/GD/Binaries/Output/libGD.js/_.
+> ℹ️ Output is created in _/path/to/GD/Binaries/embuild/GDevelop.js/_ and also copied to GDevelop 5 IDE (`newIDE` folder).
+
+> ⏱ As the linking (last step) of the build can be very long, you can run `npm run build -- --dev` to disable temporary optimizations and get a (slightly) faster build.
 
 - You can then launch GDevelop 5 that will use your build of GDevelop.js:
 

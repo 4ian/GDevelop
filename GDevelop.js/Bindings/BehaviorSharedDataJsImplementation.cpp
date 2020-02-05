@@ -73,8 +73,8 @@ bool BehaviorSharedDataJsImplementation::UpdateProperty(
           throw 'updateProperty is not defined on a BehaviorSharedDataJsImplementation.';
 
         self['updateProperty'](wrapPointer($1, Module['SerializerElement']),
-                               Pointer_stringify($2),
-                               Pointer_stringify($3));
+                               UTF8ToString($2),
+                               UTF8ToString($3));
       },
       (int)this,
       (int)&behaviorSharedDataContent,

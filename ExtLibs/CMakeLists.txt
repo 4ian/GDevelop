@@ -1,6 +1,8 @@
-#Clone SFML from its official directory using Git
+# Clone SFML from its official directory using Git. Only
+# do it if not already cloned to avoid triggering a whole
+# recompilation every time CMake is run.
 find_package(Git)
-if(GIT_FOUND)
+if(GIT_FOUND AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/SFML/readme.txt")
 	message( "Cloning SFML in ExtLibs/SFML with Git..." )
 	execute_process(
 		COMMAND ${GIT_EXECUTABLE} clone "https://www.github.com/SFML/SFML.git" SFML
@@ -11,7 +13,7 @@ if(GIT_FOUND)
 	execute_process(
 		COMMAND ${GIT_EXECUTABLE} reset --hard 2.4.1
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SFML
-		OUTPUT_QUIET) 
+		OUTPUT_QUIET)
 
 	message( "Applying the patches..." )
 	file(GLOB SFML_PATCHES

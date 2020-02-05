@@ -1,8 +1,11 @@
-const initGDevelopJS = require('../../Binaries/Output/libGD.js/Release/libGD.js');
+const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 
 describe('libGD.js object serialization', function() {
   let gd = null;
-  beforeAll(() => (gd = initGDevelopJS()));
+  beforeAll((done) => (initializeGDevelopJs().then(module => {
+    gd = module;
+    done();
+  })));
 
   describe('gd.SerializerElement', function() {
     it('should support operations on its value', function() {
@@ -13,8 +16,8 @@ describe('libGD.js object serialization', function() {
       element.setIntValue(123);
       expect(element.getIntValue()).toBe(123);
 
-      element.setDoubleValue(123.456);
-      expect(element.getDoubleValue()).toBe(123.456);
+      element.setDoubleValue(123.457);
+      expect(element.getDoubleValue()).toBeCloseTo(123.457);
     });
     it('should cast values from a type to another', function() {
       var element = new gd.SerializerElement();

@@ -2,28 +2,58 @@ var shell = require('shelljs');
 var https = require('follow-redirects').https;
 var fs = require('fs');
 
-var sourceFile = '../../../Binaries/Output/libGD.js/Release/libGD.js';
+const downloadFile = (url, filePath) =>
+  new Promise((resolve, reject) => {
+    var request = https.get(url, function(response) {
+      if (response.statusCode !== 200) {
+        reject({
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        });
+        return;
+      }
+
+      const file = fs.createWriteStream(filePath);
+      response.pipe(file).on('finish', function() {
+        resolve();
+      });
+    });
+    request.on('error', function(err) {
+      reject({
+        statusCode: 0,
+        statusMessage: err.message,
+      });
+    });
+  });
+
+var sourceJsFile = '../../../Binaries/embuild/GDevelop.js/libGD.js';
+var sourceJsMemFile = '../../../Binaries/embuild/GDevelop.js/libGD.js.mem';
 var destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
 var alreadyHasLibGdJs =
   shell.test('-f', '../public/libGD.js') &&
-  shell.test('-f', destinationTestDirectory + '/index.js');
+  shell.test('-f', '../public/libGD.js.mem') &&
+  shell.test('-f', destinationTestDirectory + '/index.js') &&
+  shell.test('-f', destinationTestDirectory + '/libGD.js.mem');
 
 if (shell.mkdir('-p', destinationTestDirectory).stderr) {
   shell.echo('❌ Error while creating node_modules folder for libGD.js');
 }
 
-if (shell.test('-f', sourceFile)) {
+if (shell.test('-f', sourceJsFile) && shell.test('-f', sourceJsMemFile)) {
   // Copy the file built locally
   if (
-    !shell.cp(sourceFile, '../public').stderr &&
-    !shell.cp(sourceFile, destinationTestDirectory + '/index.js').stderr
+    !shell.cp(sourceJsFile, '../public').stderr &&
+    !shell.cp(sourceJsFile, destinationTestDirectory + '/index.js').stderr &&
+    !shell.cp(sourceJsMemFile, '../public').stderr &&
+    !shell.cp(sourceJsMemFile, destinationTestDirectory + '/libGD.js.mem')
+      .stderr
   ) {
     shell.echo(
-      '✅ Copied libGD.js from Binaries/Output/libGD.js/Release to public and node_modules folder'
+      '✅ Copied libGD.js (and libGD.js.mem) from Binaries/embuild/GDevelop.js to public and node_modules folder'
     );
   } else {
     shell.echo(
-      '❌ Error while copying libGD.js from Binaries/Output/libGD.js/Release'
+      '❌ Error while copying libGD.js (and libGD.js.mem) from Binaries/embuild/GDevelop.js'
     );
   }
 } else {
@@ -61,9 +91,11 @@ if (shell.test('-f', sourceFile)) {
       var hash = (hashShellString.stdout || 'unknown-hash').trim();
       var branch = (branchShellString.stdout || 'unknown-branch').trim();
 
-      resolve(downloadLibGdJs(
-        `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}/libGD.js`
-      ));
+      resolve(
+        downloadLibGdJs(
+          `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
+        )
+      );
     });
 
   // Try to download libGD.js from the latest version built for master branch.
@@ -71,59 +103,56 @@ if (shell.test('-f', sourceFile)) {
     shell.echo(`ℹ️ Trying to download libGD.js from master, latest build.`);
 
     return downloadLibGdJs(
-      `https://s3.amazonaws.com/gdevelop-gdevelop.js/master/latest/libGD.js`
+      `https://s3.amazonaws.com/gdevelop-gdevelop.js/master/latest`
     );
   };
 
-  const downloadLibGdJs = url =>
-    new Promise((resolve, reject) => {
-      var request = https.get(url, function(response) {
-        if (response.statusCode === 403) {
-          shell.echo(`⚠️ Can't download libGD.js (can't find url: ${url}).`);
+  const downloadLibGdJs = baseUrl =>
+    Promise.all([
+      downloadFile(baseUrl + '/libGD.js', '../public/libGD.js'),
+      downloadFile(baseUrl + '/libGD.js.mem', '../public/libGD.js.mem'),
+    ]).then(
+      responses => {},
+      error => {
+        if (error.statusCode === 403) {
           shell.echo(
             `ℹ️ Maybe libGD.js was not automatically built yet, try again in a few minutes.`
           );
-
-          reject();
-          return;
+          throw error;
         }
-        if (response.statusCode !== 200) {
+        if (error.statusCode === 0) {
           shell.echo(
-            `⚠️ Can't download libGD.js (${
-              response.statusMessage
-            }) (url=${url}), try again later.`
+            `⚠️ Can't download libGD.js (error: ${
+              error.statusMessage
+            }) (baseUrl=${baseUrl}), please check your internet connection.`
           );
-          reject();
-          return;
+          throw error;
         }
 
-        resolve(response);
-      });
-      request.on('error', function(err) {
         shell.echo(
-          `⚠️ Can't download libGD.js (error: ${
-            err.message
-          }) (url=${url}), please check your internet connection.`
+          `⚠️ Can't download libGD.js (${
+            error.statusMessage
+          }) (baseUrl=${baseUrl}), try again later.`
         );
-        reject();
-        return;
-      });
-    });
+        throw error;
+      }
+    );
 
   const onLibGdJsDownloaded = response => {
-    var file = fs.createWriteStream('../public/libGD.js');
-    response.pipe(file).on('finish', function() {
-      shell.echo('✅ libGD.js downloaded and stored in public/libGD.js');
+    shell.echo('✅ libGD.js downloaded and stored in public/libGD.js');
 
-      if (
-        !shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js')
-          .stderr
-      ) {
-        shell.echo('✅ Copied libGD.js to node_modules folder');
-      } else {
-        shell.echo('❌ Error while copying libGD.js to node_modules folder');
-      }
-    });
+    if (
+      !shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js')
+        .stderr &&
+      !shell.cp(
+        '../public/libGD.js.mem',
+        destinationTestDirectory + '/libGD.js.mem'
+      ).stderr
+    ) {
+      shell.echo('✅ Copied libGD.js to node_modules folder');
+    } else {
+      shell.echo('❌ Error while copying libGD.js to node_modules folder');
+    }
   };
 
   // Try to download the latest libGD.js, fallback to previous or master ones

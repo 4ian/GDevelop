@@ -97,7 +97,7 @@ class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
               Module['getCache'](Module['ArbitraryResourceWorkerJS'])[$0];
           if (!self.hasOwnProperty('exposeImage'))
             throw 'a JSImplementation must implement all functions, you forgot ArbitraryResourceWorkerJS::exposeImage.';
-          return ensureString(self.exposeImage(Pointer_stringify($1)));
+          return ensureString(self.exposeImage(UTF8ToString($1)));
         },
         (int)this,
         arg0.c_str());
@@ -109,7 +109,7 @@ class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
               Module['getCache'](Module['ArbitraryResourceWorkerJS'])[$0];
           if (!self.hasOwnProperty('exposeShader'))
             throw 'a JSImplementation must implement all functions, you forgot ArbitraryResourceWorkerJS::exposeShader.';
-          return ensureString(self.exposeShader(Pointer_stringify($1)));
+          return ensureString(self.exposeShader(UTF8ToString($1)));
         },
         (int)this,
         arg0.c_str());
@@ -121,7 +121,7 @@ class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
               Module['getCache'](Module['ArbitraryResourceWorkerJS'])[$0];
           if (!self.hasOwnProperty('exposeFile'))
             throw 'a JSImplementation must implement all functions, you forgot ArbitraryResourceWorkerJS::exposeFile.';
-          return ensureString(self.exposeFile(Pointer_stringify($1)));
+          return ensureString(self.exposeFile(UTF8ToString($1)));
         },
         (int)this,
         arg0.c_str());
@@ -140,7 +140,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('mkDir'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::mkDir.';
-          self.mkDir(Pointer_stringify($1));
+          self.mkDir(UTF8ToString($1));
         },
         (int)this,
         path.c_str());
@@ -151,7 +151,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('dirExists'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::dirExists.';
-          return self.dirExists(Pointer_stringify($1));
+          return self.dirExists(UTF8ToString($1));
         },
         (int)this,
         path.c_str());
@@ -163,7 +163,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('fileExists'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::fileExists.';
-          return self.fileExists(Pointer_stringify($1));
+          return self.fileExists(UTF8ToString($1));
         },
         (int)this,
         path.c_str());
@@ -175,7 +175,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('fileNameFrom'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::fileNameFrom.';
-          return ensureString(self.fileNameFrom(Pointer_stringify($1)));
+          return ensureString(self.fileNameFrom(UTF8ToString($1)));
         },
         (int)this,
         file.c_str());
@@ -187,7 +187,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('dirNameFrom'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::dirNameFrom.';
-          return ensureString(self.dirNameFrom(Pointer_stringify($1)));
+          return ensureString(self.dirNameFrom(UTF8ToString($1)));
         },
         (int)this,
         file.c_str());
@@ -201,7 +201,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           if (!self.hasOwnProperty('makeAbsolute'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::makeAbsolute.';
           return ensureString(
-              self.makeAbsolute(Pointer_stringify($1), Pointer_stringify($2)));
+              self.makeAbsolute(UTF8ToString($1), UTF8ToString($2)));
         },
         (int)this,
         filename.c_str(),
@@ -218,7 +218,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           if (!self.hasOwnProperty('makeRelative'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::makeRelative.';
           return ensureString(
-              self.makeRelative(Pointer_stringify($1), Pointer_stringify($2)));
+              self.makeRelative(UTF8ToString($1), UTF8ToString($2)));
         },
         (int)this,
         filename.c_str(),
@@ -233,7 +233,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('isAbsolute'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::isAbsolute.';
-          return self.isAbsolute(Pointer_stringify($1));
+          return self.isAbsolute(UTF8ToString($1));
         },
         (int)this,
         filename.c_str());
@@ -245,7 +245,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('copyFile'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::copyFile.';
-          return self.copyFile(Pointer_stringify($1), Pointer_stringify($2));
+          return self.copyFile(UTF8ToString($1), UTF8ToString($2));
         },
         (int)this,
         file.c_str(),
@@ -258,7 +258,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('clearDir'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::clearDir.';
-          return self.clearDir(Pointer_stringify($1));
+          return self.clearDir(UTF8ToString($1));
         },
         (int)this,
         directory.c_str());
@@ -270,7 +270,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('writeToFile'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::writeToFile.';
-          return self.writeToFile(Pointer_stringify($1), Pointer_stringify($2));
+          return self.writeToFile(UTF8ToString($1), UTF8ToString($2));
         },
         (int)this,
         file.c_str(),
@@ -283,7 +283,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('readFile'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::readFile.';
-          return ensureString(self.readFile(Pointer_stringify($1)));
+          return ensureString(self.readFile(UTF8ToString($1)));
         },
         (int)this,
         file.c_str());
@@ -306,7 +306,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('readDir'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::readDir.';
-          return self.readDir(Pointer_stringify($1), Pointer_stringify($2)).ptr;
+          return self.readDir(UTF8ToString($1), UTF8ToString($2)).ptr;
         },
         (int)this,
         path.c_str(),

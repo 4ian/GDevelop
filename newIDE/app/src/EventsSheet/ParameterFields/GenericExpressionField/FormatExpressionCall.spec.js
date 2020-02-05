@@ -6,13 +6,8 @@ import {
 } from '../../InstructionEditor/InstructionOrExpressionSelector/EnumerateExpressions';
 
 describe('HelpButton', () => {
-  const {
-    freeExpressions,
-    objectsExpressions,
-    behaviorsExpressions,
-  } = enumerateExpressions('number');
-
   it('properly format a free function, with one or more arguments', () => {
+    const { freeExpressions } = enumerateExpressions('number');
     const countExpression = filterExpressions(freeExpressions, 'Count')[0];
     expect(formatExpressionCall(countExpression, ['MyObject'])).toBe(
       'Count(MyObject)'
@@ -25,6 +20,7 @@ describe('HelpButton', () => {
   });
 
   it('properly format a free function, with "code-only" parameters', () => {
+    const { freeExpressions } = enumerateExpressions('number');
     const cameraHeightExpression = filterExpressions(
       freeExpressions,
       'CameraHeight'
@@ -35,6 +31,7 @@ describe('HelpButton', () => {
   });
 
   it('properly format an object function', () => {
+    const { objectsExpressions } = enumerateExpressions('number');
     const variableStringExpression = filterExpressions(
       objectsExpressions,
       'Variable'
@@ -45,6 +42,7 @@ describe('HelpButton', () => {
   });
 
   it('properly format an object function with an argument', () => {
+    const { objectsExpressions } = enumerateExpressions('number');
     const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
     expect(
       formatExpressionCall(pointXExpression, ['MyObject', 'MyPoint'])
@@ -52,6 +50,7 @@ describe('HelpButton', () => {
   });
 
   it('properly format an object behavior function', () => {
+    const { behaviorsExpressions } = enumerateExpressions('number');
     const variableStringExpression = filterExpressions(
       behaviorsExpressions,
       'JumpSpeed'

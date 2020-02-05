@@ -1,10 +1,15 @@
-const initGDevelopJS = require('../../Binaries/Output/libGD.js/Release/libGD.js');
+const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 const path = require('path');
 const extend = require('extend');
 
 describe('libGD.js', function() {
   let gd = null;
-  beforeAll(() => (gd = initGDevelopJS()));
+  beforeAll(done =>
+    initializeGDevelopJs().then(module => {
+      gd = module;
+      done();
+    })
+  );
 
   describe('gd.VersionWrapper', function() {
     it('can return the version number of the library', function() {
@@ -1833,8 +1838,6 @@ describe('libGD.js', function() {
 
   describe('InstructionSentenceFormatter', function() {
     it('should translate instructions (plain text or into a vector of text with formatting)', function() {
-      var instrFormatter = gd.InstructionSentenceFormatter.get();
-      instrFormatter.loadTypesFormattingFromConfig();
       var action = new gd.Instruction(); //Create a simple instruction
       action.setType('Delete');
       action.setParametersCount(2);
@@ -1854,12 +1857,9 @@ describe('libGD.js', function() {
       expect(formattedTexts.size()).toBe(2);
       expect(formattedTexts.getString(0)).toBe('Delete ');
       expect(formattedTexts.getString(1)).toBe('MyCharacter');
-      expect(formattedTexts.getTextFormatting(0).isBold()).toBe(false);
-      expect(formattedTexts.getTextFormatting(1).isBold()).toBe(true);
       expect(formattedTexts.getTextFormatting(0).getUserData()).not.toBe(0);
       expect(formattedTexts.getTextFormatting(1).getUserData()).toBe(0);
 
-      instrFormatter.delete();
       action.delete();
     });
   });
@@ -2346,16 +2346,16 @@ describe('libGD.js', function() {
         return '/tmp/';
       };
       fs.fileNameFrom = function(fullpath) {
-        return path.basename(fullpath);
+        return path.posix.basename(fullpath);
       };
       fs.dirNameFrom = function(fullpath) {
-        return path.dirname(fullpath);
+        return path.posix.dirname(fullpath);
       };
       fs.makeAbsolute = function(relativePath, baseDirectory) {
-        return path.resolve(baseDirectory, relativePath);
+        return path.posix.resolve(baseDirectory, relativePath);
       };
       fs.makeRelative = function(absolutePath, baseDirectory) {
-        return path.relative(baseDirectory, absolutePath);
+        return path.posix.relative(baseDirectory, absolutePath);
       };
 
       // Check that ResourcesMergingHelper can update the filenames
@@ -2421,19 +2421,19 @@ describe('libGD.js', function() {
         return '/tmp/';
       };
       fs.fileNameFrom = function(fullPath) {
-        return path.basename(fullPath);
+        return path.posix.basename(fullPath);
       };
       fs.dirNameFrom = function(fullPath) {
-        return path.dirname(fullPath);
+        return path.posix.dirname(fullPath);
       };
       fs.makeAbsolute = function(relativePath, baseDirectory) {
-        return path.resolve(baseDirectory, relativePath);
+        return path.posix.resolve(baseDirectory, relativePath);
       };
       fs.makeRelative = function(absolutePath, baseDirectory) {
-        return path.relative(baseDirectory, absolutePath);
+        return path.posix.relative(baseDirectory, absolutePath);
       };
       fs.isAbsolute = function(fullPath) {
-        return path.isAbsolute(fullPath);
+        return path.posix.isAbsolute(fullPath);
       };
       fs.dirExists = function(directoryPath) {
         return true; // Fake that all directory required exist.
@@ -2443,7 +2443,6 @@ describe('libGD.js', function() {
       // files are properly copied.
       fs.copyFile = jest.fn();
       fs.copyFile.mockImplementation(function(srcPath, destPath) {
-        console.log(srcPath, destPath);
         return true;
       });
 

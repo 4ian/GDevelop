@@ -5,10 +5,9 @@ import { makeTestProject } from '../fixtures/TestProject';
 const gd = global.gd;
 
 describe('EnumerateEffects', () => {
-  makeTestExtensions(gd);
-  const { project } = makeTestProject(gd);
-
   it('can enumerate effects', () => {
+    makeTestExtensions(gd);
+    const { project } = makeTestProject(gd);
     const enumeratedEffectsMetadata = enumerateEffectsMetadata(project);
 
     expect(enumeratedEffectsMetadata).toContainEqual(

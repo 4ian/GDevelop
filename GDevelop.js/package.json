@@ -36,6 +36,10 @@
     "testEnvironment": "node",
     "transformIgnorePatterns": [
       "../Binaries/embuild/GDevelop.js/libGD.js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/emsdk/",
+      "<rootDir>/node_modules/"
     ]
   }
 }

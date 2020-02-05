@@ -104,8 +104,8 @@ export default class RepeatEvent extends React.Component<
               onInstructionClick={this.props.onInstructionClick}
               onInstructionDoubleClick={this.props.onInstructionDoubleClick}
               onInstructionContextMenu={this.props.onInstructionContextMenu}
-              onInstructionsListContextMenu={
-                this.props.onInstructionsListContextMenu
+              onAddInstructionContextMenu={
+                this.props.onAddInstructionContextMenu
               }
               onParameterClick={this.props.onParameterClick}
               disabled={this.props.disabled}
@@ -132,8 +132,8 @@ export default class RepeatEvent extends React.Component<
               onInstructionClick={this.props.onInstructionClick}
               onInstructionDoubleClick={this.props.onInstructionDoubleClick}
               onInstructionContextMenu={this.props.onInstructionContextMenu}
-              onInstructionsListContextMenu={
-                this.props.onInstructionsListContextMenu
+              onAddInstructionContextMenu={
+                this.props.onAddInstructionContextMenu
               }
               onParameterClick={this.props.onParameterClick}
               disabled={this.props.disabled}

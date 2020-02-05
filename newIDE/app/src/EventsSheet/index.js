@@ -129,8 +129,8 @@ type State = {|
   selection: SelectionState,
 
   inlineEditing: boolean,
-  inlineEditingAnchorEl: ?any,
-  inlineInstructionEditorAnchorEl: ?any,
+  inlineEditingAnchorEl: ?HTMLElement,
+  inlineInstructionEditorAnchorEl: ?HTMLElement,
   inlineEditingChangesMade: boolean,
 
   analyzedEventsContextResult: ?EventsContextResult,
@@ -388,19 +388,16 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  openInstructionsListContextMenu = (
-    inlineInstructionEditorAnchorEl: any,
+  openAddInstructionContextMenu = (
+    button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
   ) => {
-    this.openInstructionEditor(
-      instructionsListContext,
-      inlineInstructionEditorAnchorEl
-    );
+    this.openInstructionEditor(instructionsListContext, button);
   };
 
   openInstructionEditor = (
     instructionContext: InstructionContext | InstructionsListContext,
-    inlineInstructionEditorAnchorEl?: any = null
+    inlineInstructionEditorAnchorEl?: ?HTMLButtonElement = null
   ) => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
@@ -1032,8 +1029,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                           onInstructionContextMenu={
                             this.openInstructionContextMenu
                           }
-                          onInstructionsListContextMenu={
-                            this.openInstructionsListContextMenu
+                          onAddInstructionContextMenu={
+                            this.openAddInstructionContextMenu
                           }
                           onAddNewInstruction={this.openInstructionEditor}
                           onPasteInstructions={

@@ -68,8 +68,8 @@ type Props = {|
   ) => void,
   onSubInstructionClick: InstructionContext => void,
   onSubInstructionDoubleClick: InstructionContext => void,
-  onSubInstructionsListContextMenu: (
-    any,
+  onAddSubInstructionContextMenu: (
+    button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
   ) => void,
   onSubParameterClick: Function,
@@ -287,8 +287,8 @@ const Instruction = (props: Props) => {
                 onInstructionClick={props.onSubInstructionClick}
                 onInstructionDoubleClick={props.onSubInstructionDoubleClick}
                 onInstructionContextMenu={props.onSubInstructionContextMenu}
-                onInstructionsListContextMenu={
-                  props.onSubInstructionsListContextMenu
+                onAddInstructionContextMenu={
+                  props.onAddSubInstructionContextMenu
                 }
                 onParameterClick={props.onSubParameterClick}
                 addButtonLabel={<Trans>Add a sub-condition</Trans>}

@@ -33,7 +33,10 @@ type Props = {
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (any, InstructionsListContext) => void,
+  onAddInstructionContextMenu: (
+    HTMLButtonElement,
+    InstructionsListContext
+  ) => void,
   onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
@@ -86,7 +89,7 @@ export default class InstructionsList extends React.Component<Props, State> {
       onInstructionClick,
       onInstructionContextMenu,
       onInstructionDoubleClick,
-      onInstructionsListContextMenu,
+      onAddInstructionContextMenu,
       onParameterClick,
       selection,
       style,
@@ -132,7 +135,7 @@ export default class InstructionsList extends React.Component<Props, State> {
           onSubInstructionClick={onInstructionClick}
           onSubInstructionDoubleClick={onInstructionDoubleClick}
           onSubInstructionContextMenu={onInstructionContextMenu}
-          onSubInstructionsListContextMenu={onInstructionsListContextMenu}
+          onAddSubInstructionContextMenu={onAddInstructionContextMenu}
           onSubParameterClick={onParameterClick}
           disabled={disabled}
           renderObjectThumbnail={this.props.renderObjectThumbnail}
@@ -182,7 +185,7 @@ export default class InstructionsList extends React.Component<Props, State> {
                   onClick={this.onAddNewInstruction}
                   onContextMenu={e => {
                     e.stopPropagation();
-                    onInstructionsListContextMenu(
+                    onAddInstructionContextMenu(
                       e.currentTarget,
                       instructionsListContext
                     );

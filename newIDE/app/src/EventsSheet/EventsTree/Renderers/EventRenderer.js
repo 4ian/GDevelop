@@ -28,7 +28,10 @@ export type EventRendererProps = {
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (any, InstructionsListContext) => void,
+  onAddInstructionContextMenu: (
+    HTMLButtonElement,
+    InstructionsListContext
+  ) => void,
   onParameterClick: ParameterContext => void,
   selection: any,
 

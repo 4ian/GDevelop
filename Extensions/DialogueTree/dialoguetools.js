@@ -284,10 +284,10 @@ gdjs.dialogueTree.getLineOptionsCount = function() {
  */
 gdjs.dialogueTree.confirmSelectOption = function() {
   if (
-    this.dialogueIsRunning &&
-    this.dialogueData.select &&
-    !this.selectedOptionUpdated &&
-    this.selectedOption !== -1
+    !this.dialogueIsRunning ||
+    (this.dialogueData.select &&
+      !this.selectedOptionUpdated &&
+      this.selectedOption !== -1)
   ) {
     this.commandCalls = [];
     try {
@@ -307,7 +307,6 @@ gdjs.dialogueTree.confirmSelectOption = function() {
  * Select next option during Options type line parsing. Hook this to your game input.
  */
 gdjs.dialogueTree.selectNextOption = function() {
-  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption += 1;
     this.selectedOption = gdjs.dialogueTree._cycledOptionIndex(
@@ -321,7 +320,6 @@ gdjs.dialogueTree.selectNextOption = function() {
  * Select previous option during Options type line parsing. Hook this to your game input.
  */
 gdjs.dialogueTree.selectPreviousOption = function() {
-  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption -= 1;
     this.selectedOption = gdjs.dialogueTree._cycledOptionIndex(
@@ -336,7 +334,6 @@ gdjs.dialogueTree.selectPreviousOption = function() {
  * @param {number} optionIndex The index of the option to select
  */
 gdjs.dialogueTree.selectOption = function(optionIndex) {
-  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
       this.selectedOption
@@ -350,7 +347,6 @@ gdjs.dialogueTree.selectOption = function(optionIndex) {
  * @returns {number} The index of the currently selected option
  */
 gdjs.dialogueTree.getSelectedOption = function() {
-  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     return this.selectedOption;
   }
@@ -365,7 +361,6 @@ gdjs.dialogueTree.getSelectedOption = function() {
  * @returns {boolean} true if the selected option was updated since the last call to this function
  */
 gdjs.dialogueTree.hasSelectedOptionChanged = function() {
-  if (!this.dialogueIsRunning) return;
   if (this.selectedOptionUpdated) {
     this.selectedOptionUpdated = false;
     if (this.selectedOption === -1) this.selectedOption = 0;
@@ -402,7 +397,6 @@ gdjs.dialogueTree.isDialogueLineType = function(type) {
  * @param {string} branchName The Dialogue Branch name you want to check.
  */
 gdjs.dialogueTree.hasDialogueBranch = function(branchName) {
-  if (!this.dialogueIsRunning) return false;
   return (
     this.runner &&
     this.runner.yarnNodes &&

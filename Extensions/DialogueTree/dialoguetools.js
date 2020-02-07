@@ -133,7 +133,7 @@ gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
  */
 gdjs.dialogueTree.getClippedLineText = function() {
   return this.dialogueIsRunning && this.dialogueText.length
-    ? this.dialogueText.substring(0, this.clipTextEnd)
+    ? this.dialogueText.substring(0, this.clipTextEnd + 1)
     : '';
 };
 

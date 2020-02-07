@@ -41,7 +41,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
          "RendererParam1",
          _("Rendering first parameter"),
          _("Test the first parameter of rendering ( Size/Length )."),
-         _("the 1nd rendering parameter"),
+         _("the 1st rendering parameter"),
          _("Setup"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")

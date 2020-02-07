@@ -56,7 +56,7 @@ gdjs.JsonManager.prototype.preloadJsons = function(onProgress, onComplete) {
   /** @type JsonManagerRequestCallback */
   var onLoad = function(error, jsonContent) {
     if (error) {
-      console.error("Error while preloading a json resource:" + error);
+      console.error('Error while preloading a json resource:' + error);
     }
 
     loaded++;
@@ -101,6 +101,12 @@ gdjs.JsonManager.prototype.loadJson = function(resourceName, callback) {
       ),
       null
     );
+    return;
+  }
+
+  // Don't fetch again an object that is already in memory
+  if (this._loadedJsons[resourceName]) {
+    callback(null, this._loadedJsons[resourceName]);
     return;
   }
 

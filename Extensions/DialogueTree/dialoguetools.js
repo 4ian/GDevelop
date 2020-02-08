@@ -271,7 +271,7 @@ gdjs.dialogueTree.getLineOptionsTextVertical = function(optionSelectionCursor) {
  * @returns {number} The number of options
  */
 gdjs.dialogueTree.getLineOptionsCount = function() {
-  if (!this.dialogueIsRunning || this.options.length) {
+  if (this.dialogueIsRunning && this.options.length) {
     return this.optionsCount;
   }
   return 0;
@@ -283,11 +283,11 @@ gdjs.dialogueTree.getLineOptionsCount = function() {
  * This will advance the dialogue tree to the dialogue branch was selected by the player.
  */
 gdjs.dialogueTree.confirmSelectOption = function() {
+  if (!this.dialogueIsRunning) return;
   if (
-    !this.dialogueIsRunning ||
-    (this.dialogueData.select &&
-      !this.selectedOptionUpdated &&
-      this.selectedOption !== -1)
+    this.dialogueData.select &&
+    !this.selectedOptionUpdated &&
+    this.selectedOption !== -1
   ) {
     this.commandCalls = [];
     try {
@@ -307,6 +307,7 @@ gdjs.dialogueTree.confirmSelectOption = function() {
  * Select next option during Options type line parsing. Hook this to your game input.
  */
 gdjs.dialogueTree.selectNextOption = function() {
+  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption += 1;
     this.selectedOption = gdjs.dialogueTree._cycledOptionIndex(
@@ -320,6 +321,7 @@ gdjs.dialogueTree.selectNextOption = function() {
  * Select previous option during Options type line parsing. Hook this to your game input.
  */
 gdjs.dialogueTree.selectPreviousOption = function() {
+  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption -= 1;
     this.selectedOption = gdjs.dialogueTree._cycledOptionIndex(
@@ -334,6 +336,7 @@ gdjs.dialogueTree.selectPreviousOption = function() {
  * @param {number} optionIndex The index of the option to select
  */
 gdjs.dialogueTree.selectOption = function(optionIndex) {
+  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
       this.selectedOption
@@ -347,6 +350,7 @@ gdjs.dialogueTree.selectOption = function(optionIndex) {
  * @returns {number} The index of the currently selected option
  */
 gdjs.dialogueTree.getSelectedOption = function() {
+  if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     return this.selectedOption;
   }

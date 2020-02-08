@@ -54,14 +54,14 @@ npm test
 
 ### About the internal steps of compilation
 
-The grunt _build_ task:
+The npm _build_ task:
 
-- create `Binaries/embuild` directory,
-- launch CMake inside to compile GDevelop with _Emscripten toolchain file_,
-- update the glue.cpp and glue.js from Bindings.idl using _Emscripten WebIDL Binder_,
-- launch the compilation with _make_ and wrap the generated `libGD.js.raw` into the final `libGD.js` file.
+- Creates `Binaries/embuild` directory,
+- Launches CMake inside to compile GDevelop with _emconfigure_ to use Emscripten toolchain,
+- Updates the glue.cpp and glue.js from Bindings.idl using _Emscripten WebIDL Binder_,
+- Launches the compilation with `make` (or `ninja` on Windows).
 
-It also create a compressed `libGD.js.gz` file which is handy for distributing the library pre-compressed to web browsers.
+See the [CMakeLists.txt](./CMakeLists.txt) for the arguments passed to the Emscripten linker.
 
 ## Documentation
 

@@ -77,7 +77,7 @@ ENDIF()
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/glue.js")
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/postjs.js")
 target_link_libraries(GD "-s MODULARIZE=1")
-target_link_libraries(GD "-s 'EXPORT_NAME=\"initializeGDevelopJs\"'") # Global function name for browsers
+target_link_libraries(GD "-s EXPORT_NAME=\"initializeGDevelopJs\"") # Global function name for browsers
 target_link_libraries(GD "-s TOTAL_MEMORY=48MB") # Get some initial memory size that is a bit bigger than the default.
 target_link_libraries(GD "-s ALLOW_MEMORY_GROWTH=1")
 target_link_libraries(GD "-s ERROR_ON_UNDEFINED_SYMBOLS=0")

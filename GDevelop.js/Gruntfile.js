@@ -2,6 +2,7 @@
 // without Grunt, and called from package.json.
 module.exports = function(grunt) {
   const fs = require('fs');
+  const path = require('path');
   const isWin = /^win/.test(process.platform);
   const isDev = grunt.option('dev') || false;
 
@@ -10,18 +11,12 @@ module.exports = function(grunt) {
 
   let cmakeBinary = 'emconfigure cmake';
   let makeBinary = 'emmake make';
-  let cmakeGeneratorArg = '';
+  let cmakeGeneratorArgs = [];
 
   // Use more specific paths on Windows
   if (isWin) {
-    // Use make from MinGW
-    if (!fs.existsSync('C:\\MinGW\\bin\\mingw32-make.exe')) {
-      console.error(
-        "🔴 Can't find mingw32-make in C:\\MinGW. Make sure MinGW is installed."
-      );
-      return;
-    }
-    makeBinary = 'emmake "C:\\MinGW\\bin\\mingw32-make"';
+    ninjaBinary = path.join(__dirname, 'ninja', 'ninja.exe');
+    makeBinary = `emmake "${ninjaBinary}"`;
 
     // Find CMake in usual folders or fallback to PATH.
     if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake.exe')) {
@@ -36,7 +31,7 @@ module.exports = function(grunt) {
       );
     }
 
-    cmakeGeneratorArg = '-G "MinGW Makefiles"';
+    cmakeGeneratorArgs = ['-G "Ninja"', `-DCMAKE_MAKE_PROGRAM="${ninjaBinary}"`];
   }
 
   grunt.initConfig({
@@ -55,7 +50,7 @@ module.exports = function(grunt) {
           cmakeBinary +
           ' ' +
           [
-            cmakeGeneratorArg,
+            ...cmakeGeneratorArgs,
             '../..',
             '-DFULL_VERSION_NUMBER=FALSE',
             // Disable optimizations at linking time for much faster builds.

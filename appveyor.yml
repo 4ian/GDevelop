@@ -4,7 +4,7 @@ pull_requests:
 image: Visual Studio 2019
 clone_depth: 5
 init:
-- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+- ps: ''
 install:
 - ps: Install-Product node 10
 build_script:
@@ -58,4 +58,4 @@ test_script:
 
     cd ..\..
 on_finish:
-- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+- ps: ''

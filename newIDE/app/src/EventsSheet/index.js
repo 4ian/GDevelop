@@ -886,11 +886,11 @@ export default class EventsSheet extends React.Component<Props, State> {
       objectsContainer,
     } = this.props;
 
-    const NewInstruction = this.state.inlineInstructionEditorAnchorEl
+    // Choose the dialog to use
+    const Dialog = this.state.inlineInstructionEditorAnchorEl
       ? NewInstructionEditorMenu
-      : NewInstructionEditorDialog;
-    const Dialog = newInstructionEditorDialog
-      ? NewInstruction
+      : newInstructionEditorDialog
+      ? NewInstructionEditorDialog
       : InstructionEditorDialog;
 
     return this.state.editedInstruction.instruction ? (
@@ -904,9 +904,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         isNewInstruction={
           this.state.editedInstruction.indexInList === undefined
         }
-        inlineInstructionEditorAnchorEl={
-          this.state.inlineInstructionEditorAnchorEl
-        }
+        anchorEl={this.state.inlineInstructionEditorAnchorEl}
         open={true}
         onCancel={() => this.closeInstructionEditor()}
         onSubmit={() => {

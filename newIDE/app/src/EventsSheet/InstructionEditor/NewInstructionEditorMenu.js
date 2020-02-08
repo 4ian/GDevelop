@@ -43,7 +43,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   style?: Object,
-  inlineInstructionEditorAnchorEl?: any,
+  anchorEl: ?HTMLElement,
   isNewInstruction: boolean,
   onCancel: () => void,
   onSubmit: () => void,
@@ -67,7 +67,7 @@ export default function NewInstructionEditorMenu({
   instruction,
   isCondition,
   isNewInstruction,
-  inlineInstructionEditorAnchorEl,
+  anchorEl,
   scope,
   onSubmit,
 }: Props) {
@@ -175,7 +175,7 @@ export default function NewInstructionEditorMenu({
     <Popover
       open={open}
       onClose={onCancel}
-      anchorEl={inlineInstructionEditorAnchorEl}
+      anchorEl={anchorEl}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'left',

@@ -61,7 +61,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
-  inlineInstructionEditorAnchorEl?: any,
+  anchorEl?: any, // Unused
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -90,7 +90,6 @@ export default function NewInstructionEditorDialog({
   instruction,
   isCondition,
   isNewInstruction,
-  inlineInstructionEditorAnchorEl,
   scope,
   onSubmit,
   resourceSources,

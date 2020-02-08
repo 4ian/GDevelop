@@ -77,7 +77,7 @@ type State = {|
   isDirty: boolean,
 |};
 
-const setupInstruction = (
+export const setupInstruction = (
   instruction: gdInstruction,
   instructionMetadata: gdInstructionMetadata,
   objectName: ?string
@@ -228,7 +228,7 @@ export default class InstructionParametersEditor extends React.Component<
     } = this.props;
 
     const type = instruction.getType();
-    const instructionMetadata = this._getInstructionMetadata(); // move to utils
+    const instructionMetadata = this._getInstructionMetadata(); // TODO move to utils
     if (!instructionMetadata) return this._renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
@@ -237,7 +237,7 @@ export default class InstructionParametersEditor extends React.Component<
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
 
-    setupInstruction(instruction, instructionMetadata, objectName); // move to utils
+    setupInstruction(instruction, instructionMetadata, objectName);
 
     let parameterFieldIndex = 0;
     return (

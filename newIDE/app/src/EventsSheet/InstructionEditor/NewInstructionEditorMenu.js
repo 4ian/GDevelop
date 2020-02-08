@@ -7,26 +7,15 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import InstructionParametersEditor from './InstructionParametersEditor';
+import { setupInstruction } from './InstructionParametersEditor';
+import { useNewInstructionEditor } from './NewInstructionEditor';
 import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
-import {
-  createTree,
-  type InstructionOrExpressionTreeNode,
-} from './InstructionOrExpressionSelector/CreateTree';
-import {
-  type EnumeratedInstructionOrExpressionMetadata,
-  filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
-import {
-  enumerateObjectInstructions,
-  enumerateInstructions,
-  getObjectParameterIndex,
-} from './InstructionOrExpressionSelector/EnumerateInstructions';
 import { type EventsScope } from '../EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd = global.gd;
 
@@ -63,288 +52,171 @@ type Props = {|
     type: string
   ) => void,
 |};
-type State = {|
-  step: StepName,
-  chosenObjectName: ?string,
-  chosenObjectInstructionsInfo: ?Array<EnumeratedInstructionOrExpressionMetadata>,
-  chosenObjectInstructionsInfoTree: ?InstructionOrExpressionTreeNode,
-  currentInstructionOrObjectSelectorTab: TabName,
-|};
 
-const findInstruction = (
-  list: Array<EnumeratedInstructionOrExpressionMetadata>,
-  instructionType: string
-): ?EnumeratedInstructionOrExpressionMetadata => {
-  return list.find(({ type }) => type === instructionType);
-};
+// TODO: This was copied from InstructionParametersEditor. Move this to a helper
+// or pass it down.
+const getInstructionMetadata = ({
+  instructionType,
+  isCondition,
+  project,
+}: {|
+  instructionType: string,
+  isCondition: boolean,
+  project: gdProject,
+|}): ?gdInstructionMetadata => {
+  if (!instructionType) return null;
 
-// TODO move to utils
-const setupInstruction = (
-  instruction: gdInstruction,
-  instructionMetadata: gdInstructionMetadata,
-  objectName: ?string
-) => {
-  instruction.setParametersCount(instructionMetadata.getParametersCount());
-
-  if (objectName) {
-    const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
-    if (objectParameterIndex === -1) {
-      console.error(
-        `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
-      );
-      return;
-    }
-
-    instruction.setParameter(objectParameterIndex, objectName);
-  }
-};
-
-export default class NewInstructionEditorMenu extends React.Component<
-  Props,
-  State
-> {
-  state = this._getInitialState();
-  _instructionParametersEditor: ?InstructionParametersEditor;
-
-  _getInitialState(): State {
-    const { isNewInstruction, isCondition, instruction } = this.props;
-
-    if (!isNewInstruction) {
-      // Check if the instruction is an object/behavior instruction. If yes
-      // select the object, which is the first parameter of the instruction.
-      const allInstructions = enumerateInstructions(isCondition);
-      const instructionType: string = instruction.getType();
-      const enumeratedInstructionMetadata = findInstruction(
-        allInstructions,
+  return isCondition
+    ? gd.MetadataProvider.getConditionMetadata(
+        project.getCurrentPlatform(),
+        instructionType
+      )
+    : gd.MetadataProvider.getActionMetadata(
+        project.getCurrentPlatform(),
         instructionType
       );
-      if (
-        enumeratedInstructionMetadata &&
-        (enumeratedInstructionMetadata.scope.objectMetadata ||
-          enumeratedInstructionMetadata.scope.behaviorMetadata)
-      ) {
-        const objectParameterIndex = getObjectParameterIndex(
-          enumeratedInstructionMetadata.metadata
-        );
-        if (objectParameterIndex !== -1) {
-          return {
-            ...this._getChosenObjectState(
-              instruction.getParameter(objectParameterIndex),
-              false /* Even if the instruction is invalid for the object, show it as it's what we have already */
-            ),
-            step: 'object-or-free-instructions',
-            currentInstructionOrObjectSelectorTab: 'objects',
-          };
-        }
-      }
-    }
+};
 
-    // We're either making a new instruction or editing a free instruction.
-    return {
-      chosenObjectName: null,
-      chosenObjectInstructionsInfo: null,
-      chosenObjectInstructionsInfoTree: null,
-      step: 'object-or-free-instructions',
-      currentInstructionOrObjectSelectorTab: isNewInstruction
-        ? 'objects'
-        : 'free-instructions',
-    };
-  }
+export default function NewInstructionEditorMenu({
+  project,
+  globalObjectsContainer,
+  objectsContainer,
+  onCancel,
+  open,
+  instruction,
+  isCondition,
+  isNewInstruction,
+  inlineInstructionEditorAnchorEl,
+  scope,
+  onSubmit,
+}: Props) {
+  const forceUpdate = useForceUpdate();
+  const [
+    newInstructionEditorState,
+    newInstructionEditorSetters,
+  ] = useNewInstructionEditor({
+    instruction,
+    isCondition,
+    project,
+    isNewInstruction,
+    scope,
+    globalObjectsContainer,
+    objectsContainer,
+  });
+  const {
+    chosenObjectName,
+    chosenObjectInstructionsInfo,
+    chosenObjectInstructionsInfoTree,
+  } = newInstructionEditorState;
+  const {
+    chooseFreeInstruction,
+    chooseObject,
+    chooseObjectInstruction,
+  } = newInstructionEditorSetters;
+  // As we're in a context menu, always start from 'object-or-free-instructions' step and with 'objects' tab.
+  const [step, setStep] = React.useState<StepName>(
+    'object-or-free-instructions'
+  );
+  const [
+    currentInstructionOrObjectSelectorTab,
+    setCurrentInstructionOrObjectSelectorTab,
+  ] = React.useState<TabName>('objects');
+  const instructionType: string = instruction.getType();
 
-  _chooseFreeInstruction = (type: string) => {
-    const { instruction } = this.props;
-    instruction.setType(type);
-    this.setState(
-      {
-        chosenObjectName: null,
-        chosenObjectInstructionsInfo: null,
-        chosenObjectInstructionsInfoTree: null,
-      },
-      () => this._onSubmitInstruction()
-    );
-  };
-
-  _getChosenObjectState(
-    objectName: string,
-    discardInstructionTypeIfNotInObjectInstructions: boolean
-  ): State {
-    const {
-      globalObjectsContainer,
-      objectsContainer,
+  const submitInstruction = ({
+    instruction,
+    chosenObjectName,
+  }: {
+    instruction: gdInstruction,
+    chosenObjectName: ?string,
+  }) => {
+    const instructionMetadata = getInstructionMetadata({
+      instructionType: instruction.getType(),
       isCondition,
-      scope,
-      instruction,
-    } = this.props;
-
-    const chosenObjectInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateObjectInstructions(
-        isCondition,
-        globalObjectsContainer,
-        objectsContainer,
-        objectName
-      ),
-      scope
-    );
-
-    // As we changed to a new object, verify if the instruction is still valid for this object. If not,
-    // discard the chosen instruction - this is to avoid the user creating invalid instructions.
-    if (
-      instruction.getType() &&
-      discardInstructionTypeIfNotInObjectInstructions
-    ) {
-      const instructionMetadata = findInstruction(
-        chosenObjectInstructionsInfo,
-        instruction.getType()
-      );
-      if (!instructionMetadata) {
-        instruction.setType('');
-      }
-    }
-
-    return {
-      step: 'object-instructions',
-      chosenObjectName: objectName,
-      chosenObjectInstructionsInfo,
-      chosenObjectInstructionsInfoTree: createTree(
-        chosenObjectInstructionsInfo
-      ),
-      currentInstructionOrObjectSelectorTab: 'objects',
-    };
-  }
-
-  _onSubmitInstruction = () => {
-    const { instruction, onSubmit } = this.props;
-    const { chosenObjectName } = this.state;
-    const instructionMetadata = this._getInstructionMetadata();
+      project,
+    });
     if (instructionMetadata) {
       setupInstruction(instruction, instructionMetadata, chosenObjectName);
     }
     onSubmit();
   };
 
-  _chooseObjectInstruction = (type: string) => {
-    const { instruction } = this.props;
-    const { chosenObjectName } = this.state;
-    instruction.setType(type);
-    if (chosenObjectName) this._chooseObject(chosenObjectName);
-    this._onSubmitInstruction();
-  };
-
-  // TODO: This was copied from InstructionParametersEditor. Move this to a helper
-  // or pass it down.
-  _getInstructionMetadata = (): ?gdInstructionMetadata => {
-    const { instruction, isCondition, project } = this.props;
-    const type = instruction.getType();
-    if (!type) return null;
-
-    return isCondition
-      ? gd.MetadataProvider.getConditionMetadata(
-          project.getCurrentPlatform(),
-          type
-        )
-      : gd.MetadataProvider.getActionMetadata(
-          project.getCurrentPlatform(),
-          type
+  const renderInstructionOrObjectSelector = () => (
+    <InstructionOrObjectSelector
+      key="instruction-or-object-selector"
+      style={styles.fullHeightSelector}
+      project={project}
+      currentTab={currentInstructionOrObjectSelectorTab}
+      onChangeTab={setCurrentInstructionOrObjectSelectorTab}
+      globalObjectsContainer={globalObjectsContainer}
+      objectsContainer={objectsContainer}
+      isCondition={isCondition}
+      chosenInstructionType={!chosenObjectName ? instructionType : undefined}
+      onChooseInstruction={(instructionType: string) => {
+        const { instruction, chosenObjectName } = chooseFreeInstruction(
+          instructionType
         );
-  };
+        submitInstruction({ instruction, chosenObjectName });
+      }}
+      chosenObjectName={chosenObjectName}
+      onChooseObject={objectName => {
+        chooseObject(objectName);
+        setStep('object-instructions');
+      }}
+      focusOnMount={!instructionType}
+      onSearchStartOrReset={forceUpdate}
+    />
+  );
 
-  _changeTab = (currentInstructionOrObjectSelectorTab: TabName) =>
-    this.setState({
-      currentInstructionOrObjectSelectorTab,
-    });
-
-  _forceUpdate = () => {
-    this.forceUpdate(); /*Force update to ensure dialog is properly positioned*/
-  };
-
-  _chooseObject = (objectName: string) => {
-    this.setState(this._getChosenObjectState(objectName, true));
-  };
-
-  render() {
-    const {
-      project,
-      globalObjectsContainer,
-      objectsContainer,
-      onCancel,
-      open,
-      instruction,
-      isCondition,
-      inlineInstructionEditorAnchorEl,
-    } = this.props;
-    const {
-      step,
-      chosenObjectName,
-      chosenObjectInstructionsInfo,
-      chosenObjectInstructionsInfoTree,
-      currentInstructionOrObjectSelectorTab,
-    } = this.state;
-    const instructionType: string = instruction.getType();
-
-    const renderInstructionOrObjectSelector = () => (
-      <InstructionOrObjectSelector
-        key="instruction-or-object-selector"
+  const renderObjectInstructionSelector = () =>
+    chosenObjectInstructionsInfoTree && chosenObjectInstructionsInfo ? (
+      <InstructionOrExpressionSelector
+        key="object-instruction-selector"
         style={styles.fullHeightSelector}
-        project={project}
-        currentTab={currentInstructionOrObjectSelectorTab}
-        onChangeTab={this._changeTab}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        isCondition={isCondition}
-        chosenInstructionType={!chosenObjectName ? instructionType : undefined}
-        onChooseInstruction={this._chooseFreeInstruction}
-        chosenObjectName={chosenObjectName}
-        onChooseObject={this._chooseObject}
+        instructionsInfo={chosenObjectInstructionsInfo}
+        instructionsInfoTree={chosenObjectInstructionsInfoTree}
+        iconSize={24}
+        onChoose={(instructionType: string) => {
+          const { instruction, chosenObjectName } = chooseObjectInstruction(
+            instructionType
+          );
+          submitInstruction({ instruction, chosenObjectName });
+        }}
+        selectedType={instructionType}
+        useSubheaders
         focusOnMount={!instructionType}
-        onSearchStartOrReset={this._forceUpdate}
+        searchPlaceholderObjectName={chosenObjectName}
+        searchPlaceholderIsCondition={isCondition}
       />
-    );
+    ) : null;
 
-    const renderObjectInstructionSelector = () =>
-      chosenObjectInstructionsInfoTree && chosenObjectInstructionsInfo ? (
-        <InstructionOrExpressionSelector
-          key="object-instruction-selector"
-          style={styles.fullHeightSelector}
-          instructionsInfo={chosenObjectInstructionsInfo}
-          instructionsInfoTree={chosenObjectInstructionsInfoTree}
-          iconSize={24}
-          onChoose={this._chooseObjectInstruction}
-          selectedType={instructionType}
-          useSubheaders
-          focusOnMount={!instructionType}
-          searchPlaceholderObjectName={chosenObjectName}
-          searchPlaceholderIsCondition={isCondition}
-        />
-      ) : null;
-
-    return (
-      <Popover
-        open={open}
-        onClose={onCancel}
-        anchorEl={inlineInstructionEditorAnchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
+  return (
+    <Popover
+      open={open}
+      onClose={onCancel}
+      anchorEl={inlineInstructionEditorAnchorEl}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'left',
+      }}
+    >
+      <SelectColumns
+        columnsRenderer={{
+          'instruction-or-object-selector': renderInstructionOrObjectSelector,
+          'object-instruction-selector': renderObjectInstructionSelector,
         }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
+        getColumns={() => {
+          if (step === 'object-or-free-instructions') {
+            return ['instruction-or-object-selector'];
+          } else {
+            return ['object-instruction-selector'];
+          }
         }}
-      >
-        <SelectColumns
-          columnsRenderer={{
-            'instruction-or-object-selector': renderInstructionOrObjectSelector,
-            'object-instruction-selector': renderObjectInstructionSelector,
-          }}
-          getColumns={() => {
-            if (step === 'object-or-free-instructions') {
-              return ['instruction-or-object-selector'];
-            } else {
-              return ['object-instruction-selector'];
-            }
-          }}
-        />
-      </Popover>
-    );
-  }
+      />
+    </Popover>
+  );
 }

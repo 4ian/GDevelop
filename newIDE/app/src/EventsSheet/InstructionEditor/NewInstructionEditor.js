@@ -14,6 +14,30 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
 import { type EventsScope } from '../EventsScope.flow';
+const gd = global.gd;
+
+/** Helper to get the gdInstructionMetadata of an instruction. */
+export const getInstructionMetadata = ({
+  instructionType,
+  isCondition,
+  project,
+}: {|
+  instructionType: string,
+  isCondition: boolean,
+  project: gdProject,
+|}): ?gdInstructionMetadata => {
+  if (!instructionType) return null;
+
+  return isCondition
+    ? gd.MetadataProvider.getConditionMetadata(
+        project.getCurrentPlatform(),
+        instructionType
+      )
+    : gd.MetadataProvider.getActionMetadata(
+        project.getCurrentPlatform(),
+        instructionType
+      );
+};
 
 type Parameters = {|
   project: gdProject,

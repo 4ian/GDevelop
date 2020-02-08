@@ -8,7 +8,10 @@ import {
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { setupInstruction } from './InstructionParametersEditor';
-import { useNewInstructionEditor } from './NewInstructionEditor';
+import {
+  useNewInstructionEditor,
+  getInstructionMetadata,
+} from './NewInstructionEditor';
 import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
@@ -16,8 +19,6 @@ import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import { type EventsScope } from '../EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-
-const gd = global.gd;
 
 const styles = {
   fullHeightSelector: {
@@ -53,30 +54,10 @@ type Props = {|
   ) => void,
 |};
 
-// TODO: This was copied from InstructionParametersEditor. Move this to a helper
-// or pass it down.
-const getInstructionMetadata = ({
-  instructionType,
-  isCondition,
-  project,
-}: {|
-  instructionType: string,
-  isCondition: boolean,
-  project: gdProject,
-|}): ?gdInstructionMetadata => {
-  if (!instructionType) return null;
-
-  return isCondition
-    ? gd.MetadataProvider.getConditionMetadata(
-        project.getCurrentPlatform(),
-        instructionType
-      )
-    : gd.MetadataProvider.getActionMetadata(
-        project.getCurrentPlatform(),
-        instructionType
-      );
-};
-
+/**
+ * An instruction editor in a popover.
+ * Does not show the parameters for the instruction.
+ */
 export default function NewInstructionEditorMenu({
   project,
   globalObjectsContainer,
@@ -159,8 +140,8 @@ export default function NewInstructionEditorMenu({
         submitInstruction({ instruction, chosenObjectName });
       }}
       chosenObjectName={chosenObjectName}
-      onChooseObject={objectName => {
-        chooseObject(objectName);
+      onChooseObject={chosenObjectName => {
+        chooseObject(chosenObjectName);
         setStep('object-instructions');
       }}
       focusOnMount={!instructionType}

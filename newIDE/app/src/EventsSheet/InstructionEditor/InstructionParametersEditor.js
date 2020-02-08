@@ -24,6 +24,7 @@ import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../EventsScope.flow';
 import { getObjectParameterIndex } from './InstructionOrExpressionSelector/EnumerateInstructions';
 import Text from '../../UI/Text';
+import { getInstructionMetadata } from './NewInstructionEditor';
 const gd = global.gd;
 
 const styles = {
@@ -129,10 +130,16 @@ export default class InstructionParametersEditor extends React.Component<
   }
 
   focus() {
+    const { instruction, isCondition, project } = this.props;
+
     // Verify that there is a field to focus.
     if (
       this._getVisibleParametersCount(
-        this._getInstructionMetadata(),
+        getInstructionMetadata({
+          instructionType: instruction.getType(),
+          isCondition,
+          project,
+        }),
         this.props.objectName
       ) !== 0
     ) {
@@ -160,22 +167,6 @@ export default class InstructionParametersEditor extends React.Component<
     }).filter(isVisible => isVisible).length;
   }
 
-  _getInstructionMetadata = (): ?gdInstructionMetadata => {
-    const { instruction, isCondition, project } = this.props;
-    const type = instruction.getType();
-    if (!type) return null;
-
-    return isCondition
-      ? gd.MetadataProvider.getConditionMetadata(
-          project.getCurrentPlatform(),
-          type
-        )
-      : gd.MetadataProvider.getActionMetadata(
-          project.getCurrentPlatform(),
-          type
-        );
-  };
-
   _openExtension = (i18n: I18nType) => {
     if (this.state.isDirty) {
       //eslint-disable-next-line
@@ -188,20 +179,20 @@ export default class InstructionParametersEditor extends React.Component<
     }
 
     const { instruction, isCondition, project } = this.props;
-    const type = instruction.getType();
-    if (!type) return null;
+    const instructionType = instruction.getType();
+    if (!instructionType) return null;
 
     const extension = isCondition
       ? gd.MetadataProvider.getExtensionAndConditionMetadata(
           project.getCurrentPlatform(),
-          type
+          instructionType
         ).getExtension()
       : gd.MetadataProvider.getExtensionAndActionMetadata(
           project.getCurrentPlatform(),
-          type
+          instructionType
         ).getExtension();
 
-    this.props.openInstructionOrExpression(extension, type);
+    this.props.openInstructionOrExpression(extension, instructionType);
   };
 
   _renderEmpty() {
@@ -224,15 +215,22 @@ export default class InstructionParametersEditor extends React.Component<
       objectsContainer,
       noHelpButton,
       objectName,
+      isCondition,
       scope,
     } = this.props;
 
-    const type = instruction.getType();
-    const instructionMetadata = this._getInstructionMetadata(); // TODO move to utils
+    const instructionType = instruction.getType();
+    const instructionMetadata = getInstructionMetadata({
+      instructionType,
+      isCondition,
+      project,
+    });
     if (!instructionMetadata) return this._renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
-    const instructionExtraInformation = getExtraInstructionInformation(type);
+    const instructionExtraInformation = getExtraInstructionInformation(
+      instructionType
+    );
     const objectParameterIndex = objectName
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
@@ -269,7 +267,7 @@ export default class InstructionParametersEditor extends React.Component<
               </Line>
             )}
             <Spacer />
-            <div key={type} style={styles.parametersContainer}>
+            <div key={instructionType} style={styles.parametersContainer}>
               {mapFor(0, instructionMetadata.getParametersCount(), i => {
                 const parameterMetadata = instructionMetadata.getParameter(i);
                 if (

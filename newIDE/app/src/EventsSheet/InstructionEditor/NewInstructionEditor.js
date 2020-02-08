@@ -74,6 +74,7 @@ const findInstruction = (
   return list.find(({ type }) => type === instructionType);
 };
 
+/** React Hook handling the state of an instruction editor. */
 export const useNewInstructionEditor = ({
   instruction,
   isCondition,

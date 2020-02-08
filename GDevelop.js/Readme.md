@@ -10,8 +10,6 @@ This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Co
 
 - Make sure you have [CMake 3.5+](http://www.cmake.org/) and [Node.js](nodejs.org/) installed.
 
-- On Windows, install [MinGW](https://osdn.net/projects/mingw/releases/) (only `mingw32-base-bin` package is required).
-
 - Install [Emscripten](https://github.com/kripken/emscripten), as explained on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 
 | Linux/macOS                                  | Windows                                      |

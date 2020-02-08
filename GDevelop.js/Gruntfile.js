@@ -10,13 +10,15 @@ module.exports = function(grunt) {
   const buildPath = '../Binaries/embuild';
 
   let cmakeBinary = 'emconfigure cmake';
-  let makeBinary = 'emmake make';
   let cmakeGeneratorArgs = [];
+  let makeBinary = 'emmake make';
+  let makeArgs = ['-j 4'];
 
   // Use more specific paths on Windows
   if (isWin) {
     ninjaBinary = path.join(__dirname, 'ninja', 'ninja.exe');
     makeBinary = `emmake "${ninjaBinary}"`;
+    makeArgs = [];
 
     // Find CMake in usual folders or fallback to PATH.
     if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake.exe')) {
@@ -73,7 +75,7 @@ module.exports = function(grunt) {
       },
       //Compile GDevelop with emscripten
       make: {
-        command: makeBinary + ' -j 4',
+        command: makeBinary + ' ' + makeArgs.join(' '),
         options: {
           execOptions: {
             cwd: buildPath,

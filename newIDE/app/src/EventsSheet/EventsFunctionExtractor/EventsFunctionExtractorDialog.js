@@ -167,7 +167,10 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                     <SelectOption
                       key={eventsFunctionsExtension.getName()}
                       value={eventsFunctionsExtension.getName()}
-                      primaryText={eventsFunctionsExtension.getFullName()}
+                      primaryText={
+                        eventsFunctionsExtension.getFullName() ||
+                        eventsFunctionsExtension.getName()
+                      }
                     />
                   ))}
                   <SelectOption

@@ -4,7 +4,9 @@ import {
   type ParameterInlineRenderer,
   type ParameterInlineRendererProps,
 } from './ParameterFields/ParameterInlineRenderer.flow';
-import DefaultField from './ParameterFields/DefaultField';
+import DefaultField, {
+  renderInlineDefaultField,
+} from './ParameterFields/DefaultField';
 import RelationalOperatorField, {
   renderInlineRelationalOperator,
 } from './ParameterFields/RelationalOperatorField';
@@ -73,6 +75,7 @@ const components = {
   sceneName: SceneNameField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
+  default: renderInlineDefaultField,
   forceMultiplier: renderInlineForceMultiplier,
   globalvar: renderInlineGlobalVariable,
   scenevar: renderInlineSceneVariable,
@@ -100,8 +103,8 @@ export default {
       ? 'object'
       : rawType;
 
-    return inlineRenderers[fieldType]
-      ? inlineRenderers[fieldType](props)
-      : props.value;
+    const inlineRenderer =
+      inlineRenderers[fieldType] || inlineRenderers.default;
+    return inlineRenderer(props);
   },
 };

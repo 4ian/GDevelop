@@ -39,6 +39,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  anchorEl?: any, // Unused
 |};
 type State = {||};
 

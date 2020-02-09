@@ -2459,7 +2459,7 @@ storiesOf('EventsTree', module)
             onInstructionClick={action('instruction click')}
             onInstructionDoubleClick={action('instruction double click')}
             onInstructionContextMenu={action('instruction context menu')}
-            onInstructionsListContextMenu={action(
+            onAddInstructionContextMenu={action(
               'instruction list context menu'
             )}
             onParameterClick={action('parameter click')}
@@ -2497,7 +2497,7 @@ storiesOf('EventsTree', module)
             onInstructionClick={action('instruction click')}
             onInstructionDoubleClick={action('instruction double click')}
             onInstructionContextMenu={action('instruction context menu')}
-            onInstructionsListContextMenu={action(
+            onAddInstructionContextMenu={action(
               'instruction list context menu'
             )}
             onParameterClick={action('parameter click')}

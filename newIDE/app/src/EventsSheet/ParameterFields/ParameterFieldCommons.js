@@ -54,9 +54,11 @@ export const getParameterValueOrDefault = (
   value: string,
   parameterMetadata: ?gdParameterMetadata
 ) => {
+  if (value) return value;
+
   const defaultValue =
     parameterMetadata && parameterMetadata.isOptional()
       ? parameterMetadata.getDefaultValue()
       : '';
-  return value ? value : defaultValue;
+  return defaultValue;
 };

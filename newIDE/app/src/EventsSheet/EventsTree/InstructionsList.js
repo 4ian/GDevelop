@@ -33,9 +33,8 @@ type Props = {
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (
-    x: number,
-    y: number,
+  onAddInstructionContextMenu: (
+    HTMLButtonElement,
     InstructionsListContext
   ) => void,
   onParameterClick: ParameterContext => void,
@@ -90,7 +89,7 @@ export default class InstructionsList extends React.Component<Props, State> {
       onInstructionClick,
       onInstructionContextMenu,
       onInstructionDoubleClick,
-      onInstructionsListContextMenu,
+      onAddInstructionContextMenu,
       onParameterClick,
       selection,
       style,
@@ -136,7 +135,7 @@ export default class InstructionsList extends React.Component<Props, State> {
           onSubInstructionClick={onInstructionClick}
           onSubInstructionDoubleClick={onInstructionDoubleClick}
           onSubInstructionContextMenu={onInstructionContextMenu}
-          onSubInstructionsListContextMenu={onInstructionsListContextMenu}
+          onAddSubInstructionContextMenu={onAddInstructionContextMenu}
           onSubParameterClick={onParameterClick}
           disabled={disabled}
           renderObjectThumbnail={this.props.renderObjectThumbnail}
@@ -186,9 +185,8 @@ export default class InstructionsList extends React.Component<Props, State> {
                   onClick={this.onAddNewInstruction}
                   onContextMenu={e => {
                     e.stopPropagation();
-                    onInstructionsListContextMenu(
-                      e.clientX,
-                      e.clientY,
+                    onAddInstructionContextMenu(
+                      e.currentTarget,
                       instructionsListContext
                     );
                   }}
@@ -197,7 +195,6 @@ export default class InstructionsList extends React.Component<Props, State> {
                 </button>
                 {canPaste && (
                   <span>
-                    {' '}
                     <button
                       style={styles.addButton}
                       className="add-link"

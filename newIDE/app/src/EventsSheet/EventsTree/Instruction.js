@@ -20,6 +20,7 @@ import InstructionsList from './InstructionsList';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
+import MissingParameterValue from './MissingParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -67,9 +68,8 @@ type Props = {|
   ) => void,
   onSubInstructionClick: InstructionContext => void,
   onSubInstructionDoubleClick: InstructionContext => void,
-  onSubInstructionsListContextMenu: (
-    x: number,
-    y: number,
+  onAddSubInstructionContextMenu: (
+    button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
   ) => void,
   onSubParameterClick: Function,
@@ -164,6 +164,7 @@ const Instruction = (props: Props) => {
                 parameterMetadata,
                 renderObjectThumbnail,
                 InvalidParameterValue,
+                MissingParameterValue,
                 useAssignmentOperators,
               })}
             </span>
@@ -286,8 +287,8 @@ const Instruction = (props: Props) => {
                 onInstructionClick={props.onSubInstructionClick}
                 onInstructionDoubleClick={props.onSubInstructionDoubleClick}
                 onInstructionContextMenu={props.onSubInstructionContextMenu}
-                onInstructionsListContextMenu={
-                  props.onSubInstructionsListContextMenu
+                onAddInstructionContextMenu={
+                  props.onAddSubInstructionContextMenu
                 }
                 onParameterClick={props.onSubParameterClick}
                 addButtonLabel={<Trans>Add a sub-condition</Trans>}

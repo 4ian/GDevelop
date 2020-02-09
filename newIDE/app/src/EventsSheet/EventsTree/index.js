@@ -60,9 +60,8 @@ type EventsContainerProps = {|
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (
-    x: number,
-    y: number,
+  onAddInstructionContextMenu: (
+    HTMLButtonElement,
     InstructionsListContext
   ) => void,
   onParameterClick: ParameterContext => void,
@@ -131,9 +130,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={
-              this.props.onInstructionsListContextMenu
-            }
+            onAddInstructionContextMenu={this.props.onAddInstructionContextMenu}
             onParameterClick={this.props.onParameterClick}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             onOpenLayout={this.props.onOpenLayout}
@@ -183,9 +180,8 @@ type EventsTreeProps = {|
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
-  onInstructionsListContextMenu: (
-    x: number,
-    y: number,
+  onAddInstructionContextMenu: (
+    HTMLButtonElement,
     InstructionsListContext
   ) => void,
   onParameterClick: ParameterContext => void,
@@ -445,7 +441,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
           })
         }
         onInstructionContextMenu={this.props.onInstructionContextMenu}
-        onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+        onAddInstructionContextMenu={this.props.onAddInstructionContextMenu}
         onOpenExternalEvents={this.props.onOpenExternalEvents}
         onOpenLayout={this.props.onOpenLayout}
         disabled={

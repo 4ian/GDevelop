@@ -14,6 +14,7 @@ export type ParameterInlineRendererProps = {|
   value: string,
   renderObjectThumbnail: string => React.Node,
   InvalidParameterValue: InvalidParameterValueProps => React.Node,
+  MissingParameterValue: () => React.Node,
   useAssignmentOperators: boolean,
 |};
 

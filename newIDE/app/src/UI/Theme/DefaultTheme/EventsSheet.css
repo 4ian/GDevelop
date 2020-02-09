@@ -28,7 +28,7 @@
 }
 
 .gd-events-sheet-default-theme .rst__moveHandle:hover {
-  background-color: #84d2ff!important;
+  background-color: #84d2ff !important;
 }
 
 /**
@@ -151,6 +151,16 @@
   .instruction-invalid-parameter {
   color: #bb0000;
   text-decoration: #bb0000 underline wavy;
+}
+
+.gd-events-sheet-default-theme
+  .instruction-parameter
+  .instruction-missing-parameter {
+  display: inline-flex;
+  background-color: rgba(243, 0, 12, 0.15);
+  border-bottom: 1px dashed #bb0000;
+  min-width: 25px;
+  min-height: 14px;
 }
 
 /**

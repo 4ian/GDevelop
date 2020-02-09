@@ -31,10 +31,6 @@ const optionalRequire = (
   } catch (ex) {
     if (config.rethrowException) throw ex;
 
-    console.error(
-      'Exception while requiring module (from optionalRequire):',
-      ex
-    );
     return null;
   }
 };

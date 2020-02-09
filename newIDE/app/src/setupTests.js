@@ -15,6 +15,8 @@ const initializeGDevelopJs = require('libGD.js-for-tests-only');
 
 // We create the global "gd" object **synchronously** here. This is done as
 // the source files are using `global.gd` as a "top level" object (after imports).
+// This is a side effect, so this file must be imported before any test.
+// See also GDevelopJsInitializerDecorator.js for Storybook.
 global.gd = {
   I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_GD_INSIDE_A_TEST_ONLY: true,
 };

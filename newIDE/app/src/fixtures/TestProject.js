@@ -1,10 +1,43 @@
+// @flow
+
+/*::
+type TestProject = {|
+  project: gdProject,
+  shapePainterObject: any,
+  textObject: any,
+  tiledSpriteObject: any,
+  panelSpriteObject: any,
+  spriteObject: gdSpriteObject,
+  spriteObjectWithBehaviors: gdSpriteObject,
+  testLayout: gdLayout,
+  group1: gdObjectGroup,
+  group2: gdObjectGroup,
+  testLayoutInstance1: gdInitialInstance,
+  testInstruction: gdInstruction,
+  testExternalEvents1: gdExternalEvents,
+  testExternalEvents2: gdExternalEvents,
+  emptyLayout: gdLayout,
+  testEventsFunction: gdEventsFunction,
+  testEventsFunctionsExtension: gdEventsFunctionsExtension,
+  testSerializedEvents: Object,
+  testSerializedEventsWithLotsOfObjects: Object,
+  testEventsBasedBehavior: gdEventsBasedBehavior,
+  testEmptyEventsBasedBehavior: gdEventsBasedBehavior,
+  testBehaviorEventsFunction: gdEventsFunction,
+  testBehaviorLifecycleEventsFunction: gdEventsFunction,
+  layerWithEffects: gdLayer,
+  layerWithEffectWithoutEffectType: gdLayer,
+  layerWithoutEffects: gdLayer,
+|};
+*/
+
 /**
  * Create a dummy project using libGD.js filled with a
  * few elements that can be used for testing.
  *
  * @param gd The GD instance to use to create the project.
  */
-export const makeTestProject = gd => {
+export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create and expose a game project
   const project = gd.ProjectHelper.createNewGDJSProject();
 

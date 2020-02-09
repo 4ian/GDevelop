@@ -9,6 +9,9 @@ const styles = {
     paddingBottom: 10,
     overflowY: 'auto',
 
+    // Never show a horizontal scrollbar
+    overflowX: 'hidden',
+
     // Restrict size in case of extra small or large popover (though this should not happen)
     minHeight: 30,
     maxHeight: 400,

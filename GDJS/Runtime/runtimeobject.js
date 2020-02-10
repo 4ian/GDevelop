@@ -1171,7 +1171,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objects, ignoreTouch
 
    //Check if their is a collision with each object
    for(var i = 0, len = objects.length;i<len;++i) {
-       if ( objects[i].id != this.getUniqueId() ) {
+       if ( objects[i].id != this.id ) {
            var otherHitBoxes = objects[i].getHitBoxes();
 
            for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
@@ -1209,7 +1209,7 @@ gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists, ig
 
             //Check if their is a collision with each object
             for(var i = 0, len = objects.length;i<len;++i) {
-                if ( objects[i].id != this.getUniqueId() ) {
+                if ( objects[i].id != this.id ) {
                     var otherHitBoxes = objects[i].getHitBoxes();
 
                     for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
@@ -1313,7 +1313,7 @@ gdjs.RuntimeObject.prototype.separateObjectsWithoutForces = function(objectsList
     }
 
     for(var i = 0, len = objects.length;i<len;++i) {
-        if ( objects[i].id != this.getUniqueId() ) {
+        if ( objects[i].id != this.id ) {
             if ( this.getDrawableX() < objects[i].getDrawableX() ){
                 this.setX( objects[i].getDrawableX() - this.getWidth() );
             }
@@ -1350,7 +1350,7 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
     }
 
     for(var i = 0, len = objects.length;i<len;++i) {
-        if ( objects[i].id != this.getUniqueId ) {
+        if ( objects[i].id != this.id ) {
             if ( this.getDrawableX()+this.getCenterX() < objects[i].getDrawableX()+objects[i].getCenterX() )
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getX();

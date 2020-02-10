@@ -41,30 +41,53 @@
  * @param {ObjectData} objectData The initial properties of the object.
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData) {
-    /** @type {string} */
+    /**
+     * @protected
+     * @type {string}
+     */
     this.name = objectData.name || "";
-    /** @type {string} */
+    /**
+     * @protected
+     * @type {string}
+     */
     this.type = objectData.type || "";
-    /** @type {number} */
+    /**
+     * @protected
+     * @type {number}
+     */
     this.x = 0;
-    /** @type {number} */
+    /**
+     * @protected
+     * @type {number}
+     */
     this.y = 0;
-    /** @type {number} */
+    /**
+     * @protected
+     * @type {number}
+     */
     this.angle = 0;
-    /** @type {number} */
+    /**
+     * @protected
+     * @type {number}
+     */
     this.zOrder = 0;
-    /** @type {boolean} */
+    /**
+     * @protected
+     * @type {boolean}
+     */
     this.hidden = false;
-    /** @type {string} */
+    /**
+     * @protected
+     * @type {string}
+     */
     this.layer = "";
-
     /**
      * @type {number}
      * @protected
      */
     this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
-    /** 
-     * @type {boolean} 
+    /**
+     * @type {boolean}
      * @protected
      */
     this._livingOnScene = true;
@@ -75,7 +98,6 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this.id = runtimeScene.createNewUniqueId();
     /**
      * @type {gdjs.RuntimeScene}
-     * @protected
      */
     this._runtimeScene = runtimeScene;
 
@@ -90,14 +112,19 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     }
     /**
      * @type {Array<gdjs.Polygon>}
+     * @protected
      */
     this.hitBoxes = this._defaultHitBoxes;
     /**
      * @type {boolean}
+     * @protected
      */
     this.hitBoxesDirty = true;
     if ( this.aabb === undefined )
-        /** @type {AABB} */
+        /**
+         * @type {AABB}
+         * @protected
+         */
         this.aabb = { min:[0,0], max:[0,0] };
     else {
         this.aabb.min[0] = 0; this.aabb.min[1] = 0;
@@ -108,6 +135,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     if ( !this._variables )
         /**
          * @type {gdjs.VariablesContainer}
+         * @protected
          */
         this._variables = new gdjs.VariablesContainer(objectData ? objectData.variables : undefined);
     else
@@ -117,15 +145,12 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     if ( this._forces === undefined )
         /**
          * @type {Array<gdjs.Force>}
+         * @protected
          */
         this._forces = [];
     else
         this.clearForces();
 
-    /**
-     * A force returned by getAverageForce method.
-     * @type {gdjs.Force}
-     */
     if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,0);
 
     //Behaviors:
@@ -133,13 +158,15 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
         /**
          * Contains the behaviors of the object.
          * @type {Array<gdjs.RuntimeBehavior>}
+         * @protected
          */
         this._behaviors = [];
 
     if (this._behaviorsTable === undefined)
-        //TODO add <string, gdjs.RuntimeBehavior> in the future
+        //TODO: add <string, gdjs.RuntimeBehavior> typing to Hashtable.
         /**
          * @type {Hashtable}
+         * @protected
          */
         this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
     else
@@ -164,9 +191,10 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
 
     //Timers:
     if (this._timers === undefined)
-        //TODO add <string, gdjs.Timer> in the future
+        //TODO: add <string, gdjs.Timer> typing to Hashtable.
         /**
          * @type {Hashtable}
+         * @protected
          */
         this._timers = new Hashtable();
     else
@@ -181,7 +209,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
 gdjs.RuntimeObject._identifiers = gdjs.RuntimeObject._identifiers || new Hashtable();
 
 /**
- * The next available unique identifier for an object. Do not use directly or modify. 
+ * The next available unique identifier for an object. Do not use directly or modify.
  * @static
  * @private
  */
@@ -192,7 +220,7 @@ gdjs.RuntimeObject._newId = (gdjs.RuntimeObject._newId || 0);
  * @static
  * @private
  */
-gdjs.RuntimeObject.forcesGarbage = []; 
+gdjs.RuntimeObject.forcesGarbage = [];
 
 //Common members functions related to the object and its runtimeScene :
 

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * A generic map (key values) container.
  *
@@ -5,11 +6,10 @@
  * GDevelop generated events.
  *
  * @constructor
- * @template K,V
  */
 function Hashtable()
 {
-    /** @type {Object<K,V>} */
+    /** @type {Object} */
     this.items = {};
 }
 
@@ -28,8 +28,8 @@ Hashtable.newFrom = function(items) {
 /**
  * Add a key-value pair to the Hashtable.
  * @memberof Hashtable
- * @param {K} key The key for the value.
- * @param {V} value The value for the key.
+ * @param key The key for the value.
+ * @param value The value for the key.
  */
 Hashtable.prototype.put = function(key, value) {
     this.items[key] = value;
@@ -38,7 +38,7 @@ Hashtable.prototype.put = function(key, value) {
 /**
  * Get a value corresponding to a key.
  * @memberof Hashtable
- * @param {K} key The key for the value.
+ * @param key The key for the value.
  */
 Hashtable.prototype.get = function(key) {
     return this.items[key];
@@ -47,7 +47,7 @@ Hashtable.prototype.get = function(key) {
 /**
  * Verify if a key exists.
  * @memberof Hashtable
- * @param {K} key A key.
+ * @param key A key.
  * @returns {boolean} Does the key exists?
  */
 Hashtable.prototype.containsKey = function(key) {
@@ -57,7 +57,7 @@ Hashtable.prototype.containsKey = function(key) {
 /**
  * Remove the key-value pair with the key passed.
  * @memberof Hashtable
- * @param {K} key The key for the value.
+ * @param key The key for the value.
  */
 Hashtable.prototype.remove = function(key) {
     delete this.items[key];
@@ -66,7 +66,7 @@ Hashtable.prototype.remove = function(key) {
 /**
  * Get the first key of the Hashtable.
  * @memberof Hashtable
- * @returns {K} The first key of the Hashtable.
+ * @returns The first key of the Hashtable.
  */
 Hashtable.prototype.firstKey = function() {
     for (var k in this.items) {

@@ -35,13 +35,16 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function() {
     this._profilerText = new PIXI.Text(" ", {
       align: "left",
       stroke: "#FFF",
-      strokeThickness: 1
+      strokeThickness: 1,
+      fontSize: 12,
     });
     this._pixiContainer.addChild(this._profilerText);
   }
 
   var average = this._runtimeScene.getProfiler().getFramesAverageMeasures();
   var outputs = [];
+  gdjs.Profiler.getProfilerCounterTexts(average.counters, outputs);
+  gdjs.Profiler.getProfilerTimingTexts(average.timings, outputs);
   gdjs.Profiler.getProfilerSectionTexts("All", average, outputs);
 
   this._profilerText.text = outputs.join("\n");

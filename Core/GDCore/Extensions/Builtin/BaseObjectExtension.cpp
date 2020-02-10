@@ -602,17 +602,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectList", _("Object 2 (won't move)"));
 
-  obj.AddAction("SeparateFromObjects",
-                _("Separate two objects"),
-                _("Move an object away from another using their collision "
-                  "masks.\nBe sure to call this action on a reasonable number "
-                  "of objects\nto avoid slowing down the game."),
-                _("Move _PARAM0_ away from _PARAM1_ (only _PARAM0_ will move)"),
-                _("Position"),
-                "res/actions/ecarter24.png",
-                "res/actions/ecarter.png")
+  extension
+      .AddAction(
+          "SeparateFromObjects",
+          _("Separate two objects"),
+          _("Move an object away from another using their collision "
+            "masks.\nBe sure to call this action on a reasonable number "
+            "of objects\nto avoid slowing down the game."),
+          _("Move _PARAM0_ away from _PARAM1_ (only _PARAM0_ will move)"),
+          _("Position"),
+          "res/actions/ecarter24.png",
+          "res/actions/ecarter.png")
 
-      .AddParameter("object", _("Object"))
+      .AddParameter("objectList", _("Object"))
       .AddParameter("objectList", _("Objects (won't move)"))
       .AddParameter("yesorno",
                     _("Ignore objects that are touching each other on their "
@@ -620,18 +622,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "",
                     true)
       .SetDefaultValue("no")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
-  obj.AddCondition("CollisionPoint",
-                   _("Point inside object"),
-                   _("Test if a point is inside the object collision masks."),
-                   _("_PARAM1_;_PARAM2_ is inside _PARAM0_"),
-                   _("Collision"),
-                   "res/conditions/collisionPoint24.png",
-                   "res/conditions/collisionPoint.png")
-      .AddParameter("object", _("Object"))
+  extension
+      .AddCondition("CollisionPoint",
+                    _("Point inside object"),
+                    _("Test if a point is inside the object collision masks."),
+                    _("_PARAM1_;_PARAM2_ is inside _PARAM0_"),
+                    _("Collision"),
+                    "res/conditions/collisionPoint24.png",
+                    "res/conditions/collisionPoint.png")
+      .AddParameter("objectList", _("Object"))
       .AddParameter("expression", _("X position of the point"))
       .AddParameter("expression", _("Y position of the point"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
   obj.AddCondition(
@@ -963,6 +969,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object 2"))
       .AddParameter("expression", _("Distance"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
   extension
@@ -1072,8 +1079,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition("Raycast",
                     _("Raycast"),
                     _("Sends a ray from the given source position and angle, "
-                      "intersecting the closest object.\nThe instersected "
-                      "object will become the only one taken into account.\nIf "
+                      "intersecting the closest object.\nThe intersected "
+                      "object will become the only one picked for next "
+                      "conditions and actions.\nIf "
                       "the condition is inverted, the object to be intersected "
                       "will be the farthest one within the ray radius."),
                     _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the "
@@ -1095,6 +1103,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Scene variable where to store the Y position of the intersection. "
             "If no intersection is found, the variable won't be changed."))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
   extension
@@ -1102,8 +1111,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "RaycastToPosition",
           _("Raycast to position"),
           _("Sends a ray from the given source position to the final point, "
-            "intersecting the closest object.\nThe instersected "
-            "object will become the only one taken into account.\nIf "
+            "intersecting the closest object.\nThe intersected "
+            "object will become the only one picked for next conditions and "
+            "actions.\nIf "
             "the condition is inverted, the object to be intersected "
             "will be the farthest one within the ray radius."),
           _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the "
@@ -1125,6 +1135,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Scene variable where to store the Y position of the intersection. "
             "If no intersection is found, the variable won't be changed."))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
   extension

@@ -56,18 +56,19 @@ gdjs.SkeletonRuntimeObject.prototype.getSkeletonData = function(runtimeScene, ob
 
 // RuntimeObject overwrites
 gdjs.SkeletonRuntimeObject.prototype.setX = function(x){
-    this.x = x;
+    gdjs.RuntimeObject.prototype.setX.call(this, x);
     this.rootArmature.setX(x);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.setY = function(y){
-    this.y = y;
+    gdjs.RuntimeObject.prototype.setY.call(this, y);
     this.rootArmature.setY(y);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.setAngle = function(angle){
     this.angle = angle;
     this.rootArmature.setRot(angle);
+    gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getRendererObject = function(){

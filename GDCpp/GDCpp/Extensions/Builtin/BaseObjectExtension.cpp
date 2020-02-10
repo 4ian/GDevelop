@@ -109,10 +109,6 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["Ecarter"]
       .SetFunctionName("SeparateObjectsWithoutForces")
       .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
-  objectActions["SeparateFromObjects"]
-      .SetFunctionName("SeparateFromObjects")
-      .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
-  objectConditions["CollisionPoint"].SetFunctionName("IsCollidingWithPoint");
 
   objectExpressions["X"].SetFunctionName("GetX");
   objectExpressions["Y"].SetFunctionName("GetY");
@@ -174,6 +170,9 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("PickedObjectsCount")
       .SetManipulatedType("number")
       .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
+  GetAllConditions()["SeparateFromObjects"]
+      .SetFunctionName("SeparateObjects")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
   GetAllConditions()["CollisionNP"]
       .SetFunctionName("HitBoxesCollision")
       .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
@@ -186,6 +185,7 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["RaycastToPosition"]
       .SetFunctionName("RaycastObjectToPosition")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
+  GetAllConditions()["CollisionPoint"].SetFunctionName("IsCollidingWithPoint");
 
   GetAllExpressions()["Count"]
       .SetFunctionName("PickedObjectsCount")

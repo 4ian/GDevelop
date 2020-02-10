@@ -14,7 +14,8 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 gdjs.PlatformObjectsManager = function(runtimeScene, sharedData)
 {
-    this._platformRBush = new rbush(9, ['.owner.getAABB().min[0]', '.owner.getAABB().min[1]', '.owner.getAABB().max[0]', '.owner.getAABB().max[1]']);
+    // TODO: update RBush to avoid using eval-like Function.
+    this._platformRBush = new rbush(9, ['.aabb.min[0]', '.aabb.min[1]', '.aabb.max[0]', '.aabb.max[1]']);
 };
 
 /**
@@ -89,11 +90,14 @@ gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
     this._canBeGrabbed = behaviorData.canBeGrabbed || false;
     this._yGrabOffset = behaviorData.yGrabOffset || 0;
 
-    //Note that we can't use getX(), getWidth()... of owner here: The owner is not fully constructed.
-    this._oldX = 0;
-    this._oldY = 0;
-    this._oldWidth = 0;
-    this._oldHeight = 0;
+    //Note that we can't use getAABB() of the owner here: The owner is not fully constructed.
+    this._oldAABBMinX = 0;
+    this._oldAABBMinX = 0;
+    this._oldAABBMaxX = 0;
+    this._oldAABBMaxY = 0;
+
+    /** @type {AABB} */
+    this.aabb = { min: [0,0], max: [0,0] };
 
 	this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
 	this._registeredInManager = false;
@@ -111,17 +115,27 @@ gdjs.PlatformRuntimeBehavior.prototype.onDestroy = function() {
 };
 
 gdjs.PlatformRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
+    // Track changes in AABB
+    // TODO: Skip this if the behavior is deactivated.
+    /** @type {AABB} */
+    var aabb = this.owner.getAABB();
 
-    //Scene change is not supported
-    /*if ( parentScene != &scene ) //Parent scene has changed
+    if (this._oldAABBMinX !== aabb.min[0] || this._oldAABBMinY !== aabb.min[1] ||
+        this._oldAABBMaxX !== aabb.max[0] || this._oldAABBMaxY !== aabb.max[1])
     {
-        if ( sceneManager ) //Remove the object from any old scene manager.
-            sceneManager->RemovePlatform(this);
+        // Store the AABB of the platform directly in the behavior, for usage by rbush
+        this.aabb = aabb;
 
-        parentScene = &scene;
-        sceneManager = parentScene ? &ScenePlatformObjectsManager::managers[&scene] : NULL;
-        registeredInManager = false;
-    }*/
+        if ( this._registeredInManager ) {
+            this._manager.removePlatform(this);
+            this._manager.addPlatform(this);
+        }
+
+        this._oldAABBMinX = aabb.min[0];
+        this._oldAABBMinY = aabb.min[1];
+        this._oldAABBMaxX = aabb.max[0];
+        this._oldAABBMaxY = aabb.max[1];
+    }
 
     //Make sure the platform is or is not in the platforms manager.
     if (!this.activated() && this._registeredInManager)
@@ -133,21 +147,6 @@ gdjs.PlatformRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) 
     {
         this._manager.addPlatform(this);
         this._registeredInManager = true;
-    }
-
-    //Track changes in size or position
-    if (this._oldX !== this.owner.getX() || this._oldY !== this.owner.getY() ||
-        this._oldWidth !== this.owner.getWidth() || this._oldHeight !== this.owner.getHeight())
-    {
-        if ( this._registeredInManager ) {
-            this._manager.removePlatform(this);
-            this._manager.addPlatform(this);
-        }
-
-        this._oldX = this.owner.getX();
-        this._oldY = this.owner.getY();
-        this._oldWidth = this.owner.getWidth();
-        this._oldHeight = this.owner.getHeight();
     }
 };
 

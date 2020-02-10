@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -165,7 +166,7 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  * @param  {Function} predicate The function applied to each object: must return true if the object fulfill the predicate.
  * @param  {Hashtable} objectsLists The lists of objects to trim
  * @param  {boolean} negatePredicate If set to true, the result of the predicate is negated.
- * @param  {*} extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
+ * @param  {any=} extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
  * @return {boolean} true if at least one object fulfill the predicate.
  */
 gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate, extraArg) {
@@ -186,6 +187,7 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
         var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            // @ts-ignore
             if (negatePredicate ^ predicate(arr[k], extraArg)) {
                 isTrue = true;
                 arr[k].pick = true; //Pick the objects
@@ -211,18 +213,91 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
     return isTrue;
 };
 
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to test collisions for
+ * @param {Hashtable} objectsLists2 The second lists of objects to test collisions for
+ * @param {boolean} inverted If set to true, only objects from the first lists that are not in collision with *any* other objects will be picked.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ */
 gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
+    var object1IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists1);
+    var object2IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists2);
+
+    var isTrue = runtimeScene.getObjectPositionsManager().collisionTest(object1IdsSet, object2IdsSet, inverted, ignoreTouchingEdges);
+
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists1, object1IdsSet);
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists2, object2IdsSet);
+
+    return isTrue;
+};
+
+
+gdjs.evtTools.object.OLDhitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
     return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.collisionTest,
-        objectsLists1, objectsLists2, inverted, ignoreTouchingEdges);
+      objectsLists1, objectsLists2, inverted, ignoreTouchingEdges);
+}
+
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to test distance from
+ * @param {Hashtable} objectsLists2 The second lists of objects to test distance to
+ * @param {number} distance The maximum distance between objects
+ * @param {boolean} inverted If set to true, only objects from the first lists that have *no* objects from the second lists below the specified distance will be picked.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted, runtimeScene) {
+    var object1IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists1);
+    var object2IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists2);
+
+    var isTrue = runtimeScene.getObjectPositionsManager().distanceTest(object1IdsSet, object2IdsSet, distance, inverted);
+
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists1, object1IdsSet);
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists2, object2IdsSet);
+
+    return isTrue;
 };
 
 gdjs.evtTools.object._distanceBetweenObjects = function(obj1, obj2, distance) {
+    gdjs.evtTools.object._distanceBetweenObjectsCount++;
     return obj1.getSqDistanceToObject(obj2) <= distance;
 };
 
-gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
+gdjs.evtTools.object.OLDdistanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
     return gdjs.evtTools.object.twoListsTest(gdjs.evtTools.object._distanceBetweenObjects,
         objectsLists1, objectsLists2, inverted, distance*distance);
+};
+
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to move
+ * @param {Hashtable} objectsLists2 The lists of objects to move away from
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.separateObjects = function(objectsLists1, objectsLists2, ignoreTouchingEdges, runtimeScene) {
+    var object1IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists1);
+    var object2IdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists2);
+
+    runtimeScene.getObjectPositionsManager().separateObjects(object1IdsSet, object2IdsSet, ignoreTouchingEdges);
+};
+
+/**
+ * @param {Hashtable} objectsLists1 The lists of objects to move
+ * @param {Hashtable} objectsLists2 The lists of objects to move away from
+ * @param {boolean} ignoreTouchingEdges If true, polygons are not considered in collision if only their edges are touching.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.OLDseparateObjects = function(objectsLists1, objectsLists2, ignoreTouchingEdges, runtimeScene) {
+    var lists = gdjs.staticArray(gdjs.evtTools.object.separateObjects);
+    objectsLists1.values(lists);
+    for(var i = 0, len = lists.length;i<len;++i) {
+        var list = lists[i];
+
+        for(var j = 0;j < list.length;++j) {
+            /** @type gdjs.RuntimeObject */
+            var object = list[j];
+            object.OLDseparateFromObjectsList(objectsLists2, ignoreTouchingEdges);
+        }
+    }
 };
 
 gdjs.evtTools.object._movesToward = function(obj1, obj2, tolerance) {
@@ -316,6 +391,7 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
         for(var j = 0;j < list.length;++j) {
             var object = list[j];
             var distance = object.getSqDistanceTo(x, y);
+            // @ts-ignore
             if( first || (distance < best ^ inverted)) {
                 best = distance;
                 bestObject = object;
@@ -332,16 +408,54 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
     return true;
 };
 
-gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, varX, varY, inverted) {
+/**
+ * @param {Hashtable} objectsLists The lists of objects to intersect the ray with
+ * @param {number} x X position of the ray starting point
+ * @param {number} y Y position of the ray starting point
+ * @param {number} angle Angle of the ray
+ * @param {number} dist Maximum distance ("radius") before stopping the ray
+ * @param {gdjs.Variable} varX Variable where to store the ray/object intersection X position
+ * @param {gdjs.Variable} varY Variable where to store the ray/object intersection Y position
+ * @param {boolean} inverted true to find the object that is the farthest one intersecting with the ray, false to find the closest.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, varX, varY, inverted, runtimeScene) {
     return gdjs.evtTools.object.raycastObjectToPosition(
                 objectsLists,
                 x, y,
                 x + dist*Math.cos(angle*Math.PI/180.0),
                 y + dist*Math.sin(angle*Math.PI/180.0),
-                varX, varY, inverted);
+                varX, varY, inverted, runtimeScene);
 };
 
-gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX, endY, varX, varY, inverted) {
+
+/**
+ * @param {Hashtable} objectsLists The lists of objects to intersect the ray with
+ * @param {number} x X position of the ray starting point
+ * @param {number} y Y position of the ray starting point
+ * @param {number} endX X position of the ray ending point
+ * @param {number} endY Y position of the ray ending point
+ * @param {gdjs.Variable} varX Variable where to store the ray/object intersection X position
+ * @param {gdjs.Variable} varY Variable where to store the ray/object intersection Y position
+ * @param {boolean} inverted true to find the object that is the farthest one intersecting with the ray, false to find the closest.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX, endY, varX, varY, inverted, runtimeScene) {
+    var objectIdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists);
+
+    var intersectionCoordinates = [0, 0];
+    var foundIntersection = runtimeScene.getObjectPositionsManager().raycastTest(objectIdsSet, x, y, endX, endY, intersectionCoordinates, inverted);
+
+    if (!foundIntersection)
+        return false;
+
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists, objectIdsSet);
+    varX.setNumber(intersectionCoordinates[0]);
+    varY.setNumber(intersectionCoordinates[1]);
+    return true;
+}
+
+gdjs.evtTools.object.OLDraycastObjectToPosition = function(objectsLists, x, y, endX, endY, varX, varY, inverted) {
     var matchObject = null;
     var testSqDist = inverted ? 0 : (endX - x)*(endX - x) + (endY - y)*(endY - y);
     var resultX = 0;
@@ -380,6 +494,29 @@ gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX
     varX.setNumber(resultX);
     varY.setNumber(resultY);
     return true;
+};
+
+/**
+ * @param {Hashtable} objectsLists The lists of objects to test
+ * @param {number} x X position of the point
+ * @param {number} y Y position of the point
+ * @param {boolean} inverted true to find objects containing the point, false to find objects not containing it.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene objects belong to
+ */
+gdjs.evtTools.object.isCollidingWithPoint = function(objectsLists, x, y, inverted, runtimeScene) {
+    var objectIdsSet = gdjs.ObjectPositionsManager.objectsListsToObjectIdsSet(objectsLists);
+
+    var isTrue = runtimeScene.getObjectPositionsManager().pointsTest(
+        objectIdsSet, [[x, y]], true /* TODO: Allow to specify if the test should be accurate or not */, inverted);
+
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromObjectIdsSet(objectsLists, objectIdsSet);
+    return isTrue;
+};
+
+gdjs.evtTools.object.OLDisCollidingWithPoint = function(objectsLists, x, y, inverted, runtimeScene) {
+    return gdjs.evtTools.object.pickObjectsIf(function(obj) {
+        return obj.isCollidingWithPoint(x, y);
+    }, objectsLists, inverted);
 };
 
 /**

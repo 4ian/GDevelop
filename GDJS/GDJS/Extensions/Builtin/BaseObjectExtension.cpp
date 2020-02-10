@@ -114,9 +114,6 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["AngleOfDisplacement"]
       .SetFunctionName("averageForceAngleIs")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["SeparateFromObjects"]
-      .SetFunctionName("separateFromObjectsList")
-      .SetIncludeFile("runtimeobject.js");
   objectActions["Ecarter"]
       .codeExtraInformation  // Deprecated
       .SetFunctionName("separateObjectsWithoutForces")
@@ -139,9 +136,6 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetIncludeFile("runtimeobject.js");
   objectActions["ObjectVariableClearChildren"]
       .SetFunctionName("variableClearChildren")
-      .SetIncludeFile("runtimeobject.js");
-  objectConditions["CollisionPoint"]
-      .SetFunctionName("isCollidingWithPoint")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["ObjectTimer"]
       .SetFunctionName("timerElapsedTime")
@@ -202,8 +196,10 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.pickedObjectsCount");
   GetAllConditions()["NbObjet"].SetFunctionName(
       "gdjs.evtTools.object.pickedObjectsCount");
-  GetAllConditions()["CollisionNP"]
-      .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
+  GetAllActions()["SeparateFromObjects"].SetFunctionName(
+      "gdjs.evtTools.object.separateObjects");
+  GetAllConditions()["CollisionNP"].SetFunctionName(
+      "gdjs.evtTools.object.hitBoxesCollisionTest");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");
   GetAllConditions()["RaycastToPosition"].SetFunctionName(
@@ -214,6 +210,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.movesTowardTest");
   GetAllConditions()["EstTourne"].SetFunctionName(
       "gdjs.evtTools.object.turnedTowardTest");
+  GetAllConditions()["CollisionPoint"].SetFunctionName(
+      "gdjs.evtTools.object.isCollidingWithPoint");
 
   GetAllActions()["AjoutObjConcern"].SetFunctionName(
       "gdjs.evtTools.object.pickAllObjects");

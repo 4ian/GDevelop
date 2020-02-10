@@ -1,3 +1,5 @@
+// @ts-check
+
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -95,7 +97,7 @@ gdjs.evtTools.input.keysNameToCode = {
     "x": 88,
     "y": 89,
     "z": 90,
-    
+
     "Num0": 48,
     "Num1": 49,
     "Num2": 50,
@@ -226,11 +228,85 @@ gdjs.evtTools.input.getMouseY = function(runtimeScene, layer, camera) {
         runtimeScene.getGame().getInputManager().getMouseY())[1];
 };
 
+/**
+ * @param {Hashtable} objectsLists The objects to consider for the test
+ * @returns {Object.<string, ObjectIdsSet>} Sets of object ids keyed by the name of the layer the objects are on.
+ */
+gdjs.evtTools.input._objectsListsToObjectIdsSetGroupedPerLayer = function(objectsLists) {
+    /** @type Object.<string, ObjectIdsSet> */
+    var layerObjectIdsSets = {};
+
+    for (var key in objectsLists.items) {
+      /** @type gdjs.RuntimeObject[] */
+      var list = objectsLists.items[key];
+      for (var i = 0; i < list.length; ++i) {
+        var object = list[i];
+        var layerName = object.getLayer();
+
+        layerObjectIdsSets[layerName] = layerObjectIdsSets[layerName] || gdjs.ObjectPositionsManager.makeNewObjectIdsSet();
+        layerObjectIdsSets[layerName].items[object.id] = true;
+      }
+    }
+
+    return layerObjectIdsSets;
+}
+
+/**
+ * @param {Hashtable} objectsLists The objects to consider for the test
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {boolean} accurate
+ * @param {boolean} inverted
+ * @returns {boolean}
+ */
+gdjs.evtTools.input.cursorOnObject = function(objectsLists, runtimeScene, accurate, inverted) {
+    var isTrue = false;
+    var inputManager = runtimeScene.getGame().getInputManager();
+
+    // Find the mouse and touch positions on each layer
+
+    /** @type Object.<string, number[][]> */
+    var layersCursorPositions = {};
+
+    /** @type string[] */
+    var allLayerNames = [];
+    runtimeScene.getAllLayerNames(allLayerNames);
+
+    for(var i = 0;i<allLayerNames.length;i++) {
+        var layerName = allLayerNames[i];
+        var layer = runtimeScene.getLayer(layerName);
+
+        /** @type number[][] */
+        var cursorPositions = [];
+        cursorPositions.push(layer.convertCoords(inputManager.getMouseX(), inputManager.getMouseY(), 0));
+
+        var touchIds = inputManager.getAllTouchIdentifiers();
+        for(var j = 0;j<touchIds.length;++j) {
+            cursorPositions.push(layer.convertCoords(inputManager.getTouchX(touchIds[j]),
+                inputManager.getTouchY(touchIds[j]), 0));
+        }
+
+        layersCursorPositions[layerName] = cursorPositions;
+    }
+
+    // Group object ids per layer and check which objects are colliding with any of the cursor positions.
+    var layerObjectIdsSets = gdjs.evtTools.input._objectsListsToObjectIdsSetGroupedPerLayer(objectsLists);
+    for(var layerName in layerObjectIdsSets) {
+        var objectIdsSet = layerObjectIdsSets[layerName];
+        var cursorPositions = layersCursorPositions[layerName];
+
+        isTrue = runtimeScene.getObjectPositionsManager().pointsTest(objectIdsSet, cursorPositions, accurate, inverted) || isTrue;
+    }
+
+    // Trim the object lists to keep only objects satisfying the tests
+    gdjs.ObjectPositionsManager.keepOnlyObjectsFromGroupedObjectIdsSets(objectsLists, layerObjectIdsSets);
+    return isTrue;
+};
+
 gdjs.evtTools.input._cursorIsOnObject = function(obj, runtimeScene) {
     return obj.cursorOnObject(runtimeScene);
 };
 
-gdjs.evtTools.input.cursorOnObject = function(objectsLists, runtimeScene, accurate, inverted) {
+gdjs.evtTools.input.OLDcursorOnObject = function(objectsLists, runtimeScene, accurate, inverted) {
     return gdjs.evtTools.object.pickObjectsIf(gdjs.evtTools.input._cursorIsOnObject,
         objectsLists, inverted, runtimeScene);
 };

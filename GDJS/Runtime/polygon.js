@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -33,14 +34,28 @@ gdjs.Polygon = function()
     this.center = [0,0];
 };
 
-gdjs.Polygon.prototype.move = function(x,y) {
+/**
+ * Move the polygon by the specified offset.
+ * @param {number} x Offset on X axis
+ * @param {number} y Offset on Y axis
+ * @returns {gdjs.Polygon} The same, updated, polygon.
+ */
+gdjs.Polygon.prototype.move = function(x, y) {
 	for(var i = 0, len = this.vertices.length;i<len;++i) {
 
 		this.vertices[i][0] += x;
 		this.vertices[i][1] += y;
-	}
+    }
+
+    return this;
 };
 
+/**
+ * Rotate the polygon by the specified angle (in radians), clockwise.
+ *
+ * @param {number} angle The angle, in radians.
+ * @returns {gdjs.Polygon} The same, updated, polygon.
+ */
 gdjs.Polygon.prototype.rotate = function(angle) {
 	var t, cosa = Math.cos(-angle),
 		sina = Math.sin(-angle); //We want a clockwise rotation
@@ -49,7 +64,9 @@ gdjs.Polygon.prototype.rotate = function(angle) {
 		t = this.vertices[i][0];
 		this.vertices[i][0] = t*cosa + this.vertices[i][1]*sina;
 		this.vertices[i][1] = -t*sina + this.vertices[i][1]*cosa;
-	}
+    }
+
+    return this;
 };
 
 gdjs.Polygon.prototype.computeEdges = function() {
@@ -220,9 +237,23 @@ gdjs.Polygon.collisionTest._statics = {
 };
 
 /**
- * Do a raycast test.<br>
- * Please note that the polygon must be <b>convex</b>!
- * 
+ * Represents the result of a raycast test (see `gdjs.Polygon.raycastTest`)
+ *
+ * @typedef {Object} PolygonRaycastTestResult
+ * @property {boolean} collision True if there is a collision between the ray and the polygon
+ * @property {number} closeX X position of the ray/polygon intersection point closest to the ray start point.
+ * @property {number} closeY Y position of the ray/polygon intersection point closest to the ray start point.
+ * @property {number} closeSqDist The squared distance between the ray start point and the closest intersection point.
+ * @property {number} farX X position of the ray/polygon intersection point farthest to the ray start point.
+ * @property {number} farY Y position of the ray/polygon intersection point farthest to the ray start point.
+ * @property {number} farSqDist The squared distance between the ray start point and the farthest intersection point.
+ */
+
+/**
+ * Do an intersection test between a polygon and a ray.
+ *
+ * Please note that the polygon must be **convex**!
+ *
  * For some theory, check <a href="https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments">Find the Intersection Point of Two Line Segments</a>.
  *
  * @param {gdjs.Polygon} poly The polygon to test
@@ -230,10 +261,11 @@ gdjs.Polygon.collisionTest._statics = {
  * @param {number} startY The raycast start point Y
  * @param {number} endX The raycast end point X
  * @param {number} endY The raycast end point Y
- * @return A raycast result with the contact points and distances
+ * @return {PolygonRaycastTestResult} A raycast result with the contact points and distances
  */
 gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 {
+    /** @type PolygonRaycastTestResult */
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
 
@@ -313,7 +345,7 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
         {
             var x = p[0] + t*r[0];
             var y = p[1] + t*r[1];
-            
+
             var sqDist = (x-startX)*(x-startX) + (y-startY)*(y-startY);
             if ( sqDist < minSqDist )
             {
@@ -339,6 +371,21 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 
     return result;
 };
+
+/**
+ * Copy a PolygonRaycastTestResult into another.
+ * @param {PolygonRaycastTestResult} source The result to copy
+ * @param {PolygonRaycastTestResult} destination Where to save the results
+ */
+gdjs.Polygon.raycastTest.copyResultTo = function(source, destination) {
+    destination.collision = source.collision;
+    destination.closeX = source.closeX;
+    destination.closeY = source.closeY;
+    destination.closeSqDist = source.closeSqDist;
+    destination.farX = source.farX;
+    destination.farY = source.farY;
+    destination.farSqDist = source.farSqDist;
+}
 
 gdjs.Polygon.raycastTest._statics = {
     p: [0,0],

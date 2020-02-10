@@ -19,6 +19,7 @@ module.exports = function(config) {
       '../Runtime/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js',
       '../Runtime/jsonmanager.js',
       '../Runtime/timemanager.js',
+      '../Runtime/objectpositionsmanager.js',
       '../Runtime/runtimeobject.js',
       '../Runtime/runtimescene.js',
       '../Runtime/scenestack.js',

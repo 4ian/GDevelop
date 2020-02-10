@@ -27,6 +27,7 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._lastId = 0;
     this._name = "";
     this._timeManager = new gdjs.TimeManager(Date.now());
+    this._objectPositionsManager = new gdjs.ObjectPositionsManager();
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
@@ -39,8 +40,13 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
     /** @type gdjs.Profiler */
-    this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
+    this._profiler = null;
     this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
+
+    // Uncomment to manually launch profiling on the scene.
+    // Also uncomment the profiler display in `gdjs.RuntimeScenePixiRenderer` if needed.
+    // this.startProfiler(null);
+    // window.gdjsProfiler = this._profiler;
 
     this.onGameResolutionResized();
 };
@@ -378,7 +384,7 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
             if (object.isHidden()) {
                 rendererObject.visible = false;
             } else {
-                var aabb = object.getVisibilityAABB();
+                var aabb = object.getVisibilityAABB(); // TODO: Use the ObjectPositionsManager
                 if (aabb && // If no AABB is returned, the object should always be visible
                     (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
                     aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1])) {
@@ -465,6 +471,11 @@ gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
     }
 
     this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
+
+    // Update the object positions manager to ensure that, in case events or behaviors
+    // are not triggering themselves an update, we at least call update once per frame. Otherwise,
+    // we risk a **memory leak** by not clearing the object positions waiting to be deleted.
+    this._objectPositionsManager.update();
 };
 
 /**
@@ -682,6 +693,14 @@ gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
 };
 
 /**
+ * Get the ObjectPositionsManager of the scene.
+ * @return {gdjs.ObjectPositionsManager} The gdjs.ObjectPositionsManager of the scene.
+ */
+gdjs.RuntimeScene.prototype.getObjectPositionsManager = function() {
+    return this._objectPositionsManager;
+};
+
+/**
  * Get the TimeManager of the scene.
  * @return {gdjs.TimeManager} The gdjs.TimeManager of the scene.
  */
@@ -742,13 +761,14 @@ gdjs.RuntimeScene.prototype.getProfiler = function() {
 /**
  * Start a new profiler to measures the time passed in sections of the engine
  * in the scene.
- * @param {Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
+ * @param {?Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
  */
 gdjs.RuntimeScene.prototype.startProfiler = function(onProfilerStopped) {
     if (this._profiler) return;
 
     this._profiler = new gdjs.Profiler();
     this._onProfilerStopped = onProfilerStopped;
+    this._objectPositionsManager.setProfiler(this._profiler);
 }
 
 /**
@@ -761,6 +781,7 @@ gdjs.RuntimeScene.prototype.stopProfiler = function() {
     var onProfilerStopped = this._onProfilerStopped;
     this._profiler = null;
     this._onProfilerStopped = null;
+    this._objectPositionsManager.setProfiler(null);
 
     if (onProfilerStopped) {
         onProfilerStopped(oldProfiler);

@@ -45,7 +45,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this.layer = "";
     this.livingOnScene = true;
     this.id = runtimeScene.createNewUniqueId();
-    this._runtimeScene = runtimeScene; //This could/should be avoided.
+    this._runtimeScene = runtimeScene;
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
@@ -54,6 +54,8 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     }
     this.hitBoxes = this._defaultHitBoxes;
     this.hitBoxesDirty = true;
+    this._runtimeScene.getObjectPositionsManager().markObjectAsCreated(this);
+
     if ( this.aabb === undefined )
         this.aabb = { min:[0,0], max:[0,0] };
     else {
@@ -114,21 +116,21 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
  * @static
  * @private
  */
-gdjs.RuntimeObject._identifiers = gdjs.RuntimeObject._identifiers || new Hashtable();
+gdjs.RuntimeObject._identifiers = {};
 
 /**
- * The next available unique identifier for an object. Do not use directly or modify. 
+ * The next available unique identifier for an object. Do not use directly or modify.
  * @static
  * @private
  */
-gdjs.RuntimeObject._newId = (gdjs.RuntimeObject._newId || 0);
+gdjs.RuntimeObject._largestId = 0;
 
 /**
  * Global container for unused forces, avoiding recreating forces each tick.
  * @static
  * @private
  */
-gdjs.RuntimeObject.forcesGarbage = []; 
+gdjs.RuntimeObject.forcesGarbage = [];
 
 //Common members functions related to the object and its runtimeScene :
 
@@ -206,6 +208,8 @@ gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
     for(var j = 0, lenj = this._behaviors.length;j<lenj;++j) {
         this._behaviors[j].onDestroy();
     }
+
+    runtimeScene.getObjectPositionsManager().markObjectAsRemoved(this);
 };
 
 //Rendering:
@@ -270,6 +274,7 @@ gdjs.RuntimeObject.prototype.setX = function(x) {
 
     this.x = x;
     this.hitBoxesDirty = true;
+    this._runtimeScene.getObjectPositionsManager().markObjectAsDirty(this);
 };
 
 /**
@@ -291,6 +296,7 @@ gdjs.RuntimeObject.prototype.setY = function(y) {
 
     this.y = y;
     this.hitBoxesDirty = true;
+    this._runtimeScene.getObjectPositionsManager().markObjectAsDirty(this);
 };
 
 /**
@@ -374,6 +380,7 @@ gdjs.RuntimeObject.prototype.setAngle = function(angle) {
 
     this.angle = angle;
     this.hitBoxesDirty = true;
+    this._runtimeScene.getObjectPositionsManager().markObjectAsDirty(this);
 };
 
 /**
@@ -839,9 +846,11 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
 };
 
 /**
+ * An axis aligned bounding box, usually used for an object.
+ *
  * @typedef {Object} AABB
- * @property {Array} min The [x,y] coordinates of the top left point
- * @property {Array} max The [x,y] coordinates of the bottom right point
+ * @property {number[]} min The [x,y] coordinates of the top left point
+ * @property {number[]} max The [x,y] coordinates of the bottom right point
  */
 
 /**
@@ -877,7 +886,7 @@ gdjs.RuntimeObject.prototype.getAABB = function() {
  * @return {?AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`) or `null`.
  */
 gdjs.RuntimeObject.prototype.getVisibilityAABB = function() {
-    return this.getAABB();
+    return this.getAABB(); // TODO: this should return getDrawableX/Y + getWidth/getHeight
 };
 
 /**
@@ -1134,7 +1143,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objects, ignoreTouch
  * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
  * @return true if the object was moved
  */
-gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists, ignoreTouchingEdges) {
+gdjs.RuntimeObject.prototype.OLDseparateFromObjectsList = function(objectsLists, ignoreTouchingEdges) {
     var moved = false;
     var xMove = 0; var yMove = 0;
     var hitBoxes = this.getHitBoxes();
@@ -1472,18 +1481,13 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
  * @static
  */
 gdjs.RuntimeObject.getNameIdentifier = function(name) {
-    gdjs.RuntimeObject._identifiers =
-        gdjs.RuntimeObject._identifiers
-        || new Hashtable();
+    var identifier = gdjs.RuntimeObject._identifiers[name];
+    if (identifier !== undefined) return identifier;
 
-    if ( gdjs.RuntimeObject._identifiers.containsKey(name) )
-        return gdjs.RuntimeObject._identifiers.get(name);
+    gdjs.RuntimeObject._largestId++;
+    var newIdentifier = gdjs.RuntimeObject._largestId;
 
-    gdjs.RuntimeObject._newId =
-        (gdjs.RuntimeObject._newId || 0) + 1;
-    var newIdentifier = gdjs.RuntimeObject._newId;
-
-    gdjs.RuntimeObject._identifiers.put(name, newIdentifier);
+    gdjs.RuntimeObject._identifiers[name] = newIdentifier;
     return newIdentifier;
 };
 

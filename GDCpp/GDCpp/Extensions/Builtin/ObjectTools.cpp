@@ -43,6 +43,35 @@ bool GD_API HitBoxesCollision(
       });
 }
 
+void GD_API SeparateObjects(
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
+    bool ignoreTouchingEdges,
+    RuntimeScene & /*scene*/) {
+  for (auto it : objectsLists1) {
+    if (!it.second) continue;
+    const std::vector<RuntimeObject *> &list = *it.second;
+
+    for (auto runtimeObject : list) {
+      runtimeObject->SeparateFromObjects(objectsLists2, ignoreTouchingEdges);
+    }
+  }
+}
+
+bool GD_API IsCollidingWithPoint(
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
+    double pointX,
+    double pointY,
+    bool conditionInverted,
+    RuntimeScene &scene) {
+  return PickObjectsIf(objectsLists,
+                       conditionInverted,
+                       [pointX, pointY](RuntimeObject *runtimeObject) {
+                         return runtimeObject->IsCollidingWithPoint(pointX,
+                                                                    pointY);
+                       });
+}
+
 bool GD_API ObjectsTurnedToward(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
@@ -69,7 +98,8 @@ float GD_API DistanceBetweenObjects(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
     float length,
-    bool conditionInverted) {
+    bool conditionInverted,
+    RuntimeScene & /*scene*/) {
   length *= length;
   return TwoObjectListsTest(
       objectsLists1,

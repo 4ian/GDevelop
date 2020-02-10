@@ -94,7 +94,6 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this.hitBoxes = this._defaultHitBoxes;
     /**
      * @type {boolean}
-     * @note No serialization as used as internal value that should not be changed by deserialization.
      */
     this.hitBoxesDirty = true;
     if ( this.aabb === undefined )
@@ -109,7 +108,6 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     if ( !this._variables )
         /**
          * @type {gdjs.VariablesContainer}
-         * @note No serialization as {@link gdjs.Variable} and {@link gdjs.VariablesContainer} have no serializer yet.
          */
         this._variables = new gdjs.VariablesContainer(objectData ? objectData.variables : undefined);
     else
@@ -119,7 +117,6 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     if ( this._forces === undefined )
         /**
          * @type {Array<gdjs.Force>}
-         * @note No serialization as {@link gdjs.Force} has no serializer yet.
          */
         this._forces = [];
     else
@@ -128,7 +125,6 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     /**
      * A force returned by getAverageForce method.
      * @type {gdjs.Force}
-     * @note No serialization as {@link gdjs.Force} has no serializer yet.
      */
     if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,0);
 
@@ -137,14 +133,13 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
         /**
          * Contains the behaviors of the object.
          * @type {Array<gdjs.RuntimeBehavior>}
-         * @note No serialization as {@link gdjs.RuntimeBehavior} has no serializer yet.
          */
         this._behaviors = [];
 
     if (this._behaviorsTable === undefined)
+        //TODO add <string, gdjs.RuntimeBehavior> in the future
         /**
-         * @type {Hashtable} (//TODO add <string, gdjs.RuntimeBehavior> in the future)
-         * @note No serialization as {@link gdjs.RuntimeBehavior} has no serializer yet.
+         * @type {Hashtable}
          */
         this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
     else
@@ -169,9 +164,9 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
 
     //Timers:
     if (this._timers === undefined)
+        //TODO add <string, gdjs.Timer> in the future
         /**
-         * @type {Hashtable} (//TODO add <string, gdjs.Timer> in the future)
-         * @note No serialization as {@link gdjs.Timer} has no serializer yet.
+         * @type {Hashtable}
          */
         this._timers = new Hashtable();
     else
@@ -286,7 +281,7 @@ gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
  * @return {Object} The internal rendered object (PIXI.DisplayObject...)
  */
 gdjs.RuntimeObject.prototype.getRendererObject = function() {
-    return {};
+    return undefined;
 };
 
 //Common properties:

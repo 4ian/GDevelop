@@ -118,11 +118,13 @@ std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
 }
 
 std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
+  size_t textStartPosition = GetCurrentPosition();
   SkipWhitespace();
   if (!IsAnyChar("\"")) {
     auto text = gd::make_unique<TextNode>("");
     text->diagnostic =
         RaiseSyntaxError(_("A text must start with a double quote (\")."));
+    text->location = ExpressionParserLocation(textStartPosition, GetCurrentPosition());
     return text;
   }
   SkipChar();
@@ -157,6 +159,7 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   }
 
   auto text = gd::make_unique<TextNode>(parsedText);
+  text->location = ExpressionParserLocation(textStartPosition, GetCurrentPosition());
   if (!textParsingHasEnded) {
     text->diagnostic =
         RaiseSyntaxError(_("A text must end with a double quote (\"). Add a "
@@ -167,6 +170,7 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
 }
 
 std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
+  size_t numberStartPosition = GetCurrentPosition();
   SkipWhitespace();
   gd::String parsedNumber;
 
@@ -209,6 +213,7 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   // valid in most languages so we allow this.
 
   auto number = gd::make_unique<NumberNode>(parsedNumber);
+  number->location = ExpressionParserLocation(numberStartPosition, GetCurrentPosition());
   if (!numberHasStarted || !digitFound) {
     number->diagnostic = RaiseSyntaxError(
         _("A number was expected. You must enter a number here."));

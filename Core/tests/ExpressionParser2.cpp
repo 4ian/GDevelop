@@ -853,4 +853,102 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
                          "\fe'f\fwe'\te'w\f'reg[pto43o]"));
     }
   }
+
+  SECTION("Location") {
+    SECTION("Single node locations") {
+      {
+        auto node = parser.ParseExpression("string", "\"hello world\"");
+        REQUIRE(node != nullptr);
+        auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+        REQUIRE(textNode.text == "hello world");
+        REQUIRE(textNode.location.GetStartPosition() == 0);
+        REQUIRE(textNode.location.GetEndPosition() == 13);
+      }
+      {
+        auto node = parser.ParseExpression("number", "3.14159");
+        REQUIRE(node != nullptr);
+        auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+        REQUIRE(numberNode.number == "3.14159");
+        REQUIRE(numberNode.location.GetStartPosition() == 0);
+        REQUIRE(numberNode.location.GetEndPosition() == 7);
+      }
+      {
+        auto node = parser.ParseExpression("number", "345 +  678");
+        REQUIRE(node != nullptr);
+        auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+        REQUIRE(operatorNode.location.GetStartPosition() == 0);
+        REQUIRE(operatorNode.location.GetEndPosition() == 10);
+        REQUIRE(operatorNode.leftHandSide != nullptr);
+        REQUIRE(operatorNode.rightHandSide != nullptr);
+        REQUIRE(operatorNode.leftHandSide->location.GetStartPosition() == 0);
+        REQUIRE(operatorNode.leftHandSide->location.GetEndPosition() == 3);
+        REQUIRE(operatorNode.rightHandSide->location.GetStartPosition() == 7);
+        REQUIRE(operatorNode.rightHandSide->location.GetEndPosition() == 10);
+      }
+      {
+        auto node = parser.ParseExpression(
+            "number",
+            "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", three)");
+        REQUIRE(node != nullptr);
+        auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+        REQUIRE(functionNode.functionName == "WhateverFunction");
+        REQUIRE(functionNode.objectName == "WhateverObject");
+        REQUIRE(functionNode.behaviorName == "WhateverBehavior");
+        REQUIRE(functionNode.parameters.size() == 3);
+        auto &numberNode =
+            dynamic_cast<gd::NumberNode &>(*functionNode.parameters[0]);
+        auto &textNode =
+            dynamic_cast<gd::TextNode &>(*functionNode.parameters[1]);
+        auto &identifierNode =
+            dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
+
+        REQUIRE(numberNode.number == "1");
+        REQUIRE(textNode.text == "2");
+        REQUIRE(identifierNode.identifierName == "three");
+
+        REQUIRE(functionNode.location.GetStartPosition() == 0);
+        REQUIRE(functionNode.location.GetEndPosition() == 64);
+        REQUIRE(numberNode.location.GetStartPosition() == 50);
+        REQUIRE(numberNode.location.GetEndPosition() == 51);
+        REQUIRE(textNode.location.GetStartPosition() == 53);
+        REQUIRE(textNode.location.GetEndPosition() == 56);
+        REQUIRE(identifierNode.location.GetStartPosition() == 58);
+        REQUIRE(identifierNode.location.GetEndPosition() == 63);
+      }
+    }
+    SECTION("Invalid/partial expression locations") {
+      {
+        auto node = parser.ParseExpression("number", "3.14159 + ");
+        REQUIRE(node != nullptr);
+        auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+        REQUIRE(operatorNode.leftHandSide != nullptr);
+        REQUIRE(operatorNode.rightHandSide != nullptr);
+        REQUIRE(operatorNode.location.GetStartPosition() == 0);
+        REQUIRE(operatorNode.location.GetEndPosition() == 10);
+
+        auto &numberNode = dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+        auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*operatorNode.rightHandSide);
+        REQUIRE(numberNode.location.GetStartPosition() == 0);
+        REQUIRE(numberNode.location.GetEndPosition() == 7);
+        REQUIRE(emptyNode.location.GetStartPosition() == 10);
+        REQUIRE(emptyNode.location.GetEndPosition() == 10);
+      }
+      {
+        auto node = parser.ParseExpression("number", "\"abcde\" + ");
+        REQUIRE(node != nullptr);
+        auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+        REQUIRE(operatorNode.leftHandSide != nullptr);
+        REQUIRE(operatorNode.rightHandSide != nullptr);
+        REQUIRE(operatorNode.location.GetStartPosition() == 0);
+        REQUIRE(operatorNode.location.GetEndPosition() == 10);
+
+        auto &textNode = dynamic_cast<gd::TextNode &>(*operatorNode.leftHandSide);
+        auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*operatorNode.rightHandSide);
+        REQUIRE(textNode.location.GetStartPosition() == 0);
+        REQUIRE(textNode.location.GetEndPosition() == 7);
+        REQUIRE(emptyNode.location.GetStartPosition() == 10);
+        REQUIRE(emptyNode.location.GetEndPosition() == 10);
+      }
+    }
+  }
 }

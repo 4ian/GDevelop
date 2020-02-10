@@ -72,7 +72,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
      * @type {number}
      * @protected
      */
-    this._id = runtimeScene.createNewUniqueId();
+    this.id = runtimeScene.createNewUniqueId();
     /**
      * @type {gdjs.RuntimeScene}
      * @protected
@@ -286,6 +286,7 @@ gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
  * @return {Object} The internal rendered object (PIXI.DisplayObject...)
  */
 gdjs.RuntimeObject.prototype.getRendererObject = function() {
+    return {};
 };
 
 //Common properties:
@@ -315,7 +316,7 @@ gdjs.RuntimeObject.prototype.getNameId = function() {
  * @return {number} The object identifier
  */
 gdjs.RuntimeObject.prototype.getUniqueId = function() {
-    return this._id;
+    return this.id;
 }
 ;
 /**

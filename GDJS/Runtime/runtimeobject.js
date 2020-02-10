@@ -15,11 +15,10 @@
  */
 
 /**
- * @typedef {Object} AABB
+ * @typedef {Object} AABB An axis-aligned bounding box. Used to represents a box around an object for example.
  * @property {Array<number>} min The [x,y] coordinates of the top left point
  * @property {Array<number>} max The [x,y] coordinates of the bottom right point
  */
-
 
 /**
  * RuntimeObject represents an object being used on a RuntimeScene.

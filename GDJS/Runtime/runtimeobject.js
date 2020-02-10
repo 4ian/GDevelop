@@ -16,8 +16,8 @@
 
 /**
  * @typedef {Object} AABB
- * @property {Array} min The [x,y] coordinates of the top left point
- * @property {Array} max The [x,y] coordinates of the bottom right point
+ * @property {Array<number>} min The [x,y] coordinates of the top left point
+ * @property {Array<number>} max The [x,y] coordinates of the bottom right point
  */
 
 
@@ -43,12 +43,6 @@
 gdjs.RuntimeObject = function(runtimeScene, objectData) {
     /** @type {string} */
     this.name = objectData.name || "";
-    /**
-     * @type {number}
-     * @protected
-     * @note No serialization as used as internal value that should not be changed by deserialization.
-     */
-    this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
     /** @type {string} */
     this.type = objectData.type || "";
     /** @type {number} */
@@ -63,17 +57,25 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this.hidden = false;
     /** @type {string} */
     this.layer = "";
-    /** @type {boolean} */
-    this.livingOnScene = true;
+
     /**
      * @type {number}
-     * @note No serialization as used as internal value that should not be changed by deserialization.
+     * @protected
      */
-    this.id = runtimeScene.createNewUniqueId();
+    this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+    /** 
+     * @type {boolean} 
+     * @protected
+     */
+    this._livingOnScene = true;
+    /**
+     * @type {number}
+     * @protected
+     */
+    this._id = runtimeScene.createNewUniqueId();
     /**
      * @type {gdjs.RuntimeScene}
-     * @note This could/should be avoided.
-     * @note No serialization as runtimeScene would serialize objects as children and we don't want circular references (and to be able to deserialize on other scenes).
+     * @protected
      */
     this._runtimeScene = runtimeScene;
 
@@ -82,14 +84,12 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
         /**
          * @type {Array<gdjs.Polygon>}
          * @protected
-         * @note No serialization as {@link gdjs.Polygon} has no serializer yet.
          */
         this._defaultHitBoxes = [];
         this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0,0));
     }
     /**
      * @type {Array<gdjs.Polygon>}
-     * @note No serialization as {@link gdjs.Polygon} has no serializer yet.
      */
     this.hitBoxes = this._defaultHitBoxes;
     /**
@@ -143,7 +143,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
 
     if (this._behaviorsTable === undefined)
         /**
-         * @type {Hashtable<string, gdjs.RuntimeBehavior>}
+         * @type {Hashtable} (//TODO add <string, gdjs.RuntimeBehavior> in the future)
          * @note No serialization as {@link gdjs.RuntimeBehavior} has no serializer yet.
          */
         this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
@@ -170,7 +170,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     //Timers:
     if (this._timers === undefined)
         /**
-         * @type {Hashtable<string, gdjs.Timer>}
+         * @type {Hashtable} (//TODO add <string, gdjs.Timer> in the future)
          * @note No serialization as {@link gdjs.Timer} has no serializer yet.
          */
         this._timers = new Hashtable();
@@ -255,9 +255,9 @@ gdjs.RuntimeObject.prototype.extraInitializationFromInitialInstance = function(i
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
  */
 gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
-    if ( this.livingOnScene ) {
+    if ( this._livingOnScene ) {
         runtimeScene.markObjectForDeletion(this);
-        this.livingOnScene = false;
+        this._livingOnScene = false;
     }
 };
 
@@ -315,7 +315,7 @@ gdjs.RuntimeObject.prototype.getNameId = function() {
  * @return {number} The object identifier
  */
 gdjs.RuntimeObject.prototype.getUniqueId = function() {
-    return this.id;
+    return this._id;
 }
 ;
 /**
@@ -851,7 +851,7 @@ gdjs.RuntimeObject.prototype.averageForceAngleIs = function(angle, toleranceInDe
  *
  * You should probably redefine updateHitBoxes instead of this function.
  *
- * @return {Array} An array composed of polygon.
+ * @return {Array<gdjs.Polygon>} An array composed of polygon.
  */
 gdjs.RuntimeObject.prototype.getHitBoxes = function() {
     //Avoid a naive implementation requiring to recreate temporaries each time
@@ -1170,7 +1170,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objects, ignoreTouch
 
    //Check if their is a collision with each object
    for(var i = 0, len = objects.length;i<len;++i) {
-       if ( objects[i].id != this.id ) {
+       if ( objects[i].id != this.getUniqueId() ) {
            var otherHitBoxes = objects[i].getHitBoxes();
 
            for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
@@ -1208,7 +1208,7 @@ gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists, ig
 
             //Check if their is a collision with each object
             for(var i = 0, len = objects.length;i<len;++i) {
-                if ( objects[i].id != this.id ) {
+                if ( objects[i].id != this.getUniqueId() ) {
                     var otherHitBoxes = objects[i].getHitBoxes();
 
                     for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
@@ -1312,7 +1312,7 @@ gdjs.RuntimeObject.prototype.separateObjectsWithoutForces = function(objectsList
     }
 
     for(var i = 0, len = objects.length;i<len;++i) {
-        if ( objects[i].id != this.id ) {
+        if ( objects[i].id != this.getUniqueId() ) {
             if ( this.getDrawableX() < objects[i].getDrawableX() ){
                 this.setX( objects[i].getDrawableX() - this.getWidth() );
             }
@@ -1349,7 +1349,7 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
     }
 
     for(var i = 0, len = objects.length;i<len;++i) {
-        if ( objects[i].id != this.id ) {
+        if ( objects[i].id != this.getUniqueId ) {
             if ( this.getDrawableX()+this.getCenterX() < objects[i].getDrawableX()+objects[i].getCenterX() )
             {
                 var av = this.hasNoForces() ? 0 : this.getAverageForce().getX();

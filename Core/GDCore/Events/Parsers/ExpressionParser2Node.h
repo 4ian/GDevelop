@@ -20,6 +20,22 @@ class ExpressionMetadata;
 
 namespace gd {
 
+struct ExpressionParserLocation {
+  ExpressionParserLocation()
+      : isValid(false) {};
+  ExpressionParserLocation(size_t position)
+      : isValid(true), startPosition(position), endPosition(position){};
+  ExpressionParserLocation(size_t startPosition_, size_t endPosition_)
+      : isValid(true), startPosition(startPosition_), endPosition(endPosition_){};
+  size_t GetStartPosition() { return startPosition; }
+  size_t GetEndPosition() { return endPosition; }
+
+ private:
+  bool isValid;
+  size_t startPosition;
+  size_t endPosition;
+};
+
 /**
  * \brief A diagnostic that can be attached to a gd::ExpressionNode.
  */
@@ -42,28 +58,25 @@ struct ExpressionParserError : public ExpressionParserDiagnostic {
                         size_t position_)
       : type(type_),
         message(message_),
-        startPosition(position_),
-        endPosition(position_){};
+        location(position_) {};
   ExpressionParserError(const gd::String &type_,
                         const gd::String &message_,
                         size_t startPosition_,
                         size_t endPosition_)
       : type(type_),
         message(message_),
-        startPosition(startPosition_),
-        endPosition(endPosition_){};
+        location(startPosition_, endPosition_) {};
   virtual ~ExpressionParserError(){};
 
   bool IsError() override { return true; }
   const gd::String &GetMessage() override { return message; }
-  size_t GetStartPosition() override { return startPosition; }
-  size_t GetEndPosition() override { return endPosition; }
+  size_t GetStartPosition() override { return location.GetStartPosition(); }
+  size_t GetEndPosition() override { return location.GetEndPosition(); }
 
  private:
   gd::String type;
   gd::String message;
-  size_t startPosition;
-  size_t endPosition;
+  ExpressionParserLocation location;
 };
 
 /**
@@ -75,6 +88,7 @@ struct ExpressionNode {
   virtual void Visit(ExpressionParser2NodeWorker &worker){};
 
   std::unique_ptr<ExpressionParserDiagnostic> diagnostic;
+  ExpressionParserLocation location;
 };
 
 struct SubExpressionNode : public ExpressionNode {

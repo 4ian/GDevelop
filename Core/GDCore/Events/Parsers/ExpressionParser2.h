@@ -71,6 +71,7 @@ class GD_CORE_API ExpressionParser2 {
   ///@{
   std::unique_ptr<ExpressionNode> Start(const gd::String &type,
                                         const gd::String &objectName = "") {
+    size_t expressionStartPosition = GetCurrentPosition();
     auto expression = Expression(type, objectName);
 
     // Check for extra characters at the end of the expression
@@ -83,6 +84,8 @@ class GD_CORE_API ExpressionParser2 {
       op->rightHandSide->diagnostic = RaiseSyntaxError(
           _("The expression has extra character at the end that should be "
             "removed (or completed if your expression is not finished)."));
+
+      op->location = ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
       return std::move(op);
     }
 
@@ -107,6 +110,8 @@ class GD_CORE_API ExpressionParser2 {
       op->diagnostic = ValidateOperator(type, GetCurrentChar());
       SkipChar();
       op->rightHandSide = Expression(type, objectName);
+
+      op->location = ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
       return std::move(op);
     }
 
@@ -128,6 +133,7 @@ class GD_CORE_API ExpressionParser2 {
     op->op = ' ';
     op->leftHandSide = std::move(leftHandSide);
     op->rightHandSide = Expression(type, objectName);
+    op->location = ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
     return std::move(op);
   }
 
@@ -135,7 +141,9 @@ class GD_CORE_API ExpressionParser2 {
                                        const gd::String &objectName) {
     SkipWhitespace();
 
+    size_t expressionStartPosition = GetCurrentPosition();
     std::unique_ptr<ExpressionNode> factor = Factor(type, objectName);
+
     SkipWhitespace();
 
     // This while loop is used instead of a recursion (like in Expression)
@@ -148,6 +156,7 @@ class GD_CORE_API ExpressionParser2 {
       op->diagnostic = ValidateOperator(type, GetCurrentChar());
       SkipChar();
       op->rightHandSide = Factor(type, objectName);
+      op->location = ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
       SkipWhitespace();
 
       factor = std::move(op);
@@ -179,6 +188,7 @@ class GD_CORE_API ExpressionParser2 {
       SkipChar();
       unaryOperator->factor = Factor(type, objectName);
 
+      unaryOperator->location = ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
       factor = std::move(unaryOperator);
     } else if (IsAnyChar(NUMBER_FIRST_CHAR)) {
       factor = ReadNumber();
@@ -218,8 +228,11 @@ class GD_CORE_API ExpressionParser2 {
 
   std::unique_ptr<SubExpressionNode> SubExpression(
       const gd::String &type, const gd::String &objectName) {
-    return std::move(
-        gd::make_unique<SubExpressionNode>(Expression(type, objectName)));
+    size_t expressionStartPosition = GetCurrentPosition();
+    auto subExpression = gd::make_unique<SubExpressionNode>(Expression(type, objectName));
+    subExpression->location = ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
+
+    return std::move(subExpression);
   };
 
   std::unique_ptr<IdentifierOrFunctionOrEmptyNode> Identifier(
@@ -259,6 +272,7 @@ class GD_CORE_API ExpressionParser2 {
             identifierStartPosition);
       }
 
+      identifier->location = ExpressionParserLocation(identifierStartPosition, GetCurrentPosition());
       return std::move(identifier);
     }
   }
@@ -271,11 +285,14 @@ class GD_CORE_API ExpressionParser2 {
     auto variable = gd::make_unique<VariableNode>(type, name, objectName);
     variable->child = VariableAccessorOrVariableBracketAccessor();
 
+    variable->location = ExpressionParserLocation(identifierStartPosition, GetCurrentPosition());
     return std::move(variable);
   }
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>
   VariableAccessorOrVariableBracketAccessor() {
+    size_t childStartPosition = GetCurrentPosition();
+
     std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode> child;
     SkipWhitespace();
     if (IsAnyChar("[")) {
@@ -290,12 +307,14 @@ class GD_CORE_API ExpressionParser2 {
       }
       SkipIfIsAnyChar("]");
       child->child = VariableAccessorOrVariableBracketAccessor();
+      child->location = ExpressionParserLocation(childStartPosition, GetCurrentPosition()); // TODO
     } else if (IsAnyChar(DOT)) {
       SkipChar();
       SkipWhitespace();
 
       child = gd::make_unique<VariableAccessorNode>(ReadIdentifierName());
       child->child = VariableAccessorOrVariableBracketAccessor();
+      child->location = ExpressionParserLocation(childStartPosition, GetCurrentPosition()); // TODO
     }
 
     return child;
@@ -322,6 +341,7 @@ class GD_CORE_API ExpressionParser2 {
     if (!function->diagnostic)
       function->diagnostic = ValidateFunction(*function, functionStartPosition);
 
+    function->location = ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
     return std::move(function);
   }
 
@@ -366,6 +386,7 @@ class GD_CORE_API ExpressionParser2 {
         function->diagnostic =
             ValidateFunction(*function, functionStartPosition);
 
+      function->location = ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
       return std::move(function);
     }
 
@@ -374,6 +395,7 @@ class GD_CORE_API ExpressionParser2 {
         _("An opening parenthesis (for an object expression), or double colon "
           "(::) was expected (for a behavior expression)."));
 
+    node->location = ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
     return std::move(node);
   }
 
@@ -414,12 +436,14 @@ class GD_CORE_API ExpressionParser2 {
         function->diagnostic =
             ValidateFunction(*function, functionStartPosition);
 
+      function->location = ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
       return std::move(function);
     } else {
       auto node = gd::make_unique<EmptyNode>(type);
       node->diagnostic = RaiseSyntaxError(
           _("An opening parenthesis was expected here to call a function."));
 
+      node->location = ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
       return std::move(node);
     }
   }
@@ -664,6 +688,7 @@ class GD_CORE_API ExpressionParser2 {
   std::unique_ptr<NumberNode> ReadNumber();
 
   std::unique_ptr<EmptyNode> ReadUntilWhitespace(gd::String type) {
+    size_t startPosition = GetCurrentPosition();
     gd::String text;
     while (currentPosition < expression.size() &&
            WHITESPACES.find(expression[currentPosition]) == gd::String::npos) {
@@ -671,17 +696,22 @@ class GD_CORE_API ExpressionParser2 {
       currentPosition++;
     }
 
-    return gd::make_unique<EmptyNode>(type, text);
+    auto node = gd::make_unique<EmptyNode>(type, text);
+    node->location = ExpressionParserLocation(startPosition, GetCurrentPosition());
+    return node;
   }
 
   std::unique_ptr<EmptyNode> ReadUntilEnd(gd::String type) {
+    size_t startPosition = GetCurrentPosition();
     gd::String text;
     while (currentPosition < expression.size()) {
       text += expression[currentPosition];
       currentPosition++;
     }
 
-    return gd::make_unique<EmptyNode>(type, text);
+    auto node = gd::make_unique<EmptyNode>(type, text);
+    node->location = ExpressionParserLocation(startPosition, GetCurrentPosition());
+    return node;
   }
 
   size_t GetCurrentPosition() { return currentPosition; }

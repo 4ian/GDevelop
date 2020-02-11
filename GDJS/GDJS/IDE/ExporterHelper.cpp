@@ -24,7 +24,7 @@
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace gdjs {
@@ -112,7 +112,8 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
   // Export engine libraries
   AddLibsInclude(true, false, true, includesFiles);
 
-  // Export effects (after engine libraries as they auto-register themselves to the engine)
+  // Export effects (after engine libraries as they auto-register themselves to
+  // the engine)
   ExportEffectIncludes(exportedProject, includesFiles);
 
   // Generate events code
@@ -209,8 +210,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
   auto &resourceManager = project.GetResourcesManager();
   auto getIconFilename = [&resourceManager, &platformSpecificAssets](
-                             const gd::String &platform,
-                             const gd::String &name) {
+      const gd::String &platform, const gd::String &name) {
     const gd::String &file =
         resourceManager.GetResource(platformSpecificAssets.Get(platform, name))
             .GetFile();
@@ -295,10 +295,11 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
   gd::String jsonVersion =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
-  gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
-      gd::SceneNameMangler::Get()->GetMangledSceneName(project.GetName())
-          .LowerCase()
-          .FindAndReplace(" ", "-")));
+  gd::String jsonMangledName = gd::Serializer::ToJSON(
+      gd::SerializerElement(gd::SceneNameMangler::Get()
+                                ->GetMangledSceneName(project.GetName())
+                                .LowerCase()
+                                .FindAndReplace(" ", "-")));
 
   {
     gd::String str =
@@ -420,10 +421,11 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
   gd::String jsonVersion =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
-  gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
-      gd::SceneNameMangler::Get()->GetMangledSceneName(project.GetName())
-          .LowerCase()
-          .FindAndReplace(" ", "-")));
+  gd::String jsonMangledName = gd::Serializer::ToJSON(
+      gd::SerializerElement(gd::SceneNameMangler::Get()
+                                ->GetMangledSceneName(project.GetName())
+                                .LowerCase()
+                                .FindAndReplace(" ", "-")));
 
   {
     gd::String str =
@@ -648,14 +650,10 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     std::set<gd::String> eventsIncludes;
-    gd::Layout &exportedLayout = project.GetLayout(i);
-    gd::String eventsOutput =
-        EventsCodeGenerator::GenerateSceneEventsCompleteCode(
-            project,
-            exportedLayout,
-            exportedLayout.GetEvents(),
-            eventsIncludes,
-            !exportForPreview);
+    gd::Layout &layout = project.GetLayout(i);
+    LayoutCodeGenerator layoutCodeGenerator(project);
+    gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
+        layout, eventsIncludes, !exportForPreview);
     gd::String filename =
         outputDir + "/" + "code" + gd::String::From(i) + ".js";
 

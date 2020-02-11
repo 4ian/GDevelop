@@ -73,7 +73,7 @@
 #include "../../Extensions/SkeletonObject/SkeletonObject.h"
 
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
-#include <GDJS/Events/CodeGeneration/EventsCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/LayoutCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
 #include <GDJS/IDE/Exporter.h>
@@ -499,8 +499,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetObjectStrExpressionMetadata GetObjectStrExpressionMetadata
 #define STATIC_GetBehaviorStrExpressionMetadata GetBehaviorStrExpressionMetadata
 
-#define STATIC_GenerateSceneEventsCompleteCode GenerateSceneEventsCompleteCode
-#define STATIC_GenerateEventsFunctionCode GenerateEventsFunctionCode
 #define STATIC_Major Major
 #define STATIC_Minor Minor
 #define STATIC_Build Build

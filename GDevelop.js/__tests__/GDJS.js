@@ -9,8 +9,8 @@ describe('libGD.js - GDJS related tests', function() {
     })
   );
 
-  describe('EventsCodeGenerator', () => {
-    it('can generate code for a layout with generateSceneEventsCompleteCode', function() {
+  describe('LayoutCodeGenerator', () => {
+    it('can generate code for a layout', function() {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
 
@@ -25,10 +25,9 @@ describe('libGD.js - GDJS related tests', function() {
         .getConditions()
         .insert(condition, 0);
 
-      const code = gd.EventsCodeGenerator.generateSceneEventsCompleteCode(
-        project,
+      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const code = layoutCodeGenerator.generateLayoutCompleteCode(
         layout,
-        layout.getEvents(),
         new gd.SetString(),
         true
       );

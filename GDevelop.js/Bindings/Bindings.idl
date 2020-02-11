@@ -2301,11 +2301,10 @@ interface ParticleEmitterObject {
 ParticleEmitterObject implements gdObject;
 
 //GDJS bindings:
-
-[NoDelete, Prefix="gdjs::"]
-interface EventsCodeGenerator {
-    [Const, Value] DOMString STATIC_GenerateSceneEventsCompleteCode([Ref] Project project, [Ref] Layout layout, [Ref] EventsList events, [Ref] SetString includes, boolean compilationForRuntime);
-    [Const, Value] DOMString STATIC_GenerateEventsFunctionCode([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespace, [Ref] SetString includes, boolean compilationForRuntime);
+[Prefix="gdjs::"]
+interface LayoutCodeGenerator {
+    void LayoutCodeGenerator([Ref] Project project);
+    [Const, Value] DOMString GenerateLayoutCompleteCode([Const, Ref] Layout layout, [Ref] SetString includes, boolean compilationForRuntime);
 };
 
 [Prefix="gdjs::"]

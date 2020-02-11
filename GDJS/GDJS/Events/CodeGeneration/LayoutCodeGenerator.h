@@ -3,34 +3,33 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDJS_EVENTSFUNCTIONSEXTENSIONCODEGENERATOR_H
-#define GDJS_EVENTSFUNCTIONSEXTENSIONCODEGENERATOR_H
+#ifndef GDJS_LAYOUTCODEGENERATOR_H
+#define GDJS_LAYOUTCODEGENERATOR_H
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
-#include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/Layout.h"
 
 namespace gdjs {
 
 /**
  * \brief The class being responsible for generating JavaScript code for
- * EventsFunctionsExtension.
+ * the events of a scene.
  *
  * See also gd::BehaviorCodeGenerator.
  * See also gd::EventsCodeGenerator.
  */
-class EventsFunctionsExtensionCodeGenerator {
+class LayoutCodeGenerator {
  public:
-  EventsFunctionsExtensionCodeGenerator(gd::Project& project_)
+  LayoutCodeGenerator(gd::Project& project_)
       : project(project_){};
 
   /**
-   * \brief Generate the complete code for the specified events function.
+   * \brief Generate the complete code for the events of the specified scene.
    */
-  gd::String GenerateFreeEventsFunctionCompleteCode(
-      const gd::EventsFunction& eventsFunction,
-      const gd::String& codeNamespace,
+  gd::String GenerateLayoutCompleteCode(
+      const gd::Layout& layout,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime);
 
@@ -39,4 +38,4 @@ class EventsFunctionsExtensionCodeGenerator {
 };
 
 }  // namespace gdjs
-#endif  // GDJS_EVENTSFUNCTIONSEXTENSIONCODEGENERATOR_H
+#endif  // GDJS_LAYOUTCODEGENERATOR_H

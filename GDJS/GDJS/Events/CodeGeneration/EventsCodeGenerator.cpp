@@ -78,13 +78,15 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   return output;
 }
 
-gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
+gd::String EventsCodeGenerator::GenerateLayoutCode(
     gd::Project& project,
     const gd::Layout& scene,
-    const gd::EventsList& events,
+    const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
   EventsCodeGenerator codeGenerator(project, scene);
+  codeGenerator.SetCodeNamespace(codeNamespace);
+  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
       project,
@@ -92,13 +94,8 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       "runtimeScene",
       "runtimeScene.getOnceTriggers().startNewFrame();\n",
-      events,
+      scene.GetEvents(),
       "return;\n");
-
-  // Export the symbols to avoid them being stripped by the Closure Compiler:
-  output += "gdjs['" +
-            gd::SceneNameMangler::Get()->GetMangledSceneName(scene.GetName()) +
-            "Code']" + " = " + codeGenerator.GetCodeNamespace() + ";\n";
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
                       codeGenerator.GetIncludeFiles().end());
@@ -1052,18 +1049,6 @@ gd::String EventsCodeGenerator::GenerateBooleanFullName(
     const gd::EventsCodeGenerationContext& context) {
   return GetCodeNamespaceAccessor() + boolName + "_" +
          gd::String::From(context.GetCurrentConditionDepth());
-}
-
-gd::String EventsCodeGenerator::GetCodeNamespace() {
-  if (HasProjectAndLayout()) {
-    return "gdjs." +
-           gd::SceneNameMangler::Get()->GetMangledSceneName(GetLayout().GetName()) +
-           "Code";
-  } else if (!codeNamespace.empty()) {
-    return codeNamespace;
-  } else {
-    return "gdjs.unspecifiednamespacethisisprobablyanerrorincodegeneratorsetup";
-  }
 }
 
 gd::String EventsCodeGenerator::GenerateProfilerSectionBegin(

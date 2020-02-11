@@ -5,21 +5,25 @@
  */
 #include "LayoutCodeGenerator.h"
 #include "EventsCodeGenerator.h"
+#include "GDCore/IDE/SceneNameMangler.h"
 
 namespace gdjs {
-gd::String
-LayoutCodeGenerator::GenerateLayoutCompleteCode(
+gd::String LayoutCodeGenerator::GenerateLayoutCompleteCode(
     const gd::Layout& layout,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::String layoutCode =
-      EventsCodeGenerator::GenerateSceneEventsCompleteCode(project,
-                                                      layout,
-                                                      layout.GetEvents(),
-                                                      includeFiles,
-                                                      compilationForRuntime);
+  gd::String sceneMangledName =
+      gd::SceneNameMangler::Get()->GetMangledSceneName(layout.GetName());
+  gd::String codeNamespace = "gdjs." + sceneMangledName + "Code";
 
-  return layoutCode;
+  gd::String layoutCode = EventsCodeGenerator::GenerateLayoutCode(
+      project, layout, codeNamespace, includeFiles, compilationForRuntime);
+
+  // Export the symbols to avoid them being stripped by the Closure Compiler:
+  gd::String exportCode =
+      "gdjs['" + sceneMangledName + "Code']" + " = " + codeNamespace + ";\n";
+
+  return layoutCode + "\n" + exportCode;
 }
 
 }  // namespace gdjs

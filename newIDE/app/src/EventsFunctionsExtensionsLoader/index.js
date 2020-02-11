@@ -171,8 +171,10 @@ const generateFreeFunction = (
 
   if (!skipCodeGeneration) {
     const includeFiles = new gd.SetString();
-    const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
-      project,
+    const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+      project
+    );
+    const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
       eventsFunction,
       codeNamespace,
       includeFiles,

@@ -17,7 +17,7 @@ class NamedPropertyDescriptor;
 namespace gdjs {
 
 /**
- * \brief The class being responsible for generating Javascript code for
+ * \brief The class being responsible for generating JavaScript code for
  * EventsBasedBhavior.
  *
  * See also gd::EventsCodeGenerator.

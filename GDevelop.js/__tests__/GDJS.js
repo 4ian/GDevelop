@@ -2,12 +2,14 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 
 describe('libGD.js - GDJS related tests', function() {
   let gd = null;
-  beforeAll((done) => (initializeGDevelopJs().then(module => {
-    gd = module;
-    done();
-  })));
+  beforeAll(done =>
+    initializeGDevelopJs().then(module => {
+      gd = module;
+      done();
+    })
+  );
 
-  describe('EventsCodeGenerator', function() {
+  describe('EventsCodeGenerator', () => {
     it('can generate code for a layout with generateSceneEventsCompleteCode', function() {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
@@ -39,8 +41,10 @@ describe('libGD.js - GDJS related tests', function() {
 
       condition.delete();
     });
+  });
 
-    it('can generate code for a layout with generateEventsFunctionCode', function() {
+  describe('EventsFunctionsExtensionCodeGenerator', () => {
+    it('can generate code for an events function', function() {
       const project = new gd.ProjectHelper.createNewGDJSProject();
 
       const includeFiles = new gd.SetString();
@@ -114,8 +118,10 @@ describe('libGD.js - GDJS related tests', function() {
         .insert(action2, 1);
 
       const namespace = 'gdjs.eventsFunction.myTest';
-      const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
-        project,
+      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+        project
+      );
+      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
         eventsFunction,
         namespace,
         includeFiles,
@@ -167,7 +173,8 @@ describe('libGD.js - GDJS related tests', function() {
       condition.delete();
       action.delete();
     });
-    it('can generate code for a layout with generateEventsFunctionCode, with groups', function() {
+
+    it('can generate code for an events function, with groups', function() {
       const project = new gd.ProjectHelper.createNewGDJSProject();
 
       const includeFiles = new gd.SetString();
@@ -215,8 +222,10 @@ describe('libGD.js - GDJS related tests', function() {
         .insert(action, 0);
 
       const namespace = 'gdjs.eventsFunction.myTest';
-      const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
-        project,
+      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+        project
+      );
+      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
         eventsFunction,
         namespace,
         includeFiles,

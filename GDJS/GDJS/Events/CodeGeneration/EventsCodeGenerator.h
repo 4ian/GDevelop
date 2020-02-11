@@ -24,7 +24,7 @@ class EventsCodeGenerationContext;
 namespace gdjs {
 
 /**
- * \brief The class being responsible for generating Javascript code from
+ * \brief The class being responsible for generating JavaScript code from
  * events.
  *
  * See also gd::EventsCodeGenerator.

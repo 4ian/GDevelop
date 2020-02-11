@@ -2318,6 +2318,12 @@ interface BehaviorCodeGenerator {
 };
 
 [Prefix="gdjs::"]
+interface EventsFunctionsExtensionCodeGenerator {
+    void EventsFunctionsExtensionCodeGenerator([Ref] Project project);
+    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
+};
+
+[Prefix="gdjs::"]
 interface Exporter {
     void Exporter([Ref] AbstractFileSystem fs, [Const] DOMString gdjsRoot);
     void SetCodeOutputDirectory([Const] DOMString path);

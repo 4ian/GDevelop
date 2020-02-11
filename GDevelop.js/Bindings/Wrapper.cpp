@@ -75,6 +75,7 @@
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/EventsCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
 #include <GDJS/IDE/Exporter.h>
 
 #include <emscripten.h>

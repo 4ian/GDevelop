@@ -81,14 +81,9 @@ gdjs.LinksManager.prototype.removeLinkBetween = function(objA, objB) {
  */
 gdjs.evtTools.linkedObjects = {};
 
-gdjs.evtTools.linkedObjects.gdjsCallbackRuntimeSceneLoaded = function(runtimeScene) {
-	//Manager is created on demand, no need to instanciate it now.
-	//gdjs.LinksManager.getManager(runtimeScene);
-};
-
-gdjs.evtTools.linkedObjects.gdjsCallbackObjectDeletedFromScene = function(runtimeScene, obj) {
+gdjs.registerObjectDeletedFromSceneCallback(function(runtimeScene, obj) {
 	gdjs.LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
-};
+});
 
 gdjs.evtTools.linkedObjects.linkObjects = function(runtimeScene, objA, objB) {
 	if (objA === null || objB === null) return;

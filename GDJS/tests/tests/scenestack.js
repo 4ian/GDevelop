@@ -32,22 +32,19 @@ describe('gdjs.SceneStack', function() {
     var lastUnloadedScene = null;
     var lastPausedScene = null;
     var lastResumedScene = null;
-    // @ts-ignore
-    gdjs.callbackAssertions = {
-      gdjsCallbackRuntimeSceneLoaded: function(runtimeScene) {
-        lastLoadedScene = runtimeScene;
-      },
-      gdjsCallbackRuntimeSceneUnloaded: function(runtimeScene) {
-        lastUnloadedScene = runtimeScene;
-      },
-      gdjsCallbackRuntimeScenePaused: function(runtimeScene) {
-        lastPausedScene = runtimeScene;
-      },
-      gdjsCallbackRuntimeSceneResumed: function(runtimeScene) {
-        lastResumedScene = runtimeScene;
-      },
-    };
-    gdjs.registerGlobalCallbacks();
+
+    gdjs.registerRuntimeSceneLoadedCallback(function(runtimeScene) {
+      lastLoadedScene = runtimeScene;
+    });
+    gdjs.registerRuntimeSceneUnloadedCallback(function(runtimeScene) {
+      lastUnloadedScene = runtimeScene;
+    });
+    gdjs.registerRuntimeScenePausedCallback(function(runtimeScene) {
+      lastPausedScene = runtimeScene;
+    });
+    gdjs.registerRuntimeSceneResumedCallback(function(runtimeScene) {
+      lastResumedScene = runtimeScene;
+    });
 
     // Test the stack
     expect(sceneStack.pop()).to.be(null);
@@ -91,8 +88,6 @@ describe('gdjs.SceneStack', function() {
     expect(lastResumedScene).to.be(scene1); // Not changed
 
     // Remove all the global callbacks
-    // @ts-ignore
-    delete gdjs.callbackAssertions;
-    gdjs.registerGlobalCallbacks();
+    gdjs.clearGlobalCallbacks();
   });
 });

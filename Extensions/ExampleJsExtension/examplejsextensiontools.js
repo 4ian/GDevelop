@@ -17,7 +17,7 @@ gdjs.evtTools.exampleJsExtension.myConditionFunction = function(number, text) {
 };
 
 gdjs.evtTools.exampleJsExtension.getString = function() {
-  return "Hello World";
+  return 'Hello World';
 };
 
 /**
@@ -27,47 +27,41 @@ gdjs.evtTools.exampleJsExtension.getString = function() {
  * or your gdjs.RuntimeObject.
  */
 gdjs.exampleJsExtension = {
-  myGlobalString: "Hello World"
+  myGlobalString: 'Hello World',
 };
 
 /**
  * In **rare cases** you may want to run code at the start of the scene. You can define a callback
- * that will be called at this moment. Name you callback gdjsCallbackRuntimeSceneLoaded.
- * GDJS will scan anything declared inside gdjs for these names.
+ * that will be called at this moment.
  */
-gdjs.exampleJsExtension.gdjsCallbackRuntimeSceneLoaded = function(
-  runtimeScene
-) {
-  console.log("A gdjs.RuntimeScene was loaded:", runtimeScene);
-};
+gdjs.registerRuntimeSceneLoadedCallback(function(runtimeScene) {
+  console.log('A gdjs.RuntimeScene was loaded:', runtimeScene);
+});
 
 /**
  * In **rare cases** you may want to run code at the end of a scene. You can define a callback
- * that will be called at this moment. Name you callback gdjsCallbackRuntimeSceneLoaded.
- * GDJS will scan anything declared inside gdjs for these names.
+ * that will be called at this moment.
  */
-gdjs.exampleJsExtension.callbacksRuntimeSceneUnloaded = function(runtimeScene) {
-  console.log("A gdjs.RuntimeScene was unloaded:", runtimeScene);
-};
+gdjs.registerRuntimeSceneUnloadedCallback(function(runtimeScene) {
+  console.log('A gdjs.RuntimeScene was unloaded:', runtimeScene);
+});
 
 /**
  * In **very rare cases** you may want to run code whenever an object is deleted.
- * You can create a callback named "callbacksObjectDeletedFromScene" on your extension object.
- * GDJS will scan anything declared inside gdjs for this name.
  */
-gdjs.exampleJsExtension.callbacksObjectDeletedFromScene = function(
+gdjs.registerObjectDeletedFromSceneCallback(function(
   runtimeScene,
   runtimeObject
 ) {
   console.log(
-    "A gdjs.RuntimeObject was deleted from a gdjs.RuntimeScene:",
+    'A gdjs.RuntimeObject was deleted from a gdjs.RuntimeScene:',
     runtimeScene,
     runtimeObject
   );
-};
+});
 
 // Finally, note that you can also simply run code here. Most of the time you shouldn't need it though.
 console.log(
-  "gdjs.exampleJsExtension was created, with myGlobalString containing:" +
+  'gdjs.exampleJsExtension was created, with myGlobalString containing:' +
     gdjs.exampleJsExtension.myGlobalString
 );

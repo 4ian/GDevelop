@@ -99,7 +99,7 @@ gdjs.Physics2SharedData.prototype.step = function(deltaTime) {
   this.stepped = true;
 };
 
-gdjs.Physics2SharedData.gdjsCallbackRuntimeSceneUnloaded = function(
+gdjs.registerRuntimeSceneUnloadedCallback(function(
   runtimeScene
 ) {
   if (
@@ -108,7 +108,7 @@ gdjs.Physics2SharedData.gdjsCallbackRuntimeSceneUnloaded = function(
   ) {
     Box2D.destroy(runtimeScene.physics2SharedData.world);
   }
-};
+});
 
 gdjs.Physics2SharedData.prototype.clearBodyJoints = function(body) {
   // Iterate through all the joints

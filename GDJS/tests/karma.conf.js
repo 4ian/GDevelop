@@ -57,7 +57,6 @@ module.exports = function(config) {
       './tests/Extensions/**.js',
 
       //All tests files:
-      './tests-utils/init.gdjs.js',
       './tests-utils/init.pixiruntimegamewithassets.js',
       '../../Extensions/**/tests/**.spec.js',
       './tests/**/*.js',

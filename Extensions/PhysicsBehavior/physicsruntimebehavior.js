@@ -100,11 +100,11 @@ gdjs.PhysicsSharedData.prototype.step = function(dt) {
     this.stepped = true;
 };
 
-gdjs.PhysicsSharedData.gdjsCallbackRuntimeSceneUnloaded = function (runtimeScene) {
+gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
 	//Callback that destroys the box2d.js world of PhysicsSharedData shared data of the scene
 	if(runtimeScene.physicsSharedData)
 		Box2D.destroy(runtimeScene.physicsSharedData.world)
-}
+});
 
 /**
  * Allows objects to be moved in a realistic way thanks to a physics engine (Box2D).

@@ -5,7 +5,7 @@
  * @property {boolean} content.loop Does the video loops itself?
  * @property {number} content.volume The volume of the video
  * @property {string} content.videoResource Name of the resource corresponding to the video
- * 
+ *
  * @typedef {ObjectData & VideoObjectDataType} VideoObjectData
  */
 
@@ -42,15 +42,15 @@ gdjs.VideoRuntimeObject = function(runtimeScene, videoObjectData) {
 
   if (this._renderer)
     gdjs.VideoRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  /** @type {gdjs.VideoRuntimeObjectRenderer} */
-  else this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
+  /** @type {gdjs.VideoRuntimeObjectRenderer} */ else
+    this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();
 };
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.registerObject("Video::VideoObject", gdjs.VideoRuntimeObject);
+gdjs.registerObject('Video::VideoObject', gdjs.VideoRuntimeObject);
 
 gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
@@ -301,11 +301,8 @@ gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
 /**
  * When a scene is unloaded, pause any video being run.
  * TODO: Investigate how to dispose the video source?
- *
- * @private
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} that is being unloaded
  */
-gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneUnloaded = function(runtimeScene) {
+gdjs.registerRuntimeSceneUnloadedCallback(function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
   // and pause them.
   var instances = runtimeScene.getAdhocListOfAllInstances();
@@ -317,14 +314,12 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneUnloaded = function(runtimeScene
       }
     }
   }
-};
+});
 
 /**
  * When a scene is paused, pause any video being run.
- * @private
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} that is being paused
  */
-gdjs.VideoRuntimeObject.gdjsCallbackRuntimeScenePaused = function(runtimeScene) {
+gdjs.registerRuntimeScenePausedCallback(function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
   // and pause them.
   var instances = runtimeScene.getAdhocListOfAllInstances();
@@ -337,14 +332,12 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeScenePaused = function(runtimeScene) 
       }
     }
   }
-};
+});
 
 /**
  * When a scene is resumed, resume any video previously paused.
- * @private
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} that is being resumed
  */
-gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneResumed = function(runtimeScene) {
+gdjs.registerRuntimeSceneResumedCallback(function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
   // and play them if they have been previously paused.
   var instances = runtimeScene.getAdhocListOfAllInstances();
@@ -356,4 +349,4 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneResumed = function(runtimeScene)
       }
     }
   }
-};
+});

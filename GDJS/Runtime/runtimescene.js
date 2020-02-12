@@ -187,6 +187,12 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 
     if (this._profiler) this.stopProfiler();
 
+    // Notify the global callbacks (which should not release resources yet,
+    // as other callbacks might still refer to the objects/scene).
+    for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloading.length;++i) {
+        gdjs.callbacksRuntimeSceneUnloading[i](this);
+    }
+
     // Notify the objects they are being destroyed
     this._constructListOfAllInstances();
     for(var i = 0, len = this._allInstancesList.length;i<len;++i) {

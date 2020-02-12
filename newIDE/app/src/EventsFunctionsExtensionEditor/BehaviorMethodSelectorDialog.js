@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
+import { type EventsFunctionCreationParameters } from '../EventsFunctionsList';
 import FlatButton from '../UI/FlatButton';
 import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
@@ -13,11 +14,12 @@ import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
 import Function from '../UI/CustomSvgIcons/Behaviors/Function';
 import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
 import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
+const gd = global.gd;
 
 type Props = {|
   eventsBasedBehavior: gdEventsBasedBehavior,
   onCancel: () => void,
-  onChoose: (functionName: ?string) => void,
+  onChoose: (parameters: EventsFunctionCreationParameters) => void,
 |};
 type State = {||};
 
@@ -35,7 +37,7 @@ const MethodListItem = ({
 }: {|
   icon: React.Node,
   disabled: boolean,
-  onChoose: string => void,
+  onChoose: EventsFunctionCreationParameters => void,
   name: string,
   description: React.Node,
 |}) => {
@@ -45,7 +47,12 @@ const MethodListItem = ({
       primaryText={name}
       secondaryText={description}
       secondaryTextLines={2}
-      onClick={() => onChoose(name)}
+      onClick={() =>
+        onChoose({
+          functionType: gd.EventsFunction.Action,
+          name,
+        })
+      }
       style={disabled ? styles.disabledItem : undefined}
       disabled={disabled}
     />
@@ -187,7 +194,12 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
               </Trans>
             }
             secondaryTextLines={2}
-            onClick={() => onChoose(null)}
+            onClick={() =>
+              onChoose({
+                functionType: gd.EventsFunction.Action,
+                name: null,
+              })
+            }
           />
         </List>
       </Dialog>

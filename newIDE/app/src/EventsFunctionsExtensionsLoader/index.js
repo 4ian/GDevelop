@@ -8,7 +8,8 @@ import {
   declareEventsFunctionParameters,
   declareBehaviorMetadata,
   declareExtension,
-  isBehaviorLifecycleFunction,
+  isBehaviorLifecycleEventsFunction,
+  isExtensionLifecycleEventsFunction,
   declareBehaviorPropertiesInstructionAndExpressions,
 } from './MetadataDeclarationHelpers';
 
@@ -26,8 +27,29 @@ type Options = {|
   i18n: I18nType,
 |};
 
+type CodeGenerationContext = {|
+  codeNamespacePrefix: string,
+  extensionIncludeFiles: Array<string>,
+|};
+
 const mangleName = (name: string) => {
   return caseSensitiveSlug(name, '_', []);
+};
+
+/** Generate the namespace for a free function. */
+const getFreeFunctionCodeNamespace = (
+  eventsFunction: gdEventsFunction,
+  codeNamespacePrefix: string
+) => {
+  return codeNamespacePrefix + '__' + mangleName(eventsFunction.getName());
+};
+
+/** Generate the namespace for a behavior function. */
+const getBehaviorFunctionCodeNamespace = (
+  eventsBasedBehavior: gdEventsBasedBehavior,
+  codeNamespacePrefix: string
+) => {
+  return codeNamespacePrefix + '__' + mangleName(eventsBasedBehavior.getName());
 };
 
 /**
@@ -84,6 +106,33 @@ const loadProjectEventsFunctionsExtension = (
 };
 
 /**
+ * Get the list of mandatory include files when using the
+ * extension.
+ */
+const getExtensionIncludeFiles = (
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  options: Options,
+  codeNamespacePrefix: string
+): Array<string> => {
+  return mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
+    const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
+
+    if (isExtensionLifecycleEventsFunction(eventsFunction.getName())) {
+      const codeNamespace = getFreeFunctionCodeNamespace(
+        eventsFunction,
+        codeNamespacePrefix
+      );
+      const functionName = codeNamespace + '.func'; // TODO
+
+      return options.eventsFunctionCodeWriter.getIncludeFileFor(functionName);
+    }
+
+    return null;
+  }).filter(Boolean);
+};
+
+/**
  * Generate the code for the events based extension
  */
 const generateEventsFunctionExtension = (
@@ -97,6 +146,17 @@ const generateEventsFunctionExtension = (
   const codeNamespacePrefix =
     'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
 
+  const extensionIncludeFiles = getExtensionIncludeFiles(
+    project,
+    eventsFunctionsExtension,
+    options,
+    codeNamespacePrefix
+  );
+  const codeGenerationContext = {
+    codeNamespacePrefix,
+    extensionIncludeFiles,
+  };
+
   return Promise.all(
     // Generate all behaviors and their functions
     mapVector(
@@ -107,10 +167,8 @@ const generateEventsFunctionExtension = (
           extension,
           eventsFunctionsExtension,
           eventsBasedBehavior,
-          {
-            ...options,
-            codeNamespacePrefix,
-          }
+          options,
+          codeGenerationContext
         );
       }
     )
@@ -127,10 +185,8 @@ const generateEventsFunctionExtension = (
             extension,
             eventsFunctionsExtension,
             eventsFunction,
-            {
-              ...options,
-              codeNamespacePrefix,
-            }
+            options,
+            codeGenerationContext
           );
         })
       )
@@ -145,11 +201,8 @@ const generateFreeFunction = (
     | gdEventsFunctionsExtension
     | gdEventsBasedBehavior,
   eventsFunction: gdEventsFunction,
-  {
-    skipCodeGeneration,
-    eventsFunctionCodeWriter,
-    codeNamespacePrefix,
-  }: {| ...Options, codeNamespacePrefix: string |}
+  options: Options,
+  codeGenerationContext: CodeGenerationContext
 ) => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
     extensionOrBehaviorMetadata,
@@ -160,16 +213,31 @@ const generateFreeFunction = (
   instructionOrExpression.addCodeOnlyParameter('currentScene', '');
   declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
 
-  const codeNamespace =
-    codeNamespacePrefix + '__' + mangleName(eventsFunction.getName());
+  // Hide "lifecycle" functions as they are called automatically by
+  // the game engine.
+  if (isExtensionLifecycleEventsFunction(eventsFunction.getName())) {
+    instructionOrExpression.setHidden();
+  }
+
+  const codeNamespace = getFreeFunctionCodeNamespace(
+    eventsFunction,
+    codeGenerationContext.codeNamespacePrefix
+  );
   const functionName = codeNamespace + '.func';
 
   const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
   codeExtraInformation
-    .setIncludeFile(eventsFunctionCodeWriter.getIncludeFileFor(functionName))
+    .setIncludeFile(
+      options.eventsFunctionCodeWriter.getIncludeFileFor(functionName)
+    )
     .setFunctionName(functionName);
 
-  if (!skipCodeGeneration) {
+  // Always include the extension include files when using a free function.
+  codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
+    codeExtraInformation.addIncludeFile(includeFile);
+  });
+
+  if (!options.skipCodeGeneration) {
     const includeFiles = new gd.SetString();
     const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
       project
@@ -196,7 +264,10 @@ const generateFreeFunction = (
 
     includeFiles.delete();
 
-    return eventsFunctionCodeWriter.writeFunctionCode(functionName, code);
+    return options.eventsFunctionCodeWriter.writeFunctionCode(
+      functionName,
+      code
+    );
   } else {
     // Skip code generation if no events function writer is provided.
     // This is the case during the "first pass", where all events functions extensions
@@ -210,7 +281,8 @@ function generateBehavior(
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
-  options: {| ...Options, codeNamespacePrefix: string |}
+  options: Options,
+  codeGenerationContext: CodeGenerationContext
 ) {
   const behaviorMetadata = declareBehaviorMetadata(
     extension,
@@ -218,15 +290,20 @@ function generateBehavior(
   );
 
   const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
-  const codeNamespace =
-    options.codeNamespacePrefix +
-    '__' +
-    mangleName(eventsBasedBehavior.getName());
+  const codeNamespace = getBehaviorFunctionCodeNamespace(
+    eventsBasedBehavior,
+    codeGenerationContext.codeNamespacePrefix
+  );
   const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
     codeNamespace
   );
 
   behaviorMetadata.setIncludeFile(includeFile);
+
+  // Always include the extension include files when using a behavior.
+  codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
+    behaviorMetadata.addIncludeFile(includeFile);
+  });
 
   return Promise.resolve().then(() => {
     const behaviorMethodMangledNames = new gd.MapStringString();
@@ -257,7 +334,7 @@ function generateBehavior(
 
       // Hide "lifecycle" methods as they are called automatically by
       // the game engine.
-      if (isBehaviorLifecycleFunction(eventsFunction.getName())) {
+      if (isBehaviorLifecycleEventsFunction(eventsFunction.getName())) {
         instructionOrExpression.setHidden();
       }
 

@@ -11,7 +11,10 @@ import SelectOption from '../../UI/SelectOption';
 import { mapVector } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import {
+  isBehaviorLifecycleEventsFunction,
+  isExtensionLifecycleEventsFunction,
+} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
@@ -115,15 +118,31 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
-    const isABehaviorLifecycleFunction =
+    const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      isBehaviorLifecycleFunction(eventsFunction.getName());
-    if (isABehaviorLifecycleFunction) {
+      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
           <Trans>
             This is a "lifecycle method". It will be called automatically by the
-            game engine.
+            game engine for each instance living on the scene having the
+            behavior.
+          </Trans>
+        </EmptyMessage>
+      );
+    }
+
+    const isAnExtensionLifecycleEventsFunction =
+      !eventsBasedBehavior &&
+      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+    if (isAnExtensionLifecycleEventsFunction) {
+      return (
+        <EmptyMessage>
+          <Trans>
+            This is a "lifecycle function". It will be called automatically by
+            the game engine. It has no parameters. Only global objects can be
+            used as the events will be run for all scenes in your game.
           </Trans>
         </EmptyMessage>
       );

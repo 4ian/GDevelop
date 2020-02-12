@@ -898,25 +898,24 @@ gd::String EventsCodeGenerator::GenerateObject(
   //(references to) objects lists. We statically declare and construct them to
   // avoid re-creating them at runtime. Arrays are passed as reference in JS and
   // we always use the same static arrays, making this possible.
-  auto declareMapOfObjects =
-      [this](const std::vector<gd::String>& objects,
-             const gd::EventsCodeGenerationContext& context) {
-        gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
-        gd::String mapDeclaration;
-        for (auto& objectName : objects) {
-          // The map name must be unique for each set of objects lists.
-          objectsMapName +=
-              ManObjListName(GetObjectListName(objectName, context));
+  auto declareMapOfObjects = [this](
+      const std::vector<gd::String>& objects,
+      const gd::EventsCodeGenerationContext& context) {
+    gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
+    gd::String mapDeclaration;
+    for (auto& objectName : objects) {
+      // The map name must be unique for each set of objects lists.
+      objectsMapName += ManObjListName(GetObjectListName(objectName, context));
 
-          if (!mapDeclaration.empty()) mapDeclaration += ", ";
-          mapDeclaration += "\"" + ConvertToString(objectName) +
-                            "\": " + GetObjectListName(objectName, context);
-        }
+      if (!mapDeclaration.empty()) mapDeclaration += ", ";
+      mapDeclaration += "\"" + ConvertToString(objectName) +
+                        "\": " + GetObjectListName(objectName, context);
+    }
 
-        AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" +
-                                 mapDeclaration + "});");
-        return objectsMapName;
-      };
+    AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" +
+                             mapDeclaration + "});");
+    return objectsMapName;
+  };
 
   gd::String output;
   if (type == "objectList") {

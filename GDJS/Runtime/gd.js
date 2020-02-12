@@ -18,10 +18,13 @@ window.gdjs = {
    * @memberOf gdjs
    */
   evtTools: {},
+  callbacksFirstRuntimeSceneLoaded: [],
   callbacksRuntimeSceneLoaded: [],
-  callbacksRuntimeSceneUnloaded: [],
+  callbacksRuntimeScenePreEvents: [],
+  callbacksRuntimeScenePostEvents: [],
   callbacksRuntimeScenePaused: [],
   callbacksRuntimeSceneResumed: [],
+  callbacksRuntimeSceneUnloaded: [],
   callbacksObjectDeletedFromScene: [],
 };
 
@@ -123,6 +126,16 @@ gdjs.registerBehavior = function(behaviorTypeName, Ctor) {
 };
 
 /**
+ * Register a function to be called when the first {@link gdjs.RuntimeScene} is loaded, after
+ * resources loading is done. This can be considered as the "start of the game".
+ *
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerFirstRuntimeSceneLoadedCallback = function(callback) {
+  gdjs.callbacksFirstRuntimeSceneLoaded.push(callback);
+};
+
+/**
  * Register a function to be called when a scene is loaded.
  * @param {Function} callback The function to be called.
  */
@@ -131,11 +144,21 @@ gdjs.registerRuntimeSceneLoadedCallback = function(callback) {
 };
 
 /**
- * Register a function to be called when a scene is unloaded.
+ * Register a function to be called each time a scene is stepped (i.e: at every frame),
+ * before events are run.
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeSceneUnloadedCallback = function(callback) {
-  gdjs.callbacksRuntimeSceneUnloaded.push(callback);
+gdjs.registerRuntimeScenePreEventsCallback = function(callback) {
+  gdjs.callbacksRuntimeScenePreEvents.push(callback);
+};
+
+/**
+ * Register a function to be called each time a scene is stepped (i.e: at every frame),
+ * after events are run and before rendering.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeScenePostEventsCallback = function(callback) {
+  gdjs.callbacksRuntimeScenePostEvents.push(callback);
 };
 
 /**
@@ -152,6 +175,14 @@ gdjs.registerRuntimeScenePausedCallback = function(callback) {
  */
 gdjs.registerRuntimeSceneResumedCallback = function(callback) {
   gdjs.callbacksRuntimeSceneResumed.push(callback);
+};
+
+/**
+ * Register a function to be called when a scene is unloaded.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeSceneUnloadedCallback = function(callback) {
+  gdjs.callbacksRuntimeSceneUnloaded.push(callback);
 };
 
 /**
@@ -179,10 +210,13 @@ gdjs.registerGlobalCallbacks = function() {
  * Should only be used for testing - this should never be used at runtime.
  */
 gdjs.clearGlobalCallbacks = function() {
+  gdjs.callbacksFirstRuntimeSceneLoaded = [];
   gdjs.callbacksRuntimeSceneLoaded = [];
-  gdjs.callbacksRuntimeSceneUnloaded = [];
+  gdjs.callbacksRuntimeScenePreEvents = [];
+  gdjs.callbacksRuntimeScenePostEvents = [];
   gdjs.callbacksRuntimeScenePaused = [];
   gdjs.callbacksRuntimeSceneResumed = [];
+  gdjs.callbacksRuntimeSceneUnloaded = [];
   gdjs.callbacksObjectDeletedFromScene = [];
 };
 

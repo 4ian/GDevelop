@@ -14,8 +14,11 @@ gdjs.SceneStack = function(runtimeGame) {
 
     this._runtimeGame = runtimeGame;
 
-    /** @type gdjs.RuntimeScene[] */
-	this._stack = [];
+    /** @type {gdjs.RuntimeScene[]} */
+    this._stack = [];
+
+    /** @type {boolean} */
+    this._wasFirstSceneLoaded = false;
 };
 
 /**
@@ -91,6 +94,7 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
     // Load the new one
     var newScene = new gdjs.RuntimeScene(this._runtimeGame);
     newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
+    this._wasFirstSceneLoaded = true;
 
     //Optionally create the objects from an external layout.
     if (externalLayoutName) {
@@ -129,3 +133,10 @@ gdjs.SceneStack.prototype.getCurrentScene = function() {
 
 	return this._stack[this._stack.length - 1];
 };
+
+/**
+ * Return true if a scene was loaded, false otherwise (i.e: game not yet started).
+ */
+gdjs.SceneStack.prototype.wasFirstSceneLoaded = function() {
+    return this._wasFirstSceneLoaded;
+}

@@ -26,6 +26,11 @@ const styles = {
   },
 };
 
+export type EventsFunctionCreationParameters = {|
+  functionType: 0 | 1 | 2,
+  name: ?string,
+|};
+
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
   eventsFunction.getName();
 
@@ -49,7 +54,9 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
-  onAddEventsFunction: ((doAdd: boolean, name: ?string) => void) => void,
+  onAddEventsFunction: (
+    (parameters: ?EventsFunctionCreationParameters) => void
+  ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
   renderHeader?: () => React.Node,
 |};
@@ -227,24 +234,27 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _addNewEventsFunction = () => {
     const { eventsFunctionsContainer } = this.props;
 
-    this.props.onAddEventsFunction((doAdd: boolean, name: ?string) => {
-      if (!doAdd) {
-        return;
-      }
+    this.props.onAddEventsFunction(
+      (parameters: ?EventsFunctionCreationParameters) => {
+        if (!parameters) {
+          return;
+        }
 
-      const eventsFunctionName =
-        name ||
-        newNameGenerator('Function', name =>
-          eventsFunctionsContainer.hasEventsFunctionNamed(name)
+        const eventsFunctionName =
+          parameters.name ||
+          newNameGenerator('Function', name =>
+            eventsFunctionsContainer.hasEventsFunctionNamed(name)
+          );
+
+        const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+          eventsFunctionName,
+          eventsFunctionsContainer.getEventsFunctionsCount()
         );
-
-      const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
-        eventsFunctionName,
-        eventsFunctionsContainer.getEventsFunctionsCount()
-      );
-      this.props.onEventsFunctionAdded(eventsFunction);
-      this.forceUpdate();
-    });
+        eventsFunction.setFunctionType(parameters.functionType);
+        this.props.onEventsFunctionAdded(eventsFunction);
+        this.forceUpdate();
+      }
+    );
   };
 
   render() {

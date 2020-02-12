@@ -19,7 +19,10 @@ import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
-import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import {
+  isBehaviorLifecycleEventsFunction,
+  isExtensionLifecycleEventsFunction,
+} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import Add from '@material-ui/icons/Add';
 
@@ -130,16 +133,30 @@ export default class EventsFunctionParametersEditor extends React.Component<
     } = this.props;
 
     const parameters = eventsFunction.getParameters();
-    const isABehaviorLifecycleFunction =
+    const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      isBehaviorLifecycleFunction(eventsFunction.getName());
-    if (isABehaviorLifecycleFunction) {
+      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
           <Trans>
             This is a "lifecycle method". It will be called automatically by the
             game engine and has two parameters: "Object" (the object the
             behavior is acting on) and "Behavior" (the behavior itself).
+          </Trans>
+        </EmptyMessage>
+      );
+    }
+    const isAnExtensionLifecycleEventsFunction =
+      !eventsBasedBehavior &&
+      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+    if (isAnExtensionLifecycleEventsFunction) {
+      return (
+        <EmptyMessage>
+          <Trans>
+            This is a "lifecycle function". It will be called automatically by
+            the game engine. It has no parameters. Only global objects can be
+            used as the events will be run for all scenes in your game.
           </Trans>
         </EmptyMessage>
       );

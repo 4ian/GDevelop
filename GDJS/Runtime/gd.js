@@ -24,6 +24,7 @@ window.gdjs = {
   callbacksRuntimeScenePostEvents: [],
   callbacksRuntimeScenePaused: [],
   callbacksRuntimeSceneResumed: [],
+  callbacksRuntimeSceneUnloading: [],
   callbacksRuntimeSceneUnloaded: [],
   callbacksObjectDeletedFromScene: [],
 };
@@ -178,7 +179,22 @@ gdjs.registerRuntimeSceneResumedCallback = function(callback) {
 };
 
 /**
- * Register a function to be called when a scene is unloaded.
+ * Register a function to be called when a scene unload started. This is
+ * before the object deletion and renderer destruction. It is safe to
+ * manipulate these. It is **not** be safe to release resources as other
+ * callbacks might do operations on objects or the scene.
+ *
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeSceneUnloadingCallback = function(callback) {
+  gdjs.callbacksRuntimeSceneUnloading.push(callback);
+};
+
+/**
+ * Register a function to be called when a scene is unloaded. The objects
+ * and renderer are now destroyed - it is **not** safe to do anything apart
+ * from releasing resources.
+ *
  * @param {Function} callback The function to be called.
  */
 gdjs.registerRuntimeSceneUnloadedCallback = function(callback) {
@@ -216,6 +232,7 @@ gdjs.clearGlobalCallbacks = function() {
   gdjs.callbacksRuntimeScenePostEvents = [];
   gdjs.callbacksRuntimeScenePaused = [];
   gdjs.callbacksRuntimeSceneResumed = [];
+  gdjs.callbacksRuntimeSceneUnloading = [];
   gdjs.callbacksRuntimeSceneUnloaded = [];
   gdjs.callbacksObjectDeletedFromScene = [];
 };

@@ -19,6 +19,7 @@ function Hashtable()
     if(Map !== undefined) {
         this.items = new Map();
         this.map = true;
+    }
     else {
         this.items = {};
         this.map = false;

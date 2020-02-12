@@ -13,15 +13,22 @@ function Hashtable()
      * The content of the Hashtable. Prefer using methods rather
      * than accessing this internal object, unless you need to iterate
      * on the values.
-     * @type {Object.<string, any>}
+     * @type {Map|Object.<string, any>}
      */
-    this.items = {};
+    this.items = null;
+    if(Map !== undefined) {
+        this.items = new Map();
+        this.map = true;
+    else {
+        this.items = {};
+        this.map = false;
+    }
 }
 
 /**
  * Construct a Hashtable from a JS object.
  *
- * @param {Object.<string, any>} items The content of the Hashtable.
+ * @param {Map|Object.<string, any>} items The content of the Hashtable.
  * @returns {Hashtable} The new hashtable.
  * @static
  */
@@ -40,6 +47,10 @@ Hashtable.newFrom = function(items) {
  * @param {any} value The value to associate to the key.
  */
 Hashtable.prototype.put = function(key, value) {
+    if(this.map) { 
+        this.items.set(key, value);
+        return;
+    }
     this.items[key] = value;
 }
 
@@ -50,6 +61,7 @@ Hashtable.prototype.put = function(key, value) {
  * @param {string} key The key associated to the value.
  */
 Hashtable.prototype.get = function(key) {
+    if(this.map) { return this.items.get(key); }
     return this.items[key];
 }
 
@@ -61,6 +73,7 @@ Hashtable.prototype.get = function(key) {
  * @returns {boolean} true if the key exists.
  */
 Hashtable.prototype.containsKey = function(key) {
+    if(this.map) { return this.items.has(key); }
     return this.items.hasOwnProperty(key);
 }
 
@@ -71,6 +84,10 @@ Hashtable.prototype.containsKey = function(key) {
  * @param {string} key The key to remove.
  */
 Hashtable.prototype.remove = function(key) {
+    if(this.map) { 
+        this.items.delete(key); 
+        return;
+    }
     delete this.items[key];
 }
 
@@ -81,6 +98,13 @@ Hashtable.prototype.remove = function(key) {
  * @returns {?string} The first key of the Hashtable, or undefined if empty.
  */
 Hashtable.prototype.firstKey = function() {
+    if(this.map) {
+        for (var k of this.items.keys()) {
+            if (this.items.has(k)) {
+                return k;
+            }
+        }
+    }
     for (var k in this.items) {
         if (this.items.hasOwnProperty(k)) {
             return k;
@@ -98,6 +122,14 @@ Hashtable.prototype.firstKey = function() {
  */
 Hashtable.prototype.keys = function(result) {
     result.length = 0;
+    if(this.map) {
+        for (var k of this.items.keys()) {
+            if (this.items.has(k)) {
+                result.push(k);
+            }
+        }
+        return;
+    }
     for (var k in this.items) {
         if (this.items.hasOwnProperty(k)) {
             result.push(k);
@@ -109,10 +141,18 @@ Hashtable.prototype.keys = function(result) {
  * Dump all the values of the Hashtable to an array (which is cleared first).
  *
  * @memberof Hashtable
- * @param {Array<any>} result The Array where the results get pushed.
+ * @param {Array} result The Array where the results get pushed.
  */
 Hashtable.prototype.values = function(result) {
     result.length = 0;
+    if(this.map) {
+        for (var k of this.items.keys()) {
+            if (this.items.has(k)) {
+                result.push(this.items.get(k));
+            }
+        }
+        return;
+    }
     for (var k in this.items) {
         if (this.items.hasOwnProperty(k)) {
             result.push(this.items[k]);
@@ -126,6 +166,10 @@ Hashtable.prototype.values = function(result) {
  * @memberof Hashtable
  */
 Hashtable.prototype.clear = function() {
+    if(this.map) {
+        this.items.clear();
+        return;
+    }
     for (var k in this.items) {
         if (this.items.hasOwnProperty(k)) {
             delete this.items[k];

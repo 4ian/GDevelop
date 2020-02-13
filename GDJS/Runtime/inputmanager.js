@@ -88,7 +88,7 @@ gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
  * Return true if any key is pressed
  */
 gdjs.InputManager.prototype.anyKeyPressed = function() {
-    for(var keyCode in this._pressedKeys) {
+    for(var keyCode of Hastable.keys(this._pressedKeys)) {
         if (this._pressedKeys.containsKey(keyCode)) {
             if (this._pressedKeys.get(keyCode)) {
                 return true;
@@ -211,7 +211,7 @@ gdjs.InputManager.prototype.getAllTouchIdentifiers = function() {
     gdjs.InputManager._allTouchIds = gdjs.InputManager._allTouchIds || [];
     gdjs.InputManager._allTouchIds.length = 0;
 
-    for(var id in this._touches) {
+    for(var id of Hashtable.keys(this._touches)) {
         if (this._touches.containsKey(id)) {
             gdjs.InputManager._allTouchIds.push(parseInt(id, 10));
         }
@@ -286,7 +286,7 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
  */
 gdjs.InputManager.prototype.onFrameEnded = function() {
     //Only clear the ended touches at the end of the frame.
-    for(var id in this._touches) {
+    for(var id of Hastable.keys(this._touches)) {
         if (this._touches.containsKey(id)) {
             var touch = this._touches.get(id);
             if(touch.justEnded) {

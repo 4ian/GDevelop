@@ -223,6 +223,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
         onPreview={() => this.props.onPreview({})}
+        isPreviewOverride={() => this.props.isPreviewOverride}
+        onResetSceneToPreview={this.props.onResetSceneToPreview}
+        setSceneToPreview={() => this.props.setSceneToPreview({})}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         onOpenDebugger={() => {

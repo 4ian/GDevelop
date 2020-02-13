@@ -10,10 +10,12 @@ import InstancesSelection from './InstancesSelection';
 type Props = {|
   showPreviewButton: boolean,
   onPreview: () => void,
+  isPreviewOverride: boolean,
+  onResetSceneToPreview: () => void,
+  setSceneToPreview: () => void,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
-  showPreviewButton: boolean,
   openObjectsList: () => void,
   openObjectGroupsList: () => void,
   openProperties: () => void,
@@ -42,10 +44,33 @@ export class Toolbar extends PureComponent<Props> {
     return (
       <ToolbarGroup lastChild>
         {this.props.showPreviewButton && (
-          <ToolbarIcon
-            onClick={this.props.onPreview}
-            src="res/ribbon_default/preview32.png"
-            tooltip={t`Launch a preview of the scene`}
+          <ElementWithMenu
+            element={
+              <ToolbarIcon
+                onClick={this.props.onPreview}
+                src={() => {
+                  return this.props.isPreviewOverride
+                    ? 'res/ribbon_default/preview32.png'
+                    : 'res/ribbon_default/previewOverride32.png';
+                }}
+                tooltip={() => {
+                  return this.props.isPreviewOverride
+                    ? t`Launch a preview of the scene, right click for more`
+                    : t`Preview is overridden`;
+                }}
+              />
+            }
+            buildMenuTemplateRight={() => [
+              {
+                label: 'Set scene for preview',
+                click: () => this.props.setSceneToPreview(),
+              },
+              { type: 'separator' },
+              {
+                label: 'Reset scene for preview',
+                click: () => this.props.onResetSceneToPreview(),
+              },
+            ]}
           />
         )}
         {this.props.showNetworkPreviewButton && (

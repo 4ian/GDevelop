@@ -19,6 +19,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 
 const gd = global.gd;
 
@@ -138,13 +139,27 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       isExtensionLifecycleEventsFunction(eventsFunction.getName());
     if (isAnExtensionLifecycleEventsFunction) {
       return (
-        <EmptyMessage>
-          <Trans>
-            This is a "lifecycle function". It will be called automatically by
-            the game engine. It has no parameters. Only global objects can be
-            used as the events will be run for all scenes in your game.
-          </Trans>
-        </EmptyMessage>
+        <React.Fragment>
+          <DismissableAlertMessage
+            kind="info"
+            identifier="lifecycle-events-function-included-only-if-extension-used"
+          >
+            <Trans>
+              For the lifecycle functions to be executed, you need the extension
+              to be used in the game, either by having at least one action,
+              condition or expression used, or a behavior of the extension added
+              to an object. Otherwise, the extension won't be included in the
+              game.
+            </Trans>
+          </DismissableAlertMessage>
+          <EmptyMessage>
+            <Trans>
+              This is a "lifecycle function". It will be called automatically by
+              the game engine. It has no parameters. Only global objects can be
+              used as the events will be run for all scenes in your game.
+            </Trans>
+          </EmptyMessage>
+        </React.Fragment>
       );
     }
 

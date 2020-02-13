@@ -17,7 +17,8 @@ export type AlertMessageIdentifier =
   | 'objects-panel-explanation'
   | 'instance-properties-panel-explanation'
   | 'physics2-shape-collisions'
-  | 'edit-instruction-explanation';
+  | 'edit-instruction-explanation'
+  | 'lifecycle-events-function-included-only-if-extension-used';
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -82,6 +83,10 @@ export const allAlertMessages: Array<{
   {
     key: 'edit-instruction-explanation',
     label: <Trans>How to edit instructions</Trans>,
+  },
+  {
+    key: 'lifecycle-events-function-included-only-if-extension-used',
+    label: <Trans>Lifecycle functions only included when extension used</Trans>,
   },
 ];
 

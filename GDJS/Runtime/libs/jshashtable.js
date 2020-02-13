@@ -178,9 +178,9 @@ Hashtable.prototype.clear = function() {
     }
 }
 
-Hashtable[Symbol.iterator] = function*() {
+Hashtable.prototype[Symbol.iterator] = function*() {
     if(this.map) {
-        for(var k in this.items.keys()){
+        for(var k of this.items.keys()){
             if(this.items.has(k)){
                 yield this.items.get(k);
             }

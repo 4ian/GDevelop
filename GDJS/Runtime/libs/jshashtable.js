@@ -180,21 +180,24 @@ Hashtable.prototype.clear = function() {
 
 /**
  * Function for getting an array of the values of a Hashtable.
- * @memberOf Hashtable
- * @static
- */
-Hashtable.keys = function(hashtable) {
-    return hashtable.items.keys();
-}
-
-/**
- * Function for getting an array of the keys of a Hashtable.
  * Comparable to {@link Object.keys()}.
  * @memberOf Hashtable
  * @static
  */
+Hashtable.keys = function(hashtable) {
+    if (hashtable.map) { return hashtable.items.keys(); }
+    else { return Object.keys(hashtable.items); }
+}
+
+/**
+ * Function for getting an array of the keys of a Hashtable.
+ * Comparable to {@link Object.values()}.
+ * @memberOf Hashtable
+ * @static
+ */
 Hashtable.values = function(hashtable) {
-    return hashtable.items.values();
+    if (hashtable.map) { return hashtable.items.values(); }
+    else { return Object.values(hashtable.items); }
 }
 
 Hashtable.prototype[Symbol.iterator] = function*() {

@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios';
 import { GDevelopExtensionApi } from './ApiConfigs';
+import semverSatisfies from 'semver/functions/satisfies';
 
 export type ExtensionShortHeader = {|
   shortDescription: string,
@@ -8,6 +9,7 @@ export type ExtensionShortHeader = {|
   fullName: string,
   name: string,
   version: string,
+  gdevelopVersion?: string,
   url: string,
   headerUrl: string,
   tags: string,
@@ -28,6 +30,17 @@ export type ExtensionsRegistry = {
   allTags: Array<string>,
   extensionShortHeaders: Array<ExtensionShortHeader>,
 };
+
+/** Check if the IDE version, passed as argument, satisfiy the version required by the extension. */
+export const isCompatibleWithExtension = (
+  ideVersion: string,
+  extensionShortHeader: ExtensionShortHeader
+) =>
+  extensionShortHeader.gdevelopVersion
+    ? semverSatisfies(ideVersion, extensionShortHeader.gdevelopVersion, {
+        includePrerelease: true,
+      })
+    : true;
 
 // Handle urls to extension header or file. If the URL is not absolute and HTTPS,
 // it is assumed to be relative to the registry base url.

@@ -105,6 +105,7 @@ type ClosableTabProps = {|
   active: boolean,
   label: Node,
   closable: boolean,
+  onSetPreview: () => void,
   onClose: () => void,
   onCloseOthers: () => void,
   onCloseAll: () => void,
@@ -114,6 +115,7 @@ type ClosableTabProps = {|
 
 export function ClosableTab({
   active,
+  onSetPreview,
   onClose,
   onCloseOthers,
   onCloseAll,
@@ -193,6 +195,11 @@ export function ClosableTab({
             <ContextMenu
               ref={contextMenu}
               buildMenuTemplate={() => [
+                {
+                  label: 'Set scene for preview',
+                  click: onSetPreview,
+                  enabled: closable,
+                },
                 {
                   label: 'Close',
                   click: onClose,

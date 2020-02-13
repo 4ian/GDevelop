@@ -177,3 +177,19 @@ Hashtable.prototype.clear = function() {
         }
     }
 }
+
+Hashtable[Symbol.iterator] = function*() {
+    if(this.map) {
+        for(var k in this.items.keys()){
+            if(this.items.has(k)){
+                yield this.items.get(k);
+            }
+        }
+    } else {
+        for (var k in this.items) {
+            if (this.items.hasOwnProperty(k)) {
+                yield this.items[k];
+            }
+        }
+    }
+}

@@ -518,6 +518,18 @@ class MainFrame extends React.Component<Props, State> {
     this.toolbar.setEditorToolbar(editorToolbar);
   };
 
+  setSceneToPreview = () => {
+    console.log(!!this.state.sceneToPreview);
+    const editorTab = getCurrentTab(this.state.editorTabs);
+    this._onSetPreview(editorTab);
+  };
+
+  setResetSceneToPreview = () => {
+    this.setState({
+      sceneToPreview: false,
+    });
+  };
+
   addLayout = () => {
     const { currentProject } = this.state;
     if (!currentProject) return;
@@ -870,6 +882,10 @@ class MainFrame extends React.Component<Props, State> {
         previewLoading: true,
       },
       () => {
+        if (this.state.sceneToPreview) {
+          layout = this.state.sceneToPreview;
+        }
+
         _previewLauncher
           .launchLayoutPreview(project, layout, options)
           .catch(error => {
@@ -935,6 +951,9 @@ class MainFrame extends React.Component<Props, State> {
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
+              isPreviewOverride={() => !!this.state.sceneToPreview}
+              onResetSceneToPreview={this.setResetSceneToPreview}
+              setSceneToPreview={this.setSceneToPreview}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 const { currentFileMetadata } = this.state;
@@ -1534,6 +1553,15 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
+  _onSetPreview = (editorTab: number) => {
+    const { currentProject } = this.state;
+    //Get name of scene on tab clicked
+    let name = editorTab.editorRef.props.layoutName;
+    this.setState({
+      sceneToPreview: currentProject.getLayout(name),
+    });
+  };
+
   _onChangeEditorTab = (value: number) => {
     this.setState(
       {
@@ -1793,6 +1821,7 @@ class MainFrame extends React.Component<Props, State> {
                 label={editorTab.name}
                 key={editorTab.key}
                 active={isCurrentTab}
+                onSetPreview={() => this._onSetPreview(editorTab)}
                 onClick={() => this._onChangeEditorTab(id)}
                 onClose={() => this._onCloseEditorTab(editorTab)}
                 onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}

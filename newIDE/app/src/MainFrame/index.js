@@ -1126,11 +1126,11 @@ class MainFrame extends React.Component<Props, State> {
     initiallyFocusedFunctionName?: string,
     initiallyFocusedBehaviorName?: ?string
   ) => {
-    const { eventsFunctionsExtensionsState } = this.props;
+    const { i18n, eventsFunctionsExtensionsState } = this.props;
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name,
+          name: name + ' ' + i18n._(t`(Extension)`),
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
               project={this.state.currentProject}

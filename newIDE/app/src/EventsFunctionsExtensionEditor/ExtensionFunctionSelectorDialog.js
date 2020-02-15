@@ -168,8 +168,8 @@ export default function BehaviorMethodSelectorDialog({
               }
               description={
                 <Trans>
-                  Events that will be run when the a scene of the game is
-                  loaded, before the scene events.
+                  Events that will be run once when the a scene of the game
+                  is loaded, before the scene events.
                 </Trans>
               }
             />
@@ -225,8 +225,8 @@ export default function BehaviorMethodSelectorDialog({
               }
               description={
                 <Trans>
-                  Events that will be run when a scene is paused (another scene
-                  is run on top of it).
+                  Events that will be run once when a scene is paused (another
+                  scene is run on top of it).
                 </Trans>
               }
             />
@@ -244,8 +244,8 @@ export default function BehaviorMethodSelectorDialog({
               }
               description={
                 <Trans>
-                  Events that will be run when a scene is resumed (after it was
-                  previously paused).
+                  Events that will be run once when a scene is resumed (after it
+                  was previously paused).
                 </Trans>
               }
             />
@@ -263,9 +263,9 @@ export default function BehaviorMethodSelectorDialog({
               }
               description={
                 <Trans>
-                  Events that will be run when a scene is about to be unloaded
-                  from memory. The previous scene that was paused will be
-                  resumed after this.
+                  Events that will be run once when a scene is about to be
+                  unloaded from memory. The previous scene that was paused will
+                  be resumed after this.
                 </Trans>
               }
             />

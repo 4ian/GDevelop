@@ -28,13 +28,21 @@ gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to
  *
  */
 gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(parentElement) {
+    
     //This prevents flickering on some mobile devices
     PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
 
-    //Create the renderer and setup the rendering area
+     if (this._game.getScaleMode() === "nearest") {
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+     }else{
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR;
+     }
+
+    //Create the renderer and setup the rendering area for exported games.
     //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
     this._pixiRenderer = PIXI.autoDetectRenderer(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight(), {
         preserveDrawingBuffer: true,
+        antialias: false,
     } );
     parentElement.appendChild(this._pixiRenderer.view); // add the renderer view element to the DOM
     this._pixiRenderer.view.style["position"] = "absolute";

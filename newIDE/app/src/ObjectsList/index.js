@@ -296,7 +296,9 @@ export default class ObjectsList extends React.Component<Props, State> {
   _rename = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
 
-    if (getObjectWithContextName(objectWithContext) === newName) { return; }
+    if (getObjectWithContextName(objectWithContext) === newName) {
+      return;
+    }
 
     this.setState({
       renamedObjectWithContext: null,

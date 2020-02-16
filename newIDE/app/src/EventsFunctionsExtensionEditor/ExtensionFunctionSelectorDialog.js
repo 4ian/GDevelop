@@ -168,8 +168,8 @@ export default function BehaviorMethodSelectorDialog({
               }
               description={
                 <Trans>
-                  Events that will be run once when the a scene of the game
-                  is loaded, before the scene events.
+                  Events that will be run once when the a scene of the game is
+                  loaded, before the scene events.
                 </Trans>
               }
             />

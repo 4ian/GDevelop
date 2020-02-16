@@ -62,12 +62,6 @@ export default class InstancesEditorContainer extends Component {
     //This prevents flickering on some mobile devices
     PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
 
-    if (project.getScaleMode() === 'nearest') {
-      PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    } else {
-      PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR;
-    }
-
     //Create the renderer and setup the rendering area for scene editor.
     //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
     this.pixiRenderer = PIXI.autoDetectRenderer(
@@ -76,7 +70,7 @@ export default class InstancesEditorContainer extends Component {
       {
         preserveDrawingBuffer: true,
         antialias: false,
-      } // Disable antialiasing for instance in scene editor (This affect tiles sprite)
+      } // Disable anti-aliasing to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
     );
     this.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', e => {

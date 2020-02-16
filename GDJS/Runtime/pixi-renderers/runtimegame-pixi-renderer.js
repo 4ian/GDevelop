@@ -32,12 +32,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
   //This prevents flickering on some mobile devices
   PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
 
-  if (this._game.getScaleMode() === 'nearest') {
-    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-  } else {
-    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR;
-  }
-
   //Create the renderer and setup the rendering area for exported games.
   //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
   this._pixiRenderer = PIXI.autoDetectRenderer(

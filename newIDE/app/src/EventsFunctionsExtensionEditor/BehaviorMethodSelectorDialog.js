@@ -145,9 +145,9 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
             onChoose={onChoose}
             description={
               <Trans>
-                Events that will be run when the behavior is deactivated on an
-                object (step events won't be run until the behavior is activated
-                again).
+                Events that will be run once when the behavior is deactivated on
+                an object (step events won't be run until the behavior is
+                activated again).
               </Trans>
             }
           />
@@ -158,8 +158,8 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
             onChoose={onChoose}
             description={
               <Trans>
-                Events that will be run when the behavior is re-activated on an
-                object (after it was previously deactivated).
+                Events that will be run once when the behavior is re-activated
+                on an object (after it was previously deactivated).
               </Trans>
             }
           />

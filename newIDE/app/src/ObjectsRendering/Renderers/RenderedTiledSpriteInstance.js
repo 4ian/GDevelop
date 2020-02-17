@@ -74,8 +74,8 @@ RenderedTiledSpriteInstance.prototype.update = function() {
     );
   }
 
-  this._pixiObject.x = this._instance.getX() + (this._pixiObject.width / 2);
-  this._pixiObject.y = this._instance.getY() + (this._pixiObject.height / 2);
+  this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
+  this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
   this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
 };
 

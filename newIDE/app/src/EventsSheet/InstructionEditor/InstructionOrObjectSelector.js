@@ -153,6 +153,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     } = this.props;
     const { searchText, selectedObjectTags } = this.state;
 
+    // If the global objects container is not the project, consider that we're
+    // not in the events of a layout or an external events sheet - but in an extension.
+    const isOutsideLayout = globalObjectsContainer !== project;
+
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
       globalObjectsContainer,
       objectsContainer
@@ -342,11 +346,18 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     currentTab === 'objects' &&
                     !allObjectsList.length && (
                       <EmptyMessage>
-                        <Trans>
-                          There is no object in your game or in this scene.
-                          Start by adding an new object in the scene editor,
-                          using the objects list.
-                        </Trans>
+                        {isOutsideLayout ? (
+                          <Trans>
+                            There are no objects. Objects will appear if you add
+                            some as parameters.
+                          </Trans>
+                        ) : (
+                          <Trans>
+                            There is no object in your game or in this scene.
+                            Start by adding an new object in the scene editor,
+                            using the objects list.
+                          </Trans>
+                        )}
                       </EmptyMessage>
                     )}
                   {!hasResults && (

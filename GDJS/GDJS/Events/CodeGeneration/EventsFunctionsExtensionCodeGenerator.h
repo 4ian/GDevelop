@@ -35,6 +35,14 @@ class EventsFunctionsExtensionCodeGenerator {
       bool compilationForRuntime);
 
  private:
+  /**
+   * \brief Generate the code to register an events function which is an extension
+   * lifecycle into the game engine.
+   */
+  gd::String GenerateLifecycleFunctionRegistrationCode(
+      const gd::EventsFunction& eventsFunction,
+      const gd::String& codeNamespace);
+
   gd::Project& project;
 };
 

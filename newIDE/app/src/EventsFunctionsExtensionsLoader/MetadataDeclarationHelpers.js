@@ -130,10 +130,10 @@ export const declareBehaviorMetadata = (
 };
 
 /**
- * Check if the name of the function is the name of a lifecycle function,
+ * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
  * that will be called automatically by the game engine.
  */
-export const isBehaviorLifecycleFunction = (functionName: string) => {
+export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
   return (
     [
       'onCreated',
@@ -146,6 +146,16 @@ export const isBehaviorLifecycleFunction = (functionName: string) => {
       'onOwnerRemovedFromScene',
       // end of compatibility code
     ].indexOf(functionName) !== -1
+  );
+};
+
+/**
+ * Check if the name of the function is the name of a lifecycle function (for events-based extensions),
+ * that will be called automatically by the game engine.
+ */
+export const isExtensionLifecycleEventsFunction = (functionName: string) => {
+  return gd.EventsFunctionsExtension.isExtensionLifecycleEventsFunction(
+    functionName
   );
 };
 

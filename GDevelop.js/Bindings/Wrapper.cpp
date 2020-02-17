@@ -547,6 +547,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 
+#define STATIC_IsExtensionLifecycleEventsFunction IsExtensionLifecycleEventsFunction
+
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout
 #define GetExternalEventsAt GetExternalEvents

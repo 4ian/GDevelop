@@ -7,12 +7,15 @@ import {
   type ExtensionShortHeader,
   type ExtensionHeader,
   getExtensionHeader,
+  isCompatibleWithExtension,
 } from '../Utils/GDevelopServices/Extension';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { MarkdownText } from '../UI/MarkdownText';
 import Text from '../UI/Text';
+import AlertMessage from '../UI/AlertMessage';
+import { getIDEVersion } from '../Version';
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
@@ -64,6 +67,11 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
     } = this.props;
     const { extensionHeader, error } = this.state;
 
+    const isCompatible = isCompatibleWithExtension(
+      getIDEVersion(),
+      extensionShortHeader
+    );
+
     return (
       <Dialog
         title={
@@ -83,7 +91,9 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             <FlatButton
               key="install"
               label={
-                alreadyInstalled ? (
+                !isCompatible ? (
+                  <Trans>Not compatible</Trans>
+                ) : alreadyInstalled ? (
                   <Trans>Re-install/update</Trans>
                 ) : (
                   <Trans>Install in project</Trans>
@@ -91,13 +101,22 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               }
               primary
               onClick={onInstall}
-              disabled={isInstalling}
+              disabled={isInstalling || !isCompatible}
             />
           </LeftLoader>,
         ]}
         open
         onRequestClose={onClose}
       >
+        {!isCompatible && (
+          <AlertMessage kind="error">
+            <Trans>
+              Unfortunately, this extension requires a newer version of GDevelop
+              to work. Upgrade GDevelop to be able to use this extension in your
+              project.
+            </Trans>
+          </AlertMessage>
+        )}
         {!extensionHeader ? (
           <Text>{extensionShortHeader.shortDescription}</Text>
         ) : (

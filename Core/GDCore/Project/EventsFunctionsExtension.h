@@ -125,6 +125,12 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
                        const gd::SerializerElement& element);
   ///@}
 
+  /** \name Lifecycle event functions
+   */
+  ///@{
+  static bool IsExtensionLifecycleEventsFunction(const gd::String& eventsFunctionName);
+  ///@}
+
  private:
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.

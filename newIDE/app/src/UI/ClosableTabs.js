@@ -104,7 +104,9 @@ export class ClosableTabs extends Component<ClosableTabsProps> {
 type ClosableTabProps = {|
   active: boolean,
   label: Node,
+  type: string,
   closable: boolean,
+  canOverrideScene: boolean,
   onSetPreview: () => void,
   onClose: () => void,
   onCloseOthers: () => void,
@@ -120,7 +122,9 @@ export function ClosableTab({
   onCloseOthers,
   onCloseAll,
   label,
+  type,
   closable,
+  canOverrideScene,
   onClick,
   onActivated,
 }: ClosableTabProps) {
@@ -138,6 +142,14 @@ export function ClosableTab({
     event.stopPropagation();
     if (contextMenu.current) {
       contextMenu.current.open(event.clientX, event.clientY);
+    }
+  };
+
+  const canHavePreviewOverride = (type:string) => {
+    if (type === 'sceneEditor' || type === 'eventsEditor') {
+      return true;
+    } else {
+      return false;
     }
   };
 
@@ -198,7 +210,7 @@ export function ClosableTab({
                 {
                   label: 'Set scene for preview',
                   click: onSetPreview,
-                  enabled: closable,
+                  visible: canHavePreviewOverride(type),
                 },
                 {
                   label: 'Close',

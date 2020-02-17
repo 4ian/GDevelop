@@ -19,7 +19,7 @@ class VariableBracketAccessorNode;
 class IdentifierOrFunctionOrEmptyNode;
 class IdentifierNode;
 class FunctionOrEmptyNode;
-class FunctionNode;
+class FunctionCallNode;
 class EmptyNode;
 }  // namespace gd
 
@@ -45,7 +45,7 @@ class GD_CORE_API ExpressionParser2NodeWorker {
   friend class IdentifierOrFunctionOrEmptyNode;
   friend class IdentifierNode;
   friend class FunctionOrEmptyNode;
-  friend class FunctionNode;
+  friend class FunctionCallNode;
   friend class EmptyNode;
 
  public:
@@ -62,7 +62,7 @@ class GD_CORE_API ExpressionParser2NodeWorker {
   virtual void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) = 0;
   virtual void OnVisitIdentifierNode(IdentifierNode& node) = 0;
-  virtual void OnVisitFunctionNode(FunctionNode& node) = 0;
+  virtual void OnVisitFunctionCallNode(FunctionCallNode& node) = 0;
   virtual void OnVisitEmptyNode(EmptyNode& node) = 0;
 };
 

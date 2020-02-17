@@ -71,7 +71,7 @@ class GD_CORE_API ExpressionFunctionRenamer
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {}
-  void OnVisitFunctionNode(FunctionNode& node) override {
+  void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (node.functionName == oldFunctionName) {
       if (behaviorType.empty() && !objectType.empty() &&
           !node.objectName.empty()) {

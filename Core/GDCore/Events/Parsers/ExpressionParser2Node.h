@@ -220,7 +220,7 @@ struct VariableBracketAccessorNode
 struct IdentifierOrFunctionOrEmptyNode : public ExpressionNode {};
 
 /**
- * \brief An identifier node, usually representing an object.
+ * \brief An identifier node, usually representing an object or a function name.
  */
 struct IdentifierNode : public IdentifierOrFunctionOrEmptyNode {
   IdentifierNode(const gd::String &identifierName_, const gd::String &type_)
@@ -242,8 +242,8 @@ struct FunctionOrEmptyNode : public IdentifierOrFunctionOrEmptyNode {
 /**
  * \brief A function node. For example: "MyExtension::MyFunction(1, 2)".
  */
-struct FunctionNode : public FunctionOrEmptyNode {
-  FunctionNode(const gd::String &type_,
+struct FunctionCallNode : public FunctionOrEmptyNode {
+  FunctionCallNode(const gd::String &type_,
                std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                const ExpressionMetadata &expressionMetadata_,
                const gd::String &functionName_)
@@ -251,7 +251,7 @@ struct FunctionNode : public FunctionOrEmptyNode {
         parameters(std::move(parameters_)),
         expressionMetadata(expressionMetadata_),
         functionName(functionName_){};
-  FunctionNode(const gd::String &type_,
+  FunctionCallNode(const gd::String &type_,
                const gd::String &objectName_,
                std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                const ExpressionMetadata &expressionMetadata_,
@@ -261,7 +261,7 @@ struct FunctionNode : public FunctionOrEmptyNode {
         parameters(std::move(parameters_)),
         expressionMetadata(expressionMetadata_),
         functionName(functionName_){};
-  FunctionNode(const gd::String &type_,
+  FunctionCallNode(const gd::String &type_,
                const gd::String &objectName_,
                const gd::String &behaviorName_,
                std::vector<std::unique_ptr<ExpressionNode>> parameters_,
@@ -273,9 +273,9 @@ struct FunctionNode : public FunctionOrEmptyNode {
         parameters(std::move(parameters_)),
         expressionMetadata(expressionMetadata_),
         functionName(functionName_){};
-  virtual ~FunctionNode(){};
+  virtual ~FunctionCallNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
-    worker.OnVisitFunctionNode(*this);
+    worker.OnVisitFunctionCallNode(*this);
   };
 
   gd::String type;  // This could be removed if the type ("string" or "number")

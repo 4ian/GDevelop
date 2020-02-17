@@ -76,7 +76,7 @@ size_t GetMaximumParametersNumber(
 }  // namespace
 
 std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
-    const gd::FunctionNode& function, size_t functionStartPosition) {
+    const gd::FunctionCallNode& function, size_t functionStartPosition) {
   if (gd::MetadataProvider::IsBadExpressionMetadata(
           function.expressionMetadata)) {
     return gd::make_unique<ExpressionParserError>(

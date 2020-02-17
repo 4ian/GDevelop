@@ -63,7 +63,7 @@ class GD_CORE_API ExpressionObjectsAnalyzer
       context.AddObjectName(node.identifierName);
     }
   }
-  void OnVisitFunctionNode(FunctionNode& node) override {
+  void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (!node.objectName.empty()) {
       context.AddObjectName(node.objectName);
 

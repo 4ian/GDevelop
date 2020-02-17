@@ -71,6 +71,33 @@ class GD_CORE_API ExpressionFunctionRenamer
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
+    if (!node.behaviorFunctionName.empty()) {
+      // Behavior function name
+      if (!behaviorType.empty() &&
+          node.behaviorFunctionName == oldFunctionName) {
+        const gd::String& thisBehaviorType =
+            gd::GetTypeOfBehavior(globalObjectsContainer,
+                                  objectsContainer,
+                                  node.objectFunctionOrBehaviorName);
+        if (thisBehaviorType == behaviorType) {
+          node.behaviorFunctionName = newFunctionName;
+          hasDoneRenaming = true;
+        }
+      }
+    } else {
+      // Object function name
+      if (behaviorType.empty() && !objectType.empty() &&
+          node.objectFunctionOrBehaviorName == oldFunctionName) {
+        const gd::String& thisObjectType = gd::GetTypeOfObject(
+            globalObjectsContainer, objectsContainer, node.objectName);
+        if (thisObjectType == objectType) {
+          node.objectFunctionOrBehaviorName = newFunctionName;
+          hasDoneRenaming = true;
+        }
+      }
+    }
+  }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (node.functionName == oldFunctionName) {
       if (behaviorType.empty() && !objectType.empty() &&

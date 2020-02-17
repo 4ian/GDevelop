@@ -176,6 +176,23 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
                 "Idontexist(12, 34, \"56\" + 2)");
   }
 
+  SECTION("Valid function name") {
+    SECTION("Free function") {
+      testPrinter("number", "MyExtension::GetNumber");
+      testPrinter("number", "MyExtension::GetNumberWith2Params");
+      testPrinter("number", "MyExtension::UnknownFunc");
+      testPrinter("number", "UnknownFunc");
+    }
+    SECTION("Object function") {
+      testPrinter("number", "a.b");
+      testPrinter("number", "MySpriteObject.GetObjectNumber");
+      testPrinter("number", "MySpriteObject.MyOtherFunc");
+    }
+    SECTION("Behavior function") {
+      testPrinter("number", "MySpriteObject.MyBehavior::MyFunc");
+    }
+  }
+
   SECTION("Valid variables") {
     testPrinter("scenevar", "myVariable");
     testPrinter("scenevar", "myVariable.myChild");

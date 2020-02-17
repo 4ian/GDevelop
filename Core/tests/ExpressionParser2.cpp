@@ -280,12 +280,42 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("valid operators") {
+    {
+      auto node = parser.ParseExpression("number", "123 + 456");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      REQUIRE(operatorNode.type == "number");
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "123");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "456");
+    }
+    {
+      auto node = parser.ParseExpression("string", "\"abc\" + \"def\"");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      REQUIRE(operatorNode.type == "string");
+      auto &leftTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftTextNode.text == "abc");
+      auto &rightTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightTextNode.text == "def");
+    }
+  }
+
   SECTION("valid unary operators") {
     {
       auto node = parser.ParseExpression("number", "-123");
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       REQUIRE(unaryOperatorNode.op == '-');
+      REQUIRE(unaryOperatorNode.type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
@@ -295,6 +325,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       REQUIRE(unaryOperatorNode.op == '+');
+      REQUIRE(unaryOperatorNode.type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
@@ -304,6 +335,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       REQUIRE(unaryOperatorNode.op == '-');
+      REQUIRE(unaryOperatorNode.type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123.2");

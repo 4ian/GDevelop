@@ -90,6 +90,9 @@ class GD_CORE_API ExpressionNodeLocationFinder
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     CheckSearchPositionInNode(node);
   }
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
+    CheckSearchPositionInNode(node);
+  }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     CheckSearchPositionInNode(node);
     for (auto& parameter : node.parameters) {

@@ -359,4 +359,8 @@ void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
   output += GenerateDefaultValue(node.type);
 }
 
+void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) {
+  output += GenerateDefaultValue(node.type);
+}
+
 }  // namespace gd

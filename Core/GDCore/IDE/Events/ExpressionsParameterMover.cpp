@@ -74,6 +74,7 @@ class GD_CORE_API ExpressionParameterMover
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     auto moveParameter =
         [this](std::vector<std::unique_ptr<gd::ExpressionNode>>& parameters) {

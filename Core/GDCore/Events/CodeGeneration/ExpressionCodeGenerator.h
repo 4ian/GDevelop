@@ -73,6 +73,7 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override;
   void OnVisitIdentifierNode(IdentifierNode& node) override;
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override;
   void OnVisitFunctionCallNode(FunctionCallNode& node) override;
   void OnVisitEmptyNode(EmptyNode& node) override;
 

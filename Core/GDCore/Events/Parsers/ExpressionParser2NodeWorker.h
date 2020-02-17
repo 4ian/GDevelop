@@ -16,9 +16,10 @@ class TextNode;
 class VariableNode;
 class VariableAccessorNode;
 class VariableBracketAccessorNode;
-class IdentifierOrFunctionOrEmptyNode;
+class IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode;
 class IdentifierNode;
-class FunctionOrEmptyNode;
+class FunctionCallOrObjectFunctionNameOrEmptyNode;
+class ObjectFunctionNameNode;
 class FunctionCallNode;
 class EmptyNode;
 }  // namespace gd
@@ -42,9 +43,10 @@ class GD_CORE_API ExpressionParser2NodeWorker {
   friend class VariableNode;
   friend class VariableAccessorNode;
   friend class VariableBracketAccessorNode;
-  friend class IdentifierOrFunctionOrEmptyNode;
+  friend class IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode;
   friend class IdentifierNode;
-  friend class FunctionOrEmptyNode;
+  friend class FunctionCallOrObjectFunctionNameOrEmptyNode;
+  friend class ObjectFunctionNameNode;
   friend class FunctionCallNode;
   friend class EmptyNode;
 
@@ -62,6 +64,7 @@ class GD_CORE_API ExpressionParser2NodeWorker {
   virtual void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) = 0;
   virtual void OnVisitIdentifierNode(IdentifierNode& node) = 0;
+  virtual void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) = 0;
   virtual void OnVisitFunctionCallNode(FunctionCallNode& node) = 0;
   virtual void OnVisitEmptyNode(EmptyNode& node) = 0;
 };

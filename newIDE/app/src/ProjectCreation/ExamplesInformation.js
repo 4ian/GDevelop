@@ -17,7 +17,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -70,7 +70,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -103,7 +103,7 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -164,7 +164,7 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -213,7 +213,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -246,7 +246,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -283,7 +283,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -340,7 +340,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -397,7 +397,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -442,7 +442,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -495,7 +495,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -532,7 +532,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -602,7 +602,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -631,7 +631,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -660,7 +660,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -685,7 +685,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -731,7 +731,7 @@ module.exports = {
         "name": "DestroyOutsideBehavior"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -784,7 +784,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -838,7 +838,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -867,7 +867,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -905,7 +905,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -938,7 +938,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -963,7 +963,7 @@ module.exports = {
         "name": "DeviceSensors"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -992,7 +992,7 @@ module.exports = {
         "name": "DeviceSensors"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -1050,7 +1050,7 @@ module.exports = {
         "name": "AnchorBehavior"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1151,7 +1151,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1221,7 +1221,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -1266,7 +1266,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1345,7 +1345,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1390,7 +1390,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1459,7 +1459,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1500,7 +1500,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1553,7 +1553,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1590,7 +1590,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1619,7 +1619,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1672,7 +1672,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1721,7 +1721,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1766,7 +1766,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1843,7 +1843,7 @@ module.exports = {
         "name": "BuiltinFile"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1880,7 +1880,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -1930,7 +1930,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -1967,7 +1967,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2042,7 +2042,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2067,7 +2067,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2096,7 +2096,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2150,7 +2150,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2179,7 +2179,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2224,7 +2224,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2269,7 +2269,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2294,7 +2294,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2348,7 +2348,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2406,7 +2406,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2447,7 +2447,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2480,7 +2480,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2555,7 +2555,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2572,7 +2572,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2605,7 +2605,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2638,7 +2638,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2671,7 +2671,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2708,7 +2708,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2725,7 +2725,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2786,7 +2786,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -2811,7 +2811,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2865,7 +2865,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2918,7 +2918,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -2979,7 +2979,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3049,7 +3049,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3074,7 +3074,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3147,7 +3147,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3180,7 +3180,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3209,7 +3209,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3222,7 +3222,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3247,7 +3247,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3268,7 +3268,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3305,7 +3305,7 @@ module.exports = {
         "name": "BuiltinFile"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3342,7 +3342,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3375,7 +3375,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3428,7 +3428,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3453,7 +3453,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3490,7 +3490,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3547,7 +3547,7 @@ module.exports = {
         "name": "BuiltinWindow"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3588,7 +3588,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3649,7 +3649,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3686,7 +3686,7 @@ module.exports = {
         "name": "BuiltinAudio"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3732,7 +3732,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3820,7 +3820,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3902,7 +3902,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -3951,7 +3951,7 @@ module.exports = {
         "name": "BuiltinAdvanced"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {
@@ -3996,7 +3996,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       }
     ]
@@ -4033,7 +4033,7 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Base object",
+        "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
       {

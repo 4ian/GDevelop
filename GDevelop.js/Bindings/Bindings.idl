@@ -1804,6 +1804,8 @@ interface EventsFunctionsExtension {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
+    boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString eventsFunctionName);
+
     // Inherited from EventsFunctionsContainer:
     [Ref] EventsFunction InsertNewEventsFunction([Const] DOMString name, unsigned long pos);
     [Ref] EventsFunction InsertEventsFunction([Const, Ref] EventsFunction eventsFunction, unsigned long pos);
@@ -2301,11 +2303,10 @@ interface ParticleEmitterObject {
 ParticleEmitterObject implements gdObject;
 
 //GDJS bindings:
-
-[NoDelete, Prefix="gdjs::"]
-interface EventsCodeGenerator {
-    [Const, Value] DOMString STATIC_GenerateSceneEventsCompleteCode([Ref] Project project, [Ref] Layout layout, [Ref] EventsList events, [Ref] SetString includes, boolean compilationForRuntime);
-    [Const, Value] DOMString STATIC_GenerateEventsFunctionCode([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespace, [Ref] SetString includes, boolean compilationForRuntime);
+[Prefix="gdjs::"]
+interface LayoutCodeGenerator {
+    void LayoutCodeGenerator([Ref] Project project);
+    [Const, Value] DOMString GenerateLayoutCompleteCode([Const, Ref] Layout layout, [Ref] SetString includes, boolean compilationForRuntime);
 };
 
 [Prefix="gdjs::"]
@@ -2315,6 +2316,12 @@ interface BehaviorCodeGenerator {
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
 
+};
+
+[Prefix="gdjs::"]
+interface EventsFunctionsExtensionCodeGenerator {
+    void EventsFunctionsExtensionCodeGenerator([Ref] Project project);
+    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
 };
 
 [Prefix="gdjs::"]

@@ -1,7 +1,7 @@
 /**
  * Launch this script to generate a reference of all expressions supported by GDevelop.
  */
-const gd = require('../public/libGD.js')();
+const initializeGDevelopJs = require('../public/libGD.js');
 const { mapVector } = require('./lib/MapFor');
 const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
 const fs = require('fs');
@@ -9,7 +9,6 @@ const _ = require('lodash');
 const shell = require('shelljs');
 
 shell.exec('node import-GDJS-Runtime.js');
-gd.initializePlatforms();
 
 const gdevelopWikiUrlRoot = 'http://wiki.compilgames.net/doku.php/gdevelop5';
 const outputFile = 'expressions-reference.dokuwiki.md';
@@ -247,7 +246,7 @@ const sortExpressionReferenceTexts = (expressionText1, expressionText2) => {
 };
 
 /** @returns {Array<DocumentationText>} */
-const generateAllDocumentationTexts = () => {
+const generateAllDocumentationTexts = (gd) => {
   const platformExtensions = gd.JsPlatform.get().getAllPlatformExtensions();
   const platformExtensionsCount = platformExtensions.size();
 
@@ -377,23 +376,25 @@ const writeFile = content => {
 };
 
 const noopTranslationFunction = str => str;
-const extensionsLoader = makeExtensionsLoader({ gd, filterExamples: true });
-extensionsLoader
-  .loadAllExtensions(noopTranslationFunction)
-  .then(loadingResults => {
-    console.info('Loaded extensions', loadingResults);
 
-    return generateAllDocumentationTexts();
-  })
-  .then(allDocumentationTexts => {
-    const texts = allDocumentationTexts
-      .map(({ text }) => {
-        return text;
-      })
-      .join('\n');
-    return writeFile(texts);
-  })
-  .then(
-    () => console.info(`✅ Done. File generated: ${outputFile}`),
-    err => console.error('❌ Error while writing output', err)
-  );
+initializeGDevelopJs().then(gd => {
+  makeExtensionsLoader({ gd, filterExamples: true })
+    .loadAllExtensions(noopTranslationFunction)
+    .then(loadingResults => {
+      console.info('Loaded extensions', loadingResults);
+
+      return generateAllDocumentationTexts(gd);
+    })
+    .then(allDocumentationTexts => {
+      const texts = allDocumentationTexts
+        .map(({ text }) => {
+          return text;
+        })
+        .join('\n');
+      return writeFile(texts);
+    })
+    .then(
+      () => console.info(`✅ Done. File generated: ${outputFile}`),
+      err => console.error('❌ Error while writing output', err)
+    );
+});

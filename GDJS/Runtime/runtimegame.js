@@ -129,7 +129,7 @@ gdjs.RuntimeGame.prototype.getGameData = function() {
  * Get the data associated to a scene.
  *
  * @param {string} sceneName The name of the scene. If not defined, the first scene will be returned.
- * @return The data associated to the scene.
+ * @return {?Object} The data associated to the scene.
  */
 gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
   var scene = undefined;
@@ -151,7 +151,7 @@ gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
 /**
  * Check if a scene exists
  *
- * @param {string} sceneName The name of the scene to search.
+ * @param {string=} sceneName The name of the scene to search.
  * @return {boolean} true if the scene exists. If sceneName is undefined, true if the game has a scene.
  */
 gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
@@ -172,7 +172,7 @@ gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
  * Get the data associated to an external layout.
  *
  * @param {string} name The name of the external layout.
- * @return {Object} The data associated to the external layout or null if not found.
+ * @return {?Object} The data associated to the external layout or null if not found.
  */
 gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
   var externalLayout = null;
@@ -519,3 +519,10 @@ gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
 
   currentScene.stopProfiler();
 };
+
+/**
+ * Return true if a scene was loaded, false otherwise (i.e: game not yet started).
+ */
+gdjs.RuntimeGame.prototype.wasFirstSceneLoaded = function() {
+  return this._sceneStack.wasFirstSceneLoaded();
+}

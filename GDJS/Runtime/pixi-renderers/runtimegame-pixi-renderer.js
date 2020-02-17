@@ -32,7 +32,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
   //This prevents flickering on some mobile devices
   PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
 
-  //Create the renderer and setup the rendering area for exported games.
+  //Create the renderer and setup the rendering area
   //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
   this._pixiRenderer = PIXI.autoDetectRenderer(
     this._game.getGameResolutionWidth(),
@@ -123,7 +123,8 @@ gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function() {
     canvasHeight = maxHeight;
   } else if (
     (isFullPage && this._keepRatio) ||
-    canvasWidth > maxWidth || canvasHeight > maxHeight
+    canvasWidth > maxWidth ||
+    canvasHeight > maxHeight
   ) {
     var factor = maxWidth / canvasWidth;
     if (canvasHeight * factor > maxHeight) factor = maxHeight / canvasHeight;

@@ -7,11 +7,17 @@
  */
 
 /**
- * @typedef {Object} ObjectData Object containing initial properties for all objects extending gdjs.RuntimeObject
+ * @typedef {Object} ObjectData Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}.
  * @property {string} name The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example).
  * @property {string} type The object type.
  * @property {Array<VariableData>} variables The list of default variables.
  * @property {Array<BehaviorData>} behaviors The list of default behaviors.
+ */
+
+/**
+ * @typedef {Object} AABB An axis-aligned bounding box. Used to represents a box around an object for example.
+ * @property {Array<number>} min The [x,y] coordinates of the top left point
+ * @property {Array<number>} max The [x,y] coordinates of the bottom right point
  */
 
 /**
@@ -34,27 +40,90 @@
  * @param {ObjectData} objectData The initial properties of the object.
  */
 gdjs.RuntimeObject = function(runtimeScene, objectData) {
+    /**
+     * @protected
+     * @type {string}
+     */
     this.name = objectData.name || "";
-    this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+    /**
+     * @protected
+     * @type {string}
+     */
     this.type = objectData.type || "";
+    /**
+     * @protected
+     * @type {number}
+     */
     this.x = 0;
+    /**
+     * @protected
+     * @type {number}
+     */
     this.y = 0;
+    /**
+     * @protected
+     * @type {number}
+     */
     this.angle = 0;
+    /**
+     * @protected
+     * @type {number}
+     */
     this.zOrder = 0;
+    /**
+     * @protected
+     * @type {boolean}
+     */
     this.hidden = false;
+    /**
+     * @protected
+     * @type {string}
+     */
     this.layer = "";
-    this.livingOnScene = true;
+    /**
+     * @type {number}
+     * @protected
+     */
+    this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+    /**
+     * @type {boolean}
+     * @protected
+     */
+    this._livingOnScene = true;
+    /**
+     * @type {number}
+     * @protected
+     */
     this.id = runtimeScene.createNewUniqueId();
-    this._runtimeScene = runtimeScene; //This could/should be avoided.
+    /**
+     * @type {gdjs.RuntimeScene}
+     */
+    this._runtimeScene = runtimeScene;
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
+        /**
+         * @type {Array<gdjs.Polygon>}
+         * @protected
+         */
         this._defaultHitBoxes = [];
         this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0,0));
     }
+    /**
+     * @type {Array<gdjs.Polygon>}
+     * @protected
+     */
     this.hitBoxes = this._defaultHitBoxes;
+    /**
+     * @type {boolean}
+     * @protected
+     */
     this.hitBoxesDirty = true;
     if ( this.aabb === undefined )
+        /**
+         * @type {AABB}
+         * @protected
+         */
         this.aabb = { min:[0,0], max:[0,0] };
     else {
         this.aabb.min[0] = 0; this.aabb.min[1] = 0;
@@ -63,24 +132,41 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
 
     //Variables:
     if ( !this._variables )
+        /**
+         * @type {gdjs.VariablesContainer}
+         * @protected
+         */
         this._variables = new gdjs.VariablesContainer(objectData ? objectData.variables : undefined);
     else
         gdjs.VariablesContainer.call(this._variables, objectData ? objectData.variables : undefined);
 
     //Forces:
     if ( this._forces === undefined )
+        /**
+         * @type {Array<gdjs.Force>}
+         * @protected
+         */
         this._forces = [];
     else
         this.clearForces();
 
-    //A force returned by getAverageForce method:
     if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,0);
 
     //Behaviors:
     if (this._behaviors === undefined)
-        this._behaviors = []; //Contains the behaviors of the object
+        /**
+         * Contains the behaviors of the object.
+         * @type {Array<gdjs.RuntimeBehavior>}
+         * @protected
+         */
+        this._behaviors = [];
 
     if (this._behaviorsTable === undefined)
+        //TODO: add <string, gdjs.RuntimeBehavior> typing to Hashtable.
+        /**
+         * @type {Hashtable}
+         * @protected
+         */
         this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
     else
         this._behaviorsTable.clear();
@@ -104,6 +190,11 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
 
     //Timers:
     if (this._timers === undefined)
+        //TODO: add <string, gdjs.Timer> typing to Hashtable.
+        /**
+         * @type {Hashtable}
+         * @protected
+         */
         this._timers = new Hashtable();
     else
         this._timers.clear();
@@ -117,7 +208,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
 gdjs.RuntimeObject._identifiers = gdjs.RuntimeObject._identifiers || new Hashtable();
 
 /**
- * The next available unique identifier for an object. Do not use directly or modify. 
+ * The next available unique identifier for an object. Do not use directly or modify.
  * @static
  * @private
  */
@@ -128,7 +219,7 @@ gdjs.RuntimeObject._newId = (gdjs.RuntimeObject._newId || 0);
  * @static
  * @private
  */
-gdjs.RuntimeObject.forcesGarbage = []; 
+gdjs.RuntimeObject.forcesGarbage = [];
 
 //Common members functions related to the object and its runtimeScene :
 
@@ -186,9 +277,9 @@ gdjs.RuntimeObject.prototype.extraInitializationFromInitialInstance = function(i
  * @param {gdjs.RuntimeScene} runtimeScene The RuntimeScene owning the object.
  */
 gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
-    if ( this.livingOnScene ) {
+    if ( this._livingOnScene ) {
         runtimeScene.markObjectForDeletion(this);
-        this.livingOnScene = false;
+        this._livingOnScene = false;
     }
 };
 
@@ -217,6 +308,7 @@ gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
  * @return {Object} The internal rendered object (PIXI.DisplayObject...)
  */
 gdjs.RuntimeObject.prototype.getRendererObject = function() {
+    return undefined;
 };
 
 //Common properties:
@@ -782,7 +874,7 @@ gdjs.RuntimeObject.prototype.averageForceAngleIs = function(angle, toleranceInDe
  *
  * You should probably redefine updateHitBoxes instead of this function.
  *
- * @return {Array} An array composed of polygon.
+ * @return {Array<gdjs.Polygon>} An array composed of polygon.
  */
 gdjs.RuntimeObject.prototype.getHitBoxes = function() {
     //Avoid a naive implementation requiring to recreate temporaries each time
@@ -837,12 +929,6 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
     this.hitBoxes[0].rotate(this.getAngle()/180*Math.PI);
     this.hitBoxes[0].move(this.getDrawableX()+centerX, this.getDrawableY()+centerY);
 };
-
-/**
- * @typedef {Object} AABB
- * @property {Array} min The [x,y] coordinates of the top left point
- * @property {Array} max The [x,y] coordinates of the bottom right point
- */
 
 /**
  * Get the AABB (axis aligned bounding box) for the object.
@@ -1410,7 +1496,7 @@ gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
     }
     return this.aabb.min[0] <= x && this.aabb.max[0] >= x
         && this.aabb.min[1] <= y && this.aabb.max[1] >= y;
-}
+};
 
 /**
  * Check the distance between two objects.
@@ -1462,7 +1548,6 @@ gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
 
     return false;
 };
-
 
 /**
  * Get the identifier associated to an object name.

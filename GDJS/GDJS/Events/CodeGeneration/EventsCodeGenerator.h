@@ -24,7 +24,7 @@ class EventsCodeGenerationContext;
 namespace gdjs {
 
 /**
- * \brief The class being responsible for generating Javascript code from
+ * \brief The class being responsible for generating JavaScript code from
  * events.
  *
  * See also gd::EventsCodeGenerator.
@@ -32,21 +32,20 @@ namespace gdjs {
 class EventsCodeGenerator : public gd::EventsCodeGenerator {
  public:
   /**
-   * Generate complete JS file for executing events of a scene
+   * Generate JavaScript for executing events of a scene
    *
-   * \param project Project used
-   * \param scene Scene used
-   * \param events events of the scene
+   * \param project Project the scene belongs to.
+   * \param scene The scene to generate the code for.
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code is generated for
    * runtime.
    *
    * \return JavaScript code
    */
-  static gd::String GenerateSceneEventsCompleteCode(
+  static gd::String GenerateLayoutCode(
       gd::Project& project,
       const gd::Layout& scene,
-      const gd::EventsList& events,
+      const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 
@@ -155,7 +154,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    *
    * Example: "gdjs.something"
    */
-  virtual gd::String GetCodeNamespace();
+  virtual gd::String GetCodeNamespace() { return codeNamespace; };
 
   /**
    * \brief Specify the code namespace to use, useful for functions as it is not

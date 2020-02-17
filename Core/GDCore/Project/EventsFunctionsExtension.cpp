@@ -70,6 +70,19 @@ void EventsFunctionsExtension::UnserializeFrom(
       "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
 }
 
+bool EventsFunctionsExtension::IsExtensionLifecycleEventsFunction(
+    const gd::String& eventsFunctionName) {
+  // The list of all supported lifecycle events function names.
+  // If adding a new one, code generator(s) must be updated.
+  return eventsFunctionName == "onFirstSceneLoaded" ||
+         eventsFunctionName == "onSceneLoaded" ||
+         eventsFunctionName == "onScenePreEvents" ||
+         eventsFunctionName == "onScenePostEvents" ||
+         eventsFunctionName == "onScenePaused" ||
+         eventsFunctionName == "onSceneResumed" ||
+         eventsFunctionName == "onSceneUnloading";
+}
+
 }  // namespace gd
 
 #endif

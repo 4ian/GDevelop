@@ -3683,7 +3683,7 @@ storiesOf('EventsFunctionsList', module)
         )}
         onSelectEventsFunction={action('select')}
         onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
-        onAddEventsFunction={cb => cb(true, null)}
+        onAddEventsFunction={cb => cb({ functionType: 0, name: null })}
         onEventsFunctionAdded={() => {}}
         onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
         canRename={() => true}

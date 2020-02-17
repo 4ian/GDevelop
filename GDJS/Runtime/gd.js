@@ -18,7 +18,13 @@ window.gdjs = {
    * @memberOf gdjs
    */
   evtTools: {},
+  callbacksFirstRuntimeSceneLoaded: [],
   callbacksRuntimeSceneLoaded: [],
+  callbacksRuntimeScenePreEvents: [],
+  callbacksRuntimeScenePostEvents: [],
+  callbacksRuntimeScenePaused: [],
+  callbacksRuntimeSceneResumed: [],
+  callbacksRuntimeSceneUnloading: [],
   callbacksRuntimeSceneUnloaded: [],
   callbacksObjectDeletedFromScene: [],
 };
@@ -91,7 +97,6 @@ gdjs.toDegrees = function(angleInRadians) {
   return (angleInRadians * 180) / 3.14159;
 };
 
-
 /**
  * Register a runtime object (class extending {@link gdjs.RuntimeObject}) that can be used in a scene.
  *
@@ -102,12 +107,12 @@ gdjs.toDegrees = function(angleInRadians) {
  * @param {string} objectTypeName The name of the type of the Object.
  * @param Ctor The constructor of the Object.
  */
-gdjs.registerObject = function(objectTypeName, Ctor){
-  gdjs.objectsTypes.put(objectTypeName, Ctor)
+gdjs.registerObject = function(objectTypeName, Ctor) {
+  gdjs.objectsTypes.put(objectTypeName, Ctor);
 };
 
 /**
- * Register a runtime behavior (class extending {@link gdjs.RuntimeBehavior}) that can be used by a 
+ * Register a runtime behavior (class extending {@link gdjs.RuntimeBehavior}) that can be used by a
  * {@link gdjs.RuntimeObject}.
  *
  * The type of the behavior must be complete, with the namespace of the extension. For
@@ -117,73 +122,119 @@ gdjs.registerObject = function(objectTypeName, Ctor){
  * @param {string} behaviorTypeName The name of the type of the behavior.
  * @param Ctor The constructor of the Object.
  */
-gdjs.registerBehavior = function(behaviorTypeName, Ctor){
-  gdjs.behaviorsTypes.put(
-    behaviorTypeName,
-    Ctor
+gdjs.registerBehavior = function(behaviorTypeName, Ctor) {
+  gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);
+};
+
+/**
+ * Register a function to be called when the first {@link gdjs.RuntimeScene} is loaded, after
+ * resources loading is done. This can be considered as the "start of the game".
+ *
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerFirstRuntimeSceneLoadedCallback = function(callback) {
+  gdjs.callbacksFirstRuntimeSceneLoaded.push(callback);
+};
+
+/**
+ * Register a function to be called when a scene is loaded.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeSceneLoadedCallback = function(callback) {
+  gdjs.callbacksRuntimeSceneLoaded.push(callback);
+};
+
+/**
+ * Register a function to be called each time a scene is stepped (i.e: at every frame),
+ * before events are run.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeScenePreEventsCallback = function(callback) {
+  gdjs.callbacksRuntimeScenePreEvents.push(callback);
+};
+
+/**
+ * Register a function to be called each time a scene is stepped (i.e: at every frame),
+ * after events are run and before rendering.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeScenePostEventsCallback = function(callback) {
+  gdjs.callbacksRuntimeScenePostEvents.push(callback);
+};
+
+/**
+ * Register a function to be called when a scene is paused.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeScenePausedCallback = function(callback) {
+  gdjs.callbacksRuntimeScenePaused.push(callback);
+};
+
+/**
+ * Register a function to be called when a scene is resumed.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeSceneResumedCallback = function(callback) {
+  gdjs.callbacksRuntimeSceneResumed.push(callback);
+};
+
+/**
+ * Register a function to be called when a scene unload started. This is
+ * before the object deletion and renderer destruction. It is safe to
+ * manipulate these. It is **not** be safe to release resources as other
+ * callbacks might do operations on objects or the scene.
+ *
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeSceneUnloadingCallback = function(callback) {
+  gdjs.callbacksRuntimeSceneUnloading.push(callback);
+};
+
+/**
+ * Register a function to be called when a scene is unloaded. The objects
+ * and renderer are now destroyed - it is **not** safe to do anything apart
+ * from releasing resources.
+ *
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerRuntimeSceneUnloadedCallback = function(callback) {
+  gdjs.callbacksRuntimeSceneUnloaded.push(callback);
+};
+
+/**
+ * Register a function to be called when an object is deleted from a scene.
+ * @param {Function} callback The function to be called.
+ */
+gdjs.registerObjectDeletedFromSceneCallback = function(callback) {
+  gdjs.callbacksObjectDeletedFromScene.push(callback);
+};
+
+/**
+ * Keep this function until we're sure now client is using it anymore.
+ * @deprecated
+ * @private
+ */
+gdjs.registerGlobalCallbacks = function() {
+  console.warning(
+    "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
   );
 };
 
 /**
- * Register the callbacks that will be called when a runtimeScene is loaded/unloaded,
- * paused/resumed or when an object is deleted from a scene.
+ * Remove all the global callbacks that were registered previously.
  *
- * Callbacks must be called respectively `gdjsCallbackRuntimeSceneLoaded`, `gdjsCallbackRuntimeSceneUnloaded`,
- * `callbacksRuntimeScenePaused`, `callbacksRuntimeSceneResumed` or `gdjsCallbackObjectDeletedFromScene`
- * and be part of a (nested) child object of gdjs.
- *
- * Arguments passed to the function are the runtimeScene and the object if applicable.
+ * Should only be used for testing - this should never be used at runtime.
  */
-gdjs.registerGlobalCallbacks = function() {
+gdjs.clearGlobalCallbacks = function() {
+  gdjs.callbacksFirstRuntimeSceneLoaded = [];
   gdjs.callbacksRuntimeSceneLoaded = [];
-  gdjs.callbacksRuntimeSceneUnloaded = [];
+  gdjs.callbacksRuntimeScenePreEvents = [];
+  gdjs.callbacksRuntimeScenePostEvents = [];
   gdjs.callbacksRuntimeScenePaused = [];
   gdjs.callbacksRuntimeSceneResumed = [];
+  gdjs.callbacksRuntimeSceneUnloading = [];
+  gdjs.callbacksRuntimeSceneUnloaded = [];
   gdjs.callbacksObjectDeletedFromScene = [];
-
-  var totalprop = 0;
-
-  innerRegisterGlobalCallbacks = function(obj, nestLevel) {
-    for (var p in obj) {
-      if (
-        obj.hasOwnProperty(p) &&
-        obj[p] !== null &&
-        Object.prototype.toString.call(obj[p]) !== '[object Array]' &&
-        typeof obj === 'object'
-      ) {
-        totalprop++;
-        if (obj[p].gdjsCallbackRuntimeSceneLoaded !== undefined) {
-          gdjs.callbacksRuntimeSceneLoaded.push(
-            obj[p].gdjsCallbackRuntimeSceneLoaded
-          );
-        }
-        if (obj[p].gdjsCallbackRuntimeSceneUnloaded !== undefined) {
-          gdjs.callbacksRuntimeSceneUnloaded.push(
-            obj[p].gdjsCallbackRuntimeSceneUnloaded
-          );
-        }
-        if (obj[p].gdjsCallbackRuntimeScenePaused !== undefined) {
-          gdjs.callbacksRuntimeScenePaused.push(
-            obj[p].gdjsCallbackRuntimeScenePaused
-          );
-        }
-        if (obj[p].gdjsCallbackRuntimeSceneResumed !== undefined) {
-          gdjs.callbacksRuntimeSceneResumed.push(
-            obj[p].gdjsCallbackRuntimeSceneResumed
-          );
-        }
-        if (obj[p].gdjsCallbackObjectDeletedFromScene !== undefined) {
-          gdjs.callbacksObjectDeletedFromScene.push(
-            obj[p].gdjsCallbackObjectDeletedFromScene
-          );
-        }
-
-        if (nestLevel <= 1) innerRegisterGlobalCallbacks(obj[p], nestLevel + 1);
-      }
-    }
-  };
-
-  innerRegisterGlobalCallbacks(this, 0);
 };
 
 /**

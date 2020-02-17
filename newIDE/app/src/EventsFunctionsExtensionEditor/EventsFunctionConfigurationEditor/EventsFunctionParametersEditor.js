@@ -19,9 +19,13 @@ import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
-import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import {
+  isBehaviorLifecycleEventsFunction,
+  isExtensionLifecycleEventsFunction,
+} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import Add from '@material-ui/icons/Add';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 
 const gd = global.gd;
 
@@ -130,10 +134,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
     } = this.props;
 
     const parameters = eventsFunction.getParameters();
-    const isABehaviorLifecycleFunction =
+    const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      isBehaviorLifecycleFunction(eventsFunction.getName());
-    if (isABehaviorLifecycleFunction) {
+      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
           <Trans>
@@ -142,6 +146,34 @@ export default class EventsFunctionParametersEditor extends React.Component<
             behavior is acting on) and "Behavior" (the behavior itself).
           </Trans>
         </EmptyMessage>
+      );
+    }
+    const isAnExtensionLifecycleEventsFunction =
+      !eventsBasedBehavior &&
+      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+    if (isAnExtensionLifecycleEventsFunction) {
+      return (
+        <React.Fragment>
+          <DismissableAlertMessage
+            kind="info"
+            identifier="lifecycle-events-function-included-only-if-extension-used"
+          >
+            <Trans>
+              For the lifecycle functions to be executed, you need the extension
+              to be used in the game, either by having at least one action,
+              condition or expression used, or a behavior of the extension added
+              to an object. Otherwise, the extension won't be included in the
+              game.
+            </Trans>
+          </DismissableAlertMessage>
+          <EmptyMessage>
+            <Trans>
+              This is a "lifecycle function". It will be called automatically by
+              the game engine. It has no parameters. Only global objects can be
+              used as the events will be run for all scenes in your game.
+            </Trans>
+          </EmptyMessage>
+        </React.Fragment>
       );
     }
 

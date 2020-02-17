@@ -39,6 +39,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
     this._game.getGameResolutionHeight(),
     {
       preserveDrawingBuffer: true,
+      antialias: false,
     }
   );
   parentElement.appendChild(this._pixiRenderer.view); // add the renderer view element to the DOM
@@ -122,7 +123,8 @@ gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function() {
     canvasHeight = maxHeight;
   } else if (
     (isFullPage && this._keepRatio) ||
-    canvasWidth > maxWidth || canvasHeight > maxHeight
+    canvasWidth > maxWidth ||
+    canvasHeight > maxHeight
   ) {
     var factor = maxWidth / canvasWidth;
     if (canvasHeight * factor > maxHeight) factor = maxHeight / canvasHeight;

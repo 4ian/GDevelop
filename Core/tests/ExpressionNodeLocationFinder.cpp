@@ -204,13 +204,13 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
       REQUIRE(CheckNodeAtLocationIs<gd::OperatorNode>(
                   parser, "number", "12 + MyExtension::GetNumber()", 4) ==
               true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser, "number", "12 + MyExtension::GetNumber()", 5) ==
               true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser, "number", "12 + MyExtension::GetNumber()", 27) ==
               true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser, "number", "12 + MyExtension::GetNumber()", 28) ==
               true);
       REQUIRE(CheckNoNodeAtLocation(
@@ -218,17 +218,17 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
               true);
     }
     SECTION("Test 2") {
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser,
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
                   0) == true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser,
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
                   1) == true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser,
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
@@ -243,12 +243,12 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
                   35) == true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser,
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
                   36) == true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser,
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
@@ -268,7 +268,7 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
                   50) == true);
-      REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                   parser,
                   "number",
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
@@ -282,30 +282,30 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
   }
 
   SECTION("Invalid function calls") {
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(12)", 0) == true);
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(12)", 1) == true);
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(12)", 2) == true);
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(12)", 10) == true);
     REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(
                 parser, "number", "Idontexist(12)", 11) == true);
     REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(
                 parser, "number", "Idontexist(12)", 12) == true);
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(12)", 13) == true);
     REQUIRE(CheckNoNodeAtLocation(parser, "number", "Idontexist(12)", 14) ==
             true);
   }
 
   SECTION("Unterminated function calls") {
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(", 0) == true);
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(", 1) == true);
-    REQUIRE(CheckNodeAtLocationIs<gd::FunctionNode>(
+    REQUIRE(CheckNodeAtLocationIs<gd::FunctionCallNode>(
                 parser, "number", "Idontexist(", 10) == true);
     REQUIRE(CheckNoNodeAtLocation(parser, "number", "Idontexist(", 11) == true);
   }

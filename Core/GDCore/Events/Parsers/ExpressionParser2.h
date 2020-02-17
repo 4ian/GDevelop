@@ -320,7 +320,7 @@ class GD_CORE_API ExpressionParser2 {
     return child;
   }
 
-  std::unique_ptr<FunctionNode> FreeFunction(const gd::String &type,
+  std::unique_ptr<FunctionCallNode> FreeFunction(const gd::String &type,
                                              const gd::String &functionFullName,
                                              size_t functionStartPosition) {
     // TODO: error if trying to use function for type != "number" && != "string"
@@ -335,7 +335,7 @@ class GD_CORE_API ExpressionParser2 {
                                platform, functionFullName);
 
     auto parametersAndError = Parameters(metadata.parameters);
-    auto function = gd::make_unique<FunctionNode>(
+    auto function = gd::make_unique<FunctionCallNode>(
         type, std::move(parametersAndError.first), metadata, functionFullName);
     function->diagnostic = std::move(parametersAndError.second);
     if (!function->diagnostic)
@@ -376,7 +376,7 @@ class GD_CORE_API ExpressionParser2 {
 
       auto parametersAndError = Parameters(metadata.parameters, objectName);
       auto function =
-          gd::make_unique<FunctionNode>(type,
+          gd::make_unique<FunctionCallNode>(type,
                                         objectName,
                                         std::move(parametersAndError.first),
                                         metadata,
@@ -425,7 +425,7 @@ class GD_CORE_API ExpressionParser2 {
       auto parametersAndError =
           Parameters(metadata.parameters, objectName, behaviorName);
       auto function =
-          gd::make_unique<FunctionNode>(type,
+          gd::make_unique<FunctionCallNode>(type,
                                         objectName,
                                         behaviorName,
                                         std::move(parametersAndError.first),
@@ -521,7 +521,7 @@ class GD_CORE_API ExpressionParser2 {
    */
   ///@{
   std::unique_ptr<ExpressionParserDiagnostic> ValidateFunction(
-      const gd::FunctionNode &function, size_t functionStartPosition);
+      const gd::FunctionCallNode &function, size_t functionStartPosition);
 
   std::unique_ptr<ExpressionParserDiagnostic> ValidateOperator(
       const gd::String &type, gd::String::value_type operatorChar) {

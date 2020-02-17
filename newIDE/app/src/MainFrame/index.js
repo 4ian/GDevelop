@@ -132,6 +132,7 @@ type State = {|
   helpFinderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
+  isPreviewOverride: boolean,
 |};
 
 type Props = {
@@ -186,6 +187,7 @@ class MainFrame extends React.Component<Props, State> {
     helpFinderDialogOpen: false,
     eventsFunctionsExtensionsError: null,
     gdjsDevelopmentWatcherEnabled: false,
+    isPreviewOverride: false,
   };
   toolbar = null;
   _resourceSourceDialogs = {};
@@ -518,15 +520,27 @@ class MainFrame extends React.Component<Props, State> {
     this.toolbar.setEditorToolbar(editorToolbar);
   };
 
-  setSceneToPreview = () => {
-    console.log(!!this.state.sceneToPreview);
+  setScenePreview = () => {
     const editorTab = getCurrentTab(this.state.editorTabs);
     this._onSetPreview(editorTab);
+
+    this.setState(
+      {
+        isPreviewOverride: true,
+      },
+      () => this.updateToolbar()
+    );
   };
 
-  setResetSceneToPreview = () => {
-    this.setState({
-      sceneToPreview: false,
+  togglePreviewOverride = () => {
+    if (!this.state.scenePreviewOverride) {
+      this.setScenePreview();
+      return;
+    }
+
+    this.setState({ isPreviewOverride: !this.state.isPreviewOverride }, () => {
+      console.log('Toggle:' + this.state.isPreviewOverride);
+      this.updateToolbar();
     });
   };
 
@@ -882,8 +896,8 @@ class MainFrame extends React.Component<Props, State> {
         previewLoading: true,
       },
       () => {
-        if (this.state.sceneToPreview) {
-          layout = this.state.sceneToPreview;
+        if (this.state.scenePreviewOverride && this.state.isPreviewOverride) {
+          layout = this.state.scenePreviewOverride;
         }
 
         _previewLauncher
@@ -951,9 +965,8 @@ class MainFrame extends React.Component<Props, State> {
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
-              isPreviewOverride={() => !!this.state.sceneToPreview}
-              onResetSceneToPreview={this.setResetSceneToPreview}
-              setSceneToPreview={this.setSceneToPreview}
+              isPreviewOverride={this.state.isPreviewOverride}
+              togglePreviewOverride={this.togglePreviewOverride}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 const { currentFileMetadata } = this.state;
@@ -1557,9 +1570,15 @@ class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     //Get name of scene on tab clicked
     let name = editorTab.editorRef.props.layoutName;
-    this.setState({
-      sceneToPreview: currentProject.getLayout(name),
-    });
+    this.setState(
+      {
+        scenePreviewOverride: currentProject.getLayout(name),
+        isPreviewOverride: true,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
   };
 
   _onChangeEditorTab = (value: number) => {

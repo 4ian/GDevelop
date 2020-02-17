@@ -6,8 +6,8 @@ import ContextMenu from './ContextMenu';
 type Props = {|
   element: React$Element<any>,
   onClick?: () => void,
-  buildMenuTemplate: () => Array<any>,
-  buildMenuTemplateRight: () => Array<any>,
+  buildMenuTemplate?: () => Array<any>,
+  buildMenuTemplateRight?: () => Array<any>,
 |};
 
 type State = {||};
@@ -18,6 +18,7 @@ type State = {||};
 
 export default class ElementWithMenu extends React.Component<Props, State> {
   _contextMenu: ?ContextMenu;
+  _contextMenuR: ?ContextMenu;
   _wrappedElement: ?any;
 
   open = (element: any) => {

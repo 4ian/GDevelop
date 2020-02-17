@@ -10,9 +10,8 @@ import InstancesSelection from './InstancesSelection';
 type Props = {|
   showPreviewButton: boolean,
   onPreview: () => void,
-  isPreviewOverride: boolean,
-  onResetSceneToPreview: () => void,
-  setSceneToPreview: () => void,
+  isPreviewOverride: () => boolean,
+  togglePreviewOverride: () => void,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
@@ -48,27 +47,24 @@ export class Toolbar extends PureComponent<Props> {
             element={
               <ToolbarIcon
                 onClick={this.props.onPreview}
-                src={() => {
-                  return this.props.isPreviewOverride
-                    ? 'res/ribbon_default/preview32.png'
-                    : 'res/ribbon_default/previewOverride32.png';
-                }}
-                tooltip={() => {
-                  return this.props.isPreviewOverride
-                    ? t`Launch a preview of the scene, right click for more`
-                    : t`Preview is overridden`;
-                }}
+                src={
+                  this.props.isPreviewOverride
+                    ? 'res/ribbon_default/previewOverride32.png'
+                    : 'res/ribbon_default/preview32.png'
+                }
+                tooltip={
+                  this.props.isPreviewOverride
+                    ? t`Preview is overridden, right click for more`
+                    : t`Launch a preview of the scene, right click for more`
+                }
               />
             }
             buildMenuTemplateRight={() => [
               {
-                label: 'Set scene for preview',
-                click: () => this.props.setSceneToPreview(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Reset scene for preview',
-                click: () => this.props.onResetSceneToPreview(),
+                type: 'checkbox',
+                label: 'Preview override',
+                checked: this.props.isPreviewOverride,
+                click: () => this.props.togglePreviewOverride(),
               },
             ]}
           />

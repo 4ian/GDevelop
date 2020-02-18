@@ -33,7 +33,7 @@ const styles = {
     boxSizing: 'border-box',
     alignItems: 'center',
     height: '100%',
-    whiteSpace: 'initial',
+    whiteSpace: 'pre-wrap',
     lineHeight: 1.5,
     border: 1,
   },

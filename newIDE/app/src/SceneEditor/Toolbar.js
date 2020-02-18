@@ -12,6 +12,8 @@ type Props = {|
   onPreview: () => void,
   isPreviewOverride: () => boolean,
   togglePreviewOverride: () => void,
+  setScenePreview: () => void,
+  previewFirstSceneName: () => string,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
@@ -59,12 +61,22 @@ export class Toolbar extends PureComponent<Props> {
                 }
               />
             }
-            buildMenuTemplateRight={() => [
+            openMenuWithSecondaryClick
+            buildMenuTemplate={() => [
               {
                 type: 'checkbox',
-                label: 'Preview override',
+                label: this.props.previewFirstSceneName
+                  ? 'Use scene ' +
+                    this.props.previewFirstSceneName +
+                    ' for preview'
+                  : 'Use this scene for preview',
                 checked: this.props.isPreviewOverride,
                 click: () => this.props.togglePreviewOverride(),
+              },
+              { type: 'separator' },
+              {
+                label: 'Set this scene as scene to preview',
+                click: () => this.props.setScenePreview(),
               },
             ]}
           />

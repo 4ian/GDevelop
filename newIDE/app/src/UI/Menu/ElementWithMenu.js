@@ -7,7 +7,7 @@ type Props = {|
   element: React$Element<any>,
   onClick?: () => void,
   buildMenuTemplate?: () => Array<any>,
-  buildMenuTemplateRight?: () => Array<any>,
+  openMenuWithSecondaryClick?: boolean,
 |};
 
 type State = {||};
@@ -18,7 +18,6 @@ type State = {||};
 
 export default class ElementWithMenu extends React.Component<Props, State> {
   _contextMenu: ?ContextMenu;
-  _contextMenuR: ?ContextMenu;
   _wrappedElement: ?any;
 
   open = (element: any) => {
@@ -40,37 +39,21 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     }
   };
 
-  openRight = () => {
-    const { _contextMenuR } = this;
-    if (!_contextMenuR) return;
-
-    const node = ReactDOM.findDOMNode(this._wrappedElement);
-    if (node instanceof HTMLElement) {
-      const dimensions = node.getBoundingClientRect();
-
-      _contextMenuR.open(
-        Math.round(dimensions.left + dimensions.width / 2),
-        Math.round(dimensions.top + dimensions.height)
-      );
-    }
-  };
-
   render() {
-    const { element, buildMenuTemplate, buildMenuTemplateRight } = this.props;
+    const {
+      element,
+      buildMenuTemplate,
+      openMenuWithSecondaryClick,
+    } = this.props;
 
     return (
       <React.Fragment>
         {React.cloneElement(element, {
-          onClick: this.open,
-          onContextMenu: this.openRight,
+          ...(openMenuWithSecondaryClick
+            ? { onContextMenu: this.open }
+            : { onClick: this.open }),
           ref: wrappedElement => (this._wrappedElement = wrappedElement),
         })}
-        {buildMenuTemplateRight && (
-          <ContextMenu
-            ref={contextMenuR => (this._contextMenuR = contextMenuR)}
-            buildMenuTemplate={buildMenuTemplateRight}
-          />
-        )}
         {buildMenuTemplate && (
           <ContextMenu
             ref={contextMenu => (this._contextMenu = contextMenu)}

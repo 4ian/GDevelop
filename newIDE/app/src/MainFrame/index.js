@@ -533,13 +533,12 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   togglePreviewOverride = () => {
-    if (!this.state.scenePreviewOverride) {
+    if (!this.state.previewFirstSceneName) {
       this.setScenePreview();
       return;
     }
 
     this.setState({ isPreviewOverride: !this.state.isPreviewOverride }, () => {
-      console.log('Toggle:' + this.state.isPreviewOverride);
       this.updateToolbar();
     });
   };
@@ -889,6 +888,8 @@ class MainFrame extends React.Component<Props, State> {
     options: PreviewOptions
   ) => {
     const { _previewLauncher } = this;
+    const { currentProject, previewFirstSceneName, isPreviewOverride } = this.state;
+
     if (!_previewLauncher) return;
 
     this.setState(
@@ -896,8 +897,8 @@ class MainFrame extends React.Component<Props, State> {
         previewLoading: true,
       },
       () => {
-        if (this.state.scenePreviewOverride && this.state.isPreviewOverride) {
-          layout = this.state.scenePreviewOverride;
+        if (previewFirstSceneName && isPreviewOverride) {
+          layout =  currentProject.getLayout(previewFirstSceneName);
         }
 
         _previewLauncher
@@ -968,6 +969,8 @@ class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               isPreviewOverride={this.state.isPreviewOverride}
               togglePreviewOverride={this.togglePreviewOverride}
+              previewFirstSceneName={this.state.previewFirstSceneName}
+              setScenePreview={this.setScenePreview}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 const { currentFileMetadata } = this.state;
@@ -1575,12 +1578,11 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   _onSetPreview = (editorTab: number) => {
-    const { currentProject } = this.state;
     //Get name of scene on tab clicked
     let name = editorTab.editorRef.props.layoutName;
     this.setState(
       {
-        scenePreviewOverride: currentProject.getLayout(name),
+        previewFirstSceneName: name,
         isPreviewOverride: true,
       },
       () => {

@@ -120,10 +120,10 @@ class GD_CORE_API ExpressionParameterMover
   bool hasDoneMoving;
   const gd::ObjectsContainer& globalObjectsContainer;
   const gd::ObjectsContainer& objectsContainer;
-  const gd::String& behaviorType;  // The behavior type for which the expression
-                                   // must be moved (optional)
-  const gd::String& objectType;    // The object type for which the expression
-                                   // must be moved (optional). If
+  const gd::String& behaviorType;  // The behavior type of the function which
+                                   // must have a parameter moved (optional).
+  const gd::String& objectType;    // The object type of the function which
+                                   // must have a parameter moved (optional). If
                                    // `behaviorType` is not empty, it takes
                                    // precedence over `objectType`.
   const gd::String& functionName;

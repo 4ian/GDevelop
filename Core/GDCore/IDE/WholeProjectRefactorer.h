@@ -50,7 +50,10 @@ class GD_CORE_API WholeProjectRefactorer {
                                   gd::ArbitraryEventsWorkerWithContext& worker);
 
   /**
-   * \brief Refactor the project after an events function extension is renamed
+   * \brief Refactor the project **before** an events function extension is renamed.
+   *
+   * \warning Do the renaming of the specified extension after calling this.
+   * This is because the extension is expected to have its old name for the refactoring.
    */
   static void RenameEventsFunctionsExtension(
       gd::Project& project,
@@ -59,7 +62,10 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newName);
 
   /**
-   * \brief Refactor the project after an events function is renamed
+   * \brief Refactor the project **before** an events function is renamed.
+   *
+   * \warning Do the renaming of the specified function after calling this.
+   * This is because the function is expected to have its old name for the refactoring.
    */
   static void RenameEventsFunction(
       gd::Project& project,
@@ -68,8 +74,11 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
-   * \brief Refactor the project after an events function of a behavior is
+   * \brief Refactor the project **before** an events function of a behavior is
    * renamed.
+   *
+   * \warning Do the renaming of the specified function after calling this.
+   * This is because the function is expected to have its old name for the refactoring.
    */
   static void RenameBehaviorEventsFunction(
       gd::Project& project,
@@ -79,8 +88,11 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
-   * \brief Refactor the project after an events function parameter
-   * was moved.
+   * \brief Refactor the project **before** an events function parameter
+   * is moved.
+   *
+   * \warning Do the move of the specified function parameters after calling this.
+   * This is because the function is expected to be in its old state for the refactoring.
    */
   static void MoveEventsFunctionParameter(
       gd::Project& project,
@@ -90,8 +102,11 @@ class GD_CORE_API WholeProjectRefactorer {
       std::size_t newIndex);
 
   /**
-   * \brief Refactor the project after the parmaeter of an events function of a
-   * behavior was moved.
+   * \brief Refactor the project **before** the parameter of an events function of a
+   * behavior is moved.
+   *
+   * \warning Do the move of the specified function parameters after calling this.
+   * This is because the function is expected to be in its old state for the refactoring.
    */
   static void MoveBehaviorEventsFunctionParameter(
       gd::Project& project,
@@ -102,8 +117,11 @@ class GD_CORE_API WholeProjectRefactorer {
       std::size_t newIndex);
 
   /**
-   * \brief Refactor the project after a property of a behavior is
+   * \brief Refactor the project **before** a property of a behavior is
    * renamed.
+   *
+   * \warning Do the renaming of the specified property after calling this.
+   * This is because the property is expected to have its old name for the refactoring.
    */
   static void RenameBehaviorProperty(
       gd::Project& project,
@@ -113,7 +131,10 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newPropertyName);
 
   /**
-   * \brief Refactor the project after a behavior is renamed.
+   * \brief Refactor the project **before** a behavior is renamed.
+   *
+   * \warning Do the renaming of the specified behavior after calling this.
+   * This is because the behavior is expected to have its old name for the refactoring.
    */
   static void RenameEventsBasedBehavior(
       gd::Project& project,

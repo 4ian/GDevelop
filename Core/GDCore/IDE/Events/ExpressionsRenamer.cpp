@@ -77,7 +77,7 @@ class GD_CORE_API ExpressionFunctionRenamer
         // Replace an object function
         const gd::String& thisObjectType = gd::GetTypeOfObject(
             globalObjectsContainer, objectsContainer, node.objectName);
-        if (thisObjectType == behaviorType) {
+        if (thisObjectType == objectType) {
           node.functionName = newFunctionName;
           hasDoneRenaming = true;
         }

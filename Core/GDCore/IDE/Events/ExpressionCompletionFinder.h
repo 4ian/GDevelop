@@ -10,8 +10,8 @@
 #include <vector>
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
-#include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 namespace gd {
 class Expression;
 class ObjectsContainer;
@@ -34,23 +34,23 @@ struct ExpressionCompletionDescription {
    * The different kind of completions that can be described.
    */
   enum CompletionKind {
-    OBJECT,
-    EXPRESSION,
-    VARIABLE,
+    Object,
+    Expression,
+    Variable,
   };
 
   /**
    * \brief Create a completion for an object with the given prefix
    */
   static ExpressionCompletionDescription ForObject(const gd::String& prefix_) {
-    return ExpressionCompletionDescription(OBJECT, "", prefix_);
+    return ExpressionCompletionDescription(Object, "", prefix_);
   }
   /**
    * \brief Create a completion for a variable with the given prefix
    */
   static ExpressionCompletionDescription ForVariable(
       const gd::String& prefix_) {
-    return ExpressionCompletionDescription(VARIABLE, "", prefix_);
+    return ExpressionCompletionDescription(Variable, "", prefix_);
   }
   /**
    * \brief Create a completion for an expression (free, object or behavior
@@ -62,7 +62,7 @@ struct ExpressionCompletionDescription {
       const gd::String& objectName_ = "",
       const gd::String& behaviorName_ = "") {
     return ExpressionCompletionDescription(
-        EXPRESSION, type_, prefix_, objectName_, behaviorName_);
+        Expression, type_, prefix_, objectName_, behaviorName_);
   }
 
   /** Check if two description of completions are equal */
@@ -97,6 +97,9 @@ struct ExpressionCompletionDescription {
    * expression.
    */
   const gd::String& GetBehaviorName() const { return behaviorName; }
+
+  /** Default constructor, only to be used by Emscripten bindings. */
+  ExpressionCompletionDescription() : completionKind(Object){};
 
  private:
   ExpressionCompletionDescription(CompletionKind completionKind_,
@@ -158,7 +161,8 @@ class GD_CORE_API ExpressionCompletionFinder
   /**
    * \brief Return the completions found for the visited node.
    */
-  std::vector<ExpressionCompletionDescription> GetCompletionDescriptions() {
+  const std::vector<ExpressionCompletionDescription>&
+  GetCompletionDescriptions() {
     return completions;
   };
 

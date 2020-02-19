@@ -136,6 +136,7 @@ type Props = {|
   togglePreviewOverride: () => void,
   setScenePreview: (options: PreviewOptions) => void,
   previewFirstSceneName: string,
+  getLayoutName: () => string,
 |};
 
 type State = {|
@@ -164,6 +165,7 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
+  layoutName: () => string,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
@@ -211,6 +213,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       showPropertiesInfoBar: false,
 
       selectedObjectTags: [],
+
+      layoutName: props.getLayoutName,
     };
   }
 
@@ -420,11 +424,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.updateToolbar();
       }
     );
-  };
-
-  getLayoutName = () => {
-    if (!this.props.layout) return;
-    return this.props.layout.getName();
   };
 
   _onObjectSelected = (selectedObjectName: string) => {

@@ -1584,8 +1584,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   _onSetPreview = (editorTab: EditorTab) => {
-    //const editorRef = React.useRef();
-    let name = editorTab.editorRef.editor.getLayoutName();
+    let name = editorTab.editorRef.getLayoutName();
     this.setState(
       {
         previewFirstSceneName: name,

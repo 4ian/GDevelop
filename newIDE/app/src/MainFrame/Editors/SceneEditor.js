@@ -37,6 +37,13 @@ export default class SceneEditorContainer extends BaseEditor {
       uiSettings: this.editor ? this.editor.getUiSettings() : {},
     };
   }
+  
+  getLayoutName = () => {
+    const { layoutName } = this.props;
+    if (!layoutName) return;
+    return layoutName;
+  };
+  
 
   getLayout(): ?gdLayout {
     const { project, layoutName } = this.props;

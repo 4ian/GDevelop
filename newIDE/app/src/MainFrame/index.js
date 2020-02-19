@@ -963,6 +963,11 @@ class MainFrame extends React.Component<Props, State> {
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
     const { i18n, storageProviderOperations } = this.props;
+
+    this.setState({
+      previewFirstSceneName: name,
+    });
+
     const sceneEditorOptions = {
       name,
       type: 'sceneEditor',
@@ -1584,10 +1589,8 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   _onSetPreview = (editorTab: EditorTab) => {
-    let name = editorTab.editorRef.getLayoutName();
     this.setState(
       {
-        previewFirstSceneName: name,
         isPreviewOverride: true,
       },
       () => {

@@ -136,7 +136,6 @@ type Props = {|
   togglePreviewOverride: () => void,
   setScenePreview: (options: PreviewOptions) => void,
   previewFirstSceneName: string,
-  getLayoutName: () => string,
 |};
 
 type State = {|
@@ -165,7 +164,6 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
-  layoutName: () => string,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
@@ -213,8 +211,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       showPropertiesInfoBar: false,
 
       selectedObjectTags: [],
-
-      layoutName: props.getLayoutName,
     };
   }
 

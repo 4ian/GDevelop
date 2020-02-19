@@ -10,10 +10,10 @@ import InstancesSelection from './InstancesSelection';
 type Props = {|
   showPreviewButton: boolean,
   onPreview: () => void,
-  isPreviewOverride: () => boolean,
+  isPreviewOverride: boolean,
   togglePreviewOverride: () => void,
   setScenePreview: () => void,
-  previewFirstSceneName: () => string,
+  previewFirstSceneName: string,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,

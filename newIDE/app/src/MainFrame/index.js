@@ -133,6 +133,7 @@ type State = {|
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
   isPreviewOverride: boolean,
+  previewFirstSceneName: string,
 |};
 
 type Props = {
@@ -188,6 +189,7 @@ class MainFrame extends React.Component<Props, State> {
     eventsFunctionsExtensionsError: null,
     gdjsDevelopmentWatcherEnabled: false,
     isPreviewOverride: false,
+    previewFirstSceneName: '',
   };
   toolbar = null;
   _resourceSourceDialogs = {};
@@ -888,7 +890,11 @@ class MainFrame extends React.Component<Props, State> {
     options: PreviewOptions
   ) => {
     const { _previewLauncher } = this;
-    const { currentProject, previewFirstSceneName, isPreviewOverride } = this.state;
+    const {
+      currentProject,
+      previewFirstSceneName,
+      isPreviewOverride,
+    } = this.state;
 
     if (!_previewLauncher) return;
 
@@ -898,7 +904,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         if (previewFirstSceneName && isPreviewOverride) {
-          layout =  currentProject.getLayout(previewFirstSceneName);
+          layout = currentProject.getLayout(previewFirstSceneName);
         }
 
         _previewLauncher
@@ -1577,9 +1583,9 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  _onSetPreview = (editorTab: number) => {
-    //Get name of scene on tab clicked
-    let name = editorTab.editorRef.props.layoutName;
+  _onSetPreview = (editorTab: EditorTab) => {
+    //const editorRef = React.useRef();
+    let name = editorTab.editorRef.editor.getLayoutName();
     this.setState(
       {
         previewFirstSceneName: name,

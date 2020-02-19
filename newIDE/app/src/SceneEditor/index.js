@@ -132,6 +132,10 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
+  isPreviewOverride: boolean,
+  togglePreviewOverride: () => void,
+  setScenePreview: (options: PreviewOptions) => void,
+  previewFirstSceneName: string,
 |};
 
 type State = {|
@@ -416,6 +420,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.updateToolbar();
       }
     );
+  };
+
+  getLayoutName = () => {
+    if (!this.props.layout) return;
+    return this.props.layout.getName();
   };
 
   _onObjectSelected = (selectedObjectName: string) => {

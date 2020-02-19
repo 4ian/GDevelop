@@ -104,10 +104,10 @@ export class ClosableTabs extends Component<ClosableTabsProps> {
 type ClosableTabProps = {|
   active: boolean,
   label: Node,
-  type: string,
+  type?: string,
   closable: boolean,
-  canOverrideScene: boolean,
-  onSetPreview: () => void,
+  canOverrideScene?: boolean,
+  onSetPreview?: () => void,
   onClose: () => void,
   onCloseOthers: () => void,
   onCloseAll: () => void,

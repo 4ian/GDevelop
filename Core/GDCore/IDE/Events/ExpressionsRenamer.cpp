@@ -73,7 +73,8 @@ class GD_CORE_API ExpressionFunctionRenamer
   void OnVisitIdentifierNode(IdentifierNode& node) override {}
   void OnVisitFunctionNode(FunctionNode& node) override {
     if (node.functionName == oldFunctionName) {
-      if (!objectType.empty() && !node.objectName.empty()) {
+      if (behaviorType.empty() && !objectType.empty() &&
+          !node.objectName.empty()) {
         // Replace an object function
         const gd::String& thisObjectType = gd::GetTypeOfObject(
             globalObjectsContainer, objectsContainer, node.objectName);
@@ -89,7 +90,7 @@ class GD_CORE_API ExpressionFunctionRenamer
           node.functionName = newFunctionName;
           hasDoneRenaming = true;
         }
-      } else {
+      } else if (behaviorType.empty() && objectType.empty()) {
         // Replace a free function
         node.functionName = newFunctionName;
         hasDoneRenaming = true;
@@ -106,9 +107,11 @@ class GD_CORE_API ExpressionFunctionRenamer
   const gd::ObjectsContainer& globalObjectsContainer;
   const gd::ObjectsContainer& objectsContainer;
   const gd::String& behaviorType;  // The behavior type for which the expression
-                                   // must be replaced (optional)
+                                   // must be replaced (optional).
   const gd::String& objectType;    // The object type for which the expression
-                                   // must be replaced (optional)
+                                   // must be replaced (optional). If
+                                   // `behaviorType` is not empty, it takes
+                                   // precedence over `objectType`.
   const gd::String& oldFunctionName;
   const gd::String& newFunctionName;
 };

@@ -87,7 +87,8 @@ class GD_CORE_API ExpressionParameterMover
         };
 
     if (node.functionName == functionName) {
-      if (!objectType.empty() && !node.objectName.empty()) {
+      if (behaviorType.empty() && !objectType.empty() &&
+          !node.objectName.empty()) {
         // Move parameter of an object function
         const gd::String& thisObjectType = gd::GetTypeOfObject(
             globalObjectsContainer, objectsContainer, node.objectName);
@@ -103,7 +104,7 @@ class GD_CORE_API ExpressionParameterMover
           moveParameter(node.parameters);
           hasDoneMoving = true;
         }
-      } else {
+      } else if (behaviorType.empty() && objectType.empty()) {
         // Move parameter of a free function
         moveParameter(node.parameters);
         hasDoneMoving = true;
@@ -119,10 +120,12 @@ class GD_CORE_API ExpressionParameterMover
   bool hasDoneMoving;
   const gd::ObjectsContainer& globalObjectsContainer;
   const gd::ObjectsContainer& objectsContainer;
-  const gd::String& behaviorType;  // The behavior type for which the expression
-                                   // must be replaced (optional)
-  const gd::String& objectType;    // The object type for which the expression
-                                   // must be replaced (optional)
+  const gd::String& behaviorType;  // The behavior type of the function which
+                                   // must have a parameter moved (optional).
+  const gd::String& objectType;    // The object type of the function which
+                                   // must have a parameter moved (optional). If
+                                   // `behaviorType` is not empty, it takes
+                                   // precedence over `objectType`.
   const gd::String& functionName;
   std::size_t oldIndex;
   std::size_t newIndex;

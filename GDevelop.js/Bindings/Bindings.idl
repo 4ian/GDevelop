@@ -1672,6 +1672,7 @@ interface ExpressionValidator {
 
 enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Object",
+  "ExpressionCompletionDescription::Behavior",
   "ExpressionCompletionDescription::Variable",
   "ExpressionCompletionDescription::Expression"
 };

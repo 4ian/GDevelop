@@ -119,6 +119,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   SECTION("Partial object or behavior function") {
     SECTION("Test 1") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForBehavior(
+              "Func", "MyObject"),
           gd::ExpressionCompletionDescription::ForExpression(
               "string", "Func", "MyObject")};
       REQUIRE(getCompletionsFor("string", "MyObject.Func", 0) ==

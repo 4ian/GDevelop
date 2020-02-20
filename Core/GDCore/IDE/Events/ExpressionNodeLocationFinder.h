@@ -32,13 +32,15 @@ class GD_CORE_API ExpressionNodeLocationFinder
    * \brief Initialize the finder to search at the specified position.
    */
   ExpressionNodeLocationFinder(size_t searchedPosition_)
-      : searchedPosition(searchedPosition_), foundNode(nullptr) {};
+      : searchedPosition(searchedPosition_), foundNode(nullptr){};
   virtual ~ExpressionNodeLocationFinder(){};
 
   /**
-   * \brief Helper function to find the deepest node at the search position, if any.
+   * \brief Helper function to find the deepest node at the search position, if
+   * any.
    */
-  static ExpressionNode* GetNodeAtPosition(gd::ExpressionNode& node, size_t searchedPosition) {
+  static ExpressionNode* GetNodeAtPosition(gd::ExpressionNode& node,
+                                           size_t searchedPosition) {
     gd::ExpressionNodeLocationFinder finder(searchedPosition);
     node.Visit(finder);
     return finder.GetNode();
@@ -100,13 +102,14 @@ class GD_CORE_API ExpressionNodeLocationFinder
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
-    CheckSearchPositionInNode(node);
+    CheckSearchPositionInNode(node, /*inclusive=*/true);
   }
 
  private:
-  bool CheckSearchPositionInNode(ExpressionNode& node) {
+  bool CheckSearchPositionInNode(ExpressionNode& node, bool inclusive = false) {
     if (node.location.GetStartPosition() <= searchedPosition &&
-        searchedPosition < node.location.GetEndPosition()) {
+        ((!inclusive && searchedPosition < node.location.GetEndPosition()) ||
+         (inclusive && searchedPosition <= node.location.GetEndPosition()))) {
       foundNode = &node;
       return true;
     }

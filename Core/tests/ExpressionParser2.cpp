@@ -21,6 +21,51 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   gd::ExpressionParser2 parser(platform, project, layout1);
 
+  SECTION("Empty expression") {
+    {
+      auto node = parser.ParseExpression("string", "");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "string");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("number", "");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "number");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("object", "");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "object");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("string", " ");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "string");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("number", " ");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "number");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("object", " ");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "object");
+      REQUIRE(emptyNode.text == "");
+    }
+  }
+
   SECTION("Valid texts") {
     {
       auto node = parser.ParseExpression("string", "\"hello world\"");

@@ -43,6 +43,23 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
 
   gd::ExpressionParser2 parser(platform, project, layout1);
 
+  SECTION("Empty expressions") {
+    SECTION("Test 1") {
+      REQUIRE(CheckNodeAtLocationIs<gd::EmptyNode>(
+                  parser, "string", "", 0) == true);
+      REQUIRE(CheckNoNodeAtLocation(parser, "string", "", 1) ==
+              true);
+    }
+    SECTION("Test 2") {
+      REQUIRE(CheckNoNodeAtLocation(parser, "string", " ", 0) ==
+              true);
+      REQUIRE(CheckNodeAtLocationIs<gd::EmptyNode>(
+                  parser, "string", " ", 1) == true);
+      REQUIRE(CheckNoNodeAtLocation(parser, "string", " ", 2) ==
+              true);
+    }
+  }
+
   SECTION("Valid text") {
     SECTION("Test 1") {
       REQUIRE(CheckNodeAtLocationIs<gd::TextNode>(

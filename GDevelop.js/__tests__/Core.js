@@ -2850,6 +2850,25 @@ describe('libGD.js', function() {
       parser.delete();
     }
 
+    it('completes an empty expression', function() {
+      expect.assertions(6);
+      testCompletions('number', '|', (completionDescription, index) => {
+          if (index === 0) {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Object
+            );
+            expect(completionDescription.getType()).toBe('');
+            expect(completionDescription.getPrefix()).toBe('');
+          } else {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Expression
+            );
+            expect(completionDescription.getType()).toBe('number');
+            expect(completionDescription.getPrefix()).toBe('');
+          }
+      });
+    });
+
     it('completes an expression with an operator', function() {
       expect.assertions(6);
       testCompletions('number', '1 +| ', (completionDescription, index) => {
@@ -2868,6 +2887,7 @@ describe('libGD.js', function() {
         }
       });
     });
+
     it('completes an expression with an operator and a prefix', function() {
       expect.assertions(6);
       testCompletions('number', '1 + My| ', (completionDescription, index) => {
@@ -2887,17 +2907,26 @@ describe('libGD.js', function() {
       });
     });
     it('completes an expression with a partial object function', function() {
-      expect.assertions(4);
+      expect.assertions(8);
       testCompletions(
         'number',
         '1 + MyObject.Func| ',
         (completionDescription, index) => {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('Func');
-          expect(completionDescription.getObjectName()).toBe('MyObject');
+          if (index == 0) {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Behavior
+            );
+            expect(completionDescription.getType()).toBe('');
+            expect(completionDescription.getPrefix()).toBe('Func');
+            expect(completionDescription.getObjectName()).toBe('MyObject');
+          } else {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Expression
+            );
+            expect(completionDescription.getType()).toBe('number');
+            expect(completionDescription.getPrefix()).toBe('Func');
+            expect(completionDescription.getObjectName()).toBe('MyObject');
+          }
         }
       );
     });

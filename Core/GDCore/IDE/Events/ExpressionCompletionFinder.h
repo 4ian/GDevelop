@@ -35,6 +35,7 @@ struct ExpressionCompletionDescription {
    */
   enum CompletionKind {
     Object,
+    Behavior,
     Expression,
     Variable,
   };
@@ -45,6 +46,16 @@ struct ExpressionCompletionDescription {
   static ExpressionCompletionDescription ForObject(const gd::String& prefix_) {
     return ExpressionCompletionDescription(Object, "", prefix_);
   }
+
+  /**
+   * \brief Create a completion for a behavior with the given prefix of
+   * the specified object
+   */
+  static ExpressionCompletionDescription ForBehavior(
+      const gd::String& prefix_, const gd::String& objectName_) {
+    return ExpressionCompletionDescription(Behavior, "", prefix_, objectName_);
+  }
+
   /**
    * \brief Create a completion for a variable with the given prefix
    */
@@ -88,13 +99,17 @@ struct ExpressionCompletionDescription {
   const gd::String& GetPrefix() const { return prefix; }
 
   /**
-   * \brief Return the object name, if completing an object expression.
+   * \brief Return the object name, if completing an object expression or a
+   * behavior.
    */
   const gd::String& GetObjectName() const { return objectName; }
 
   /**
    * \brief Return the behavior name, if completing an object behavior
    * expression.
+   *
+   * \warning If completing a behavior, the behavior (partial) name is returned
+   * by `GetPrefix`.
    */
   const gd::String& GetBehaviorName() const { return behaviorName; }
 
@@ -220,6 +235,8 @@ class GD_CORE_API ExpressionCompletionFinder
           node.objectName,
           node.objectFunctionOrBehaviorName));
     } else {
+      completions.push_back(ExpressionCompletionDescription::ForBehavior(
+          node.objectFunctionOrBehaviorName, node.objectName));
       completions.push_back(ExpressionCompletionDescription::ForExpression(
           node.type, node.objectFunctionOrBehaviorName, node.objectName));
     }

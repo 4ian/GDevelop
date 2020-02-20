@@ -164,6 +164,7 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
+  layoutName: () => string,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };

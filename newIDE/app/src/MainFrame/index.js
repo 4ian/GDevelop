@@ -524,7 +524,7 @@ class MainFrame extends React.Component<Props, State> {
 
   setScenePreview = () => {
     const editorTab = getCurrentTab(this.state.editorTabs);
-    this._onSetPreview(editorTab);
+    this._setLayoutForPreview(editorTab.name);
 
     this.setState(
       {
@@ -963,11 +963,6 @@ class MainFrame extends React.Component<Props, State> {
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
     const { i18n, storageProviderOperations } = this.props;
-
-    this.setState({
-      previewFirstSceneName: name,
-    });
-
     const sceneEditorOptions = {
       name,
       type: 'sceneEditor',
@@ -1588,9 +1583,11 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  _onSetPreview = (editorTab: EditorTab) => {
+  _setLayoutForPreview = (name:string) => {
+    
     this.setState(
       {
+        previewFirstSceneName: name,
         isPreviewOverride: true,
       },
       () => {
@@ -1859,7 +1856,7 @@ class MainFrame extends React.Component<Props, State> {
                 type={editorTab.type}
                 key={editorTab.key}
                 active={isCurrentTab}
-                onSetPreview={() => this._onSetPreview(editorTab)}
+                onSetPreview={() => this._setLayoutForPreview(editorTab.name)}
                 onClick={() => this._onChangeEditorTab(id)}
                 onClose={() => this._onCloseEditorTab(editorTab)}
                 onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}

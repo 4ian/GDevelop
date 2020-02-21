@@ -522,21 +522,9 @@ class MainFrame extends React.Component<Props, State> {
     this.toolbar.setEditorToolbar(editorToolbar);
   };
 
-  setScenePreview = () => {
-    const editorTab = getCurrentTab(this.state.editorTabs);
-    this._setLayoutForPreview(editorTab.name);
-
-    this.setState(
-      {
-        isPreviewOverride: true,
-      },
-      () => this.updateToolbar()
-    );
-  };
-
   togglePreviewOverride = () => {
     if (!this.state.previewFirstSceneName) {
-      this.setScenePreview();
+      this._setLayoutForPreview();
       return;
     }
 
@@ -895,6 +883,7 @@ class MainFrame extends React.Component<Props, State> {
       previewFirstSceneName,
       isPreviewOverride,
     } = this.state;
+    const layoutOverride = currentProject.getLayout(previewFirstSceneName);
 
     if (!_previewLauncher) return;
 
@@ -904,7 +893,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         if (previewFirstSceneName && isPreviewOverride) {
-          layout = currentProject.getLayout(previewFirstSceneName);
+          layout = layoutOverride;
         }
 
         _previewLauncher
@@ -976,7 +965,9 @@ class MainFrame extends React.Component<Props, State> {
               isPreviewOverride={this.state.isPreviewOverride}
               togglePreviewOverride={this.togglePreviewOverride}
               previewFirstSceneName={this.state.previewFirstSceneName}
-              setScenePreview={this.setScenePreview}
+              setScenePreview={() => {
+                this._setLayoutForPreview(name);
+              }}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 const { currentFileMetadata } = this.state;
@@ -1583,8 +1574,11 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  _setLayoutForPreview = (name:string) => {
-    
+  _setLayoutForPreview = (name?: string) => {
+    if (!name) {
+      const editorTab = getCurrentTab(this.state.editorTabs);
+      name = editorTab.name;
+    }
     this.setState(
       {
         previewFirstSceneName: name,

@@ -164,7 +164,6 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
-  layoutName: () => string,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
@@ -231,7 +230,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         isPreviewOverride={this.props.isPreviewOverride}
         togglePreviewOverride={this.props.togglePreviewOverride}
         previewFirstSceneName={this.props.previewFirstSceneName}
-        setScenePreview={() => this.props.setScenePreview({})}
+        setScenePreview={() => this.props.setScenePreview()}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         onOpenDebugger={() => {

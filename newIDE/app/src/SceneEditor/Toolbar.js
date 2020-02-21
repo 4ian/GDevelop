@@ -71,7 +71,12 @@ export class Toolbar extends PureComponent<Props> {
                     ' for preview'
                   : 'Use this scene for preview',
                 checked: this.props.isPreviewOverride,
-                click: () => this.props.togglePreviewOverride(),
+                click: () => {
+                  if (!this.props.previewFirstSceneName) {
+                    this.props.setScenePreview();
+                  }
+                  this.props.togglePreviewOverride();
+                },
               },
               { type: 'separator' },
               {

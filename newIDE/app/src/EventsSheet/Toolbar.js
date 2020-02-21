@@ -10,6 +10,10 @@ import { type EventMetadata } from './EnumerateEventsMetadata';
 type Props = {|
   showPreviewButton: boolean,
   onPreview: () => void,
+  isPreviewOverride: boolean,
+  togglePreviewOverride: () => void,
+  setScenePreview: () => void,
+  previewFirstSceneName: string,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
@@ -35,10 +39,45 @@ export class Toolbar extends PureComponent<Props> {
     return (
       <ToolbarGroup lastChild>
         {this.props.showPreviewButton && (
-          <ToolbarIcon
-            onClick={this.props.onPreview}
-            src="res/ribbon_default/preview32.png"
-            tooltip={t`Launch a preview of the scene`}
+          <ElementWithMenu
+            element={
+              <ToolbarIcon
+                onClick={this.props.onPreview}
+                src={
+                  this.props.isPreviewOverride
+                    ? 'res/ribbon_default/previewOverride32.png'
+                    : 'res/ribbon_default/preview32.png'
+                }
+                tooltip={
+                  this.props.isPreviewOverride
+                    ? t`Preview is overridden, right click for more`
+                    : t`Launch a preview of the scene, right click for more`
+                }
+              />
+            }
+            openMenuWithSecondaryClick
+            buildMenuTemplate={() => [
+              {
+                type: 'checkbox',
+                label: this.props.previewFirstSceneName
+                  ? 'Use scene ' +
+                    this.props.previewFirstSceneName +
+                    ' for preview'
+                  : 'Use this scene for preview',
+                checked: this.props.isPreviewOverride,
+                click: () => {
+                  if (!this.props.previewFirstSceneName) {
+                    this.props.setScenePreview();
+                  }
+                  this.props.togglePreviewOverride();
+                },
+              },
+              { type: 'separator' },
+              {
+                label: 'Set this scene as scene to preview',
+                click: () => this.props.setScenePreview(),
+              },
+            ]}
           />
         )}
         {this.props.showNetworkPreviewButton && (

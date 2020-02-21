@@ -523,11 +523,6 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   togglePreviewOverride = () => {
-    if (!this.state.previewFirstSceneName) {
-      this._setLayoutForPreview();
-      return;
-    }
-
     this.setState({ isPreviewOverride: !this.state.isPreviewOverride }, () => {
       this.updateToolbar();
     });
@@ -1010,6 +1005,12 @@ class MainFrame extends React.Component<Props, State> {
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
+              isPreviewOverride={this.state.isPreviewOverride}
+              togglePreviewOverride={this.togglePreviewOverride}
+              previewFirstSceneName={this.state.previewFirstSceneName}
+              setScenePreview={() => {
+                this._setLayoutForPreview(name);
+              }}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 const { currentFileMetadata } = this.state;
@@ -1574,11 +1575,7 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  _setLayoutForPreview = (name?: string) => {
-    if (!name) {
-      const editorTab = getCurrentTab(this.state.editorTabs);
-      name = editorTab.name;
-    }
+  _setLayoutForPreview = (name: string) => {
     this.setState(
       {
         previewFirstSceneName: name,

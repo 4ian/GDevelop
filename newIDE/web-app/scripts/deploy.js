@@ -1,5 +1,6 @@
 const shell = require('shelljs');
 const path = require('path');
+const fs = require('fs');
 const args = require('minimist')(process.argv.slice(2));
 const ghpages = require('gh-pages');
 const isGitClean = require('is-git-clean');
@@ -26,6 +27,33 @@ isGitClean()
           shell.exit(1);
         }
 
+        resolve();
+      });
+    });
+  })
+  .then(() => {
+    return new Promise(resolve => {
+      fs.stat(path.join('../../app/public/libGD.js'), (err, stats) => {
+        if (err) {
+          shell.echo(
+            `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
+          );
+          shell.exit(1);
+        }
+
+        const sizeInMiB = stats.size / 1024 / 1024;
+        if (sizeInMiB > 5) {
+          shell.echo(
+            `❌ libGD.js size is too big (${sizeInMiB.toFixed(
+              2
+            )}MiB) - are you sure you're not trying to deploy the development version?`
+          );
+          shell.exit(1);
+        }
+
+        shell.echo(
+          `✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`
+        );
         resolve();
       });
     });

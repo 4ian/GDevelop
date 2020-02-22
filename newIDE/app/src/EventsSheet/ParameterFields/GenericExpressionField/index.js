@@ -53,6 +53,16 @@ const styles = {
     paddingLeft: 12,
     paddingRight: 12,
   },
+  backgroundHighlightingInline: {
+    marginTop: 6, //Properly align with the text field
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  backgroundHighlightingInlineWithDescription: {
+    marginTop: 22, //Properly align with the text field
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
 };
 
 type State = {|
@@ -82,7 +92,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
 
-    validatedValue: '',
+    validatedValue: this.props.value,
     errorText: null,
     errorHighlights: [],
   };
@@ -273,7 +283,11 @@ export default class ExpressionField extends React.Component<Props, State> {
       zIndex: muiZIndex.tooltip + 100,
     };
 
-    const backgroundHighlightingStyle = description
+    const backgroundHighlightingStyle = this.props.isInline
+      ? description
+        ? styles.backgroundHighlightingInlineWithDescription
+        : styles.backgroundHighlightingInline
+      : description
       ? styles.backgroundHighlightingWithDescription
       : styles.backgroundHighlighting;
 

@@ -21,21 +21,17 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _wrappedElement: ?any;
 
   open = (element: any) => {
-    if (!this.props.buildMenuTemplate) {
-      this.props.element.props.onClick();
-    } else {
-      const { _contextMenu } = this;
-      if (!_contextMenu) return;
+    const { _contextMenu } = this;
+    if (!_contextMenu) return;
 
-      const node = ReactDOM.findDOMNode(this._wrappedElement);
-      if (node instanceof HTMLElement) {
-        const dimensions = node.getBoundingClientRect();
+    const node = ReactDOM.findDOMNode(this._wrappedElement);
+    if (node instanceof HTMLElement) {
+      const dimensions = node.getBoundingClientRect();
 
-        _contextMenu.open(
-          Math.round(dimensions.left + dimensions.width / 2),
-          Math.round(dimensions.top + dimensions.height)
-        );
-      }
+      _contextMenu.open(
+        Math.round(dimensions.left + dimensions.width / 2),
+        Math.round(dimensions.top + dimensions.height)
+      );
     }
   };
 

@@ -21,6 +21,7 @@ type EditorRef =
 export type EditorTab = {|
   render: (isCurrentTab: boolean) => React$Element<*>,
   editorRef: ?EditorRef,
+  label: string,
   name: string,
   type: string,
   key: string,

@@ -100,6 +100,7 @@ const renderMenu = option => {
 
 export default function SemiControlledAutoComplete(props) {
   const [state, setState] = React.useState({ inputValue: props.value });
+  const [render, setRender] = React.useState(true);
 
   const helperText = props.helperMarkdownText ? (
     <MarkdownText source={props.helperMarkdownText} />
@@ -126,53 +127,60 @@ export default function SemiControlledAutoComplete(props) {
       setState({ inputValue: value });
       props.onChange(state.inputValue);
     }
+    setRender(false);
   };
 
-  return (
-    <div
-      style={{
-        ...styles.container,
-        flexGrow: props.fullWidth ? 1 : undefined,
-      }}
-    >
-      <Autocomplete
-        freeSolo
-        disableClearable
-        disableListWrap
-        options={props.dataSource.filter(option =>
-          filterFunction(option, state.inputValue)
-        )}
-        getOptionLabel={option => {
-          if (typeof option !== 'string') {
-            return option.value;
-          } else {
-            return '';
-          }
+  if (render) {
+    return (
+      <div
+        style={{
+          ...styles.container,
+          flexGrow: props.fullWidth ? 1 : undefined,
         }}
-        renderOption={(option, state) => renderMenu(option)}
-        renderInput={params => (
-          <TextField
-            {...params}
-            classes={{ root: classes.root }}
-            label={props.floatingLabelText}
-            error={!!props.errorText}
-            helperText={props.helperText || helperText || props.errorText}
-            disabled={props.disabled}
-            style={props.textFieldStyle}
-            onChange={event => {
-              setState({ inputValue: event.target.value });
-            }}
-            // Todo: Implement i18n for placeholder, couldn't find a workaround.
-            placeholder={props.hintText}
-            variant="filled"
-          />
-        )}
-        inputValue={state.inputValue}
-        onInputChange={(event, inputValue, reason) => {
-          setState({ inputValue });
-        }}
-        onChange={(event, value) => handleChange(event, value)}
-      />
-    </div>
-  );
+      >
+        <Autocomplete
+          freeSolo
+          disableClearable
+          blurOnSelect
+          clearOnEscape
+          disableListWrap
+          options={props.dataSource.filter(option =>
+            filterFunction(option, state.inputValue)
+          )}
+          getOptionLabel={option => {
+            if (typeof option !== 'string') {
+              return option.value;
+            } else {
+              return '';
+            }
+          }}
+          renderOption={(option, state) => renderMenu(option)}
+          renderInput={params => (
+            <TextField
+              {...params}
+              classes={{ root: classes.root }}
+              label={props.floatingLabelText}
+              error={!!props.errorText}
+              helperText={props.helperText || helperText || props.errorText}
+              disabled={props.disabled}
+              style={props.textFieldStyle}
+              onChange={event => {
+                setState({ inputValue: event.target.value });
+              }}
+              // Todo: Implement i18n for placeholder, couldn't find a workaround.
+              placeholder={props.hintText}
+              variant="filled"
+            />
+          )}
+          inputValue={state.inputValue}
+          onInputChange={(event, inputValue, reason) => {
+            setState({ inputValue });
+          }}
+          onChange={(event, value) => handleChange(event, value)}
+        />
+      </div>
+    );
+  } else {
+    return null;
+  }
 }

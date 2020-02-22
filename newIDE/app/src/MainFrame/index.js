@@ -948,7 +948,7 @@ class MainFrame extends React.Component<Props, State> {
   ) => {
     const { i18n, storageProviderOperations } = this.props;
     const sceneEditorOptions = {
-      name,
+      label: name,
       type: 'sceneEditor',
       renderEditor: ({ isActive, editorRef }) => (
         <PreferencesContext.Consumer>
@@ -996,7 +996,7 @@ class MainFrame extends React.Component<Props, State> {
       key: 'layout ' + name,
     };
     const eventsEditorOptions = {
-      name: name + ' ' + i18n._(t`(Events)`),
+      label: name + ' ' + i18n._(t`(Events)`),
       type: 'eventsEditor',
       renderEditor: ({ isActive, editorRef }) => (
         <PreferencesContext.Consumer>
@@ -1070,7 +1070,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name,
+          label: name,
           type: 'externalEventsEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <ExternalEventsEditor
@@ -1106,7 +1106,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name,
+          label: name,
           type: 'externalLayoutEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <PreferencesContext.Consumer>
@@ -1168,7 +1168,7 @@ class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           type: 'eventsFunctionsExtensionEditor',
-          name: name + ' ' + i18n._(t`(Extension)`),
+          label: name + ' ' + i18n._(t`(Extension)`),
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
               project={this.state.currentProject}
@@ -1203,7 +1203,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name: i18n._(t`Resources`),
+          label: i18n._(t`Resources`),
           type: 'resourcesEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <ResourcesEditor
@@ -1239,7 +1239,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name: i18n._(t`Start Page`),
+          label: i18n._(t`Start Page`),
           type: 'startPage',
           renderEditor: ({ isActive, editorRef }) => (
             <StartPage
@@ -1276,7 +1276,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name: i18n._(t`Debugger`),
+          label: i18n._(t`Debugger`),
           type: 'debuggerEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <DebuggerEditor
@@ -1843,11 +1843,11 @@ class MainFrame extends React.Component<Props, State> {
               getCurrentTabIndex(this.state.editorTabs) === id;
             return (
               <ClosableTab
-                label={editorTab.name}
+                label={editorTab.label}
                 type={editorTab.type}
                 key={editorTab.key}
                 active={isCurrentTab}
-                onSetPreview={() => this._setLayoutForPreview(editorTab.name)}
+                onSetPreview={() => this._setLayoutForPreview(editorTab.label)}
                 onClick={() => this._onChangeEditorTab(id)}
                 onClose={() => this._onCloseEditorTab(editorTab)}
                 onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}

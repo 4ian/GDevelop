@@ -127,7 +127,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   }
 }
 
-void ExpressionCodeGenerator::OnVisitFunctionNode(FunctionNode& node) {
+void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
   if (gd::MetadataProvider::IsBadExpressionMetadata(node.expressionMetadata)) {
     output += "/* Error during generation, function not found: " +
               codeGenerator.ConvertToString(node.functionName) + " for type " +
@@ -356,6 +356,10 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
+  output += GenerateDefaultValue(node.type);
+}
+
+void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) {
   output += GenerateDefaultValue(node.type);
 }
 

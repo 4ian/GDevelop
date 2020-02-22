@@ -21,6 +21,51 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   gd::ExpressionParser2 parser(platform, project, layout1);
 
+  SECTION("Empty expression") {
+    {
+      auto node = parser.ParseExpression("string", "");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "string");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("number", "");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "number");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("object", "");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "object");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("string", " ");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "string");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("number", " ");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "number");
+      REQUIRE(emptyNode.text == "");
+    }
+    {
+      auto node = parser.ParseExpression("object", " ");
+      REQUIRE(node != nullptr);
+      auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
+      REQUIRE(emptyNode.type == "object");
+      REQUIRE(emptyNode.text == "");
+    }
+  }
+
   SECTION("Valid texts") {
     {
       auto node = parser.ParseExpression("string", "\"hello world\"");
@@ -280,12 +325,42 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("valid operators") {
+    {
+      auto node = parser.ParseExpression("number", "123 + 456");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      REQUIRE(operatorNode.type == "number");
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "123");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "456");
+    }
+    {
+      auto node = parser.ParseExpression("string", "\"abc\" + \"def\"");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      REQUIRE(operatorNode.type == "string");
+      auto &leftTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftTextNode.text == "abc");
+      auto &rightTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightTextNode.text == "def");
+    }
+  }
+
   SECTION("valid unary operators") {
     {
       auto node = parser.ParseExpression("number", "-123");
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       REQUIRE(unaryOperatorNode.op == '-');
+      REQUIRE(unaryOperatorNode.type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
@@ -295,6 +370,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       REQUIRE(unaryOperatorNode.op == '+');
+      REQUIRE(unaryOperatorNode.type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
@@ -304,6 +380,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       REQUIRE(unaryOperatorNode.op == '-');
+      REQUIRE(unaryOperatorNode.type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123.2");
@@ -560,7 +637,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("number", "MyExtension::GetNumber()");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       REQUIRE(functionNode.functionName == "MyExtension::GetNumber");
       REQUIRE(functionNode.objectName == "");
       REQUIRE(functionNode.behaviorName == "");
@@ -573,7 +650,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression(
           "number", "MyExtension::GetNumberWith2Params(12, \"hello world\")");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       REQUIRE(functionNode.functionName == "MyExtension::GetNumberWith2Params");
       REQUIRE(functionNode.objectName == "");
       REQUIRE(functionNode.behaviorName == "");
@@ -586,7 +663,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression(
           "number", "MyExtension::GetNumberWith3Params(12, \"hello world\")");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -597,7 +674,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "number",
           "MyExtension::GetNumberWith3Params(12, \"hello world\", 34)");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -607,7 +684,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node =
           parser.ParseExpression("number", "MySpriteObject.GetObjectNumber()");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       REQUIRE(functionNode.functionName == "GetObjectNumber");
       REQUIRE(functionNode.objectName == "MySpriteObject");
       REQUIRE(functionNode.behaviorName == "");
@@ -620,7 +697,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression(
           "number", "WhateverObject.WhateverBehavior::WhateverFunction()");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       REQUIRE(functionNode.functionName == "WhateverFunction");
       REQUIRE(functionNode.objectName == "WhateverObject");
       REQUIRE(functionNode.behaviorName == "WhateverBehavior");
@@ -630,7 +707,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "number",
           "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", three)");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       REQUIRE(functionNode.functionName == "WhateverFunction");
       REQUIRE(functionNode.objectName == "WhateverObject");
       REQUIRE(functionNode.behaviorName == "WhateverBehavior");
@@ -653,7 +730,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression(
           "number", "MyExtension::GetNumberWith3Params(12, \"hello world\",)");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -665,7 +742,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("number", "MyExtension::MouseX(,)");
       REQUIRE(node != nullptr);
-      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -890,7 +967,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "number",
             "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", three)");
         REQUIRE(node != nullptr);
-        auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+        auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
         REQUIRE(functionNode.functionName == "WhateverFunction");
         REQUIRE(functionNode.objectName == "WhateverObject");
         REQUIRE(functionNode.behaviorName == "WhateverBehavior");

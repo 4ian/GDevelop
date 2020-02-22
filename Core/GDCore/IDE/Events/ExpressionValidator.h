@@ -83,7 +83,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     ReportAnyError(node);
   }
-  void OnVisitFunctionNode(FunctionNode& node) override {
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
+    ReportAnyError(node);
+  }
+  void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     ReportAnyError(node);
     for (auto& parameter : node.parameters) {
       parameter->Visit(*this);

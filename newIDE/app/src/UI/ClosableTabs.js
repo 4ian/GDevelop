@@ -106,8 +106,6 @@ type ClosableTabProps = {|
   label: Node,
   type?: string,
   closable: boolean,
-  canOverrideScene?: boolean,
-  onSetPreview?: () => void,
   onClose: () => void,
   onCloseOthers: () => void,
   onCloseAll: () => void,
@@ -117,14 +115,12 @@ type ClosableTabProps = {|
 
 export function ClosableTab({
   active,
-  onSetPreview,
   onClose,
   onCloseOthers,
   onCloseAll,
   label,
   type,
   closable,
-  canOverrideScene,
   onClick,
   onActivated,
 }: ClosableTabProps) {
@@ -142,14 +138,6 @@ export function ClosableTab({
     event.stopPropagation();
     if (contextMenu.current) {
       contextMenu.current.open(event.clientX, event.clientY);
-    }
-  };
-
-  const canHavePreviewOverride = (type:string) => {
-    if (type === 'sceneEditor' || type === 'eventsEditor') {
-      return true;
-    } else {
-      return false;
     }
   };
 
@@ -207,11 +195,6 @@ export function ClosableTab({
             <ContextMenu
               ref={contextMenu}
               buildMenuTemplate={() => [
-                {
-                  label: 'Set scene for preview',
-                  click: onSetPreview,
-                  visible: canHavePreviewOverride(type),
-                },
                 {
                   label: 'Close',
                   click: onClose,

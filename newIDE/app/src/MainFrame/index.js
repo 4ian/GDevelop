@@ -873,10 +873,7 @@ class MainFrame extends React.Component<Props, State> {
     options: PreviewOptions
   ) => {
     const { _previewLauncher } = this;
-    const {
-      previewFirstSceneName,
-      isPreviewOverride,
-    } = this.state;
+    const { previewFirstSceneName, isPreviewOverride } = this.state;
 
     if (!_previewLauncher) return;
 
@@ -887,7 +884,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         let previewedLayout = layout;
         if (previewFirstSceneName && isPreviewOverride) {
-          if (project.hasLayout(previewFirstSceneName)) {
+          if (project.hasLayoutNamed(previewFirstSceneName)) {
             previewedLayout = project.getLayout(previewFirstSceneName);
           }
         }
@@ -1848,7 +1845,6 @@ class MainFrame extends React.Component<Props, State> {
                 type={editorTab.type}
                 key={editorTab.key}
                 active={isCurrentTab}
-                onSetPreview={() => this._setLayoutForPreview(editorTab.name)}
                 onClick={() => this._onChangeEditorTab(id)}
                 onClose={() => this._onCloseEditorTab(editorTab)}
                 onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}

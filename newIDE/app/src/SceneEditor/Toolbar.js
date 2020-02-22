@@ -80,7 +80,7 @@ export class Toolbar extends PureComponent<Props> {
               },
               { type: 'separator' },
               {
-                label: 'Set this scene as scene to preview',
+                label: 'Always use this scene to start the previews',
                 click: () => this.props.setScenePreview(),
               },
             ]}

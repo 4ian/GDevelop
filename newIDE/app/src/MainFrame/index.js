@@ -874,11 +874,9 @@ class MainFrame extends React.Component<Props, State> {
   ) => {
     const { _previewLauncher } = this;
     const {
-      currentProject,
       previewFirstSceneName,
       isPreviewOverride,
     } = this.state;
-    const layoutOverride = currentProject.getLayout(previewFirstSceneName);
 
     if (!_previewLauncher) return;
 
@@ -887,12 +885,15 @@ class MainFrame extends React.Component<Props, State> {
         previewLoading: true,
       },
       () => {
+        let previewedLayout = layout;
         if (previewFirstSceneName && isPreviewOverride) {
-          layout = layoutOverride;
+          if (project.hasLayout(previewFirstSceneName)) {
+            previewedLayout = project.getLayout(previewFirstSceneName);
+          }
         }
 
         _previewLauncher
-          .launchLayoutPreview(project, layout, options)
+          .launchLayoutPreview(project, previewedLayout, options)
           .catch(error => {
             console.error(
               'Error caught while launching preview, this should never happen.',
@@ -1847,7 +1848,7 @@ class MainFrame extends React.Component<Props, State> {
                 type={editorTab.type}
                 key={editorTab.key}
                 active={isCurrentTab}
-                onSetPreview={() => this._setLayoutForPreview(editorTab.label)}
+                onSetPreview={() => this._setLayoutForPreview(editorTab.name)}
                 onClick={() => this._onChangeEditorTab(id)}
                 onClose={() => this._onCloseEditorTab(editorTab)}
                 onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}

@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react';
+// eslint-disable-next-line
 import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
+import Divider from '@material-ui/core/Divider';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from './ListIcon';
-import muiZIndex from '@material-ui/core/styles/zIndex';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import { computeTextFieldStyleProps } from './TextField';
 import { MarkdownText } from './MarkdownText';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
@@ -42,6 +42,7 @@ const styles = {
   },
 };
 
+// eslint-disable-next-line
 type Props = {|
   value: string,
   onChange: string => void,
@@ -65,6 +66,7 @@ type Props = {|
   openOnFocus?: boolean,
 |};
 
+// eslint-disable-next-line
 type State = {|
   inputValue: string | null,
 |};

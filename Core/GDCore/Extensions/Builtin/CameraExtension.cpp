@@ -24,7 +24,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCondition("CameraX",
                     _("Camera center X position"),
                     _("Compare the X position of the center of a camera."),
-                    _("the x position of camera _PARAM4_ (layer: _PARAM3_)"),
+                    _("the X position of camera _PARAM4_ (layer: _PARAM3_)"),
                     _("Layers and cameras"),
                     "res/conditions/camera24.png",
                     "res/conditions/camera.png")
@@ -57,7 +57,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "CameraX",
           _("Camera center X position"),
           _("Change the X position of the center of the specified camera."),
-          _("the x position of camera _PARAM4_ (layer: _PARAM3_)"),
+          _("the X position of camera _PARAM4_ (layer: _PARAM3_)"),
           _("Layers and cameras"),
           "res/conditions/camera24.png",
           "res/conditions/camera.png")
@@ -74,7 +74,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "CameraY",
           _("Camera center Y position"),
           _("Change the Y position of the center of the specified camera."),
-          _("the y position of camera _PARAM4_ (layer: _PARAM3_)"),
+          _("the Y position of camera _PARAM4_ (layer: _PARAM3_)"),
           _("Layers and cameras"),
           "res/conditions/camera24.png",
           "res/conditions/camera.png")

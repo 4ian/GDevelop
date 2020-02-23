@@ -33,6 +33,10 @@ window.gdjs = {
  * Convert a rgb color value to a hex string.
  *
  * No "#" or "0x" are added.
+ * @param {number} r Red
+ * @param {number} g Green
+ * @param {number} b Blue
+ * @returns {string}
  */
 gdjs.rgbToHex = function(r, g, b) {
   return '' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
@@ -40,6 +44,10 @@ gdjs.rgbToHex = function(r, g, b) {
 
 /**
  * Convert a rgb color value to a hex value.
+ * @param {number} r Red
+ * @param {number} g Green
+ * @param {number} b Blue
+ * @returns {number}
  */
 gdjs.rgbToHexNumber = function(r, g, b) {
   return (r << 16) + (g << 8) + b;
@@ -47,6 +55,8 @@ gdjs.rgbToHexNumber = function(r, g, b) {
 
 /**
  * Get a random integer between 0 and max.
+ * @param {number} max The maximum value.
+ * @returns {number}
  */
 gdjs.random = function(max) {
   if (max <= 0) return 0;
@@ -54,7 +64,10 @@ gdjs.random = function(max) {
 };
 
 /**
- * Get a random integer between min and max
+ * Get a random integer between min and max.
+ * @param {number} min The minimum value.
+ * @param {number} max The maximum value.
+ * @returns {number}
  */
 gdjs.randomInRange = function(min, max) {
   return min + gdjs.random(max - min); // return min if min >= max
@@ -62,6 +75,8 @@ gdjs.randomInRange = function(min, max) {
 
 /**
  * Get a random float between 0 and max.
+ * @param {number} max The maximum value.
+ * @returns {number}
  */
 gdjs.randomFloat = function(max) {
   if (max <= 0) return 0;
@@ -70,6 +85,9 @@ gdjs.randomFloat = function(max) {
 
 /**
  * Get a random float between min and max
+ * @param {number} min The minimum value.
+ * @param {number} max The maximum value.
+ * @returns {number}
  */
 gdjs.randomFloatInRange = function(min, max) {
   return min + gdjs.randomFloat(max - min); // return min if min >= max
@@ -77,6 +95,10 @@ gdjs.randomFloatInRange = function(min, max) {
 
 /**
  * Get a random number between min and max in steps
+ * @param {number} min The minimum value.
+ * @param {number} max The maximum value.
+ * @param {number} step The step.}
+ * @returns {number}
  */
 gdjs.randomWithStep = function(min, max, step) {
   if (step <= 0) return min + gdjs.random(max - min);
@@ -85,6 +107,8 @@ gdjs.randomWithStep = function(min, max, step) {
 
 /**
  * Convert an angle in degrees to radians.
+ * @param {number} angleInDegrees The angle in degrees.
+ * @returns {number}
  */
 gdjs.toRad = function(angleInDegrees) {
   return (angleInDegrees / 180) * 3.14159;
@@ -92,10 +116,20 @@ gdjs.toRad = function(angleInDegrees) {
 
 /**
  * Convert an angle in radians to degrees.
+ * @param {number} angleInRadians The angle in radians.
+ * @returns {number}
  */
 gdjs.toDegrees = function(angleInRadians) {
   return (angleInRadians * 180) / 3.14159;
 };
+
+/**
+ * A Constructor for a {@link gdjs.RuntimeObject}.
+ * @name ObjectCtor
+ * @function
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
+ * @param {ObjectData} objectData The initial properties of the object.
+ */
 
 /**
  * Register a runtime object (class extending {@link gdjs.RuntimeObject}) that can be used in a scene.
@@ -105,11 +139,20 @@ gdjs.toDegrees = function(angleInRadians) {
  * of the type of the object is "TextObject::Text".
  *
  * @param {string} objectTypeName The name of the type of the Object.
- * @param Ctor The constructor of the Object.
+ * @param {ObjectCtor} Ctor The constructor of the Object.
  */
 gdjs.registerObject = function(objectTypeName, Ctor) {
   gdjs.objectsTypes.put(objectTypeName, Ctor);
 };
+
+/**
+ * A Constructor for a {@link gdjs.RuntimeBehavior}.
+ * @name BehaviorCtor
+ * @function
+ * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object of the behavior
+ * @param {BehaviorData} behaviorData The properties used to setup the behavior
+ * @param {gdjs.RuntimeObject} owner The object owning the behavior
+ */
 
 /**
  * Register a runtime behavior (class extending {@link gdjs.RuntimeBehavior}) that can be used by a
@@ -120,7 +163,7 @@ gdjs.registerObject = function(objectTypeName, Ctor) {
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
  * @param {string} behaviorTypeName The name of the type of the behavior.
- * @param Ctor The constructor of the Object.
+ * @param {BehaviorCtor} Ctor The constructor of the Object.
  */
 gdjs.registerBehavior = function(behaviorTypeName, Ctor) {
   gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);
@@ -241,6 +284,7 @@ gdjs.clearGlobalCallbacks = function() {
  * Get the constructor of an object.
  *
  * @param {string} name The name of the type of the object.
+ * @returns {ObjectCtor}
  */
 gdjs.getObjectConstructor = function(name) {
   if (name !== undefined && gdjs.objectsTypes.containsKey(name))
@@ -254,6 +298,7 @@ gdjs.getObjectConstructor = function(name) {
  * Get the constructor of a behavior.
  *
  * @param {string} name The name of the type of the behavior.
+ * @returns {BehaviorCtor}
  */
 gdjs.getBehaviorConstructor = function(name) {
   if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))
@@ -265,6 +310,8 @@ gdjs.getBehaviorConstructor = function(name) {
 
 /**
  * Create a static array that won't need a new allocation each time it's used.
+ * @param {any} owner The owner of the Array.
+ * @returns {Array<any>}
  */
 gdjs.staticArray = function(owner) {
   owner._staticArray = owner._staticArray || [];
@@ -273,6 +320,8 @@ gdjs.staticArray = function(owner) {
 
 /**
  * Create a second static array that won't need a new allocation each time it's used.
+ * @param {any} owner The owner of the Array.
+ * @returns {Array<any>}
  */
 gdjs.staticArray2 = function(owner) {
   owner._staticArray2 = owner._staticArray2 || [];
@@ -281,6 +330,8 @@ gdjs.staticArray2 = function(owner) {
 
 /**
  * Create a static object that won't need a new allocation each time it's used.
+ * @param {any} owner The owner of the Array.
+ * @returns {Object}
  */
 gdjs.staticObject = function(owner) {
   owner._staticObject = owner._staticObject || {};
@@ -291,6 +342,7 @@ gdjs.staticObject = function(owner) {
  * Return a new array of objects that is the concatenation of all the objects passed
  * as parameters.
  * @param objectsLists
+ * @returns {Array}
  */
 gdjs.objectsListsToArray = function(objectsLists) {
   var lists = gdjs.staticArray(gdjs.objectsListsToArray);

@@ -104,7 +104,6 @@ export class ClosableTabs extends Component<ClosableTabsProps> {
 type ClosableTabProps = {|
   active: boolean,
   label: Node,
-  type?: string,
   closable: boolean,
   onClose: () => void,
   onCloseOthers: () => void,
@@ -119,7 +118,6 @@ export function ClosableTab({
   onCloseOthers,
   onCloseAll,
   label,
-  type,
   closable,
   onClick,
   onActivated,

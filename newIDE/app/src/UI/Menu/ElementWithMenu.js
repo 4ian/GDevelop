@@ -5,8 +5,7 @@ import ContextMenu from './ContextMenu';
 
 type Props = {|
   element: React$Element<any>,
-  onClick?: () => void,
-  buildMenuTemplate?: () => Array<any>,
+  buildMenuTemplate: () => Array<any>,
   openMenuWithSecondaryClick?: boolean,
 |};
 
@@ -50,12 +49,10 @@ export default class ElementWithMenu extends React.Component<Props, State> {
             : { onClick: this.open }),
           ref: wrappedElement => (this._wrappedElement = wrappedElement),
         })}
-        {buildMenuTemplate && (
-          <ContextMenu
-            ref={contextMenu => (this._contextMenu = contextMenu)}
-            buildMenuTemplate={buildMenuTemplate}
-          />
-        )}
+        <ContextMenu
+          ref={contextMenu => (this._contextMenu = contextMenu)}
+          buildMenuTemplate={buildMenuTemplate}
+        />
       </React.Fragment>
     );
   }

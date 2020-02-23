@@ -109,7 +109,7 @@ type Props = {|
   ) => void,
   isPreviewOverride: boolean,
   togglePreviewOverride: () => void,
-  setScenePreview: (options: PreviewOptions) => void,
+  setScenePreview: () => void,
   previewFirstSceneName: string,
 |};
 type State = {|

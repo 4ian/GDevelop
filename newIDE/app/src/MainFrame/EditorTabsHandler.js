@@ -22,8 +22,6 @@ export type EditorTab = {|
   render: (isCurrentTab: boolean) => React$Element<*>,
   editorRef: ?EditorRef,
   label: string,
-  name: string,
-  type: string,
   key: string,
   closable: boolean,
 |};
@@ -49,14 +47,12 @@ export const openEditorTab = (
   state: EditorTabsState,
   {
     label,
-    type,
     renderEditor,
     key,
     dontFocusTab,
     closable,
   }: {
     label: string,
-    type: string,
     renderEditor: (props: renderEditorProps) => React$Element<*>,
     key: string,
     dontFocusTab?: boolean,
@@ -82,7 +78,6 @@ export const openEditorTab = (
       }),
     editorRef: null,
     label,
-    type,
     key,
     closable: typeof closable === 'undefined' ? true : !!closable,
   };

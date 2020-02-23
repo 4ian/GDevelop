@@ -454,7 +454,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._releaseGrabbedPlatform = functio
 /**
  * Among the platforms passed in parameter, return true if there is a platform colliding with the object.
  * Ladders are *always* excluded from the test.
- * @param candidates The platform to be tested for collision
+ * @param {Array<gdjs.PlatformRuntimeBehavior>} candidates The platform to be tested for collision
  * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
  * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
  */
@@ -466,6 +466,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWith = function(candi
         var platform = candidates[i];
 
         if ( platform.owner.id === exceptThisOne ) continue;
+        if ( platform.getPlatformID() in this._ignoredPlatforms ) continue;
         if ( platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ) continue;
         if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU ) continue;
 

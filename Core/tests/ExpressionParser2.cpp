@@ -598,6 +598,26 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
 
     {
+      auto node = parser.ParseExpression("object", "Hello World 1");
+      REQUIRE(node != nullptr);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "Hello World 1");
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("object", "Hello World 1 ");
+      REQUIRE(node != nullptr);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "Hello World 1");
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+    {
       auto node = parser.ParseExpression("object", "Hello World 1  ");
       REQUIRE(node != nullptr);
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);

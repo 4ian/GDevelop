@@ -95,16 +95,16 @@ class GD_CORE_API ExpressionParser2 {
 
   std::unique_ptr<ExpressionNode> Expression(
       const gd::String &type, const gd::String &objectName = "") {
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
     size_t expressionStartPosition = GetCurrentPosition();
     std::unique_ptr<ExpressionNode> leftHandSide = Term(type, objectName);
 
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
     if (IsEndReached()) return leftHandSide;
-    if (IsAnyChar(",)]")) return leftHandSide;
-    if (IsAnyChar(EXPRESSION_OPERATORS)) {
+    if (CheckIfChar(IsExpressionEndingChar)) return leftHandSide;
+    if (CheckIfChar(IsExpressionOperator)) {
       auto op = gd::make_unique<OperatorNode>(type, GetCurrentChar());
       op->leftHandSide = std::move(leftHandSide);
       op->diagnostic = ValidateOperator(type, GetCurrentChar());
@@ -140,17 +140,17 @@ class GD_CORE_API ExpressionParser2 {
 
   std::unique_ptr<ExpressionNode> Term(const gd::String &type,
                                        const gd::String &objectName) {
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
     size_t expressionStartPosition = GetCurrentPosition();
     std::unique_ptr<ExpressionNode> factor = Factor(type, objectName);
 
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
     // This while loop is used instead of a recursion (like in Expression)
     // to guarantee the proper operator precedence. (Expression could also
     // be reworked to use a while loop).
-    while (IsAnyChar(TERM_OPERATORS)) {
+    while (CheckIfChar(IsTermOperator)) {
       auto op = gd::make_unique<OperatorNode>(type, GetCurrentChar());
       op->leftHandSide = std::move(factor);
       op->diagnostic = ValidateOperator(type, GetCurrentChar());
@@ -158,7 +158,7 @@ class GD_CORE_API ExpressionParser2 {
       op->rightHandSide = Factor(type, objectName);
       op->location = ExpressionParserLocation(expressionStartPosition,
                                               GetCurrentPosition());
-      SkipWhitespace();
+      SkipAllWhitespaces();
 
       factor = std::move(op);
     }
@@ -168,12 +168,12 @@ class GD_CORE_API ExpressionParser2 {
 
   std::unique_ptr<ExpressionNode> Factor(const gd::String &type,
                                          const gd::String &objectName) {
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
     size_t expressionStartPosition = GetCurrentPosition();
     std::unique_ptr<ExpressionNode> factor;
 
-    if (IsAnyChar(QUOTE)) {
+    if (CheckIfChar(IsQuote)) {
       factor = ReadText();
       if (type == "number")
         factor->diagnostic =
@@ -183,7 +183,7 @@ class GD_CORE_API ExpressionParser2 {
         factor->diagnostic = RaiseTypeError(
             _("You entered a text, but this type was expected:") + type,
             expressionStartPosition);
-    } else if (IsAnyChar(UNARY_OPERATORS)) {
+    } else if (CheckIfChar(IsUnaryOperator)) {
       auto unaryOperator =
           gd::make_unique<UnaryOperatorNode>(type, GetCurrentChar());
       unaryOperator->diagnostic = ValidateUnaryOperator(type, GetCurrentChar());
@@ -193,7 +193,7 @@ class GD_CORE_API ExpressionParser2 {
       unaryOperator->location = ExpressionParserLocation(
           expressionStartPosition, GetCurrentPosition());
       factor = std::move(unaryOperator);
-    } else if (IsAnyChar(NUMBER_FIRST_CHAR)) {
+    } else if (CheckIfChar(IsNumberFirstChar)) {
       factor = ReadNumber();
       if (type == "string")
         factor->diagnostic = RaiseTypeError(
@@ -203,16 +203,16 @@ class GD_CORE_API ExpressionParser2 {
         factor->diagnostic = RaiseTypeError(
             _("You entered a number, but this type was expected:") + type,
             expressionStartPosition);
-    } else if (IsAnyChar("(")) {
+    } else if (CheckIfChar(IsOpeningParenthesis)) {
       SkipChar();
       factor = SubExpression(type, objectName);
 
-      if (!IsAnyChar(")")) {
+      if (!CheckIfChar(IsClosingParenthesis)) {
         factor->diagnostic =
             RaiseSyntaxError(_("Missing a closing parenthesis. Add a closing "
                                "parenthesis for each opening parenthesis."));
       }
-      SkipIfIsAnyChar(")");
+      SkipIfChar(IsClosingParenthesis);
     } else if (IsIdentifierAllowedChar()) {
       // This is a place where the grammar differs according to the
       // type being expected.
@@ -245,7 +245,7 @@ class GD_CORE_API ExpressionParser2 {
     size_t identifierStartPosition = GetCurrentPosition();
     gd::String name = ReadIdentifierName();
 
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
     if (IsNamespaceSeparator()) {
       SkipNamespaceSeparator();
@@ -254,10 +254,10 @@ class GD_CORE_API ExpressionParser2 {
       name += ReadIdentifierName();
     }
 
-    if (IsAnyChar("(")) {
+    if (CheckIfChar(IsOpeningParenthesis)) {
       SkipChar();
       return FreeFunction(type, name, identifierStartPosition);
-    } else if (IsAnyChar(DOT)) {
+    } else if (CheckIfChar(IsDot)) {
       SkipChar();
       return ObjectFunctionOrBehaviorFunction(
           type, name, identifierStartPosition);
@@ -301,24 +301,24 @@ class GD_CORE_API ExpressionParser2 {
     size_t childStartPosition = GetCurrentPosition();
 
     std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode> child;
-    SkipWhitespace();
-    if (IsAnyChar("[")) {
+    SkipAllWhitespaces();
+    if (CheckIfChar(IsOpeningSquareBracket)) {
       SkipChar();
       child =
           gd::make_unique<VariableBracketAccessorNode>(Expression("string"));
 
-      if (!IsAnyChar("]")) {
+      if (!CheckIfChar(IsClosingSquareBracket)) {
         child->diagnostic =
             RaiseSyntaxError(_("Missing a closing bracket. Add a closing "
                                "bracket for each opening bracket."));
       }
-      SkipIfIsAnyChar("]");
+      SkipIfChar(IsClosingSquareBracket);
       child->child = VariableAccessorOrVariableBracketAccessor();
       child->location =
           ExpressionParserLocation(childStartPosition, GetCurrentPosition());
-    } else if (IsAnyChar(DOT)) {
+    } else if (CheckIfChar(IsDot)) {
       SkipChar();
-      SkipWhitespace();
+      SkipAllWhitespaces();
 
       child = gd::make_unique<VariableAccessorNode>(ReadIdentifierName());
       child->child = VariableAccessorOrVariableBracketAccessor();
@@ -362,7 +362,7 @@ class GD_CORE_API ExpressionParser2 {
                                    size_t functionStartPosition) {
     gd::String objectFunctionOrBehaviorName = ReadIdentifierName();
 
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
     if (IsNamespaceSeparator()) {
       SkipNamespaceSeparator();
@@ -370,7 +370,7 @@ class GD_CORE_API ExpressionParser2 {
                               objectName,
                               objectFunctionOrBehaviorName,
                               functionStartPosition);
-    } else if (IsAnyChar("(")) {
+    } else if (CheckIfChar(IsOpeningParenthesis)) {
       SkipChar();
 
       gd::String objectType =
@@ -420,9 +420,9 @@ class GD_CORE_API ExpressionParser2 {
       size_t functionStartPosition) {
     gd::String functionName = ReadIdentifierName();
 
-    SkipWhitespace();
+    SkipAllWhitespaces();
 
-    if (IsAnyChar("(")) {
+    if (CheckIfChar(IsOpeningParenthesis)) {
       SkipChar();
 
       gd::String behaviorType = GetTypeOfBehavior(
@@ -478,9 +478,9 @@ class GD_CORE_API ExpressionParser2 {
         WrittenParametersFirstIndex(objectName, behaviorName);
 
     while (!IsEndReached()) {
-      SkipWhitespace();
+      SkipAllWhitespaces();
 
-      if (IsAnyChar(")")) {
+      if (CheckIfChar(IsClosingParenthesis)) {
         SkipChar();
         return std::make_pair(std::move(parameters), nullptr);
       } else {
@@ -520,8 +520,8 @@ class GD_CORE_API ExpressionParser2 {
               GetCurrentPosition());
         }
 
-        SkipWhitespace();
-        SkipIfIsAnyChar(PARAMETERS_SEPARATOR);
+        SkipAllWhitespaces();
+        SkipIfChar(IsParameterSeparator);
         parameterIndex++;
       }
     }
@@ -624,15 +624,16 @@ class GD_CORE_API ExpressionParser2 {
   ///@{
   void SkipChar() { currentPosition++; }
 
-  void SkipWhitespace() {
+  void SkipAllWhitespaces() {
     while (currentPosition < expression.size() &&
-           WHITESPACES.find(expression[currentPosition]) != gd::String::npos) {
+           IsWhitespace(expression[currentPosition])) {
       currentPosition++;
     }
   }
 
-  void SkipIfIsAnyChar(const gd::String &allowedCharacters) {
-    if (IsAnyChar(allowedCharacters)) {
+  void SkipIfChar(
+      const std::function<bool(gd::String::value_type)> &predicate) {
+    if (CheckIfChar(predicate)) {
       currentPosition++;
     }
   }
@@ -645,30 +646,101 @@ class GD_CORE_API ExpressionParser2 {
     }
   }
 
-  bool IsAnyChar(const gd::String &allowedCharacters) {
-    if (currentPosition < expression.size() &&
-        allowedCharacters.find(expression[currentPosition]) !=
-            gd::String::npos) {
+  bool CheckIfChar(
+      const std::function<bool(gd::String::value_type)> &predicate) {
+    if (currentPosition >= expression.size()) return false;
+    gd::String::value_type character = expression[currentPosition];
+
+    return predicate(character);
+  }
+
+  bool IsIdentifierAllowedChar() {
+    if (currentPosition >= expression.size()) return false;
+    gd::String::value_type character = expression[currentPosition];
+
+    // Quickly compare if the character is a number or ASCII character.
+    if ((character >= '0' && character <= '9') ||
+        (character >= 'A' && character <= 'Z') ||
+        (character >= 'a' && character <= 'z'))
+      return true;
+
+    // Otherwise do the full check against separators forbidden in identifiers.
+    if (!IsParameterSeparator(character) && !IsDot(character) &&
+        !IsQuote(character) && !IsBracket(character) &&
+        !IsExpressionOperator(character) && !IsTermOperator(character)) {
       return true;
     }
 
     return false;
   }
 
-  bool IsIdentifierAllowedChar() {
-    if (currentPosition < expression.size() &&
-        PARAMETERS_SEPARATOR.find(expression[currentPosition]) ==
-            gd::String::npos &&
-        DOT.find(expression[currentPosition]) == gd::String::npos &&
-        QUOTE.find(expression[currentPosition]) == gd::String::npos &&
-        BRACKETS.find(expression[currentPosition]) == gd::String::npos &&
-        EXPRESSION_OPERATORS.find(expression[currentPosition]) ==
-            gd::String::npos &&
-        TERM_OPERATORS.find(expression[currentPosition]) == gd::String::npos) {
-      return true;
-    }
+  static bool IsWhitespace(gd::String::value_type character) {
+    return character == ' ' || character == '\n' || character == '\r';
+  }
 
-    return false;
+  static bool IsParameterSeparator(gd::String::value_type character) {
+    return character == ',';
+  }
+
+  static bool IsDot(gd::String::value_type character) {
+    return character == '.';
+  }
+
+  static bool IsQuote(gd::String::value_type character) {
+    return character == '"';
+  }
+
+  static bool IsBracket(gd::String::value_type character) {
+    return character == '(' || character == ')' || character == '[' ||
+           character == ']' || character == '{' || character == '}';
+  }
+
+  static bool IsOpeningParenthesis(gd::String::value_type character) {
+    return character == '(';
+  }
+
+  static bool IsClosingParenthesis(gd::String::value_type character) {
+    return character == ')';
+  }
+
+  static bool IsOpeningSquareBracket(gd::String::value_type character) {
+    return character == '[';
+  }
+
+  static bool IsClosingSquareBracket(gd::String::value_type character) {
+    return character == ']';
+  }
+
+  static bool IsExpressionEndingChar(gd::String::value_type character) {
+    return character == ',' || IsClosingParenthesis(character) ||
+           IsClosingSquareBracket(character);
+  }
+
+  static bool IsExpressionOperator(gd::String::value_type character) {
+    return character == '+' || character == '-' || character == '<' ||
+           character == '>' || character == '?' || character == '^' ||
+           character == '=' || character == '\\' || character == ':' ||
+           character == '!';
+  }
+
+  static bool IsUnaryOperator(gd::String::value_type character) {
+    return character == '+' || character == '-';
+  }
+
+  static bool IsTermOperator(gd::String::value_type character) {
+    return character == '/' || character == '*';
+  }
+
+  static bool IsNumberFirstChar(gd::String::value_type character) {
+    return character == '.' || (character >= '0' && character <= '9');
+  }
+
+  static bool IsNonZeroDigit(gd::String::value_type character) {
+    return (character >= '1' && character <= '9');
+  }
+
+  static bool IsZeroDigit(gd::String::value_type character) {
+    return character == '0';
   }
 
   bool IsNamespaceSeparator() {
@@ -695,9 +767,14 @@ class GD_CORE_API ExpressionParser2 {
     // Trim whitespace at the end (we allow them for compatibility inside
     // the name, but after the last character that is not whitespace, they
     // should be ignore again).
-    size_t lastCharacterPos = name.find_last_not_of(WHITESPACES);
-    if (!name.empty() && (lastCharacterPos + 1) < name.size()) {
-      name.erase(lastCharacterPos + 1);
+    if (!name.empty() && IsWhitespace(name[name.size() - 1])) {
+      size_t lastCharacterPos = name.size() - 1;
+      while(lastCharacterPos < name.size() && IsWhitespace(name[lastCharacterPos])) {
+        lastCharacterPos--;
+      }
+      if ((lastCharacterPos + 1) < name.size()) {
+        name.erase(lastCharacterPos + 1);
+      }
     }
 
     return name;
@@ -711,7 +788,7 @@ class GD_CORE_API ExpressionParser2 {
     size_t startPosition = GetCurrentPosition();
     gd::String text;
     while (currentPosition < expression.size() &&
-           WHITESPACES.find(expression[currentPosition]) == gd::String::npos) {
+           !IsWhitespace(expression[currentPosition])) {
       text += expression[currentPosition];
       currentPosition++;
     }
@@ -798,15 +875,6 @@ class GD_CORE_API ExpressionParser2 {
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
 
-  static gd::String NUMBER_FIRST_CHAR;
-  static gd::String DOT;
-  static gd::String PARAMETERS_SEPARATOR;
-  static gd::String QUOTE;
-  static gd::String BRACKETS;
-  static gd::String EXPRESSION_OPERATORS;
-  static gd::String TERM_OPERATORS;
-  static gd::String UNARY_OPERATORS;
-  static gd::String WHITESPACES;
   static gd::String NAMESPACE_SEPARATOR;
 };
 

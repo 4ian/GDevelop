@@ -29,6 +29,21 @@ gdjs.PlatformObjectsManager.getManager = function(runtimeScene) {
 };
 
 /**
+ * An ID used by the UID Generator.
+ * @type {number}
+ * @private
+ */
+gdjs.PlatformObjectsManager._id = 0;
+
+/**
+ * A Unique IDentifier generator.
+ * @returns {number}
+ */
+gdjs.PlatformObjectsManager._getNewUID = function() {
+    return ++gdjs.PlatformObjectsManager._id
+};
+
+/**
  * Add a platform to the list of existing platforms.
  */
 gdjs.PlatformObjectsManager.prototype.addPlatform = function(platformBehavior) {
@@ -97,6 +112,8 @@ gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 
 	this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
 	this._registeredInManager = false;
+
+	this.id = gdjs.PlatformObjectsManager._getNewUID()
 };
 
 gdjs.PlatformRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );

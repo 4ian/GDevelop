@@ -94,9 +94,9 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
       autExpressions["JumpSpeed"].SetFunctionName("getJumpSpeed");
 
       autActions["PlatformBehavior::ignorePlatform"]
-                .SetFunctionName("ignorePlatform")
+                .SetFunctionName("ignorePlatform");
       autActions["PlatformBehavior::unIgnorePlatform"]
-                .SetFunctionName("unIgnorePlatform")
+                .SetFunctionName("unIgnorePlatform");
 
       autActions["PlatformBehavior::SetCanJump"].SetFunctionName("setCanJump");
       autActions["PlatformBehavior::SimulateLeftKey"].SetFunctionName(

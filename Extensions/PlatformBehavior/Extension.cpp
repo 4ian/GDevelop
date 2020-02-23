@@ -502,6 +502,28 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetJumpSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddExpression("ignorePlatform",
+                          _("Jump speed"),
+                          _("Jump speed"),
+                          _("Options"),
+                          "CppPlatform/Extensions/platformerobjecticon16.png")
+            .AddParameter("object", _("Object"))
+            .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+            .SetFunctionName("IgnorePlatform")
+            .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddExpression("unIgnorePlatform",
+                              _("Jump speed"),
+                              _("Jump speed"),
+                              _("Options"),
+                              "CppPlatform/Extensions/platformerobjecticon16.png")
+                .AddParameter("object", _("Object"))
+                .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+                .AddParameter("object", _("Platform to ignore"))
+                .AddParameter("behavior", _("Platform Behavior"), "PlatformObjectBehavior")
+                .SetFunctionName("UnIgnorePlatform")
+                .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 #endif
   }
   {

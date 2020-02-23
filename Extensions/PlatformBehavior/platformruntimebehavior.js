@@ -206,3 +206,12 @@ gdjs.PlatformRuntimeBehavior.prototype.getYGrabOffset = function()
 {
     return this._yGrabOffset;
 };
+
+/**
+ * Get the UID of the platform.
+ * @returns {number}
+ */
+gdjs.PlatformRuntimeBehavior.prototype.getPlatformID = function()
+{
+    return this.id;
+};

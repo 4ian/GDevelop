@@ -76,6 +76,9 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
   }
   bool IsGrabbingPlatform() const { return isGrabbingPlatform; }
 
+  void IgnorePlatform(RuntimeBehavior platformBehavior) {};
+  void UnIgnorePlatform() {};
+
   virtual void OnOwnerChanged();
 
  private:

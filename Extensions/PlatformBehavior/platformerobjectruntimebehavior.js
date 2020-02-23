@@ -60,6 +60,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(runtimeScene, behaviorData, owne
     this._hasReallyMoved = false;
     this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
     this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
+    this._ignoredPlatforms = [];
 };
 
 gdjs.PlatformerObjectRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
@@ -903,4 +904,20 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.isFalling = function()
 gdjs.PlatformerObjectRuntimeBehavior.prototype.isMoving = function()
 {
     return (this._hasReallyMoved &&this._currentSpeed !== 0) || this._currentJumpSpeed !== 0 || this._currentFallSpeed !== 0;
+};
+
+/**
+ * Ignore a platform
+ * @param {gdjs.PlatformRuntimeBehavior} platformBehavior
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.ignorePlatform = function(platformBehavior) {
+    this._ignoredPlatforms.push(platformBehavior.getPlatformID())
+};
+
+/**
+ * Ignore a platform
+ * @param {gdjs.PlatformRuntimeBehavior} platformBehavior
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.unIgnorePlatform = function(platformBehavior) {
+    this._ignoredPlatforms.remove(platformBehavior.getPlatformID())
 };

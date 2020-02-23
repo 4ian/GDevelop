@@ -1357,7 +1357,7 @@ gdjs.RuntimeObject.prototype.separateObjectsWithoutForces = function(objectsList
  * @deprecated
  * @param objectsLists Tables of objects
  */
-gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, dummyVar) {
+gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists) {
     //Prepare the list of objects to iterate over.
     var objects = gdjs.staticArray(gdjs.RuntimeObject.prototype.separateObjectsWithForces);
     objects.length = 0;

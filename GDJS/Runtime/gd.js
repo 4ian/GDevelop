@@ -64,7 +64,7 @@ gdjs.random = function(max) {
 };
 
 /**
- * Get a random float in the range 0 to less than max (inclusive of 0, but not max).
+ * Get a random integer between min and max.
  * @param {number} min The minimum value (inclusive).
  * @param {number} max The maximum value (inclusive).
  * @returns {number}
@@ -74,7 +74,7 @@ gdjs.randomInRange = function(min, max) {
 };
 
 /**
- * Get a random float between 0 and max.
+ *  Get a random float in the range 0 to less than max (inclusive of 0, but not max).
  * @param {number} max The maximum value (exclusive).
  * @returns {number}
  */

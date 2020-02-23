@@ -180,6 +180,12 @@ class StartPage extends BaseEditor {
                       Window.openExternalURL('https://twitter.com/GDevelopApp')
                     }
                   />
+                  <IconButton
+                    className="icon-discord"
+                    onClick={() =>
+                      Window.openExternalURL('https://discord.gg/rjdYHvj')
+                    }
+                  />
                 </Line>
               </Line>
             </div>

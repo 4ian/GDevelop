@@ -55,7 +55,7 @@ gdjs.rgbToHexNumber = function(r, g, b) {
 
 /**
  * Get a random integer between 0 and max.
- * @param {number} max The maximum value.
+ * @param {number} max The maximum value (inclusive).
  * @returns {number}
  */
 gdjs.random = function(max) {
@@ -64,9 +64,9 @@ gdjs.random = function(max) {
 };
 
 /**
- * Get a random integer between min and max.
- * @param {number} min The minimum value.
- * @param {number} max The maximum value.
+ * Get a random float in the range 0 to less than max (inclusive of 0, but not max).
+ * @param {number} min The minimum value (inclusive).
+ * @param {number} max The maximum value (inclusive).
  * @returns {number}
  */
 gdjs.randomInRange = function(min, max) {
@@ -75,7 +75,7 @@ gdjs.randomInRange = function(min, max) {
 
 /**
  * Get a random float between 0 and max.
- * @param {number} max The maximum value.
+ * @param {number} max The maximum value (exclusive).
  * @returns {number}
  */
 gdjs.randomFloat = function(max) {
@@ -85,8 +85,8 @@ gdjs.randomFloat = function(max) {
 
 /**
  * Get a random float between min and max
- * @param {number} min The minimum value.
- * @param {number} max The maximum value.
+ * @param {number} min The minimum value (inclusive).
+ * @param {number} max The maximum value (exclusive).
  * @returns {number}
  */
 gdjs.randomFloatInRange = function(min, max) {
@@ -95,9 +95,9 @@ gdjs.randomFloatInRange = function(min, max) {
 
 /**
  * Get a random number between min and max in steps
- * @param {number} min The minimum value.
- * @param {number} max The maximum value.
- * @param {number} step The step.}
+ * @param {number} min The minimum value (inclusive).
+ * @param {number} max The maximum value (inclusive).
+ * @param {number} step The interval between each value.
  * @returns {number}
  */
 gdjs.randomWithStep = function(min, max, step) {
@@ -125,7 +125,7 @@ gdjs.toDegrees = function(angleInRadians) {
 
 /**
  * A Constructor for a {@link gdjs.RuntimeObject}.
- * @name ObjectCtor
+ * @name RuntimeObjectConstructor
  * @function
  * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
  * @param {ObjectData} objectData The initial properties of the object.
@@ -139,7 +139,7 @@ gdjs.toDegrees = function(angleInRadians) {
  * of the type of the object is "TextObject::Text".
  *
  * @param {string} objectTypeName The name of the type of the Object.
- * @param {ObjectCtor} Ctor The constructor of the Object.
+ * @param {RuntimeObjectConstructor} Ctor The constructor of the Object.
  */
 gdjs.registerObject = function(objectTypeName, Ctor) {
   gdjs.objectsTypes.put(objectTypeName, Ctor);
@@ -147,7 +147,7 @@ gdjs.registerObject = function(objectTypeName, Ctor) {
 
 /**
  * A Constructor for a {@link gdjs.RuntimeBehavior}.
- * @name BehaviorCtor
+ * @name RuntimeBehaviorConstructor
  * @function
  * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object of the behavior
  * @param {BehaviorData} behaviorData The properties used to setup the behavior
@@ -163,7 +163,7 @@ gdjs.registerObject = function(objectTypeName, Ctor) {
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
  * @param {string} behaviorTypeName The name of the type of the behavior.
- * @param {BehaviorCtor} Ctor The constructor of the Object.
+ * @param {RuntimeBehaviorConstructor} Ctor The constructor of the Object.
  */
 gdjs.registerBehavior = function(behaviorTypeName, Ctor) {
   gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);

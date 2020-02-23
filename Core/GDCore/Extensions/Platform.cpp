@@ -14,19 +14,19 @@ using namespace std;
 
 namespace gd {
 
-Platform::Platform() {}
+Platform::Platform(): enableExtensionLoadingLogs(true) {}
 
 Platform::~Platform() {}
 
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
   if (!extension) return false;
 
-  std::cout << "Loading " << extension->GetName() << "...";
+  if (enableExtensionLoadingLogs) std::cout << "Loading " << extension->GetName() << "...";
   if (IsExtensionLoaded(extension->GetName())) {
-    std::cout << " (replacing existing extension)";
+    if (enableExtensionLoadingLogs) std::cout << " (replacing existing extension)";
     RemoveExtension(extension->GetName());
   }
-  std::cout << std::endl;
+  if (enableExtensionLoadingLogs) std::cout << std::endl;
 
   extensionsLoaded.push_back(extension);
 

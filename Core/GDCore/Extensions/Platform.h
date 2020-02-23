@@ -157,6 +157,12 @@ class GD_CORE_API Platform {
   ///@}
 
   /**
+   * \brief Activate or disable the logs on the standard output when
+   * loading an extension.
+   */
+  void EnableExtensionLoadingLogs(bool enable) { enableExtensionLoadingLogs = enable; };
+
+  /**
    * \brief Called when the IDE is about to shut down: Take this opportunity for
    * erasing for example any temporary file.
    */
@@ -174,6 +180,7 @@ class GD_CORE_API Platform {
       extensionsLoaded;  ///< Extensions of the platform
   std::map<gd::String, CreateFunPtr>
       creationFunctionTable;  ///< Creation functions for objects
+  bool enableExtensionLoadingLogs;
 };
 
 }  // namespace gd

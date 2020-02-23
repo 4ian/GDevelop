@@ -660,7 +660,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     if (argOutput.empty()) {
       if (!metadata.type.empty())
         cout << "Warning: Unknown type of parameter \"" << metadata.type
-             << "\".";
+             << "\"." << std::endl;
       argOutput += "\"" + ConvertToString(parameter) + "\"";
     }
   }

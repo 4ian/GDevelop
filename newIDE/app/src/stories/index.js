@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 
 // Keep first as it creates the `global.gd` object:
 import GDevelopJsInitializerDecorator, {
@@ -185,6 +185,12 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { emptyPreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 import TextField from '../UI/TextField';
+import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
+import {
+  getFakePopperJsAnchorElement,
+  makeFakeExpressionAutocompletions,
+  makeFakeExactExpressionAutocompletion,
+} from '../fixtures/TestExpressionAutocompletions';
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -2030,6 +2036,57 @@ storiesOf('ParameterFields', module)
           objectsContainer={testProject.testLayout}
         />
       )}
+    />
+  ));
+
+storiesOf('ExpressionAutcompletionsDisplayer', module)
+  .addDecorator(muiDecorator)
+  .add('autocompletions (first selected)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={makeFakeExpressionAutocompletions()}
+      remainingCount={3}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('autocompletions (second selected)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={makeFakeExpressionAutocompletions()}
+      remainingCount={3}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={1}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('autocompletion for an exact expression', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
+      remainingCount={0}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('empty autocompletions (nothing shown)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={[]}
+      remainingCount={0}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
     />
   ));
 

@@ -515,6 +515,7 @@ export const filterInstructionsList = (
     return list;
   };
 
+  // See EnumerateExpressions for a similar logic for expressions
   return favorExactMatch(list.filter(matchCritera));
 };
 

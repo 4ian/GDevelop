@@ -67,7 +67,7 @@ export default class SemiControlledTextField extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  getInputNode() {
+  getInputNode(): ?HTMLInputElement {
     if (this._field) return this._field.getInputNode();
   }
 

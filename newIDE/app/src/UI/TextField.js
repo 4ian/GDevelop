@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import { I18n } from '@lingui/react';
 import MUITextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -167,9 +166,9 @@ export default class TextField extends React.Component<Props, {||}> {
     }
   }
 
-  getInputNode() {
+  getInputNode(): ?HTMLInputElement {
     if (this._input.current) {
-      return ReactDOM.findDOMNode(this._input.current);
+      return this._input.current;
     }
 
     return null;

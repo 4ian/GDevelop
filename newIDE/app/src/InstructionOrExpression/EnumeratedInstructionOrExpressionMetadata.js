@@ -21,7 +21,7 @@ export type EnumeratedInstructionOrExpressionMetadata = {|
   isPrivate: boolean,
 
   name?: string, // For expressions
-  parameters?: Array<any>, // For expressions
+  parameters?: Array<gdParameterMetadata>, // For expressions
 |};
 
 export const filterEnumeratedInstructionOrExpressionMetadataByScope = (

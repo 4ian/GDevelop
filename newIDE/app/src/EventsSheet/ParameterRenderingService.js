@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import {
   type ParameterInlineRenderer,
@@ -44,6 +45,7 @@ import ForceMultiplierField, {
   renderInlineForceMultiplier,
 } from './ParameterFields/ForceMultiplierField';
 import SceneNameField from './ParameterFields/SceneNameField';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 const gd = global.gd;
 
 const components = {
@@ -88,11 +90,37 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
 };
+const userFriendlyTypeName: { [string]: MessageDescriptor } = {
+  mouse: t`Mouse button`,
+  object: t`Object`,
+  relationalOperator: t`Relational operator`,
+  operator: t`Operator`,
+  yesorno: t`Yes or No`,
+  trueorfalse: t`True or False`,
+  expression: t`Number`,
+  string: t`String`,
+  stringWithSelector: t`String`,
+  behavior: t`Behavior`,
+  scenevar: t`Scene variable`,
+  globalvar: t`Global variable`,
+  objectvar: t`Object variable`,
+  layer: t`Layer`,
+  key: t`Keyboard key`,
+  musicfile: t`Audio resource`,
+  soundfile: t`Audio resource`,
+  videoResource: t`Video resource`,
+  jsonResource: t`JSON resource`,
+  color: t`Color`,
+  forceMultiplier: t`Instant or permanent force`,
+  sceneName: t`Scene name`,
+};
 
 export default {
   components,
-  getParameterComponent: (type: string) => {
-    const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;
+  getParameterComponent: (rawType: string) => {
+    const fieldType = gd.ParameterMetadata.isObject(rawType)
+      ? 'object'
+      : rawType;
 
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
@@ -106,5 +134,12 @@ export default {
     const inlineRenderer =
       inlineRenderers[fieldType] || inlineRenderers.default;
     return inlineRenderer(props);
+  },
+  getUserFriendlyTypeName: (rawType: string): ?MessageDescriptor => {
+    const fieldType = gd.ParameterMetadata.isObject(rawType)
+      ? 'object'
+      : rawType;
+
+    return userFriendlyTypeName[fieldType] || null;
   },
 };

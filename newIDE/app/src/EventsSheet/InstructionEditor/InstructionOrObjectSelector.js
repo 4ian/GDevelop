@@ -9,12 +9,12 @@ import {
   createTree,
   type InstructionOrExpressionTreeNode,
   findInTree,
-} from './InstructionOrExpressionSelector/CreateTree';
+} from '../../InstructionOrExpression/CreateTree';
 import {
   enumerateFreeInstructions,
   filterInstructionsList,
-} from './InstructionOrExpressionSelector/EnumerateInstructions';
-import { type EnumeratedInstructionOrExpressionMetadata } from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumerateInstructions';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { List, ListItem } from '../../UI/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';

@@ -4,10 +4,13 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import { List } from '../../../UI/List';
 import SearchBar from '../../../UI/SearchBar';
-import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
-import { type InstructionOrExpressionTreeNode, findInTree } from './CreateTree';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import {
+  type InstructionOrExpressionTreeNode,
+  findInTree,
+} from '../../../InstructionOrExpression/CreateTree';
+import { filterInstructionsList } from '../../../InstructionOrExpression/EnumerateInstructions';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
-import { filterInstructionsList } from './EnumerateInstructions';
 import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../../UI/EmptyMessage';

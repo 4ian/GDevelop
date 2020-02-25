@@ -3,7 +3,7 @@ import { formatExpressionCall } from './FormatExpressionCall';
 import {
   enumerateExpressions,
   filterExpressions,
-} from '../../InstructionEditor/InstructionOrExpressionSelector/EnumerateExpressions';
+} from '../../../InstructionOrExpression/EnumerateExpressions';
 
 describe('HelpButton', () => {
   it('properly format a free function, with one or more arguments', () => {

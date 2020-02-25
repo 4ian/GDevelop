@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { getInstructionListItemValue, getInstructionListItemKey } from './Keys';
 
 type Props = {|

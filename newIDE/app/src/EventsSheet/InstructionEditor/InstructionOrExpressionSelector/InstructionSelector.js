@@ -1,12 +1,15 @@
 // @flow
 import React, { Component } from 'react';
 import InstructionOrExpressionSelector from './index';
-import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
-import { enumerateInstructions } from './EnumerateInstructions';
+import {
+  createTree,
+  type InstructionOrExpressionTreeNode,
+} from '../../../InstructionOrExpression/CreateTree';
+import { enumerateInstructions } from '../../../InstructionOrExpression/EnumerateInstructions';
 import {
   type EnumeratedInstructionOrExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from './EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type EventsScope } from '../../EventsScope.flow';
 
 type Props = {|

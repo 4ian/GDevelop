@@ -1,5 +1,5 @@
 //@flow
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../EventsSheet/EventsScope.flow';
 const gd = global.gd;
 
 export type InstructionOrExpressionScope = {|

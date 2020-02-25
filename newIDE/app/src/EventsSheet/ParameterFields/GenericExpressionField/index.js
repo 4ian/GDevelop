@@ -12,7 +12,7 @@ import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionEditor/InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,

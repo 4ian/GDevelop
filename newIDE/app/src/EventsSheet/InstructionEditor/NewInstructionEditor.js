@@ -4,15 +4,15 @@ import {
   enumerateObjectInstructions,
   enumerateInstructions,
   getObjectParameterIndex,
-} from './InstructionOrExpressionSelector/EnumerateInstructions';
+} from '../../InstructionOrExpression/EnumerateInstructions';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
-} from './InstructionOrExpressionSelector/CreateTree';
+} from '../../InstructionOrExpression/CreateTree';
 import {
   type EnumeratedInstructionOrExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type EventsScope } from '../EventsScope.flow';
 const gd = global.gd;
 

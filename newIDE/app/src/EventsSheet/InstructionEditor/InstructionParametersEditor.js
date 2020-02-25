@@ -22,7 +22,7 @@ import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../EventsScope.flow';
-import { getObjectParameterIndex } from './InstructionOrExpressionSelector/EnumerateInstructions';
+import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
 import Text from '../../UI/Text';
 import { getInstructionMetadata } from './NewInstructionEditor';
 const gd = global.gd;

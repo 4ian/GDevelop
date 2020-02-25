@@ -87,7 +87,7 @@ Hashtable.prototype.firstKey = function() {
         }
     }
 
-    return undefined;
+    return null;
 }
 
 /**

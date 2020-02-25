@@ -73,6 +73,8 @@ gdjs.SceneStack.prototype.pop = function() {
 
     // Unload the current scene
     var scene = this._stack.pop();
+    if (!scene) return null;
+
     scene.unloadScene();
 
     // Tell the new current scene it's being resumed
@@ -112,13 +114,13 @@ gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {
             var scene = this._stack.pop();
-            scene.unloadScene();
+            if (scene) scene.unloadScene();
         }
     } else {
         // Unload the current scene
         if (this._stack.length !== 0) {
             var scene = this._stack.pop();
-            scene.unloadScene();
+            if (scene) scene.unloadScene();
         }
     }
 

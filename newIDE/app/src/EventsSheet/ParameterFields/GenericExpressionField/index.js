@@ -43,12 +43,7 @@ const styles = {
     fontFamily: '"Lucida Console", Monaco, monospace',
     lineHeight: 1.4,
   },
-  backgroundHighlighting: {
-    marginTop: 13, //Properly align with the text field
-    paddingLeft: 12,
-    paddingRight: 12,
-  },
-  backgroundHighlightingWithDescription: {
+  backgroundHighlightingWithFloatingLabel: {
     marginTop: 29, //Properly align with the text field
     paddingLeft: 12,
     paddingRight: 12,
@@ -58,7 +53,7 @@ const styles = {
     paddingLeft: 0,
     paddingRight: 0,
   },
-  backgroundHighlightingInlineWithDescription: {
+  backgroundHighlightingInlineWithFloatingLabel: {
     marginTop: 22, //Properly align with the text field
     paddingLeft: 0,
     paddingRight: 0,
@@ -83,9 +78,9 @@ type Props = {|
 |};
 
 export default class ExpressionField extends React.Component<Props, State> {
-  _field: ?any = null;
-  _fieldElement: ?any = null;
-  _inputElement = null;
+  _field: ?SemiControlledTextField = null;
+  _fieldElement: ?Element = null;
+  _inputElement: ?HTMLInputElement = null;
 
   state = {
     popoverOpen: false,
@@ -99,7 +94,10 @@ export default class ExpressionField extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this._field) {
-      this._fieldElement = ReactDOM.findDOMNode(this._field);
+      const node = ReactDOM.findDOMNode(this._field);
+      if (node instanceof Element) {
+        this._fieldElement = node;
+      }
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
   }
@@ -269,7 +267,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
-      : undefined;
+      : this.props.isInline
+      ? undefined
+      : '-'; // We're using multiLine TextField, which does not support having no label.
     const longDescription = parameterMetadata
       ? parameterMetadata.getLongDescription()
       : undefined;
@@ -284,12 +284,17 @@ export default class ExpressionField extends React.Component<Props, State> {
     };
 
     const backgroundHighlightingStyle = this.props.isInline
-      ? description
-        ? styles.backgroundHighlightingInlineWithDescription
+      ? // An inline GenericExpressionField is shown with a TextField
+        // with variant "standard", and no margins. The label is shown
+        // only if provided (description), so we need to adapt the margins
+        // of the background
+        description
+        ? styles.backgroundHighlightingInlineWithFloatingLabel
         : styles.backgroundHighlightingInline
-      : description
-      ? styles.backgroundHighlightingWithDescription
-      : styles.backgroundHighlighting;
+      : // A non-inline GenericExpressionField is shown with a TextField
+        // with variant "filled". As we're using a *multiLine* field, it
+        // always put space for the label, even if not provided.
+        styles.backgroundHighlightingWithFloatingLabel;
 
     return (
       <React.Fragment>

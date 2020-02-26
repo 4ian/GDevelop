@@ -1,13 +1,15 @@
 // @flow
 import { formatExpressionCall } from './FormatExpressionCall';
 import {
-  enumerateExpressions,
   filterExpressions,
+  enumerateFreeExpressions,
+  enumerateBehaviorExpressions,
+  enumerateObjectExpressions,
 } from '../../../InstructionOrExpression/EnumerateExpressions';
 
-describe('HelpButton', () => {
+describe('FormatExpressionCall', () => {
   it('properly format a free function, with one or more arguments', () => {
-    const { freeExpressions } = enumerateExpressions('number');
+    const freeExpressions = enumerateFreeExpressions('number');
     const countExpression = filterExpressions(freeExpressions, 'Count')[0];
     expect(formatExpressionCall(countExpression, ['MyObject'])).toBe(
       'Count(MyObject)'
@@ -20,7 +22,7 @@ describe('HelpButton', () => {
   });
 
   it('properly format a free function, with "code-only" parameters', () => {
-    const { freeExpressions } = enumerateExpressions('number');
+    const freeExpressions = enumerateFreeExpressions('number');
     const cameraHeightExpression = filterExpressions(
       freeExpressions,
       'CameraHeight'
@@ -31,32 +33,38 @@ describe('HelpButton', () => {
   });
 
   it('properly format an object function', () => {
-    const { objectsExpressions } = enumerateExpressions('number');
+    const objectsExpressions = enumerateObjectExpressions('number', 'Sprite');
     const variableStringExpression = filterExpressions(
       objectsExpressions,
       'Variable'
     )[0];
+    expect(variableStringExpression).not.toBeUndefined();
     expect(
       formatExpressionCall(variableStringExpression, ['MyObject', 'Variable1'])
     ).toBe('MyObject.Variable(Variable1)');
   });
 
   it('properly format an object function with an argument', () => {
-    const { objectsExpressions } = enumerateExpressions('number');
+    const objectsExpressions = enumerateObjectExpressions('number', 'Sprite');
     const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
+    expect(pointXExpression).not.toBeUndefined();
     expect(
-      formatExpressionCall(pointXExpression, ['MyObject', 'MyPoint'])
-    ).toBe('MyObject.PointX(MyPoint)');
+      formatExpressionCall(pointXExpression, ['MyObject', '"MyPoint"'])
+    ).toBe('MyObject.PointX("MyPoint")');
   });
 
   it('properly format an object behavior function', () => {
-    const { behaviorsExpressions } = enumerateExpressions('number');
-    const variableStringExpression = filterExpressions(
+    const behaviorsExpressions = enumerateBehaviorExpressions(
+      'number',
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
+    const jumpSpeedExpression = filterExpressions(
       behaviorsExpressions,
       'JumpSpeed'
     )[0];
+    expect(jumpSpeedExpression).not.toBeUndefined();
     expect(
-      formatExpressionCall(variableStringExpression, [
+      formatExpressionCall(jumpSpeedExpression, [
         'MyObject',
         'PlatformerObject',
       ])

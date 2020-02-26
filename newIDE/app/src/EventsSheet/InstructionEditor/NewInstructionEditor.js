@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
-  enumerateObjectInstructions,
+  enumerateObjectAndBehaviorsInstructions,
   enumerateInstructions,
   getObjectParameterIndex,
 } from '../../InstructionOrExpression/EnumerateInstructions';
@@ -89,7 +89,7 @@ export const useNewInstructionEditor = ({
     discardInstructionTypeIfNotInObjectInstructions: boolean
   ): NewInstructionEditorState => {
     const chosenObjectInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateObjectInstructions(
+      enumerateObjectAndBehaviorsInstructions(
         isCondition,
         globalObjectsContainer,
         objectsContainer,

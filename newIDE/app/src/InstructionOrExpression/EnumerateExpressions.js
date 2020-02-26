@@ -3,26 +3,36 @@ import {
   type EnumeratedInstructionOrExpressionMetadata,
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata.js';
+import { mapVector } from '../Utils/MapFor';
+import flatten from 'lodash/flatten';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
 
-const enumerateExtensionExpressions = (
+const getExtensionPrefix = (extension: gdPlatformExtension): string => {
+  const allObjectsTypes = extension.getExtensionObjectsTypes();
+  const allBehaviorsTypes = extension.getBehaviorsTypes();
+
+  if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
+    return (
+      (extension.getName() === 'BuiltinObject'
+        ? 'Common expressions for all objects'
+        : extension.getFullName()) + GROUP_DELIMITER
+    );
+  }
+
+  return '';
+};
+
+const enumerateExpressionMetadataMap = (
   prefix: string,
   expressions: gdMapStringExpressionMetadata,
   scope: InstructionOrExpressionScope
 ): Array<EnumeratedInstructionOrExpressionMetadata> => {
-  const allExpressions = [];
-
-  //Get the map containing the metadata of the expression provided by the extension...
-  var expressionsTypes = expressions.keys();
-
-  //... and add each instruction
-  for (var j = 0; j < expressionsTypes.size(); ++j) {
-    var exprMetadata = expressions.get(expressionsTypes.get(j));
+  return mapVector(expressions.keys(), expressionType => {
+    const exprMetadata = expressions.get(expressionType);
     if (!exprMetadata.isShown()) {
-      //Skip hidden expressions
-      continue;
+      return null; // Skip hidden expressions
     }
 
     var parameters = [];
@@ -34,111 +44,157 @@ const enumerateExtensionExpressions = (
       parameters.push(exprMetadata.getParameter(i));
     }
 
-    const displayedName = exprMetadata.getFullName();
-    const groupName = exprMetadata.getGroup();
-    const iconFilename = exprMetadata.getSmallIconFilename();
-    const fullGroupName = prefix + groupName;
-
-    allExpressions.push({
-      type: expressionsTypes.get(j),
-      name: expressionsTypes.get(j),
-      displayedName,
-      fullGroupName,
-      iconFilename,
+    return {
+      type: expressionType,
+      name: expressionType,
+      displayedName: exprMetadata.getFullName(),
+      fullGroupName: prefix + exprMetadata.getGroup(),
+      iconFilename: exprMetadata.getSmallIconFilename(),
       metadata: exprMetadata,
       parameters: parameters,
       scope,
       isPrivate: exprMetadata.isPrivate(),
-    });
-  }
-
-  return allExpressions;
+    };
+  }).filter(Boolean);
 };
 
-export const enumerateExpressions = (type: string) => {
-  const freeExpressions = [];
+/** Enumerate all the free expressions available. */
+export const enumerateFreeExpressions = (
+  type: string
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
+  const allExtensions = gd
+    .asPlatform(gd.JsPlatform.get())
+    .getAllPlatformExtensions();
+
+  return flatten(
+    mapVector(allExtensions, extension => {
+      const prefix = getExtensionPrefix(extension);
+      return enumerateExpressionMetadataMap(
+        prefix,
+        type === 'string'
+          ? extension.getAllStrExpressions()
+          : extension.getAllExpressions(),
+        {
+          objectMetadata: undefined,
+          behaviorMetadata: undefined,
+        }
+      );
+    })
+  );
+};
+
+/** Enumerate the expressions available for the given object type. */
+export const enumerateObjectExpressions = (
+  type: string,
+  objectType: string
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
+  const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
+    gd.JsPlatform.get(),
+    objectType
+  );
+  const extension = extensionAndObjectMetadata.getExtension();
+  const objectMetadata = extensionAndObjectMetadata.getMetadata();
+  const scope = { objectMetadata };
+
+  let objectsExpressions = enumerateExpressionMetadataMap(
+    '',
+    type === 'string'
+      ? extension.getAllStrExpressionsForObject(objectType)
+      : extension.getAllExpressionsForObject(objectType),
+    scope
+  );
+
+  const baseObjectType = ''; /* An empty string means the base object */
+  if (objectType !== baseObjectType) {
+    const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
+      gd.JsPlatform.get(),
+      baseObjectType
+    );
+    const extension = extensionAndObjectMetadata.getExtension();
+
+    objectsExpressions = [
+      ...objectsExpressions,
+      ...enumerateExpressionMetadataMap(
+        '',
+        type === 'string'
+          ? extension.getAllStrExpressionsForObject(baseObjectType)
+          : extension.getAllExpressionsForObject(baseObjectType),
+        scope
+      ),
+    ];
+  }
+
+  return objectsExpressions;
+};
+
+/** Enumerate the expressions available for the given behavior type. */
+export const enumerateBehaviorExpressions = (
+  type: string,
+  behaviorType: string
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
+  const extensionAndBehaviorMetadata = gd.MetadataProvider.getExtensionAndBehaviorMetadata(
+    gd.JsPlatform.get(),
+    behaviorType
+  );
+  const extension = extensionAndBehaviorMetadata.getExtension();
+  const behaviorMetadata = extensionAndBehaviorMetadata.getMetadata();
+  const scope = { behaviorMetadata };
+
+  return enumerateExpressionMetadataMap(
+    '',
+    type === 'string'
+      ? extension.getAllStrExpressionsForBehavior(behaviorType)
+      : extension.getAllExpressionsForBehavior(behaviorType),
+    scope
+  );
+};
+
+/** Enumerate all the expressions available. */
+export const enumerateAllExpressions = (
+  type: string
+): Array<EnumeratedInstructionOrExpressionMetadata> => {
+  const freeExpressions = enumerateFreeExpressions(type);
   const objectsExpressions = [];
   const behaviorsExpressions = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
-  for (var i = 0; i < allExtensions.size(); ++i) {
-    var extension = allExtensions.get(i);
-    var allObjectsTypes = extension.getExtensionObjectsTypes();
-    var allBehaviorsTypes = extension.getBehaviorsTypes();
-
-    let prefix = '';
-    if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix =
-        extension.getName() === 'BuiltinObject'
-          ? 'Common expressions for all objects'
-          : extension.getFullName();
-      prefix += GROUP_DELIMITER;
-    }
-
-    //Check which type of expression we want to autocomplete.
-    var allFreeExpressionsGetter = extension.getAllExpressions;
-    var allObjectExpressionsGetter = extension.getAllExpressionsForObject;
-    var allBehaviorExpressionsGetter = extension.getAllExpressionsForBehavior;
-    if (type === 'string') {
-      allFreeExpressionsGetter = extension.getAllStrExpressions;
-      allObjectExpressionsGetter = extension.getAllStrExpressionsForObject;
-      allBehaviorExpressionsGetter = extension.getAllStrExpressionsForBehavior;
-    }
-
-    //Free expressions
-    freeExpressions.push.apply(
-      freeExpressions,
-      enumerateExtensionExpressions(
-        prefix,
-        allFreeExpressionsGetter.call(extension),
-        {
-          objectMetadata: undefined,
-          behaviorMetadata: undefined,
-        }
-      )
-    );
+  mapVector(allExtensions, extension => {
+    const prefix = getExtensionPrefix(extension);
 
     //Objects expressions:
-    for (var j = 0; j < allObjectsTypes.size(); ++j) {
-      const objectType = allObjectsTypes.get(j);
+    mapVector(extension.getExtensionObjectsTypes(), objectType => {
       const objectMetadata = extension.getObjectMetadata(objectType);
       objectsExpressions.push.apply(
         objectsExpressions,
-        enumerateExtensionExpressions(
+        enumerateExpressionMetadataMap(
           prefix,
-          allObjectExpressionsGetter.call(extension, objectType),
+          type === 'string'
+            ? extension.getAllStrExpressionsForObject(objectType)
+            : extension.getAllExpressionsForObject(objectType),
           { objectMetadata }
         )
       );
-    }
+    });
 
     //Behaviors expressions:
-    for (var k = 0; k < allBehaviorsTypes.size(); ++k) {
-      const behaviorType = allBehaviorsTypes.get(k);
+    mapVector(extension.getBehaviorsTypes(), behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       behaviorsExpressions.push.apply(
         behaviorsExpressions,
-        enumerateExtensionExpressions(
+        enumerateExpressionMetadataMap(
           prefix,
-          allBehaviorExpressionsGetter.call(extension, behaviorType),
+          type === 'string'
+            ? extension.getAllStrExpressionsForBehavior(behaviorType)
+            : extension.getAllExpressionsForBehavior(behaviorType),
           { behaviorMetadata }
         )
       );
-    }
-  }
+    });
+  });
 
-  return {
-    allExpressions: [
-      ...freeExpressions,
-      ...objectsExpressions,
-      ...behaviorsExpressions,
-    ],
-    freeExpressions,
-    objectsExpressions,
-    behaviorsExpressions,
-  };
+  return [...freeExpressions, ...objectsExpressions, ...behaviorsExpressions];
 };
 
 export const filterExpressions = (

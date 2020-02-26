@@ -289,7 +289,7 @@ const orderFirstInstructionsWithoutGroup = (
  * in the given context. This includes instructions for the behaviors
  * attached to the object.
  */
-export const enumerateObjectInstructions = (
+export const enumerateObjectAndBehaviorsInstructions = (
   isCondition: boolean,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,

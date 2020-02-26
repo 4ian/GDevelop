@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { enumerateExpressions } from '../../../InstructionOrExpression/EnumerateExpressions';
+import { enumerateAllExpressions } from '../../../InstructionOrExpression/EnumerateExpressions';
 import InstructionOrExpressionSelector from './index';
 import {
   createTree,
@@ -28,7 +28,7 @@ const style = {
 
 export default class ExpressionSelector extends Component<Props, {||}> {
   instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateExpressions(this.props.expressionType).allExpressions,
+    enumerateAllExpressions(this.props.expressionType),
     this.props.scope
   );
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(

@@ -6,6 +6,7 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import InstancesSelection from './InstancesSelection';
+import PreviewButtons from './PreviewButtons.js';
 
 type Props = {|
   showPreviewButton: boolean,
@@ -44,69 +45,18 @@ export class Toolbar extends PureComponent<Props> {
   render() {
     return (
       <ToolbarGroup lastChild>
-        {this.props.showPreviewButton && (
-          <ElementWithMenu
-            element={
-              <ToolbarIcon
-                onClick={this.props.onPreview}
-                src={
-                  this.props.isPreviewOverride
-                    ? 'res/ribbon_default/previewOverride32.png'
-                    : 'res/ribbon_default/preview32.png'
-                }
-                tooltip={
-                  this.props.isPreviewOverride
-                    ? t`Preview is overridden, right click for more`
-                    : t`Launch a preview of the scene, right click for more`
-                }
-              />
-            }
-            openMenuWithSecondaryClick
-            buildMenuTemplate={() => [
-              {
-                type: 'checkbox',
-                label: this.props.previewFirstSceneName
-                  ? 'Use scene ' +
-                    this.props.previewFirstSceneName +
-                    ' for preview'
-                  : 'Use this scene for preview',
-                checked: this.props.isPreviewOverride,
-                click: () => {
-                  if (!this.props.previewFirstSceneName) {
-                    this.props.setScenePreview();
-                  }
-                  this.props.togglePreviewOverride();
-                },
-              },
-              { type: 'separator' },
-              {
-                label: 'Always use this scene to start the previews',
-                click: () => this.props.setScenePreview(),
-              },
-            ]}
-          />
-        )}
-        {this.props.showNetworkPreviewButton && (
-          <ElementWithMenu
-            element={
-              <ToolbarIcon
-                src="res/ribbon_default/bug32.png"
-                tooltip={t`Advanced preview options (debugger, network preview...)`}
-              />
-            }
-            buildMenuTemplate={() => [
-              {
-                label: 'Network preview (Preview over WiFi/LAN)',
-                click: () => this.props.onNetworkPreview(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Preview with debugger and performance profiler',
-                click: () => this.props.onOpenDebugger(),
-              },
-            ]}
-          />
-        )}
+        <PreviewButtons
+          showPreviewButton={this.props.showPreviewButton}
+          onPreview={this.props.onPreview}
+          previewFirstSceneName={this.props.previewFirstSceneName}
+          setScenePreview={this.props.setScenePreview}
+          isPreviewOverride={this.props.isPreviewOverride}
+          togglePreviewOverride={this.props.togglePreviewOverride}
+          onNetworkPreview={this.props.onNetworkPreview}
+          onOpenDebugger={this.props.onOpenDebugger}
+          showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        />
+
         {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.openObjectsList}

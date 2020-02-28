@@ -113,12 +113,15 @@ export const closeEditorTab = (
   state: EditorTabsState,
   chosenEditorTab: EditorTab
 ): EditorTabsState => {
+  const chosenEditorTabId = state.editors.indexOf(chosenEditorTab);
   return changeCurrentTab(
     {
       ...state,
       editors: state.editors.filter(editorTab => editorTab !== chosenEditorTab),
     },
-    state.currentTab
+    chosenEditorTabId >= state.currentTab
+      ? state.currentTab
+      : state.currentTab - 1
   );
 };
 

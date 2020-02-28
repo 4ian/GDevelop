@@ -99,6 +99,20 @@ export const changeCurrentTab = (
   };
 };
 
+export const newTabIndex = (
+  key: string,
+  editors: Array<EditorTab>
+): number => {
+  let index = 0;
+  for (let editor of editors) {
+    if (editor.key === key ) {
+      return index;
+    }
+    index += 1;
+  }
+  return index;
+};
+
 export const closeAllEditorTabs = (state: EditorTabsState): EditorTabsState => {
   return changeCurrentTab(
     {
@@ -113,12 +127,14 @@ export const closeEditorTab = (
   state: EditorTabsState,
   chosenEditorTab: EditorTab
 ): EditorTabsState => {
+  const key = state.editors[state.currentTab].key;
+  const editors = state.editors.filter(editorTab => editorTab !== chosenEditorTab);
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(editorTab => editorTab !== chosenEditorTab),
+      editors: editors,
     },
-    state.currentTab
+    newTabIndex( key, editors)
   );
 };
 
@@ -126,14 +142,16 @@ export const closeOtherEditorTabs = (
   state: EditorTabsState,
   chosenEditorTab: EditorTab
 ): EditorTabsState => {
+  const key = state.editors[state.currentTab].key;
+  const editors = state.editors.filter(
+    editorTab => !editorTab.closable || editorTab === chosenEditorTab
+  );
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(
-        editorTab => !editorTab.closable || editorTab === chosenEditorTab
-      ),
+      editors: editors,
     },
-    state.currentTab
+    newTabIndex( key, editors)
   );
 };
 
@@ -153,16 +171,18 @@ export const closeProjectTabs = (
   state: EditorTabsState,
   project: ?gdProject
 ) => {
+  const key = state.editors[state.currentTab].key;
+  const editors = state.editors.filter(editorTab => {
+    const editorProject =
+      editorTab.editorRef && editorTab.editorRef.getProject();
+    return !editorProject || editorProject !== project;
+  })
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(editorTab => {
-        const editorProject =
-          editorTab.editorRef && editorTab.editorRef.getProject();
-        return !editorProject || editorProject !== project;
-      }),
+      editors: editors,
     },
-    state.currentTab
+    newTabIndex( key, editors)
   );
 };
 
@@ -179,16 +199,18 @@ export const saveUiSettings = (state: EditorTabsState) => {
 };
 
 export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
+  const key = state.editors[state.currentTab].key;
+  const editors = state.editors.filter(editorTab => {
+    const editorLayout =
+      editorTab.editorRef && editorTab.editorRef.getLayout();
+    return !editorLayout || editorLayout !== layout;
+  });
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(editorTab => {
-        const editorLayout =
-          editorTab.editorRef && editorTab.editorRef.getLayout();
-        return !editorLayout || editorLayout !== layout;
-      }),
+      editors: editors,
     },
-    state.currentTab
+    newTabIndex( key, editors)
   );
 };
 
@@ -196,23 +218,25 @@ export const closeExternalLayoutTabs = (
   state: EditorTabsState,
   externalLayout: gdExternalLayout
 ) => {
+  const key = state.editors[state.currentTab].key;
+  const editors = state.editors.filter(editorTab => {
+    const editor = editorTab.editorRef;
+
+    if (editor instanceof ExternalLayoutEditor) {
+      return (
+        !editor.getExternalLayout() ||
+        editor.getExternalLayout() !== externalLayout
+      );
+    }
+
+    return true;
+  });
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(editorTab => {
-        const editor = editorTab.editorRef;
-
-        if (editor instanceof ExternalLayoutEditor) {
-          return (
-            !editor.getExternalLayout() ||
-            editor.getExternalLayout() !== externalLayout
-          );
-        }
-
-        return true;
-      }),
+      editors: editors,
     },
-    state.currentTab
+    newTabIndex( key, editors)
   );
 };
 
@@ -220,22 +244,24 @@ export const closeExternalEventsTabs = (
   state: EditorTabsState,
   externalEvents: gdExternalEvents
 ) => {
+  const key = state.editors[state.currentTab].key;
+  const editors = state.editors.filter(editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof ExternalEventsEditor) {
+      return (
+        !editor.getExternalEvents() ||
+        editor.getExternalEvents() !== externalEvents
+      );
+    }
+
+    return true;
+  });
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(editorTab => {
-        const editor = editorTab.editorRef;
-        if (editor instanceof ExternalEventsEditor) {
-          return (
-            !editor.getExternalEvents() ||
-            editor.getExternalEvents() !== externalEvents
-          );
-        }
-
-        return true;
-      }),
+      editors: editors,
     },
-    state.currentTab
+    newTabIndex( key, editors)
   );
 };
 
@@ -243,22 +269,24 @@ export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
+  const key = state.editors[state.currentTab].key;
+  const editors = state.editors.filter(editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof EventsFunctionsExtensionEditorWrapper) {
+      return (
+        !editor.getEventsFunctionsExtension() ||
+        editor.getEventsFunctionsExtension() !== eventsFunctionsExtension
+      );
+    }
+
+    return true;
+  });
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(editorTab => {
-        const editor = editorTab.editorRef;
-        if (editor instanceof EventsFunctionsExtensionEditorWrapper) {
-          return (
-            !editor.getEventsFunctionsExtension() ||
-            editor.getEventsFunctionsExtension() !== eventsFunctionsExtension
-          );
-        }
-
-        return true;
-      }),
+      editors: editors,
     },
-    state.currentTab
+    newTabIndex( key, editors)
   );
 };
 

@@ -69,6 +69,9 @@ declare type gdPropertyDescriptor = gdEmscriptenObject;
 declare type gdNamedPropertyDescriptor = gdEmscriptenObject;
 declare type gdNamedPropertyDescriptorsList = gdEmscriptenObject;
 
+declare type gdExpressionNode = gdEmscriptenObject;
+declare type gdUniquePtrExpressionNode = gdEmscriptenObject;
+
 declare type gdjsExporter = gdEmscriptenObject;
 
 declare type gdEventsContext = gdEmscriptenObject;

@@ -9,6 +9,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { MarkdownText } from './MarkdownText';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ListItem from '@material-ui/core/ListItem';
+import { computeTextFieldStyleProps } from './TextField';
 
 export type DataSource = Array<
   | {|
@@ -207,7 +208,7 @@ export default class SemiControlledAutoComplete extends React.Component<
       if (this.props.errorText) return this.props.errorText.props.id;
       else if (this.props.hintText && typeof this.props.hintText === 'string')
         return this.props.hintText;
-      else return '';
+      else return null;
     };
 
     return (
@@ -237,7 +238,7 @@ export default class SemiControlledAutoComplete extends React.Component<
           return (
             <TextField
               {...params}
-              margin={this.props.margin}
+              {...computeTextFieldStyleProps(this.props)}
               style={{ ...this.props.textFieldStyle }}
               label={this.props.floatingLabelText}
               inputRef={this._input}

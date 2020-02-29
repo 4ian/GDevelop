@@ -36,7 +36,7 @@ export const Column = props => (
       alignItems: props.alignItems || 'stretch',
       justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
-      overflowY: props.scrollY ? 'scroll' ? undefined,
+      overflowY: props.scrollY ? 'scroll' : undefined,
     }}
   >
     {props.children}

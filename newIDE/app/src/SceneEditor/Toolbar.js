@@ -6,6 +6,7 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import InstancesSelection from './InstancesSelection';
+import PreviewButtons from '../MainFrame/Toolbar/PreviewButtons.js';
 
 type Props = {|
   showPreviewButton: boolean,
@@ -44,6 +45,18 @@ export class Toolbar extends PureComponent<Props> {
   render() {
     return (
       <ToolbarGroup lastChild>
+        <PreviewButtons
+          showPreviewButton={this.props.showPreviewButton}
+          onPreview={this.props.onPreview}
+          previewFirstSceneName={this.props.previewFirstSceneName}
+          setScenePreview={this.props.setScenePreview}
+          isPreviewOverride={this.props.isPreviewOverride}
+          togglePreviewOverride={this.props.togglePreviewOverride}
+          onNetworkPreview={this.props.onNetworkPreview}
+          onOpenDebugger={this.props.onOpenDebugger}
+          showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        />
+
         {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.openObjectsList}

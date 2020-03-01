@@ -1,14 +1,13 @@
 // @flow
 import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
-import { Toolbar, ToolbarGroup } from '../../UI/Toolbar';
-import ToolbarIcon from '../../UI/ToolbarIcon';
-import ToolbarSeparator from '../../UI/ToolbarSeparator';
-import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
-import Window from '../../Utils/Window';
+import { Toolbar, ToolbarGroup } from '../UI/Toolbar';
+import ToolbarIcon from '../UI/ToolbarIcon';
+import ToolbarSeparator from '../UI/ToolbarSeparator';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import Window from '../Utils/Window';
 import { I18n } from '@lingui/react';
-import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import PreviewButtons from './PreviewButtons';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {
   showProjectIcons: boolean,
@@ -18,14 +17,6 @@ type Props = {
   simulateUpdateDownloaded: ?() => void,
   simulateUpdateAvailable: ?() => void,
   exportProject: Function,
-
-  showPreviewButton: boolean,
-  onPreview: () => void,
-  isPreviewOverride: boolean,
-  togglePreviewOverride: () => void,
-  setScenePreview: () => void,
-  previewFirstSceneName: string,
-  showNetworkPreviewButton: boolean,
 };
 
 type State = {
@@ -101,24 +92,6 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
                   )}
                   <ToolbarSeparator />
                 </ToolbarGroup>
-                {this.props.hasProject ||
-                  this.props.isPreviewOverride(
-                    <ToolbarGroup>
-                      <PreviewButtons
-                        showPreviewButton={this.props.showPreviewButton}
-                        onPreview={this.props.onPreview}
-                        previewFirstSceneName={this.props.previewFirstSceneName}
-                        setScenePreview={this.props.setScenePreview}
-                        isPreviewOverride={this.props.isPreviewOverride}
-                        togglePreviewOverride={this.props.togglePreviewOverride}
-                        onNetworkPreview={this.props.onNetworkPreview}
-                        onOpenDebugger={this.props.onOpenDebugger}
-                        showNetworkPreviewButton={
-                          this.props.showNetworkPreviewButton
-                        }
-                      />
-                    </ToolbarGroup>
-                  )}
                 {this.state.editorToolbar || <ToolbarGroup />}
               </Toolbar>
             )}

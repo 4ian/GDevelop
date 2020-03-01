@@ -88,7 +88,12 @@ struct ExpressionNode {
   virtual void Visit(ExpressionParser2NodeWorker &worker){};
 
   std::unique_ptr<ExpressionParserDiagnostic> diagnostic;
-  ExpressionParserLocation location;
+  ExpressionParserLocation location;  ///< The location of the entire node. Some
+                                      ///nodes might have other locations stored
+                                      ///inside them. For example, a function
+                                      ///can store the position of the object
+                                      ///name, the dot, the function name,
+                                      ///etc...
 };
 
 struct SubExpressionNode : public ExpressionNode {
@@ -197,6 +202,8 @@ struct VariableNode : public ExpressionNode {
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>
       child;  // Can be nullptr if no accessor
+
+  ExpressionParserLocation nameLocation;
 };
 
 /**
@@ -212,6 +219,8 @@ struct VariableAccessorNode
   };
 
   gd::String name;
+  ExpressionParserLocation nameLocation;
+  ExpressionParserLocation dotLocation;
 };
 
 /**
@@ -286,14 +295,29 @@ struct ObjectFunctionNameNode
                     // supported by gd::ParameterMetadata::IsExpression or
                     // "unknown") was stored in ExpressionMetadata.
   gd::String objectName;
-  gd::String objectFunctionOrBehaviorName; ///< Behavior name if `behaviorFunctionName` is not empty.
-  gd::String behaviorFunctionName; ///< If empty, then objectFunctionOrBehaviorName is filled with the behavior name.
+  gd::String objectFunctionOrBehaviorName;  ///< Behavior name if
+                                            ///`behaviorFunctionName` is not
+                                            ///empty.
+  gd::String behaviorFunctionName;          ///< If empty, then
+                                    ///objectFunctionOrBehaviorName is filled
+                                    ///with the behavior name.
 
-  ExpressionParserLocation objectNameLocation; ///< Location of the object name.
-  ExpressionParserLocation objectNameDotLocation; ///< Location of the "." after the object name.
-  ExpressionParserLocation objectFunctionOrBehaviorNameLocation; ///< Location of object function name or behavior name.
-  ExpressionParserLocation behaviorNameNamespaceSeparatorLocation; ///< Location of the "::" separator, if any.
-  ExpressionParserLocation behaviorFunctionNameLocation; ///< Location of the behavior function name, if any.
+  ExpressionParserLocation
+      objectNameLocation;  ///< Location of the object name.
+  ExpressionParserLocation
+      objectNameDotLocation;  ///< Location of the "." after the object name.
+  ExpressionParserLocation objectFunctionOrBehaviorNameLocation;  ///< Location
+                                                                  ///of object
+                                                                  ///function
+                                                                  ///name or
+                                                                  ///behavior
+                                                                  ///name.
+  ExpressionParserLocation
+      behaviorNameNamespaceSeparatorLocation;  ///< Location of the "::"
+                                               ///separator, if any.
+  ExpressionParserLocation behaviorFunctionNameLocation;  ///< Location of the
+                                                          ///behavior function
+                                                          ///name, if any.
 };
 
 /**
@@ -348,12 +372,19 @@ struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
   const ExpressionMetadata &expressionMetadata;
   gd::String functionName;
 
-  ExpressionParserLocation functionNameLocation; ///< Location of the function name.
-  ExpressionParserLocation objectNameLocation; ///< Location of the object name, if any.
-  ExpressionParserLocation objectNameDotLocation; ///< Location of the "." after the object name.
-  ExpressionParserLocation behaviorNameLocation; ///< Location of the behavior name, if any.
-  ExpressionParserLocation behaviorNameNamespaceSeparatorLocation; ///< Location of the "::" separator, if any.
-  ExpressionParserLocation openingParenthesisLocation; ///< Location of the "(".
+  ExpressionParserLocation
+      functionNameLocation;  ///< Location of the function name.
+  ExpressionParserLocation
+      objectNameLocation;  ///< Location of the object name, if any.
+  ExpressionParserLocation
+      objectNameDotLocation;  ///< Location of the "." after the object name.
+  ExpressionParserLocation
+      behaviorNameLocation;  ///< Location of the behavior name, if any.
+  ExpressionParserLocation
+      behaviorNameNamespaceSeparatorLocation;  ///< Location of the "::"
+                                               ///separator, if any.
+  ExpressionParserLocation
+      openingParenthesisLocation;  ///< Location of the "(".
 };
 
 /**

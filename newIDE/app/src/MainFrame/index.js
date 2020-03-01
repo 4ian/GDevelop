@@ -5,7 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
-import Toolbar from './Toolbar';
+import Toolbar from './Toolbar/index';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -954,32 +954,39 @@ class MainFrame extends React.Component<Props, State> {
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
-              isPreviewOverride={this.state.isPreviewOverride}
-              togglePreviewOverride={this.togglePreviewOverride}
-              previewFirstSceneName={this.state.previewFirstSceneName}
-              setScenePreview={() => {
-                this._setLayoutForPreview(name);
-              }}
-              onPreview={(project, layout, options) => {
-                this._launchLayoutPreview(project, layout, options);
-                const { currentFileMetadata } = this.state;
-                if (
-                  values.autosaveOnPreview &&
-                  storageProviderOperations.onAutoSaveProject &&
-                  currentFileMetadata
-                ) {
-                  storageProviderOperations.onAutoSaveProject(
-                    project,
-                    currentFileMetadata
-                  );
-                }
-              }}
-              showPreviewButton={!!this.props.renderPreviewLauncher}
-              showNetworkPreviewButton={
-                this._previewLauncher &&
-                this._previewLauncher.canDoNetworkPreview()
-              }
-              onOpenDebugger={this.openDebugger}
+              /*
+              TODO bouh
+              To remove after moving preview buttons from toolbar for each editor inside the main toolbar in MainFrame
+              See FIXME bouh in this file
+               */
+
+              // isPreviewOverride={this.state.isPreviewOverride}
+              // togglePreviewOverride={this.togglePreviewOverride}
+              // previewFirstSceneName={this.state.previewFirstSceneName}
+              // setScenePreview={() => {
+              //   this._setLayoutForPreview(name);
+              // }}
+              // onPreview={(project, layout, options) => {
+              //   this._launchLayoutPreview(project, layout, options);
+              //   const { currentFileMetadata } = this.state;
+              //   if (
+              //     values.autosaveOnPreview &&
+              //     storageProviderOperations.onAutoSaveProject &&
+              //     currentFileMetadata
+              //   ) {
+              //     storageProviderOperations.onAutoSaveProject(
+              //       project,
+              //       currentFileMetadata
+              //     );
+              //   }
+              // }}
+              // showPreviewButton={!!this.props.renderPreviewLauncher}
+              // showNetworkPreviewButton={
+              //   this._previewLauncher &&
+              //   this._previewLauncher.canDoNetworkPreview()
+              // }
+              // onOpenDebugger={this.openDebugger}
+
               onEditObject={this.props.onEditObject}
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
@@ -1826,6 +1833,40 @@ class MainFrame extends React.Component<Props, State> {
           requestUpdate={this.props.requestUpdate}
           simulateUpdateDownloaded={this.simulateUpdateDownloaded}
           simulateUpdateAvailable={this.simulateUpdateAvailable}
+        
+          isPreviewOverride={this.state.isPreviewOverride}
+          togglePreviewOverride={this.togglePreviewOverride}
+          previewFirstSceneName={this.state.previewFirstSceneName}
+
+          /*
+          TODO Bouh
+          - Disable the previewButtons is no project are open or if override dosent exist.
+          - Enable previewButtons everywhere in the app if override exist.
+          - Enable the previewButtons only in SceneEditor/EventSheet/ExternalLayout always.
+          FIXME bouh, name, values, storageProviderOperations
+          */
+          setScenePreview={() => {
+            this._setLayoutForPreview(name);
+          }}
+          onPreview={(project, layout, options) => {
+            this._launchLayoutPreview(project, layout, options);
+            const { currentFileMetadata } = this.state;
+            if (
+              values.autosaveOnPreview &&
+              storageProviderOperations.onAutoSaveProject &&
+              currentFileMetadata
+            ) {
+              storageProviderOperations.onAutoSaveProject(
+                project,
+                currentFileMetadata
+              );
+            }
+          }}
+          showPreviewButton={!!this.props.renderPreviewLauncher}
+          showNetworkPreviewButton={
+            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
+          }
+          onOpenDebugger={this.openDebugger}
         />
         <ClosableTabs hideLabels={!!this.props.integratedEditor}>
           {getEditors(this.state.editorTabs).map((editorTab, id) => {

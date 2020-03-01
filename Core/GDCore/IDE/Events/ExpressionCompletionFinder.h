@@ -60,8 +60,8 @@ struct ExpressionCompletionDescription {
    * \brief Create a completion for a variable with the given prefix
    */
   static ExpressionCompletionDescription ForVariable(
-      const gd::String& prefix_) {
-    return ExpressionCompletionDescription(Variable, "", prefix_);
+      const gd::String& type_, const gd::String& prefix_) {
+    return ExpressionCompletionDescription(Variable, type_, prefix_);
   }
   /**
    * \brief Create a completion for an expression (free, object or behavior
@@ -113,6 +113,25 @@ struct ExpressionCompletionDescription {
    */
   const gd::String& GetBehaviorName() const { return behaviorName; }
 
+  /**
+   * \brief Set if the completion description is informative, i.e: it's not used
+   * to
+   * complete anything. Rather, it should display information about what is
+   * described by the completion.
+   */
+  ExpressionCompletionDescription& SetIsInformative(bool isInformative_) {
+    isInformative = isInformative_;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the completion description is informative, i.e: it's not
+   * used to
+   * complete anything. Rather, it should display information about what is
+   * described by the completion.
+   */
+  bool IsInformative() const { return isInformative; }
+
   /** Default constructor, only to be used by Emscripten bindings. */
   ExpressionCompletionDescription() : completionKind(Object){};
 
@@ -126,13 +145,15 @@ struct ExpressionCompletionDescription {
         type(type_),
         prefix(prefix_),
         objectName(objectName_),
-        behaviorName(behaviorName_) {}
+        behaviorName(behaviorName_),
+        isInformative(false) {}
 
   CompletionKind completionKind;
   gd::String type;
   gd::String prefix;
   gd::String objectName;
   gd::String behaviorName;
+  bool isInformative;
 };
 
 /**
@@ -142,7 +163,8 @@ std::ostream& operator<<(std::ostream& os,
                          ExpressionCompletionDescription const& value) {
   os << "{ " << value.GetCompletionKind() << ", " << value.GetType() << ", "
      << value.GetPrefix() << ", " << value.GetObjectName() << ", "
-     << value.GetBehaviorName() << " }";
+     << value.GetBehaviorName() << ", "
+     << (value.IsInformative() ? "informative" : "non-informative") << " }";
   return os;
 }
 
@@ -159,16 +181,18 @@ class GD_CORE_API ExpressionCompletionFinder
    * and returns completions for it.
    */
   static std::vector<ExpressionCompletionDescription>
-  GetCompletionDescriptionsFor(gd::ExpressionNode& node, size_t location) {
+  GetCompletionDescriptionsFor(gd::ExpressionNode& node,
+                               size_t searchedPosition) {
     gd::ExpressionNode* nodeAtLocation =
-        gd::ExpressionNodeLocationFinder::GetNodeAtPosition(node, location);
+        gd::ExpressionNodeLocationFinder::GetNodeAtPosition(node,
+                                                            searchedPosition);
 
     if (nodeAtLocation == nullptr) {
       std::vector<ExpressionCompletionDescription> emptyCompletions;
       return emptyCompletions;
     }
 
-    gd::ExpressionCompletionFinder autocompletionProvider;
+    gd::ExpressionCompletionFinder autocompletionProvider(searchedPosition);
     nodeAtLocation->Visit(autocompletionProvider);
     return autocompletionProvider.GetCompletionDescriptions();
   }
@@ -180,6 +204,8 @@ class GD_CORE_API ExpressionCompletionFinder
   GetCompletionDescriptions() {
     return completions;
   };
+
+  virtual ~ExpressionCompletionFinder(){};
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
@@ -205,7 +231,7 @@ class GD_CORE_API ExpressionCompletionFinder
   }
   void OnVisitVariableNode(VariableNode& node) override {
     completions.push_back(
-        ExpressionCompletionDescription::ForVariable(node.name));
+        ExpressionCompletionDescription::ForVariable(node.type, node.name));
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     // No completions
@@ -228,22 +254,85 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    if (!node.behaviorFunctionName.empty()) {
-      completions.push_back(ExpressionCompletionDescription::ForExpression(
-          node.type,
-          node.behaviorFunctionName,
-          node.objectName,
-          node.objectFunctionOrBehaviorName));
+    if (!node.behaviorFunctionName.empty() ||
+        node.behaviorNameNamespaceSeparatorLocation.IsValid()) {
+      // Behavior function (or behavior function being written, with the
+      // function name missing)
+      if (IsCaretOn(node.objectNameLocation)) {
+        completions.push_back(
+            ExpressionCompletionDescription::ForObject(node.objectName));
+      } else if (IsCaretOn(node.objectNameDotLocation) ||
+                 IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
+        completions.push_back(ExpressionCompletionDescription::ForBehavior(
+            node.objectFunctionOrBehaviorName, node.objectName));
+      } else if (IsCaretOn(node.behaviorNameNamespaceSeparatorLocation) ||
+                 IsCaretOn(node.behaviorFunctionNameLocation)) {
+        completions.push_back(ExpressionCompletionDescription::ForExpression(
+            node.type,
+            node.behaviorFunctionName,
+            node.objectName,
+            node.objectFunctionOrBehaviorName));
+      }
     } else {
-      completions.push_back(ExpressionCompletionDescription::ForBehavior(
-          node.objectFunctionOrBehaviorName, node.objectName));
-      completions.push_back(ExpressionCompletionDescription::ForExpression(
-          node.type, node.objectFunctionOrBehaviorName, node.objectName));
+      // Object function or behavior name
+      if (IsCaretOn(node.objectNameLocation)) {
+        completions.push_back(
+            ExpressionCompletionDescription::ForObject(node.objectName));
+      } else if (IsCaretOn(node.objectNameDotLocation) ||
+                 IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
+        completions.push_back(ExpressionCompletionDescription::ForBehavior(
+            node.objectFunctionOrBehaviorName, node.objectName));
+        completions.push_back(ExpressionCompletionDescription::ForExpression(
+            node.type, node.objectFunctionOrBehaviorName, node.objectName));
+      }
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    completions.push_back(ExpressionCompletionDescription::ForExpression(
-        node.type, node.functionName, node.objectName, node.behaviorName));
+    if (!node.behaviorName.empty()) {
+      // Behavior function
+      if (IsCaretOn(node.objectNameLocation)) {
+        completions.push_back(
+            ExpressionCompletionDescription::ForObject(node.objectName));
+      } else if (IsCaretOn(node.objectNameDotLocation) ||
+                 IsCaretOn(node.behaviorNameLocation)) {
+        completions.push_back(ExpressionCompletionDescription::ForBehavior(
+            node.behaviorName, node.objectName));
+      } else {
+        completions.push_back(
+            ExpressionCompletionDescription::ForExpression(node.type,
+                                                           node.functionName,
+                                                           node.objectName,
+                                                           node.behaviorName)
+                .SetIsInformative(IsCaretOn(node.openingParenthesisLocation)));
+      }
+    } else if (!node.objectName.empty()) {
+      // Object function
+      if (IsCaretOn(node.objectNameLocation)) {
+        completions.push_back(
+            ExpressionCompletionDescription::ForObject(node.objectName));
+      } else {
+        // Add completions for behaviors, because we could imagine that the user
+        // wants to move from an object function to a behavior function, and so
+        // need behavior completions. Do this unless we're on the parenthesis
+        // (at which point we're only showing informative message about the
+        // function).
+        if (!IsCaretOn(node.openingParenthesisLocation)) {
+          completions.push_back(ExpressionCompletionDescription::ForBehavior(
+              node.functionName, node.objectName));
+        }
+
+        completions.push_back(
+            ExpressionCompletionDescription::ForExpression(
+                node.type, node.functionName, node.objectName)
+                .SetIsInformative(IsCaretOn(node.openingParenthesisLocation)));
+      }
+    } else {
+      // Free function
+      completions.push_back(
+          ExpressionCompletionDescription::ForExpression(node.type,
+                                                         node.functionName)
+              .SetIsInformative(IsCaretOn(node.openingParenthesisLocation)));
+    }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
     completions.push_back(
@@ -253,7 +342,18 @@ class GD_CORE_API ExpressionCompletionFinder
   }
 
  private:
+  bool IsCaretOn(const ExpressionParserLocation& location,
+                 bool inclusive = false) {
+    return (location.GetStartPosition() <= searchedPosition &&
+            ((!inclusive && searchedPosition < location.GetEndPosition()) ||
+             (inclusive && searchedPosition <= location.GetEndPosition())));
+  }
+
+  ExpressionCompletionFinder(size_t searchedPosition_)
+      : searchedPosition(searchedPosition_){};
+
   std::vector<ExpressionCompletionDescription> completions;
+  size_t searchedPosition;
 };
 
 }  // namespace gd

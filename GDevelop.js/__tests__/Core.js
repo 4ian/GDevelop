@@ -2822,8 +2822,8 @@ describe('libGD.js', function() {
       expressionWithCaret,
       onCompletionDescription
     ) {
-      const caretLocation = expressionWithCaret.indexOf('|');
-      if (caretLocation === -1) {
+      const caretPosition = expressionWithCaret.indexOf('|');
+      if (caretPosition === -1) {
         throw new Error(
           'Caret location not found in expression: ' + expressionWithCaret
         );
@@ -2838,7 +2838,8 @@ describe('libGD.js', function() {
       const expressionNode = parser.parseExpression(type, expression).get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         expressionNode,
-        caretLocation
+        // We're looking for completion for the character just before the caret.
+        Math.max(0, caretPosition - 1)
       );
 
       for (let i = 0; i < completionDescriptions.size(); i++) {
@@ -2853,19 +2854,19 @@ describe('libGD.js', function() {
     it('completes an empty expression', function() {
       expect.assertions(6);
       testCompletions('number', '|', (completionDescription, index) => {
-          if (index === 0) {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Object
-            );
-            expect(completionDescription.getType()).toBe('');
-            expect(completionDescription.getPrefix()).toBe('');
-          } else {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Expression
-            );
-            expect(completionDescription.getType()).toBe('number');
-            expect(completionDescription.getPrefix()).toBe('');
-          }
+        if (index === 0) {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Object
+          );
+          expect(completionDescription.getType()).toBe('');
+          expect(completionDescription.getPrefix()).toBe('');
+        } else {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Expression
+          );
+          expect(completionDescription.getType()).toBe('number');
+          expect(completionDescription.getPrefix()).toBe('');
+        }
       });
     });
 
@@ -2968,6 +2969,8 @@ describe('libGD.js', function() {
         }
       );
     });
+
+    // More tests are done in C++ for ExpressionCompletionFinder.
   });
 
   describe('gd.Vector2f', function() {

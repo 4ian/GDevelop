@@ -331,7 +331,7 @@ class GD_CORE_API ExpressionParser2 {
       child->location =
           ExpressionParserLocation(childStartPosition, GetCurrentPosition());
 
-      return child;
+      return std::move(child);
     } else if (CheckIfChar(IsDot)) {
       auto dotLocation = SkipChar();
       SkipAllWhitespaces();
@@ -345,10 +345,10 @@ class GD_CORE_API ExpressionParser2 {
       child->location =
           ExpressionParserLocation(childStartPosition, GetCurrentPosition());
 
-      return child;
+      return std::move(child);
     }
 
-    return std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>();
+    return std::move(std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>());
   }
 
   std::unique_ptr<FunctionCallNode> FreeFunction(

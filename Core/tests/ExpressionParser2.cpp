@@ -822,6 +822,40 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid object function name") {
+      auto node = parser.ParseExpression("string", "MyObject.MyFunc");
+      REQUIRE(node != nullptr);
+      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+      REQUIRE(objectFunctionName.objectName == "MyObject");
+      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyFunc");
+  }
+
+  SECTION("Valid object behavior name") {
+      auto node = parser.ParseExpression("string", "MyObject.MyBehavior::MyFunc");
+      REQUIRE(node != nullptr);
+      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+      REQUIRE(objectFunctionName.objectName == "MyObject");
+      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
+      REQUIRE(objectFunctionName.behaviorFunctionName == "MyFunc");
+  }
+
+  SECTION("Unfinished object function name") {
+      auto node = parser.ParseExpression("string", "MyObject.");
+      REQUIRE(node != nullptr);
+      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+      REQUIRE(objectFunctionName.objectName == "MyObject");
+      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "");
+  }
+
+  SECTION("Unfinished object behavior name") {
+      auto node = parser.ParseExpression("string", "MyObject.MyBehavior::");
+      REQUIRE(node != nullptr);
+      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+      REQUIRE(objectFunctionName.objectName == "MyObject");
+      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
+      REQUIRE(objectFunctionName.behaviorFunctionName == "");
+  }
+
   SECTION("Invalid function calls") {
     {
       auto node = parser.ParseExpression("number", "Idontexist(12)");

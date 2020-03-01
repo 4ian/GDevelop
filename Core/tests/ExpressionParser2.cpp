@@ -895,6 +895,45 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 33);
     }
   }
+  SECTION("Invalid free function call, finishing with namespace separator") {
+    {
+      auto node = parser.ParseExpression("number", "MyExtension::(12)");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "Cannot find an expression with this name: MyExtension::\nDouble "
+              "check that you've not made any typo in the name.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 17);
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+              "This parameter was not expected by this expression. Remove it "
+              "or verify that you've entered the proper expression name.");
+    }
+  }
+
+  SECTION("Invalid behavior function call, finishing with namespace separator") {
+    {
+      auto node = parser.ParseExpression("number", "MyObject.MyBehavior::(12)");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 2);
+
+      // TODO: The error message could be improved
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "Cannot find an expression with this name: \nDouble "
+              "check that you've not made any typo in the name.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+              "This parameter was not expected by this expression. Remove it "
+              "or verify that you've entered the proper expression name.");
+    }
+  }
 
   SECTION("Invalid variables") {
     {

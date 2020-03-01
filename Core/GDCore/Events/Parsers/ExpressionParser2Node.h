@@ -28,8 +28,9 @@ struct ExpressionParserLocation {
       : isValid(true),
         startPosition(startPosition_),
         endPosition(endPosition_){};
-  size_t GetStartPosition() { return startPosition; }
-  size_t GetEndPosition() { return endPosition; }
+  size_t GetStartPosition() const { return startPosition; }
+  size_t GetEndPosition() const { return endPosition; }
+  bool IsValid() const { return isValid; }
 
  private:
   bool isValid;
@@ -287,6 +288,12 @@ struct ObjectFunctionNameNode
   gd::String objectName;
   gd::String objectFunctionOrBehaviorName; ///< Behavior name if `behaviorFunctionName` is not empty.
   gd::String behaviorFunctionName; ///< If empty, then objectFunctionOrBehaviorName is filled with the behavior name.
+
+  ExpressionParserLocation objectNameLocation; ///< Location of the object name.
+  ExpressionParserLocation objectNameDotLocation; ///< Location of the "." after the object name.
+  ExpressionParserLocation objectFunctionOrBehaviorNameLocation; ///< Location of object function name or behavior name.
+  ExpressionParserLocation behaviorNameNamespaceSeparatorLocation; ///< Location of the "::" separator, if any.
+  ExpressionParserLocation behaviorFunctionNameLocation; ///< Location of the behavior function name, if any.
 };
 
 /**
@@ -340,6 +347,13 @@ struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
   std::vector<std::unique_ptr<ExpressionNode>> parameters;
   const ExpressionMetadata &expressionMetadata;
   gd::String functionName;
+
+  ExpressionParserLocation functionNameLocation; ///< Location of the function name.
+  ExpressionParserLocation objectNameLocation; ///< Location of the object name, if any.
+  ExpressionParserLocation objectNameDotLocation; ///< Location of the "." after the object name.
+  ExpressionParserLocation behaviorNameLocation; ///< Location of the behavior name, if any.
+  ExpressionParserLocation behaviorNameNamespaceSeparatorLocation; ///< Location of the "::" separator, if any.
+  ExpressionParserLocation openingParenthesisLocation; ///< Location of the "(".
 };
 
 /**

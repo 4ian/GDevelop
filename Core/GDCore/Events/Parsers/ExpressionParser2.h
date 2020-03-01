@@ -244,6 +244,8 @@ class GD_CORE_API ExpressionParser2 {
   Identifier(const gd::String &type) {
     size_t identifierStartPosition = GetCurrentPosition();
     gd::String name = ReadIdentifierName();
+    ExpressionParserLocation identifierLocation(identifierStartPosition,
+                                                GetCurrentPosition());
 
     SkipAllWhitespaces();
 
@@ -252,15 +254,20 @@ class GD_CORE_API ExpressionParser2 {
 
       name += NAMESPACE_SEPARATOR;
       name += ReadIdentifierName();
+      ExpressionParserLocation completeIdentifierLocation(
+          identifierStartPosition, GetCurrentPosition());
+      identifierLocation = completeIdentifierLocation;
     }
 
     if (CheckIfChar(IsOpeningParenthesis)) {
-      SkipChar();
-      return FreeFunction(type, name, identifierStartPosition);
+      ExpressionParserLocation openingParenthesisLocation = SkipChar();
+      return FreeFunction(
+          type, name, identifierLocation, openingParenthesisLocation);
     } else if (CheckIfChar(IsDot)) {
-      SkipChar();
+      ExpressionParserLocation dotLocation = SkipChar();
+      SkipAllWhitespaces();
       return ObjectFunctionOrBehaviorFunction(
-          type, name, identifierStartPosition);
+          type, name, identifierLocation, dotLocation);
     } else {
       auto identifier = gd::make_unique<IdentifierNode>(name, type);
       if (type == "string") {
@@ -332,7 +339,8 @@ class GD_CORE_API ExpressionParser2 {
   std::unique_ptr<FunctionCallNode> FreeFunction(
       const gd::String &type,
       const gd::String &functionFullName,
-      size_t functionStartPosition) {
+      const ExpressionParserLocation &identifierLocation,
+      const ExpressionParserLocation &openingParenthesisLocation) {
     // TODO: error if trying to use function for type != "number" && != "string"
     // + Test for it
 
@@ -349,29 +357,42 @@ class GD_CORE_API ExpressionParser2 {
         type, std::move(parametersAndError.first), metadata, functionFullName);
     function->diagnostic = std::move(parametersAndError.second);
     if (!function->diagnostic)
-      function->diagnostic = ValidateFunction(*function, functionStartPosition);
+      function->diagnostic =
+          ValidateFunction(*function, identifierLocation.GetStartPosition());
 
-    function->location =
-        ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
+    function->location = ExpressionParserLocation(
+        identifierLocation.GetStartPosition(), GetCurrentPosition());
+    function->functionNameLocation = identifierLocation;
+    function->openingParenthesisLocation = openingParenthesisLocation;
     return std::move(function);
   }
 
   std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode>
-  ObjectFunctionOrBehaviorFunction(const gd::String &type,
-                                   const gd::String &objectName,
-                                   size_t functionStartPosition) {
+  ObjectFunctionOrBehaviorFunction(
+      const gd::String &type,
+      const gd::String &objectName,
+      const ExpressionParserLocation &objectNameLocation,
+      const ExpressionParserLocation &objectNameDotLocation) {
+    size_t objectFunctionOrBehaviorNameStartPosition = GetCurrentPosition();
     gd::String objectFunctionOrBehaviorName = ReadIdentifierName();
+    ExpressionParserLocation objectFunctionOrBehaviorNameLocation(
+        objectFunctionOrBehaviorNameStartPosition, GetCurrentPosition());
 
     SkipAllWhitespaces();
 
     if (IsNamespaceSeparator()) {
-      SkipNamespaceSeparator();
+      ExpressionParserLocation namespaceSeparatorLocation =
+          SkipNamespaceSeparator();
+      SkipAllWhitespaces();
       return BehaviorFunction(type,
                               objectName,
                               objectFunctionOrBehaviorName,
-                              functionStartPosition);
+                              objectNameLocation,
+                              objectNameDotLocation,
+                              objectFunctionOrBehaviorNameLocation,
+                              namespaceSeparatorLocation);
     } else if (CheckIfChar(IsOpeningParenthesis)) {
-      SkipChar();
+      ExpressionParserLocation openingParenthesisLocation = SkipChar();
 
       gd::String objectType =
           GetTypeOfObject(globalObjectsContainer, objectsContainer, objectName);
@@ -395,10 +416,14 @@ class GD_CORE_API ExpressionParser2 {
       function->diagnostic = std::move(parametersAndError.second);
       if (!function->diagnostic)
         function->diagnostic =
-            ValidateFunction(*function, functionStartPosition);
+            ValidateFunction(*function, objectNameLocation.GetStartPosition());
 
-      function->location =
-          ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
+      function->location = ExpressionParserLocation(
+          objectNameLocation.GetStartPosition(), GetCurrentPosition());
+      function->objectNameLocation = objectNameLocation;
+      function->objectNameDotLocation = objectNameDotLocation;
+      function->functionNameLocation = objectFunctionOrBehaviorNameLocation;
+      function->openingParenthesisLocation = openingParenthesisLocation;
       return std::move(function);
     }
 
@@ -408,8 +433,12 @@ class GD_CORE_API ExpressionParser2 {
         _("An opening parenthesis (for an object expression), or double colon "
           "(::) was expected (for a behavior expression)."));
 
-    node->location =
-        ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
+    node->location = ExpressionParserLocation(
+        objectNameLocation.GetStartPosition(), GetCurrentPosition());
+    node->objectNameLocation = objectNameLocation;
+    node->objectNameDotLocation = objectNameDotLocation;
+    node->objectFunctionOrBehaviorNameLocation =
+        objectFunctionOrBehaviorNameLocation;
     return std::move(node);
   }
 
@@ -417,13 +446,19 @@ class GD_CORE_API ExpressionParser2 {
       const gd::String &type,
       const gd::String &objectName,
       const gd::String &behaviorName,
-      size_t functionStartPosition) {
+      const ExpressionParserLocation &objectNameLocation,
+      const ExpressionParserLocation &objectNameDotLocation,
+      const ExpressionParserLocation &behaviorNameLocation,
+      const ExpressionParserLocation &behaviorNameNamespaceSeparatorLocation) {
+    size_t functionNameStartPosition = GetCurrentPosition();
     gd::String functionName = ReadIdentifierName();
+    ExpressionParserLocation functionNameLocation(functionNameStartPosition,
+                                                  GetCurrentPosition());
 
     SkipAllWhitespaces();
 
     if (CheckIfChar(IsOpeningParenthesis)) {
-      SkipChar();
+      ExpressionParserLocation openingParenthesisLocation = SkipChar();
 
       gd::String behaviorType = GetTypeOfBehavior(
           globalObjectsContainer, objectsContainer, behaviorName);
@@ -448,10 +483,17 @@ class GD_CORE_API ExpressionParser2 {
       function->diagnostic = std::move(parametersAndError.second);
       if (!function->diagnostic)
         function->diagnostic =
-            ValidateFunction(*function, functionStartPosition);
+            ValidateFunction(*function, objectNameLocation.GetStartPosition());
 
-      function->location =
-          ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
+      function->location = ExpressionParserLocation(
+          objectNameLocation.GetStartPosition(), GetCurrentPosition());
+      function->objectNameLocation = objectNameLocation;
+      function->objectNameDotLocation = objectNameDotLocation;
+      function->behaviorNameLocation = behaviorNameLocation;
+      function->behaviorNameNamespaceSeparatorLocation =
+          behaviorNameNamespaceSeparatorLocation;
+      function->openingParenthesisLocation = openingParenthesisLocation;
+      function->functionNameLocation = functionNameLocation;
       return std::move(function);
     } else {
       auto node = gd::make_unique<ObjectFunctionNameNode>(
@@ -459,8 +501,14 @@ class GD_CORE_API ExpressionParser2 {
       node->diagnostic = RaiseSyntaxError(
           _("An opening parenthesis was expected here to call a function."));
 
-      node->location =
-          ExpressionParserLocation(functionStartPosition, GetCurrentPosition());
+      node->location = ExpressionParserLocation(
+          objectNameLocation.GetStartPosition(), GetCurrentPosition());
+      node->objectNameLocation = objectNameLocation;
+      node->objectNameDotLocation = objectNameDotLocation;
+      node->objectFunctionOrBehaviorNameLocation = behaviorNameLocation;
+      node->behaviorNameNamespaceSeparatorLocation =
+          behaviorNameNamespaceSeparatorLocation;
+      node->behaviorFunctionNameLocation = functionNameLocation;
       return std::move(node);
     }
   }
@@ -622,7 +670,10 @@ class GD_CORE_API ExpressionParser2 {
    * Read tokens or characters
    */
   ///@{
-  void SkipChar() { currentPosition++; }
+  ExpressionParserLocation SkipChar() {
+    size_t startPosition = currentPosition;
+    return ExpressionParserLocation(startPosition, ++currentPosition);
+  }
 
   void SkipAllWhitespaces() {
     while (currentPosition < expression.size() &&
@@ -638,12 +689,15 @@ class GD_CORE_API ExpressionParser2 {
     }
   }
 
-  void SkipNamespaceSeparator() {
+  ExpressionParserLocation SkipNamespaceSeparator() {
+    size_t startPosition = currentPosition;
     // Namespace separator is a special kind of delimiter as it is 2 characters
     // long
     if (IsNamespaceSeparator()) {
       currentPosition += NAMESPACE_SEPARATOR.size();
     }
+
+    return ExpressionParserLocation(startPosition, currentPosition);
   }
 
   bool CheckIfChar(
@@ -769,7 +823,8 @@ class GD_CORE_API ExpressionParser2 {
     // should be ignore again).
     if (!name.empty() && IsWhitespace(name[name.size() - 1])) {
       size_t lastCharacterPos = name.size() - 1;
-      while(lastCharacterPos < name.size() && IsWhitespace(name[lastCharacterPos])) {
+      while (lastCharacterPos < name.size() &&
+             IsWhitespace(name[lastCharacterPos])) {
         lastCharacterPos--;
       }
       if ((lastCharacterPos + 1) < name.size()) {

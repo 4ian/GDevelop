@@ -10,6 +10,7 @@ type CommonProps = {|
   // The parameter
   parameterMetadata?: gdParameterMetadata,
   onChange: string => void,
+  onRequestClose?: () => void,
   value: string,
 
   // Context

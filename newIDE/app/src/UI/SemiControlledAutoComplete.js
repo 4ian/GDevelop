@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-// import { I18n } from '@lingui/react';
+import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from './ListIcon';
@@ -11,7 +11,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
 
-export type DataSource = Array<
+type Option =
   | {|
       type: 'separator',
     |}
@@ -20,8 +20,12 @@ export type DataSource = Array<
       value: string, // The value to show on screen and to be selected
       onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
-    |}
->;
+    |};
+
+// type Option is defined in isolation to DataSource, since it needs to be
+// passed as an object for some funtions.
+
+export type DataSource = Array<Option>;
 
 const styles = {
   container: {
@@ -76,13 +80,7 @@ export default class SemiControlledAutoComplete extends React.Component<
   };
 
   focus() {
-    if (this._input.current) {
-      this._input.current.focus();
-      this._input.current.onkeydown = e => {
-        if (e.key === 'Escape' && this.props.onRequestClose)
-          this.props.onRequestClose();
-      };
-    }
+    if (this._input.current) this._input.current.focus();
   }
 
   forceInputValueTo(newValue: string): void {
@@ -93,37 +91,44 @@ export default class SemiControlledAutoComplete extends React.Component<
     }
   }
 
-  disableDivider = (option: Object): boolean => {
-    if (option.type === 'separator') {
-      return true;
-    } else {
-      return false;
-    }
+  isOptionDisabled = (option: Option): boolean => {
+    // Writing shorthand, ie, return option.type === 'separator' fails flow test.
+    // All the cases of type Option have to be explicitly handled.
+    if (option.type === 'separator') return true;
+    else return false;
   };
 
   render() {
-    const currentInputValue = (): string => {
-      if (this.state.inputValue !== null) {
-        return this.state.inputValue;
-      } else {
-        return this.props.value;
-      }
-    };
+    const getCurrentInputValue = (): string =>
+      this.state.inputValue !== null ? this.state.inputValue : this.props.value;
 
-    const filterFunction = (options, state): Array<DataSource> => {
+    const filterFunction = (options: DataSource, state: Object): DataSource => {
       var separatorCount = 0;
-      const lowercaseInputValue = currentInputValue().toLowerCase();
+      const lowercaseInputValue = getCurrentInputValue().toLowerCase();
       var optionList = options.filter(option => {
-        if (!option.text) return true;
-        if (option.type === 'seperator') {
+        if (option.type === 'separator') {
           separatorCount++;
           return true;
         }
+        if (!option.text) return true;
         return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
       });
+
+      // Empty the list if there are only dividers inside it
       if (optionList.length === separatorCount) optionList = [];
-      if (optionList[optionList.length - 1].type !== undefined)
+
+      // Remove divider(s) if they are at the start or end of array
+      while (
+        optionList[optionList.length - 1] !== undefined &&
+        optionList[optionList.length - 1].type !== undefined
+      )
         optionList.pop();
+      while (
+        optionList[optionList.length - 1] !== undefined &&
+        optionList[0].type !== undefined
+      )
+        optionList.shift();
+
       return optionList;
     };
 
@@ -131,59 +136,58 @@ export default class SemiControlledAutoComplete extends React.Component<
       <MarkdownText source={this.props.helperMarkdownText} />
     ) : null;
 
-    const handleOptionLabel = (option: DataSource | null): string => {
-      if (option.value) {
-        return option.value;
-      } else {
-        return currentInputValue();
-      }
+    const getOptionLabel = (option: Option): string => {
+      // option.value ? option.value : getCurrentInputValue();
+      // Writing shorthand will fail flow checks.
+      // Explicitly define all the cases of type Option.
+      if (option.value) return option.value;
+      else return getCurrentInputValue();
     };
 
-    const handleChange = (event: Event, option: DataSource | string): void => {
-      if (option !== null) {
-        if (option.value) {
+    const handleChange = (event, option: Option | string): void => {
+      // Explicitly handle option.type to avoid flow errors
+      if (option !== null && option.type !== 'separator') {
+        if (typeof option === 'string') {
+          this.props.onChange(option);
+        } else {
           if (option.onClick) option.onClick();
           else {
             if (this.props.onChoose) this.props.onChoose(option.value);
             else this.props.onChange(option.value);
           }
-        } else {
-          /* option is just a string in this case, and it
-             enables user to type something other than provided options. */
-
-          this.props.onChange(option);
         }
-        if (event.key) handleKeyDown(event.key);
-        if (this.props.onRequestClose) this.props.onRequestClose();
       }
+      if (typeof event.key === 'string') handleKeyDown(event.key);
+      if (this.props.onRequestClose) this.props.onRequestClose();
     };
 
-    //Todo: Find a way to call this function everytime.
     const handleKeyDown = (key: string): void => {
       if (key === 'Enter' && this._input.current !== null)
         this._input.current.blur();
     };
 
-    const handleInputChange = (
-      e: Event,
-      value: string,
-      reason: string
-    ): void => {
+    const handleInputChange = (e, value: string, reason: string): void =>
       this.setState({ inputValue: value });
-    };
 
-    const nullifyDefaultStyling = (params: Object): void => {
-      const { InputProps, inputProps, InputLabelProps } = params;
+    const getDefaultStylingProps = (params: Object): Object => {
+      var { InputProps, inputProps, InputLabelProps, ...other } = params;
       InputProps.className = null;
       InputProps.endAdornment = null;
       inputProps.className = null;
-      InputLabelProps.disableAnimation = true;
       InputProps.style = styles.inputRoot;
       inputProps.style = styles.inputInput;
+      inputProps = {
+        ...inputProps,
+        onKeyDown: (e): void => {
+          if (e.key === 'Escape' && this.props.onRequestClose)
+            this.props.onRequestClose();
+        },
+      };
+      return { InputProps, inputProps, InputLabelProps, ...other };
     };
 
-    const renderItem = (option: DataSource, state: Object): React.Node => {
-      if (option.type === 'separator') {
+    const renderItem = (option: Option, state: Object): React.Node => {
+      if (option.type && option.type === 'separator') {
         return (
           <ListItem
             divider
@@ -204,53 +208,55 @@ export default class SemiControlledAutoComplete extends React.Component<
       }
     };
 
-    const placeholder = () => {
-      if (this.props.errorText) return this.props.errorText.props.id;
-      else if (this.props.hintText && typeof this.props.hintText === 'string')
-        return this.props.hintText;
-      else return null;
-    };
-
     return (
-      <Autocomplete
-        freeSolo
-        clearOnEscape
-        disableOpenOnFocus={this.props.openOnFocus}
-        onChange={handleChange}
-        style={{
-          ...styles.container,
-        }}
-        inputValue={currentInputValue()}
-        onInputChange={handleInputChange}
-        options={this.props.dataSource}
-        renderOption={renderItem}
-        getOptionDisabled={this.disableDivider}
-        ListboxProps={{
-          style: {
-            padding: 0,
-            margin: 0,
-          },
-        }}
-        getOptionLabel={handleOptionLabel}
-        filterOptions={filterFunction}
-        renderInput={params => {
-          nullifyDefaultStyling(params);
-          return (
-            <TextField
-              {...params}
-              {...computeTextFieldStyleProps(this.props)}
-              style={{ ...this.props.textFieldStyle }}
-              label={this.props.floatingLabelText}
-              inputRef={this._input}
-              disabled={this.props.disabled}
-              error={!!this.props.errorText}
-              placeholder={placeholder()}
-              helperText={helperText}
-              fullWidth={this.props.fullWidth}
-            />
-          );
-        }}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <Autocomplete
+            freeSolo
+            clearOnEscape
+            disableOpenOnFocus={!this.props.openOnFocus}
+            onChange={handleChange}
+            style={{ ...styles.container }}
+            inputValue={getCurrentInputValue()}
+            onInputChange={handleInputChange}
+            options={this.props.dataSource}
+            renderOption={renderItem}
+            getOptionDisabled={this.isOptionDisabled}
+            ListboxProps={{
+              style: {
+                padding: 0,
+                margin: 0,
+              },
+            }}
+            getOptionLabel={getOptionLabel}
+            filterOptions={filterFunction}
+            renderInput={params => {
+              var { InputProps, ...other } = getDefaultStylingProps(params);
+              InputProps = {
+                ...InputProps,
+                placeholder:
+                  typeof this.props.hintText === 'string'
+                    ? this.props.hintText
+                    : i18n._(this.props.hintText),
+              };
+              const defaultStylingProps = { InputProps, ...other };
+              return (
+                <TextField
+                  {...defaultStylingProps}
+                  {...computeTextFieldStyleProps(this.props)}
+                  style={{ ...this.props.textFieldStyle }}
+                  label={this.props.floatingLabelText}
+                  inputRef={this._input}
+                  disabled={this.props.disabled}
+                  error={!!this.props.errorText}
+                  helperText={helperText}
+                  fullWidth={this.props.fullWidth}
+                />
+              );
+            }}
+          />
+        )}
+      </I18n>
     );
   }
 }

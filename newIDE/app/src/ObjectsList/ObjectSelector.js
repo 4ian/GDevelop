@@ -18,7 +18,7 @@ type Props = {|
 
   onChoose?: string => void,
   onChange: string => void,
-  onRequestClose: () => void,
+  onRequestClose?: () => void,
   value: string,
   errorTextIfInvalid?: React.Node,
 

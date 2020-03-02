@@ -55,11 +55,13 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       REQUIRE(getCompletionsFor("object", "My", 1) == expectedCompletions);
       REQUIRE(getCompletionsFor("object", "My", 2) == expectedEmptyCompletions);
 
-      // Also test alternate types also considered as objects (but that can result
+      // Also test alternate types also considered as objects (but that can
+      // result
       // in different code generation):
       REQUIRE(getCompletionsFor("objectPtr", "My", 0) == expectedCompletions);
       REQUIRE(getCompletionsFor("objectPtr", "My", 1) == expectedCompletions);
-      REQUIRE(getCompletionsFor("objectPtr", "My", 2) == expectedEmptyCompletions);
+      REQUIRE(getCompletionsFor("objectPtr", "My", 2) ==
+              expectedEmptyCompletions);
     }
   }
   SECTION("Operator (number)") {
@@ -84,6 +86,11 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
           gd::ExpressionCompletionDescription::ForExpression("string",
                                                              "Function")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedInformativeCompletions{
+              gd::ExpressionCompletionDescription::ForExpression("string",
+                                                                 "Function")
+                  .SetIsInformative(true)};
       REQUIRE(getCompletionsFor("string", "Function(", 0) ==
               expectedCompletions);
       REQUIRE(getCompletionsFor("string", "Function(", 1) ==
@@ -91,7 +98,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       REQUIRE(getCompletionsFor("string", "Function(", 7) ==
               expectedCompletions);
       REQUIRE(getCompletionsFor("string", "Function(", 8) ==
-              expectedCompletions);
+              expectedInformativeCompletions);
       REQUIRE(getCompletionsFor("string", "Function(", 9) ==
               expectedEmptyCompletions);
     }
@@ -109,7 +116,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
     SECTION("Function with a Variable as argument") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForVariable("myVar")};
+          gd::ExpressionCompletionDescription::ForVariable("scenevar",
+                                                           "myVar")};
       REQUIRE(getCompletionsFor("number",
                                 "MyExtension::GetVariableAsNumber(myVar",
                                 33) == expectedCompletions);
@@ -118,19 +126,25 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
 
   SECTION("Partial object or behavior function") {
     SECTION("Test 1") {
-      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForBehavior(
-              "Func", "MyObject"),
-          gd::ExpressionCompletionDescription::ForExpression(
-              "string", "Func", "MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedBehaviorOrFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForBehavior("Func",
+                                                               "MyObject"),
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "string", "Func", "MyObject")};
       REQUIRE(getCompletionsFor("string", "MyObject.Func", 0) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.Func", 5) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.Func", 10) ==
-              expectedCompletions);
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func", 7) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func", 8) ==
+              expectedBehaviorOrFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func", 9) ==
+              expectedBehaviorOrFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.Func", 12) ==
-              expectedCompletions);
+              expectedBehaviorOrFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.Func", 13) ==
               expectedEmptyCompletions);
     }
@@ -138,55 +152,136 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
 
   SECTION("Object function") {
     SECTION("Test 1") {
-      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForExpression(
-              "string", "Func", "MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedBehaviorOrFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForBehavior("Func",
+                                                               "MyObject"),
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "string", "Func", "MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedInformativeFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "string", "Func", "MyObject")
+                  .SetIsInformative(true)};
       REQUIRE(getCompletionsFor("string", "MyObject.Func(", 0) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.Func(", 5) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.Func(", 10) ==
-              expectedCompletions);
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func(", 7) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func(", 8) ==
+              expectedBehaviorOrFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func(", 9) ==
+              expectedBehaviorOrFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.Func(", 12) ==
-              expectedCompletions);
+              expectedBehaviorOrFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.Func(", 13) ==
-              expectedCompletions);
+              expectedInformativeFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func(", 14) ==
+              expectedEmptyCompletions);
     }
   }
 
   SECTION("Partial behavior function") {
     SECTION("Test 1") {
-      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForExpression(
-              "string", "Func", "MyObject", "MyBehavior")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedBehaviorCompletions{
+              gd::ExpressionCompletionDescription::ForBehavior("MyBehavior",
+                                                               "MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "string", "Func", "MyObject", "MyBehavior")};
       REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 0) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 5) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 10) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 12) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 13) ==
-              expectedCompletions);
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 7) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 8) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 9) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 18) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 19) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 20) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 21) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func", 23) ==
+              expectedFunctionCompletions);
+    }
+    SECTION("Test 2") {
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedBehaviorCompletions{
+              gd::ExpressionCompletionDescription::ForBehavior("MyBehavior",
+                                                               "MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "string", "", "MyObject", "MyBehavior")};
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::", 0) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::", 7) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::", 8) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::", 9) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::", 18) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::", 19) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::", 20) ==
+              expectedFunctionCompletions);
     }
   }
 
   SECTION("Behavior function") {
     SECTION("Test 1") {
-      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForExpression(
-              "string", "Func", "MyObject", "MyBehavior")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedBehaviorCompletions{
+              gd::ExpressionCompletionDescription::ForBehavior("MyBehavior",
+                                                               "MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "string", "Func", "MyObject", "MyBehavior")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedInformativeFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "string", "Func", "MyObject", "MyBehavior")
+                  .SetIsInformative(true)};
       REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 0) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 5) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 10) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 24) ==
-              expectedCompletions);
-      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 25) ==
-              expectedCompletions);
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 7) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 8) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 9) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 18) ==
+              expectedBehaviorCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 19) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 20) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 21) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 22) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 23) ==
+              expectedFunctionCompletions);
     }
   }
 }

@@ -1683,6 +1683,7 @@ interface ExpressionCompletionDescription {
   [Const, Ref] DOMString GetPrefix();
   [Const, Ref] DOMString GetObjectName();
   [Const, Ref] DOMString GetBehaviorName();
+  boolean IsInformative();
 };
 
 interface VectorExpressionCompletionDescription {
@@ -1691,8 +1692,6 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    void ExpressionCompletionFinder();
-
     [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();

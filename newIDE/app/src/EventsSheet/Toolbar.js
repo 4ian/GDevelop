@@ -18,7 +18,6 @@ type Props = {|
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
-  showPreviewButton: boolean,
   onAddStandardEvent: () => void,
   onAddSubEvent: () => void,
   canAddSubEvent: boolean,

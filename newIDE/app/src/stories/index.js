@@ -2525,6 +2525,10 @@ storiesOf('EventsSheet', module)
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          isPreviewOverride={false}
+          togglePreviewOverride={() => {}}
+          previewFirstSceneName={''}
+          setScenePreview={() => {}}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2553,6 +2557,10 @@ storiesOf('EventsSheet', module)
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          isPreviewOverride={false}
+          togglePreviewOverride={() => {}}
+          previewFirstSceneName={''}
+          setScenePreview={() => {}}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -3709,6 +3717,10 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
+          isPreviewOverride={false}
+          togglePreviewOverride={() => {}}
+          previewFirstSceneName={''}
+          setScenePreview={() => {}}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

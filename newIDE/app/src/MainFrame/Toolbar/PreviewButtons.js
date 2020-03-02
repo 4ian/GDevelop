@@ -32,7 +32,7 @@ export default class PreviewButtons extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        {showPreviewButton && ( //FIXME bouh, need rework this, because this will come useless? See also this props in other files
+        {showPreviewButton && (
           <ElementWithMenu
             element={
               <ToolbarIcon

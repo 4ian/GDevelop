@@ -20,6 +20,7 @@ type IconProps =
 type Props = {|
   ...IconProps,
   onClick?: () => void,
+  onContextMenu?: () => void,
   disabled?: boolean,
 
   style?: {|

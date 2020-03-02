@@ -36,6 +36,7 @@ export const Column = props => (
       alignItems: props.alignItems || 'stretch',
       justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
+      maxHeight: props.useMaxHeight ? '100%' : undefined,
     }}
   >
     {props.children}

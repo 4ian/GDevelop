@@ -2072,7 +2072,7 @@ storiesOf('BuildStepsProgress', module)
       build={{
         id: 'fake-build-id',
         userId: 'fake-user-id',
-        type: 'cordova-build(apk)',
+        type: 'cordova-build',
         status: 'error',
         logsKey: '/fake-error.log',
         updatedAt: Date.now(),
@@ -2091,7 +2091,7 @@ storiesOf('BuildStepsProgress', module)
       build={{
         id: 'fake-build-id',
         userId: 'fake-user-id',
-        type: 'cordova-build(apk)',
+        type: 'cordova-build',
         status: 'complete',
         logsKey: '/fake-error.log',
         apkKey: '/fake-game.apk',
@@ -2132,13 +2132,13 @@ storiesOf('BuildProgress', module)
       onDownload={action('download')}
     />
   ))
-  .add('pending (cordova-build(apk))', () => (
+  .add('pending (cordova-build)', () => (
     <BuildProgress
       build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
       onDownload={action('download')}
     />
   ))
-  .add('pending and very old (cordova-build(apk))', () => (
+  .add('pending and very old (cordova-build)', () => (
     <BuildProgress
       build={{
         ...pendingCordovaBuild,
@@ -2147,7 +2147,7 @@ storiesOf('BuildProgress', module)
       onDownload={action('download')}
     />
   ))
-  .add('complete (cordova-build(apk))', () => (
+  .add('complete (cordova-build)', () => (
     <BuildProgress
       build={completeCordovaBuild}
       onDownload={action('download')}
@@ -3206,21 +3206,21 @@ storiesOf('LimitDisplayer', module)
   .add('default', () => (
     <LimitDisplayer
       subscription={subscriptionForIndieUser}
-      limit={limitsForIndieUser['cordova-build(apk)']}
+      limit={limitsForIndieUser['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
   ))
   .add('limit reached', () => (
     <LimitDisplayer
       subscription={subscriptionForIndieUser}
-      limit={limitsReached['cordova-build(apk)']}
+      limit={limitsReached['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
   ))
   .add('limit reached without subscription', () => (
     <LimitDisplayer
       subscription={noSubscription}
-      limit={limitsReached['cordova-build(apk)']}
+      limit={limitsReached['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
   ));

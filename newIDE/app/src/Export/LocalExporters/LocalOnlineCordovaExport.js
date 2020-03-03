@@ -47,7 +47,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'local-online-cordova',
-  onlineBuildType: 'cordova-build(apk)',
+  onlineBuildType: 'cordova-build',
 
   getInitialExportState: () => null,
 

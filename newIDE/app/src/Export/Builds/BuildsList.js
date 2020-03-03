@@ -26,6 +26,19 @@ const styles = {
   },
 };
 
+const formatBuildText = buildType => {
+  switch (buildType) {
+    case 'cordova-build':
+      return 'Apk Build (Cordova)';
+    case 'electron-build':
+      return 'Desktop Application Build (Electron)';
+    case 'web-build':
+      return 'Browser Build';
+    default:
+      return buildType;
+  }
+};
+
 export default ({ builds, onDownload }: Props) => {
   return (
     <Column noMargin expand>
@@ -59,7 +72,7 @@ export default ({ builds, onDownload }: Props) => {
               return (
                 <Paper style={styles.buildContainer} key={build.id}>
                   <Text>
-                    {build.type} - Last updated on{' '}
+                    {formatBuildText(build.type)} - Last updated on{' '}
                     {format(build.updatedAt, 'YYYY-MM-DD HH:mm:ss')}
                   </Text>
                   {!isOld && (

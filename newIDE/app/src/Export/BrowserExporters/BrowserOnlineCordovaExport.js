@@ -53,7 +53,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'browser-online-cordova',
-  onlineBuildType: 'cordova-build(apk)',
+  onlineBuildType: 'cordova-build',
 
   getInitialExportState: () => null,
 

@@ -23,7 +23,7 @@ export type Build = {
   linuxAppImageKey?: string,
   s3Key?: string,
   status: 'pending' | 'complete' | 'error',
-  type: 'cordova-build(apk)' | 'electron-build' | 'web-build',
+  type: 'cordova-build' | 'electron-build' | 'web-build',
   targets?: Array<TargetName>,
   createdAt: number,
   updatedAt: number,

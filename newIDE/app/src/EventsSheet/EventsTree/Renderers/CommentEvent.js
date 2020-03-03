@@ -42,6 +42,7 @@ const styles = {
 
 type State = {|
   editing: boolean,
+  prevValue: string,
 |};
 
 export default class CommentEvent extends React.Component<
@@ -50,7 +51,7 @@ export default class CommentEvent extends React.Component<
 > {
   state = {
     editing: false,
-    prevValue: undefined,
+    prevValue: '',
   };
 
   _selectable: ?HTMLSpanElement;

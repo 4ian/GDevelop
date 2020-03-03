@@ -139,7 +139,7 @@ export const buildCordovaAndroid = (
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
           userId
-        )}&key=${encodeURIComponent(key)}&type=cordova-build(apk)`,
+        )}&key=${encodeURIComponent(key)}&type=cordova-build`,
         null,
         {
           params: {},

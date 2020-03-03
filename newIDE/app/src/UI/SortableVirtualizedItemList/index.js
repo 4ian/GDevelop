@@ -43,18 +43,21 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
   }
 
   renderItemRow(
-    item,
-    itemName,
-    index,
-    isItemBold,
-    nameBeingEdited,
-    getItemThumbnail,
-    selectedItems,
-    erroredItems,
-    onEditItem,
-    windowWidth,
-    connectIconDragSource = null
+    item: Item,
+    itemName: string,
+    index: number,
+    nameBeingEdited: boolean,
+    windowWidth: string,
+    connectIconDragSource?: ?(React.Node) => React.Node
   ) {
+    const {
+      selectedItems,
+      getItemThumbnail,
+      erroredItems,
+      isItemBold,
+      onEditItem,
+    } = this.props;
+
     return (
       <ItemRow
         item={item}
@@ -71,7 +74,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
         onEdit={onEditItem}
         hideMenuButton={windowWidth === 'small'}
-        connectIconDragSource={connectIconDragSource}
+        connectIconDragSource={connectIconDragSource || null}
       />
     );
   }
@@ -81,15 +84,11 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       height,
       width,
       fullList,
-      selectedItems,
       addNewItemLabel,
       renamedItem,
       getItemThumbnail,
       getItemName,
-      erroredItems,
       onAddNewItem,
-      isItemBold,
-      onEditItem,
       onMoveSelectionToItem,
       canMoveSelectionToItem,
     } = this.props;
@@ -141,12 +140,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                           item,
                           itemName,
                           index,
-                          isItemBold,
                           nameBeingEdited,
-                          getItemThumbnail,
-                          selectedItems,
-                          erroredItems,
-                          onEditItem,
                           windowWidth
                         )
                       ) : (
@@ -180,14 +174,11 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                                   item,
                                   itemName,
                                   index,
-                                  isItemBold,
                                   nameBeingEdited,
-                                  getItemThumbnail,
-                                  selectedItems,
-                                  erroredItems,
-                                  onEditItem,
                                   windowWidth,
-                                  screenType === 'touch' && connectDragSource
+                                  screenType === 'touch'
+                                    ? connectDragSource
+                                    : null
                                 )}
                               </div>
                             );

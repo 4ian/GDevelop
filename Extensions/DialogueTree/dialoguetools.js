@@ -472,7 +472,7 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
       this.dialogueText = this.dialogueData.text;
       this.commandCalls = [];
     } else {
-      this.dialogueText += this.dialogueData.text;
+      this.dialogueText += ' ' + this.dialogueData.text;
     }
 
     this.dialogueDataType = 'text';
@@ -489,7 +489,6 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
     this.selectedOptionUpdated = true;
   } else if (gdjs.dialogueTree._isLineTypeCommand()) {
     this.dialogueDataType = 'command';
-    this.dialogueText += ' ';
     this.clipTextEnd = 0;
 
     var command = this.dialogueData.text.split(' ');

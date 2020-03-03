@@ -472,7 +472,7 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
       this.dialogueText = this.dialogueData.text;
       this.commandCalls = [];
     } else {
-      this.dialogueText += this.dialogueData.text;
+      this.dialogueText += ' ' + this.dialogueData.text;
     }
 
     this.dialogueDataType = 'text';

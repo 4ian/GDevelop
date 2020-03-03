@@ -23,7 +23,7 @@ export type Build = {
   linuxAppImageKey?: string,
   s3Key?: string,
   status: 'pending' | 'complete' | 'error',
-  type: 'cordova-build' | 'electron-build' | 'web-build',
+  type: 'cordova-build(apk)' | 'electron-build' | 'web-build',
   targets?: Array<TargetName>,
   createdAt: number,
   updatedAt: number,
@@ -139,7 +139,7 @@ export const buildCordovaAndroid = (
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
           userId
-        )}&key=${encodeURIComponent(key)}&type=cordova-build`,
+        )}&key=${encodeURIComponent(key)}&type=cordova-build(apk)`,
         null,
         {
           params: {},

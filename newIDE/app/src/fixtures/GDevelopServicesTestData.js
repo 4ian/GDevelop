@@ -20,19 +20,19 @@ export const usagesForIndieUser: Usages = [
   {
     id: '1',
     userId: 'indie-user',
-    type: 'cordova-build',
+    type: 'cordova-build(apk)',
     createdAt: 1515084391000,
   },
   {
     id: '56',
     userId: 'indie-user',
-    type: 'cordova-build',
+    type: 'cordova-build(apk)',
     createdAt: 1515084351000,
   },
   {
     id: '75',
     userId: 'indie-user',
-    type: 'cordova-build',
+    type: 'cordova-build(apk)',
     createdAt: 1515084311000,
   },
 ];
@@ -52,7 +52,7 @@ export const noSubscription: Subscription = {
 };
 
 export const limitsForIndieUser: Limits = {
-  'cordova-build': {
+  'cordova-build(apk)': {
     current: 2,
     max: 10,
     limitReached: false,
@@ -60,7 +60,7 @@ export const limitsForIndieUser: Limits = {
 };
 
 export const limitsReached: Limits = {
-  'cordova-build': {
+  'cordova-build(apk)': {
     current: 10,
     max: 10,
     limitReached: true,
@@ -161,7 +161,7 @@ export const erroredCordovaBuild: Build = {
   createdAt: 1515084391000,
   updatedAt: 1515084399000,
   userId: 'fake-user-id',
-  type: 'cordova-build',
+  type: 'cordova-build(apk)',
 };
 
 export const pendingCordovaBuild: Build = {
@@ -170,7 +170,7 @@ export const pendingCordovaBuild: Build = {
   createdAt: 1515084391000,
   updatedAt: 1515084399000,
   userId: 'fake-user-id',
-  type: 'cordova-build',
+  type: 'cordova-build(apk)',
 };
 
 export const pendingElectronBuild: Build = {
@@ -186,7 +186,7 @@ export const completeCordovaBuild: Build = {
   id: 'complete-build-id',
   createdAt: 1515084391000,
   userId: 'fake-user-id',
-  type: 'cordova-build',
+  type: 'cordova-build(apk)',
   status: 'complete',
   logsKey: '/fake-error.log',
   apkKey: '/fake-game.apk',

@@ -16,7 +16,7 @@ import {
 } from '../../Utils/GDevelopServices/Build';
 
 const buildTypesConfig = {
-  'cordova-build': {
+  'cordova-build(apk)': {
     estimatedTimeInSeconds: (build: Build) => 300,
     completeDescription:
       'You can download it on your Android phone and install it.',
@@ -134,6 +134,8 @@ export default ({ build, onDownload }: Props) => {
         ) : build.status === 'complete' ? (
           <React.Fragment>
             <Line expand>
+              {console.log('config,', config)}
+
               {buttons
                 .filter(button => !!build[button.key])
                 .map((button, index) => (

@@ -225,7 +225,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
               return (
                 <MosaicWindow
                   path={path}
-                  title={editor.title}
+                  title={editor.title.props.id}
                   toolbarControls={editor.toolbarControls}
                 >
                   {editor.renderEditor()}

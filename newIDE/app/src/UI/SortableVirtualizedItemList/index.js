@@ -42,11 +42,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     if (this._list) this._list.forceUpdateGrid();
   }
 
-  renderItemRow(
+  _renderItemRow(
     item: Item,
-    itemName: string,
     index: number,
-    nameBeingEdited: boolean,
     windowWidth: string,
     connectIconDragSource?: ?(React.Node) => React.Node
   ) {
@@ -56,7 +54,12 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       erroredItems,
       isItemBold,
       onEditItem,
+      renamedItem,
+      getItemName,
     } = this.props;
+
+    const nameBeingEdited = renamedItem === item;
+    const itemName = getItemName(item);
 
     return (
       <ItemRow
@@ -87,7 +90,6 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       addNewItemLabel,
       renamedItem,
       getItemThumbnail,
-      getItemName,
       onAddNewItem,
       onMoveSelectionToItem,
       canMoveSelectionToItem,
@@ -131,18 +133,11 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
                   const item = fullList[index];
                   const nameBeingEdited = renamedItem === item;
-                  const itemName = getItemName(item);
 
                   return (
                     <div style={style} key={key}>
                       {nameBeingEdited ? (
-                        this.renderItemRow(
-                          item,
-                          itemName,
-                          index,
-                          nameBeingEdited,
-                          windowWidth
-                        )
+                        this._renderItemRow(item, index, windowWidth)
                       ) : (
                         <DragSourceAndDropTarget
                           beginDrag={() => {
@@ -170,11 +165,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                               <div>
                                 {isOver && <DropIndicator canDrop={canDrop} />}
                                 {// If on a touch screen, only set the icon to be draggable.
-                                this.renderItemRow(
+                                this._renderItemRow(
                                   item,
-                                  itemName,
                                   index,
-                                  nameBeingEdited,
                                   windowWidth,
                                   screenType === 'touch'
                                     ? connectDragSource

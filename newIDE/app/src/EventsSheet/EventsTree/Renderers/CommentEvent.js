@@ -1,54 +1,54 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t } from "@lingui/macro";
 
-import * as React from 'react';
-import classNames from 'classnames';
-import TextField from '../../../UI/TextField';
-import { rgbToHex } from '../../../Utils/ColorTransformer';
+import * as React from "react";
+import classNames from "classnames";
+import TextField from "../../../UI/TextField";
+import { rgbToHex } from "../../../Utils/ColorTransformer";
 import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
-  disabledText,
-} from '../ClassNames';
-import { type EventRendererProps } from './EventRenderer';
+  disabledText
+} from "../ClassNames";
+import { type EventRendererProps } from "./EventRenderer";
+
 const gd = global.gd;
 
 const commentTextStyle = {
-  width: '100%',
-  fontSize: 14,
+  width: "100%",
+  fontSize: 14
 };
 
 const styles = {
   container: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexWrap: "wrap",
     padding: 5,
-    overflow: 'hidden',
-    minHeight: 35,
+    overflow: "hidden",
+    minHeight: 35
   },
   commentTextField: commentTextStyle,
   commentSpan: {
     ...commentTextStyle,
-    boxSizing: 'border-box',
-    alignItems: 'center',
-    height: '100%',
-    whiteSpace: 'pre-wrap',
+    boxSizing: "border-box",
+    alignItems: "center",
+    height: "100%",
+    whiteSpace: "pre-wrap",
     lineHeight: 1.5,
-    border: 1,
-  },
+    border: 1
+  }
 };
 
 type State = {|
   editing: boolean,
 |};
 
-export default class CommentEvent extends React.Component<
-  EventRendererProps,
-  State
-> {
+export default class CommentEvent extends React.Component<EventRendererProps,
+  State> {
   state = {
     editing: false,
+    prevValue: undefined
   };
 
   _selectable: ?HTMLSpanElement;
@@ -57,7 +57,7 @@ export default class CommentEvent extends React.Component<
   edit = () => {
     this.setState(
       {
-        editing: true,
+        editing: true
       },
       () => {
         if (this._textField) this._textField.focus();
@@ -78,7 +78,7 @@ export default class CommentEvent extends React.Component<
 
     this.setState(
       {
-        editing: false,
+        editing: false
       },
       () => this.props.onUpdate()
     );
@@ -88,10 +88,10 @@ export default class CommentEvent extends React.Component<
     const commentEvent = gd.asCommentEvent(this.props.event);
     return commentEvent
       .getComment()
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br>');
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\n/g, "<br>");
   };
 
   render() {
@@ -113,13 +113,18 @@ export default class CommentEvent extends React.Component<
       <div
         className={classNames({
           [largeSelectableArea]: true,
-          [largeSelectedArea]: this.props.selected,
+          [largeSelectedArea]: this.props.selected
         })}
         style={{
           ...styles.container,
-          backgroundColor: `#${backgroundColor}`,
+          backgroundColor: `#${backgroundColor}`
         }}
-        onClick={this.edit}
+        onClick={()=>{
+          this.setState({
+            prevValue: commentEvent.getComment()
+          })
+          this.edit();
+        }}
       >
         {this.state.editing ? (
           <TextField
@@ -134,27 +139,38 @@ export default class CommentEvent extends React.Component<
             inputStyle={{
               color: `#${textColor}`,
               padding: 0,
-              lineHeight: 1.5,
+              lineHeight: 1.5
             }}
             underlineFocusStyle={{
-              borderColor: `#${textColor}`,
+              borderColor: `#${textColor}`
             }}
             fullWidth
             id="comment-title"
+            onKeyUp={(e) => {
+              if (e.key === "Escape") {
+                this.onEvent(e, this.state.prevValue);
+                this.endEditing();
+              }
+            }}
+            onKeyPress={(e) => {
+              if (e.charCode === 13 && !e.shiftKey) {
+                this.endEditing();
+              }
+            }}
           />
         ) : (
           <span
             ref={selectable => (this._selectable = selectable)}
             className={classNames({
               [selectableArea]: true,
-              [disabledText]: this.props.disabled,
+              [disabledText]: this.props.disabled
             })}
             style={{
               ...styles.commentSpan,
-              color: `#${textColor}`,
+              color: `#${textColor}`
             }}
             dangerouslySetInnerHTML={{
-              __html: this._getCommentHTML(),
+              __html: this._getCommentHTML()
             }}
           />
         )}

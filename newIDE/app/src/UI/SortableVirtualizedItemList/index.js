@@ -42,6 +42,40 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     if (this._list) this._list.forceUpdateGrid();
   }
 
+  renderItemRow(
+    item,
+    itemName,
+    index,
+    isItemBold,
+    nameBeingEdited,
+    getItemThumbnail,
+    selectedItems,
+    erroredItems,
+    onEditItem,
+    windowWidth,
+    connectIconDragSource = null
+  ) {
+    return (
+      <ItemRow
+        item={item}
+        itemName={itemName}
+        isBold={isItemBold ? isItemBold(item) : false}
+        onRename={newName => this.props.onRename(item, newName)}
+        editingName={nameBeingEdited}
+        getThumbnail={
+          getItemThumbnail ? () => getItemThumbnail(item) : undefined
+        }
+        selected={selectedItems.indexOf(item) !== -1}
+        onItemSelected={this.props.onItemSelected}
+        errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
+        buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
+        onEdit={onEditItem}
+        hideMenuButton={windowWidth === 'small'}
+        connectIconDragSource={connectIconDragSource}
+      />
+    );
+  }
+
   render() {
     const {
       height,
@@ -100,35 +134,21 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                   const nameBeingEdited = renamedItem === item;
                   const itemName = getItemName(item);
 
-                  const itemRow = (
-                    <ItemRow
-                      item={item}
-                      itemName={itemName}
-                      isBold={isItemBold ? isItemBold(item) : false}
-                      onRename={newName => this.props.onRename(item, newName)}
-                      editingName={nameBeingEdited}
-                      getThumbnail={
-                        getItemThumbnail
-                          ? () => getItemThumbnail(item)
-                          : undefined
-                      }
-                      selected={selectedItems.indexOf(item) !== -1}
-                      onItemSelected={this.props.onItemSelected}
-                      errorStatus={
-                        erroredItems ? erroredItems[itemName] || '' : ''
-                      }
-                      buildMenuTemplate={() =>
-                        this.props.buildMenuTemplate(item, index)
-                      }
-                      onEdit={onEditItem}
-                      hideMenuButton={windowWidth === 'small'}
-                    />
-                  );
-
                   return (
                     <div style={style} key={key}>
                       {nameBeingEdited ? (
-                        itemRow
+                        this.renderItemRow(
+                          item,
+                          itemName,
+                          index,
+                          isItemBold,
+                          nameBeingEdited,
+                          getItemThumbnail,
+                          selectedItems,
+                          erroredItems,
+                          onEditItem,
+                          windowWidth
+                        )
                       ) : (
                         <DragSourceAndDropTarget
                           beginDrag={() => {
@@ -155,13 +175,20 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                             const dropTarget = connectDropTarget(
                               <div>
                                 {isOver && <DropIndicator canDrop={canDrop} />}
-                                {React.cloneElement(itemRow, {
-                                  // If on a touch screen, only set the icon to be draggable.
-                                  connectIconDragSource:
-                                    screenType === 'touch'
-                                      ? connectDragSource
-                                      : null,
-                                })}
+                                {// If on a touch screen, only set the icon to be draggable.
+                                this.renderItemRow(
+                                  item,
+                                  itemName,
+                                  index,
+                                  isItemBold,
+                                  nameBeingEdited,
+                                  getItemThumbnail,
+                                  selectedItems,
+                                  erroredItems,
+                                  onEditItem,
+                                  windowWidth,
+                                  screenType === 'touch' && connectDragSource
+                                )}
                               </div>
                             );
 

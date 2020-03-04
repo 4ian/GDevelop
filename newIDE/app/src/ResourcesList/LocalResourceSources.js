@@ -4,15 +4,20 @@ import { type I18n as I18nType } from '@lingui/core';
 import { type ResourceSourceComponentProps } from './ResourceSource.flow';
 import { Component } from 'react';
 import {
-  isPathInProjectFolder,
   copyAllToProjectFolder,
+  isPathInProjectFolder,
 } from './ResourceUtils.js';
+import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import optionalRequire from '../Utils/OptionalRequire.js';
+
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
 const path = optionalRequire('path');
 
 const gd = global.gd;
+
+// Local Storage key
+const LocalStorageItem = 'gd-preferences';
 
 export default [
   {
@@ -192,6 +197,50 @@ export default [
   },
 ];
 
+// function _loadValuesFromLocalStorage(): ?PreferencesValues {
+//   try {
+//     const persistedState = localStorage.getItem(LocalStorageItem);
+//     if (!persistedState) return null;
+//
+//     return JSON.parse(persistedState);
+//   } catch (e) {
+//     return null;
+//   }
+// }
+
+function _loadValuesFromLocalStorage(): ?PreferencesValues {
+  try {
+    const persistedState = localStorage.getItem(LocalStorageItem);
+    if (!persistedState) return null;
+
+    return JSON.parse(persistedState);
+  } catch (e) {
+    return null;
+  }
+}
+
+function _loadPathFromLocalStorage(): ?string {
+  const values = _loadValuesFromLocalStorage();
+  console.log(values);
+  if (values) return values.lastOpenedPath;
+  else return '';
+}
+
+function _savePathToLocalStorage(lastOpenedPath: string) {
+  let values = _loadValuesFromLocalStorage();
+  values = { ...values, lastOpenedPath };
+  _persistValuesToLocalStorage(values);
+}
+
+function _persistValuesToLocalStorage(values: ?PreferencesValues) {
+  try {
+    localStorage.setItem(LocalStorageItem, JSON.stringify(values));
+  } catch (e) {
+    console.warn('Unable to persist preferences', e);
+  }
+  return values;
+}
+
 const selectLocalResourcePath = (
   i18n: I18nType,
   project: gdProject,
@@ -207,7 +256,13 @@ const selectLocalResourcePath = (
 
     const properties = ['openFile'];
     if (options.multiSelections) properties.push('multiSelections');
-    const projectPath = path.dirname(project.getProjectFile());
+    let projectPath = path.dirname(project.getProjectFile());
+
+    // Load locally stored lastOpenedPath and update projectPath if not undefined
+    let lastOpenedPath = _loadPathFromLocalStorage();
+    if (lastOpenedPath !== '') {
+      projectPath = lastOpenedPath;
+    }
 
     const browserWindow = electron.remote.getCurrentWindow();
     dialog.showOpenDialog(
@@ -220,6 +275,11 @@ const selectLocalResourcePath = (
       },
       paths => {
         if (!paths) return resolve([]);
+
+        // Update locally stored path value
+        if (paths[0] !== projectPath) {
+          _savePathToLocalStorage(paths[0]);
+        }
 
         const outsideProjectFolderPaths = paths.filter(
           path => !isPathInProjectFolder(project, path)

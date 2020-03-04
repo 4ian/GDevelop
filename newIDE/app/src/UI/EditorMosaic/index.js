@@ -7,7 +7,7 @@ import {
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
-import { I18n } from '@lingui/react'
+import { I18n } from '@lingui/react';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -120,11 +120,11 @@ const renderMosaicWindowPreview = props => (
 );
 
 const renderMosaicWindowToolbar = props => (
-  <div className='mosaic-window-toolbar' style={{width: '100%'}}>
-    <div className='mosaic-window-title' title={props.tooltip}>
+  <div className="mosaic-window-toolbar" style={{ width: '100%' }}>
+    <div className="mosaic-window-title" title={props.tooltip}>
       {props.title}
     </div>
-    <div className='mosaic-window-controls'>
+    <div className="mosaic-window-controls">
       {props.toolbarControls || defaultToolbarControls}
     </div>
   </div>
@@ -247,7 +247,6 @@ export default class EditorMosaic extends React.Component<Props, State> {
                       {editor.renderEditor()}
                     </MosaicWindow>
                   )}
-                  
                 </I18n>
               );
             }}

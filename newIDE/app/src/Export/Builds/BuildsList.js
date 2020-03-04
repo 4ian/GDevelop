@@ -33,7 +33,7 @@ const formatBuildText = (
     case 'cordova-build':
       return <Trans>Android Build</Trans>;
     case 'electron-build':
-      return <Trans>Windows / macOS / Linux Build</Trans>;
+      return <Trans>Windows/macOS/Linux Build</Trans>;
     case 'web-build':
       return <Trans>Web (upload online) Build</Trans>;
     default:

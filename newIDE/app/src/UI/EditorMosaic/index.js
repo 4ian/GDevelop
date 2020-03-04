@@ -7,6 +7,7 @@ import {
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
+import { I18n } from '@lingui/react'
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -17,6 +18,7 @@ export type Editor = {|
   renderEditor: () => React.Node,
   noTitleBar?: boolean,
   title?: React.Node,
+  tooltip?: React.Node,
   toolbarControls?: Array<React.Node>,
 |};
 
@@ -117,6 +119,17 @@ const renderMosaicWindowPreview = props => (
   </div>
 );
 
+const renderMosaicWindowToolbar = props => (
+  <div className='mosaic-window-toolbar' style={{width: '100%'}}>
+    <div className='mosaic-window-title' title={props.tooltip}>
+      {props.title}
+    </div>
+    <div className='mosaic-window-controls'>
+      {props.toolbarControls || defaultToolbarControls}
+    </div>
+  </div>
+);
+
 /**
  * A window that can be used in a EditorMosaic, with a close button
  * by default in the toolbarControls and a preview when the window is
@@ -125,8 +138,8 @@ const renderMosaicWindowPreview = props => (
 const MosaicWindow = (props: any) => (
   <RMMosaicWindow
     {...props}
-    toolbarControls={props.toolbarControls || defaultToolbarControls}
     renderPreview={renderMosaicWindowPreview}
+    renderToolbar={renderMosaicWindowToolbar}
   />
 );
 
@@ -223,13 +236,19 @@ export default class EditorMosaic extends React.Component<Props, State> {
               }
 
               return (
-                <MosaicWindow
-                  path={path}
-                  title={editor.title}
-                  toolbarControls={editor.toolbarControls}
-                >
-                  {editor.renderEditor()}
-                </MosaicWindow>
+                <I18n>
+                  {({ i18n }) => (
+                    <MosaicWindow
+                      path={path}
+                      title={editor.title}
+                      tooltip={i18n._(editor.tooltip)}
+                      toolbarControls={editor.toolbarControls}
+                    >
+                      {editor.renderEditor()}
+                    </MosaicWindow>
+                  )}
+                  
+                </I18n>
               );
             }}
             value={this.state.mosaicNode}

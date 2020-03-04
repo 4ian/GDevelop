@@ -22,9 +22,6 @@ type Option =
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
     |};
 
-// type Option is defined in isolation to DataSource, since it needs to be
-// passed as an object for some funtions.
-
 export type DataSource = Array<Option>;
 
 const styles = {
@@ -38,6 +35,10 @@ const styles = {
   },
   inputRoot: {
     flexWrap: 'wrap',
+  },
+  listBoxAndItem: {
+    padding: 0,
+    margin: 0,
   },
 };
 
@@ -92,10 +93,8 @@ export default class SemiControlledAutoComplete extends React.Component<
   }
 
   isOptionDisabled = (option: Option): boolean => {
-    // Writing shorthand, ie, return option.type === 'separator' fails flow test.
-    // All the cases of type Option have to be explicitly handled.
     if (option.type === 'separator') return true;
-    else return false;
+    return false;
   };
 
   render() {
@@ -103,19 +102,18 @@ export default class SemiControlledAutoComplete extends React.Component<
       this.state.inputValue !== null ? this.state.inputValue : this.props.value;
 
     const filterFunction = (options: DataSource, state: Object): DataSource => {
-      var separatorCount = 0;
       const lowercaseInputValue = getCurrentInputValue().toLowerCase();
       var optionList = options.filter(option => {
-        if (option.type === 'separator') {
-          separatorCount++;
-          return true;
-        }
+        if (option.type === 'separator') return true;
         if (!option.text) return true;
         return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
       });
 
-      // Empty the list if there are only dividers inside it
-      if (optionList.length === separatorCount) optionList = [];
+      if (
+        !optionList.filter(option => option.type !== 'separator' && option.text)
+          .length
+      )
+        return [];
 
       // Remove divider(s) if they are at the start or end of array
       while (
@@ -137,15 +135,11 @@ export default class SemiControlledAutoComplete extends React.Component<
     ) : null;
 
     const getOptionLabel = (option: Option): string => {
-      // option.value ? option.value : getCurrentInputValue();
-      // Writing shorthand will fail flow checks.
-      // Explicitly define all the cases of type Option.
       if (option.value) return option.value;
-      else return getCurrentInputValue();
+      return getCurrentInputValue();
     };
 
     const handleChange = (event, option: Option | string): void => {
-      // Explicitly handle option.type to avoid flow errors
       if (option !== null && option.type !== 'separator') {
         if (typeof option === 'string') {
           this.props.onChange(option);
@@ -170,20 +164,25 @@ export default class SemiControlledAutoComplete extends React.Component<
       this.setState({ inputValue: value });
 
     const getDefaultStylingProps = (params: Object): Object => {
-      var { InputProps, inputProps, InputLabelProps, ...other } = params;
-      InputProps.className = null;
-      InputProps.endAdornment = null;
-      inputProps.className = null;
-      InputProps.style = styles.inputRoot;
-      inputProps.style = styles.inputInput;
-      inputProps = {
-        ...inputProps,
-        onKeyDown: (e): void => {
-          if (e.key === 'Escape' && this.props.onRequestClose)
-            this.props.onRequestClose();
+      const { InputProps, inputProps, InputLabelProps, ...other } = params;
+      return {
+        ...other,
+        InputProps: {
+          ...InputProps,
+          className: null,
+          endAdornment: null,
+          style: styles.inputRoot,
+        },
+        inputProps: {
+          ...inputProps,
+          className: null,
+          style: styles.inputInput,
+          onKeyDown: (event): void => {
+            if (event.key === 'Escape' && this.props.onRequestClose)
+              this.props.onRequestClose();
+          },
         },
       };
-      return { InputProps, inputProps, InputLabelProps, ...other };
     };
 
     const renderItem = (option: Option, state: Object): React.Node => {
@@ -193,19 +192,18 @@ export default class SemiControlledAutoComplete extends React.Component<
             divider
             disableGutters
             component={'div'}
-            style={{ padding: 0, margin: 0 }}
+            style={styles.listBoxAndItem}
           />
         );
-      } else {
-        return (
-          <ListItem component={'div'} style={{ padding: 0, margin: 0 }}>
-            {option.renderIcon && (
-              <ListItemIcon>{option.renderIcon()}</ListItemIcon>
-            )}
-            {option.value}
-          </ListItem>
-        );
       }
+      return (
+        <ListItem component={'div'} style={styles.listBoxAndItem}>
+          {option.renderIcon && (
+            <ListItemIcon>{option.renderIcon()}</ListItemIcon>
+          )}
+          {option.value}
+        </ListItem>
+      );
     };
 
     return (
@@ -213,7 +211,6 @@ export default class SemiControlledAutoComplete extends React.Component<
         {({ i18n }) => (
           <Autocomplete
             freeSolo
-            clearOnEscape
             disableOpenOnFocus={!this.props.openOnFocus}
             onChange={handleChange}
             style={{ ...styles.container }}
@@ -222,27 +219,21 @@ export default class SemiControlledAutoComplete extends React.Component<
             options={this.props.dataSource}
             renderOption={renderItem}
             getOptionDisabled={this.isOptionDisabled}
-            ListboxProps={{
-              style: {
-                padding: 0,
-                margin: 0,
-              },
-            }}
+            ListboxProps={{ style: styles.listBoxAndItem }}
             getOptionLabel={getOptionLabel}
             filterOptions={filterFunction}
             renderInput={params => {
-              var { InputProps, ...other } = getDefaultStylingProps(params);
-              InputProps = {
-                ...InputProps,
-                placeholder:
-                  typeof this.props.hintText === 'string'
-                    ? this.props.hintText
-                    : i18n._(this.props.hintText),
-              };
-              const defaultStylingProps = { InputProps, ...other };
+              const { InputProps, ...other } = getDefaultStylingProps(params);
               return (
                 <TextField
-                  {...defaultStylingProps}
+                  InputProps={{
+                    ...InputProps,
+                    placeholder:
+                      typeof this.props.hintText === 'string'
+                        ? this.props.hintText
+                        : i18n._(this.props.hintText),
+                  }}
+                  {...other}
                   {...computeTextFieldStyleProps(this.props)}
                   style={{ ...this.props.textFieldStyle }}
                   label={this.props.floatingLabelText}

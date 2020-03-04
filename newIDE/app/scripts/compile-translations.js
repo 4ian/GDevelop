@@ -161,6 +161,17 @@ const lintMessagePo = (locale, path) => {
           'Unexpected number of <subject>: verify the <subject> translations',
       });
     }
+    if (
+      content.indexOf(`msgid "<subject> <operator> <value>"
+msgstr "<subject> <operator> <value>"`) === -1 &&
+      content.indexOf(`msgid "<subject> <operator> <value>"
+msgstr ""`) === -1
+    ) {
+      errors.push({
+        str:
+          "Can't find an untranslated <subject> <operator> <value>: Double check these translations, they are surely wrongly done!",
+      });
+    }
 
     return {
       errors,

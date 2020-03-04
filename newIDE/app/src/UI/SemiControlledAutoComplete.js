@@ -103,7 +103,7 @@ export default class SemiControlledAutoComplete extends React.Component<
 
     const filterFunction = (options: DataSource, state: Object): DataSource => {
       const lowercaseInputValue = getCurrentInputValue().toLowerCase();
-      var optionList = options.filter(option => {
+      const optionList = options.filter(option => {
         if (option.type === 'separator') return true;
         if (!option.text) return true;
         return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;

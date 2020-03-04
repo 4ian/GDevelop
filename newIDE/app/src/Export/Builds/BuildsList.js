@@ -31,11 +31,11 @@ const formatBuildText = (
 ) => {
   switch (buildType) {
     case 'cordova-build':
-      return <Trans>Apk Build (Cordova)</Trans>;
+      return <Trans>Android Build</Trans>;
     case 'electron-build':
-      return <Trans>Desktop Application Build (Electron)</Trans>;
+      return <Trans>Windows / macOS / Linux Build</Trans>;
     case 'web-build':
-      return <Trans>Browser Build</Trans>;
+      return <Trans>Web (upload online) Build</Trans>;
     default:
       return buildType;
   }

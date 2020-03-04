@@ -472,7 +472,8 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
       this.dialogueText = this.dialogueData.text;
       this.commandCalls = [];
     } else {
-      this.dialogueText += (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
+      this.dialogueText +=
+        (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
     }
 
     this.dialogueDataType = 'text';
@@ -482,7 +483,7 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
     this.dialogueData = this.dialogue.next().value;
   } else if (gdjs.dialogueTree._isLineTypeOptions()) {
     this.dialogueDataType = 'options';
-    this.dialogueText = ' ';
+    this.dialogueText = '';
     this.clipTextEnd = 0;
     this.optionsCount = this.dialogueData.options.length;
     this.options = this.dialogueData.options;

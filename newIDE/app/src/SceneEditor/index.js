@@ -903,7 +903,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       properties: {
         type: 'secondary',
         title: <Trans>Properties</Trans>,
-        tooltip: t`Properties of Instance`,
+        tooltip: t`Display the properties of the selected instances from the scene editor`,
         renderEditor: () => (
           <InstancePropertiesEditor
             project={project}
@@ -959,7 +959,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'objects-list': {
         type: 'secondary',
         title: <Trans>Objects</Trans>,
-        tooltip: t`List of Objects`,
+        tooltip: t`The list of objects that can be used in this scene`,
         toolbarControls: [
           <I18n key="tags">
             {({ i18n }) => (
@@ -1001,7 +1001,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'object-groups-list': {
         type: 'secondary',
         title: <Trans>Object Groups</Trans>,
-        tooltip: t`List of Object Groups`,
+        tooltip: t`The groups of objects that can be used in events of this scene`,
         renderEditor: () => (
           <ObjectGroupsList
             globalObjectGroups={project.getObjectGroups()}

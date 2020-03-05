@@ -1,4 +1,5 @@
 // @flow
+import { I18n } from '@lingui/react';
 import * as React from 'react';
 import {
   MosaicWindow as RMMosaicWindow,
@@ -7,7 +8,7 @@ import {
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
-import { I18n } from '@lingui/react';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -18,7 +19,7 @@ export type Editor = {|
   renderEditor: () => React.Node,
   noTitleBar?: boolean,
   title?: React.Node,
-  tooltip?: React.Node,
+  tooltip?: MessageDescriptor,
   toolbarControls?: Array<React.Node>,
 |};
 
@@ -241,7 +242,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
                     <MosaicWindow
                       path={path}
                       title={editor.title}
-                      tooltip={i18n._(editor.tooltip)}
+                      tooltip={editor.tooltip ? i18n._(editor.tooltip) : null}
                       toolbarControls={editor.toolbarControls}
                     >
                       {editor.renderEditor()}

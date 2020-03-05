@@ -27,14 +27,26 @@ class GD_CORE_API Serializer {
   static void FromXML(SerializerElement& element,
                       const TiXmlElement* xmlElement);
 #endif
+  /**
+   * \brief Escape a string for inclusion in a XML tag
+   */
+  static gd::String ToEscapedXMLString(const gd::String& str);
   ///@}
 
   /** \name JSON serialization.
    * Serialize a SerializerElement from/to JSON.
    */
   ///@{
+  /**
+   * \brief Serialize a gd::SerializerElement to a JSON string.
+   */
   static gd::String ToJSON(const SerializerElement& element);
+
   static SerializerElement FromJSON(const std::string& json);
+
+  /**
+   * \brief Parse a JSON string and returns a gd::SerializerElement for it.
+   */
   static SerializerElement FromJSON(const gd::String& json) {
     return FromJSON(json.ToUTF8());
   }

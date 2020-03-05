@@ -95,6 +95,14 @@ void Serializer::FromXML(SerializerElement& element,
 }
 #endif
 
+gd::String Serializer::ToEscapedXMLString(const gd::String& str) {
+  return str.FindAndReplace("&", "&amp;")
+      .FindAndReplace("'", "&apos;")
+      .FindAndReplace("\"", "&quot;")
+      .FindAndReplace("<", "&lt;")
+      .FindAndReplace(">", "&gt;");
+}
+
 namespace {
 
 /**

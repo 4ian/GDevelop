@@ -40,11 +40,11 @@ const theme = createMuiTheme({
   overrides: {
     MuiAutocomplete: {
       option: {
-        cursor: "default"
+        cursor: 'default',
       },
       listbox: {
         padding: 0,
-        margin: 0
+        margin: 0,
       },
       input: {
         width: 'auto',
@@ -52,9 +52,9 @@ const theme = createMuiTheme({
       },
       inputRoot: {
         flexWrap: 'wrap',
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 type Props = {|
@@ -125,8 +125,9 @@ export default class SemiControlledAutoComplete extends React.Component<
       });
 
       if (
-        !optionList.filter(option => option.type !== 'separator' && option.text)
-          .length
+        !optionList.filter(
+          option => option.type !== 'separator' && option.value
+        ).length
       )
         return [];
 
@@ -171,8 +172,9 @@ export default class SemiControlledAutoComplete extends React.Component<
     };
 
     const handleKeyDown = (key: string): void => {
-      if (key === 'Enter' && this._input.current !== null)
+      if (key === 'Enter' && this._input.current !== null) {
         this._input.current.blur();
+      }
     };
 
     const handleInputChange = (e, value: string, reason: string): void =>
@@ -193,6 +195,8 @@ export default class SemiControlledAutoComplete extends React.Component<
           onKeyDown: (event): void => {
             if (event.key === 'Escape' && this.props.onRequestClose)
               this.props.onRequestClose();
+            if (event.key === 'Enter')
+              handleChange(event, getCurrentInputValue());
           },
         },
       };
@@ -225,10 +229,10 @@ export default class SemiControlledAutoComplete extends React.Component<
           {({ i18n }) => (
             <Autocomplete
               freeSolo
-              disableOpenOnFocus={!this.props.openOnFocus}
               onChange={handleChange}
               style={{ ...styles.container }}
               inputValue={getCurrentInputValue()}
+              value={getCurrentInputValue()}
               onInputChange={handleInputChange}
               options={this.props.dataSource}
               renderOption={renderItem}

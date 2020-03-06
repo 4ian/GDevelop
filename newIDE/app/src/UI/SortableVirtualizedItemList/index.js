@@ -164,12 +164,11 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                             const dropTarget = connectDropTarget(
                               <div>
                                 {isOver && <DropIndicator canDrop={canDrop} />}
-                                {// If on a touch screen, only set the icon to be draggable.
-                                this._renderItemRow(
+                                {this._renderItemRow(
                                   item,
                                   index,
                                   windowWidth,
-                                  screenType === 'touch'
+                                  screenType === 'touch' // Set the icon to be draggable, only if on a touch screen
                                     ? connectDragSource
                                     : null
                                 )}

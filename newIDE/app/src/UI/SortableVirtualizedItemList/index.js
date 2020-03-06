@@ -136,51 +136,48 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
                   return (
                     <div style={style} key={key}>
-                      {nameBeingEdited ? (
-                        this._renderItemRow(item, index, windowWidth)
-                      ) : (
-                        <DragSourceAndDropTarget
-                          beginDrag={() => {
-                            this.props.onItemSelected(item);
-                            return {};
-                          }}
-                          canDrop={() =>
-                            canMoveSelectionToItem
-                              ? canMoveSelectionToItem(item)
-                              : true
-                          }
-                          drop={() => {
-                            onMoveSelectionToItem(item);
-                          }}
-                        >
-                          {({
-                            connectDragSource,
-                            connectDropTarget,
-                            isOver,
-                            canDrop,
-                          }) => {
-                            // Add an extra div because connectDropTarget/connectDragSource can
-                            // only be used on native elements
-                            const dropTarget = connectDropTarget(
-                              <div>
-                                {isOver && <DropIndicator canDrop={canDrop} />}
-                                {this._renderItemRow(
-                                  item,
-                                  index,
-                                  windowWidth,
-                                  screenType === 'touch' // Set the icon to be draggable, only if on a touch screen
-                                    ? connectDragSource
-                                    : null
-                                )}
-                              </div>
-                            );
+                      <DragSourceAndDropTarget
+                        beginDrag={() => {
+                          this.props.onItemSelected(item);
+                          return {};
+                        }}
+                        canDrag={() => !nameBeingEdited}
+                        canDrop={() =>
+                          canMoveSelectionToItem
+                            ? canMoveSelectionToItem(item)
+                            : true
+                        }
+                        drop={() => {
+                          onMoveSelectionToItem(item);
+                        }}
+                      >
+                        {({
+                          connectDragSource,
+                          connectDropTarget,
+                          isOver,
+                          canDrop,
+                        }) => {
+                          // Add an extra div because connectDropTarget/connectDragSource can
+                          // only be used on native elements
+                          const dropTarget = connectDropTarget(
+                            <div>
+                              {isOver && <DropIndicator canDrop={canDrop} />}
+                              {this._renderItemRow(
+                                item,
+                                index,
+                                windowWidth,
+                                screenType === 'touch' // Set the icon to be draggable, only if on a touch screen
+                                  ? connectDragSource
+                                  : null
+                              )}
+                            </div>
+                          );
 
-                            return screenType === 'touch'
-                              ? dropTarget
-                              : connectDragSource(dropTarget);
-                          }}
-                        </DragSourceAndDropTarget>
-                      )}
+                          return screenType === 'touch'
+                            ? dropTarget
+                            : connectDragSource(dropTarget);
+                        }}
+                      </DragSourceAndDropTarget>
                     </div>
                   );
                 }}

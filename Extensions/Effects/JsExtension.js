@@ -904,11 +904,10 @@ module.exports = {
         .setDescription('Blur intensity of the vignette')
     );
     oldFilmProperties.set(
-      'seed',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Seed'))
-        .setType('number')
-        .setDescription('A seed value to apply to the random noise generation')
+      'animated',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel(_('Animated (Enable animations)'))
+        .setType('boolean')
     );
 
     return extension;

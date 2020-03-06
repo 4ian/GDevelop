@@ -4,7 +4,12 @@ gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
 
     return oldFilmFilter;
   },
-  update: function(filter, layer) {},
+  update: function(filter, layer) {
+    if (filter.animated) {
+      filter.time += layer.getElapsedTime() / 1000;
+      filter.seed = Math.random();
+    }
+  },
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === 'sepia') {
       filter.sepia = value;
@@ -33,10 +38,11 @@ gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
     else if (parameterName === 'vignettingBlur') {
       filter.vignettingBlur = value;
     }
-    else if (parameterName === 'seed') {
-      filter.seed = value;
-    }
   },
   updateStringParameter: function(filter, parameterName, value) {},
-  updateBooleanParameter: function(filter, parameterName, value) {},
+  updateBooleanParameter: function(filter, parameterName, value) {
+    if (parameterName === 'animated') {
+      filter.animated = value;
+    }
+  },
 });

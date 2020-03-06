@@ -4,8 +4,9 @@ import * as React from 'react';
 import PreferencesContext, {
   initialPreferences,
   type Preferences,
-  type PreferencesValues,
   type AlertMessageIdentifier,
+  savePreferencesValues,
+  loadPreferencesValues,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
@@ -19,11 +20,9 @@ type Props = {|
 
 type State = Preferences;
 
-const LocalStorageItem = 'gd-preferences';
-
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
-    values: this._loadValuesFromLocalStorage() || initialPreferences.values,
+    values: loadPreferencesValues() || initialPreferences.values,
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -58,7 +57,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           language,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -72,7 +71,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           eventsSheetShowObjectThumbnails,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -84,7 +83,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autosaveOnPreview,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -96,7 +95,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           useNewInstructionEditorDialog,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -108,7 +107,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           useGDJSDevelopmentWatcher,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -122,7 +121,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           eventsSheetUseAssignmentOperators,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -134,7 +133,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           showEffectParameterNames,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -146,7 +145,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           themeName,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -158,7 +157,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           codeEditorThemeName,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -170,7 +169,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autoDownloadUpdates,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -182,7 +181,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autoDisplayChangelog,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
   }
 
@@ -216,7 +215,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           lastLaunchedVersion: currentVersion,
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
 
     if (lastLaunchedVersion === undefined) {
@@ -239,46 +238,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           },
         },
       }),
-      () => this._persistValuesToLocalStorage(this.state)
+      () => savePreferencesValues(this.state.values)
     );
-  }
-
-  _loadValuesFromLocalStorage(): ?PreferencesValues {
-    try {
-      const persistedState = localStorage.getItem(LocalStorageItem);
-      if (!persistedState) return null;
-
-      const values = JSON.parse(persistedState);
-
-      // "Migrate" non existing properties to their default values
-      // (useful when upgrading the preferences to a new version where
-      // a new preference was added).
-      for (const key in initialPreferences.values) {
-        if (
-          initialPreferences.values.hasOwnProperty(key) &&
-          typeof values[key] === 'undefined'
-        ) {
-          values[key] = initialPreferences.values[key];
-        }
-      }
-
-      return values;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  _persistValuesToLocalStorage(preferences: Preferences) {
-    try {
-      localStorage.setItem(
-        LocalStorageItem,
-        JSON.stringify(preferences.values)
-      );
-    } catch (e) {
-      console.warn('Unable to persist preferences', e);
-    }
-
-    return preferences;
   }
 
   render() {

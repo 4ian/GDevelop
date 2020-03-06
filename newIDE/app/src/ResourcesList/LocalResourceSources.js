@@ -7,7 +7,10 @@ import {
   copyAllToProjectFolder,
   isPathInProjectFolder,
 } from './ResourceUtils.js';
-import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
+import {
+  loadPreferencesValues,
+  savePreferencesValues,
+} from '../MainFrame/Preferences/PreferencesContext';
 import optionalRequire from '../Utils/OptionalRequire.js';
 
 const electron = optionalRequire('electron');
@@ -15,9 +18,6 @@ const dialog = electron ? electron.remote.dialog : null;
 const path = optionalRequire('path');
 
 const gd = global.gd;
-
-// Local Storage key
-const LocalStorageItem = 'gd-preferences';
 
 export default [
   {
@@ -197,48 +197,16 @@ export default [
   },
 ];
 
-// function _loadValuesFromLocalStorage(): ?PreferencesValues {
-//   try {
-//     const persistedState = localStorage.getItem(LocalStorageItem);
-//     if (!persistedState) return null;
-//
-//     return JSON.parse(persistedState);
-//   } catch (e) {
-//     return null;
-//   }
-// }
-
-function _loadValuesFromLocalStorage(): ?PreferencesValues {
-  try {
-    const persistedState = localStorage.getItem(LocalStorageItem);
-    if (!persistedState) return null;
-
-    return JSON.parse(persistedState);
-  } catch (e) {
-    return null;
-  }
-}
-
-function _loadPathFromLocalStorage(): ?string {
-  const values = _loadValuesFromLocalStorage();
-  console.log(values);
+function _loadLastOpenedPath(): ?string {
+  const values = loadPreferencesValues();
   if (values) return values.lastOpenedPath;
   else return '';
 }
 
-function _savePathToLocalStorage(lastOpenedPath: string) {
-  let values = _loadValuesFromLocalStorage();
+function _saveLastOpenedPath(lastOpenedPath: string) {
+  let values = loadPreferencesValues();
   values = { ...values, lastOpenedPath };
-  _persistValuesToLocalStorage(values);
-}
-
-function _persistValuesToLocalStorage(values: ?PreferencesValues) {
-  try {
-    localStorage.setItem(LocalStorageItem, JSON.stringify(values));
-  } catch (e) {
-    console.warn('Unable to persist preferences', e);
-  }
-  return values;
+  savePreferencesValues(values);
 }
 
 const selectLocalResourcePath = (
@@ -259,7 +227,7 @@ const selectLocalResourcePath = (
     let projectPath = path.dirname(project.getProjectFile());
 
     // Load locally stored lastOpenedPath and update projectPath if not undefined
-    let lastOpenedPath = _loadPathFromLocalStorage();
+    let lastOpenedPath = _loadLastOpenedPath();
     if (lastOpenedPath !== '') {
       projectPath = lastOpenedPath;
     }
@@ -278,7 +246,7 @@ const selectLocalResourcePath = (
 
         // Update locally stored path value
         if (paths[0] !== projectPath) {
-          _savePathToLocalStorage(paths[0]);
+          _saveLastOpenedPath(paths[0]);
         }
 
         const outsideProjectFolderPaths = paths.filter(

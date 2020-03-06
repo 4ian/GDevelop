@@ -236,7 +236,7 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
               popper: classes.popper,
             }}
             onChange={handleChange}
-            style={{ ...styles.container }}
+            style={styles.container}
             inputValue={getCurrentInputValue()}
             value={getCurrentInputValue()}
             onInputChange={handleInputChange}
@@ -258,7 +258,7 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
                   }}
                   {...other}
                   {...computeTextFieldStyleProps(this.props)}
-                  style={{ ...this.props.textFieldStyle }}
+                  style={this.props.textFieldStyle}
                   label={this.props.floatingLabelText}
                   inputRef={this._input}
                   disabled={this.props.disabled}

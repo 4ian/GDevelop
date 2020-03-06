@@ -31,7 +31,6 @@ const styles = {
 export default class GroupEvent extends React.Component<EventRendererProps, *> {
   state = {
     editing: false,
-    prevValue: '',
   };
   _textField: ?TextField = null;
 
@@ -72,9 +71,6 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
         onClick={() => {
-          this.setState({
-            prevValue: groupEvent.getName(),
-          });
           this.edit();
         }}
       >
@@ -100,12 +96,11 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             id="group-title"
             onKeyUp={e => {
               if (e.key === 'Escape') {
-                groupEvent.setName(this.state.prevValue);
                 this.endEditing();
               }
             }}
             onKeyPress={e => {
-              if (e.charCode === 13 && !e.shiftKey) {
+              if (e.charCode === 13) {
                 this.endEditing();
               }
             }}

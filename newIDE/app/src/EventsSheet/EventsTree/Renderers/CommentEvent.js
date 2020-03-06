@@ -42,7 +42,6 @@ const styles = {
 
 type State = {|
   editing: boolean,
-  prevValue: string,
 |};
 
 export default class CommentEvent extends React.Component<
@@ -51,7 +50,6 @@ export default class CommentEvent extends React.Component<
 > {
   state = {
     editing: false,
-    prevValue: '',
   };
 
   _selectable: ?HTMLSpanElement;
@@ -123,9 +121,6 @@ export default class CommentEvent extends React.Component<
           backgroundColor: `#${backgroundColor}`,
         }}
         onClick={() => {
-          this.setState({
-            prevValue: commentEvent.getComment(),
-          });
           this.edit();
         }}
       >
@@ -151,12 +146,6 @@ export default class CommentEvent extends React.Component<
             id="comment-title"
             onKeyUp={e => {
               if (e.key === 'Escape') {
-                this.onEvent(e, this.state.prevValue);
-                this.endEditing();
-              }
-            }}
-            onKeyPress={e => {
-              if (e.charCode === 13 && !e.shiftKey) {
                 this.endEditing();
               }
             }}

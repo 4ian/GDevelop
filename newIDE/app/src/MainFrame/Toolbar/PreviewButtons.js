@@ -4,31 +4,41 @@ import { t } from '@lingui/macro';
 import ToolbarIcon from '../../UI/ToolbarIcon';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 
-type Props = {|
-  onPreview: () => void,
+export type PreviewButtonSettings = {|
   isPreviewOverride: boolean,
   previewFirstSceneName: string,
   setScenePreview: () => void,
   togglePreviewOverride: () => void,
+|};
+
+type Props = {|
+  onPreview: () => void,
   onOpenDebugger: () => void,
   onNetworkPreview: () => void,
   showNetworkPreviewButton: boolean,
   showPreviewButton: boolean,
+  previewButtonSettings: PreviewButtonSettings,
 |};
 
-export default class PreviewButtons extends React.Component<Props> {
+export default class PreviewButtons extends React.Component<
+  Props,
+  PreviewButtonSettings
+> {
   render() {
     const {
       onPreview,
-      isPreviewOverride,
-      previewFirstSceneName,
-      setScenePreview,
-      togglePreviewOverride,
       onNetworkPreview,
       onOpenDebugger,
       showNetworkPreviewButton,
       showPreviewButton,
     } = this.props;
+
+    const {
+      isPreviewOverride,
+      previewFirstSceneName,
+      setScenePreview,
+      togglePreviewOverride,
+    } = this.props.previewButtonSettings;
 
     return (
       <React.Fragment>

@@ -951,15 +951,17 @@ class MainFrame extends React.Component<Props, State> {
         <PreferencesContext.Consumer>
           {({ values }) => (
             <SceneEditor
+              previewButtonSettings={{
+                isPreviewOverride: this.state.isPreviewOverride,
+                togglePreviewOverride: () => this.togglePreviewOverride(),
+                previewFirstSceneName: this.state.previewFirstSceneName,
+                setScenePreview: () => {
+                  this._setLayoutForPreview(name);
+                },
+              }}
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
-              isPreviewOverride={this.state.isPreviewOverride}
-              togglePreviewOverride={this.togglePreviewOverride}
-              previewFirstSceneName={this.state.previewFirstSceneName}
-              setScenePreview={() => {
-                this._setLayoutForPreview(name);
-              }}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 const { currentFileMetadata } = this.state;
@@ -1001,11 +1003,13 @@ class MainFrame extends React.Component<Props, State> {
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
-              isPreviewOverride={this.state.isPreviewOverride}
-              togglePreviewOverride={this.togglePreviewOverride}
-              previewFirstSceneName={this.state.previewFirstSceneName}
-              setScenePreview={() => {
-                this._setLayoutForPreview(name);
+              previewButtonSettings={{
+                isPreviewOverride: this.state.isPreviewOverride,
+                togglePreviewOverride: () => this.togglePreviewOverride(),
+                previewFirstSceneName: this.state.previewFirstSceneName,
+                setScenePreview: () => {
+                  this._setLayoutForPreview(name);
+                },
               }}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
@@ -1165,10 +1169,12 @@ class MainFrame extends React.Component<Props, State> {
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
               onPreview={() => {}}
-              isPreviewOverride={false}
-              togglePreviewOverride={() => {}}
-              previewFirstSceneName={''}
-              setScenePreview={() => {}}
+              previewButtonSettings={{
+                isPreviewOverride: false,
+                togglePreviewOverride: () => {},
+                previewFirstSceneName: '',
+                setScenePreview: () => {},
+              }}
               project={this.state.currentProject}
               eventsFunctionsExtensionName={name}
               setToolbar={this.setEditorToolbar}

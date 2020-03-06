@@ -56,10 +56,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
-  isPreviewOverride: boolean,
-  togglePreviewOverride: () => void,
-  setScenePreview: () => void,
-  previewFirstSceneName: string,
+  previewButtonSettings: Object,
 |};
 
 type State = {|
@@ -585,10 +582,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 events={selectedEventsFunction.getEvents()}
                 showPreviewButton={false}
                 onPreview={options => {}}
-                isPreviewOverride={false}
-                togglePreviewOverride={() => {}}
-                previewFirstSceneName={''}
-                setScenePreview={() => {}}
+                previewButtonSettings={{
+                  isPreviewOverride: false,
+                  togglePreviewOverride: () => {},
+                  previewFirstSceneName: '',
+                  setScenePreview: () => {},
+                }}
                 showNetworkPreviewButton={false}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}

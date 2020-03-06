@@ -117,6 +117,7 @@ const initialEditorsSmallWindow = {
 };
 
 type Props = {|
+  previewButtonSettings: Object,
   initialInstances: gdInitialInstancesContainer,
   initialUiSettings: Object,
   layout: gdLayout,
@@ -132,10 +133,6 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
-  isPreviewOverride: boolean,
-  togglePreviewOverride: () => void,
-  setScenePreview: () => void,
-  previewFirstSceneName: string,
 |};
 
 type State = {|
@@ -225,12 +222,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
+        previewButtonSettings={this.props.previewButtonSettings}
         showPreviewButton={this.props.showPreviewButton}
         onPreview={() => this.props.onPreview({})}
-        isPreviewOverride={this.props.isPreviewOverride}
-        togglePreviewOverride={this.props.togglePreviewOverride}
-        previewFirstSceneName={this.props.previewFirstSceneName}
-        setScenePreview={() => this.props.setScenePreview()}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         onOpenDebugger={() => {

@@ -85,10 +85,12 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           initiallyFocusedBehaviorName={this.props.initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
           ref={editor => (this.editor = editor)}
-          isPreviewOverride={false}
-          togglePreviewOverride={() => {}}
-          previewFirstSceneName={''}
-          setScenePreview={() => {}}
+          previewButtonSettings={{
+            isPreviewOverride:false,
+            togglePreviewOverride:() => {},
+            previewFirstSceneName:'',
+            setScenePreview:() => {},
+            }}
         />
       </div>
     );

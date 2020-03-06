@@ -11,10 +11,7 @@ import PreviewButtons from '../MainFrame/Toolbar/PreviewButtons.js';
 type Props = {|
   showPreviewButton: boolean,
   onPreview: () => void,
-  isPreviewOverride: boolean,
-  togglePreviewOverride: () => void,
-  setScenePreview: () => void,
-  previewFirstSceneName: string,
+  previewButtonSettings: Object,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
@@ -41,10 +38,7 @@ export class Toolbar extends PureComponent<Props> {
         <PreviewButtons
           showPreviewButton={this.props.showPreviewButton}
           onPreview={this.props.onPreview}
-          previewFirstSceneName={this.props.previewFirstSceneName}
-          setScenePreview={this.props.setScenePreview}
-          isPreviewOverride={this.props.isPreviewOverride}
-          togglePreviewOverride={this.props.togglePreviewOverride}
+          previewButtonSettings={this.props.previewButtonSettings}
           onNetworkPreview={this.props.onNetworkPreview}
           onOpenDebugger={this.props.onOpenDebugger}
           showNetworkPreviewButton={this.props.showNetworkPreviewButton}

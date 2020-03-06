@@ -91,6 +91,7 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   showPreviewButton: boolean,
   showNetworkPreviewButton: boolean,
+  previewButtonSettings: Object,
   onPreview: (options: PreviewOptions) => void,
   onOpenDebugger: () => void,
   onOpenSettings?: ?() => void,
@@ -107,10 +108,6 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
-  isPreviewOverride: boolean,
-  togglePreviewOverride: () => void,
-  setScenePreview: () => void,
-  previewFirstSceneName: string,
 |};
 type State = {|
   history: HistoryState,
@@ -247,10 +244,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         showPreviewButton={this.props.showPreviewButton}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onPreview={() => this.props.onPreview({})}
-        isPreviewOverride={this.props.isPreviewOverride}
-        togglePreviewOverride={this.props.togglePreviewOverride}
-        previewFirstSceneName={this.props.previewFirstSceneName}
-        setScenePreview={() => this.props.setScenePreview()}
+        previewButtonSettings={this.props.previewButtonSettings}
         onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         onOpenDebugger={() => {
           this.props.onOpenDebugger();

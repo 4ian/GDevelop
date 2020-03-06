@@ -831,6 +831,86 @@ module.exports = {
         .setType('number')
     );
 
+    const oldFilmEffect = extension
+      .addEffect('OldFilm')
+      .setFullName(_('Old Film'))
+      .setDescription(_('Add a Old film effect around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-old-film.js')
+      .addIncludeFile('Extensions/Effects/old-film-pixi-filter.js');
+    const oldFilmProperties = oldFilmEffect.getProperties();
+    oldFilmProperties.set(
+      'sepia',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Sepia (between 0 and 1)'))
+        .setType('number')
+        .setDescription(_('The amount of saturation of sepia effect, a value'
+          + 'of 1 is more saturation and closer to 0 is less, and a value of 0' 
+          + 'produces no sepia effect'))
+    );
+    oldFilmProperties.set(
+      'noise',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Noise (between 0 and 1)'))
+        .setType('number')
+        .setDescription('Opacity/intensity of the noise effect')
+    );
+    oldFilmProperties.set(
+      'noiseSize',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Noise Size (between 0 and 10)'))
+        .setType('number')
+        .setDescription('The size of the noise particles')
+    );
+    oldFilmProperties.set(
+      'scratch',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Scratch (between -1 and 1)'))
+        .setType('number')
+        .setDescription('How often scratches appear')
+    );
+    oldFilmProperties.set(
+      'scratchDensity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Scratch Density (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The density of the number of scratches')
+    );
+    oldFilmProperties.set(
+      'scratchWidth',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
+        .setLabel(_('Scratch Width (between 1 and 20)'))
+        .setType('number')
+        .setDescription('The width of the scratches')
+    );
+    oldFilmProperties.set(
+      'vignetting',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The radius of the vignette effect')
+    );
+    oldFilmProperties.set(
+      'vignettingAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
+        .setLabel(_('Vignetting Alpha (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The size of the noise particles')
+    );
+    oldFilmProperties.set(
+      'vignettingBlur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting Blur (between 0 and 1)'))
+        .setType('number')
+        .setDescription('Blur intensity of the vignette')
+    );
+    oldFilmProperties.set(
+      'seed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Seed'))
+        .setType('number')
+        .setDescription('A seed value to apply to the random noise generation')
+    );
+
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

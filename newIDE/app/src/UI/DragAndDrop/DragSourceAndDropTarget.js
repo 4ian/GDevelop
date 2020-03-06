@@ -44,7 +44,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
   reactDndType: string
 ): ((Props<DraggedItemType>) => React.Node) => {
   const sourceSpec = {
-    canDrag(props: Props<DraggedItemType>, monitor: DragTargetMonitor) {
+    canDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
       const item = monitor.getItem();
       const canDrag = props.canDrag || null;
       if (canDrag) return canDrag(item);

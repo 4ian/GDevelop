@@ -10,7 +10,8 @@ import { MarkdownText } from './MarkdownText';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
+import muiZIndex from '@material-ui/core/styles/zIndex';
 
 type Option =
   | {|
@@ -36,24 +37,23 @@ const styles = {
   },
 };
 
-const theme = createMuiTheme({
-  overrides: {
-    MuiAutocomplete: {
-      option: {
-        cursor: 'default',
-      },
-      listbox: {
-        padding: 0,
-        margin: 0,
-      },
-      input: {
-        width: 'auto',
-        flexGrow: 1,
-      },
-      inputRoot: {
-        flexWrap: 'wrap',
-      },
-    },
+const themeStyles = theme => ({
+  option: {
+    cursor: 'default',
+  },
+  listbox: {
+    padding: 0,
+    margin: 0,
+  },
+  input: {
+    width: 'auto',
+    flexGrow: 1,
+  },
+  inputRoot: {
+    flexWrap: 'wrap',
+  },
+  popper: {
+    zIndex: muiZIndex.tooltip + 100,
   },
 });
 
@@ -79,16 +79,14 @@ type Props = {|
   margin?: 'none' | 'dense',
   textFieldStyle?: Object,
   openOnFocus?: boolean,
+  classes: Object,
 |};
 
 type State = {|
   inputValue: string | null,
 |};
 
-export default class SemiControlledAutoComplete extends React.Component<
-  Props,
-  State
-> {
+class SemiControlledAutoComplete extends React.Component<Props, State> {
   _input = React.createRef<HTMLInputElement>();
 
   state = {
@@ -113,6 +111,8 @@ export default class SemiControlledAutoComplete extends React.Component<
   };
 
   render() {
+    const { classes } = this.props;
+
     const getCurrentInputValue = (): string =>
       this.state.inputValue !== null ? this.state.inputValue : this.props.value;
 
@@ -224,48 +224,55 @@ export default class SemiControlledAutoComplete extends React.Component<
     };
 
     return (
-      <ThemeProvider theme={theme}>
-        <I18n>
-          {({ i18n }) => (
-            <Autocomplete
-              freeSolo
-              onChange={handleChange}
-              style={{ ...styles.container }}
-              inputValue={getCurrentInputValue()}
-              value={getCurrentInputValue()}
-              onInputChange={handleInputChange}
-              options={this.props.dataSource}
-              renderOption={renderItem}
-              getOptionDisabled={this.isOptionDisabled}
-              getOptionLabel={getOptionLabel}
-              filterOptions={filterFunction}
-              renderInput={params => {
-                const { InputProps, ...other } = getDefaultStylingProps(params);
-                return (
-                  <TextField
-                    InputProps={{
-                      ...InputProps,
-                      placeholder:
-                        typeof this.props.hintText === 'string'
-                          ? this.props.hintText
-                          : i18n._(this.props.hintText),
-                    }}
-                    {...other}
-                    {...computeTextFieldStyleProps(this.props)}
-                    style={{ ...this.props.textFieldStyle }}
-                    label={this.props.floatingLabelText}
-                    inputRef={this._input}
-                    disabled={this.props.disabled}
-                    error={!!this.props.errorText}
-                    helperText={helperText}
-                    fullWidth={this.props.fullWidth}
-                  />
-                );
-              }}
-            />
-          )}
-        </I18n>
-      </ThemeProvider>
+      <I18n>
+        {({ i18n }) => (
+          <Autocomplete
+            freeSolo
+            classes={{
+              option: classes.option,
+              listbox: classes.listbox,
+              input: classes.input,
+              inputRoot: classes.inputRoot,
+              popper: classes.popper,
+            }}
+            onChange={handleChange}
+            style={{ ...styles.container }}
+            inputValue={getCurrentInputValue()}
+            value={getCurrentInputValue()}
+            onInputChange={handleInputChange}
+            options={this.props.dataSource}
+            renderOption={renderItem}
+            getOptionDisabled={this.isOptionDisabled}
+            getOptionLabel={getOptionLabel}
+            filterOptions={filterFunction}
+            renderInput={params => {
+              const { InputProps, ...other } = getDefaultStylingProps(params);
+              return (
+                <TextField
+                  InputProps={{
+                    ...InputProps,
+                    placeholder:
+                      typeof this.props.hintText === 'string'
+                        ? this.props.hintText
+                        : i18n._(this.props.hintText),
+                  }}
+                  {...other}
+                  {...computeTextFieldStyleProps(this.props)}
+                  style={{ ...this.props.textFieldStyle }}
+                  label={this.props.floatingLabelText}
+                  inputRef={this._input}
+                  disabled={this.props.disabled}
+                  error={!!this.props.errorText}
+                  helperText={helperText}
+                  fullWidth={this.props.fullWidth}
+                />
+              );
+            }}
+          />
+        )}
+      </I18n>
     );
   }
 }
+
+export default withStyles(themeStyles)(SemiControlledAutoComplete);

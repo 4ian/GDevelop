@@ -8,6 +8,7 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import DropIndicator from './DropIndicator';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
+import type { WidthType } from '../Reponsive/ResponsiveWidthMeasurer';
 
 type Props<Item> = {|
   height: number,
@@ -45,7 +46,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
   _renderItemRow(
     item: Item,
     index: number,
-    windowWidth: string,
+    windowWidth: WidthType,
     connectIconDragSource?: ?(React.Node) => React.Node
   ) {
     const {

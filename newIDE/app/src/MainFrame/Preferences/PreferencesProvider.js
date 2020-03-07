@@ -43,6 +43,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
+    loadPreferencesValues: loadPreferencesValues,
+    savePreferencesValues: savePreferencesValues,
   };
 
   componentDidMount() {

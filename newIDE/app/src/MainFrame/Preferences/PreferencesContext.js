@@ -133,8 +133,8 @@ export type Preferences = {|
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setShowEffectParameterNames: (enabled: boolean) => void,
-  loadPreferencesValues: () => PreferencesValues,
-  savePreferencesValues: (preferences: Preferences) => Preferences,
+  loadPreferencesValues: () => ?PreferencesValues,
+  savePreferencesValues: (values: PreferencesValues) => void,
 |};
 
 export const initialPreferences = {
@@ -168,8 +168,8 @@ export const initialPreferences = {
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
-  loadPreferencesValues: loadPreferencesValues,
-  savePreferencesValues: savePreferencesValues,
+  loadPreferencesValues: () => {},
+  savePreferencesValues: (values: PreferencesValues)=> {},
 };
 
 export function loadPreferencesValues(): ?PreferencesValues {
@@ -203,8 +203,6 @@ export function savePreferencesValues(values: PreferencesValues) {
   } catch (e) {
     console.warn('Unable to persist preferences', e);
   }
-
-  return values;
 }
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

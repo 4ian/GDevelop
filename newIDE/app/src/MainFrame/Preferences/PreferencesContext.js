@@ -169,7 +169,7 @@ export const initialPreferences = {
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
   loadPreferencesValues: () => {},
-  savePreferencesValues: (values: PreferencesValues)=> {},
+  savePreferencesValues: (values: PreferencesValues) => {},
 };
 
 export function loadPreferencesValues(): ?PreferencesValues {

@@ -3,7 +3,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
     var oldFilmFilter = new PIXI.filters.OldFilmFilter();
 
     return oldFilmFilter;
-  },
+  },  
   update: function(filter, layer) {
     if (filter.animated) {
       filter.time += layer.getElapsedTime() / 1000;

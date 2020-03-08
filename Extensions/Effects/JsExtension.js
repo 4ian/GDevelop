@@ -915,7 +915,7 @@ module.exports = {
     const colorReplaceEffect = extension
       .addEffect('ColorReplace')
       .setFullName(_('Color Replace'))
-      .setDescription(_('Color Replace Filter.'))
+      .setDescription(_('Effect replacing a color (or similar) by another.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-replace.js')
       .addIncludeFile('Extensions/Effects/color-replace-pixi-filter.js');
     const colorReplaceProperties = colorReplaceEffect.getProperties();
@@ -931,7 +931,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
         .setLabel(_('New Color'))
         .setType('color')
-        .setDescription('The resulting color')
+        .setDescription('The new color')
     );
     colorReplaceProperties.set(
       'epsilon',

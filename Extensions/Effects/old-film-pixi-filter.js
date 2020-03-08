@@ -18,7 +18,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
       filter.noise = value;
     }
     else if (parameterName === 'noiseSize') {
-      filter.uniforms.noiseSize = value;
+      filter.noiseSize = value;
     }
     else if (parameterName === 'scratch') {
       filter.scratch = value;

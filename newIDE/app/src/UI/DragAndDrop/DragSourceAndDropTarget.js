@@ -48,7 +48,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
       const item = monitor.getItem();
       const canDrag = props.canDrag || null;
       if (canDrag) return canDrag(item);
-      else return true;
+      return true;
     },
     beginDrag(props: InnerDragSourceAndDropTargetProps<DraggedItemType>) {
       return props.beginDrag();

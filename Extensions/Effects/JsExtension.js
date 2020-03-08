@@ -950,7 +950,7 @@ module.exports = {
       .setFullName(_('Dot'))
       .setDescription(
         _(
-          'Applies a dotscreen effect making display objects appear to be made out of black and white halftone dots like an old printer.'
+          'Applies a dotscreen effect making objects appear to be made out of black and white halftone dots like an old printer.'
         )
       )
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-dot.js')

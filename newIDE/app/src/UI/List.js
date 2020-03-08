@@ -193,6 +193,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
           <MUIListItemText
             primary={props.primaryText}
             secondary={props.secondaryText}
+            style={{ margin: '0 auto' }}
           />
           {this._renderListItemSecondaryAction()}
           {props.displayAddIcon && <Add />}
@@ -222,6 +223,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             <MUIListItemText
               primary={props.primaryText}
               secondary={props.secondaryText}
+              style={{ margin: '0 auto' }}
             />
             {props.autoGenerateNestedIndicator ? (
               isOpen ? (

@@ -162,49 +162,42 @@ export default class InstancesList extends Component<Props, State> {
                   >
                     <RVColumn
                       label={<Trans>Object name</Trans>}
-                      style={{ fontWeight: 'bold' }}
                       dataKey="name"
                       width={width * 0.35}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label=""
-                      style={{ fontWeight: 'bold' }}
                       dataKey="locked"
                       width={width * 0.05}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>X</Trans>}
-                      style={{ fontWeight: 'bold' }}
                       dataKey="x"
                       width={width * 0.1}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Y</Trans>}
-                      style={{ fontWeight: 'bold' }}
                       dataKey="y"
                       width={width * 0.1}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Angle</Trans>}
-                      style={{ fontWeight: 'bold' }}
                       dataKey="angle"
                       width={width * 0.1}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Layer</Trans>}
-                      style={{ fontWeight: 'bold' }}
                       dataKey="layer"
                       width={width * 0.2}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Z Order</Trans>}
-                      style={{ fontWeight: 'bold' }}
                       dataKey="zOrder"
                       width={width * 0.1}
                       className={'tableColumn'}

@@ -144,7 +144,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     } = this.props;
 
     return (
-      <Column expand noMargin>
+      <Column expand noMargin useMaxHeight>
         <Tabs value={this.state.currentTab} onChange={this._chooseTab}>
           <Tab
             label={<Trans>Configuration</Trans>}

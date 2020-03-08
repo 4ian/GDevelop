@@ -77,6 +77,47 @@ type Props = {|
   ...ParameterFieldProps,
 |};
 
+const MAX_ERRORS_COUNT = 10;
+
+const extractErrors = (
+  expressionNode: gdExpressionNode
+): {|
+  errorText: ?string,
+  errorHighlights: Array<Highlight>,
+|} => {
+  const expressionValidator = new gd.ExpressionValidator();
+  expressionNode.visit(expressionValidator);
+  const errors = expressionValidator.getErrors();
+
+  const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
+    begin: error.getStartPosition(),
+    end: error.getEndPosition() + 1,
+    message: error.getMessage(),
+    type: 'error',
+  }));
+  const otherErrorsCount = Math.max(
+    0,
+    errorHighlights.length - MAX_ERRORS_COUNT
+  );
+  const hasMultipleErrors = errorHighlights.length > 1;
+
+  const filteredErrorHighlights =
+    otherErrorsCount > 0
+      ? errorHighlights.slice(0, MAX_ERRORS_COUNT)
+      : errorHighlights;
+
+  const errorText = filteredErrorHighlights
+    .map(
+      (highlight, i) =>
+        (hasMultipleErrors ? `[${i + 1}] ` : '') + highlight.message
+    )
+    .join(' ');
+
+  expressionValidator.delete();
+
+  return { errorText, errorHighlights };
+};
+
 export default class ExpressionField extends React.Component<Props, State> {
   _field: ?SemiControlledTextField = null;
   _fieldElement: ?Element = null;
@@ -147,11 +188,6 @@ export default class ExpressionField extends React.Component<Props, State> {
         this._doValidation();
       }
     );
-  };
-
-  _handleMenuMouseDown = (event: any) => {
-    // Keep the TextField focused
-    event.preventDefault();
   };
 
   _handleExpressionChosen = (
@@ -230,25 +266,8 @@ export default class ExpressionField extends React.Component<Props, State> {
       .parseExpression(expressionType, expression)
       .get();
 
-    const expressionValidator = new gd.ExpressionValidator();
-    expressionNode.visit(expressionValidator);
-    const errors = expressionValidator.getErrors();
+    const { errorText, errorHighlights } = extractErrors(expressionNode);
 
-    const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
-      begin: error.getStartPosition(),
-      end: error.getEndPosition() + 1,
-      message: error.getMessage(),
-      type: 'error',
-    }));
-    const hasMultipleErrors = errorHighlights.length > 1;
-    const errorText = errorHighlights
-      .map(
-        (highlight, i) =>
-          (hasMultipleErrors ? `[${i + 1}] ` : '') + highlight.message
-      )
-      .join(' ');
-
-    expressionValidator.delete();
     parser.delete();
 
     this.setState({ errorText, errorHighlights });

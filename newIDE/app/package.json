@@ -94,7 +94,7 @@
     "extract-all-translations": "node scripts/extract-all-translations.js",
     "compile-translations": "node scripts/compile-translations.js",
     "reload-extensions": "node scripts/import-GDJS-Runtime.js",
-    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 e02f67866b338b4cc577e1ffa48f55f52cd520ed751dccc6f0931e3c1b995de0 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.0-beta80 5930c686ccf2b6fd3433b1c9539483473a6aedb8b6a73dd13c07030c95efecb9"
+    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 b8e4d57b160ff93d3680168cd271af795412ea6c4c0da321aee2946345c7fb75 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.0-beta80 5930c686ccf2b6fd3433b1c9539483473a6aedb8b6a73dd13c07030c95efecb9"
   },
   "eslintConfig": {
     "extends": "react-app"

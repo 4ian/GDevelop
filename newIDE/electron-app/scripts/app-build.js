@@ -1,17 +1,55 @@
-var shell = require('shelljs');
-var args = require('minimist')(process.argv.slice(2));
+const shell = require('shelljs');
+const fs = require('fs');
+const path = require('path');
+const args = require('minimist')(process.argv.slice(2));
 
+// Sanity check electron-builder installation
 if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
   shell.echo('⚠️ Please run npm install in electron-app folder');
   shell.exit(1);
 }
 
-if (!args['skip-app-build']) {
-  shell.cd('../app');
-  shell.exec('npm run build');
-  shell.cd('../electron-app');
-}
+// Sanity check libGD.js size
+const checkLibGDjsSize = () =>
+  new Promise(resolve => {
+    fs.stat(path.join(__dirname, '../../app/public/libGD.js'), (err, stats) => {
+      if (err) {
+        shell.echo(
+          `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
+        );
+        shell.exit(1);
+      }
 
-shell.rm('-rf', 'app/www');
-shell.mkdir('-p', 'app/www');
-shell.cp('-r', '../app/build/*', 'app/www');
+      const sizeInMiB = stats.size / 1024 / 1024;
+      if (sizeInMiB > 5) {
+        shell.echo(
+          `❌ libGD.js size is too big (${sizeInMiB.toFixed(
+            2
+          )}MiB) - are you sure you're not trying to deploy the development version?`
+        );
+        shell.exit(1);
+      }
+
+      shell.echo(`✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`);
+      resolve();
+    });
+  });
+
+checkLibGDjsSize().then(() => {
+  if (!args['skip-app-build']) {
+    shell.cd('../app');
+    if (shell.exec('npm run build').code !== 0) {
+      shell.exit(1);
+    }
+    shell.cd('../electron-app');
+  }
+
+  shell.rm('-rf', 'app/www');
+  shell.mkdir('-p', 'app/www');
+  if (shell.cp('-r', '../app/build/*', 'app/www').code !== 0) {
+    shell.echo(
+      `❌ Copy from "../app/build" to Electron's "app/www" folder failed.`
+    );
+    shell.exit(1);
+  }
+});

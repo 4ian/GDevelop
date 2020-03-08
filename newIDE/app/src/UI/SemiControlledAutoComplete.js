@@ -60,7 +60,7 @@ const themeStyles = theme => ({
 type Props = {|
   value: string,
   onChange: string => void,
-  onRequestClose?: () => void,
+  //onRequestClose?: () => void,
   onChoose?: string => void,
   dataSource: DataSource,
 
@@ -108,6 +108,27 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
   isOptionDisabled = (option: Option): boolean => {
     if (option.type === 'separator') return true;
     return false;
+  };
+
+  renderItem = (option: Option, state: Object): React.Node => {
+    if (option.type && option.type === 'separator') {
+      return (
+        <ListItem
+          divider
+          disableGutters
+          component={'div'}
+          style={styles.listItem}
+        />
+      );
+    }
+    return (
+      <ListItem component={'div'} style={styles.listItem}>
+        {option.renderIcon && (
+          <ListItemIcon>{option.renderIcon()}</ListItemIcon>
+        )}
+        {option.value}
+      </ListItem>
+    );
   };
 
   render() {
@@ -167,14 +188,13 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
           }
         }
       }
-      if (typeof event.key === 'string') handleKeyDown(event.key);
-      if (this.props.onRequestClose) this.props.onRequestClose();
-    };
-
-    const handleKeyDown = (key: string): void => {
-      if (key === 'Enter' && this._input.current !== null) {
+      if (
+        typeof event.key === 'string' &&
+        event.key === 'Enter' &&
+        this._input.current !== null
+      )
         this._input.current.blur();
-      }
+      //if (this.props.onRequestClose) this.props.onRequestClose();
     };
 
     const handleInputChange = (e, value: string, reason: string): void =>
@@ -193,8 +213,8 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
           ...inputProps,
           className: null,
           onKeyDown: (event): void => {
-            if (event.key === 'Escape' && this.props.onRequestClose)
-              this.props.onRequestClose();
+            // if (event.key === 'Escape' && this.props.onRequestClose)
+            //   this.props.onRequestClose();
             if (event.key === 'Enter')
               handleChange(event, getCurrentInputValue());
           },
@@ -202,32 +222,12 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
       };
     };
 
-    const renderItem = (option: Option, state: Object): React.Node => {
-      if (option.type && option.type === 'separator') {
-        return (
-          <ListItem
-            divider
-            disableGutters
-            component={'div'}
-            style={styles.listItem}
-          />
-        );
-      }
-      return (
-        <ListItem component={'div'} style={styles.listItem}>
-          {option.renderIcon && (
-            <ListItemIcon>{option.renderIcon()}</ListItemIcon>
-          )}
-          {option.value}
-        </ListItem>
-      );
-    };
-
     return (
       <I18n>
         {({ i18n }) => (
           <Autocomplete
             freeSolo
+            blurOnSelect
             classes={{
               option: classes.option,
               listbox: classes.listbox,
@@ -241,7 +241,7 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
             value={getCurrentInputValue()}
             onInputChange={handleInputChange}
             options={this.props.dataSource}
-            renderOption={renderItem}
+            renderOption={this.renderItem}
             getOptionDisabled={this.isOptionDisabled}
             getOptionLabel={getOptionLabel}
             filterOptions={filterFunction}

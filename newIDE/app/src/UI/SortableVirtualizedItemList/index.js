@@ -8,6 +8,7 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import DropIndicator from './DropIndicator';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
+import type { WidthType } from '../Reponsive/ResponsiveWidthMeasurer';
 
 type Props<Item> = {|
   height: number,
@@ -42,20 +43,55 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     if (this._list) this._list.forceUpdateGrid();
   }
 
+  _renderItemRow(
+    item: Item,
+    index: number,
+    windowWidth: WidthType,
+    connectIconDragSource?: ?(React.Node) => React.Node
+  ) {
+    const {
+      selectedItems,
+      getItemThumbnail,
+      erroredItems,
+      isItemBold,
+      onEditItem,
+      renamedItem,
+      getItemName,
+    } = this.props;
+
+    const nameBeingEdited = renamedItem === item;
+    const itemName = getItemName(item);
+
+    return (
+      <ItemRow
+        item={item}
+        itemName={itemName}
+        isBold={isItemBold ? isItemBold(item) : false}
+        onRename={newName => this.props.onRename(item, newName)}
+        editingName={nameBeingEdited}
+        getThumbnail={
+          getItemThumbnail ? () => getItemThumbnail(item) : undefined
+        }
+        selected={selectedItems.indexOf(item) !== -1}
+        onItemSelected={this.props.onItemSelected}
+        errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
+        buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
+        onEdit={onEditItem}
+        hideMenuButton={windowWidth === 'small'}
+        connectIconDragSource={connectIconDragSource || null}
+      />
+    );
+  }
+
   render() {
     const {
       height,
       width,
       fullList,
-      selectedItems,
       addNewItemLabel,
       renamedItem,
       getItemThumbnail,
-      getItemName,
-      erroredItems,
       onAddNewItem,
-      isItemBold,
-      onEditItem,
       onMoveSelectionToItem,
       canMoveSelectionToItem,
     } = this.props;
@@ -98,7 +134,6 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
                   const item = fullList[index];
                   const nameBeingEdited = renamedItem === item;
-                  const itemName = getItemName(item);
 
                   return (
                     <div style={style} key={key}>
@@ -107,6 +142,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                           this.props.onItemSelected(item);
                           return {};
                         }}
+                        canDrag={() => !nameBeingEdited}
                         canDrop={() =>
                           canMoveSelectionToItem
                             ? canMoveSelectionToItem(item)
@@ -127,38 +163,14 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                           const dropTarget = connectDropTarget(
                             <div>
                               {isOver && <DropIndicator canDrop={canDrop} />}
-                              <ItemRow
-                                item={item}
-                                itemName={itemName}
-                                isBold={isItemBold ? isItemBold(item) : false}
-                                onRename={newName =>
-                                  this.props.onRename(item, newName)
-                                }
-                                editingName={nameBeingEdited}
-                                getThumbnail={
-                                  getItemThumbnail
-                                    ? () => getItemThumbnail(item)
-                                    : undefined
-                                }
-                                selected={selectedItems.indexOf(item) !== -1}
-                                onItemSelected={this.props.onItemSelected}
-                                errorStatus={
-                                  erroredItems
-                                    ? erroredItems[itemName] || ''
-                                    : ''
-                                }
-                                buildMenuTemplate={() =>
-                                  this.props.buildMenuTemplate(item, index)
-                                }
-                                onEdit={onEditItem}
-                                hideMenuButton={windowWidth === 'small'}
-                                connectIconDragSource={
-                                  // If on a touch screen, only set the icon to be draggable.
-                                  screenType === 'touch'
-                                    ? connectDragSource
-                                    : undefined
-                                }
-                              />
+                              {this._renderItemRow(
+                                item,
+                                index,
+                                windowWidth,
+                                screenType === 'touch' // Set the icon to be draggable, only if on a touch screen
+                                  ? connectDragSource
+                                  : null
+                              )}
                             </div>
                           );
 

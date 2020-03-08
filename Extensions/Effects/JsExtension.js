@@ -43,7 +43,7 @@ module.exports = {
       .addEffect('BlendingMode')
       .setFullName(_('Blending mode'))
       .setDescription(
-        _('Alter the rendered image with a specified blend mode.')
+        _('Alter the rendered image with the specified blend mode.')
       )
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-alpha.js')
       .addIncludeFile('Extensions/Effects/blending-mode-pixi-filter.js');
@@ -51,7 +51,7 @@ module.exports = {
     blendingModeProperties.set(
       'blendmode',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('0: Normal, 1: Add, 2: Multiply, 3: Screen'))
+        .setLabel(_('Mode (0: Normal, 1: Add, 2: Multiply, 3: Screen)'))
         .setType('number')
     );
     blendingModeProperties.set(

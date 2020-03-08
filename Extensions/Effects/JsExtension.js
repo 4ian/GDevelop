@@ -39,6 +39,28 @@ module.exports = {
         .setType('number')
     );
 
+    const blendingModeEffect = extension
+      .addEffect('BlendingMode')
+      .setFullName(_('Blending mode'))
+      .setDescription(
+        _('Alter the rendered image with the specified blend mode.')
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-alpha.js')
+      .addIncludeFile('Extensions/Effects/blending-mode-pixi-filter.js');
+    const blendingModeProperties = blendingModeEffect.getProperties();
+    blendingModeProperties.set(
+      'blendmode',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Mode (0: Normal, 1: Add, 2: Multiply, 3: Screen)'))
+        .setType('number')
+    );
+    blendingModeProperties.set(
+      'opacity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Opacity (between 0 and 1)'))
+        .setType('number')
+    );
+
     const blurEffect = extension
       .addEffect('Blur')
       .setFullName(_('Blur'))

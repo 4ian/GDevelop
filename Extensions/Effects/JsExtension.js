@@ -831,6 +831,146 @@ module.exports = {
         .setType('number')
     );
 
+    const oldFilmEffect = extension
+      .addEffect('OldFilm')
+      .setFullName(_('Old Film'))
+      .setDescription(_('Add a Old film effect around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-old-film.js')
+      .addIncludeFile('Extensions/Effects/old-film-pixi-filter.js');
+    const oldFilmProperties = oldFilmEffect.getProperties();
+    oldFilmProperties.set(
+      'sepia',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Sepia (between 0 and 1)'))
+        .setType('number')
+        .setDescription(
+          _(
+            'The amount of saturation of sepia effect, a value of 1 is more saturation and closer to 0 is less, and a value of 0 produces no sepia effect'
+          )
+        )
+    );
+    oldFilmProperties.set(
+      'noise',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Noise (between 0 and 1)'))
+        .setType('number')
+        .setDescription('Opacity/intensity of the noise effect')
+    );
+    oldFilmProperties.set(
+      'noiseSize',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Noise Size (between 0 and 10)'))
+        .setType('number')
+        .setDescription('The size of the noise particles')
+    );
+    oldFilmProperties.set(
+      'scratch',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Scratch (between -1 and 1)'))
+        .setType('number')
+        .setDescription('How often scratches appear')
+    );
+    oldFilmProperties.set(
+      'scratchDensity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Scratch Density (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The density of the number of scratches')
+    );
+    oldFilmProperties.set(
+      'scratchWidth',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
+        .setLabel(_('Scratch Width (between 1 and 20)'))
+        .setType('number')
+        .setDescription('The width of the scratches')
+    );
+    oldFilmProperties.set(
+      'vignetting',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The radius of the vignette effect')
+    );
+    oldFilmProperties.set(
+      'vignettingAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
+        .setLabel(_('Vignetting Alpha (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The size of the noise particles')
+    );
+    oldFilmProperties.set(
+      'vignettingBlur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting Blur (between 0 and 1)'))
+        .setType('number')
+        .setDescription('Blur intensity of the vignette')
+    );
+    oldFilmProperties.set(
+      'animated',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel(_('Animated (Enable animations)'))
+        .setType('boolean')
+    );
+
+    const colorReplaceEffect = extension
+      .addEffect('ColorReplace')
+      .setFullName(_('Color Replace'))
+      .setDescription(_('Effect replacing a color (or similar) by another.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-replace.js')
+      .addIncludeFile('Extensions/Effects/color-replace-pixi-filter.js');
+    const colorReplaceProperties = colorReplaceEffect.getProperties();
+    colorReplaceProperties.set(
+      'originalColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#ff0000')
+        .setLabel(_('Original Color'))
+        .setType('color')
+        .setDescription('The color that will be changed')
+    );
+    colorReplaceProperties.set(
+      'newColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
+        .setLabel(_('New Color'))
+        .setType('color')
+        .setDescription('The new color')
+    );
+    colorReplaceProperties.set(
+      'epsilon',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.4')
+        .setLabel(_('Epsilon (between 0 and 1)'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Tolerance/sensitivity of the floating-point comparison between colors (lower = more exact, higher = more inclusive)'
+          )
+        )
+    );
+
+    const dotEffect = extension
+      .addEffect('Dot')
+      .setFullName(_('Dot'))
+      .setDescription(
+        _(
+          'Applies a dotscreen effect making objects appear to be made out of black and white halftone dots like an old printer.'
+        )
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-dot.js')
+      .addIncludeFile('Extensions/Effects/dot-pixi-filter.js');
+    const dotProperties = dotEffect.getProperties();
+    dotProperties.set(
+      'scale',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Scale (between 0.3 and 1)'))
+        .setType('number')
+        .setDescription('The scale of the effect')
+    );
+    dotProperties.set(
+      'angle',
+      new gd.PropertyDescriptor(/* defaultValue= */ '5')
+        .setLabel(_('Angle (between 0 and 5)'))
+        .setType('number')
+        .setDescription('The radius of the effect')
+    );
+
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

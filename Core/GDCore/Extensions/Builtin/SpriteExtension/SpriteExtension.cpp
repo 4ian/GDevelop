@@ -388,7 +388,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("expression",
-                    _("Mode (0 : Normal, 1 : Add, 2 : Multiply, 3 : Screen)"))
+                    _("Mode (0: Normal, 1: Add, 2: Multiply, 3: Screen)"))
       .MarkAsSimple();
 
   obj.AddAction("FlipX",

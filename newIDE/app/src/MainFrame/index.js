@@ -522,7 +522,7 @@ class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    const name = newNameGenerator('NewScene', name =>
+    const name = newNameGenerator('New scene', name =>
       currentProject.hasLayoutNamed(name)
     );
     const newLayout = currentProject.insertNewLayout(

@@ -345,7 +345,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addLayout = (index: number) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator('NewScene', name =>
+    const newName = newNameGenerator('New scene', name =>
       project.hasLayoutNamed(name)
     );
     const newLayout = project.insertNewLayout(newName, index + 1);
@@ -700,6 +700,11 @@ export default class ProjectManager extends React.Component<Props, State> {
             autoGenerateNestedIndicator={!forceOpen}
             renderNestedItems={() =>
               filterProjectItemsList(enumerateLayouts(project), searchText)
+                .sort((layout1: gdLayout,layout2: gdLayout) => {
+                  const name1 = layout1.getName();
+                  const name2 = layout2.getName();
+                  return (name1.localeCompare(name2));
+                })  
                 .map((layout: gdLayout, i: number) => {
                   const name = layout.getName();
                   return (

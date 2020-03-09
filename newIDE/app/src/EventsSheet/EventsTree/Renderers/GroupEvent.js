@@ -11,7 +11,6 @@ import {
   disabledText,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
-
 const gd = global.gd;
 
 const styles = {
@@ -70,9 +69,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           ...styles.container,
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
-        onClick={() => {
-          this.edit();
-        }}
+        onClick={this.edit}
       >
         {this.state.editing ? (
           <TextField
@@ -94,13 +91,13 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             }}
             fullWidth
             id="group-title"
-            onKeyUp={e => {
-              if (e.key === 'Escape') {
+            onKeyUp={event => {
+              if (event.key === 'Escape') {
                 this.endEditing();
               }
             }}
-            onKeyPress={e => {
-              if (e.charCode === 13) {
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
                 this.endEditing();
               }
             }}

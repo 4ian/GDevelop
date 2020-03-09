@@ -44,11 +44,7 @@ type Props = {|
       value: string,
     },
   }) => void,
-  onKeyPress?: (event: {|
-    charCode: number,
-    key: string,
-    shiftKey: string,
-  |}) => void,
+  onKeyPress?: (event: {| charCode: number, key: string |}) => void,
   onKeyUp?: (event: {| charCode: number, key: string |}) => void,
 
   // Error handling:

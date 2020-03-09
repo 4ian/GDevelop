@@ -12,7 +12,6 @@ import {
   disabledText,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
-
 const gd = global.gd;
 
 const commentTextStyle = {
@@ -120,9 +119,7 @@ export default class CommentEvent extends React.Component<
           ...styles.container,
           backgroundColor: `#${backgroundColor}`,
         }}
-        onClick={() => {
-          this.edit();
-        }}
+        onClick={this.edit}
       >
         {this.state.editing ? (
           <TextField
@@ -144,8 +141,8 @@ export default class CommentEvent extends React.Component<
             }}
             fullWidth
             id="comment-title"
-            onKeyUp={e => {
-              if (e.key === 'Escape') {
+            onKeyUp={event => {
+              if (event.key === 'Escape') {
                 this.endEditing();
               }
             }}

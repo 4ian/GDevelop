@@ -55,6 +55,14 @@ type Props = {|
   noTitleMargin?: boolean,
 |};
 
+// Help Flow to understand the type of the dialog content style.
+type DialogContentStyle = {
+  padding?: 0,
+  overflowX?: 'hidden',
+  display?: 'flex',
+  flexDirection?: 'row',
+};
+
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
@@ -82,6 +90,12 @@ export default (props: Props) => {
     actions
   );
 
+  const dialogContentStyle: DialogContentStyle = {
+    ...(noMargin ? styles.noMarginBody : styles.defaultBody),
+    ...((flexRowBody ? styles.flexRowBody : {}): DialogContentStyle),
+    ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
+  };
+
   return (
     <ResponsiveWindowMeasurer>
       {size => (
@@ -100,15 +114,7 @@ export default (props: Props) => {
               {title}
             </DialogTitle>
           )}
-          <DialogContent
-            style={{
-              ...(noMargin ? styles.noMarginBody : styles.defaultBody),
-              ...(flexRowBody ? styles.flexRowBody : {}),
-              ...(flexBody ? styles.flexBody : {}),
-            }}
-          >
-            {children}
-          </DialogContent>
+          <DialogContent style={dialogContentStyle}>{children}</DialogContent>
           <DialogActions
             style={
               secondaryActions

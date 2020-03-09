@@ -17,9 +17,9 @@ type Props<DraggedItemType> = {|
     connectDropTarget: ConnectDropTarget,
     isOver: boolean,
     canDrop: boolean,
-  }) => React.Node,
+  }) => ?React.Node,
   beginDrag: () => DraggedItemType,
-  canDrag: (item: DraggedItemType) => boolean,
+  canDrag?: (item: DraggedItemType) => boolean,
   canDrop: (item: DraggedItemType) => boolean,
   drop: () => void,
 |};

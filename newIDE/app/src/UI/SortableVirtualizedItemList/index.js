@@ -47,7 +47,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     item: Item,
     index: number,
     windowWidth: WidthType,
-    connectIconDragSource?: ?(React.Node) => React.Node
+    connectIconDragSource?: ?(React.Element<any>) => ?React.Node
   ) {
     const {
       selectedItems,
@@ -140,6 +140,8 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                       <DragSourceAndDropTarget
                         beginDrag={() => {
                           this.props.onItemSelected(item);
+
+                          // $FlowFixMe
                           return {};
                         }}
                         canDrag={() => !nameBeingEdited}
@@ -173,6 +175,8 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                               )}
                             </div>
                           );
+
+                          if (!dropTarget) return null;
 
                           return screenType === 'touch'
                             ? dropTarget

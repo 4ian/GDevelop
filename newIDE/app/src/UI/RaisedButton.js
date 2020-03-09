@@ -22,10 +22,10 @@ export type RaisedButtonPropsWithoutOnClick = {|
   labelPosition?: 'before',
 |};
 
-type Props = {
+type Props = {|
   ...RaisedButtonPropsWithoutOnClick,
   onClick: ?() => void,
-};
+|};
 
 /**
  * A raised button based on Material-UI button.

@@ -112,7 +112,7 @@ const replaceNode = (
 const defaultToolbarControls = [<CloseButton key="close" />];
 
 // This is based on the implementation of the react-mosaic window
-// toolbar done here: https://github.com/nomcopter/react-mosaic/blob/b36984c34b0fa1e3f21a211578301933cea24992/src/MosaicWindow.tsx#L136-L183 
+// toolbar done here: https://github.com/nomcopter/react-mosaic/blob/b36984c34b0fa1e3f21a211578301933cea24992/src/MosaicWindow.tsx#L136-L183
 const renderMosaicWindowPreview = props => (
   <div className="mosaic-preview">
     <div className="mosaic-window-toolbar">

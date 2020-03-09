@@ -11,6 +11,13 @@ export type PreviewButtonSettings = {|
   togglePreviewOverride: () => void,
 |};
 
+export const emptyPreviewButtonSettings = {
+  isPreviewOverride: false,
+  previewFirstSceneName: '',
+  setScenePreview: () => {},
+  togglePreviewOverride: () => {},
+};
+
 type Props = {|
   onPreview: () => void,
   onOpenDebugger: () => void,

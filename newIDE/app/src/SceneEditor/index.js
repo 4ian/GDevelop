@@ -67,6 +67,7 @@ import {
 } from '../Utils/TagsHelper';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -117,7 +118,7 @@ const initialEditorsSmallWindow = {
 };
 
 type Props = {|
-  previewButtonSettings: Object,
+  previewButtonSettings: PreviewButtonSettings,
   initialInstances: gdInitialInstancesContainer,
   initialUiSettings: Object,
   layout: gdLayout,

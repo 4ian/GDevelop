@@ -92,6 +92,8 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
+
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -1169,12 +1171,7 @@ class MainFrame extends React.Component<Props, State> {
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
               onPreview={() => {}}
-              previewButtonSettings={{
-                isPreviewOverride: false,
-                togglePreviewOverride: () => {},
-                previewFirstSceneName: '',
-                setScenePreview: () => {},
-              }}
+              previewButtonSettings={emptyPreviewButtonSettings}
               project={this.state.currentProject}
               eventsFunctionsExtensionName={name}
               setToolbar={this.setEditorToolbar}

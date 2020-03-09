@@ -6,12 +6,14 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import { type EventMetadata } from './EnumerateEventsMetadata';
-import PreviewButtons from '../MainFrame/Toolbar/PreviewButtons.js';
+import PreviewButtons, {
+  type PreviewButtonSettings,
+} from '../MainFrame/Toolbar/PreviewButtons.js';
 
 type Props = {|
   showPreviewButton: boolean,
   onPreview: () => void,
-  previewButtonSettings: Object,
+  previewButtonSettings: PreviewButtonSettings,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,

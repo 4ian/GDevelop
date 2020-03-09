@@ -80,6 +80,7 @@ import {
 import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 const gd = global.gd;
 
 type Props = {|
@@ -91,7 +92,7 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   showPreviewButton: boolean,
   showNetworkPreviewButton: boolean,
-  previewButtonSettings: Object,
+  previewButtonSettings: PreviewButtonSettings,
   onPreview: (options: PreviewOptions) => void,
   onOpenDebugger: () => void,
   onOpenSettings?: ?() => void,

@@ -183,6 +183,7 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import emptyPreviewButtonSettings from '../MainFrame/Toolbar/PreviewButtons';
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -2525,12 +2526,7 @@ storiesOf('EventsSheet', module)
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={{
-            isPreviewOverride: false,
-            togglePreviewOverride: () => {},
-            previewFirstSceneName: '',
-            setScenePreview: () => {},
-          }}
+          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2559,12 +2555,7 @@ storiesOf('EventsSheet', module)
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={{
-            isPreviewOverride: false,
-            togglePreviewOverride: () => {},
-            previewFirstSceneName: '',
-            setScenePreview: () => {},
-          }}
+          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -3721,12 +3712,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
-          previewButtonSettings={{
-            isPreviewOverride: false,
-            togglePreviewOverride: () => {},
-            previewFirstSceneName: '',
-            setScenePreview: () => {},
-          }}
+          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

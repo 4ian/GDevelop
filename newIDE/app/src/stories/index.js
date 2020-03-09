@@ -183,7 +183,7 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import emptyPreviewButtonSettings from '../MainFrame/Toolbar/PreviewButtons';
+import { emptyPreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 
 addDecorator(GDevelopJsInitializerDecorator);
 

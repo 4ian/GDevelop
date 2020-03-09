@@ -2,7 +2,7 @@
 import * as React from 'react';
 import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor';
 import BaseEditor from './BaseEditor';
-import emptyPreviewButtonSettings from '../Toolbar/PreviewButtons';
+import { emptyPreviewButtonSettings } from '../Toolbar/PreviewButtons';
 
 const styles = {
   container: {

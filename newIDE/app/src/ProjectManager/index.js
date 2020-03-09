@@ -700,11 +700,6 @@ export default class ProjectManager extends React.Component<Props, State> {
             autoGenerateNestedIndicator={!forceOpen}
             renderNestedItems={() =>
               filterProjectItemsList(enumerateLayouts(project), searchText)
-                .sort((layout1: gdLayout,layout2: gdLayout) => {
-                  const name1 = layout1.getName();
-                  const name2 = layout2.getName();
-                  return (name1.localeCompare(name2));
-                })  
                 .map((layout: gdLayout, i: number) => {
                   const name = layout.getName();
                   return (

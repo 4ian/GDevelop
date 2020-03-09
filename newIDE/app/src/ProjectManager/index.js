@@ -345,7 +345,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addLayout = (index: number) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator('NewScene', name =>
+    const newName = newNameGenerator('New scene', name =>
       project.hasLayoutNamed(name)
     );
     const newLayout = project.insertNewLayout(newName, index + 1);

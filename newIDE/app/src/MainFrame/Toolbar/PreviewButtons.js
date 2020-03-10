@@ -75,10 +75,10 @@ export default class PreviewButtons extends React.Component<
                   : 'Use this scene for preview',
                 checked: isPreviewFirstSceneOverriden,
                 click: () => {
+                  togglePreviewFirstSceneOverride();
                   if (!previewFirstSceneName) {
                     useSceneAsPreviewFirstScene();
                   }
-                  togglePreviewFirstSceneOverride();
                 },
               },
               { type: 'separator' },

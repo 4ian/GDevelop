@@ -12,7 +12,7 @@ export type PreviewButtonSettings = {|
 |};
 
 export const emptyPreviewButtonSettings = {
-  isPreviewFirstSceneOverriden: false,
+  isPreviewFirstSceneOverriden: null,
   previewFirstSceneName: '',
   useSceneAsPreviewFirstScene: () => {},
   togglePreviewFirstSceneOverride: () => {},
@@ -67,26 +67,29 @@ export default class PreviewButtons extends React.Component<
               />
             }
             openMenuWithSecondaryClick
-            buildMenuTemplate={() => [
-              {
-                type: 'checkbox',
-                label: previewFirstSceneName
-                  ? 'Use scene ' + previewFirstSceneName + ' for preview'
-                  : 'Use this scene for preview',
-                checked: isPreviewFirstSceneOverriden,
-                click: () => {
-                  togglePreviewFirstSceneOverride();
-                  if (!previewFirstSceneName) {
-                    useSceneAsPreviewFirstScene();
-                  }
+            buildMenuTemplate={() => {
+              if (isPreviewFirstSceneOverriden === null) return [];
+              return [
+                {
+                  type: 'checkbox',
+                  label: previewFirstSceneName
+                    ? 'Use scene ' + previewFirstSceneName + ' for preview'
+                    : 'Use this scene for preview',
+                  checked: isPreviewFirstSceneOverriden,
+                  click: () => {
+                    togglePreviewFirstSceneOverride();
+                    if (!previewFirstSceneName) {
+                      useSceneAsPreviewFirstScene();
+                    }
+                  },
                 },
-              },
-              { type: 'separator' },
-              {
-                label: 'Always use this scene to start the previews',
-                click: () => useSceneAsPreviewFirstScene(),
-              },
-            ]}
+                { type: 'separator' },
+                {
+                  label: 'Always use this scene to start the previews',
+                  click: () => useSceneAsPreviewFirstScene(),
+                },
+              ];
+            }}
           />
         )}
         {showNetworkPreviewButton && (

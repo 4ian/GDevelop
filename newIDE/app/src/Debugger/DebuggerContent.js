@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -82,7 +83,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
         editors={{
           inspectors: {
             type: 'primary',
-            title: <Trans>Inspectors</Trans>,
+            title: t`Inspectors`,
             toolbarControls: [],
             renderEditor: () => (
               <Background>
@@ -181,7 +182,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
           },
           profiler: {
             type: 'secondary',
-            title: <Trans>Profiler</Trans>,
+            title: t`Profiler`,
             renderEditor: () => (
               <Profiler
                 onStart={onStartProfiler}

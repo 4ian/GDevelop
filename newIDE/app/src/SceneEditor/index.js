@@ -902,7 +902,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const editors = {
       properties: {
         type: 'secondary',
-        title: <Trans>Properties</Trans>,
+        title: t`Properties`,
         renderEditor: () => (
           <InstancePropertiesEditor
             project={project}
@@ -957,7 +957,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       'objects-list': {
         type: 'secondary',
-        title: <Trans>Objects</Trans>,
+        title: t`Objects`,
         toolbarControls: [
           <I18n key="tags">
             {({ i18n }) => (
@@ -998,7 +998,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       'object-groups-list': {
         type: 'secondary',
-        title: <Trans>Object Groups</Trans>,
+        title: t`Object Groups`,
         renderEditor: () => (
           <ObjectGroupsList
             globalObjectGroups={project.getObjectGroups()}

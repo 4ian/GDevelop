@@ -63,6 +63,13 @@ type Props = {|
   // Size
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
 
+  // Header, Footer and their styles
+  header?: React.Node,
+  footer?: React.Node,
+  headerContainerStyle?: Object,
+  footerContainerStyle?: Object,
+  mainContainerStyle?: Object,
+
   // Style:
   noMargin?: boolean,
   noTitleMargin?: boolean,
@@ -126,14 +133,16 @@ export default (props: Props) => {
               overflow: 'hidden',
             }}
           >
-            <ScrollView
-              style={{
-                ...styles.headerContainerStyle,
-                ...headerContainerStyle,
-              }}
-            >
-              {header}
-            </ScrollView>
+            {header && (
+              <ScrollView
+                style={{
+                  ...styles.headerContainerStyle,
+                  ...headerContainerStyle,
+                }}
+              >
+                {header}
+              </ScrollView>
+            )}
             <ScrollView
               style={{
                 ...styles.mainContainerStyle,
@@ -142,14 +151,16 @@ export default (props: Props) => {
             >
               {children}
             </ScrollView>
-            <ScrollView
-              style={{
-                ...styles.footerContainerStyle,
-                ...footerContainerStyle,
-              }}
-            >
-              {footer}
-            </ScrollView>
+            {footer && (
+              <ScrollView
+                style={{
+                  ...styles.footerContainerStyle,
+                  ...footerContainerStyle,
+                }}
+              >
+                {footer}
+              </ScrollView>
+            )}
           </DialogContent>
           <DialogActions
             style={

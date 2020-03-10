@@ -5,17 +5,17 @@ import ToolbarIcon from '../../UI/ToolbarIcon';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 
 export type PreviewButtonSettings = {|
-  isPreviewOverride: boolean,
+  isPreviewFirstSceneOverriden: boolean,
   previewFirstSceneName: string,
-  setScenePreview: () => void,
-  togglePreviewOverride: () => void,
+  useSceneAsPreviewFirstScene: () => void,
+  togglePreviewFirstSceneOverride: () => void,
 |};
 
 export const emptyPreviewButtonSettings = {
-  isPreviewOverride: false,
+  isPreviewFirstSceneOverriden: false,
   previewFirstSceneName: '',
-  setScenePreview: () => {},
-  togglePreviewOverride: () => {},
+  useSceneAsPreviewFirstScene: () => {},
+  togglePreviewFirstSceneOverride: () => {},
 };
 
 type Props = {|
@@ -41,10 +41,10 @@ export default class PreviewButtons extends React.Component<
     } = this.props;
 
     const {
-      isPreviewOverride,
+      isPreviewFirstSceneOverriden,
       previewFirstSceneName,
-      setScenePreview,
-      togglePreviewOverride,
+      useSceneAsPreviewFirstScene,
+      togglePreviewFirstSceneOverride,
     } = this.props.previewButtonSettings;
 
     return (
@@ -55,12 +55,12 @@ export default class PreviewButtons extends React.Component<
               <ToolbarIcon
                 onClick={onPreview}
                 src={
-                  isPreviewOverride
+                  isPreviewFirstSceneOverriden
                     ? 'res/ribbon_default/previewOverride32.png'
                     : 'res/ribbon_default/preview32.png'
                 }
                 tooltip={
-                  isPreviewOverride
+                  isPreviewFirstSceneOverriden
                     ? t`Preview is overridden, right click for more`
                     : t`Launch a preview of the scene, right click for more`
                 }
@@ -73,18 +73,18 @@ export default class PreviewButtons extends React.Component<
                 label: previewFirstSceneName
                   ? 'Use scene ' + previewFirstSceneName + ' for preview'
                   : 'Use this scene for preview',
-                checked: isPreviewOverride,
+                checked: isPreviewFirstSceneOverriden,
                 click: () => {
                   if (!previewFirstSceneName) {
-                    setScenePreview();
+                    useSceneAsPreviewFirstScene();
                   }
-                  togglePreviewOverride();
+                  togglePreviewFirstSceneOverride();
                 },
               },
               { type: 'separator' },
               {
                 label: 'Always use this scene to start the previews',
-                click: () => setScenePreview(),
+                click: () => useSceneAsPreviewFirstScene(),
               },
             ]}
           />

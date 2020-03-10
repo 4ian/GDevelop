@@ -134,7 +134,7 @@ type State = {|
   helpFinderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
-  isPreviewOverride: boolean,
+  isPreviewFirstSceneOverriden: boolean,
   previewFirstSceneName: string,
 |};
 
@@ -190,7 +190,7 @@ class MainFrame extends React.Component<Props, State> {
     helpFinderDialogOpen: false,
     eventsFunctionsExtensionsError: null,
     gdjsDevelopmentWatcherEnabled: false,
-    isPreviewOverride: false,
+    isPreviewFirstSceneOverriden: false,
     previewFirstSceneName: '',
   };
   toolbar = null;
@@ -524,10 +524,15 @@ class MainFrame extends React.Component<Props, State> {
     this.toolbar.setEditorToolbar(editorToolbar);
   };
 
-  togglePreviewOverride = () => {
-    this.setState({ isPreviewOverride: !this.state.isPreviewOverride }, () => {
-      this.updateToolbar();
-    });
+  togglePreviewFirstSceneOverride = () => {
+    this.setState(
+      {
+        isPreviewFirstSceneOverriden: !this.state.isPreviewFirstSceneOverriden,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
   };
 
   addLayout = () => {
@@ -875,7 +880,7 @@ class MainFrame extends React.Component<Props, State> {
     options: PreviewOptions
   ) => {
     const { _previewLauncher } = this;
-    const { previewFirstSceneName, isPreviewOverride } = this.state;
+    const { previewFirstSceneName, isPreviewFirstSceneOverriden } = this.state;
 
     if (!_previewLauncher) return;
 
@@ -885,7 +890,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         let previewedLayout = layout;
-        if (previewFirstSceneName && isPreviewOverride) {
+        if (previewFirstSceneName && isPreviewFirstSceneOverriden) {
           if (project.hasLayoutNamed(previewFirstSceneName)) {
             previewedLayout = project.getLayout(previewFirstSceneName);
           }
@@ -954,11 +959,13 @@ class MainFrame extends React.Component<Props, State> {
           {({ values }) => (
             <SceneEditor
               previewButtonSettings={{
-                isPreviewOverride: this.state.isPreviewOverride,
-                togglePreviewOverride: () => this.togglePreviewOverride(),
+                isPreviewFirstSceneOverriden: this.state
+                  .isPreviewFirstSceneOverriden,
+                togglePreviewFirstSceneOverride: () =>
+                  this.togglePreviewFirstSceneOverride(),
                 previewFirstSceneName: this.state.previewFirstSceneName,
-                setScenePreview: () => {
-                  this._setLayoutForPreview(name);
+                useSceneAsPreviewFirstScene: () => {
+                  this._setPreviewFirstScene(name);
                 },
               }}
               project={this.state.currentProject}
@@ -1006,11 +1013,13 @@ class MainFrame extends React.Component<Props, State> {
               layoutName={name}
               setToolbar={this.setEditorToolbar}
               previewButtonSettings={{
-                isPreviewOverride: this.state.isPreviewOverride,
-                togglePreviewOverride: () => this.togglePreviewOverride(),
+                isPreviewFirstSceneOverriden: this.state
+                  .isPreviewFirstSceneOverriden,
+                togglePreviewFirstSceneOverride: () =>
+                  this.togglePreviewFirstSceneOverride(),
                 previewFirstSceneName: this.state.previewFirstSceneName,
-                setScenePreview: () => {
-                  this._setLayoutForPreview(name);
+                useSceneAsPreviewFirstScene: () => {
+                  this._setPreviewFirstScene(name);
                 },
               }}
               onPreview={(project, layout, options) => {
@@ -1573,11 +1582,11 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  _setLayoutForPreview = (name: string) => {
+  _setPreviewFirstScene = (name: string) => {
     this.setState(
       {
         previewFirstSceneName: name,
-        isPreviewOverride: true,
+        isPreviewFirstSceneOverriden: true,
       },
       () => {
         this.updateToolbar();

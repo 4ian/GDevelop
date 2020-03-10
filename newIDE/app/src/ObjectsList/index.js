@@ -34,6 +34,7 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
 
 const styles = {
   listContainer: {
@@ -487,6 +488,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     ];
   };
 
+  static contextType = UnsavedChangesContext;
   render() {
     const { project, objectsContainer, selectedObjectTags } = this.props;
     const { searchText, tagEditedObject } = this.state;
@@ -578,7 +580,10 @@ export default class ObjectsList extends React.Component<Props, State> {
               this.state.variablesEditedObject.getVariables()
             }
             onCancel={() => this._editVariables(null)}
-            onApply={() => this._editVariables(null)}
+            onApply={() => {
+              this.context.triggerUnsavedChanges();
+              return this._editVariables(null);
+            }}
             title={<Trans>Object Variables</Trans>}
             emptyExplanationMessage={
               <Trans>

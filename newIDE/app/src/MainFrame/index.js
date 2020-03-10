@@ -92,6 +92,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+import UnsavedChangesContextProvider from './UnsavedChangesContext';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -851,7 +852,6 @@ class MainFrame extends React.Component<Props, State> {
         eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
           currentProject
         );
-
         this.forceUpdate();
       }
     );
@@ -1379,6 +1379,8 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     const { i18n, storageProviderOperations } = this.props;
+    console.log('saved');
+
     const { onSaveProject } = storageProviderOperations;
     if (!onSaveProject) {
       return this.saveProjectAs();
@@ -1389,6 +1391,7 @@ class MainFrame extends React.Component<Props, State> {
 
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
+        console.log('saved!');
         if (wasSaved) {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         }
@@ -1705,281 +1708,292 @@ class MainFrame extends React.Component<Props, State> {
       this.props.loading;
 
     return (
-      <div className="main-frame">
-        <ProjectTitlebar fileMetadata={currentFileMetadata} />
-        <Drawer
-          open={projectManagerOpen}
-          PaperProps={{
-            style: styles.drawerContent,
-          }}
-          onClose={this.toggleProjectManager}
-        >
-          <EditorBar
-            title={currentProject ? currentProject.getName() : 'No project'}
-            displayRightCloseButton
+      <UnsavedChangesContextProvider>
+        <div className="main-frame">
+          <ProjectTitlebar fileMetadata={currentFileMetadata} />
+          <Drawer
+            open={projectManagerOpen}
+            PaperProps={{
+              style: styles.drawerContent,
+            }}
             onClose={this.toggleProjectManager}
-          />
-          {currentProject && (
-            <ProjectManager
-              project={currentProject}
-              onOpenExternalEvents={this.openExternalEvents}
-              onOpenLayout={this.openLayout}
-              onOpenExternalLayout={this.openExternalLayout}
-              onOpenEventsFunctionsExtension={this.openEventsFunctionsExtension}
-              onAddLayout={this.addLayout}
-              onAddExternalLayout={this.addExternalLayout}
-              onAddEventsFunctionsExtension={this.addEventsFunctionsExtension}
-              onAddExternalEvents={this.addExternalEvents}
-              onDeleteLayout={this.deleteLayout}
-              onDeleteExternalLayout={this.deleteExternalLayout}
-              onDeleteEventsFunctionsExtension={
-                this.deleteEventsFunctionsExtension
-              }
-              onDeleteExternalEvents={this.deleteExternalEvents}
-              onRenameLayout={this.renameLayout}
-              onRenameExternalLayout={this.renameExternalLayout}
-              onRenameEventsFunctionsExtension={
-                this.renameEventsFunctionsExtension
-              }
-              onRenameExternalEvents={this.renameExternalEvents}
-              onSaveProject={this.saveProject}
-              onSaveProjectAs={this.saveProjectAs}
-              onCloseProject={() => {
-                this.askToCloseProject();
-              }}
-              onExportProject={this.openExportDialog}
-              onOpenPreferences={() => this.openPreferences(true)}
-              onOpenProfile={() => this.openProfile(true)}
-              onOpenResources={() => {
-                this.openResources();
-                this.openProjectManager(false);
-              }}
-              onOpenPlatformSpecificAssets={() =>
-                this.openPlatformSpecificAssets()
-              }
-              onChangeSubscription={() => this.openSubscription(true)}
-              eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
-              onReloadEventsFunctionsExtensions={() => {
-                // Check if load is sufficient
-                eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-                  currentProject
-                );
-              }}
-              freezeUpdate={!projectManagerOpen}
+          >
+            <EditorBar
+              title={currentProject ? currentProject.getName() : 'No project'}
+              displayRightCloseButton
+              onClose={this.toggleProjectManager}
             />
-          )}
-          {!currentProject && (
-            <EmptyMessage>
-              <Trans>To begin, open or create a new project.</Trans>
-            </EmptyMessage>
-          )}
-        </Drawer>
-        <Toolbar
-          ref={toolbar => (this.toolbar = toolbar)}
-          showProjectIcons={!this.props.integratedEditor}
-          hasProject={!!this.state.currentProject}
-          toggleProjectManager={this.toggleProjectManager}
-          exportProject={() => this.openExportDialog(true)}
-          requestUpdate={this.props.requestUpdate}
-          simulateUpdateDownloaded={this.simulateUpdateDownloaded}
-          simulateUpdateAvailable={this.simulateUpdateAvailable}
-        />
-        <ClosableTabs hideLabels={!!this.props.integratedEditor}>
+            {currentProject && (
+              <ProjectManager
+                project={currentProject}
+                onOpenExternalEvents={this.openExternalEvents}
+                onOpenLayout={this.openLayout}
+                onOpenExternalLayout={this.openExternalLayout}
+                onOpenEventsFunctionsExtension={
+                  this.openEventsFunctionsExtension
+                }
+                onAddLayout={this.addLayout}
+                onAddExternalLayout={this.addExternalLayout}
+                onAddEventsFunctionsExtension={this.addEventsFunctionsExtension}
+                onAddExternalEvents={this.addExternalEvents}
+                onDeleteLayout={this.deleteLayout}
+                onDeleteExternalLayout={this.deleteExternalLayout}
+                onDeleteEventsFunctionsExtension={
+                  this.deleteEventsFunctionsExtension
+                }
+                onDeleteExternalEvents={this.deleteExternalEvents}
+                onRenameLayout={this.renameLayout}
+                onRenameExternalLayout={this.renameExternalLayout}
+                onRenameEventsFunctionsExtension={
+                  this.renameEventsFunctionsExtension
+                }
+                onRenameExternalEvents={this.renameExternalEvents}
+                onSaveProject={this.saveProject}
+                onSaveProjectAs={this.saveProjectAs}
+                onCloseProject={() => {
+                  this.askToCloseProject();
+                }}
+                onExportProject={this.openExportDialog}
+                onOpenPreferences={() => this.openPreferences(true)}
+                onOpenProfile={() => this.openProfile(true)}
+                onOpenResources={() => {
+                  this.openResources();
+                  this.openProjectManager(false);
+                }}
+                onOpenPlatformSpecificAssets={() =>
+                  this.openPlatformSpecificAssets()
+                }
+                onChangeSubscription={() => this.openSubscription(true)}
+                eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
+                onReloadEventsFunctionsExtensions={() => {
+                  // Check if load is sufficient
+                  eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+                    currentProject
+                  );
+                }}
+                freezeUpdate={!projectManagerOpen}
+              />
+            )}
+            {!currentProject && (
+              <EmptyMessage>
+                <Trans>To begin, open or create a new project.</Trans>
+              </EmptyMessage>
+            )}
+          </Drawer>
+          <Toolbar
+            ref={toolbar => (this.toolbar = toolbar)}
+            showProjectIcons={!this.props.integratedEditor}
+            hasProject={!!this.state.currentProject}
+            toggleProjectManager={this.toggleProjectManager}
+            exportProject={() => this.openExportDialog(true)}
+            requestUpdate={this.props.requestUpdate}
+            simulateUpdateDownloaded={this.simulateUpdateDownloaded}
+            simulateUpdateAvailable={this.simulateUpdateAvailable}
+          />
+          <ClosableTabs hideLabels={!!this.props.integratedEditor}>
+            {getEditors(this.state.editorTabs).map((editorTab, id) => {
+              const isCurrentTab =
+                getCurrentTabIndex(this.state.editorTabs) === id;
+              return (
+                <ClosableTab
+                  label={editorTab.name}
+                  key={editorTab.key}
+                  active={isCurrentTab}
+                  onClick={() => this._onChangeEditorTab(id)}
+                  onClose={() => this._onCloseEditorTab(editorTab)}
+                  onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}
+                  onCloseAll={this._onCloseAllEditorTabs}
+                  onActivated={() => this._onEditorTabActive(editorTab)}
+                  closable={editorTab.closable}
+                />
+              );
+            })}
+          </ClosableTabs>
           {getEditors(this.state.editorTabs).map((editorTab, id) => {
             const isCurrentTab =
               getCurrentTabIndex(this.state.editorTabs) === id;
             return (
-              <ClosableTab
-                label={editorTab.name}
-                key={editorTab.key}
-                active={isCurrentTab}
-                onClick={() => this._onChangeEditorTab(id)}
-                onClose={() => this._onCloseEditorTab(editorTab)}
-                onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}
-                onCloseAll={this._onCloseAllEditorTabs}
-                onActivated={() => this._onEditorTabActive(editorTab)}
-                closable={editorTab.closable}
-              />
+              <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+                <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
+              </TabContentContainer>
             );
           })}
-        </ClosableTabs>
-        {getEditors(this.state.editorTabs).map((editorTab, id) => {
-          const isCurrentTab = getCurrentTabIndex(this.state.editorTabs) === id;
-          return (
-            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
-              <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
-            </TabContentContainer>
-          );
-        })}
-        <LoaderModal show={showLoader} />
-        <HelpFinder
-          open={helpFinderDialogOpen}
-          onClose={() => this.openHelpFinderDialog(false)}
-        />
-        <Snackbar
-          open={this.state.snackMessageOpen}
-          autoHideDuration={3000}
-          onClose={this._closeSnackMessage}
-          ContentProps={{
-            'aria-describedby': 'snackbar-message',
-          }}
-          message={<span id="snackbar-message">{this.state.snackMessage}</span>}
-        />
-        {!!renderExportDialog &&
-          this.state.exportDialogOpen &&
-          renderExportDialog({
-            onClose: () => this.openExportDialog(false),
-            onChangeSubscription: () => {
-              this.openExportDialog(false);
-              this.openSubscription(true);
-            },
-            project: this.state.currentProject,
-          })}
-        {!!renderCreateDialog &&
-          this.state.createDialogOpen &&
-          renderCreateDialog({
-            open: this.state.createDialogOpen,
-            onClose: () => this.openCreateDialog(false),
-            onOpen: (storageProvider, fileMetadata) => {
-              this.openCreateDialog(false);
-              useStorageProvider(storageProvider)
-                .then(() => this.openFromFileMetadata(fileMetadata))
-                .then(() => this.openSceneOrProjectManager());
-            },
-            onCreate: (project, storageProvider, fileMetadata) => {
-              this.openCreateDialog(false);
-              useStorageProvider(storageProvider)
-                .then(() => this.loadFromProject(project, fileMetadata))
-                .then(() => this.openSceneOrProjectManager());
-            },
-          })}
-        {!!introDialog &&
-          React.cloneElement(introDialog, {
-            open: this.state.introDialogOpen,
-            onClose: () => this._openIntroDialog(false),
-          })}
-        {!!this.state.currentProject &&
-          this.state.platformSpecificAssetsDialogOpen && (
-            <PlatformSpecificAssetsDialog
-              project={this.state.currentProject}
-              open
-              onApply={() => this.openPlatformSpecificAssets(false)}
-              onClose={() => this.openPlatformSpecificAssets(false)}
-              resourceSources={resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
-            />
-          )}
-        {!!genericDialog &&
-          React.cloneElement(genericDialog, {
-            open: this.state.genericDialogOpen,
-            onClose: () => this._openGenericDialog(false),
-          })}
-        {!!renderPreviewLauncher &&
-          renderPreviewLauncher(
-            {
-              onExport: () => this.openExportDialog(true),
-              onChangeSubscription: () => this.openSubscription(true),
-            },
-            (previewLauncher: ?PreviewLauncherInterface) => {
-              this._previewLauncher = previewLauncher;
+          <LoaderModal show={showLoader} />
+          <HelpFinder
+            open={helpFinderDialogOpen}
+            onClose={() => this.openHelpFinderDialog(false)}
+          />
+          <Snackbar
+            open={this.state.snackMessageOpen}
+            autoHideDuration={3000}
+            onClose={this._closeSnackMessage}
+            ContentProps={{
+              'aria-describedby': 'snackbar-message',
+            }}
+            message={
+              <span id="snackbar-message">{this.state.snackMessage}</span>
+            }
+          />
+          {!!renderExportDialog &&
+            this.state.exportDialogOpen &&
+            renderExportDialog({
+              onClose: () => this.openExportDialog(false),
+              onChangeSubscription: () => {
+                this.openExportDialog(false);
+                this.openSubscription(true);
+              },
+              project: this.state.currentProject,
+            })}
+          {!!renderCreateDialog &&
+            this.state.createDialogOpen &&
+            renderCreateDialog({
+              open: this.state.createDialogOpen,
+              onClose: () => this.openCreateDialog(false),
+              onOpen: (storageProvider, fileMetadata) => {
+                this.openCreateDialog(false);
+                useStorageProvider(storageProvider)
+                  .then(() => this.openFromFileMetadata(fileMetadata))
+                  .then(() => this.openSceneOrProjectManager());
+              },
+              onCreate: (project, storageProvider, fileMetadata) => {
+                this.openCreateDialog(false);
+                useStorageProvider(storageProvider)
+                  .then(() => this.loadFromProject(project, fileMetadata))
+                  .then(() => this.openSceneOrProjectManager());
+              },
+            })}
+          {!!introDialog &&
+            React.cloneElement(introDialog, {
+              open: this.state.introDialogOpen,
+              onClose: () => this._openIntroDialog(false),
+            })}
+          {!!this.state.currentProject &&
+            this.state.platformSpecificAssetsDialogOpen && (
+              <PlatformSpecificAssetsDialog
+                project={this.state.currentProject}
+                open
+                onApply={() => {
+                  this.openPlatformSpecificAssets(false);
+                }}
+                onClose={() => this.openPlatformSpecificAssets(false)}
+                resourceSources={resourceSources}
+                onChooseResource={this._onChooseResource}
+                resourceExternalEditors={resourceExternalEditors}
+              />
+            )}
+          {!!genericDialog &&
+            React.cloneElement(genericDialog, {
+              open: this.state.genericDialogOpen,
+              onClose: () => this._openGenericDialog(false),
+            })}
+          {!!renderPreviewLauncher &&
+            renderPreviewLauncher(
+              {
+                onExport: () => this.openExportDialog(true),
+                onChangeSubscription: () => this.openSubscription(true),
+              },
+              (previewLauncher: ?PreviewLauncherInterface) => {
+                this._previewLauncher = previewLauncher;
+              }
+            )}
+          {resourceSources.map(
+            (resourceSource, index): React.Node => {
+              const Component = resourceSource.component;
+              return (
+                <Component
+                  key={resourceSource.name}
+                  ref={dialog =>
+                    (this._resourceSourceDialogs[resourceSource.name] = dialog)
+                  }
+                  i18n={i18n}
+                />
+              );
             }
           )}
-        {resourceSources.map(
-          (resourceSource, index): React.Node => {
-            const Component = resourceSource.component;
-            return (
-              <Component
-                key={resourceSource.name}
-                ref={dialog =>
-                  (this._resourceSourceDialogs[resourceSource.name] = dialog)
+          {profileDialogOpen && (
+            <ProfileDialog
+              open
+              onClose={() => this.openProfile(false)}
+              onChangeSubscription={() => this.openSubscription(true)}
+            />
+          )}
+          {subscriptionDialogOpen && (
+            <SubscriptionDialog
+              onClose={() => {
+                this.openSubscription(false);
+              }}
+              open
+            />
+          )}
+          {this.state.preferencesDialogOpen && (
+            <PreferencesDialog onClose={() => this.openPreferences(false)} />
+          )}
+          {this.state.languageDialogOpen && (
+            <LanguageDialog
+              open
+              onClose={languageChanged => {
+                this.openLanguage(false);
+                if (languageChanged) {
+                  this._languageDidChange();
                 }
-                i18n={i18n}
-              />
-            );
-          }
-        )}
-        {profileDialogOpen && (
-          <ProfileDialog
-            open
-            onClose={() => this.openProfile(false)}
-            onChangeSubscription={() => this.openSubscription(true)}
-          />
-        )}
-        {subscriptionDialogOpen && (
-          <SubscriptionDialog
-            onClose={() => {
-              this.openSubscription(false);
-            }}
-            open
-          />
-        )}
-        {this.state.preferencesDialogOpen && (
-          <PreferencesDialog onClose={() => this.openPreferences(false)} />
-        )}
-        {this.state.languageDialogOpen && (
-          <LanguageDialog
-            open
-            onClose={languageChanged => {
-              this.openLanguage(false);
-              if (languageChanged) {
-                this._languageDidChange();
-              }
-            }}
-          />
-        )}
-        {aboutDialogOpen && (
-          <AboutDialog
-            open
-            onClose={() => this.openAboutDialog(false)}
-            updateStatus={updateStatus}
-          />
-        )}
-        {this.state.openFromStorageProviderDialogOpen && (
-          <OpenFromStorageProviderDialog
-            onClose={() => this.openOpenFromStorageProviderDialog(false)}
-            storageProviders={this.props.storageProviders}
-            onChooseProvider={storageProvider => {
-              this.openOpenFromStorageProviderDialog(false);
-              useStorageProvider(storageProvider).then(() => {
-                this.chooseProjectWithStorageProviderPicker();
-              });
-            }}
-            onCreateNewProject={() => {
-              this.openOpenFromStorageProviderDialog(false);
-              this.openCreateDialog(true);
-            }}
-          />
-        )}
-        {this.state.saveToStorageProviderDialogOpen && (
-          <SaveToStorageProviderDialog
-            onClose={() => this.openSaveToStorageProviderDialog(false)}
-            storageProviders={this.props.storageProviders}
-            onChooseProvider={storageProvider => {
-              this.openSaveToStorageProviderDialog(false);
-              useStorageProvider(storageProvider).then(() => {
-                this.saveProjectAsWithStorageProvider();
-              });
-            }}
-          />
-        )}
-        {this.state.openConfirmDialogOpen && (
-          <OpenConfirmDialog
-            onClose={() => {
-              this._openOpenConfirmDialog(false);
-            }}
-            onConfirm={() => {
-              this._openOpenConfirmDialog(false);
-              this._openInitialFileMetadata(/* isAfterUserInteraction= */ true);
-            }}
-          />
-        )}
-        <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
-        <ChangelogDialogContainer />
-        {this.state.gdjsDevelopmentWatcherEnabled &&
-          renderGDJSDevelopmentWatcher &&
-          renderGDJSDevelopmentWatcher()}
-      </div>
+              }}
+            />
+          )}
+          {aboutDialogOpen && (
+            <AboutDialog
+              open
+              onClose={() => this.openAboutDialog(false)}
+              updateStatus={updateStatus}
+            />
+          )}
+          {this.state.openFromStorageProviderDialogOpen && (
+            <OpenFromStorageProviderDialog
+              onClose={() => this.openOpenFromStorageProviderDialog(false)}
+              storageProviders={this.props.storageProviders}
+              onChooseProvider={storageProvider => {
+                this.openOpenFromStorageProviderDialog(false);
+                useStorageProvider(storageProvider).then(() => {
+                  this.chooseProjectWithStorageProviderPicker();
+                });
+              }}
+              onCreateNewProject={() => {
+                this.openOpenFromStorageProviderDialog(false);
+                this.openCreateDialog(true);
+              }}
+            />
+          )}
+          {this.state.saveToStorageProviderDialogOpen && (
+            <SaveToStorageProviderDialog
+              onClose={() => this.openSaveToStorageProviderDialog(false)}
+              storageProviders={this.props.storageProviders}
+              onChooseProvider={storageProvider => {
+                this.openSaveToStorageProviderDialog(false);
+                useStorageProvider(storageProvider).then(() => {
+                  this.saveProjectAsWithStorageProvider();
+                });
+              }}
+            />
+          )}
+          {this.state.openConfirmDialogOpen && (
+            <OpenConfirmDialog
+              onClose={() => {
+                this._openOpenConfirmDialog(false);
+              }}
+              onConfirm={() => {
+                this._openOpenConfirmDialog(false);
+                this._openInitialFileMetadata(
+                  /* isAfterUserInteraction= */ true
+                );
+              }}
+            />
+          )}
+          <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
+          <ChangelogDialogContainer />
+          {this.state.gdjsDevelopmentWatcherEnabled &&
+            renderGDJSDevelopmentWatcher &&
+            renderGDJSDevelopmentWatcher()}
+        </div>
+      </UnsavedChangesContextProvider>
     );
   }
 }

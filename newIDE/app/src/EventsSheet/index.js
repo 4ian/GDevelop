@@ -80,6 +80,7 @@ import {
 import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 type Props = {|
@@ -220,6 +221,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
+  static contextType = UnsavedChangesContext;
 
   updateToolbar() {
     if (!this.props.setToolbar) return;
@@ -256,6 +258,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         onToggleSearchPanel={this._toggleSearchPanel}
       />
     );
+    this.context.triggerUnsavedChanges();
   }
 
   _toggleSearchPanel = () => {

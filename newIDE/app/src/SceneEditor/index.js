@@ -67,6 +67,7 @@ import {
 } from '../Utils/TagsHelper';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -218,7 +219,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     return this.state.uiSettings;
   }
 
+  static contextType = UnsavedChangesContext;
   updateToolbar() {
+    this.context.triggerUnsavedChanges();
     this.props.setToolbar(
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
@@ -336,18 +339,22 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
+    this.context.triggerUnsavedChanges();
     this.setState({ variablesEditedInstance: instance });
   };
 
   editObjectVariables = (object: ?gdObject) => {
+    this.context.triggerUnsavedChanges();
     this.setState({ variablesEditedObject: object });
   };
 
   editLayoutVariables = (open: boolean = true) => {
+    this.context.triggerUnsavedChanges();
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
   editObject = (editedObject: ?gdObject) => {
+    this.context.triggerUnsavedChanges();
     const { project } = this.props;
     if (editedObject) {
       this.setState({
@@ -364,6 +371,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editObjectByName = (objectName: string) => {
+    this.context.triggerUnsavedChanges();
     const { project, layout } = this.props;
     if (layout.hasObjectNamed(objectName))
       this.editObject(layout.getObject(objectName));
@@ -372,10 +380,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editGroup = (group: ?gdObjectGroup) => {
+    this.context.triggerUnsavedChanges();
     this.setState({ editedGroup: group });
   };
 
   setUiSettings = (uiSettings: Object) => {
+    this.context.triggerUnsavedChanges();
     this.setState({
       uiSettings: {
         ...this.state.uiSettings,
@@ -1045,9 +1055,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
             canRenameObject={this._canObjectOrGroupUseNewName}
             onRename={newName => {
-              this._onRenameEditedObject(newName);
+              this.context.triggerUnsavedChanges();
+              return this._onRenameEditedObject(newName);
             }}
             onApply={() => {
+              this.context.triggerUnsavedChanges();
               if (this.state.editedObjectWithContext) {
                 this.reloadResourcesFor(
                   this.state.editedObjectWithContext.object
@@ -1227,7 +1239,10 @@ export default class SceneEditor extends React.Component<Props, State> {
             project={project}
             layout={layout}
             onClose={() => this.openSceneProperties(false)}
-            onApply={() => this.openSceneProperties(false)}
+            onApply={() => {
+              this.context.triggerUnsavedChanges();
+              return this.openSceneProperties(false);
+            }}
             onEditVariables={() => this.editLayoutVariables(true)}
             onOpenMoreSettings={this.props.onOpenMoreSettings}
           />

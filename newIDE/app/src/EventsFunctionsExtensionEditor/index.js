@@ -36,6 +36,7 @@ import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
+import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 type Props = {|
@@ -498,6 +499,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this._editorNavigator.openEditor('behaviors-list');
   };
 
+  static contextType = UnsavedChangesContext;
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -854,7 +857,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             project={project}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
-            onApply={() => this._editBehavior(null)}
+            onApply={() => {
+              this.context.triggerUnsavedChanges();
+              this._editBehavior(null);
+            }}
             onRenameProperty={(oldName, newName) =>
               this._onBehaviorPropertyRenamed(
                 editedEventsBasedBehavior,

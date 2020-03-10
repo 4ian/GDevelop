@@ -13,6 +13,7 @@ import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Text from '../../UI/Text';
+import { UnsavedChangesContext } from '../../MainFrame/UnsavedChangesContext';
 
 type Props = {|
   project: gdProject,
@@ -31,8 +32,10 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       valueType: 'string',
       disabled: true,
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
-      setValue: (instance: gdInitialInstance, newValue: string) =>
-        instance.setObjectName(newValue),
+      setValue: (instance: gdInitialInstance, newValue: string) => {
+        this.context.triggerUnsavedChanges();
+        return instance.setObjectName(newValue);
+      },
       onEditButtonClick: (instance: gdInitialInstance) =>
         this.props.onEditObjectByName(instance.getObjectName()),
     },
@@ -44,15 +47,19 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           name: 'X',
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getX(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setX(newValue),
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            this.context.triggerUnsavedChanges();
+            return instance.setX(newValue);
+          },
         },
         {
           name: 'Y',
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getY(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setY(newValue),
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            this.context.triggerUnsavedChanges();
+            return instance.setY(newValue);
+          },
         },
       ],
     },
@@ -60,30 +67,38 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       name: 'Angle',
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getAngle(),
-      setValue: (instance: gdInitialInstance, newValue: number) =>
-        instance.setAngle(newValue),
+      setValue: (instance: gdInitialInstance, newValue: number) => {
+        this.context.triggerUnsavedChanges();
+        return instance.setAngle(newValue);
+      },
     },
     {
       name: 'Lock position/angle in the editor',
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.isLocked(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setLocked(newValue),
+      setValue: (instance: gdInitialInstance, newValue: boolean) => {
+        this.context.triggerUnsavedChanges();
+        return instance.setLocked(newValue);
+      },
     },
     {
       name: 'Z Order',
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getZOrder(),
-      setValue: (instance: gdInitialInstance, newValue: number) =>
-        instance.setZOrder(newValue),
+      setValue: (instance: gdInitialInstance, newValue: number) => {
+        this.context.triggerUnsavedChanges();
+        return instance.setZOrder(newValue);
+      },
     },
     {
       name: 'Layer',
       valueType: 'string',
       getChoices: () => enumerateLayers(this.props.layout),
       getValue: (instance: gdInitialInstance) => instance.getLayer(),
-      setValue: (instance: gdInitialInstance, newValue: string) =>
-        instance.setLayer(newValue),
+      setValue: (instance: gdInitialInstance, newValue: string) => {
+        this.context.triggerUnsavedChanges();
+        return instance.setLayer(newValue);
+      },
     },
     {
       name: 'Custom size',
@@ -93,15 +108,19 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           name: 'Width',
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomWidth(newValue),
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            this.context.triggerUnsavedChanges();
+            return instance.setCustomWidth(newValue);
+          },
         },
         {
           name: 'Height',
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomHeight(newValue),
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            this.context.triggerUnsavedChanges();
+            return instance.setCustomHeight(newValue);
+          },
         },
       ],
     },
@@ -109,10 +128,14 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       name: 'Custom size?',
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setHasCustomSize(newValue),
+      setValue: (instance: gdInitialInstance, newValue: boolean) => {
+        this.context.triggerUnsavedChanges();
+        return instance.setHasCustomSize(newValue);
+      },
     },
   ];
+
+  static contextType = UnsavedChangesContext;
 
   _renderEmpty() {
     return (

@@ -111,25 +111,12 @@ const replaceNode = (
 
 const defaultToolbarControls = [<CloseButton key="close" />];
 
-// This is based on the implementation of the react-mosaic window
-// toolbar done here: https://github.com/nomcopter/react-mosaic/blob/b36984c34b0fa1e3f21a211578301933cea24992/src/MosaicWindow.tsx#L136-L183
 const renderMosaicWindowPreview = props => (
   <div className="mosaic-preview">
     <div className="mosaic-window-toolbar">
       <div className="mosaic-window-title">{props.title}</div>
     </div>
     <div className="mosaic-window-body" />
-  </div>
-);
-
-const renderMosaicWindowToolbar = props => (
-  <div className="mosaic-window-toolbar" style={{ width: '100%' }}>
-    <div className="mosaic-window-title" title={props.tooltip}>
-      {props.title}
-    </div>
-    <div className="mosaic-window-controls">
-      {props.toolbarControls || defaultToolbarControls}
-    </div>
   </div>
 );
 
@@ -141,8 +128,8 @@ const renderMosaicWindowToolbar = props => (
 const MosaicWindow = (props: any) => (
   <RMMosaicWindow
     {...props}
+    toolbarControls={props.toolbarControls || defaultToolbarControls}
     renderPreview={renderMosaicWindowPreview}
-    renderToolbar={renderMosaicWindowToolbar}
   />
 );
 
@@ -243,8 +230,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
                   {({ i18n }) => (
                     <MosaicWindow
                       path={path}
-                      title={editor.title}
-                      tooltip={editor.tooltip ? i18n._(editor.tooltip) : null}
+                      title={i18n._(editor.title)}
                       toolbarControls={editor.toolbarControls}
                     >
                       {editor.renderEditor()}

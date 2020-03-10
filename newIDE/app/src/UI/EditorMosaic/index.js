@@ -8,6 +8,7 @@ import {
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -17,7 +18,7 @@ export type Editor = {|
   type: 'primary' | 'secondary',
   renderEditor: () => React.Node,
   noTitleBar?: boolean,
-  title?: React.Node,
+  title?: MessageDescriptor,
   toolbarControls?: Array<React.Node>,
 |};
 

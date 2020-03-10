@@ -132,6 +132,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
             onPreview={options =>
               this.props.onPreview(project, layout, externalLayout, options)
             }
+            previewButtonSettings={this.props.previewButtonSettings}
             onOpenDebugger={this.props.onOpenDebugger}
             onOpenMoreSettings={this.openLayoutChooser}
             isActive={isActive}

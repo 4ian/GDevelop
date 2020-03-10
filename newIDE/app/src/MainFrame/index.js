@@ -484,6 +484,8 @@ class MainFrame extends React.Component<Props, State> {
           this.setState(
             {
               currentProject: null,
+              isPreviewFirstSceneOverriden: false,
+              previewFirstSceneName: '',
             },
             () => {
               this.updateToolbar();
@@ -1148,6 +1150,7 @@ class MainFrame extends React.Component<Props, State> {
                     this._previewLauncher &&
                     this._previewLauncher.canDoNetworkPreview()
                   }
+                  previewButtonSettings={emptyPreviewButtonSettings}
                   onOpenDebugger={this.openDebugger}
                   onEditObject={this.props.onEditObject}
                   resourceSources={this.props.resourceSources}

@@ -47,29 +47,32 @@ export default class PreviewButtons extends React.Component<
       togglePreviewFirstSceneOverride,
     } = this.props.previewButtonSettings;
 
+    const previewIcon = (
+      <ToolbarIcon
+        onClick={onPreview}
+        src={
+          isPreviewFirstSceneOverriden
+            ? 'res/ribbon_default/previewOverride32.png'
+            : 'res/ribbon_default/preview32.png'
+        }
+        tooltip={
+          isPreviewFirstSceneOverriden
+            ? t`Preview is overridden, right click for more`
+            : t`Launch a preview of the scene, right click for more`
+        }
+      />
+    );
+
     return (
       <React.Fragment>
-        {showPreviewButton && (
-          <ElementWithMenu
-            element={
-              <ToolbarIcon
-                onClick={onPreview}
-                src={
-                  isPreviewFirstSceneOverriden
-                    ? 'res/ribbon_default/previewOverride32.png'
-                    : 'res/ribbon_default/preview32.png'
-                }
-                tooltip={
-                  isPreviewFirstSceneOverriden
-                    ? t`Preview is overridden, right click for more`
-                    : t`Launch a preview of the scene, right click for more`
-                }
-              />
-            }
-            openMenuWithSecondaryClick
-            buildMenuTemplate={() => {
-              if (isPreviewFirstSceneOverriden === null) return [];
-              return [
+        {showPreviewButton &&
+          (isPreviewFirstSceneOverriden === null ? (
+            previewIcon
+          ) : (
+            <ElementWithMenu
+              element={previewIcon}
+              openMenuWithSecondaryClick
+              buildMenuTemplate={() => [
                 {
                   type: 'checkbox',
                   label: previewFirstSceneName
@@ -88,10 +91,9 @@ export default class PreviewButtons extends React.Component<
                   label: 'Always use this scene to start the previews',
                   click: () => useSceneAsPreviewFirstScene(),
                 },
-              ];
-            }}
-          />
-        )}
+              ]}
+            />
+          ))}
         {showNetworkPreviewButton && (
           <ElementWithMenu
             element={

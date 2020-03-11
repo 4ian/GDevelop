@@ -31,7 +31,7 @@ type Props<Item> = {
   buildMenuTemplate: () => Array<any>,
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
-  connectIconDragSource?: ?(React.Node) => React.Node,
+  connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
 };
 
 class ItemRow<Item> extends React.Component<Props<Item>> {

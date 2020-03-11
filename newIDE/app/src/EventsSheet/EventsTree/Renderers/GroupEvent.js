@@ -23,6 +23,7 @@ const styles = {
   },
   title: {
     fontSize: 18,
+    width: '100%',
   },
 };
 
@@ -90,6 +91,16 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             }}
             fullWidth
             id="group-title"
+            onKeyUp={event => {
+              if (event.key === 'Escape') {
+                this.endEditing();
+              }
+            }}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                this.endEditing();
+              }
+            }}
           />
         ) : (
           <span

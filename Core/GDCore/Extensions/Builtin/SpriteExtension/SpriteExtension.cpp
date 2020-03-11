@@ -380,7 +380,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddAction("ChangeBlendMode",
                 _("Blend mode"),
                 _("Change the number of the blend mode of an object.\nThe "
-                  "default blend mode is 0 (Alpha)."),
+                  "default blend mode is 0 (Normal)."),
                 _("Change Blend mode of _PARAM0_ to _PARAM1_"),
                 _("Effects"),
                 "res/actions/color24.png",
@@ -388,7 +388,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("expression",
-                    _("Mode (0 : Alpha, 1 : Add, 2 : Multiply, 3 : None)"))
+                    _("Mode (0: Normal, 1: Add, 2: Multiply, 3: Screen)"))
       .MarkAsSimple();
 
   obj.AddAction("FlipX",

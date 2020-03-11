@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import ResourcesList from '../ResourcesList';
@@ -136,7 +137,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     const editors = {
       properties: {
         type: 'secondary',
-        title: <Trans>Properties</Trans>,
+        title: t`Properties`,
         renderEditor: () => (
           <ResourcePropertiesEditor
             key={selectedResource ? selectedResource.ptr : undefined}

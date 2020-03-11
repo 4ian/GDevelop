@@ -28,7 +28,7 @@ type ListItemRightButtonProps =
   | {|
       displayReloadButton: boolean,
       reloadButtonTooltip: string,
-      onReload: () => void,
+      onReload?: () => void,
     |}
   | {|
       displayMenuButton: boolean,

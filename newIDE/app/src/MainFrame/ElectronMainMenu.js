@@ -27,7 +27,8 @@ type MainMenuEvent =
   | 'main-menu-open-preferences'
   | 'main-menu-open-language'
   | 'main-menu-open-profile'
-  | 'update-status';
+  | 'update-status'
+  | 'quit-app';
 
 type MenuItemTemplate =
   | {|
@@ -129,6 +130,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
       ('update-status': MainMenuEvent),
       (event, status) => this._editor && this._editor.setUpdateStatus(status)
     );
+    ipcRenderer.on(
+      ('quit-app' : MainMenuEvent),
+      () => this._editor && this._editor.quitApp()
+    );
 
     this._buildAndSendMenuTemplate();
   }
@@ -177,6 +182,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
           label: i18n._(t`Close Project`),
           accelerator: 'CommandOrControl+Shift+W',
           onClickSendEvent: 'main-menu-close',
+        },
+        {
+          label: i18n._(t`Quit App`),
+          onClickSendEvent: 'quit-app',
         },
       ],
     };

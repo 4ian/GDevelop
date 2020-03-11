@@ -92,6 +92,9 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+
+const electron = optionalRequire('electron');
+
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -132,6 +135,7 @@ type State = {|
   helpFinderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
+  quitApp: boolean
 |};
 
 type Props = {
@@ -1673,6 +1677,10 @@ class MainFrame extends React.Component<Props, State> {
     this.setState({
       snackMessageOpen: false,
     });
+
+  quitApp = () => {
+    electron.app.quit()
+  }
 
   render() {
     const {

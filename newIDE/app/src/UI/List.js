@@ -17,6 +17,12 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 
+const styles = {
+  listItemText: {
+    margin: '0 auto',
+  },
+};
+
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 40;
 export const listItemWithoutIconHeight = 37;
@@ -193,6 +199,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
           <MUIListItemText
             primary={props.primaryText}
             secondary={props.secondaryText}
+            style={styles.listItemText}
           />
           {this._renderListItemSecondaryAction()}
           {props.displayAddIcon && <Add />}
@@ -222,6 +229,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             <MUIListItemText
               primary={props.primaryText}
               secondary={props.secondaryText}
+              style={styles.listItemText}
             />
             {props.autoGenerateNestedIndicator ? (
               isOpen ? (

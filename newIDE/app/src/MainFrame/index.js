@@ -92,7 +92,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
-import UnsavedChangesContextProvider from './UnsavedChangesContext';
+import { UnsavedChangesContext } from './UnsavedChangesContext';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -187,6 +187,7 @@ class MainFrame extends React.Component<Props, State> {
     helpFinderDialogOpen: false,
     eventsFunctionsExtensionsError: null,
     gdjsDevelopmentWatcherEnabled: false,
+    hasUnsavedChanges: false,
   };
   toolbar = null;
   _resourceSourceDialogs = {};
@@ -225,6 +226,16 @@ class MainFrame extends React.Component<Props, State> {
     ]);
     console.info('Startup times:', getStartupTimesSummary());
   }
+
+  triggerUnsavedChanges = () => {
+    if (!this.state.hasUnsavedChanges)
+      this.setState({ hasUnsavedChanges: true });
+  };
+
+  sealUnsavedChanges = () => {
+    if (this.state.hasUnsavedChanges)
+      this.setState({ hasUnsavedChanges: false });
+  };
 
   _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
     const { storageProviderOperations, initialFileMetadataToOpen } = this.props;
@@ -1379,8 +1390,6 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     const { i18n, storageProviderOperations } = this.props;
-    console.log('saved');
-
     const { onSaveProject } = storageProviderOperations;
     if (!onSaveProject) {
       return this.saveProjectAs();
@@ -1391,7 +1400,6 @@ class MainFrame extends React.Component<Props, State> {
 
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
-        console.log('saved!');
         if (wasSaved) {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         }
@@ -1460,17 +1468,18 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   askToCloseProject = (): Promise<void> => {
-    if (!this.state.currentProject) return Promise.resolve();
-    const { i18n } = this.props;
+    if (this.state.hasUnsavedChanges) {
+      if (!this.state.currentProject) return Promise.resolve();
+      const { i18n } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      i18n._(
-        t`Close the project? Any changes that have not been saved will be lost.`
-      )
-    );
-    if (!answer) return Promise.resolve();
-
+      //eslint-disable-next-line
+      const answer = confirm(
+        i18n._(
+          t`Close the project? Any changes that have not been saved will be lost.`
+        )
+      );
+      if (!answer) return Promise.resolve();
+    }
     return this.closeProject();
   };
 
@@ -1708,7 +1717,13 @@ class MainFrame extends React.Component<Props, State> {
       this.props.loading;
 
     return (
-      <UnsavedChangesContextProvider>
+      <UnsavedChangesContext.Provider
+        value={{
+          hasUnsavedChanges: this.state.hasUnsavedChanges,
+          triggerUnsavedChanges: this.triggerUnsavedChanges,
+          sealUnsavedChanges: this.sealUnsavedChanges,
+        }}
+      >
         <div className="main-frame">
           <ProjectTitlebar fileMetadata={currentFileMetadata} />
           <Drawer
@@ -1748,8 +1763,14 @@ class MainFrame extends React.Component<Props, State> {
                   this.renameEventsFunctionsExtension
                 }
                 onRenameExternalEvents={this.renameExternalEvents}
-                onSaveProject={this.saveProject}
-                onSaveProjectAs={this.saveProjectAs}
+                onSaveProject={() => {
+                  this.sealUnsavedChanges();
+                  this.saveProject();
+                }}
+                onSaveProjectAs={() => {
+                  this.sealUnsavedChanges();
+                  this.saveProjectAs();
+                }}
                 onCloseProject={() => {
                   this.askToCloseProject();
                 }}
@@ -1993,7 +2014,7 @@ class MainFrame extends React.Component<Props, State> {
             renderGDJSDevelopmentWatcher &&
             renderGDJSDevelopmentWatcher()}
         </div>
-      </UnsavedChangesContextProvider>
+      </UnsavedChangesContext.Provider>
     );
   }
 }

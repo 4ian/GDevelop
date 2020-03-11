@@ -22,7 +22,7 @@ import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
-import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },

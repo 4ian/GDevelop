@@ -1,7 +1,20 @@
+// @flow
 import * as React from 'react';
-import Toggle from '../UI/Toggle';
-export const UnsavedChangesContext = React.createContext({
+
+export type UnsavedChanges = {|
+  hasUnsavedChanges: boolean,
+  sealUnsavedChanges: () => void,
+  triggerUnsavedChanges: () => void,
+|};
+
+const initialUnsavedChanges = {
   hasUnsavedChanges: false,
   sealUnsavedChanges: () => {},
   triggerUnsavedChanges: () => {},
-});
+};
+
+const UnsavedChangesContext = React.createContext<UnsavedChanges>(
+  initialUnsavedChanges
+);
+
+export default UnsavedChangesContext;

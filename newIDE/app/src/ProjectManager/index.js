@@ -39,7 +39,7 @@ import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';

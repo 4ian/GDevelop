@@ -67,7 +67,7 @@ import {
 } from '../Utils/TagsHelper';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';

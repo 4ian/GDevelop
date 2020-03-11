@@ -36,7 +36,7 @@ import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
-import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 type Props = {|

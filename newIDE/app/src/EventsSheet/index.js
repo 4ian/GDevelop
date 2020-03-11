@@ -80,7 +80,7 @@ import {
 import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 type Props = {|

@@ -13,7 +13,7 @@ import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Text from '../../UI/Text';
-import { UnsavedChangesContext } from '../../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
 
 type Props = {|
   project: gdProject,

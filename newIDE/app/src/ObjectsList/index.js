@@ -34,7 +34,7 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
-import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
 const styles = {
   listContainer: {

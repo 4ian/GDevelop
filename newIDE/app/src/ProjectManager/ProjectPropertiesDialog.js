@@ -19,7 +19,7 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { UnsavedChangesContext } from '../MainFrame/UnsavedChangesContext';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
 type Props = {|
   project: gdProject,

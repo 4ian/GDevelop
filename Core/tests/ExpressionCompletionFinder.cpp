@@ -101,6 +101,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedInformativeCompletions);
       REQUIRE(getCompletionsFor("string", "Function(", 9) ==
               expectedEmptyCompletions);
+      REQUIRE(getCompletionsFor("string", "Function()", 9) ==
+              expectedInformativeCompletions);
     }
     SECTION("Unknown function, test with arguments") {
       REQUIRE(getCompletionsFor("string", "Function(1", 9) ==
@@ -180,6 +182,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedInformativeFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.Func(", 14) ==
               expectedEmptyCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func()", 14) ==
+              expectedInformativeFunctionCompletions);
     }
   }
 
@@ -282,6 +286,14 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 23) ==
               expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 24) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 25) ==
+              expectedInformativeFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 26) ==
+              expectedEmptyCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func()", 26) ==
+              expectedInformativeFunctionCompletions);
     }
   }
 }

@@ -288,6 +288,9 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
+    bool isCaretOnParenthesis = IsCaretOn(node.openingParenthesisLocation) ||
+                                IsCaretOn(node.closingParenthesisLocation);
+
     if (!node.behaviorName.empty()) {
       // Behavior function
       if (IsCaretOn(node.objectNameLocation)) {
@@ -303,7 +306,7 @@ class GD_CORE_API ExpressionCompletionFinder
                                                            node.functionName,
                                                            node.objectName,
                                                            node.behaviorName)
-                .SetIsInformative(IsCaretOn(node.openingParenthesisLocation)));
+                .SetIsInformative(isCaretOnParenthesis));
       }
     } else if (!node.objectName.empty()) {
       // Object function
@@ -316,22 +319,20 @@ class GD_CORE_API ExpressionCompletionFinder
         // need behavior completions. Do this unless we're on the parenthesis
         // (at which point we're only showing informative message about the
         // function).
-        if (!IsCaretOn(node.openingParenthesisLocation)) {
+        if (!isCaretOnParenthesis) {
           completions.push_back(ExpressionCompletionDescription::ForBehavior(
               node.functionName, node.objectName));
         }
 
-        completions.push_back(
-            ExpressionCompletionDescription::ForExpression(
-                node.type, node.functionName, node.objectName)
-                .SetIsInformative(IsCaretOn(node.openingParenthesisLocation)));
+        completions.push_back(ExpressionCompletionDescription::ForExpression(
+                                  node.type, node.functionName, node.objectName)
+                                  .SetIsInformative(isCaretOnParenthesis));
       }
     } else {
       // Free function
-      completions.push_back(
-          ExpressionCompletionDescription::ForExpression(node.type,
-                                                         node.functionName)
-              .SetIsInformative(IsCaretOn(node.openingParenthesisLocation)));
+      completions.push_back(ExpressionCompletionDescription::ForExpression(
+                                node.type, node.functionName)
+                                .SetIsInformative(isCaretOnParenthesis));
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
@@ -344,6 +345,8 @@ class GD_CORE_API ExpressionCompletionFinder
  private:
   bool IsCaretOn(const ExpressionParserLocation& location,
                  bool inclusive = false) {
+    if (!location.IsValid()) return false;
+
     return (location.GetStartPosition() <= searchedPosition &&
             ((!inclusive && searchedPosition < location.GetEndPosition()) ||
              (inclusive && searchedPosition <= location.GetEndPosition())));

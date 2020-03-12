@@ -105,7 +105,6 @@ export default (props: Props) => {
           fullWidth
           fullScreen={size === 'small'}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick
         >
           {title && (
             <DialogTitle

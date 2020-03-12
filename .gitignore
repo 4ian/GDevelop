@@ -59,4 +59,5 @@
 **/.DS_Store
 **/node_modules/
 .idea
+.vscode/
 .vscode/ipch

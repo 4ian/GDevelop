@@ -524,7 +524,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       parameters: {
         type: 'primary',
-        title: <Trans>Function Configuration</Trans>,
+        title: t`Function Configuration`,
         toolbarControls: [],
         renderEditor: () => (
           <Background>
@@ -609,7 +609,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'free-functions-list': {
         type: 'primary',
-        title: <Trans>Functions</Trans>,
+        title: t`Functions`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>
@@ -651,7 +651,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'behavior-functions-list': {
         type: 'primary',
-        title: <Trans>Behavior functions</Trans>,
+        title: t`Behavior functions`,
         renderEditor: () =>
           selectedEventsBasedBehavior ? (
             <I18n>
@@ -722,7 +722,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
       'behaviors-list': {
         type: 'secondary',
-        title: <Trans>Behaviors</Trans>,
+        title: t`Behaviors`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>

@@ -26,6 +26,171 @@ module.exports = {
     // experimental effect, create an extension for it (copy this folder, rename "Effects" to something else,
     // and remove all the files and declaration of effects, or take a look at ExampleJsExtension).
 
+    const adjustmentEffect = extension
+      .addEffect('Adjustment')
+      .setFullName(_('Adjustment'))
+      .setDescription(
+        _(
+          'Adjust gamma, contrast, saturation, brightness, alpha or color-channel shift.'
+        )
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-adjustment.js')
+      .addIncludeFile('Extensions/Effects/adjustment-pixi-filter.js');
+    const adjustmentProperties = adjustmentEffect.getProperties();
+    adjustmentProperties.set(
+      'gamma',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Gamma (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'saturation',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Saturation (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'contrast',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Contrast (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'brightness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Brightness (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'red',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Red (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'green',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Green (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'blue',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.6')
+        .setLabel(_('Blue (between 0 and 5)'))
+        .setType('number')
+    );
+    adjustmentProperties.set(
+      'alpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Alpha (between 0 and 1, 0 is transparent)'))
+        .setType('number')
+    );
+
+    const advancedBloomEffect = extension
+      .addEffect('AdvancedBloom')
+      .setFullName(_('Advanced bloom'))
+      .setDescription(_('Applies a Bloom Effect.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
+      .addIncludeFile(
+        'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
+      )
+      .addIncludeFile('Extensions/Effects/advanced-bloom-pixi-filter.js');
+    const advancedBloomProperties = advancedBloomEffect.getProperties();
+    advancedBloomProperties.set(
+      'threshold',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Threshold (between 0 and 1)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'bloomScale',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.7')
+        .setLabel(_('Bloom Scale (between 0 and 2)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'brightness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.7')
+        .setLabel(_('Brightness (between 0 and 2)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'blur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '4')
+        .setLabel(_('Blur (between 0 and 20)'))
+        .setType('number')
+    );
+    advancedBloomProperties.set(
+      'quality',
+      new gd.PropertyDescriptor(/* defaultValue= */ '7')
+        .setLabel(_('Quality (between 0 and 20)'))
+        .setType('number')
+    );
+
+    const asciiEffect = extension
+      .addEffect('Ascii')
+      .setFullName(_('ASCII'))
+      .setDescription(_('Render the image with ASCII characters only.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-ascii.js')
+      .addIncludeFile('Extensions/Effects/ascii-pixi-filter.js');
+    const asciiProperties = asciiEffect.getProperties();
+    asciiProperties.set(
+      'size',
+      new gd.PropertyDescriptor(/* defaultValue= */ '8')
+        .setLabel(_('Size (between 2 and 20)'))
+        .setType('number')
+    );
+
+    const bevelEffect = extension
+      .addEffect('Bevel')
+      .setFullName(_('Beveled edges'))
+      .setDescription(_('Add beveled edges around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-bevel.js')
+      .addIncludeFile('Extensions/Effects/bevel-pixi-filter.js');
+    const bevelProperties = bevelEffect.getProperties();
+    bevelProperties.set(
+      'rotation',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Rotation (between 0 and 360)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'thickness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Outer strength (between 0 and 5)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'distance',
+      new gd.PropertyDescriptor(/* defaultValue= */ '15')
+        .setLabel(_('Distance (between 10 and 20)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'lightAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Light alpha (between 0 and 1)'))
+        .setType('number')
+    );
+    bevelProperties.set(
+      'lightColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#ffffff')
+        .setLabel(_('Light color (color of the outline)'))
+        .setType('color')
+    );
+    bevelProperties.set(
+      'shadowColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
+        .setLabel(_('Shadow color (color of the outline)'))
+        .setType('color')
+    );
+    bevelProperties.set(
+      'shadowAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Shadow alpha (between 0 and 1)'))
+        .setType('number')
+    );
+
     const blackAndWhiteEffect = extension
       .addEffect('BlackAndWhite')
       .setFullName(_('Black and White'))
@@ -109,62 +274,70 @@ module.exports = {
         .setType('number')
     );
 
-    const lightNightEffect = extension
-      .addEffect('LightNight')
-      .setFullName(_('Light Night'))
-      .setDescription(_('Alter the colors to simulate night.'))
-      .addIncludeFile('Extensions/Effects/light-night-pixi-filter.js');
-    const lightNightProperties = lightNightEffect.getProperties();
-    lightNightProperties.set(
-      'opacity',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Opacity (between 0 and 1)'))
+    const colorMapEffect = extension
+      .addEffect('ColorMap')
+      .setFullName(_('Color Map'))
+      .setDescription(_('Change the color rendered on screen.'))
+      .addIncludeFile('Extensions/Effects/color-map-pixi-filter.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-map.js');
+    const colorMapProperties = colorMapEffect.getProperties();
+    colorMapProperties.set(
+      'colorMapTexture',
+      new gd.PropertyDescriptor('')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Color map texture for the effect'))
+        .setDescription(
+          _(
+            'You can change colors of pixels by modifing a reference color image, containing each colors, called the *Color Map Texture*. To get started, **download** [a default color map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
+          )
+        )
+    );
+    colorMapProperties.set(
+      'nearest',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
+        .setLabel(_('Disable anti-aliasing ("nearest" pixel rounding)'))
+        .setType('boolean')
+    );
+    colorMapProperties.set(
+      'mix',
+      new gd.PropertyDescriptor(/* defaultValue= */ '100')
+        .setLabel(_('Mix'))
         .setType('number')
+        .setDescription(_('Mix value of the effect on the layer (in percent)'))
     );
 
-    const nightEffect = extension
-      .addEffect('Night')
-      .setFullName(_('Dark Night'))
-      .setDescription(_('Alter the colors to simulate a dark night.'))
-      .addIncludeFile('Extensions/Effects/night-pixi-filter.js');
-    const nightProperties = nightEffect.getProperties();
-    nightProperties.set(
-      'intensity',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Intensity (between 0 and 1)'))
-        .setType('number')
+    const colorReplaceEffect = extension
+      .addEffect('ColorReplace')
+      .setFullName(_('Color Replace'))
+      .setDescription(_('Effect replacing a color (or similar) by another.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-replace.js')
+      .addIncludeFile('Extensions/Effects/color-replace-pixi-filter.js');
+    const colorReplaceProperties = colorReplaceEffect.getProperties();
+    colorReplaceProperties.set(
+      'originalColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#ff0000')
+        .setLabel(_('Original Color'))
+        .setType('color')
+        .setDescription('The color that will be changed')
     );
-    nightProperties.set(
-      'opacity',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Opacity (between 0 and 1)'))
-        .setType('number')
+    colorReplaceProperties.set(
+      'newColor',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
+        .setLabel(_('New Color'))
+        .setType('color')
+        .setDescription('The new color')
     );
-
-    const noiseEffect = extension
-      .addEffect('Noise')
-      .setFullName(_('Noise'))
-      .setDescription(_('Add some noise on the rendered image.'))
-      .addIncludeFile('Extensions/Effects/noise-pixi-filter.js');
-    const noiseProperties = noiseEffect.getProperties();
-    noiseProperties.set(
-      'noise',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Noise intensity (between 0 and 1)'))
+    colorReplaceProperties.set(
+      'epsilon',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.4')
+        .setLabel(_('Epsilon (between 0 and 1)'))
         .setType('number')
-    );
-
-    const sepiaEffect = extension
-      .addEffect('Sepia')
-      .setFullName(_('Sepia'))
-      .setDescription(_('Alter the colors to sepia.'))
-      .addIncludeFile('Extensions/Effects/sepia-pixi-filter.js');
-    const sepiaProperties = sepiaEffect.getProperties();
-    sepiaProperties.set(
-      'opacity',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Opacity (between 0 and 1)'))
-        .setType('number')
+        .setDescription(
+          _(
+            'Tolerance/sensitivity of the floating-point comparison between colors (lower = more exact, higher = more inclusive)'
+          )
+        )
     );
 
     const crtEffect = extension
@@ -235,6 +408,150 @@ module.exports = {
         .setType('boolean')
     );
 
+    const displacementEffect = extension
+      .addEffect('Displacement')
+      .setFullName(_('Displacement'))
+      .setDescription(
+        _(
+          'Uses the pixel values from the specified texture (called the displacement map) to perform a displacement of an object.'
+        )
+      )
+      .addIncludeFile('Extensions/Effects/displacement-pixi-filter.js');
+    const displacementProperties = displacementEffect.getProperties();
+    displacementProperties.set(
+      'displacementMapTexture',
+      new gd.PropertyDescriptor('')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Displacement map texture'))
+        .setDescription(
+          _(
+            'Displacement map texture for the effect. To get started, **download** [a default displacement map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
+          )
+        )
+    );
+    displacementProperties.set(
+      'scaleX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '20')
+        .setLabel(_('Scale on X axis'))
+        .setType('number')
+    );
+    displacementProperties.set(
+      'scaleY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '20')
+        .setLabel(_('Scale on Y axis'))
+        .setType('number')
+    );
+
+    const dotEffect = extension
+      .addEffect('Dot')
+      .setFullName(_('Dot'))
+      .setDescription(
+        _(
+          'Applies a dotscreen effect making objects appear to be made out of black and white halftone dots like an old printer.'
+        )
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-dot.js')
+      .addIncludeFile('Extensions/Effects/dot-pixi-filter.js');
+    const dotProperties = dotEffect.getProperties();
+    dotProperties.set(
+      'scale',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Scale (between 0.3 and 1)'))
+        .setType('number')
+        .setDescription('The scale of the effect')
+    );
+    dotProperties.set(
+      'angle',
+      new gd.PropertyDescriptor(/* defaultValue= */ '5')
+        .setLabel(_('Angle (between 0 and 5)'))
+        .setType('number')
+        .setDescription('The radius of the effect')
+    );
+
+    const dropShadowEffect = extension
+      .addEffect('DropShadow')
+      .setFullName(_('Drop shadow'))
+      .setDescription(_('Add a shadow around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-drop-shadow.js')
+      .addIncludeFile('Extensions/Effects/drop-shadow-pixi-filter.js');
+    const dropShadowProperties = dropShadowEffect.getProperties();
+    dropShadowProperties.set(
+      'blur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Blur (between 0 and 20)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'quality',
+      new gd.PropertyDescriptor(/* defaultValue= */ '3')
+        .setLabel(_('Quality (between 1 and 20)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'alpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Alpha (between 0 and 1)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'distance',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Distance (between 0 and 50)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'rotation',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Rotation (between 0 and 360)'))
+        .setType('number')
+    );
+    dropShadowProperties.set(
+      'color',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
+        .setLabel(_('Color of the shadow'))
+        .setType('color')
+    );
+    dropShadowProperties.set(
+      'shadowOnly',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
+        .setLabel(_('Shadow only (shows only the shadow when enabled)'))
+        .setType('boolean')
+    );
+
+    const glowEffect = extension
+      .addEffect('Glow')
+      .setFullName(_('Glow'))
+      .setDescription(_('Add a glow effect around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-glow.js')
+      .addIncludeFile('Extensions/Effects/glow-pixi-filter.js');
+    const glowProperties = glowEffect.getProperties();
+    glowProperties.set(
+      'innerStrength',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Inner strength (between 0 and 20)'))
+        .setType('number')
+    );
+    glowProperties.set(
+      'outerStrength',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Outer strength (between 0 and 20)'))
+        .setType('number')
+    );
+    glowProperties.set(
+      'distance',
+      new gd.PropertyDescriptor(/* defaultValue= */ '15')
+        .setLabel(_('Distance (between 10 and 20)'))
+        .setType('number')
+    );
+    glowProperties.set(
+      'color',
+      new gd.PropertyDescriptor(/* defaultValue= */ '#ffffff')
+        .setLabel(_('Color of the outline)'))
+        .setType('color')
+    );
+
     const godrayEffect = extension
       .addEffect('Godray')
       .setFullName(_('Godray'))
@@ -291,67 +608,6 @@ module.exports = {
         .setType('number')
     );
 
-    const tiltShiftEffect = extension
-      .addEffect('TiltShift')
-      .setFullName(_('Tilt shift'))
-      .setDescription(_('Render a tilt-shift-like camera effect.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-tilt-shift.js')
-      .addIncludeFile('Extensions/Effects/tilt-shift-pixi-filter.js');
-    const tiltShiftProperties = tiltShiftEffect.getProperties();
-    tiltShiftProperties.set(
-      'blur',
-      new gd.PropertyDescriptor(/* defaultValue= */ '30')
-        .setLabel(_('Blur (between 0 and 200)'))
-        .setType('number')
-    );
-    tiltShiftProperties.set(
-      'gradientBlur',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1000')
-        .setLabel(_('Gradient blur (between 0 and 2000)'))
-        .setType('number')
-    );
-
-    const advancedBloomEffect = extension
-      .addEffect('AdvancedBloom')
-      .setFullName(_('Advanced bloom'))
-      .setDescription(_('Applies a Bloom Effect.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
-      .addIncludeFile(
-        'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
-      )
-      .addIncludeFile('Extensions/Effects/advanced-bloom-pixi-filter.js');
-    const advancedBloomProperties = advancedBloomEffect.getProperties();
-    advancedBloomProperties.set(
-      'threshold',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Threshold (between 0 and 1)'))
-        .setType('number')
-    );
-    advancedBloomProperties.set(
-      'bloomScale',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.7')
-        .setLabel(_('Bloom Scale (between 0 and 2)'))
-        .setType('number')
-    );
-    advancedBloomProperties.set(
-      'brightness',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.7')
-        .setLabel(_('Brightness (between 0 and 2)'))
-        .setType('number')
-    );
-    advancedBloomProperties.set(
-      'blur',
-      new gd.PropertyDescriptor(/* defaultValue= */ '4')
-        .setLabel(_('Blur (between 0 and 20)'))
-        .setType('number')
-    );
-    advancedBloomProperties.set(
-      'quality',
-      new gd.PropertyDescriptor(/* defaultValue= */ '7')
-        .setLabel(_('Quality (between 0 and 20)'))
-        .setType('number')
-    );
-
     const kawaseBlurEffect = extension
       .addEffect('KawaseBlur')
       .setFullName(_('Kawase blur'))
@@ -386,104 +642,150 @@ module.exports = {
         .setType('number')
     );
 
-    const zoomBlurEffect = extension
-      .addEffect('ZoomBlur')
-      .setFullName(_('Zoom blur'))
-      .setDescription(_('Applies a Zoom blur.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-zoom-blur.js')
-      .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js');
-    const zoomBlurProperties = zoomBlurEffect.getProperties();
-    zoomBlurProperties.set(
-      'centerX',
+    const lightNightEffect = extension
+      .addEffect('LightNight')
+      .setFullName(_('Light Night'))
+      .setDescription(_('Alter the colors to simulate night.'))
+      .addIncludeFile('Extensions/Effects/light-night-pixi-filter.js');
+    const lightNightProperties = lightNightEffect.getProperties();
+    lightNightProperties.set(
+      'opacity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Opacity (between 0 and 1)'))
+        .setType('number')
+    );
+
+    const nightEffect = extension
+      .addEffect('Night')
+      .setFullName(_('Dark Night'))
+      .setDescription(_('Alter the colors to simulate a dark night.'))
+      .addIncludeFile('Extensions/Effects/night-pixi-filter.js');
+    const nightProperties = nightEffect.getProperties();
+    nightProperties.set(
+      'intensity',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Intensity (between 0 and 1)'))
         .setType('number')
     );
-    zoomBlurProperties.set(
-      'centerY',
+    nightProperties.set(
+      'opacity',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Opacity (between 0 and 1)'))
         .setType('number')
     );
-    zoomBlurProperties.set(
-      'innerRadius',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
-        .setLabel(_('Inner radius (between 0 and 1, 0.5 is mid-way)'))
+
+    const noiseEffect = extension
+      .addEffect('Noise')
+      .setFullName(_('Noise'))
+      .setDescription(_('Add some noise on the rendered image.'))
+      .addIncludeFile('Extensions/Effects/noise-pixi-filter.js');
+    const noiseProperties = noiseEffect.getProperties();
+    noiseProperties.set(
+      'noise',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Noise intensity (between 0 and 1)'))
         .setType('number')
     );
-    zoomBlurProperties.set(
-      'strength',
+
+    const oldFilmEffect = extension
+      .addEffect('OldFilm')
+      .setFullName(_('Old Film'))
+      .setDescription(_('Add a Old film effect around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-old-film.js')
+      .addIncludeFile('Extensions/Effects/old-film-pixi-filter.js');
+    const oldFilmProperties = oldFilmEffect.getProperties();
+    oldFilmProperties.set(
+      'sepia',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
-        .setLabel(_('strength (between 0 and 5)'))
+        .setLabel(_('Sepia (between 0 and 1)'))
         .setType('number')
-    );
-
-    const displacementEffect = extension
-      .addEffect('Displacement')
-      .setFullName(_('Displacement'))
-      .setDescription(
-        _(
-          'Uses the pixel values from the specified texture (called the displacement map) to perform a displacement of an object.'
-        )
-      )
-      .addIncludeFile('Extensions/Effects/displacement-pixi-filter.js');
-    const displacementProperties = displacementEffect.getProperties();
-    displacementProperties.set(
-      'displacementMapTexture',
-      new gd.PropertyDescriptor('')
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Displacement map texture'))
         .setDescription(
           _(
-            'Displacement map texture for the effect. To get started, **download** [a default displacement map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
+            'The amount of saturation of sepia effect, a value of 1 is more saturation and closer to 0 is less, and a value of 0 produces no sepia effect'
           )
         )
     );
-    displacementProperties.set(
-      'scaleX',
-      new gd.PropertyDescriptor(/* defaultValue= */ '20')
-        .setLabel(_('Scale on X axis'))
+    oldFilmProperties.set(
+      'noise',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Noise (between 0 and 1)'))
         .setType('number')
+        .setDescription('Opacity/intensity of the noise effect')
     );
-    displacementProperties.set(
-      'scaleY',
-      new gd.PropertyDescriptor(/* defaultValue= */ '20')
-        .setLabel(_('Scale on Y axis'))
+    oldFilmProperties.set(
+      'noiseSize',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Noise Size (between 0 and 10)'))
         .setType('number')
+        .setDescription('The size of the noise particles')
     );
-
-    const colorMapEffect = extension
-      .addEffect('ColorMap')
-      .setFullName(_('Color Map'))
-      .setDescription(_('Change the color rendered on screen.'))
-      .addIncludeFile('Extensions/Effects/color-map-pixi-filter.js')
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-map.js');
-    const colorMapProperties = colorMapEffect.getProperties();
-    colorMapProperties.set(
-      'colorMapTexture',
-      new gd.PropertyDescriptor('')
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Color map texture for the effect'))
-        .setDescription(
-          _(
-            'You can change colors of pixels by modifing a reference color image, containing each colors, called the *Color Map Texture*. To get started, **download** [a default color map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
-          )
-        )
+    oldFilmProperties.set(
+      'scratch',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Scratch (between -1 and 1)'))
+        .setType('number')
+        .setDescription('How often scratches appear')
     );
-    colorMapProperties.set(
-      'nearest',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('Disable anti-aliasing ("nearest" pixel rounding)'))
+    oldFilmProperties.set(
+      'scratchDensity',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Scratch Density (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The density of the number of scratches')
+    );
+    oldFilmProperties.set(
+      'scratchWidth',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
+        .setLabel(_('Scratch Width (between 1 and 20)'))
+        .setType('number')
+        .setDescription('The width of the scratches')
+    );
+    oldFilmProperties.set(
+      'vignetting',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The radius of the vignette effect')
+    );
+    oldFilmProperties.set(
+      'vignettingAlpha',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
+        .setLabel(_('Vignetting Alpha (between 0 and 1)'))
+        .setType('number')
+        .setDescription('The size of the noise particles')
+    );
+    oldFilmProperties.set(
+      'vignettingBlur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
+        .setLabel(_('Vignetting Blur (between 0 and 1)'))
+        .setType('number')
+        .setDescription('Blur intensity of the vignette')
+    );
+    oldFilmProperties.set(
+      'animated',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
+        .setLabel(_('Animated (Enable animations)'))
         .setType('boolean')
     );
-    colorMapProperties.set(
-      'mix',
-      new gd.PropertyDescriptor(/* defaultValue= */ '100')
-        .setLabel(_('Mix'))
+
+    const outlineEffect = extension
+      .addEffect('Outline')
+      .setFullName(_('Outline'))
+      .setDescription(_('Draws an outline around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-outline.js')
+      .addIncludeFile('Extensions/Effects/outline-pixi-filter.js');
+    const outlineProperties = outlineEffect.getProperties();
+    outlineProperties.set(
+      'thickness',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Thickness (between 0 and 20)'))
         .setType('number')
-        .setDescription(_('Mix value of the effect on the layer (in percent)'))
+    );
+    outlineProperties.set(
+      'color',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Color of the outline'))
+        .setType('color')
     );
 
     const pixelateEffect = extension
@@ -626,373 +928,71 @@ module.exports = {
         .setType('number')
     );
 
-    const adjustmentEffect = extension
-      .addEffect('Adjustment')
-      .setFullName(_('Adjustment'))
-      .setDescription(
-        _(
-          'Adjust gamma, contrast, saturation, brightness, alpha or color-channel shift.'
-        )
-      )
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-adjustment.js')
-      .addIncludeFile('Extensions/Effects/adjustment-pixi-filter.js');
-    const adjustmentProperties = adjustmentEffect.getProperties();
-    adjustmentProperties.set(
-      'gamma',
+    const sepiaEffect = extension
+      .addEffect('Sepia')
+      .setFullName(_('Sepia'))
+      .setDescription(_('Alter the colors to sepia.'))
+      .addIncludeFile('Extensions/Effects/sepia-pixi-filter.js');
+    const sepiaProperties = sepiaEffect.getProperties();
+    sepiaProperties.set(
+      'opacity',
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Gamma (between 0 and 5)'))
-        .setType('number')
-    );
-    adjustmentProperties.set(
-      'saturation',
-      new gd.PropertyDescriptor(/* defaultValue= */ '2')
-        .setLabel(_('Saturation (between 0 and 5)'))
-        .setType('number')
-    );
-    adjustmentProperties.set(
-      'contrast',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Contrast (between 0 and 5)'))
-        .setType('number')
-    );
-    adjustmentProperties.set(
-      'brightness',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Brightness (between 0 and 5)'))
-        .setType('number')
-    );
-    adjustmentProperties.set(
-      'red',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Red (between 0 and 5)'))
-        .setType('number')
-    );
-    adjustmentProperties.set(
-      'green',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Green (between 0 and 5)'))
-        .setType('number')
-    );
-    adjustmentProperties.set(
-      'blue',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.6')
-        .setLabel(_('Blue (between 0 and 5)'))
-        .setType('number')
-    );
-    adjustmentProperties.set(
-      'alpha',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Alpha (between 0 and 1, 0 is transparent)'))
+        .setLabel(_('Opacity (between 0 and 1)'))
         .setType('number')
     );
 
-    const dropShadowEffect = extension
-      .addEffect('DropShadow')
-      .setFullName(_('Drop shadow'))
-      .setDescription(_('Add a shadow around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-drop-shadow.js')
-      .addIncludeFile('Extensions/Effects/drop-shadow-pixi-filter.js');
-    const dropShadowProperties = dropShadowEffect.getProperties();
-    dropShadowProperties.set(
+    const tiltShiftEffect = extension
+      .addEffect('TiltShift')
+      .setFullName(_('Tilt shift'))
+      .setDescription(_('Render a tilt-shift-like camera effect.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-tilt-shift.js')
+      .addIncludeFile('Extensions/Effects/tilt-shift-pixi-filter.js');
+    const tiltShiftProperties = tiltShiftEffect.getProperties();
+    tiltShiftProperties.set(
       'blur',
-      new gd.PropertyDescriptor(/* defaultValue= */ '2')
-        .setLabel(_('Blur (between 0 and 20)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '30')
+        .setLabel(_('Blur (between 0 and 200)'))
         .setType('number')
     );
-    dropShadowProperties.set(
-      'quality',
-      new gd.PropertyDescriptor(/* defaultValue= */ '3')
-        .setLabel(_('Quality (between 1 and 20)'))
-        .setType('number')
-    );
-    dropShadowProperties.set(
-      'alpha',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Alpha (between 0 and 1)'))
-        .setType('number')
-    );
-    dropShadowProperties.set(
-      'distance',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Distance (between 0 and 50)'))
-        .setType('number')
-    );
-    dropShadowProperties.set(
-      'rotation',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Rotation (between 0 and 360)'))
-        .setType('number')
-    );
-    dropShadowProperties.set(
-      'color',
-      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
-        .setLabel(_('Color of the shadow'))
-        .setType('color')
-    );
-    dropShadowProperties.set(
-      'shadowOnly',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('Shadow only (shows only the shadow when enabled)'))
-        .setType('boolean')
-    );
-
-    const outlineEffect = extension
-      .addEffect('Outline')
-      .setFullName(_('Outline'))
-      .setDescription(_('Draws an outline around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-outline.js')
-      .addIncludeFile('Extensions/Effects/outline-pixi-filter.js');
-    const outlineProperties = outlineEffect.getProperties();
-    outlineProperties.set(
-      'thickness',
-      new gd.PropertyDescriptor(/* defaultValue= */ '2')
-        .setLabel(_('Thickness (between 0 and 20)'))
-        .setType('number')
-    );
-    outlineProperties.set(
-      'color',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Color of the outline'))
-        .setType('color')
-    );
-
-    const glowEffect = extension
-      .addEffect('Glow')
-      .setFullName(_('Glow'))
-      .setDescription(_('Add a glow effect around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-glow.js')
-      .addIncludeFile('Extensions/Effects/glow-pixi-filter.js');
-    const glowProperties = glowEffect.getProperties();
-    glowProperties.set(
-      'innerStrength',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Inner strength (between 0 and 20)'))
-        .setType('number')
-    );
-    glowProperties.set(
-      'outerStrength',
-      new gd.PropertyDescriptor(/* defaultValue= */ '2')
-        .setLabel(_('Outer strength (between 0 and 20)'))
-        .setType('number')
-    );
-    glowProperties.set(
-      'distance',
-      new gd.PropertyDescriptor(/* defaultValue= */ '15')
-        .setLabel(_('Distance (between 10 and 20)'))
-        .setType('number')
-    );
-    glowProperties.set(
-      'color',
-      new gd.PropertyDescriptor(/* defaultValue= */ '#ffffff')
-        .setLabel(_('Color of the outline)'))
-        .setType('color')
-    );
-
-    const asciiEffect = extension
-      .addEffect('Ascii')
-      .setFullName(_('ASCII'))
-      .setDescription(_('Render the image with ASCII characters only.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-ascii.js')
-      .addIncludeFile('Extensions/Effects/ascii-pixi-filter.js');
-    const asciiProperties = asciiEffect.getProperties();
-    asciiProperties.set(
-      'size',
-      new gd.PropertyDescriptor(/* defaultValue= */ '8')
-        .setLabel(_('Size (between 2 and 20)'))
+    tiltShiftProperties.set(
+      'gradientBlur',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1000')
+        .setLabel(_('Gradient blur (between 0 and 2000)'))
         .setType('number')
     );
 
-    const bevelEffect = extension
-      .addEffect('Bevel')
-      .setFullName(_('Beveled edges'))
-      .setDescription(_('Add beveled edges around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-bevel.js')
-      .addIncludeFile('Extensions/Effects/bevel-pixi-filter.js');
-    const bevelProperties = bevelEffect.getProperties();
-    bevelProperties.set(
-      'rotation',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Rotation (between 0 and 360)'))
-        .setType('number')
-    );
-    bevelProperties.set(
-      'thickness',
-      new gd.PropertyDescriptor(/* defaultValue= */ '2')
-        .setLabel(_('Outer strength (between 0 and 5)'))
-        .setType('number')
-    );
-    bevelProperties.set(
-      'distance',
-      new gd.PropertyDescriptor(/* defaultValue= */ '15')
-        .setLabel(_('Distance (between 10 and 20)'))
-        .setType('number')
-    );
-    bevelProperties.set(
-      'lightAlpha',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Light alpha (between 0 and 1)'))
-        .setType('number')
-    );
-    bevelProperties.set(
-      'lightColor',
-      new gd.PropertyDescriptor(/* defaultValue= */ '#ffffff')
-        .setLabel(_('Light color (color of the outline)'))
-        .setType('color')
-    );
-    bevelProperties.set(
-      'shadowColor',
-      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
-        .setLabel(_('Shadow color (color of the outline)'))
-        .setType('color')
-    );
-    bevelProperties.set(
-      'shadowAlpha',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Shadow alpha (between 0 and 1)'))
-        .setType('number')
-    );
-
-    const oldFilmEffect = extension
-      .addEffect('OldFilm')
-      .setFullName(_('Old Film'))
-      .setDescription(_('Add a Old film effect around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-old-film.js')
-      .addIncludeFile('Extensions/Effects/old-film-pixi-filter.js');
-    const oldFilmProperties = oldFilmEffect.getProperties();
-    oldFilmProperties.set(
-      'sepia',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
-        .setLabel(_('Sepia (between 0 and 1)'))
-        .setType('number')
-        .setDescription(
-          _(
-            'The amount of saturation of sepia effect, a value of 1 is more saturation and closer to 0 is less, and a value of 0 produces no sepia effect'
-          )
-        )
-    );
-    oldFilmProperties.set(
-      'noise',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
-        .setLabel(_('Noise (between 0 and 1)'))
-        .setType('number')
-        .setDescription('Opacity/intensity of the noise effect')
-    );
-    oldFilmProperties.set(
-      'noiseSize',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Noise Size (between 0 and 10)'))
-        .setType('number')
-        .setDescription('The size of the noise particles')
-    );
-    oldFilmProperties.set(
-      'scratch',
+    const zoomBlurEffect = extension
+      .addEffect('ZoomBlur')
+      .setFullName(_('Zoom blur'))
+      .setDescription(_('Applies a Zoom blur.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-zoom-blur.js')
+      .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js');
+    const zoomBlurProperties = zoomBlurEffect.getProperties();
+    zoomBlurProperties.set(
+      'centerX',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Scratch (between -1 and 1)'))
+        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
         .setType('number')
-        .setDescription('How often scratches appear')
     );
-    oldFilmProperties.set(
-      'scratchDensity',
+    zoomBlurProperties.set(
+      'centerY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+        .setType('number')
+    );
+    zoomBlurProperties.set(
+      'innerRadius',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
+        .setLabel(_('Inner radius (between 0 and 1, 0.5 is mid-way)'))
+        .setType('number')
+    );
+    zoomBlurProperties.set(
+      'strength',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
-        .setLabel(_('Scratch Density (between 0 and 1)'))
+        .setLabel(_('strength (between 0 and 5)'))
         .setType('number')
-        .setDescription('The density of the number of scratches')
     );
-    oldFilmProperties.set(
-      'scratchWidth',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
-        .setLabel(_('Scratch Width (between 1 and 20)'))
-        .setType('number')
-        .setDescription('The width of the scratches')
-    );
-    oldFilmProperties.set(
-      'vignetting',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
-        .setLabel(_('Vignetting (between 0 and 1)'))
-        .setType('number')
-        .setDescription('The radius of the vignette effect')
-    );
-    oldFilmProperties.set(
-      'vignettingAlpha',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
-        .setLabel(_('Vignetting Alpha (between 0 and 1)'))
-        .setType('number')
-        .setDescription('The size of the noise particles')
-    );
-    oldFilmProperties.set(
-      'vignettingBlur',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
-        .setLabel(_('Vignetting Blur (between 0 and 1)'))
-        .setType('number')
-        .setDescription('Blur intensity of the vignette')
-    );
-    oldFilmProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (Enable animations)'))
-        .setType('boolean')
-    );
-
-    const colorReplaceEffect = extension
-      .addEffect('ColorReplace')
-      .setFullName(_('Color Replace'))
-      .setDescription(_('Effect replacing a color (or similar) by another.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-replace.js')
-      .addIncludeFile('Extensions/Effects/color-replace-pixi-filter.js');
-    const colorReplaceProperties = colorReplaceEffect.getProperties();
-    colorReplaceProperties.set(
-      'originalColor',
-      new gd.PropertyDescriptor(/* defaultValue= */ '#ff0000')
-        .setLabel(_('Original Color'))
-        .setType('color')
-        .setDescription('The color that will be changed')
-    );
-    colorReplaceProperties.set(
-      'newColor',
-      new gd.PropertyDescriptor(/* defaultValue= */ '#000000')
-        .setLabel(_('New Color'))
-        .setType('color')
-        .setDescription('The new color')
-    );
-    colorReplaceProperties.set(
-      'epsilon',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.4')
-        .setLabel(_('Epsilon (between 0 and 1)'))
-        .setType('number')
-        .setDescription(
-          _(
-            'Tolerance/sensitivity of the floating-point comparison between colors (lower = more exact, higher = more inclusive)'
-          )
-        )
-    );
-
-    const dotEffect = extension
-      .addEffect('Dot')
-      .setFullName(_('Dot'))
-      .setDescription(
-        _(
-          'Applies a dotscreen effect making objects appear to be made out of black and white halftone dots like an old printer.'
-        )
-      )
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-dot.js')
-      .addIncludeFile('Extensions/Effects/dot-pixi-filter.js');
-    const dotProperties = dotEffect.getProperties();
-    dotProperties.set(
-      'scale',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Scale (between 0.3 and 1)'))
-        .setType('number')
-        .setDescription('The scale of the effect')
-    );
-    dotProperties.set(
-      'angle',
-      new gd.PropertyDescriptor(/* defaultValue= */ '5')
-        .setLabel(_('Angle (between 0 and 5)'))
-        .setType('number')
-        .setDescription('The radius of the effect')
-    );
-
+    
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

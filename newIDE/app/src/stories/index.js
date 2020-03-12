@@ -11,6 +11,7 @@ import { action } from '@storybook/addon-actions';
 import { linkTo } from '@storybook/addon-links';
 
 import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
@@ -1063,7 +1064,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
           editors={{
             firstEditor: {
               type: 'primary',
-              title: 'First editor',
+              title: t`First editor`,
               toolbarControls: [],
               renderEditor: () => (
                 <div>
@@ -1083,7 +1084,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
             },
             thirdEditor: {
               type: 'secondary',
-              title: 'Third editor',
+              title: t`Third editor`,
               renderEditor: () => <div>This is the third editor (bottom).</div>,
             },
           }}
@@ -1127,17 +1128,17 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
           editors={{
             firstEditor: {
               type: 'secondary',
-              title: '1st secondary editor',
+              title: t`1st secondary editor`,
               renderEditor: () => <div>This is a secondary editor.</div>,
             },
             secondEditor: {
               type: 'secondary',
-              title: '2nd secondary editor',
+              title: t`2nd secondary editor`,
               renderEditor: () => <div>This is another secondary editor.</div>,
             },
             thirdEditor: {
               type: 'secondary',
-              title: '3rd secondary editor',
+              title: t`3rd secondary editor`,
               renderEditor: () => (
                 <div>This is yet another secondary editor.</div>
               ),
@@ -1198,7 +1199,7 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
           editors={{
             firstEditor: {
               type: 'primary',
-              title: 'First editor',
+              title: t`First editor`,
               toolbarControls: [],
               renderEditor: () => <div>This is the first editor.</div>,
             },
@@ -1209,12 +1210,12 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
             },
             thirdEditor: {
               type: 'secondary',
-              title: 'Third editor',
+              title: t`Third editor`,
               renderEditor: () => <div>This is the third editor.</div>,
             },
             noTransitionsEditor: {
               type: 'secondary',
-              title: 'Editor without transitions',
+              title: t`Editor without transitions`,
               renderEditor: () => (
                 <div>This is an editor without transitions.</div>
               ),

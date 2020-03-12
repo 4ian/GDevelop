@@ -7,11 +7,28 @@ export type UnsavedChanges = {|
   triggerUnsavedChanges: () => void,
 |};
 
-const UnsavedChangesContext = React.createContext<UnsavedChanges>();
+const initialState: UnsavedChanges = {
+  hasUnsavedChanges: false,
+  sealUnsavedChanges: () => {},
+  triggerUnsavedChanges: () => {},
+};
+
+const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
 
 export default UnsavedChangesContext;
 
-export class UnsavedChangesContextProvider extends React.Component {
+type State = {|
+  hasUnsavedChanges: boolean,
+|};
+
+type Props = {|
+  children?: React.Node,
+|};
+
+export class UnsavedChangesContextProvider extends React.Component<
+  Props,
+  State
+> {
   state = { hasUnsavedChanges: false };
   triggerUnsavedChanges = (): void => {
     if (!this.state.hasUnsavedChanges)

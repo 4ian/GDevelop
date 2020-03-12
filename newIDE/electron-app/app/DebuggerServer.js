@@ -1,5 +1,5 @@
-const WebSocket = require("ws");
-const log = require("electron-log");
+const WebSocket = require('ws');
+const log = require('electron-log');
 
 let wsServer = null;
 let webSockets = [];
@@ -24,17 +24,17 @@ module.exports = {
     wsServer = new WebSocket.Server({ port: 3030 });
     webSockets = [];
 
-    wsServer.on("connection", function connection(newWebSocket) {
+    wsServer.on('connection', function connection(newWebSocket) {
       const id = webSockets.length;
       webSockets.push(newWebSocket);
       log.info(`Debugger connection #${id} opened.`);
 
-      newWebSocket.on("message", message => {
+      newWebSocket.on('message', message => {
         log.info(`Debugger connection #${id} received message.`);
         options.onMessage({ id, message });
       });
 
-      newWebSocket.on("close", () => {
+      newWebSocket.on('close', () => {
         log.info(`Debugger connection #${id} closed.`);
         webSockets[id] = null;
         options.onConnectionClose({ id });
@@ -43,13 +43,13 @@ module.exports = {
       options.onConnectionOpen({ id });
     });
 
-    wsServer.on("listening", () => {
-      log.info("Debugger listening for connections.");
+    wsServer.on('listening', () => {
+      log.info('Debugger listening for connections.');
       options.onListening();
     });
 
-    wsServer.on("error", error => {
-      log.error("Debugger server errored.");
+    wsServer.on('error', error => {
+      log.error('Debugger server errored.');
       options.onError(error);
       closeServer();
     });
@@ -61,5 +61,5 @@ module.exports = {
     webSockets[id].send(message, err => {
       cb(err);
     });
-  }
+  },
 };

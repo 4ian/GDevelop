@@ -179,6 +179,10 @@ class Item extends React.Component<ItemProps, {||}> {
                 click: () => this.props.onEdit(),
               },
               {
+                label: 'Edit scene Properties',
+                click:() => this.props.onEditLayoutVariable()
+              },
+              {
                 label: 'Rename',
                 click: () => this.props.onEditName(),
               },
@@ -270,6 +274,7 @@ type State = {|
   projectPropertiesDialogOpen: boolean,
   variablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
+  layoutVariablesDialogOpen: boolean
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -282,6 +287,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
+    layoutVariablesDialogOpen:false,
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -297,6 +303,10 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
       if (this._searchBar) this._searchBar.focus();
     }
+  }
+
+  _onEditLayoutVariable = (open:boolean) => {
+    this.setState({layoutVariablesDialogOpen: open})
   }
 
   _onEditName = (kind: ?string, name: string) => {
@@ -718,6 +728,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         this._onEditName(null, '');
                       }}
                       onEditName={() => this._onEditName('layout', name)}
+                      onEditLayoutVariable={() => this._onEditLayoutVariable(true)}
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
                       onPaste={() => this._pasteLayout(i)}
@@ -738,6 +749,27 @@ export default class ProjectManager extends React.Component<Props, State> {
                 )
             }
           />
+          {!!this.state.layoutVariablesDialogOpen && (
+          <VariablesEditorDialog
+            open={this.state.layoutVariablesDialogOpen}
+            variablesContainer={project.getVariables()}
+            onCancel={() => this._onEditLayoutVariable(false)}
+            onApply={() => this._onEditLayoutVariable(false)}
+            title={<Trans>Scene Variables</Trans>}
+            emptyExplanationMessage={
+              <Trans>
+                Scene variables can be used to store any value or text during
+                the game.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called Score representing
+                the current score of the player.
+              </Trans>
+            }
+          />
+        )}
           <ProjectStructureItem
             primaryText={<Trans>External events</Trans>}
             leftIcon={

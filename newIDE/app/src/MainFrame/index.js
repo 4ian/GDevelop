@@ -526,7 +526,7 @@ class MainFrame extends React.Component<Props, State> {
     this.toolbar.setEditorToolbar(editorToolbar);
   };
 
-  togglePreviewFirstSceneOverride = () => {
+  _togglePreviewFirstSceneOverride = () => {
     this.setState(
       {
         isPreviewFirstSceneOverriden: !this.state.isPreviewFirstSceneOverriden,
@@ -964,7 +964,7 @@ class MainFrame extends React.Component<Props, State> {
                 isPreviewFirstSceneOverriden: this.state
                   .isPreviewFirstSceneOverriden,
                 togglePreviewFirstSceneOverride: () =>
-                  this.togglePreviewFirstSceneOverride(),
+                  this._togglePreviewFirstSceneOverride(),
                 previewFirstSceneName: this.state.previewFirstSceneName,
                 useSceneAsPreviewFirstScene: () => {
                   this._setPreviewFirstScene(name);
@@ -1018,7 +1018,7 @@ class MainFrame extends React.Component<Props, State> {
                 isPreviewFirstSceneOverriden: this.state
                   .isPreviewFirstSceneOverriden,
                 togglePreviewFirstSceneOverride: () =>
-                  this.togglePreviewFirstSceneOverride(),
+                  this._togglePreviewFirstSceneOverride(),
                 previewFirstSceneName: this.state.previewFirstSceneName,
                 useSceneAsPreviewFirstScene: () => {
                   this._setPreviewFirstScene(name);

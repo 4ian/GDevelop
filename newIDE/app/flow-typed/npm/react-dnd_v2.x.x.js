@@ -1,23 +1,22 @@
-// flow-typed signature: cf6cf392ef13583af7c89327c319a5a5
-// flow-typed version: 45acb9a3f7/react-dnd_v2.x.x/flow_>=v0.53.x
+// flow-typed signature: 0df5fbd2d164ee9c137293cbb8debfeb
+// flow-typed version: 4618dcebd8/react-dnd_v2.x.x/flow_>=v0.98.x
 
 declare module "react-dnd" {
   declare type Identifier = string;
 
   declare type ClientOffset = {
     x: number,
-    y: number
+    y: number,
+    ...
   };
 
   declare type ElementOrNode = React$Element<any> | HTMLElement;
 
-  declare type DndOptions<P> = {
-    arePropsEqual?: (props: P, otherProps: P) => boolean
-  };
+  declare type DndOptions<P> = { arePropsEqual?: (props: P, otherProps: P) => boolean, ... };
 
-  declare type ComponentClassWithDefaultProps<D: {}, P: {}, S> = Class<
+  declare type ComponentClassWithDefaultProps<D: {...}, P: {...}, S> = Class<
     React$Component<P, S>
-  > & { defaultProps: D };
+  > & { defaultProps: D, ... };
 
   declare type _InstanceOf<I, C: Class<I>> = I;
   declare type InstanceOf<C> = _InstanceOf<*, C>;
@@ -30,7 +29,7 @@ declare module "react-dnd" {
     state: void;
   }
 
-  declare type Connector<SP: {}, CP: {}> = (<
+  declare type Connector<SP: {...}, CP: {...}> = (<
     P: SP,
     D,
     S,
@@ -38,16 +37,16 @@ declare module "react-dnd" {
   >(
     component: C
   ) => Class<
-    ConnectedComponent<C, InstanceOf<C>, { ...CP } & $Diff<$Diff<P, D>, CP>>
+    ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & $Diff<$Diff<P, D>, CP>>
   >) &
     (<P: SP, S, C: Class<React$Component<P, S>>>(
       component: C
     ) => Class<
-      ConnectedComponent<C, InstanceOf<C>, { ...CP } & $Diff<P, CP>>
+      ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & $Diff<P, CP>>
     >) &
     (<P: SP, C: React$ComponentType<P>>(
       component: C
-    ) => Class<ConnectedComponent<C, void, { ...CP } & $Diff<P, CP>>>);
+    ) => Class<ConnectedComponent<C, void, { ...CP, ... } & $Diff<P, CP>>>);
 
   // Drag Source
   // ----------------------------------------------------------------------
@@ -60,16 +59,14 @@ declare module "react-dnd" {
       monitor: DragSourceMonitor,
       component: React$Component<P, any>
     ) => Object,
-
     endDrag?: (
       props: P,
       monitor: DragSourceMonitor,
       component: ?React$Component<P, any>
     ) => void,
-
     canDrag?: (props: P, monitor: DragSourceMonitor) => boolean,
-
-    isDragging?: (props: P, monitor: DragSourceMonitor) => boolean
+    isDragging?: (props: P, monitor: DragSourceMonitor) => boolean,
+    ...
   };
 
   declare type DragSourceMonitor = {
@@ -83,22 +80,23 @@ declare module "react-dnd" {
     getInitialSourceClientOffset: () => ClientOffset,
     getClientOffset: () => ClientOffset,
     getDifferenceFromInitialOffset: () => ClientOffset,
-    getSourceClientOffset: () => ClientOffset
+    getSourceClientOffset: () => ClientOffset,
+    ...
   };
 
   declare type DragSourceConnector = {
     dragSource: () => ConnectDragSource,
-    dragPreview: () => ConnectDragPreview
+    dragPreview: () => ConnectDragPreview,
+    ...
   };
 
-  declare type DragSourceOptions = {
-    dropEffect?: string
-  };
+  declare type DragSourceOptions = { dropEffect?: string, ... };
 
   declare type DragPreviewOptions = {
     captureDraggingState?: boolean,
     anchorX?: number,
-    anchorY?: number
+    anchorY?: number,
+    ...
   };
 
   declare type ConnectDragSource = <T: ElementOrNode>(
@@ -116,12 +114,12 @@ declare module "react-dnd" {
     monitor: DragSourceMonitor
   ) => T;
 
-  declare function DragSource<OP: {}, CP: {}>(
+  declare function DragSource<OP: {...}, CP: {...}>(
     type: DragSourceType<OP>,
     spec: DragSourceSpec<OP>,
     collect: DragSourceCollector<CP>,
     options?: DndOptions<OP>
-  ): Connector<$Supertype<OP & CP>, CP>;
+  ): Connector<$Shape<OP & CP>, CP>;
 
   // Drop Target
   // ----------------------------------------------------------------------
@@ -137,19 +135,18 @@ declare module "react-dnd" {
       monitor: DropTargetMonitor,
       component: React$Component<P, any>
     ) => ?Object,
-
     hover?: (
       props: P,
       monitor: DropTargetMonitor,
       component: React$Component<P, any>
     ) => void,
-
-    canDrop?: (props: P, monitor: DropTargetMonitor) => boolean
+    canDrop?: (props: P, monitor: DropTargetMonitor) => boolean,
+    ...
   };
 
   declare type DropTargetMonitor = {
     canDrop: () => boolean,
-    isOver: (options?: { shallow: boolean }) => boolean,
+    isOver: (options?: { shallow: boolean, ... }) => boolean,
     getItemType: () => Identifier,
     getItem: () => Object,
     getDropResult: () => Object,
@@ -158,12 +155,11 @@ declare module "react-dnd" {
     getInitialSourceClientOffset: () => ClientOffset,
     getClientOffset: () => ClientOffset,
     getDifferenceFromInitialOffset: () => ClientOffset,
-    getSourceClientOffset: () => ClientOffset
+    getSourceClientOffset: () => ClientOffset,
+    ...
   };
 
-  declare type DropTargetConnector = {
-    dropTarget: () => ConnectDropTarget
-  };
+  declare type DropTargetConnector = { dropTarget: () => ConnectDropTarget, ... };
 
   declare type ConnectDropTarget = <T: ElementOrNode>(elementOrNode: T) => ?T;
 
@@ -172,12 +168,12 @@ declare module "react-dnd" {
     monitor: DropTargetMonitor
   ) => T;
 
-  declare function DropTarget<OP: {}, CP: {}>(
+  declare function DropTarget<OP: {...}, CP: {...}>(
     types: DropTargetTypes<OP>,
     spec: DropTargetSpec<OP>,
     collect: DropTargetCollector<CP>,
     options?: DndOptions<OP>
-  ): Connector<$Supertype<OP & CP>, CP>;
+  ): Connector<$Shape<OP & CP>, CP>;
 
   // Drag Layer
   // ----------------------------------------------------------------------
@@ -190,13 +186,14 @@ declare module "react-dnd" {
     getInitialSourceClientOffset: () => ClientOffset,
     getClientOffset: () => ClientOffset,
     getDifferenceFromInitialOffset: () => ClientOffset,
-    getSourceClientOffset: () => ClientOffset
+    getSourceClientOffset: () => ClientOffset,
+    ...
   };
 
-  declare function DragLayer<OP: {}, CP: {}>(
+  declare function DragLayer<OP: {...}, CP: {...}>(
     collect: (monitor: DragLayerMonitor) => CP,
     options?: DndOptions<OP>
-  ): Connector<$Supertype<OP & CP>, CP>;
+  ): Connector<$Shape<OP & CP>, CP>;
 
   // Drag Drop Context
   // ----------------------------------------------------------------------
@@ -204,7 +201,8 @@ declare module "react-dnd" {
   declare type ProviderProps = {
     backend: mixed,
     children: React$Element<any>,
-    window?: Object
+    window?: Object,
+    ...
   };
 
   declare class DragDropContextProvider<ProviderProps> extends React$Component<
@@ -213,7 +211,7 @@ declare module "react-dnd" {
     props: ProviderProps;
   }
 
-  declare function DragDropContext<OP: {}, CP: {}>(
+  declare function DragDropContext<OP: {...}, CP: {...}>(
     backend: mixed
-  ): Connector<$Supertype<OP & CP>, CP>;
+  ): Connector<$Shape<OP & CP>, CP>;
 }

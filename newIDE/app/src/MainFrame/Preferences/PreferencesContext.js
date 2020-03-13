@@ -2,8 +2,6 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 
-const LocalStorageItem = 'gd-preferences';
-
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
   | 'use-nearest-scale-mode'
@@ -171,39 +169,6 @@ export const initialPreferences = {
   loadPreferencesValues: () => {},
   savePreferencesValues: (values: PreferencesValues) => {},
 };
-
-export function loadPreferencesValues(): ?PreferencesValues {
-  try {
-    const persistedState = localStorage.getItem(LocalStorageItem);
-    if (!persistedState) return null;
-
-    const values = JSON.parse(persistedState);
-
-    // "Migrate" non existing properties to their default values
-    // (useful when upgrading the preferences to a new version where
-    // a new preference was added).
-    for (const key in initialPreferences.values) {
-      if (
-        initialPreferences.values.hasOwnProperty(key) &&
-        typeof values[key] === 'undefined'
-      ) {
-        values[key] = initialPreferences.values[key];
-      }
-    }
-
-    return values;
-  } catch (e) {
-    return null;
-  }
-}
-
-export function savePreferencesValues(values: PreferencesValues) {
-  try {
-    localStorage.setItem(LocalStorageItem, JSON.stringify(values));
-  } catch (e) {
-    console.warn('Unable to persist preferences', e);
-  }
-}
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);
 

@@ -92,6 +92,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+import type { PreferencesValues } from './Preferences/PreferencesContext';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -156,6 +157,8 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
+  loadPreferencesValues: () => ?PreferencesValues,
+  savePreferencesValues: (values: PreferencesValues) => void,
 };
 
 class MainFrame extends React.Component<Props, State> {
@@ -1697,13 +1700,14 @@ class MainFrame extends React.Component<Props, State> {
       eventsFunctionsExtensionsState,
       useStorageProvider,
       i18n,
+      loadPreferencesValues,
+      savePreferencesValues,
       renderGDJSDevelopmentWatcher,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
       this.state.previewLoading ||
       this.props.loading;
-
     return (
       <div className="main-frame">
         <ProjectTitlebar fileMetadata={currentFileMetadata} />
@@ -1895,6 +1899,8 @@ class MainFrame extends React.Component<Props, State> {
                   (this._resourceSourceDialogs[resourceSource.name] = dialog)
                 }
                 i18n={i18n}
+                loadPreferencesValues={loadPreferencesValues}
+                savePreferencesValues={savePreferencesValues}
               />
             );
           }

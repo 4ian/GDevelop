@@ -7,11 +7,8 @@ import {
   copyAllToProjectFolder,
   isPathInProjectFolder,
 } from './ResourceUtils.js';
-import {
-  loadPreferencesValues,
-  savePreferencesValues,
-} from '../MainFrame/Preferences/PreferencesContext';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import type { PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
@@ -29,25 +26,33 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n } = this.props;
+        const {
+          i18n,
+          loadPreferencesValues,
+          savePreferencesValues,
+        } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose an audio file`),
           name: i18n._(t`Audio files`),
           extensions: ['wav', 'mp3', 'ogg'],
         };
-        return selectLocalResourcePath(i18n, project, options).then(
-          resources => {
-            return resources.map(resourcePath => {
-              const audioResource = new gd.AudioResource();
-              const projectPath = path.dirname(project.getProjectFile());
-              audioResource.setFile(path.relative(projectPath, resourcePath));
-              audioResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(
+          i18n,
+          project,
+          options,
+          loadPreferencesValues,
+          savePreferencesValues
+        ).then(resources => {
+          return resources.map(resourcePath => {
+            const audioResource = new gd.AudioResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            audioResource.setFile(path.relative(projectPath, resourcePath));
+            audioResource.setName(path.relative(projectPath, resourcePath));
 
-              return audioResource;
-            });
-          }
-        );
+            return audioResource;
+          });
+        });
       };
 
       render() {
@@ -64,25 +69,33 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n } = this.props;
+        const {
+          i18n,
+          loadPreferencesValues,
+          savePreferencesValues,
+        } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose an image`),
           name: i18n._(t`Image files`),
           extensions: ['png', 'jpg'],
         };
-        return selectLocalResourcePath(i18n, project, options).then(
-          resources => {
-            return resources.map(resourcePath => {
-              const imageResource = new gd.ImageResource();
-              const projectPath = path.dirname(project.getProjectFile());
-              imageResource.setFile(path.relative(projectPath, resourcePath));
-              imageResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(
+          i18n,
+          project,
+          options,
+          loadPreferencesValues,
+          savePreferencesValues
+        ).then(resources => {
+          return resources.map(resourcePath => {
+            const imageResource = new gd.ImageResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            imageResource.setFile(path.relative(projectPath, resourcePath));
+            imageResource.setName(path.relative(projectPath, resourcePath));
 
-              return imageResource;
-            });
-          }
-        );
+            return imageResource;
+          });
+        });
       };
 
       render() {
@@ -99,25 +112,33 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n } = this.props;
+        const {
+          i18n,
+          loadPreferencesValues,
+          savePreferencesValues,
+        } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a font file`),
           name: i18n._(t`Font files`),
           extensions: ['ttf', 'otf'],
         };
-        return selectLocalResourcePath(i18n, project, options).then(
-          resources => {
-            return resources.map(resourcePath => {
-              const fontResource = new gd.FontResource();
-              const projectPath = path.dirname(project.getProjectFile());
-              fontResource.setFile(path.relative(projectPath, resourcePath));
-              fontResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(
+          i18n,
+          project,
+          options,
+          loadPreferencesValues,
+          savePreferencesValues
+        ).then(resources => {
+          return resources.map(resourcePath => {
+            const fontResource = new gd.FontResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            fontResource.setFile(path.relative(projectPath, resourcePath));
+            fontResource.setName(path.relative(projectPath, resourcePath));
 
-              return fontResource;
-            });
-          }
-        );
+            return fontResource;
+          });
+        });
       };
 
       render() {
@@ -134,25 +155,33 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n } = this.props;
+        const {
+          i18n,
+          loadPreferencesValues,
+          savePreferencesValues,
+        } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a video file`),
           name: i18n._(t`Video files`),
           extensions: ['mp4'],
         };
-        return selectLocalResourcePath(i18n, project, options).then(
-          resources => {
-            return resources.map(resourcePath => {
-              const videoResource = new gd.VideoResource();
-              const projectPath = path.dirname(project.getProjectFile());
-              videoResource.setFile(path.relative(projectPath, resourcePath));
-              videoResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(
+          i18n,
+          project,
+          options,
+          loadPreferencesValues,
+          savePreferencesValues
+        ).then(resources => {
+          return resources.map(resourcePath => {
+            const videoResource = new gd.VideoResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            videoResource.setFile(path.relative(projectPath, resourcePath));
+            videoResource.setName(path.relative(projectPath, resourcePath));
 
-              return videoResource;
-            });
-          }
-        );
+            return videoResource;
+          });
+        });
       };
 
       render() {
@@ -169,25 +198,33 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n } = this.props;
+        const {
+          i18n,
+          loadPreferencesValues,
+          savePreferencesValues,
+        } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a json file`),
           name: i18n._(t`JSON file`),
           extensions: ['json'],
         };
-        return selectLocalResourcePath(i18n, project, options).then(
-          resources => {
-            return resources.map(resourcePath => {
-              const jsonResource = new gd.JsonResource();
-              const projectPath = path.dirname(project.getProjectFile());
-              jsonResource.setFile(path.relative(projectPath, resourcePath));
-              jsonResource.setName(path.relative(projectPath, resourcePath));
+        return selectLocalResourcePath(
+          i18n,
+          project,
+          options,
+          loadPreferencesValues,
+          savePreferencesValues
+        ).then(resources => {
+          return resources.map(resourcePath => {
+            const jsonResource = new gd.JsonResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            jsonResource.setFile(path.relative(projectPath, resourcePath));
+            jsonResource.setName(path.relative(projectPath, resourcePath));
 
-              return jsonResource;
-            });
-          }
-        );
+            return jsonResource;
+          });
+        });
       };
 
       render() {
@@ -197,18 +234,6 @@ export default [
   },
 ];
 
-function _loadLastOpenedPath(): ?string {
-  const values = loadPreferencesValues();
-  if (values) return values.lastOpenedPath;
-  else return '';
-}
-
-function _saveLastOpenedPath(lastOpenedPath: string) {
-  let values = loadPreferencesValues();
-  values = { ...values, lastOpenedPath };
-  savePreferencesValues(values);
-}
-
 const selectLocalResourcePath = (
   i18n: I18nType,
   project: gdProject,
@@ -217,7 +242,9 @@ const selectLocalResourcePath = (
     title: string,
     name: string,
     extensions: Array<string>,
-  }
+  },
+  loadPreferencesValues: () => ?PreferencesValues,
+  savePreferencesValues: (values: PreferencesValues) => void
 ): Promise<Array<string>> => {
   return new Promise((resolve, reject) => {
     if (!dialog) return reject('Not supported');
@@ -226,10 +253,10 @@ const selectLocalResourcePath = (
     if (options.multiSelections) properties.push('multiSelections');
     let projectPath = path.dirname(project.getProjectFile());
 
-    // Load locally stored lastOpenedPath and update projectPath if not undefined
-    let lastOpenedPath = _loadLastOpenedPath();
-    if (lastOpenedPath !== '') {
-      projectPath = lastOpenedPath;
+    // Load lastOpenedPath and update projectPath if not undefined
+    const values = loadPreferencesValues();
+    if (values) {
+      projectPath = values.lastOpenedPath;
     }
 
     const browserWindow = electron.remote.getCurrentWindow();
@@ -244,9 +271,11 @@ const selectLocalResourcePath = (
       paths => {
         if (!paths) return resolve([]);
 
-        // Update locally stored path value
+        // Update stored preferences values
         if (paths[0] !== projectPath) {
-          _saveLastOpenedPath(paths[0]);
+          let values = loadPreferencesValues();
+          values = { ...values, lastOpenedPath: paths[0] };
+          savePreferencesValues(values);
         }
 
         const outsideProjectFolderPaths = paths.filter(

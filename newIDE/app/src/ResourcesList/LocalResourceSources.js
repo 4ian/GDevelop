@@ -254,7 +254,7 @@ const selectLocalResourcePath = (
     let projectPath = path.dirname(project.getProjectFile());
 
     // Load lastOpenedPath and update projectPath if not undefined
-    const values = loadPreferencesValues();
+    let values = loadPreferencesValues();
     if (values) {
       projectPath = values.lastOpenedPath;
     }
@@ -273,9 +273,10 @@ const selectLocalResourcePath = (
 
         // Update stored preferences values
         if (paths[0] !== projectPath) {
-          let values = loadPreferencesValues();
-          values = { ...values, lastOpenedPath: paths[0] };
-          savePreferencesValues(values);
+          if (values) {
+            values.lastOpenedPath = paths[0];
+            savePreferencesValues(values);
+          }
         }
 
         const outsideProjectFolderPaths = paths.filter(

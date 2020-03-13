@@ -294,7 +294,6 @@ const selectLocalResourcePath = (
               values.lastOpenedPath[projectName] = path;
             }
             savePreferencesValues(values);
-            console.log(values)
           }
         }
 

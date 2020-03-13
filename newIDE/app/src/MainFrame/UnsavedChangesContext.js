@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react';
 
-export type UnsavedChanges = {|
+export type UnsavedChanges = {
   hasUnsavedChanges: boolean,
   sealUnsavedChanges: () => void,
   triggerUnsavedChanges: () => void,
-|};
+};
 
 const initialState: UnsavedChanges = {
   hasUnsavedChanges: false,
@@ -17,13 +17,13 @@ const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
 
 export default UnsavedChangesContext;
 
-type State = {|
+type State = {
   hasUnsavedChanges: boolean,
-|};
+};
 
-type Props = {|
+type Props = {
   children?: React.Node,
-|};
+};
 
 export class UnsavedChangesContextProvider extends React.Component<
   Props,

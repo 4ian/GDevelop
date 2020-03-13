@@ -8,6 +8,7 @@ export default class SceneNameField extends Component<
   ParameterFieldProps,
   {||}
 > {
+  // $FlowFixMe
   _field: ?SemiControlledAutoComplete;
 
   focus() {

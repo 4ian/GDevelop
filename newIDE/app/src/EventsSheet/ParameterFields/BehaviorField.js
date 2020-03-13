@@ -19,6 +19,7 @@ export default class BehaviorField extends React.Component<
   _longDescription: ?string;
   _behaviorTypeAllowed: ?string;
   _behaviorNames: Array<string> = [];
+  // $FlowFixMe
   _field: ?SemiControlledAutoComplete;
 
   constructor(props: ParameterFieldProps) {

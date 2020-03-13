@@ -60,6 +60,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
   allResourcesNames: Array<string>;
   autoCompleteData: DataSource;
+  // $FlowFixMe
   _autoComplete: ?SemiControlledAutoComplete;
 
   focus() {

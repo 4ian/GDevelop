@@ -17,6 +17,7 @@ type Props = {
 };
 
 export default class VariableField extends Component<Props, {||}> {
+  // $FlowFixMe
   _field: ?SemiControlledAutoComplete;
 
   focus() {

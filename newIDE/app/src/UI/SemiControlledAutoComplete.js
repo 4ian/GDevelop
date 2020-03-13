@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { useState } from 'react';
 import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -10,7 +11,7 @@ import { MarkdownText } from './MarkdownText';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 
 type Option =
@@ -26,6 +27,38 @@ type Option =
 
 export type DataSource = Array<Option>;
 
+type Props = {|
+  value: string,
+  onChange: string => void,
+  onChoose?: string => void,
+  dataSource: DataSource,
+
+  id?: string,
+  onBlur?: (event: {|
+    currentTarget: {|
+      value: string,
+    |},
+  |}) => void,
+  errorText?: React.Node,
+  disabled?: boolean,
+  floatingLabelText?: React.Node,
+  helperMarkdownText?: ?string,
+  hintText?: MessageDescriptor | string,
+  fullWidth?: boolean,
+  margin?: 'none' | 'dense',
+  textFieldStyle?: Object,
+  openOnFocus?: boolean,
+|};
+
+type State = {|
+  inputValue: string | null,
+|};
+
+type Interface = {|
+  focus: () => void,
+  forceInputValueTo: (newValue: string) => void,
+|};
+
 const styles = {
   container: {
     position: 'relative',
@@ -37,7 +70,7 @@ const styles = {
   },
 };
 
-const themeStyles = theme => ({
+const useStyles = makeStyles({
   option: {
     cursor: 'default',
   },
@@ -57,170 +90,131 @@ const themeStyles = theme => ({
   },
 });
 
-type Props = {|
-  value: string,
-  onChange: string => void,
-  //onRequestClose?: () => void,
-  onChoose?: string => void,
-  dataSource: DataSource,
-
-  id?: string,
-  onBlur?: (event: {|
-    currentTarget: {|
-      value: string,
-    |},
-  |}) => void,
-  errorText?: React.Node,
-  disabled?: boolean,
-  floatingLabelText?: React.Node,
-  helperMarkdownText?: ?string,
-  hintText?: MessageDescriptor | string,
-  fullWidth?: boolean,
-  margin?: 'none' | 'dense',
-  textFieldStyle?: Object,
-  openOnFocus?: boolean,
-  classes: Object,
-|};
-
-type State = {|
-  inputValue: string | null,
-|};
-
-class SemiControlledAutoComplete extends React.Component<Props, State> {
-  _input = React.createRef<HTMLInputElement>();
-
-  state = {
-    inputValue: null,
-  };
-
-  focus() {
-    if (this._input.current) this._input.current.focus();
-  }
-
-  forceInputValueTo(newValue: string): void {
-    if (this.state.inputValue !== null) {
-      this.setState({
-        inputValue: newValue,
-      });
-    }
-  }
-
-  isOptionDisabled = (option: Option): boolean => {
-    if (option.type === 'separator') return true;
-    return false;
-  };
-
-  renderItem = (option: Option, state: Object): React.Node => {
-    if (option.type && option.type === 'separator') {
-      return (
-        <ListItem
-          divider
-          disableGutters
-          component={'div'}
-          style={styles.listItem}
-        />
-      );
-    }
+const renderItem = (option: Option, state: Object): React.Node => {
+  if (option.type && option.type === 'separator') {
     return (
-      <ListItem component={'div'} style={styles.listItem}>
-        {option.renderIcon && (
-          <ListItemIcon>{option.renderIcon()}</ListItemIcon>
-        )}
-        {option.value}
-      </ListItem>
+      <ListItem
+        divider
+        disableGutters
+        component={'div'}
+        style={styles.listItem}
+      />
     );
+  }
+  return (
+    <ListItem component={'div'} style={styles.listItem}>
+      {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
+      {option.value}
+    </ListItem>
+  );
+};
+
+const isOptionDisabled = (option: Option) =>
+  option.type === 'separator' ? true : false;
+
+const filterFunction = (
+  options: DataSource,
+  state: Object,
+  value: string
+): DataSource => {
+  const lowercaseInputValue = value.toLowerCase();
+  const optionList = options.filter(option => {
+    if (option.type === 'separator') return true;
+    if (!option.text) return true;
+    return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
+  });
+
+  if (
+    !optionList.filter(option => option.type !== 'separator' && option.value)
+      .length
+  )
+    return [];
+
+  // Remove divider(s) if they are at the start or end of array
+  while (
+    optionList[optionList.length - 1] !== undefined &&
+    optionList[optionList.length - 1].type !== undefined
+  )
+    optionList.pop();
+  while (optionList[0] !== undefined && optionList[0].type !== undefined)
+    optionList.shift();
+
+  return optionList;
+};
+
+const handleChange = (
+  event: SyntheticKeyboardEvent<HTMLInputElement>,
+  option: Option | string,
+  props: Props,
+  ref: { current: ?HTMLInputElement }
+): void => {
+  if (option !== null && option.type !== 'separator') {
+    if (typeof option === 'string') props.onChange(option);
+    else {
+      if (option.onClick) option.onClick();
+      else
+        props.onChoose
+          ? props.onChoose(option.value)
+          : props.onChange(option.value);
+    }
+  }
+  if (event.key === 'Enter' && ref.current) ref.current.blur();
+};
+
+const getDefaultStylingProps = (
+  params: Object,
+  value: string,
+  props: Props,
+  ref: { current: ?HTMLInputElement }
+): Object => {
+  const { InputProps, inputProps, InputLabelProps, ...other } = params;
+  return {
+    ...other,
+    InputProps: {
+      ...InputProps,
+      className: null,
+      endAdornment: null,
+    },
+    inputProps: {
+      ...inputProps,
+      className: null,
+      onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
+        if (event.key === 'Enter') handleChange(event, value, props, ref);
+      },
+    },
   };
+};
 
-  render() {
-    const { classes } = this.props;
+const getOptionLabel = (option: Option, value: string): string =>
+  option.value ? option.value : value;
 
-    const getCurrentInputValue = (): string =>
-      this.state.inputValue !== null ? this.state.inputValue : this.props.value;
+export default React.forwardRef<Props, Interface>(
+  function SemiControlledAutoComplete(props: Props, ref) {
+    const _input = React.useRef((null: ?HTMLInputElement));
+    const [state, setState] = useState<State>({ inputValue: null });
+    const classes = useStyles();
 
-    const filterFunction = (options: DataSource, state: Object): DataSource => {
-      const lowercaseInputValue = getCurrentInputValue().toLowerCase();
-      const optionList = options.filter(option => {
-        if (option.type === 'separator') return true;
-        if (!option.text) return true;
-        return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
-      });
+    React.useImperativeHandle(ref, () => ({
+      focus: () => {
+        if (_input.current) _input.current.focus();
+      },
+      forceInputValueTo: (newValue: string) => {
+        if (state.inputValue !== null) setState({ inputValue: newValue });
+      },
+    }));
 
-      if (
-        !optionList.filter(
-          option => option.type !== 'separator' && option.value
-        ).length
-      )
-        return [];
+    const currentInputValue =
+      state.inputValue !== null ? state.inputValue : props.value;
 
-      // Remove divider(s) if they are at the start or end of array
-      while (
-        optionList[optionList.length - 1] !== undefined &&
-        optionList[optionList.length - 1].type !== undefined
-      )
-        optionList.pop();
-      while (
-        optionList[optionList.length - 1] !== undefined &&
-        optionList[0].type !== undefined
-      )
-        optionList.shift();
-
-      return optionList;
-    };
-
-    const helperText = this.props.helperMarkdownText ? (
-      <MarkdownText source={this.props.helperMarkdownText} />
+    const helperText = props.helperMarkdownText ? (
+      <MarkdownText source={props.helperMarkdownText} />
     ) : null;
 
-    const getOptionLabel = (option: Option): string => {
-      if (option.value) return option.value;
-      return getCurrentInputValue();
-    };
-
-    const handleChange = (event, option: Option | string): void => {
-      if (option !== null && option.type !== 'separator') {
-        if (typeof option === 'string') {
-          this.props.onChange(option);
-        } else {
-          if (option.onClick) option.onClick();
-          else {
-            if (this.props.onChoose) this.props.onChoose(option.value);
-            else this.props.onChange(option.value);
-          }
-        }
-      }
-      if (
-        typeof event.key === 'string' &&
-        event.key === 'Enter' &&
-        this._input.current !== null
-      )
-        this._input.current.blur();
-      //if (this.props.onRequestClose) this.props.onRequestClose();
-    };
-
-    const handleInputChange = (e, value: string, reason: string): void =>
-      this.setState({ inputValue: value });
-
-    const getDefaultStylingProps = (params: Object): Object => {
-      const { InputProps, inputProps, InputLabelProps, ...other } = params;
-      return {
-        ...other,
-        InputProps: {
-          ...InputProps,
-          className: null,
-          endAdornment: null,
-        },
-        inputProps: {
-          ...inputProps,
-          className: null,
-          onKeyDown: (event): void => {
-            // if (event.key === 'Escape' && this.props.onRequestClose)
-            //   this.props.onRequestClose();
-            if (event.key === 'Enter')
-              handleChange(event, getCurrentInputValue());
-          },
-        },
-      };
-    };
+    const handleInputChange = (
+      event: SyntheticKeyboardEvent<HTMLInputElement>,
+      value: string,
+      reason: string
+    ): void => setState({ inputValue: value });
 
     return (
       <I18n>
@@ -228,43 +222,48 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
           <Autocomplete
             freeSolo
             blurOnSelect
-            classes={{
-              option: classes.option,
-              listbox: classes.listbox,
-              input: classes.input,
-              inputRoot: classes.inputRoot,
-              popper: classes.popper,
-            }}
-            onChange={handleChange}
+            classes={classes}
+            onChange={(event, option: Option | string) =>
+              handleChange(event, option, props, _input)
+            }
             style={styles.container}
-            inputValue={getCurrentInputValue()}
-            value={getCurrentInputValue()}
+            inputValue={currentInputValue}
+            value={currentInputValue}
             onInputChange={handleInputChange}
-            options={this.props.dataSource}
-            renderOption={this.renderItem}
-            getOptionDisabled={this.isOptionDisabled}
-            getOptionLabel={getOptionLabel}
-            filterOptions={filterFunction}
+            options={props.dataSource}
+            renderOption={renderItem}
+            getOptionDisabled={isOptionDisabled}
+            getOptionLabel={(option: Option) =>
+              getOptionLabel(option, currentInputValue)
+            }
+            filterOptions={(options: DataSource, state) =>
+              filterFunction(options, state, currentInputValue)
+            }
             renderInput={params => {
-              const { InputProps, ...other } = getDefaultStylingProps(params);
+              const { InputProps, ...other } = getDefaultStylingProps(
+                params,
+                currentInputValue,
+                props,
+                _input
+              );
               return (
                 <TextField
                   InputProps={{
                     ...InputProps,
                     placeholder:
-                      typeof this.props.hintText === 'string'
-                        ? this.props.hintText
-                        : i18n._(this.props.hintText),
+                      typeof props.hintText === 'string'
+                        ? props.hintText
+                        : i18n._(props.hintText),
                   }}
                   {...other}
-                  {...computeTextFieldStyleProps(this.props)}
-                  style={this.props.textFieldStyle}
-                  label={this.props.floatingLabelText}
-                  inputRef={this._input}
-                  disabled={this.props.disabled}
-                  error={!!this.props.errorText}
-                  helperText={helperText}
-                  fullWidth={this.props.fullWidth}
+                  {...computeTextFieldStyleProps(props)}
+                  style={props.textFieldStyle}
+                  label={props.floatingLabelText}
+                  inputRef={_input}
+                  disabled={props.disabled}
+                  error={!!props.errorText}
+                  helperText={helperText || props.errorText}
+                  fullWidth={props.fullWidth}
                 />
               );
             }}
@@ -273,6 +272,4 @@ class SemiControlledAutoComplete extends React.Component<Props, State> {
       </I18n>
     );
   }
-}
-
-export default withStyles(themeStyles)(SemiControlledAutoComplete);
+);

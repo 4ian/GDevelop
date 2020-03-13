@@ -5,6 +5,7 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 export default class LayerField extends Component<ParameterFieldProps, {||}> {
+  // $FlowFixMe
   _field: ?SemiControlledAutoComplete;
 
   focus() {

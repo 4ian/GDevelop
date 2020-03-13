@@ -18,7 +18,6 @@ type Props = {|
 
   onChoose?: string => void,
   onChange: string => void,
-  onRequestClose?: () => void,
   value: string,
   errorTextIfInvalid?: React.Node,
 
@@ -78,6 +77,7 @@ const getObjectsAndGroupsDataSource = ({
 };
 
 export default class ObjectSelector extends React.Component<Props, {||}> {
+  // $FlowFixMe
   _field: ?SemiControlledAutoComplete;
 
   // Don't add a componentWillUnmount that would call onChange. This can lead to
@@ -92,7 +92,6 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       value,
       onChange,
       onChoose,
-      onRequestClose,
       project,
       globalObjectsContainer,
       objectsContainer,

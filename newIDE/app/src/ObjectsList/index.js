@@ -34,8 +34,7 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
-import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
-
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 const styles = {
   listContainer: {
     flex: 1,
@@ -95,8 +94,8 @@ type Props = {|
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
-
   getThumbnail: (project: gdProject, object: Object) => string,
+  unsavedChangesManagement: UnsavedChanges,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -488,7 +487,6 @@ export default class ObjectsList extends React.Component<Props, State> {
     ];
   };
 
-  static contextType = UnsavedChangesContext;
   render() {
     const { project, objectsContainer, selectedObjectTags } = this.props;
     const { searchText, tagEditedObject } = this.state;
@@ -581,7 +579,7 @@ export default class ObjectsList extends React.Component<Props, State> {
             }
             onCancel={() => this._editVariables(null)}
             onApply={() => {
-              this.context.triggerUnsavedChanges();
+              this.props.unsavedChangesManagement.triggerUnsavedChanges();
               return this._editVariables(null);
             }}
             title={<Trans>Object Variables</Trans>}

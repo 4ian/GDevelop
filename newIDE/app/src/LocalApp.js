@@ -25,7 +25,8 @@ import LocalEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoad
 import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
-import {LocalGDJSDevelopmentWatcher} from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
+import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
+import UnsavedChangesContext from './MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
@@ -61,18 +62,25 @@ export const create = (authentification: Authentification) => {
                 editor={appArguments['editor']}
                 editedElementName={appArguments['edited-element-name']}
               >
-                <MainFrame
-                  i18n={i18n}
-                  eventsFunctionsExtensionsState={
-                    eventsFunctionsExtensionsState
-                  }
-                  resourceSources={localResourceSources}
-                  storageProviders={storageProviders}
-                  useStorageProvider={useStorageProvider}
-                  storageProviderOperations={currentStorageProviderOperations}
-                  resourceExternalEditors={localResourceExternalEditors}
-                  initialFileMetadataToOpen={initialFileMetadataToOpen}
-                />
+                <UnsavedChangesContext.Consumer>
+                  {unsavedChangesManagement => (
+                    <MainFrame
+                      i18n={i18n}
+                      eventsFunctionsExtensionsState={
+                        eventsFunctionsExtensionsState
+                      }
+                      resourceSources={localResourceSources}
+                      storageProviders={storageProviders}
+                      useStorageProvider={useStorageProvider}
+                      storageProviderOperations={
+                        currentStorageProviderOperations
+                      }
+                      resourceExternalEditors={localResourceExternalEditors}
+                      initialFileMetadataToOpen={initialFileMetadataToOpen}
+                      unsavedChangesManagement={unsavedChangesManagement}
+                    />
+                  )}
+                </UnsavedChangesContext.Consumer>
               </ExternalEditor>
             )}
           </ProjectStorageProviders>
@@ -100,38 +108,52 @@ export const create = (authentification: Authentification) => {
               storageProviders,
               initialFileMetadataToOpen,
             }) => (
-              <ElectronMainMenu i18n={i18n}>
-                <MainFrame
-                  i18n={i18n}
-                  eventsFunctionsExtensionsState={
-                    eventsFunctionsExtensionsState
-                  }
-                  renderPreviewLauncher={(props, ref) => <LocalPreviewLauncher {...props} ref={ref} />}
-                  renderExportDialog={props => (
-                    <ExportDialog {...props} exporters={getLocalExporters()} />
-                  )}
-                  renderCreateDialog={props => (
-                    <CreateProjectDialog
-                      {...props}
-                      examplesComponent={LocalExamples}
-                      startersComponent={LocalStarters}
+              <UnsavedChangesContext.Consumer>
+                {unsavedChangesManagement => (
+                  <ElectronMainMenu i18n={i18n}>
+                    <MainFrame
+                      i18n={i18n}
+                      eventsFunctionsExtensionsState={
+                        eventsFunctionsExtensionsState
+                      }
+                      renderPreviewLauncher={(props, ref) => (
+                        <LocalPreviewLauncher {...props} ref={ref} />
+                      )}
+                      renderExportDialog={props => (
+                        <ExportDialog
+                          {...props}
+                          exporters={getLocalExporters()}
+                        />
+                      )}
+                      renderCreateDialog={props => (
+                        <CreateProjectDialog
+                          {...props}
+                          examplesComponent={LocalExamples}
+                          startersComponent={LocalStarters}
+                        />
+                      )}
+                      renderGDJSDevelopmentWatcher={
+                        isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
+                      }
+                      storageProviders={storageProviders}
+                      useStorageProvider={useStorageProvider}
+                      storageProviderOperations={
+                        currentStorageProviderOperations
+                      }
+                      resourceSources={localResourceSources}
+                      resourceExternalEditors={localResourceExternalEditors}
+                      extensionsLoader={makeExtensionsLoader({
+                        gd,
+                        objectsEditorService: ObjectsEditorService,
+                        objectsRenderingService: ObjectsRenderingService,
+                        filterExamples: !isDev,
+                      })}
+                      initialFileMetadataToOpen={initialFileMetadataToOpen}
+                      unsavedChangesManagement={unsavedChangesManagement}
                     />
-                  )}
-                  renderGDJSDevelopmentWatcher={isDev ? () => <LocalGDJSDevelopmentWatcher /> : null}
-                  storageProviders={storageProviders}
-                  useStorageProvider={useStorageProvider}
-                  storageProviderOperations={currentStorageProviderOperations}
-                  resourceSources={localResourceSources}
-                  resourceExternalEditors={localResourceExternalEditors}
-                  extensionsLoader={makeExtensionsLoader({
-                    gd,
-                    objectsEditorService: ObjectsEditorService,
-                    objectsRenderingService: ObjectsRenderingService,
-                    filterExamples: !isDev,
-                  })}
-                  initialFileMetadataToOpen={initialFileMetadataToOpen}
-                />
-              </ElectronMainMenu>
+                  </ElectronMainMenu>
+                )}
+              </UnsavedChangesContext.Consumer>
             )}
           </ProjectStorageProviders>
         )}

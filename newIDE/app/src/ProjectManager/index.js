@@ -39,8 +39,8 @@ import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
@@ -262,6 +262,7 @@ type Props = {|
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
+  unsavedChangesManagement: UnsavedChanges,
 |};
 
 type State = {|
@@ -630,7 +631,6 @@ export default class ProjectManager extends React.Component<Props, State> {
     /* Do nothing for now, but we could open the first result. */
   };
 
-  static contextType = UnsavedChangesContext;
   render() {
     const {
       project,
@@ -712,31 +712,25 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemKind === 'layout' && renamedItemName === name
                       }
                       onEdit={() => {
-                        this.context.triggerUnsavedChanges();
                         this.props.onOpenLayout(name);
                       }}
                       onDelete={() => {
-                        this.context.triggerUnsavedChanges();
                         return this.props.onDeleteLayout(layout);
                       }}
                       addLabel={'Add a New Scene'}
                       onAdd={() => {
-                        this.context.triggerUnsavedChanges();
                         this._addLayout(i);
                       }}
                       onRename={newName => {
-                        this.context.triggerUnsavedChanges();
                         this.props.onRenameLayout(name, newName);
                         this._onEditName(null, '');
                       }}
                       onEditName={() => {
-                        this.context.triggerUnsavedChanges();
                         return this._onEditName('layout', name);
                       }}
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
                       onPaste={() => {
-                        this.context.triggerUnsavedChanges();
                         return this._pasteLayout(i);
                       }}
                       canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
@@ -784,34 +778,27 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemName === name
                       }
                       onEdit={() => {
-                        this.context.triggerUnsavedChanges();
                         return this.props.onOpenExternalEvents(name);
                       }}
                       onDelete={() => {
-                        this.context.triggerUnsavedChanges();
                         this.props.onDeleteExternalEvents(externalEvents);
                       }}
                       addLabel={'Add New External Events'}
                       onAdd={() => {
-                        this.context.triggerUnsavedChanges();
                         return this._addExternalEvents(i);
                       }}
                       onRename={newName => {
-                        this.context.triggerUnsavedChanges();
                         this.props.onRenameExternalEvents(name, newName);
                         this._onEditName(null, '');
                       }}
                       onEditName={() => {
-                        this.context.triggerUnsavedChanges();
                         this._onEditName('external-events', name);
                       }}
                       onCopy={() => this._copyExternalEvents(externalEvents)}
                       onCut={() => {
-                        this.context.triggerUnsavedChanges();
                         this._cutExternalEvents(externalEvents);
                       }}
                       onPaste={() => {
-                        this.context.triggerUnsavedChanges();
                         this._pasteExternalEvents(i);
                       }}
                       canPaste={() =>
@@ -927,22 +914,18 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemName === name
                       }
                       onEdit={() => {
-                        this.context.triggerUnsavedChanges();
                         this.props.onOpenEventsFunctionsExtension(name);
                       }}
                       onDelete={() => {
-                        this.context.triggerUnsavedChanges();
                         return this.props.onDeleteEventsFunctionsExtension(
                           eventsFunctionsExtension
                         );
                       }}
                       addLabel={'Add a New Extension'}
                       onAdd={() => {
-                        this.context.triggerUnsavedChanges();
                         this._addEventsFunctionsExtension(i);
                       }}
                       onRename={newName => {
-                        this.context.triggerUnsavedChanges();
                         this.props.onRenameEventsFunctionsExtension(
                           name,
                           newName
@@ -1010,7 +993,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             variablesContainer={project.getVariables()}
             onCancel={() => this.setState({ variablesEditorOpen: false })}
             onApply={() => {
-              this.context.triggerUnsavedChanges();
+              this.props.unsavedChangesManagement.triggerUnsavedChanges();
               this.setState({ variablesEditorOpen: false });
             }}
             emptyExplanationMessage={
@@ -1035,7 +1018,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false })
             }
             onApply={() => {
-              this.context.triggerUnsavedChanges();
+              this.props.unsavedChangesManagement.triggerUnsavedChanges();
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}

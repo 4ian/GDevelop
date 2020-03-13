@@ -92,7 +92,8 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
-import UnsavedChangesContext from './UnsavedChangesContext';
+import { type UnsavedChanges } from './UnsavedChangesContext';
+
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -157,6 +158,7 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
+  unsavedChangesManagement: UnsavedChanges,
 };
 
 class MainFrame extends React.Component<Props, State> {
@@ -532,6 +534,7 @@ class MainFrame extends React.Component<Props, State> {
     );
     newLayout.updateBehaviorsSharedData(currentProject);
     this.forceUpdate();
+    this.props.unsavedChangesManagement.triggerUnsavedChanges();
   };
 
   addExternalLayout = () => {
@@ -546,6 +549,7 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getExternalLayoutsCount()
     );
     this.forceUpdate();
+    this.props.unsavedChangesManagement.triggerUnsavedChanges();
   };
 
   addExternalEvents = () => {
@@ -560,6 +564,7 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getExternalEventsCount()
     );
     this.forceUpdate();
+    this.props.unsavedChangesManagement.triggerUnsavedChanges();
   };
 
   addEventsFunctionsExtension = () => {
@@ -574,6 +579,7 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getEventsFunctionsExtensionsCount()
     );
     this.forceUpdate();
+    this.props.unsavedChangesManagement.triggerUnsavedChanges();
   };
 
   deleteLayout = (layout: gdLayout) => {
@@ -596,6 +602,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeLayout(layout.getName());
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
   };
@@ -623,6 +630,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeExternalLayout(externalLayout.getName());
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
   };
@@ -650,6 +658,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeExternalEvents(externalEvents.getName());
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
   };
@@ -679,6 +688,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
 
@@ -716,6 +726,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         layout.setName(newName);
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
   };
@@ -753,6 +764,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         externalLayout.setName(newName);
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
   };
@@ -790,6 +802,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         externalEvents.setName(newName);
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
   };
@@ -853,6 +866,7 @@ class MainFrame extends React.Component<Props, State> {
           currentProject
         );
         this.forceUpdate();
+        this.props.unsavedChangesManagement.triggerUnsavedChanges();
       }
     );
   };
@@ -961,6 +975,7 @@ class MainFrame extends React.Component<Props, State> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
+              unsavedChangesManagement={this.props.unsavedChangesManagement}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1010,6 +1025,7 @@ class MainFrame extends React.Component<Props, State> {
               onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
+              unsavedChangesManagement={this.props.unsavedChangesManagement}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1055,6 +1071,7 @@ class MainFrame extends React.Component<Props, State> {
               onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
+              unsavedChangesManagement={this.props.unsavedChangesManagement}
             />
           ),
           key: 'external events ' + name,
@@ -1150,6 +1167,7 @@ class MainFrame extends React.Component<Props, State> {
                   this.state.currentProject
                 );
               }}
+              unsavedChangesManagement={this.props.unsavedChangesManagement}
             />
           ),
           key: 'events functions extension ' + name,
@@ -1390,7 +1408,7 @@ class MainFrame extends React.Component<Props, State> {
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
         if (wasSaved) {
-          this.context.sealUnsavedChanges();
+          this.props.unsavedChangesManagement.sealUnsavedChanges();
           this._showSnackMessage(i18n._(t`Project properly saved`));
         }
       },
@@ -1437,7 +1455,7 @@ class MainFrame extends React.Component<Props, State> {
       .then(
         ({ wasSaved, fileMetadata }) => {
           if (wasSaved) {
-            this.context.sealUnsavedChanges();
+            this.props.unsavedChangesManagement.sealUnsavedChanges();
             this._showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
@@ -1459,7 +1477,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   askToCloseProject = (): Promise<void> => {
-    if (this.context.hasUnsavedChanges) {
+    if (this.props.unsavedChangesManagement.hasUnsavedChanges) {
       if (!this.state.currentProject) return Promise.resolve();
       const { i18n } = this.props;
 
@@ -1677,7 +1695,6 @@ class MainFrame extends React.Component<Props, State> {
       snackMessageOpen: false,
     });
 
-  static contextType = UnsavedChangesContext;
   render() {
     const {
       currentProject,
@@ -1747,11 +1764,9 @@ class MainFrame extends React.Component<Props, State> {
               }
               onRenameExternalEvents={this.renameExternalEvents}
               onSaveProject={() => {
-                this.context.sealUnsavedChanges();
                 this.saveProject();
               }}
               onSaveProjectAs={() => {
-                this.context.sealUnsavedChanges();
                 this.saveProjectAs();
               }}
               onCloseProject={() => {
@@ -1776,6 +1791,7 @@ class MainFrame extends React.Component<Props, State> {
                 );
               }}
               freezeUpdate={!projectManagerOpen}
+              unsavedChangesManagement={this.props.unsavedChangesManagement}
             />
           )}
           {!currentProject && (

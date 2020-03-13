@@ -22,7 +22,6 @@ import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
-import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -317,7 +316,6 @@ export default class InstancesEditorContainer extends Component {
     stopPIXITicker();
   }
 
-  static contextType = UnsavedChangesContext;
   componentWillReceiveProps(nextProps) {
     if (
       nextProps.width !== this.props.width ||
@@ -339,7 +337,6 @@ export default class InstancesEditorContainer extends Component {
     }
 
     if (nextProps.options !== this.props.options) {
-      this.context.triggerUnsavedChanges();
       this.grid.setOptions(nextProps.options);
       this.instancesMover.setOptions(nextProps.options);
       this.instancesResizer.setOptions(nextProps.options);

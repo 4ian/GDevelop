@@ -19,7 +19,6 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
 type Props = {|
   project: gdProject,
@@ -84,7 +83,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     }
   }
 
-  static contextType = UnsavedChangesContext;
   _onApply = () => {
     const t = str => str; //TODO
     const { project } = this.props;
@@ -123,7 +121,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 
     this.props.onApply();
-    this.context.triggerUnsavedChanges();
   };
 
   render() {

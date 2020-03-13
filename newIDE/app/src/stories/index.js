@@ -184,6 +184,7 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -1444,23 +1445,28 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
               }
               {
                 <TabContentContainer active={value === 1}>
-                  <ObjectsList
-                    getThumbnail={() => 'res/unknown32.png'}
-                    project={testProject.project}
-                    objectsContainer={testProject.testLayout}
-                    onEditObject={action('On edit object')}
-                    selectedObjectNames={[]}
-                    selectedObjectTags={[]}
-                    onChangeSelectedObjectTags={() => {}}
-                    getAllObjectTags={() => []}
-                    canRenameObject={() => true}
-                    onDeleteObject={(objectWithContext, cb) => cb(true)}
-                    onRenameObject={(objectWithContext, newName, cb) =>
-                      cb(true)
-                    }
-                    onObjectCreated={() => {}}
-                    onObjectSelected={() => {}}
-                  />
+                  <UnsavedChangesContext.Consumer>
+                    {unsavedChangesManagement => (
+                      <ObjectsList
+                        getThumbnail={() => 'res/unknown32.png'}
+                        project={testProject.project}
+                        objectsContainer={testProject.testLayout}
+                        onEditObject={action('On edit object')}
+                        selectedObjectNames={[]}
+                        selectedObjectTags={[]}
+                        onChangeSelectedObjectTags={() => {}}
+                        getAllObjectTags={() => []}
+                        canRenameObject={() => true}
+                        onDeleteObject={(objectWithContext, cb) => cb(true)}
+                        onRenameObject={(objectWithContext, newName, cb) =>
+                          cb(true)
+                        }
+                        onObjectCreated={() => {}}
+                        onObjectSelected={() => {}}
+                        unsavedChangesManagement={unsavedChangesManagement}
+                      />
+                    )}
+                  </UnsavedChangesContext.Consumer>
                 </TabContentContainer>
               }
               {
@@ -2505,56 +2511,70 @@ storiesOf('EventsSheet', module)
   .add('default (no scope)', () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
-        <EventsSheet
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          events={testProject.testLayout.getEvents()}
-          onOpenExternalEvents={action('Open external events')}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
-          onOpenLayout={action('open layout')}
-          onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
-          setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCreateEventsFunction={action('create events function')}
-        />
+        <UnsavedChangesContext.Consumer>
+          {unsavedChangesManagement => (
+            <EventsSheet
+              project={testProject.project}
+              scope={{ layout: testProject.testLayout }}
+              globalObjectsContainer={testProject.project}
+              objectsContainer={testProject.testLayout}
+              events={testProject.testLayout.getEvents()}
+              onOpenExternalEvents={action('Open external events')}
+              resourceSources={[]}
+              onChooseResource={source =>
+                action('Choose resource from source', source)
+              }
+              resourceExternalEditors={fakeResourceExternalEditors}
+              onOpenDebugger={action('open debugger')}
+              onOpenLayout={action('open layout')}
+              onOpenSettings={action('open settings')}
+              onPreview={action('preview')}
+              setToolbar={() => {}}
+              showNetworkPreviewButton={false}
+              showPreviewButton={false}
+              openInstructionOrExpression={action(
+                'open instruction or expression'
+              )}
+              onCreateEventsFunction={action('create events function')}
+              unsavedChangesManagement={unsavedChangesManagement}
+            />
+          )}
+        </UnsavedChangesContext.Consumer>
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
   ))
   .add('empty (no events) (no scope)', () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
-        <EventsSheet
-          project={testProject.project}
-          scope={{ layout: testProject.emptyLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.emptyLayout}
-          events={testProject.emptyLayout.getEvents()}
-          onOpenExternalEvents={action('Open external events')}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
-          onOpenLayout={action('open layout')}
-          onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
-          setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCreateEventsFunction={action('create events function')}
-        />
+        <UnsavedChangesContext.Consumer>
+          {unsavedChangesManagement => (
+            <EventsSheet
+              project={testProject.project}
+              scope={{ layout: testProject.emptyLayout }}
+              globalObjectsContainer={testProject.project}
+              objectsContainer={testProject.emptyLayout}
+              events={testProject.emptyLayout.getEvents()}
+              onOpenExternalEvents={action('Open external events')}
+              resourceSources={[]}
+              onChooseResource={source =>
+                action('Choose resource from source', source)
+              }
+              resourceExternalEditors={fakeResourceExternalEditors}
+              onOpenDebugger={action('open debugger')}
+              onOpenLayout={action('open layout')}
+              onOpenSettings={action('open settings')}
+              onPreview={action('preview')}
+              setToolbar={() => {}}
+              showNetworkPreviewButton={false}
+              showPreviewButton={false}
+              openInstructionOrExpression={action(
+                'open instruction or expression'
+              )}
+              onCreateEventsFunction={action('create events function')}
+              unsavedChangesManagement={unsavedChangesManagement}
+            />
+          )}
+        </UnsavedChangesContext.Consumer>
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
   ));
@@ -2983,21 +3003,26 @@ storiesOf('ObjectsList', module)
     <DragAndDropContextProvider>
       <SerializedObjectDisplay object={testProject.testLayout}>
         <div style={{ height: 250 }}>
-          <ObjectsList
-            getThumbnail={() => 'res/unknown32.png'}
-            project={testProject.project}
-            objectsContainer={testProject.testLayout}
-            onEditObject={action('On edit object')}
-            onObjectCreated={action('On object created')}
-            selectedObjectNames={[]}
-            selectedObjectTags={[]}
-            onChangeSelectedObjectTags={selectedObjectTags => {}}
-            getAllObjectTags={() => []}
-            canRenameObject={() => true}
-            onDeleteObject={(objectWithContext, cb) => cb(true)}
-            onRenameObject={(objectWithContext, newName, cb) => cb(true)}
-            onObjectSelected={() => {}}
-          />
+          <UnsavedChangesContext.Consumer>
+            {unsavedChangesManagement => (
+              <ObjectsList
+                getThumbnail={() => 'res/unknown32.png'}
+                project={testProject.project}
+                objectsContainer={testProject.testLayout}
+                onEditObject={action('On edit object')}
+                onObjectCreated={action('On object created')}
+                selectedObjectNames={[]}
+                selectedObjectTags={[]}
+                onChangeSelectedObjectTags={selectedObjectTags => {}}
+                getAllObjectTags={() => []}
+                canRenameObject={() => true}
+                onDeleteObject={(objectWithContext, cb) => cb(true)}
+                onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+                onObjectSelected={() => {}}
+                unsavedChangesManagement={unsavedChangesManagement}
+              />
+            )}
+          </UnsavedChangesContext.Consumer>
         </div>
       </SerializedObjectDisplay>
     </DragAndDropContextProvider>
@@ -3006,28 +3031,33 @@ storiesOf('ObjectsList', module)
     <DragAndDropContextProvider>
       <SerializedObjectDisplay object={testProject.testLayout}>
         <div style={{ height: 250 }}>
-          <ObjectsList
-            getThumbnail={() => 'res/unknown32.png'}
-            project={testProject.project}
-            objectsContainer={testProject.testLayout}
-            onEditObject={action('On edit object')}
-            onObjectCreated={action('On object created')}
-            selectedObjectNames={[]}
-            selectedObjectTags={['Tag1', 'Tag2']}
-            onChangeSelectedObjectTags={action(
-              'on change selected object tags'
+          <UnsavedChangesContext.Consumer>
+            {unsavedChangesManagement => (
+              <ObjectsList
+                getThumbnail={() => 'res/unknown32.png'}
+                project={testProject.project}
+                objectsContainer={testProject.testLayout}
+                onEditObject={action('On edit object')}
+                onObjectCreated={action('On object created')}
+                selectedObjectNames={[]}
+                selectedObjectTags={['Tag1', 'Tag2']}
+                onChangeSelectedObjectTags={action(
+                  'on change selected object tags'
+                )}
+                getAllObjectTags={() => [
+                  'Tag1',
+                  'Tag2',
+                  'Looooooooooong Tag 3',
+                  'Unselected Tag 4',
+                ]}
+                canRenameObject={() => true}
+                onDeleteObject={(objectWithContext, cb) => cb(true)}
+                onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+                onObjectSelected={() => {}}
+                unsavedChangesManagement={unsavedChangesManagement}
+              />
             )}
-            getAllObjectTags={() => [
-              'Tag1',
-              'Tag2',
-              'Looooooooooong Tag 3',
-              'Unselected Tag 4',
-            ]}
-            canRenameObject={() => true}
-            onDeleteObject={(objectWithContext, cb) => cb(true)}
-            onRenameObject={(objectWithContext, newName, cb) => cb(true)}
-            onObjectSelected={() => {}}
-          />
+          </UnsavedChangesContext.Consumer>
         </div>
       </SerializedObjectDisplay>
     </DragAndDropContextProvider>
@@ -3079,14 +3109,19 @@ storiesOf('InstancePropertiesEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={testProject.testLayout}>
-      <InstancePropertiesEditor
-        project={testProject.project}
-        layout={testProject.testLayout}
-        instances={[testProject.testLayoutInstance1]}
-        editInstanceVariables={action('edit instance variables')}
-        editObjectVariables={action('edit object variables')}
-        onEditObjectByName={action('edit object')}
-      />
+      <UnsavedChangesContext.Consumer>
+        {unsavedChangesManagement => (
+          <InstancePropertiesEditor
+            project={testProject.project}
+            layout={testProject.testLayout}
+            instances={[testProject.testLayoutInstance1]}
+            editInstanceVariables={action('edit instance variables')}
+            editObjectVariables={action('edit object variables')}
+            onEditObjectByName={action('edit object')}
+            unsavedChangesManagement={unsavedChangesManagement}
+          />
+        )}
+      </UnsavedChangesContext.Consumer>
     </SerializedObjectDisplay>
   ));
 
@@ -3697,20 +3732,29 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
   .add('default', () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
-        <EventsFunctionsExtensionEditor
-          project={testProject.project}
-          eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
-          setToolbar={() => {}}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          openInstructionOrExpression={action('open instruction or expression')}
-          initiallyFocusedFunctionName={null}
-          initiallyFocusedBehaviorName={null}
-          onCreateEventsFunction={action('on create events function')}
-        />
+        <UnsavedChangesContext.Consumer>
+          {unsavedChangesManagement => (
+            <EventsFunctionsExtensionEditor
+              project={testProject.project}
+              eventsFunctionsExtension={
+                testProject.testEventsFunctionsExtension
+              }
+              setToolbar={() => {}}
+              resourceSources={[]}
+              onChooseResource={source =>
+                action('Choose resource from source', source)
+              }
+              resourceExternalEditors={fakeResourceExternalEditors}
+              openInstructionOrExpression={action(
+                'open instruction or expression'
+              )}
+              initiallyFocusedFunctionName={null}
+              initiallyFocusedBehaviorName={null}
+              onCreateEventsFunction={action('on create events function')}
+              unsavedChangesManagement={unsavedChangesManagement}
+            />
+          )}
+        </UnsavedChangesContext.Consumer>
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
   ));
@@ -3801,84 +3845,102 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
 storiesOf('ProjectManager', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ProjectManager
-      project={testProject.project}
-      onOpenExternalEvents={action('onOpenExternalEvents')}
-      onOpenLayout={action('onOpenLayout')}
-      onOpenExternalLayout={action('onOpenExternalLayout')}
-      onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
-      onAddLayout={action('onAddLayout')}
-      onAddExternalLayout={action('onAddExternalLayout')}
-      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
-      onAddExternalEvents={action('onAddExternalEvents')}
-      onDeleteLayout={action('onDeleteLayout')}
-      onDeleteExternalLayout={action('onDeleteExternalLayout')}
-      onDeleteEventsFunctionsExtension={action(
-        'onDeleteEventsFunctionsExtension'
+    <UnsavedChangesContext.Consumer>
+      {unsavedChangesManagement => (
+        <ProjectManager
+          project={testProject.project}
+          onOpenExternalEvents={action('onOpenExternalEvents')}
+          onOpenLayout={action('onOpenLayout')}
+          onOpenExternalLayout={action('onOpenExternalLayout')}
+          onOpenEventsFunctionsExtension={action(
+            'onOpenEventsFunctionsExtension'
+          )}
+          onAddLayout={action('onAddLayout')}
+          onAddExternalLayout={action('onAddExternalLayout')}
+          onAddEventsFunctionsExtension={action(
+            'onAddEventsFunctionsExtension'
+          )}
+          onAddExternalEvents={action('onAddExternalEvents')}
+          onDeleteLayout={action('onDeleteLayout')}
+          onDeleteExternalLayout={action('onDeleteExternalLayout')}
+          onDeleteEventsFunctionsExtension={action(
+            'onDeleteEventsFunctionsExtension'
+          )}
+          onDeleteExternalEvents={action('onDeleteExternalEvents')}
+          onRenameLayout={action('onRenameLayout')}
+          onRenameExternalLayout={action('onRenameExternalLayout')}
+          onRenameEventsFunctionsExtension={action(
+            'onRenameEventsFunctionsExtension'
+          )}
+          onRenameExternalEvents={action('onRenameExternalEvents')}
+          onSaveProject={action('onSaveProject')}
+          onSaveProjectAs={action('onSaveProjectAs')}
+          onCloseProject={action('onCloseProject')}
+          onExportProject={action('onExportProject')}
+          onOpenPreferences={action('onOpenPreferences')}
+          onOpenProfile={action('onOpenProfile')}
+          onOpenResources={action('onOpenResources')}
+          onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+          onChangeSubscription={action('onChangeSubscription')}
+          eventsFunctionsExtensionsError={null}
+          onReloadEventsFunctionsExtensions={action(
+            'onReloadEventsFunctionsExtensions'
+          )}
+          freezeUpdate={false}
+          unsavedChangesManagement={unsavedChangesManagement}
+        />
       )}
-      onDeleteExternalEvents={action('onDeleteExternalEvents')}
-      onRenameLayout={action('onRenameLayout')}
-      onRenameExternalLayout={action('onRenameExternalLayout')}
-      onRenameEventsFunctionsExtension={action(
-        'onRenameEventsFunctionsExtension'
-      )}
-      onRenameExternalEvents={action('onRenameExternalEvents')}
-      onSaveProject={action('onSaveProject')}
-      onSaveProjectAs={action('onSaveProjectAs')}
-      onCloseProject={action('onCloseProject')}
-      onExportProject={action('onExportProject')}
-      onOpenPreferences={action('onOpenPreferences')}
-      onOpenProfile={action('onOpenProfile')}
-      onOpenResources={action('onOpenResources')}
-      onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-      onChangeSubscription={action('onChangeSubscription')}
-      eventsFunctionsExtensionsError={null}
-      onReloadEventsFunctionsExtensions={action(
-        'onReloadEventsFunctionsExtensions'
-      )}
-      freezeUpdate={false}
-    />
+    </UnsavedChangesContext.Consumer>
   ))
   .add('Error in functions', () => (
-    <ProjectManager
-      project={testProject.project}
-      onOpenExternalEvents={action('onOpenExternalEvents')}
-      onOpenLayout={action('onOpenLayout')}
-      onOpenExternalLayout={action('onOpenExternalLayout')}
-      onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
-      onAddLayout={action('onAddLayout')}
-      onAddExternalLayout={action('onAddExternalLayout')}
-      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
-      onAddExternalEvents={action('onAddExternalEvents')}
-      onDeleteLayout={action('onDeleteLayout')}
-      onDeleteExternalLayout={action('onDeleteExternalLayout')}
-      onDeleteEventsFunctionsExtension={action(
-        'onDeleteEventsFunctionsExtension'
+    <UnsavedChangesContext.Consumer>
+      {unsavedChangesManagement => (
+        <ProjectManager
+          project={testProject.project}
+          onOpenExternalEvents={action('onOpenExternalEvents')}
+          onOpenLayout={action('onOpenLayout')}
+          onOpenExternalLayout={action('onOpenExternalLayout')}
+          onOpenEventsFunctionsExtension={action(
+            'onOpenEventsFunctionsExtension'
+          )}
+          onAddLayout={action('onAddLayout')}
+          onAddExternalLayout={action('onAddExternalLayout')}
+          onAddEventsFunctionsExtension={action(
+            'onAddEventsFunctionsExtension'
+          )}
+          onAddExternalEvents={action('onAddExternalEvents')}
+          onDeleteLayout={action('onDeleteLayout')}
+          onDeleteExternalLayout={action('onDeleteExternalLayout')}
+          onDeleteEventsFunctionsExtension={action(
+            'onDeleteEventsFunctionsExtension'
+          )}
+          onDeleteExternalEvents={action('onDeleteExternalEvents')}
+          onRenameLayout={action('onRenameLayout')}
+          onRenameExternalLayout={action('onRenameExternalLayout')}
+          onRenameEventsFunctionsExtension={action(
+            'onRenameEventsFunctionsExtension'
+          )}
+          onRenameExternalEvents={action('onRenameExternalEvents')}
+          onSaveProject={action('onSaveProject')}
+          onSaveProjectAs={action('onSaveProjectAs')}
+          onCloseProject={action('onCloseProject')}
+          onExportProject={action('onExportProject')}
+          onOpenPreferences={action('onOpenPreferences')}
+          onOpenProfile={action('onOpenProfile')}
+          onOpenResources={action('onOpenResources')}
+          onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+          onChangeSubscription={action('onChangeSubscription')}
+          eventsFunctionsExtensionsError={
+            new Error('Fake error during code generation')
+          }
+          onReloadEventsFunctionsExtensions={action(
+            'onReloadEventsFunctionsExtensions'
+          )}
+          freezeUpdate={false}
+          unsavedChangesManagement={unsavedChangesManagement}
+        />
       )}
-      onDeleteExternalEvents={action('onDeleteExternalEvents')}
-      onRenameLayout={action('onRenameLayout')}
-      onRenameExternalLayout={action('onRenameExternalLayout')}
-      onRenameEventsFunctionsExtension={action(
-        'onRenameEventsFunctionsExtension'
-      )}
-      onRenameExternalEvents={action('onRenameExternalEvents')}
-      onSaveProject={action('onSaveProject')}
-      onSaveProjectAs={action('onSaveProjectAs')}
-      onCloseProject={action('onCloseProject')}
-      onExportProject={action('onExportProject')}
-      onOpenPreferences={action('onOpenPreferences')}
-      onOpenProfile={action('onOpenProfile')}
-      onOpenResources={action('onOpenResources')}
-      onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-      onChangeSubscription={action('onChangeSubscription')}
-      eventsFunctionsExtensionsError={
-        new Error('Fake error during code generation')
-      }
-      onReloadEventsFunctionsExtensions={action(
-        'onReloadEventsFunctionsExtensions'
-      )}
-      freezeUpdate={false}
-    />
+    </UnsavedChangesContext.Consumer>
   ));
 
 storiesOf('BehaviorTypeSelector', module)

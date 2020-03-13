@@ -36,7 +36,7 @@ import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
-import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 const gd = global.gd;
 
 type Props = {|
@@ -57,6 +57,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
+  unsavedChangesManagement: UnsavedChanges,
 |};
 
 type State = {|
@@ -499,8 +500,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this._editorNavigator.openEditor('behaviors-list');
   };
 
-  static contextType = UnsavedChangesContext;
-
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -597,6 +596,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onOpenDebugger={() => {}}
                 onCreateEventsFunction={this.props.onCreateEventsFunction}
                 onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
+                unsavedChangesManagement={this.props.unsavedChangesManagement}
               />
             </Background>
           ) : (
@@ -858,7 +858,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
             onApply={() => {
-              this.context.triggerUnsavedChanges();
+              this.props.unsavedChangesManagement.triggerUnsavedChanges();
               this._editBehavior(null);
             }}
             onRenameProperty={(oldName, newName) =>

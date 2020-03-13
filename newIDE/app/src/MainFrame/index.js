@@ -1890,7 +1890,7 @@ class MainFrame extends React.Component<Props, State> {
             const Component = resourceSource.component;
             return (
               <PreferencesContext.Consumer>
-                {({ loadPreferencesValues, savePreferencesValues }) => {
+                {({ loadLatestPath, saveLatestPath }) => {
                   return (
                     <Component
                       key={resourceSource.name}
@@ -1900,8 +1900,8 @@ class MainFrame extends React.Component<Props, State> {
                         ] = dialog)
                       }
                       i18n={i18n}
-                      loadPreferencesValues={loadPreferencesValues}
-                      savePreferencesValues={savePreferencesValues}
+                      loadLatestPath={loadLatestPath}
+                      saveLatestPath={saveLatestPath}
                     />
                   );
                 }}

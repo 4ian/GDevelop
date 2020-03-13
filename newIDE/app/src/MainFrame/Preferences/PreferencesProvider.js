@@ -9,6 +9,7 @@ import PreferencesContext, {
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
 import type { PreferencesValues } from './PreferencesContext';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -43,8 +44,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
-    loadPreferencesValues: this._loadPreferencesValues.bind(this),
-    savePreferencesValues: this._savePreferencesValues.bind(this),
+    loadLatestPath: this._loadLatestPath.bind(this),
+    saveLatestPath: this._saveLatestPath.bind(this),
   };
 
   componentDidMount() {
@@ -59,7 +60,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           language,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -73,7 +74,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           eventsSheetShowObjectThumbnails,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -85,7 +86,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autosaveOnPreview,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -97,7 +98,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           useNewInstructionEditorDialog,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -109,7 +110,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           useGDJSDevelopmentWatcher,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -123,7 +124,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           eventsSheetUseAssignmentOperators,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -135,7 +136,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           showEffectParameterNames,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -147,7 +148,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           themeName,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -159,7 +160,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           codeEditorThemeName,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -171,7 +172,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autoDownloadUpdates,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -183,7 +184,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autoDisplayChangelog,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -217,7 +218,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           lastLaunchedVersion: currentVersion,
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
 
     if (lastLaunchedVersion === undefined) {
@@ -240,7 +241,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           },
         },
       }),
-      () => this.state.savePreferencesValues(this.state.values)
+      () => this._savePreferencesValues(this.state.values)
     );
   }
 
@@ -274,6 +275,39 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       localStorage.setItem(LocalStorageItem, JSON.stringify(values));
     } catch (e) {
       console.warn('Unable to persist preferences', e);
+    }
+  }
+
+  _loadLatestPath(project: gdProject, kind: ResourceKind) {
+    try {
+      const projectName = project.getName();
+      const values = this._loadPreferencesValues();
+      if (values) {
+        const curProjectPaths = values.latestPath[projectName];
+        if (curProjectPaths) {
+          console.log(curProjectPaths, curProjectPaths[kind]);
+          return curProjectPaths[kind];
+        }
+      }
+    } catch (e) {
+      console.warn('Unable to load latest path', e);
+    }
+  }
+
+  _saveLatestPath(project: gdProject, kind: ResourceKind, path: string) {
+    try {
+      const projectName = project.getName();
+      let values = this._loadPreferencesValues();
+      if (values) {
+        if (values.latestPath[projectName])
+          values.latestPath[projectName][kind] = path;
+        else {
+          values.latestPath[projectName] = { [kind]: path };
+        }
+        this._savePreferencesValues(values);
+      }
+    } catch (e) {
+      console.warn('Unable to save latest path', e);
     }
   }
 

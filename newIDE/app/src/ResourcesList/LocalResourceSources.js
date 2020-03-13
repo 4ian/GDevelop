@@ -9,8 +9,6 @@ import {
   isPathInProjectFolder,
 } from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import type { PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
-
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
 const path = optionalRequire('path');
@@ -27,11 +25,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const {
-          i18n,
-          loadPreferencesValues,
-          savePreferencesValues,
-        } = this.props;
+        const { i18n, loadLatestPath, saveLatestPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose an audio file`),
@@ -42,8 +36,8 @@ export default [
           i18n,
           project,
           options,
-          loadPreferencesValues,
-          savePreferencesValues,
+          loadLatestPath,
+          saveLatestPath,
           'audio'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -71,11 +65,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const {
-          i18n,
-          loadPreferencesValues,
-          savePreferencesValues,
-        } = this.props;
+        const { i18n, loadLatestPath, saveLatestPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose an image`),
@@ -86,8 +76,8 @@ export default [
           i18n,
           project,
           options,
-          loadPreferencesValues,
-          savePreferencesValues,
+          loadLatestPath,
+          saveLatestPath,
           'image'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -115,11 +105,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const {
-          i18n,
-          loadPreferencesValues,
-          savePreferencesValues,
-        } = this.props;
+        const { i18n, loadLatestPath, saveLatestPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a font file`),
@@ -130,8 +116,8 @@ export default [
           i18n,
           project,
           options,
-          loadPreferencesValues,
-          savePreferencesValues,
+          loadLatestPath,
+          saveLatestPath,
           'font'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -159,11 +145,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const {
-          i18n,
-          loadPreferencesValues,
-          savePreferencesValues,
-        } = this.props;
+        const { i18n, loadLatestPath, saveLatestPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a video file`),
@@ -174,8 +156,8 @@ export default [
           i18n,
           project,
           options,
-          loadPreferencesValues,
-          savePreferencesValues,
+          loadLatestPath,
+          saveLatestPath,
           'video'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -203,11 +185,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const {
-          i18n,
-          loadPreferencesValues,
-          savePreferencesValues,
-        } = this.props;
+        const { i18n, loadLatestPath, saveLatestPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a json file`),
@@ -218,8 +196,8 @@ export default [
           i18n,
           project,
           options,
-          loadPreferencesValues,
-          savePreferencesValues,
+          loadLatestPath,
+          saveLatestPath,
           'json'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -249,8 +227,12 @@ const selectLocalResourcePath = (
     name: string,
     extensions: Array<string>,
   },
-  loadPreferencesValues: () => ?PreferencesValues,
-  savePreferencesValues: (values: PreferencesValues) => void,
+  loadLatestPath: (project: gdProject, kind: ResourceKind) => string,
+  saveLatestPath: (
+    project: gdProject,
+    kind: ResourceKind,
+    path: string
+  ) => void,
   kind: ResourceKind
 ): Promise<Array<string>> => {
   return new Promise((resolve, reject) => {
@@ -260,16 +242,10 @@ const selectLocalResourcePath = (
     if (options.multiSelections) properties.push('multiSelections');
     let projectPath = path.dirname(project.getProjectFile());
 
-    const projectName = project.getName();
-
-    // Load lastOpenedPath and update projectPath if not undefined
-    let values = loadPreferencesValues();
-    if (values) {
-      const lastOpenedPath = values.lastOpenedPath;
-      if (lastOpenedPath) {
-        const projectPaths = lastOpenedPath[projectName];
-        if (projectPaths) projectPath = projectPaths[kind];
-      }
+    // Load latestPath and update projectPath if not undefined
+    const latestPath = loadLatestPath(project, kind);
+    if (latestPath) {
+      projectPath = latestPath;
     }
 
     const browserWindow = electron.remote.getCurrentWindow();
@@ -283,18 +259,10 @@ const selectLocalResourcePath = (
       },
       paths => {
         if (!paths) return resolve([]);
-        // Update stored preferences values
+
+        // Update stored latestPath value
         if (paths[0] !== projectPath) {
-          if (values) {
-            if (values.lastOpenedPath[projectName])
-              values.lastOpenedPath[projectName][kind] = paths[0];
-            else {
-              let path = {};
-              path[kind] = paths[0];
-              values.lastOpenedPath[projectName] = path;
-            }
-            savePreferencesValues(values);
-          }
+          saveLatestPath(project, kind, paths[0]);
         }
 
         const outsideProjectFolderPaths = paths.filter(

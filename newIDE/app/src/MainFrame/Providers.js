@@ -20,7 +20,6 @@ import {
   type EventsFunctionsExtensionOpener,
 } from '../EventsFunctionsExtensionsLoader/Storage';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
-import type { PreferencesValues } from './Preferences/PreferencesContext';
 
 type Props = {|
   authentification: Authentification,
@@ -31,8 +30,6 @@ type Props = {|
   children: ({
     i18n: I18nType,
     eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-    loadPreferencesValues: () => ?PreferencesValues,
-    savePreferencesValues: (values: PreferencesValues) => void,
   }) => React.Node,
 |};
 
@@ -54,7 +51,7 @@ export default class Providers extends React.Component<Props, {||}> {
       <DragAndDropContextProvider>
         <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
           <PreferencesContext.Consumer>
-            {({ values, loadPreferencesValues, savePreferencesValues }) => {
+            {({ values }) => {
               const theme = getTheme(values.themeName);
               return (
                 <GDI18nProvider language={values.language}>
@@ -80,8 +77,6 @@ export default class Providers extends React.Component<Props, {||}> {
                                   children({
                                     i18n,
                                     eventsFunctionsExtensionsState,
-                                    loadPreferencesValues,
-                                    savePreferencesValues,
                                   })
                                 }
                               </EventsFunctionsExtensionsContext.Consumer>

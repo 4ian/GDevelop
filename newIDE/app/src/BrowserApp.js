@@ -44,8 +44,6 @@ export const create = (authentification: Authentification) => {
       {({
         i18n,
         eventsFunctionsExtensionsState,
-        loadPreferencesValues,
-        savePreferencesValues,
       }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
@@ -66,8 +64,6 @@ export const create = (authentification: Authentification) => {
           }) => (
             <MainFrame
               i18n={i18n}
-              loadPreferencesValues={loadPreferencesValues}
-              savePreferencesValues={savePreferencesValues}
               eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               renderPreviewLauncher={(props, ref) => (
                 <BrowserS3PreviewLauncher {...props} ref={ref} />

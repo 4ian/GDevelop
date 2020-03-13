@@ -157,8 +157,6 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
-  loadPreferencesValues: () => ?PreferencesValues,
-  savePreferencesValues: (values: PreferencesValues) => void,
 };
 
 class MainFrame extends React.Component<Props, State> {
@@ -1700,8 +1698,6 @@ class MainFrame extends React.Component<Props, State> {
       eventsFunctionsExtensionsState,
       useStorageProvider,
       i18n,
-      loadPreferencesValues,
-      savePreferencesValues,
       renderGDJSDevelopmentWatcher,
     } = this.props;
     const showLoader =
@@ -1893,15 +1889,23 @@ class MainFrame extends React.Component<Props, State> {
           (resourceSource, index): React.Node => {
             const Component = resourceSource.component;
             return (
-              <Component
-                key={resourceSource.name}
-                ref={dialog =>
-                  (this._resourceSourceDialogs[resourceSource.name] = dialog)
-                }
-                i18n={i18n}
-                loadPreferencesValues={loadPreferencesValues}
-                savePreferencesValues={savePreferencesValues}
-              />
+              <PreferencesContext.Consumer>
+                {({ loadPreferencesValues, savePreferencesValues }) => {
+                  return (
+                    <Component
+                      key={resourceSource.name}
+                      ref={dialog =>
+                        (this._resourceSourceDialogs[
+                          resourceSource.name
+                        ] = dialog)
+                      }
+                      i18n={i18n}
+                      loadPreferencesValues={loadPreferencesValues}
+                      savePreferencesValues={savePreferencesValues}
+                    />
+                  );
+                }}
+              </PreferencesContext.Consumer>
             );
           }
         )}

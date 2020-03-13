@@ -257,4 +257,4 @@ export default class TextField extends React.Component<Props, {||}> {
 
 // The "top" offset to add to the position of the TextField when
 // it's used inside a ListItem "primaryText"
-export const noMarginTextFieldInListItemTopOffset = -7;
+export const noMarginTextFieldInListItemTopOffset = 0;

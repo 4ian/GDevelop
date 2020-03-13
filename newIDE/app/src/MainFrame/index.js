@@ -1182,8 +1182,6 @@ class MainFrame extends React.Component<Props, State> {
           label: name + ' ' + i18n._(t`(Extension)`),
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
-              onPreview={null}
-              previewButtonSettings={emptyPreviewButtonSettings}
               project={this.state.currentProject}
               eventsFunctionsExtensionName={name}
               setToolbar={this.setEditorToolbar}

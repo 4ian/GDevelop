@@ -1,6 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
+import type { ResourceKind } from './ResourceSource.flow';
 import { type ResourceSourceComponentProps } from './ResourceSource.flow';
 import { Component } from 'react';
 import {
@@ -42,7 +43,8 @@ export default [
           project,
           options,
           loadPreferencesValues,
-          savePreferencesValues
+          savePreferencesValues,
+          'audio'
         ).then(resources => {
           return resources.map(resourcePath => {
             const audioResource = new gd.AudioResource();
@@ -85,7 +87,8 @@ export default [
           project,
           options,
           loadPreferencesValues,
-          savePreferencesValues
+          savePreferencesValues,
+          'image'
         ).then(resources => {
           return resources.map(resourcePath => {
             const imageResource = new gd.ImageResource();
@@ -128,7 +131,8 @@ export default [
           project,
           options,
           loadPreferencesValues,
-          savePreferencesValues
+          savePreferencesValues,
+          'font'
         ).then(resources => {
           return resources.map(resourcePath => {
             const fontResource = new gd.FontResource();
@@ -171,7 +175,8 @@ export default [
           project,
           options,
           loadPreferencesValues,
-          savePreferencesValues
+          savePreferencesValues,
+          'video'
         ).then(resources => {
           return resources.map(resourcePath => {
             const videoResource = new gd.VideoResource();
@@ -214,7 +219,8 @@ export default [
           project,
           options,
           loadPreferencesValues,
-          savePreferencesValues
+          savePreferencesValues,
+          'json'
         ).then(resources => {
           return resources.map(resourcePath => {
             const jsonResource = new gd.JsonResource();
@@ -244,7 +250,8 @@ const selectLocalResourcePath = (
     extensions: Array<string>,
   },
   loadPreferencesValues: () => ?PreferencesValues,
-  savePreferencesValues: (values: PreferencesValues) => void
+  savePreferencesValues: (values: PreferencesValues) => void,
+  kind: ResourceKind
 ): Promise<Array<string>> => {
   return new Promise((resolve, reject) => {
     if (!dialog) return reject('Not supported');
@@ -253,10 +260,16 @@ const selectLocalResourcePath = (
     if (options.multiSelections) properties.push('multiSelections');
     let projectPath = path.dirname(project.getProjectFile());
 
+    const projectName = project.getName();
+
     // Load lastOpenedPath and update projectPath if not undefined
     let values = loadPreferencesValues();
     if (values) {
-      projectPath = values.lastOpenedPath;
+      const lastOpenedPath = values.lastOpenedPath;
+      if (lastOpenedPath) {
+        const projectPaths = lastOpenedPath[projectName];
+        if (projectPaths) projectPath = projectPaths[kind];
+      }
     }
 
     const browserWindow = electron.remote.getCurrentWindow();
@@ -270,12 +283,18 @@ const selectLocalResourcePath = (
       },
       paths => {
         if (!paths) return resolve([]);
-
         // Update stored preferences values
         if (paths[0] !== projectPath) {
           if (values) {
-            values.lastOpenedPath = paths[0];
+            if (values.lastOpenedPath[projectName])
+              values.lastOpenedPath[projectName][kind] = paths[0];
+            else {
+              let path = {};
+              path[kind] = paths[0];
+              values.lastOpenedPath[projectName] = path;
+            }
             savePreferencesValues(values);
+            console.log(values)
           }
         }
 

@@ -20,7 +20,7 @@
     "jimp": "^0.2.28",
     "live-server": "^1.2.0",
     "lodash.throttle": "^4.1.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "ws": "^5.1.1"
   }
 }

@@ -179,7 +179,7 @@ class Item extends React.Component<ItemProps, {||}> {
                 click: () => this.props.onEdit(),
               },
               {
-                label: 'Edit scene Properties',
+                label: 'Edit scene Variables',
                 click: () => this.props.onEditLayoutVariable(),
               },
               {

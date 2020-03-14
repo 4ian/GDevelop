@@ -459,6 +459,10 @@ class MainFrame extends React.Component<Props, State> {
       .then(() => this.setState({ loadingProject: false }));
   };
 
+  closeApp = (): void => {
+    return Window.quit();
+  };
+
   closeProject = (): Promise<void> => {
     const { currentProject } = this.state;
     const { eventsFunctionsExtensionsState } = this.props;

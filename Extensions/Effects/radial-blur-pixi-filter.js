@@ -8,7 +8,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('RadialBlur', {
   },
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === 'radius') {
-      filter.radius = (value < 0 ? -1 : Math.round(window.innerWidth * value));
+      filter.radius = (value < 0 ? -1 : value);
     }
     else if (parameterName === 'angle') {
       filter.angle = value;
@@ -17,10 +17,10 @@ gdjs.PixiFiltersTools.registerFilterCreator('RadialBlur', {
       filter.kernelSize = gdjs.PixiFiltersTools.clampKernelSize(value, 3, 25);
     }
     else if (parameterName === 'centerX') {
-      filter.center[0]= Math.round(window.innerWidth * value);
+      filter.center[0] = value;
     }
     else if (parameterName === 'centerY') {
-      filter.center[1] = Math.round(window.innerHeight * value);
+      filter.center[1] = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {

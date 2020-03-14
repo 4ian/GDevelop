@@ -8,7 +8,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
   },
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === 'radius') {
-      filter.radius = Math.round(window.innerWidth * value);
+      filter.radius = value;
     }
     else if (parameterName === 'angle') {
       filter.angle = value;
@@ -17,10 +17,10 @@ gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
       filter.padding = value;
     }
     else if (parameterName === 'offsetX') {
-      filter.offset[0] = Math.round(window.innerWidth * value);
+      filter.offset[0] = value;
     }
     else if (parameterName === 'offsetY') {
-      filter.offset[1] = Math.round(window.innerHeight * value);
+      filter.offset[1] = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {

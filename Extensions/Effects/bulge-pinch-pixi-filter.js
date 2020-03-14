@@ -14,7 +14,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('BulgePinch', {
       filter.center[1] = value;
     }
     else if (parameterName === 'radius') {
-      filter.radius = Math.round(window.innerWidth * value);
+      filter.radius = value;
     }
     else if (parameterName === 'strength') {
       filter.strength = gdjs.PixiFiltersTools.clampValue(value, -1, 1);

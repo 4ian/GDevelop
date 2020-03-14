@@ -283,19 +283,19 @@ module.exports = {
     bulgePinchProperties.set(
       'centerX',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center X (between 0 and 1)'))
         .setType('number')
     );
     bulgePinchProperties.set(
       'centerY',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center Y (between 0 and 1)'))
         .setType('number')
     );
     bulgePinchProperties.set(
       'radius',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
-        .setLabel(_('Radius (between 0 and 1, 0.5 is mid-way)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '100')
+        .setLabel(_('Radius'))
         .setType('number')
     );
     bulgePinchProperties.set(
@@ -596,11 +596,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ 'false')
         .setLabel(_('Average'))
         .setType('boolean')
-        .setDescription(
-          _(
-            'true will divide the bands roughly based on equal amounts where as setting to false will vary the band sizes dramatically (more random looking)'
-          )
-        )
+        .setDescription('Divide the bands roughly based on equal amounts')
     );
     glitchProperties.set(
       'minSize',
@@ -954,7 +950,7 @@ module.exports = {
     radialBlurProperties.set(
       'radius',
       new gd.PropertyDescriptor(/* defaultValue= */ '-1')
-        .setLabel(_('Radius (between 0 and 1, 0.5 is mid-way)'))
+        .setLabel(_('Radius'))
         .setType('number')
         .setDescription(_('The maximum size of the blur radius, -1 is infinite'))
     );
@@ -975,13 +971,13 @@ module.exports = {
     radialBlurProperties.set(
       'centerX',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center X'))
         .setType('number')
     );
     radialBlurProperties.set(
       'centerY',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center Y'))
         .setType('number')
     );
 
@@ -1154,8 +1150,8 @@ module.exports = {
     const twistProperties = twistEffect.getProperties();
     twistProperties.set(
       'radius',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
-        .setLabel(_('Radius (between 0 and 1, 0.5 is mid-way)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '200')
+        .setLabel(_('Radius'))
         .setType('number')
         .setDescription(_('The radius of the twist'))
     );
@@ -1176,13 +1172,13 @@ module.exports = {
     twistProperties.set(
       'offsetX',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center X'))
         .setType('number')
     );
     twistProperties.set(
       'offsetY',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center Y'))
         .setType('number')
     );
 

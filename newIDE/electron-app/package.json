@@ -47,7 +47,7 @@
     "electron": "3.0.9",
     "electron-builder": "20.44.4",
     "electron-notarize": "^0.2.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "shelljs": "^0.7.7",
     "unzipper": "^0.9.11"
   },

@@ -92,7 +92,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     );
     ipcRenderer.on(
       ('main-menu-close-app': MainMenuEvent),
-      event => this._editor && this._editor.askToCloseApp()
+      event => this._editor && this._editor.closeApp()
     );
     ipcRenderer.on(
       ('main-menu-export': MainMenuEvent),

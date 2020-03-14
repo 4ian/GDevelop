@@ -180,7 +180,7 @@ class Item extends React.Component<ItemProps, {||}> {
               },
               {
                 label: 'Edit scene Properties',
-                click:() => this.props.onEditLayoutVariable()
+                click: () => this.props.onEditLayoutVariable(),
               },
               {
                 label: 'Rename',
@@ -274,7 +274,7 @@ type State = {|
   projectPropertiesDialogOpen: boolean,
   variablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
-  layoutVariablesDialogOpen: boolean
+  layoutVariablesDialogOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -287,7 +287,8 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
-    layoutVariablesDialogOpen:false,
+    layoutVariablesDialogOpen: false,
+    layoutName: '',
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -305,9 +306,17 @@ export default class ProjectManager extends React.Component<Props, State> {
     }
   }
 
-  _onEditLayoutVariable = (open:boolean) => {
-    this.setState({layoutVariablesDialogOpen: open})
-  }
+  _onEditLayoutVariable = (open: boolean, name: string) => {
+    this.setState({ layoutVariablesDialogOpen: open, layoutName: name });
+  };
+
+  getLayoutVariables = () => {
+    const { project } = this.props;
+    const { layoutName } = this.state;
+    if (!project || !project.hasLayoutNamed(layoutName)) return null;
+
+    return project.getLayout(layoutName).getVariables();
+  };
 
   _onEditName = (kind: ?string, name: string) => {
     this.setState({
@@ -728,7 +737,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                         this._onEditName(null, '');
                       }}
                       onEditName={() => this._onEditName('layout', name)}
-                      onEditLayoutVariable={() => this._onEditLayoutVariable(true)}
+                      onEditLayoutVariable={() =>
+                        this._onEditLayoutVariable(true, name)
+                      }
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
                       onPaste={() => this._pasteLayout(i)}
@@ -750,26 +761,26 @@ export default class ProjectManager extends React.Component<Props, State> {
             }
           />
           {!!this.state.layoutVariablesDialogOpen && (
-          <VariablesEditorDialog
-            open={this.state.layoutVariablesDialogOpen}
-            variablesContainer={project.getVariables()}
-            onCancel={() => this._onEditLayoutVariable(false)}
-            onApply={() => this._onEditLayoutVariable(false)}
-            title={<Trans>Scene Variables</Trans>}
-            emptyExplanationMessage={
-              <Trans>
-                Scene variables can be used to store any value or text during
-                the game.
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                For example, you can have a variable called Score representing
-                the current score of the player.
-              </Trans>
-            }
-          />
-        )}
+            <VariablesEditorDialog
+              open={this.state.layoutVariablesDialogOpen}
+              variablesContainer={this.getLayoutVariables()}
+              onCancel={() => this._onEditLayoutVariable(false)}
+              onApply={() => this._onEditLayoutVariable(false)}
+              title={<Trans>Scene Variables</Trans>}
+              emptyExplanationMessage={
+                <Trans>
+                  Scene variables can be used to store any value or text during
+                  the game.
+                </Trans>
+              }
+              emptyExplanationSecondMessage={
+                <Trans>
+                  For example, you can have a variable called Score representing
+                  the current score of the player.
+                </Trans>
+              }
+            />
+          )}
           <ProjectStructureItem
             primaryText={<Trans>External events</Trans>}
             leftIcon={

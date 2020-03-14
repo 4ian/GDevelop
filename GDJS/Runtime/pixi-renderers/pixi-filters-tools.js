@@ -7,7 +7,10 @@ gdjs.PixiFiltersTools = {};
 gdjs.PixiFiltersTools.clampValue = function(value, min, max) { return Math.max(min, Math.min(max, value)); };
 gdjs.PixiFiltersTools.clampKernelSize = function(value, min, max) {
     var len = Math.round((max - min) / 2 + 1);
-    var arr = new Array(len).fill().map((_, i) => min + 2 * i);
+    var arr = new Array(len);
+    for (var i = 0; i < len; i++) {
+        arr[i] = min + 2 * i;
+    }
     return ((arr.indexOf(value) !== -1) ? value : min);
 };
 

@@ -18,6 +18,7 @@ type MainMenuEvent =
   | 'main-menu-save'
   | 'main-menu-save-as'
   | 'main-menu-close'
+  | 'main-menu-close-app'
   | 'main-menu-export'
   | 'main-menu-create'
   | 'main-menu-open-project-manager'
@@ -88,6 +89,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     ipcRenderer.on(
       ('main-menu-close': MainMenuEvent),
       event => this._editor && this._editor.askToCloseProject()
+    );
+    ipcRenderer.on(
+      ('main-menu-close-app': MainMenuEvent),
+      event => this._editor && this._editor.closeApp()
     );
     ipcRenderer.on(
       ('main-menu-export': MainMenuEvent),
@@ -194,6 +199,12 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         {
           label: i18n._(t`Language`),
           onClickSendEvent: 'main-menu-open-language',
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Exit GDevelop`),
+          accelerator: 'Control+Q',
+          onClickSendEvent: 'main-menu-close-app',
         }
       );
     }

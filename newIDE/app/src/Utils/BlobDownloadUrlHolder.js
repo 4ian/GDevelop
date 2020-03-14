@@ -28,7 +28,7 @@ export const BlobDownloadUrlHolder = ({ blob, children }: Props) => {
         }
       };
     },
-    [blob]
+    [blob, blobDownloadUrl]
   );
 
   return children(blobDownloadUrl);

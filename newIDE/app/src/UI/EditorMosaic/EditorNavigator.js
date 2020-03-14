@@ -45,7 +45,7 @@ export default React.forwardRef<Props, Interface>(
       () => {
         onEditorChanged(currentEditorName);
       },
-      [currentEditorName]
+      [currentEditorName, onEditorChanged]
     );
 
     const transition = transitions[currentEditorName];

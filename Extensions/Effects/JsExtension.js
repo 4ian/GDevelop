@@ -282,14 +282,14 @@ module.exports = {
     const bulgePinchProperties = bulgePinchEffect.getProperties();
     bulgePinchProperties.set(
       'centerX',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center X (between 0 and 1)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center X (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
     bulgePinchProperties.set(
       'centerY',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center Y (between 0 and 1)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center Y (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
     bulgePinchProperties.set(

@@ -459,7 +459,7 @@ class MainFrame extends React.Component<Props, State> {
       .then(() => this.setState({ loadingProject: false }));
   };
 
-  askToCloseApp = (): void => {
+  closeApp = (): void => {
     return Window.quit();
   };
 

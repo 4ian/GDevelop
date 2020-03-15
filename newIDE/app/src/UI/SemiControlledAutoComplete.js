@@ -54,7 +54,7 @@ type State = {|
   inputValue: string | null,
 |};
 
-type Interface = {|
+export type SemiControlledAutoCompleteInterface = {|
   focus: () => void,
   forceInputValueTo: (newValue: string) => void,
 |};
@@ -188,15 +188,15 @@ const getDefaultStylingProps = (
 const getOptionLabel = (option: Option, value: string): string =>
   option.value ? option.value : value;
 
-export default React.forwardRef<Props, Interface>(
+export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props: Props, ref) {
-    const _input = React.useRef((null: ?HTMLInputElement));
+    const input = React.useRef((null: ?HTMLInputElement));
     const [state, setState] = useState<State>({ inputValue: null });
     const classes = useStyles();
 
     React.useImperativeHandle(ref, () => ({
       focus: () => {
-        if (_input.current) _input.current.focus();
+        if (input.current) input.current.focus();
       },
       forceInputValueTo: (newValue: string) => {
         if (state.inputValue !== null) setState({ inputValue: newValue });
@@ -224,7 +224,7 @@ export default React.forwardRef<Props, Interface>(
             blurOnSelect
             classes={classes}
             onChange={(event, option: Option | string) =>
-              handleChange(event, option, props, _input)
+              handleChange(event, option, props, input)
             }
             style={styles.container}
             inputValue={currentInputValue}
@@ -244,7 +244,7 @@ export default React.forwardRef<Props, Interface>(
                 params,
                 currentInputValue,
                 props,
-                _input
+                input
               );
               return (
                 <TextField
@@ -259,7 +259,7 @@ export default React.forwardRef<Props, Interface>(
                   {...computeTextFieldStyleProps(props)}
                   style={props.textFieldStyle}
                   label={props.floatingLabelText}
-                  inputRef={_input}
+                  inputRef={input}
                   disabled={props.disabled}
                   error={!!props.errorText}
                   helperText={helperText || props.errorText}

@@ -11,8 +11,8 @@ export type PreviewButtonSettings = {|
   togglePreviewFirstSceneOverride: () => void,
 |};
 
-export const emptyPreviewButtonSettings = {
-  isPreviewFirstSceneOverriden: null,
+export const emptyPreviewButtonSettings: PreviewButtonSettings = {
+  isPreviewFirstSceneOverriden: false,
   previewFirstSceneName: '',
   useSceneAsPreviewFirstScene: () => {},
   togglePreviewFirstSceneOverride: () => {},
@@ -82,6 +82,7 @@ export default class PreviewButtons extends React.Component<
                   click: () => {
                     togglePreviewFirstSceneOverride();
                     if (!previewFirstSceneName) {
+                      // eslint-disable-next-line
                       useSceneAsPreviewFirstScene();
                     }
                   },
@@ -89,6 +90,7 @@ export default class PreviewButtons extends React.Component<
                 { type: 'separator' },
                 {
                   label: 'Always use this scene to start the previews',
+                  // eslint-disable-next-line
                   click: () => useSceneAsPreviewFirstScene(),
                 },
               ]}

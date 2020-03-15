@@ -132,8 +132,8 @@ export type Preferences = {|
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setShowEffectParameterNames: (enabled: boolean) => void,
-  loadLatestPath: (project: gdProject, kind: ResourceKind) => string,
-  saveLatestPath: (
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
+  setLastUsedPath: (
     project: gdProject,
     kind: ResourceKind,
     path: string
@@ -171,8 +171,8 @@ export const initialPreferences = {
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
-  loadLatestPath: (project: gdProject, kind: ResourceKind) => '',
-  saveLatestPath: (project: gdProject, kind: ResourceKind, path: string) => {},
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
+  setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

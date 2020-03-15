@@ -44,8 +44,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
-    loadLatestPath: this._loadLatestPath.bind(this),
-    saveLatestPath: this._saveLatestPath.bind(this),
+    getLastUsedPath: this._getLastUsedPath.bind(this),
+    setLastUsedPath: this._setLastUsedPath.bind(this),
   };
 
   componentDidMount() {
@@ -278,7 +278,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _loadLatestPath(project: gdProject, kind: ResourceKind) {
+  _getLastUsedPath(project: gdProject, kind: ResourceKind) {
     try {
       const projectName = project.getName();
       const values = this._loadPreferencesValues();
@@ -294,7 +294,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _saveLatestPath(project: gdProject, kind: ResourceKind, path: string) {
+  _setLastUsedPath(project: gdProject, kind: ResourceKind, path: string) {
     try {
       const projectName = project.getName();
       let values = this._loadPreferencesValues();

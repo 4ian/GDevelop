@@ -25,7 +25,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n, loadLatestPath, saveLatestPath } = this.props;
+        const { i18n, getLastUsedPath, setLastUsedPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose an audio file`),
@@ -36,8 +36,8 @@ export default [
           i18n,
           project,
           options,
-          loadLatestPath,
-          saveLatestPath,
+          getLastUsedPath,
+          setLastUsedPath,
           'audio'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -65,7 +65,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n, loadLatestPath, saveLatestPath } = this.props;
+        const { i18n, getLastUsedPath, setLastUsedPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose an image`),
@@ -76,8 +76,8 @@ export default [
           i18n,
           project,
           options,
-          loadLatestPath,
-          saveLatestPath,
+          getLastUsedPath,
+          setLastUsedPath,
           'image'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -105,7 +105,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n, loadLatestPath, saveLatestPath } = this.props;
+        const { i18n, getLastUsedPath, setLastUsedPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a font file`),
@@ -116,8 +116,8 @@ export default [
           i18n,
           project,
           options,
-          loadLatestPath,
-          saveLatestPath,
+          getLastUsedPath,
+          setLastUsedPath,
           'font'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -145,7 +145,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n, loadLatestPath, saveLatestPath } = this.props;
+        const { i18n, getLastUsedPath, setLastUsedPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a video file`),
@@ -156,8 +156,8 @@ export default [
           i18n,
           project,
           options,
-          loadLatestPath,
-          saveLatestPath,
+          getLastUsedPath,
+          setLastUsedPath,
           'video'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -185,7 +185,7 @@ export default [
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
-        const { i18n, loadLatestPath, saveLatestPath } = this.props;
+        const { i18n, getLastUsedPath, setLastUsedPath } = this.props;
         const options = {
           multiSelections,
           title: i18n._(t`Choose a json file`),
@@ -196,8 +196,8 @@ export default [
           i18n,
           project,
           options,
-          loadLatestPath,
-          saveLatestPath,
+          getLastUsedPath,
+          setLastUsedPath,
           'json'
         ).then(resources => {
           return resources.map(resourcePath => {
@@ -227,8 +227,8 @@ const selectLocalResourcePath = (
     name: string,
     extensions: Array<string>,
   },
-  loadLatestPath: (project: gdProject, kind: ResourceKind) => string,
-  saveLatestPath: (
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
+  setLastUsedPath: (
     project: gdProject,
     kind: ResourceKind,
     path: string
@@ -243,7 +243,7 @@ const selectLocalResourcePath = (
     let projectPath = path.dirname(project.getProjectFile());
 
     // Load latestPath and update projectPath if not undefined
-    const latestPath = loadLatestPath(project, kind);
+    const latestPath = getLastUsedPath(project, kind);
     if (latestPath) {
       projectPath = latestPath;
     }
@@ -262,7 +262,7 @@ const selectLocalResourcePath = (
 
         // Update stored latestPath value
         if (paths[0] !== projectPath) {
-          saveLatestPath(project, kind, paths[0]);
+          setLastUsedPath(project, kind, paths[0]);
         }
 
         const outsideProjectFolderPaths = paths.filter(

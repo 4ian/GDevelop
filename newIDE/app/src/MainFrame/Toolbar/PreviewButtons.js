@@ -7,15 +7,15 @@ import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 export type PreviewButtonSettings = {|
   isPreviewFirstSceneOverriden: boolean,
   previewFirstSceneName: string,
-  useSceneAsPreviewFirstScene: () => void,
-  togglePreviewFirstSceneOverride: () => void,
+  useSceneAsPreviewFirstScene: ?() => void,
+  togglePreviewFirstSceneOverride: ?() => void,
 |};
 
 export const emptyPreviewButtonSettings: PreviewButtonSettings = {
   isPreviewFirstSceneOverriden: false,
   previewFirstSceneName: '',
-  useSceneAsPreviewFirstScene: () => {},
-  togglePreviewFirstSceneOverride: () => {},
+  useSceneAsPreviewFirstScene: null,
+  togglePreviewFirstSceneOverride: null,
 };
 
 type Props = {|
@@ -66,7 +66,7 @@ export default class PreviewButtons extends React.Component<
     return (
       <React.Fragment>
         {showPreviewButton &&
-          (isPreviewFirstSceneOverriden === null ? (
+          (!useSceneAsPreviewFirstScene || !togglePreviewFirstSceneOverride ? (
             previewIcon
           ) : (
             <ElementWithMenu

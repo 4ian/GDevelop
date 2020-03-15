@@ -240,13 +240,9 @@ const selectLocalResourcePath = (
 
     const properties = ['openFile'];
     if (options.multiSelections) properties.push('multiSelections');
-    let projectPath = path.dirname(project.getProjectFile());
+    const projectPath = path.dirname(project.getProjectFile());
 
-    // Load latestPath and update projectPath if not undefined
-    const latestPath = getLastUsedPath(project, kind);
-    if (latestPath) {
-      projectPath = latestPath;
-    }
+    const latestPath = getLastUsedPath(project, kind) || projectPath;
 
     const browserWindow = electron.remote.getCurrentWindow();
     dialog.showOpenDialog(
@@ -255,15 +251,12 @@ const selectLocalResourcePath = (
         title: options.title,
         properties,
         filters: [{ name: options.name, extensions: options.extensions }],
-        defaultPath: projectPath,
+        defaultPath: latestPath,
       },
       paths => {
         if (!paths) return resolve([]);
 
-        // Update stored latestPath value
-        if (paths[0] !== projectPath) {
-          setLastUsedPath(project, kind, paths[0]);
-        }
+        setLastUsedPath(project, kind, paths[0]);
 
         const outsideProjectFolderPaths = paths.filter(
           path => !isPathInProjectFolder(project, path)

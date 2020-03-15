@@ -110,7 +110,7 @@ export type PreferencesValues = {|
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
-  latestPath: Object,
+  lastUsedPath: Object,
 |};
 
 /**
@@ -155,7 +155,7 @@ export const initialPreferences = {
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
-    latestPath: {},
+    lastUsedPath: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},

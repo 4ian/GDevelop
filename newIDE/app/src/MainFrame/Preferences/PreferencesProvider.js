@@ -23,7 +23,7 @@ const LocalStorageItem = 'gd-preferences';
 
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
-    values: this._loadPreferencesValues() || initialPreferences.values,
+    values: this._loadValuesFromLocalStorage() || initialPreferences.values,
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -60,7 +60,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           language,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -74,7 +74,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           eventsSheetShowObjectThumbnails,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -86,7 +86,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autosaveOnPreview,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -98,7 +98,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           useNewInstructionEditorDialog,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -110,7 +110,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           useGDJSDevelopmentWatcher,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -124,7 +124,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           eventsSheetUseAssignmentOperators,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -136,7 +136,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           showEffectParameterNames,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -148,7 +148,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           themeName,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -160,7 +160,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           codeEditorThemeName,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -172,7 +172,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autoDownloadUpdates,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -184,7 +184,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           autoDisplayChangelog,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
@@ -218,7 +218,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           lastLaunchedVersion: currentVersion,
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
 
     if (lastLaunchedVersion === undefined) {
@@ -241,11 +241,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           },
         },
       }),
-      () => this._savePreferencesValues(this.state.values)
+      () => this._persistValuesToLocalStorage(this.state.values)
     );
   }
 
-  _loadPreferencesValues(): ?PreferencesValues {
+  _loadValuesFromLocalStorage(): ?PreferencesValues {
     try {
       const persistedState = localStorage.getItem(LocalStorageItem);
       if (!persistedState) return null;
@@ -270,7 +270,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _savePreferencesValues(values: PreferencesValues) {
+  _persistValuesToLocalStorage(values: PreferencesValues) {
     try {
       localStorage.setItem(LocalStorageItem, JSON.stringify(values));
     } catch (e) {
@@ -281,11 +281,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _getLastUsedPath(project: gdProject, kind: ResourceKind) {
     try {
       const projectName = project.getName();
-      const values = this._loadPreferencesValues();
+      const values = this.state.values;
       if (values) {
-        const curProjectPaths = values.latestPath[projectName];
+        const curProjectPaths = values.lastUsedPath[projectName];
         if (curProjectPaths) {
-          console.log(curProjectPaths, curProjectPaths[kind]);
           return curProjectPaths[kind];
         }
       }
@@ -294,17 +293,25 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _setLastUsedPath(project: gdProject, kind: ResourceKind, path: string) {
+  _setLastUsedPath(project: gdProject, kind: ResourceKind, latestPath: string) {
     try {
       const projectName = project.getName();
-      let values = this._loadPreferencesValues();
+      const values = this.state.values;
       if (values) {
-        if (values.latestPath[projectName])
-          values.latestPath[projectName][kind] = path;
+        if (values.lastUsedPath[projectName])
+          values.lastUsedPath[projectName][kind] = latestPath;
         else {
-          values.latestPath[projectName] = { [kind]: path };
+          const path: { [ResourceKind]: string } = {};
+          path[kind] = latestPath;
+          values.lastUsedPath[projectName] = path;
         }
-        this._savePreferencesValues(values);
+
+        this.setState(
+          {
+            values: values,
+          },
+          () => this._persistValuesToLocalStorage(this.state.values)
+        );
       }
     } catch (e) {
       console.warn('Unable to save latest path', e);

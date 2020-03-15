@@ -92,9 +92,8 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
-import type { PreferencesValues } from './Preferences/PreferencesContext';
-const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
+const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 const gd = global.gd;
 
 const styles = {

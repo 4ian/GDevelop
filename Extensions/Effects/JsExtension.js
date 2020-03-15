@@ -89,7 +89,7 @@ module.exports = {
     const advancedBloomEffect = extension
       .addEffect('AdvancedBloom')
       .setFullName(_('Advanced bloom'))
-      .setDescription(_('Applies a Bloom Effect.'))
+      .setDescription(_('Applies a bloom effect.'))
       .addIncludeFile(
         'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
       )
@@ -562,7 +562,7 @@ module.exports = {
     glitchProperties.set(
       'slices',
       new gd.PropertyDescriptor(/* defaultValue= */ '5')
-        .setLabel(_('Slices (between 2 and 20)'))
+        .setLabel(_('Slices (between 2 and infinite)'))
         .setType('number')
         .setDescription('The maximum number of slices')
     );
@@ -959,7 +959,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
         .setLabel(_('Angle (between -180 and 180)'))
         .setType('number')
-        .setDescription(_('The angle of the motion for blur effect'))
+        .setDescription(_('The angle in degree of the motion for blur effect'))
     );
     radialBlurProperties.set(
       'kernelSize',
@@ -1160,7 +1160,7 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ '4')
         .setLabel(_('Angle (between -10 and 10)'))
         .setType('number')
-        .setDescription(_('The angle of the twist'))
+        .setDescription(_('The angle in degree of the twist'))
     );
     twistProperties.set(
       'padding',

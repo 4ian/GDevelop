@@ -32,7 +32,9 @@ import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
 import Divider from '@material-ui/core/Divider';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
+import EditorNavigator, {
+  type EditorNavigatorInterface,
+} from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
@@ -85,8 +87,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
   editor: ?EventsSheet;
   _editorMosaic: ?EditorMosaic;
-  // $FlowFixMe
-  _editorNavigator: ?EditorNavigator;
+  _editorNavigator: ?EditorNavigatorInterface;
   _globalObjectsContainer: ?gdObjectsContainer;
   _objectsContainer: ?gdObjectsContainer;
 

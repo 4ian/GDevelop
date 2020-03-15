@@ -11,19 +11,18 @@ const styles = {
 
 type Props = {| children: React.Node, style?: ?Object |};
 
-type Interface = {| scrollTo: (target: React$Component<any>) => void |};
+export type ScrollViewInterface = {|
+  scrollTo: (target: ?React$Component<any, any>) => void,
+|};
 
-// Flow types might have to be changed/removed if upgrading Flow
-// (see example at https://github.com/wgao19/flow-notes/blob/master/react/react-memo.md)
-
-export default React.forwardRef<Props, Interface>(
+export default React.forwardRef<Props, ScrollViewInterface>(
   ({ children, style }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
       /**
        * Scroll the view to the target component.
        */
-      scrollTo: (target: React$Component<any>) => {
+      scrollTo: (target: ?React$Component<any, any>) => {
         const targetElement = ReactDOM.findDOMNode(target);
         if (targetElement instanceof HTMLElement) {
           const yPosition = targetElement.getBoundingClientRect().top;

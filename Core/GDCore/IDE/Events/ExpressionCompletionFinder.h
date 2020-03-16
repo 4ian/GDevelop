@@ -43,8 +43,9 @@ struct ExpressionCompletionDescription {
   /**
    * \brief Create a completion for an object with the given prefix
    */
-  static ExpressionCompletionDescription ForObject(const gd::String& prefix_) {
-    return ExpressionCompletionDescription(Object, "", prefix_);
+  static ExpressionCompletionDescription ForObject(const gd::String& type_,
+                                                   const gd::String& prefix_) {
+    return ExpressionCompletionDescription(Object, type_, prefix_);
   }
 
   /**
@@ -209,17 +210,20 @@ class GD_CORE_API ExpressionCompletionFinder
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
-    completions.push_back(ExpressionCompletionDescription::ForObject(""));
+    completions.push_back(
+        ExpressionCompletionDescription::ForObject(node.type, ""));
     completions.push_back(
         ExpressionCompletionDescription::ForExpression(node.type, ""));
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
-    completions.push_back(ExpressionCompletionDescription::ForObject(""));
+    completions.push_back(
+        ExpressionCompletionDescription::ForObject(node.type, ""));
     completions.push_back(
         ExpressionCompletionDescription::ForExpression(node.type, ""));
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
-    completions.push_back(ExpressionCompletionDescription::ForObject(""));
+    completions.push_back(
+        ExpressionCompletionDescription::ForObject(node.type, ""));
     completions.push_back(
         ExpressionCompletionDescription::ForExpression(node.type, ""));
   }
@@ -243,12 +247,12 @@ class GD_CORE_API ExpressionCompletionFinder
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     if (gd::ParameterMetadata::IsObject(node.type)) {
       // Only show completions of objects if an object is required
-      completions.push_back(
-          ExpressionCompletionDescription::ForObject(node.identifierName));
+      completions.push_back(ExpressionCompletionDescription::ForObject(
+          node.type, node.identifierName));
     } else {
       // Show completions for expressions and objects otherwise.
-      completions.push_back(
-          ExpressionCompletionDescription::ForObject(node.identifierName));
+      completions.push_back(ExpressionCompletionDescription::ForObject(
+          node.type, node.identifierName));
       completions.push_back(ExpressionCompletionDescription::ForExpression(
           node.type, node.identifierName));
     }
@@ -259,8 +263,8 @@ class GD_CORE_API ExpressionCompletionFinder
       // Behavior function (or behavior function being written, with the
       // function name missing)
       if (IsCaretOn(node.objectNameLocation)) {
-        completions.push_back(
-            ExpressionCompletionDescription::ForObject(node.objectName));
+        completions.push_back(ExpressionCompletionDescription::ForObject(
+            node.type, node.objectName));
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForBehavior(
@@ -276,8 +280,8 @@ class GD_CORE_API ExpressionCompletionFinder
     } else {
       // Object function or behavior name
       if (IsCaretOn(node.objectNameLocation)) {
-        completions.push_back(
-            ExpressionCompletionDescription::ForObject(node.objectName));
+        completions.push_back(ExpressionCompletionDescription::ForObject(
+            node.type, node.objectName));
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForBehavior(
@@ -294,8 +298,8 @@ class GD_CORE_API ExpressionCompletionFinder
     if (!node.behaviorName.empty()) {
       // Behavior function
       if (IsCaretOn(node.objectNameLocation)) {
-        completions.push_back(
-            ExpressionCompletionDescription::ForObject(node.objectName));
+        completions.push_back(ExpressionCompletionDescription::ForObject(
+            node.type, node.objectName));
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.behaviorNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForBehavior(
@@ -311,8 +315,8 @@ class GD_CORE_API ExpressionCompletionFinder
     } else if (!node.objectName.empty()) {
       // Object function
       if (IsCaretOn(node.objectNameLocation)) {
-        completions.push_back(
-            ExpressionCompletionDescription::ForObject(node.objectName));
+        completions.push_back(ExpressionCompletionDescription::ForObject(
+            node.type, node.objectName));
       } else {
         // Add completions for behaviors, because we could imagine that the user
         // wants to move from an object function to a behavior function, and so
@@ -337,7 +341,7 @@ class GD_CORE_API ExpressionCompletionFinder
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
     completions.push_back(
-        ExpressionCompletionDescription::ForObject(node.text));
+        ExpressionCompletionDescription::ForObject(node.type, node.text));
     completions.push_back(
         ExpressionCompletionDescription::ForExpression(node.type, node.text));
   }

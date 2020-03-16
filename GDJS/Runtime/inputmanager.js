@@ -46,7 +46,10 @@ gdjs.InputManager.MOUSE_MIDDLE_BUTTON = 2;
  * Should be called whenever a key is pressed
  * @param {number} keyCode The key code associated to the key press.
  */
-gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
+gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
+    // Negative keycode for right-modifier keys (RCtrl, RShift, RAlt, RSystem)
+    if (location === 2) keyCode = -keyCode;
+
     this._pressedKeys.put(keyCode, true);
     this._lastPressedKey = keyCode;
 };
@@ -55,7 +58,10 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
  * Should be called whenever a key is released
  * @param {number} keyCode The key code associated to the key release.
  */
-gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
+gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
+  // Negative keycode for right-modifier keys (RCtrl, RShift, RAlt, RSystem)
+    if (location === 2) keyCode = -keyCode;
+
     this._pressedKeys.put(keyCode, false);
     this._releasedKeys.put(keyCode, true);
 };
@@ -131,7 +137,7 @@ gdjs.InputManager.prototype.getMouseY = function() {
 
 /**
  * Should be called whenever a mouse button is pressed
- * @param {number} buttonCode The mouse button code associated to the event. 
+ * @param {number} buttonCode The mouse button code associated to the event.
  * See gdjs.InputManager.MOUSE_LEFT_BUTTON, gdjs.InputManager.MOUSE_RIGHT_BUTTON, gdjs.InputManager.MOUSE_MIDDLE_BUTTON
  */
 gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {

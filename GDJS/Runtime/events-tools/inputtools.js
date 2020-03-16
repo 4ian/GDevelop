@@ -95,7 +95,7 @@ gdjs.evtTools.input.keysNameToCode = {
     "x": 88,
     "y": 89,
     "z": 90,
-    
+
     "Num0": 48,
     "Num1": 49,
     "Num2": 50,
@@ -118,14 +118,16 @@ gdjs.evtTools.input.keysNameToCode = {
     "Numpad8": 104,
     "Numpad9": 105,
 
-    "RControl": 17,
-    "RShift": 16,
-    "RAlt": 18,
+    // Negative keycodes for right-modifier keys
+    "RControl": -17,
+    "RShift": -16,
+    "RAlt": -18,
+    "RSystem": -91,
+
     "LControl": 17,
     "LShift": 16,
     "LAlt": 18,
     "LSystem": 91,
-    "RSystem": 91,
     /*"Menu": sf::Keyboard::Menu ,
     "LBracket": sf::Keyboard::LBracket ,
     "RBracket": sf::Keyboard::RBracket ,

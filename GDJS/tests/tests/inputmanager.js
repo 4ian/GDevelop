@@ -31,6 +31,18 @@ describe('gdjs.InputManager', function() {
 		expect(inputManager.wasKeyReleased(33)).to.be(true);
 		expect(inputManager.anyKeyPressed()).to.be(false);
 
+    inputManager.onKeyPressed(16, 1);
+		expect(inputManager.wasKeyPressed(16)).to.be(true);
+		expect(inputManager.wasKeyPressed(-16)).to.be(false);
+		inputManager.onKeyReleased(16, 1);
+		expect(inputManager.wasKeyReleased(16)).to.be(true);
+		expect(inputManager.wasKeyReleased(-16)).to.be(false);
+		inputManager.onKeyPressed(16, 2);
+		expect(inputManager.wasKeyPressed(16)).to.be(false);
+		expect(inputManager.wasKeyPressed(-16)).to.be(true);
+		inputManager.onKeyReleased(16, 2);
+		expect(inputManager.wasKeyReleased(16)).to.be(true);
+		expect(inputManager.wasKeyReleased(-16)).to.be(true);
 	});
 
 	it('should handle mouse events', function(){

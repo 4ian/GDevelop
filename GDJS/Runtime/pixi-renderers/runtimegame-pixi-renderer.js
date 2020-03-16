@@ -327,10 +327,10 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
 
   //Keyboard
   document.onkeydown = function(e) {
-    manager.onKeyPressed(e.keyCode);
+    manager.onKeyPressed(e.keyCode, e.location);
   };
   document.onkeyup = function(e) {
-    manager.onKeyReleased(e.keyCode);
+    manager.onKeyReleased(e.keyCode, e.location);
   };
   //Mouse
   renderer.view.onmousemove = function(e) {

@@ -26,8 +26,8 @@ export default class ElementWithMenu extends React.Component<Props, State> {
       const dimensions = node.getBoundingClientRect();
 
       _contextMenu.open(
-        event.clientX - dimensions.left,
-        event.clientY - dimensions.top
+        Math.round(dimensions.left),
+        Math.round(dimensions.top + dimensions.height)
       );
     }
   };

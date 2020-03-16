@@ -41,7 +41,6 @@ class MaterialUIContextMenu extends React.Component {
     return (
       <div>
         <div
-          ref={element => (this.anchorEl = element)}
           style={{
             position: 'fixed',
             pointerEvents: 'none',
@@ -51,7 +50,8 @@ class MaterialUIContextMenu extends React.Component {
         />
         <Menu
           open={this.state.open}
-          anchorEl={this.anchorEl}
+          anchorPosition={{left: this.state.anchorX, top: this.state.anchorY}}
+          anchorReference={'anchorPosition'}
           onClose={this._onClose}
           TransitionComponent={Fade}
           {...this.menuImplementation.getMenuProps()}

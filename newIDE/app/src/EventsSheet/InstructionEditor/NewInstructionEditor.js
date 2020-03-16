@@ -1,18 +1,18 @@
 // @flow
 import * as React from 'react';
 import {
-  enumerateObjectInstructions,
+  enumerateObjectAndBehaviorsInstructions,
   enumerateInstructions,
   getObjectParameterIndex,
-} from './InstructionOrExpressionSelector/EnumerateInstructions';
+} from '../../InstructionOrExpression/EnumerateInstructions';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
-} from './InstructionOrExpressionSelector/CreateTree';
+} from '../../InstructionOrExpression/CreateTree';
 import {
   type EnumeratedInstructionOrExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from './InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type EventsScope } from '../EventsScope.flow';
 const gd = global.gd;
 
@@ -89,7 +89,7 @@ export const useNewInstructionEditor = ({
     discardInstructionTypeIfNotInObjectInstructions: boolean
   ): NewInstructionEditorState => {
     const chosenObjectInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateObjectInstructions(
+      enumerateObjectAndBehaviorsInstructions(
         isCondition,
         globalObjectsContainer,
         objectsContainer,

@@ -192,5 +192,5 @@ If you have ideas or are creating a new extension, your contribution is welcome!
 
 ## 4) Note on the development of extensions declared in C++ (`JsExtension.cpp` or `Extension.cpp`)
 
-The majority of extensions are still declared in C++ for being compatible with GDevelop 4.
+Some extensions are still declared in C++ for being compatible with GDevelop 4.
 Check the sources in [Extensions folder](https://github.com/4ian/GDevelop/tree/master/Extensions) and install [GDevelop.js](https://github.com/4ian/GDevelop.js). You'll then be able to make changes in C++ source files and have this reflected in the editor.

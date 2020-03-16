@@ -12,7 +12,7 @@ type Props<DraggedItemType> = {|
     connectDropTarget: ConnectDropTarget,
     isOver: boolean,
     canDrop: boolean,
-  }) => React.Node,
+  }) => ?React.Node,
   canDrop: (item: DraggedItemType) => boolean,
   hover?: (monitor: DropTargetMonitor) => void,
   drop: (monitor: DropTargetMonitor) => void,

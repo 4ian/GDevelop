@@ -19,7 +19,6 @@ export const openYarn = ({
   resourcesLoader,
   resourceNames,
   onChangesSaved,
-  resourcePath,
   extraOptions,
 }: ExternalEditorOpenOptions) => {
   if (!electron || !ipcRenderer) return;

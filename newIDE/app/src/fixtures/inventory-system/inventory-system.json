@@ -5296,7 +5296,7 @@
   "externalEvents": [
     {
       "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1479413261,
+      "lastChangeTimeStamp": 1479413248,
       "name": "save_inventory",
       "events": [
         {
@@ -5352,7 +5352,7 @@
     },
     {
       "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1479413261,
+      "lastChangeTimeStamp": 1479413248,
       "name": "load_inventory",
       "events": [
         {

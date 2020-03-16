@@ -12,7 +12,7 @@ import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionEditor/InstructionOrExpressionSelector/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
@@ -43,15 +43,20 @@ const styles = {
     fontFamily: '"Lucida Console", Monaco, monospace',
     lineHeight: 1.4,
   },
-  backgroundHighlighting: {
-    marginTop: 13, //Properly align with the text field
-    paddingLeft: 12,
-    paddingRight: 12,
-  },
-  backgroundHighlightingWithDescription: {
+  backgroundHighlightingWithFloatingLabel: {
     marginTop: 29, //Properly align with the text field
     paddingLeft: 12,
     paddingRight: 12,
+  },
+  backgroundHighlightingInline: {
+    marginTop: 6, //Properly align with the text field
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  backgroundHighlightingInlineWithFloatingLabel: {
+    marginTop: 22, //Properly align with the text field
+    paddingLeft: 0,
+    paddingRight: 0,
   },
 };
 
@@ -72,24 +77,68 @@ type Props = {|
   ...ParameterFieldProps,
 |};
 
+const MAX_ERRORS_COUNT = 10;
+
+const extractErrors = (
+  expressionNode: gdExpressionNode
+): {|
+  errorText: ?string,
+  errorHighlights: Array<Highlight>,
+|} => {
+  const expressionValidator = new gd.ExpressionValidator();
+  expressionNode.visit(expressionValidator);
+  const errors = expressionValidator.getErrors();
+
+  const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
+    begin: error.getStartPosition(),
+    end: error.getEndPosition() + 1,
+    message: error.getMessage(),
+    type: 'error',
+  }));
+  const otherErrorsCount = Math.max(
+    0,
+    errorHighlights.length - MAX_ERRORS_COUNT
+  );
+  const hasMultipleErrors = errorHighlights.length > 1;
+
+  const filteredErrorHighlights =
+    otherErrorsCount > 0
+      ? errorHighlights.slice(0, MAX_ERRORS_COUNT)
+      : errorHighlights;
+
+  const errorText = filteredErrorHighlights
+    .map(
+      (highlight, i) =>
+        (hasMultipleErrors ? `[${i + 1}] ` : '') + highlight.message
+    )
+    .join(' ');
+
+  expressionValidator.delete();
+
+  return { errorText, errorHighlights };
+};
+
 export default class ExpressionField extends React.Component<Props, State> {
-  _field: ?any = null;
-  _fieldElement: ?any = null;
-  _inputElement = null;
+  _field: ?SemiControlledTextField = null;
+  _fieldElement: ?Element = null;
+  _inputElement: ?HTMLInputElement = null;
 
   state = {
     popoverOpen: false,
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
 
-    validatedValue: '',
+    validatedValue: this.props.value,
     errorText: null,
     errorHighlights: [],
   };
 
   componentDidMount() {
     if (this._field) {
-      this._fieldElement = ReactDOM.findDOMNode(this._field);
+      const node = ReactDOM.findDOMNode(this._field);
+      if (node instanceof Element) {
+        this._fieldElement = node;
+      }
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
   }
@@ -139,11 +188,6 @@ export default class ExpressionField extends React.Component<Props, State> {
         this._doValidation();
       }
     );
-  };
-
-  _handleMenuMouseDown = (event: any) => {
-    // Keep the TextField focused
-    event.preventDefault();
   };
 
   _handleExpressionChosen = (
@@ -222,25 +266,8 @@ export default class ExpressionField extends React.Component<Props, State> {
       .parseExpression(expressionType, expression)
       .get();
 
-    const expressionValidator = new gd.ExpressionValidator();
-    expressionNode.visit(expressionValidator);
-    const errors = expressionValidator.getErrors();
+    const { errorText, errorHighlights } = extractErrors(expressionNode);
 
-    const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
-      begin: error.getStartPosition(),
-      end: error.getEndPosition() + 1,
-      message: error.getMessage(),
-      type: 'error',
-    }));
-    const hasMultipleErrors = errorHighlights.length > 1;
-    const errorText = errorHighlights
-      .map(
-        (highlight, i) =>
-          (hasMultipleErrors ? `[${i + 1}] ` : '') + highlight.message
-      )
-      .join(' ');
-
-    expressionValidator.delete();
     parser.delete();
 
     this.setState({ errorText, errorHighlights });
@@ -259,7 +286,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
-      : undefined;
+      : this.props.isInline
+      ? undefined
+      : '-'; // We're using multiLine TextField, which does not support having no label.
     const longDescription = parameterMetadata
       ? parameterMetadata.getLongDescription()
       : undefined;
@@ -273,9 +302,18 @@ export default class ExpressionField extends React.Component<Props, State> {
       zIndex: muiZIndex.tooltip + 100,
     };
 
-    const backgroundHighlightingStyle = description
-      ? styles.backgroundHighlightingWithDescription
-      : styles.backgroundHighlighting;
+    const backgroundHighlightingStyle = this.props.isInline
+      ? // An inline GenericExpressionField is shown with a TextField
+        // with variant "standard", and no margins. The label is shown
+        // only if provided (description), so we need to adapt the margins
+        // of the background
+        description
+        ? styles.backgroundHighlightingInlineWithFloatingLabel
+        : styles.backgroundHighlightingInline
+      : // A non-inline GenericExpressionField is shown with a TextField
+        // with variant "filled". As we're using a *multiLine* field, it
+        // always put space for the label, even if not provided.
+        styles.backgroundHighlightingWithFloatingLabel;
 
     return (
       <React.Fragment>

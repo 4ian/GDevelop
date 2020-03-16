@@ -1403,6 +1403,75 @@ module.exports = {
       }
     ]
   },
+  "flappy-bird": {
+    "description": "A clone of the popular Flappy Bird game.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
   "geodash": {
     "description": "A fast paced game where you must jump and avoid obstacles.",
     "usedExtensions": [

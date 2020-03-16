@@ -3,7 +3,10 @@
     "noEmit": true,
     "allowJs": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true
   },
   "include": [
     "Runtime/**/*",
@@ -17,6 +20,7 @@
     "Runtime/Cordova",
     "Runtime/Electron",
     "Runtime/FacebookInstantGames",
-    "Runtime/libs/CocoonJS"
+    "Runtime/libs/CocoonJS",
+    "../Extensions/Effects/pixi-filters/filter-alpha.js"
   ]
 }

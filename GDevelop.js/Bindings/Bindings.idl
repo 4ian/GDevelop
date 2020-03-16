@@ -1670,6 +1670,35 @@ interface ExpressionValidator {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+enum ExpressionCompletionDescription_CompletionKind {
+  "ExpressionCompletionDescription::Object",
+  "ExpressionCompletionDescription::Behavior",
+  "ExpressionCompletionDescription::Variable",
+  "ExpressionCompletionDescription::Expression"
+};
+
+interface ExpressionCompletionDescription {
+  ExpressionCompletionDescription_CompletionKind GetCompletionKind();
+  [Const, Ref] DOMString GetType();
+  [Const, Ref] DOMString GetPrefix();
+  [Const, Ref] DOMString GetObjectName();
+  [Const, Ref] DOMString GetBehaviorName();
+  boolean IsInformative();
+};
+
+interface VectorExpressionCompletionDescription {
+    unsigned long size();
+    [Value] ExpressionCompletionDescription at(unsigned long index);
+};
+
+interface ExpressionCompletionFinder {
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Ref] ExpressionNode node, unsigned long location);
+
+    [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
+
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
 interface ExpressionNode {
     void Visit([Ref] ExpressionParser2NodeWorker worker);
 };

@@ -235,6 +235,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           hiddenAlertMessages: {
             ...state.values.hiddenAlertMessages,
+            // $FlowFixMe - Flow won't typecheck this because of https://medium.com/flow-type/spreads-common-errors-fixes-9701012e9d58
             [identifier]: !show,
           },
         },

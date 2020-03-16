@@ -44,6 +44,7 @@
 #include <GDCore/IDE/Events/InstructionSentenceFormatter.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/EventsListUnfolder.h>
+#include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>
@@ -385,6 +386,8 @@ typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserDiagnostic*> VectorExpressionParserDiagnostic;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor> NamedPropertyDescriptorsList;
+typedef ExpressionCompletionDescription::CompletionKind ExpressionCompletionDescription_CompletionKind;
+typedef std::vector<gd::ExpressionCompletionDescription> VectorExpressionCompletionDescription;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -548,6 +551,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 
 #define STATIC_IsExtensionLifecycleEventsFunction IsExtensionLifecycleEventsFunction
+
+#define STATIC_GetCompletionDescriptionsFor GetCompletionDescriptionsFor
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

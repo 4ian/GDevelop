@@ -14,6 +14,9 @@
 
 void SetupProjectWithDummyPlatform(gd::Project &project,
                                    gd::Platform &platform) {
+  // Don't show extension loading logs for tests (too verbose).
+  platform.EnableExtensionLoadingLogs(false);
+
   std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   baseObjectExtension->SetExtensionInformation(

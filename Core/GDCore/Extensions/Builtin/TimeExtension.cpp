@@ -121,16 +121,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddExpression("TimeDelta",
-                     _("Time elapsed since the last image"),
-                     _("Time elapsed since the last image"),
+                     _("Time elapsed since the last frame"),
+                     _("Time elapsed since the last frame rendered on screen"),
                      _("Time"),
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddExpression("TempsFrame",
-                     _("Time elapsed since the last image"),
-                     _("Time elapsed since the last image"),
+                     _("Time elapsed since the last frame"),
+                     _("Time elapsed since the last frame rendered on screen"),
                      _("Time"),
                      "res/actions/time.png")
       .SetHidden()
@@ -138,8 +138,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddExpression("ElapsedTime",
-                     _("Time elapsed since the last image"),
-                     _("Time elapsed since the last image"),
+                     _("Time elapsed since the last frame"),
+                     _("Time elapsed since the last frame rendered on screen"),
                      _("Time"),
                      "res/actions/time.png")
       .SetHidden()

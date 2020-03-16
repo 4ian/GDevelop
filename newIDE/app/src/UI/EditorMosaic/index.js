@@ -1,4 +1,5 @@
 // @flow
+import { I18n } from '@lingui/react';
 import * as React from 'react';
 import {
   MosaicWindow as RMMosaicWindow,
@@ -7,6 +8,7 @@ import {
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -16,7 +18,7 @@ export type Editor = {|
   type: 'primary' | 'secondary',
   renderEditor: () => React.Node,
   noTitleBar?: boolean,
-  title?: React.Node,
+  title?: MessageDescriptor,
   toolbarControls?: Array<React.Node>,
 |};
 
@@ -223,13 +225,17 @@ export default class EditorMosaic extends React.Component<Props, State> {
               }
 
               return (
-                <MosaicWindow
-                  path={path}
-                  title={editor.title}
-                  toolbarControls={editor.toolbarControls}
-                >
-                  {editor.renderEditor()}
-                </MosaicWindow>
+                <I18n>
+                  {({ i18n }) => (
+                    <MosaicWindow
+                      path={path}
+                      title={i18n._(editor.title)}
+                      toolbarControls={editor.toolbarControls}
+                    >
+                      {editor.renderEditor()}
+                    </MosaicWindow>
+                  )}
+                </I18n>
               );
             }}
             value={this.state.mosaicNode}

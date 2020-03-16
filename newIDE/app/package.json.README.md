@@ -4,7 +4,7 @@ GDevelop relies a some dependencies that can have special requirements:
 
 * **Storybook** is depending on webpack and babel.
   * It's important to have the same webpack version as the one provided by create-react-app, hence why `webpack` is specified in the `devDependencies`.
-  * `@babel/core`, `babel-core`, `babel-loader` are also specified to avoid incompatibilities after upgrading to Storybook 4.
+  * `@babel/core`, `babel-core` are also specified to avoid incompatibilities after upgrading to Storybook 4.
   * **Try removing these extra `devDependencies`** if you upgrade Storybook.
 
 * **`react-dnd`** is used by `react-mosaic-component` and `react-sortable-tree` (but not `react-sortable-hoc`). It is important that both are using **the same versions** of `react-dnd` and `react-dnd-html5-backend`. Otherwise, you get blanks/not rendered components.

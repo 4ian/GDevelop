@@ -14,6 +14,8 @@ Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches
 | Create/improve an extension | Download [Node.js] and follow this [README](newIDE/README-extensions.md). |
 | Help to translate GDevelop | Go on the [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop). |
 
+> Are you interested in contributing to GDevelop for the first time? Or want to participate to [Google Summer of Code 2020](https://summerofcode.withgoogle.com/organizations/5586892420022272/)? Take a look at the list of **[good first issues](https://github.com/4ian/GDevelop/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%91%8Cgood+first+issue%22)** and the **["🏐 not too hard" cards](https://trello.com/b/qf0lM7k8/gdevelop-roadmap?menu=filter&filter=label:Not%20too%20hard%20%E2%9A%BD%EF%B8%8F)** on the Roadmap.
+
 Overview of the architecture
 ----------------------------
 

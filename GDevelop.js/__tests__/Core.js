@@ -2808,6 +2808,171 @@ describe('libGD.js', function() {
     });
   });
 
+  describe('gd.ExpressionCompletionFinder', function() {
+    let project = null;
+    let layout = null;
+    beforeAll(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      layout = project.insertNewLayout('Scene', 0);
+      layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+    });
+
+    function testCompletions(
+      type,
+      expressionWithCaret,
+      onCompletionDescription
+    ) {
+      const caretPosition = expressionWithCaret.indexOf('|');
+      if (caretPosition === -1) {
+        throw new Error(
+          'Caret location not found in expression: ' + expressionWithCaret
+        );
+      }
+      const expression = expressionWithCaret.replace('|', '');
+
+      const parser = new gd.ExpressionParser2(
+        gd.JsPlatform.get(),
+        project,
+        layout
+      );
+      const expressionNode = parser.parseExpression(type, expression).get();
+      const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        // We're looking for completion for the character just before the caret.
+        Math.max(0, caretPosition - 1)
+      );
+
+      for (let i = 0; i < completionDescriptions.size(); i++) {
+        const completionDescription = completionDescriptions.at(i);
+
+        onCompletionDescription(completionDescription, i);
+      }
+
+      parser.delete();
+    }
+
+    it('completes an empty expression', function() {
+      expect.assertions(6);
+      testCompletions('number', '|', (completionDescription, index) => {
+        if (index === 0) {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Object
+          );
+          expect(completionDescription.getType()).toBe('');
+          expect(completionDescription.getPrefix()).toBe('');
+        } else {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Expression
+          );
+          expect(completionDescription.getType()).toBe('number');
+          expect(completionDescription.getPrefix()).toBe('');
+        }
+      });
+    });
+
+    it('completes an expression with an operator', function() {
+      expect.assertions(6);
+      testCompletions('number', '1 +| ', (completionDescription, index) => {
+        if (index === 0) {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Object
+          );
+          expect(completionDescription.getType()).toBe('');
+          expect(completionDescription.getPrefix()).toBe('');
+        } else {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Expression
+          );
+          expect(completionDescription.getType()).toBe('number');
+          expect(completionDescription.getPrefix()).toBe('');
+        }
+      });
+    });
+
+    it('completes an expression with an operator and a prefix', function() {
+      expect.assertions(6);
+      testCompletions('number', '1 + My| ', (completionDescription, index) => {
+        if (index === 0) {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Object
+          );
+          expect(completionDescription.getType()).toBe('');
+          expect(completionDescription.getPrefix()).toBe('My');
+        } else {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Expression
+          );
+          expect(completionDescription.getType()).toBe('number');
+          expect(completionDescription.getPrefix()).toBe('My');
+        }
+      });
+    });
+    it('completes an expression with a partial object function', function() {
+      expect.assertions(8);
+      testCompletions(
+        'number',
+        '1 + MyObject.Func| ',
+        (completionDescription, index) => {
+          if (index == 0) {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Behavior
+            );
+            expect(completionDescription.getType()).toBe('');
+            expect(completionDescription.getPrefix()).toBe('Func');
+            expect(completionDescription.getObjectName()).toBe('MyObject');
+          } else {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Expression
+            );
+            expect(completionDescription.getType()).toBe('number');
+            expect(completionDescription.getPrefix()).toBe('Func');
+            expect(completionDescription.getObjectName()).toBe('MyObject');
+          }
+        }
+      );
+    });
+    it('completes an expression with a partial behavior function', function() {
+      expect.assertions(5);
+      testCompletions(
+        'number',
+        '1 + MyObject.MyBehavior::Func| ',
+        (completionDescription, index) => {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Expression
+          );
+          expect(completionDescription.getType()).toBe('number');
+          expect(completionDescription.getPrefix()).toBe('Func');
+          expect(completionDescription.getObjectName()).toBe('MyObject');
+          expect(completionDescription.getBehaviorName()).toBe('MyBehavior');
+        }
+      );
+    });
+    it('completes an expression parameters', function() {
+      expect.assertions(6);
+      testCompletions(
+        'number',
+        '1 + MySpriteObject.PointX(a| ',
+        (completionDescription, index) => {
+          if (index === 0) {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Object
+            );
+            expect(completionDescription.getType()).toBe('');
+            expect(completionDescription.getPrefix()).toBe('a');
+          } else {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Expression
+            );
+            expect(completionDescription.getType()).toBe('string');
+            expect(completionDescription.getPrefix()).toBe('a');
+          }
+        }
+      );
+    });
+
+    // More tests are done in C++ for ExpressionCompletionFinder.
+  });
+
   describe('gd.Vector2f', function() {
     describe('gd.VectorVector2f', function() {
       it('can be used to manipulate a vector of gd.Vector2f', function() {

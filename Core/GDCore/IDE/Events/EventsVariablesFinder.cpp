@@ -63,7 +63,8 @@ class GD_CORE_API ExpressionParameterSearcher
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {}
-  void OnVisitFunctionNode(FunctionNode& node) override {
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
+  void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     bool considerFunction = objectName.empty() || node.objectName == objectName;
     for (size_t i = 0; i < node.parameters.size() &&
                        i < node.expressionMetadata.parameters.size();

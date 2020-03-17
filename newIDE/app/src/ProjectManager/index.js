@@ -39,6 +39,7 @@ import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import SceneEditor from '../SceneEditor';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -309,12 +310,13 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({ name });
   };
 
-  getLayoutVariables = () => {
+  getLayout = () => {
     const { project } = this.props;
     const { name } = this.state;
     if (!project || !project.hasLayoutNamed(name)) return null;
 
-    return project.getLayout(name).getVariables();
+    console.log(project.getLayout(name));
+    return project.getLayout(name);
   };
 
   _onEditName = (kind: ?string, name: string) => {
@@ -760,23 +762,16 @@ export default class ProjectManager extends React.Component<Props, State> {
             }
           />
           {!!this.state.name && (
-            <VariablesEditorDialog
-              open={!!this.state.name}
-              variablesContainer={this.getLayoutVariables()}
-              onCancel={() => this._onEditLayoutVariable(null)}
-              onApply={() => this._onEditLayoutVariable(null)}
-              title={<Trans>Scene Variables</Trans>}
-              emptyExplanationMessage={
-                <Trans>
-                  Scene variables can be used to store any value or text during
-                  the game.
-                </Trans>
-              }
-              emptyExplanationSecondMessage={
-                <Trans>
-                  For example, you can have a variable called Score representing
-                  the current score of the player.
-                </Trans>
+            <SceneEditor
+              layout={this.getLayout()}
+              layoutVariablesDialogOpen={true}
+              project={project}
+              initialInstances={this.getLayout().getInitialInstances()}
+              initialUiSettings={serializeToJSObject(
+                this.getLayout().getAssociatedSettings()
+              )}
+              onLayoutVariablesDialogClose={() =>
+                this._onEditLayoutVariable(null)
               }
             />
           )}

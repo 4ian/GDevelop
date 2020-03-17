@@ -124,6 +124,7 @@ type Props = {|
   onOpenDebugger: () => void,
   onOpenMoreSettings: () => void,
   onPreview: (options: PreviewOptions) => void,
+  onLayoutVariablesDialogClose: () => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
   showNetworkPreviewButton: boolean,
@@ -132,6 +133,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
+  layoutVariablesDialogOpen: boolean,
 |};
 
 type State = {|
@@ -203,7 +205,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       }),
 
       showObjectsListInfoBar: false,
-      layoutVariablesDialogOpen: false,
+      layoutVariablesDialogOpen: this.props.layoutVariablesDialogOpen || false,
       showPropertiesInfoBar: false,
 
       selectedObjectTags: [],
@@ -344,6 +346,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editLayoutVariables = (open: boolean = true) => {
+    if (this.props.onLayoutVariablesDialogClose) {
+      this.props.onLayoutVariablesDialogClose();
+      return;
+    }
     this.setState({ layoutVariablesDialogOpen: open });
   };
 

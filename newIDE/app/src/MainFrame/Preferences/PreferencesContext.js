@@ -110,7 +110,7 @@ export type PreferencesValues = {|
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
-  lastUsedPath: Object,
+  lastUsedPath: { [string]: { [ResourceKind]: string } },
 |};
 
 /**

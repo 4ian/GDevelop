@@ -462,6 +462,10 @@ class MainFrame extends React.Component<Props, State> {
       .then(() => this.setState({ loadingProject: false }));
   };
 
+  closeApp = (): void => {
+    return Window.quit();
+  };
+
   closeProject = (): Promise<void> => {
     const { currentProject } = this.state;
     const { eventsFunctionsExtensionsState } = this.props;
@@ -1868,12 +1872,14 @@ class MainFrame extends React.Component<Props, State> {
             onClose: () => this.openCreateDialog(false),
             onOpen: (storageProvider, fileMetadata) => {
               this.openCreateDialog(false);
+              // eslint-disable-next-line
               useStorageProvider(storageProvider)
                 .then(() => this.openFromFileMetadata(fileMetadata))
                 .then(() => this.openSceneOrProjectManager());
             },
             onCreate: (project, storageProvider, fileMetadata) => {
               this.openCreateDialog(false);
+              // eslint-disable-next-line
               useStorageProvider(storageProvider)
                 .then(() => this.loadFromProject(project, fileMetadata))
                 .then(() => this.openSceneOrProjectManager());

@@ -348,7 +348,8 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(child);
     }
 
-    return std::move(std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>());
+    return std::move(
+        std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>());
   }
 
   std::unique_ptr<FunctionCallNode> FreeFunction(
@@ -367,10 +368,10 @@ class GD_CORE_API ExpressionParser2 {
                          : MetadataProvider::GetStrExpressionMetadata(
                                platform, functionFullName);
 
-    auto parametersAndError = Parameters(metadata.parameters);
+    auto parametersNode = Parameters(metadata.parameters);
     auto function = gd::make_unique<FunctionCallNode>(
-        type, std::move(parametersAndError.first), metadata, functionFullName);
-    function->diagnostic = std::move(parametersAndError.second);
+        type, std::move(parametersNode.parameters), metadata, functionFullName);
+    function->diagnostic = std::move(parametersNode.diagnostic);
     if (!function->diagnostic)
       function->diagnostic =
           ValidateFunction(*function, identifierLocation.GetStartPosition());
@@ -379,6 +380,8 @@ class GD_CORE_API ExpressionParser2 {
         identifierLocation.GetStartPosition(), GetCurrentPosition());
     function->functionNameLocation = identifierLocation;
     function->openingParenthesisLocation = openingParenthesisLocation;
+    function->closingParenthesisLocation =
+        parametersNode.closingParenthesisLocation;
     return std::move(function);
   }
 
@@ -421,14 +424,14 @@ class GD_CORE_API ExpressionParser2 {
               : MetadataProvider::GetObjectStrExpressionMetadata(
                     platform, objectType, objectFunctionOrBehaviorName);
 
-      auto parametersAndError = Parameters(metadata.parameters, objectName);
-      auto function =
-          gd::make_unique<FunctionCallNode>(type,
-                                            objectName,
-                                            std::move(parametersAndError.first),
-                                            metadata,
-                                            objectFunctionOrBehaviorName);
-      function->diagnostic = std::move(parametersAndError.second);
+      auto parametersNode = Parameters(metadata.parameters, objectName);
+      auto function = gd::make_unique<FunctionCallNode>(
+          type,
+          objectName,
+          std::move(parametersNode.parameters),
+          metadata,
+          objectFunctionOrBehaviorName);
+      function->diagnostic = std::move(parametersNode.diagnostic);
       if (!function->diagnostic)
         function->diagnostic =
             ValidateFunction(*function, objectNameLocation.GetStartPosition());
@@ -439,6 +442,8 @@ class GD_CORE_API ExpressionParser2 {
       function->objectNameDotLocation = objectNameDotLocation;
       function->functionNameLocation = objectFunctionOrBehaviorNameLocation;
       function->openingParenthesisLocation = openingParenthesisLocation;
+      function->closingParenthesisLocation =
+          parametersNode.closingParenthesisLocation;
       return std::move(function);
     }
 
@@ -485,16 +490,16 @@ class GD_CORE_API ExpressionParser2 {
                            : MetadataProvider::GetBehaviorStrExpressionMetadata(
                                  platform, behaviorType, functionName);
 
-      auto parametersAndError =
+      auto parametersNode =
           Parameters(metadata.parameters, objectName, behaviorName);
-      auto function =
-          gd::make_unique<FunctionCallNode>(type,
-                                            objectName,
-                                            behaviorName,
-                                            std::move(parametersAndError.first),
-                                            metadata,
-                                            functionName);
-      function->diagnostic = std::move(parametersAndError.second);
+      auto function = gd::make_unique<FunctionCallNode>(
+          type,
+          objectName,
+          behaviorName,
+          std::move(parametersNode.parameters),
+          metadata,
+          functionName);
+      function->diagnostic = std::move(parametersNode.diagnostic);
       if (!function->diagnostic)
         function->diagnostic =
             ValidateFunction(*function, objectNameLocation.GetStartPosition());
@@ -507,6 +512,8 @@ class GD_CORE_API ExpressionParser2 {
       function->behaviorNameNamespaceSeparatorLocation =
           behaviorNameNamespaceSeparatorLocation;
       function->openingParenthesisLocation = openingParenthesisLocation;
+      function->closingParenthesisLocation =
+          parametersNode.closingParenthesisLocation;
       function->functionNameLocation = functionNameLocation;
       return std::move(function);
     } else {
@@ -527,11 +534,17 @@ class GD_CORE_API ExpressionParser2 {
     }
   }
 
-  std::pair<std::vector<std::unique_ptr<ExpressionNode>>,
-            std::unique_ptr<gd::ExpressionParserError>>
-  Parameters(std::vector<gd::ParameterMetadata> parameterMetadata,
-             const gd::String &objectName = "",
-             const gd::String &behaviorName = "") {
+  // A temporary node that will be integrated into function nodes.
+  struct ParametersNode {
+    std::vector<std::unique_ptr<ExpressionNode>> parameters;
+    std::unique_ptr<gd::ExpressionParserError> diagnostic;
+    ExpressionParserLocation closingParenthesisLocation;
+  };
+
+  ParametersNode Parameters(
+      std::vector<gd::ParameterMetadata> parameterMetadata,
+      const gd::String &objectName = "",
+      const gd::String &behaviorName = "") {
     std::vector<std::unique_ptr<ExpressionNode>> parameters;
 
     // By convention, object is always the first parameter, and behavior the
@@ -543,8 +556,9 @@ class GD_CORE_API ExpressionParser2 {
       SkipAllWhitespaces();
 
       if (CheckIfChar(IsClosingParenthesis)) {
-        SkipChar();
-        return std::make_pair(std::move(parameters), nullptr);
+        auto closingParenthesisLocation = SkipChar();
+        return ParametersNode{
+            std::move(parameters), nullptr, closingParenthesisLocation};
       } else {
         if (parameterIndex < parameterMetadata.size()) {
           const gd::String &type = parameterMetadata[parameterIndex].GetType();
@@ -588,10 +602,12 @@ class GD_CORE_API ExpressionParser2 {
       }
     }
 
-    return std::make_pair(
+    ExpressionParserLocation invalidClosingParenthesisLocation;
+    return ParametersNode{
         std::move(parameters),
         RaiseSyntaxError(_("The list of parameters is not terminated. Add a "
-                           "closing parenthesis to end the parameters.")));
+                           "closing parenthesis to end the parameters.")),
+        invalidClosingParenthesisLocation};
   }
   ///@}
 
@@ -821,6 +837,7 @@ class GD_CORE_API ExpressionParser2 {
 
   bool IsEndReached() { return currentPosition >= expression.size(); }
 
+  // A temporary node used when reading an identifier
   struct IdentifierAndLocation {
     gd::String name;
     ExpressionParserLocation location;

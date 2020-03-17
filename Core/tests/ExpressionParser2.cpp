@@ -1172,6 +1172,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(textNode.location.GetEndPosition() == 23);
       REQUIRE(identifierNode.location.GetStartPosition() == 25);
       REQUIRE(identifierNode.location.GetEndPosition() == 30);
+      REQUIRE(functionNode.closingParenthesisLocation.GetStartPosition() == 30);
+      REQUIRE(functionNode.closingParenthesisLocation.GetEndPosition() == 31);
     }
     SECTION("Free function locations (with whitespaces)") {
       auto node = parser.ParseExpression("number",
@@ -1192,6 +1194,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.functionNameLocation.GetEndPosition() == 16);
       REQUIRE(functionNode.openingParenthesisLocation.GetStartPosition() == 18);
       REQUIRE(functionNode.openingParenthesisLocation.GetEndPosition() == 19);
+      REQUIRE(functionNode.closingParenthesisLocation.GetStartPosition() == 32);
+      REQUIRE(functionNode.closingParenthesisLocation.GetEndPosition() == 33);
     }
     SECTION("Object function locations") {
       auto node = parser.ParseExpression(
@@ -1231,6 +1235,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(textNode.location.GetEndPosition() == 38);
       REQUIRE(identifierNode.location.GetStartPosition() == 40);
       REQUIRE(identifierNode.location.GetEndPosition() == 45);
+      REQUIRE(functionNode.closingParenthesisLocation.GetStartPosition() == 45);
+      REQUIRE(functionNode.closingParenthesisLocation.GetEndPosition() == 46);
     }
     SECTION("Object function name locations") {
       auto node =
@@ -1306,6 +1312,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.functionNameLocation.GetEndPosition() == 33);
       REQUIRE(functionNode.openingParenthesisLocation.GetStartPosition() == 34);
       REQUIRE(functionNode.openingParenthesisLocation.GetEndPosition() == 35);
+      REQUIRE(functionNode.closingParenthesisLocation.GetStartPosition() == 48);
+      REQUIRE(functionNode.closingParenthesisLocation.GetEndPosition() == 49);
     }
     SECTION("Behavior function locations") {
       auto node = parser.ParseExpression(
@@ -1350,6 +1358,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(textNode.location.GetEndPosition() == 56);
       REQUIRE(identifierNode.location.GetStartPosition() == 58);
       REQUIRE(identifierNode.location.GetEndPosition() == 63);
+      REQUIRE(functionNode.closingParenthesisLocation.GetStartPosition() == 63);
+      REQUIRE(functionNode.closingParenthesisLocation.GetEndPosition() == 64);
     }
     SECTION("Behavior function name locations (with whitespace)") {
       auto node = parser.ParseExpression(

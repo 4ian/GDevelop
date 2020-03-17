@@ -128,7 +128,7 @@ export function ClosableTab({
         onActivated();
       }
     },
-    [active]
+    [active, onActivated]
   );
   const contextMenu = useRef<ContextMenu>(null);
 

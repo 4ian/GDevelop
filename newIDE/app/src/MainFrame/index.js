@@ -1606,8 +1606,7 @@ class MainFrame extends React.Component<Props, State> {
   forceUpdateObjectsList() {
     const editorTab = getCurrentTab(this.state.editorTabs);
     if (
-      editorTab.key.startsWith('layout') &&
-      !editorTab.key.startsWith('layout events')
+      editorTab.key.startsWith('layout ' + editorTab.name)
     )
       editorTab.editorRef.forceUpdateObjectsList();
   }

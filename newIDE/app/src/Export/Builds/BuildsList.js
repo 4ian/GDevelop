@@ -51,8 +51,8 @@ export default ({ builds, userProfile, onDownload }: Props) => {
           <EmptyMessage>
             <Trans>
               This is the list of builds that you've done. Note that you can
-              download games generated during last 7 days, after which they are
-              removed.
+              download games generated during the last 7 days, after which they
+              are removed.
             </Trans>
           </EmptyMessage>
         </Column>
@@ -60,9 +60,7 @@ export default ({ builds, userProfile, onDownload }: Props) => {
       <Line>
         {!userProfile.authenticated ? (
           <EmptyMessage>
-            <Trans>
-              You need to login first to see your builds.
-            </Trans>
+            <Trans>You need to login first to see your builds.</Trans>
           </EmptyMessage>
         ) : !builds ? (
           <PlaceholderLoader />

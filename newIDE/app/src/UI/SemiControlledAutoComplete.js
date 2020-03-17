@@ -46,10 +46,6 @@ type Props = {|
   openOnFocus?: boolean,
 |};
 
-type State = {|
-  inputValue: string | null,
-|};
-
 export type SemiControlledAutoCompleteInterface = {|
   focus: () => void,
   forceInputValueTo: (newValue: string) => void,
@@ -181,8 +177,8 @@ const getOptionLabel = (option: Option, value: string): string =>
 export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props: Props, ref) {
     const input = React.useRef((null: ?HTMLInputElement));
-    const [state, setState] = useState<State>({ inputValue: null });
-    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
+    const [inputValue, setInputValue] = useState((null: string | null));
+    const [isMenuOpen, setIsMenuOpen] = useState(true);
     const classes = useStyles();
 
     React.useImperativeHandle(ref, () => ({
@@ -190,12 +186,11 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
         if (input.current) input.current.focus();
       },
       forceInputValueTo: (newValue: string) => {
-        if (state.inputValue !== null) setState({ inputValue: newValue });
+        if (inputValue !== null) setInputValue(newValue);
       },
     }));
 
-    const currentInputValue =
-      state.inputValue !== null ? state.inputValue : props.value;
+    const currentInputValue = inputValue !== null ? inputValue : props.value;
 
     const helperText = props.helperMarkdownText ? (
       <MarkdownText source={props.helperMarkdownText} />
@@ -206,7 +201,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       value: string,
       reason: string
     ): void => {
-      setState({ inputValue: value });
+      setInputValue(value);
       if (!isMenuOpen) setIsMenuOpen(true);
     };
 
@@ -267,7 +262,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                     onBlur: (
                       event: SyntheticFocusEvent<HTMLInputElement>
                     ): void => {
-                      setTimeout(() => setState({ inputValue: null }));
+                      setInputValue(null);
                       setIsMenuOpen(false);
                       props.onChange(event.currentTarget.value);
                       if (props.onBlur) props.onBlur(event);

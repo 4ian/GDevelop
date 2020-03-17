@@ -262,7 +262,7 @@ type Props = {|
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 
 type State = {|
@@ -711,28 +711,18 @@ export default class ProjectManager extends React.Component<Props, State> {
                       editingName={
                         renamedItemKind === 'layout' && renamedItemName === name
                       }
-                      onEdit={() => {
-                        this.props.onOpenLayout(name);
-                      }}
-                      onDelete={() => {
-                        return this.props.onDeleteLayout(layout);
-                      }}
+                      onEdit={() => this.props.onOpenLayout(name)}
+                      onDelete={() => this.props.onDeleteLayout(layout)}
                       addLabel={'Add a New Scene'}
-                      onAdd={() => {
-                        this._addLayout(i);
-                      }}
+                      onAdd={() => this._addLayout(i)}
                       onRename={newName => {
                         this.props.onRenameLayout(name, newName);
                         this._onEditName(null, '');
                       }}
-                      onEditName={() => {
-                        return this._onEditName('layout', name);
-                      }}
+                      onEditName={() => this._onEditName('layout', name)}
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
-                      onPaste={() => {
-                        return this._pasteLayout(i);
-                      }}
+                      onPaste={() => this._pasteLayout(i)}
                       canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
                       canMoveUp={i !== 0}
                       onMoveUp={() => this._moveUpLayout(i)}
@@ -777,30 +767,22 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemKind === 'external-events' &&
                         renamedItemName === name
                       }
-                      onEdit={() => {
-                        return this.props.onOpenExternalEvents(name);
-                      }}
-                      onDelete={() => {
-                        this.props.onDeleteExternalEvents(externalEvents);
-                      }}
+                      onEdit={() => this.props.onOpenExternalEvents(name)}
+                      onDelete={() =>
+                        this.props.onDeleteExternalEvents(externalEvents)
+                      }
                       addLabel={'Add New External Events'}
-                      onAdd={() => {
-                        return this._addExternalEvents(i);
-                      }}
+                      onAdd={() => this._addExternalEvents(i)}
                       onRename={newName => {
                         this.props.onRenameExternalEvents(name, newName);
                         this._onEditName(null, '');
                       }}
-                      onEditName={() => {
-                        this._onEditName('external-events', name);
-                      }}
+                      onEditName={() =>
+                        this._onEditName('external-events', name)
+                      }
                       onCopy={() => this._copyExternalEvents(externalEvents)}
-                      onCut={() => {
-                        this._cutExternalEvents(externalEvents);
-                      }}
-                      onPaste={() => {
-                        this._pasteExternalEvents(i);
-                      }}
+                      onCut={() => this._cutExternalEvents(externalEvents)}
+                      onPaste={() => this._pasteExternalEvents(i)}
                       canPaste={() =>
                         Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
                       }
@@ -913,18 +895,16 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemKind === 'events-functions-extension' &&
                         renamedItemName === name
                       }
-                      onEdit={() => {
-                        this.props.onOpenEventsFunctionsExtension(name);
-                      }}
-                      onDelete={() => {
-                        return this.props.onDeleteEventsFunctionsExtension(
+                      onEdit={() =>
+                        this.props.onOpenEventsFunctionsExtension(name)
+                      }
+                      onDelete={() =>
+                        this.props.onDeleteEventsFunctionsExtension(
                           eventsFunctionsExtension
-                        );
-                      }}
+                        )
+                      }
                       addLabel={'Add a New Extension'}
-                      onAdd={() => {
-                        this._addEventsFunctionsExtension(i);
-                      }}
+                      onAdd={() => this._addEventsFunctionsExtension(i)}
                       onRename={newName => {
                         this.props.onRenameEventsFunctionsExtension(
                           name,
@@ -993,7 +973,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             variablesContainer={project.getVariables()}
             onCancel={() => this.setState({ variablesEditorOpen: false })}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               this.setState({ variablesEditorOpen: false });
             }}
             emptyExplanationMessage={
@@ -1018,7 +998,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false })
             }
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}

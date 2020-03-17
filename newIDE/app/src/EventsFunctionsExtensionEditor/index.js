@@ -59,7 +59,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 
 type State = {|
@@ -597,7 +597,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onOpenDebugger={() => {}}
                 onCreateEventsFunction={this.props.onCreateEventsFunction}
                 onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
-                unsavedChangesManagement={this.props.unsavedChangesManagement}
+                unsavedChanges={this.props.unsavedChanges}
               />
             </Background>
           ) : (
@@ -859,7 +859,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               this._editBehavior(null);
             }}
             onRenameProperty={(oldName, newName) =>

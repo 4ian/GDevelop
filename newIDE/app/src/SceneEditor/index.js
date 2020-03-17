@@ -133,7 +133,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 
 type State = {|
@@ -399,7 +399,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.updateToolbar();
       }
     );
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   redo = () => {
@@ -415,7 +415,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.updateToolbar();
       }
     );
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   _onObjectSelected = (selectedObjectName: string) => {
@@ -477,7 +477,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
@@ -497,7 +497,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   _onInstancesResized = (instances: Array<gdInitialInstance>) => {
@@ -507,7 +507,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
@@ -517,13 +517,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   _onSelectInstances = (
@@ -653,7 +653,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     if (editedObjectWithContext) {
       this._onRenameObject(editedObjectWithContext, newName, () => {});
-      this.props.unsavedChangesManagement.triggerUnsavedChanges();
+      this.props.unsavedChanges.triggerUnsavedChanges();
     }
   };
 
@@ -688,7 +688,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     object.setName(newName);
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
     done(true);
   };
 
@@ -720,7 +720,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         !!answer
       );
     }
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
     done(true);
   };
 
@@ -753,7 +753,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         );
       }
     }
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
     done(true);
   };
 
@@ -776,7 +776,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.forceUpdatePropertiesEditor();
       }
     );
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   centerView = () => {
@@ -927,7 +927,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             ref={propertiesEditor =>
               (this._propertiesEditor = propertiesEditor)
             }
-            unsavedChangesManagement={this.props.unsavedChangesManagement}
+            unsavedChanges={this.props.unsavedChanges}
           />
         ),
       },
@@ -1007,7 +1007,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             getAllObjectTags={this._getAllObjectTags}
             ref={objectsList => (this._objectsList = objectsList)}
-            unsavedChangesManagement={this.props.unsavedChangesManagement}
+            unsavedChanges={this.props.unsavedChanges}
           />
         ),
       },
@@ -1060,10 +1060,10 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
             canRenameObject={this._canObjectOrGroupUseNewName}
             onRename={newName => {
-              return this._onRenameEditedObject(newName);
+              this._onRenameEditedObject(newName);
             }}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               if (this.state.editedObjectWithContext) {
                 this.reloadResourcesFor(
                   this.state.editedObjectWithContext.object
@@ -1244,7 +1244,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             layout={layout}
             onClose={() => this.openSceneProperties(false)}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               return this.openSceneProperties(false);
             }}
             onEditVariables={() => this.editLayoutVariables(true)}

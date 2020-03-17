@@ -1446,7 +1446,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
               {
                 <TabContentContainer active={value === 1}>
                   <UnsavedChangesContext.Consumer>
-                    {unsavedChangesManagement => (
+                    {unsavedChanges => (
                       <ObjectsList
                         getThumbnail={() => 'res/unknown32.png'}
                         project={testProject.project}
@@ -1463,7 +1463,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                         }
                         onObjectCreated={() => {}}
                         onObjectSelected={() => {}}
-                        unsavedChangesManagement={unsavedChangesManagement}
+                        unsavedChanges={unsavedChanges}
                       />
                     )}
                   </UnsavedChangesContext.Consumer>
@@ -2512,7 +2512,7 @@ storiesOf('EventsSheet', module)
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <UnsavedChangesContext.Consumer>
-          {unsavedChangesManagement => (
+          {unsavedChanges => (
             <EventsSheet
               project={testProject.project}
               scope={{ layout: testProject.testLayout }}
@@ -2536,7 +2536,7 @@ storiesOf('EventsSheet', module)
                 'open instruction or expression'
               )}
               onCreateEventsFunction={action('create events function')}
-              unsavedChangesManagement={unsavedChangesManagement}
+              unsavedChanges={unsavedChanges}
             />
           )}
         </UnsavedChangesContext.Consumer>
@@ -2547,7 +2547,7 @@ storiesOf('EventsSheet', module)
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <UnsavedChangesContext.Consumer>
-          {unsavedChangesManagement => (
+          {unsavedChanges => (
             <EventsSheet
               project={testProject.project}
               scope={{ layout: testProject.emptyLayout }}
@@ -2571,7 +2571,7 @@ storiesOf('EventsSheet', module)
                 'open instruction or expression'
               )}
               onCreateEventsFunction={action('create events function')}
-              unsavedChangesManagement={unsavedChangesManagement}
+              unsavedChanges={unsavedChanges}
             />
           )}
         </UnsavedChangesContext.Consumer>
@@ -3004,7 +3004,7 @@ storiesOf('ObjectsList', module)
       <SerializedObjectDisplay object={testProject.testLayout}>
         <div style={{ height: 250 }}>
           <UnsavedChangesContext.Consumer>
-            {unsavedChangesManagement => (
+            {unsavedChanges => (
               <ObjectsList
                 getThumbnail={() => 'res/unknown32.png'}
                 project={testProject.project}
@@ -3019,7 +3019,7 @@ storiesOf('ObjectsList', module)
                 onDeleteObject={(objectWithContext, cb) => cb(true)}
                 onRenameObject={(objectWithContext, newName, cb) => cb(true)}
                 onObjectSelected={() => {}}
-                unsavedChangesManagement={unsavedChangesManagement}
+                unsavedChanges={unsavedChanges}
               />
             )}
           </UnsavedChangesContext.Consumer>
@@ -3032,7 +3032,7 @@ storiesOf('ObjectsList', module)
       <SerializedObjectDisplay object={testProject.testLayout}>
         <div style={{ height: 250 }}>
           <UnsavedChangesContext.Consumer>
-            {unsavedChangesManagement => (
+            {unsavedChanges => (
               <ObjectsList
                 getThumbnail={() => 'res/unknown32.png'}
                 project={testProject.project}
@@ -3054,7 +3054,7 @@ storiesOf('ObjectsList', module)
                 onDeleteObject={(objectWithContext, cb) => cb(true)}
                 onRenameObject={(objectWithContext, newName, cb) => cb(true)}
                 onObjectSelected={() => {}}
-                unsavedChangesManagement={unsavedChangesManagement}
+                unsavedChanges={unsavedChanges}
               />
             )}
           </UnsavedChangesContext.Consumer>
@@ -3110,7 +3110,7 @@ storiesOf('InstancePropertiesEditor', module)
   .add('default', () => (
     <SerializedObjectDisplay object={testProject.testLayout}>
       <UnsavedChangesContext.Consumer>
-        {unsavedChangesManagement => (
+        {unsavedChanges => (
           <InstancePropertiesEditor
             project={testProject.project}
             layout={testProject.testLayout}
@@ -3118,7 +3118,7 @@ storiesOf('InstancePropertiesEditor', module)
             editInstanceVariables={action('edit instance variables')}
             editObjectVariables={action('edit object variables')}
             onEditObjectByName={action('edit object')}
-            unsavedChangesManagement={unsavedChangesManagement}
+            unsavedChanges={unsavedChanges}
           />
         )}
       </UnsavedChangesContext.Consumer>
@@ -3733,7 +3733,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <UnsavedChangesContext.Consumer>
-          {unsavedChangesManagement => (
+          {unsavedChanges => (
             <EventsFunctionsExtensionEditor
               project={testProject.project}
               eventsFunctionsExtension={
@@ -3751,7 +3751,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
               initiallyFocusedFunctionName={null}
               initiallyFocusedBehaviorName={null}
               onCreateEventsFunction={action('on create events function')}
-              unsavedChangesManagement={unsavedChangesManagement}
+              unsavedChanges={unsavedChanges}
             />
           )}
         </UnsavedChangesContext.Consumer>
@@ -3846,7 +3846,7 @@ storiesOf('ProjectManager', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <UnsavedChangesContext.Consumer>
-      {unsavedChangesManagement => (
+      {unsavedChanges => (
         <ProjectManager
           project={testProject.project}
           onOpenExternalEvents={action('onOpenExternalEvents')}
@@ -3887,14 +3887,14 @@ storiesOf('ProjectManager', module)
             'onReloadEventsFunctionsExtensions'
           )}
           freezeUpdate={false}
-          unsavedChangesManagement={unsavedChangesManagement}
+          unsavedChanges={unsavedChanges}
         />
       )}
     </UnsavedChangesContext.Consumer>
   ))
   .add('Error in functions', () => (
     <UnsavedChangesContext.Consumer>
-      {unsavedChangesManagement => (
+      {unsavedChanges => (
         <ProjectManager
           project={testProject.project}
           onOpenExternalEvents={action('onOpenExternalEvents')}
@@ -3937,7 +3937,7 @@ storiesOf('ProjectManager', module)
             'onReloadEventsFunctionsExtensions'
           )}
           freezeUpdate={false}
-          unsavedChangesManagement={unsavedChangesManagement}
+          unsavedChanges={unsavedChanges}
         />
       )}
     </UnsavedChangesContext.Consumer>

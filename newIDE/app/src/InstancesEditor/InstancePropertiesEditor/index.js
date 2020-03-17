@@ -22,7 +22,7 @@ type Props = {|
   onEditObjectByName: string => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
@@ -34,7 +34,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       disabled: true,
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
       setValue: (instance: gdInitialInstance, newValue: string) => {
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
         return instance.setObjectName(newValue);
       },
       onEditButtonClick: (instance: gdInitialInstance) =>
@@ -49,7 +49,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getX(),
           setValue: (instance: gdInitialInstance, newValue: number) => {
-            this.props.unsavedChangesManagement.triggerUnsavedChanges();
+            this.props.unsavedChanges.triggerUnsavedChanges();
             return instance.setX(newValue);
           },
         },
@@ -58,7 +58,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getY(),
           setValue: (instance: gdInitialInstance, newValue: number) => {
-            this.props.unsavedChangesManagement.triggerUnsavedChanges();
+            this.props.unsavedChanges.triggerUnsavedChanges();
             return instance.setY(newValue);
           },
         },
@@ -69,7 +69,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getAngle(),
       setValue: (instance: gdInitialInstance, newValue: number) => {
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
         return instance.setAngle(newValue);
       },
     },
@@ -78,7 +78,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.isLocked(),
       setValue: (instance: gdInitialInstance, newValue: boolean) => {
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
         return instance.setLocked(newValue);
       },
     },
@@ -87,7 +87,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getZOrder(),
       setValue: (instance: gdInitialInstance, newValue: number) => {
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
         return instance.setZOrder(newValue);
       },
     },
@@ -97,7 +97,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       getChoices: () => enumerateLayers(this.props.layout),
       getValue: (instance: gdInitialInstance) => instance.getLayer(),
       setValue: (instance: gdInitialInstance, newValue: string) => {
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
         return instance.setLayer(newValue);
       },
     },
@@ -110,7 +110,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
           setValue: (instance: gdInitialInstance, newValue: number) => {
-            this.props.unsavedChangesManagement.triggerUnsavedChanges();
+            this.props.unsavedChanges.triggerUnsavedChanges();
             return instance.setCustomWidth(newValue);
           },
         },
@@ -119,7 +119,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
           setValue: (instance: gdInitialInstance, newValue: number) => {
-            this.props.unsavedChangesManagement.triggerUnsavedChanges();
+            this.props.unsavedChanges.triggerUnsavedChanges();
             return instance.setCustomHeight(newValue);
           },
         },
@@ -130,7 +130,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
       setValue: (instance: gdInitialInstance, newValue: boolean) => {
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
         return instance.setHasCustomSize(newValue);
       },
     },

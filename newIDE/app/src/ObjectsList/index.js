@@ -95,7 +95,7 @@ type Props = {|
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
   getThumbnail: (project: gdProject, object: Object) => string,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -579,7 +579,7 @@ export default class ObjectsList extends React.Component<Props, State> {
             }
             onCancel={() => this._editVariables(null)}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               return this._editVariables(null);
             }}
             title={<Trans>Object Variables</Trans>}

@@ -158,7 +158,7 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 };
 
 class MainFrame extends React.Component<Props, State> {
@@ -538,7 +538,7 @@ class MainFrame extends React.Component<Props, State> {
     );
     newLayout.updateBehaviorsSharedData(currentProject);
     this.forceUpdate();
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   addExternalLayout = () => {
@@ -553,7 +553,7 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getExternalLayoutsCount()
     );
     this.forceUpdate();
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   addExternalEvents = () => {
@@ -568,7 +568,7 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getExternalEventsCount()
     );
     this.forceUpdate();
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   addEventsFunctionsExtension = () => {
@@ -583,7 +583,7 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getEventsFunctionsExtensionsCount()
     );
     this.forceUpdate();
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   deleteLayout = (layout: gdLayout) => {
@@ -606,7 +606,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeLayout(layout.getName());
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
   };
@@ -634,7 +634,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeExternalLayout(externalLayout.getName());
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
   };
@@ -662,7 +662,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeExternalEvents(externalEvents.getName());
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
   };
@@ -692,7 +692,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
 
@@ -730,7 +730,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         layout.setName(newName);
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
   };
@@ -768,7 +768,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         externalLayout.setName(newName);
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
   };
@@ -806,7 +806,7 @@ class MainFrame extends React.Component<Props, State> {
       () => {
         externalEvents.setName(newName);
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
   };
@@ -870,7 +870,7 @@ class MainFrame extends React.Component<Props, State> {
           currentProject
         );
         this.forceUpdate();
-        this.props.unsavedChangesManagement.triggerUnsavedChanges();
+        this.props.unsavedChanges.triggerUnsavedChanges();
       }
     );
   };
@@ -979,7 +979,7 @@ class MainFrame extends React.Component<Props, State> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
-              unsavedChangesManagement={this.props.unsavedChangesManagement}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1029,7 +1029,7 @@ class MainFrame extends React.Component<Props, State> {
               onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
-              unsavedChangesManagement={this.props.unsavedChangesManagement}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1075,7 +1075,7 @@ class MainFrame extends React.Component<Props, State> {
               onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
-              unsavedChangesManagement={this.props.unsavedChangesManagement}
+              unsavedChanges={this.props.unsavedChanges}
             />
           ),
           key: 'external events ' + name,
@@ -1171,7 +1171,7 @@ class MainFrame extends React.Component<Props, State> {
                   this.state.currentProject
                 );
               }}
-              unsavedChangesManagement={this.props.unsavedChangesManagement}
+              unsavedChanges={this.props.unsavedChanges}
             />
           ),
           key: 'events functions extension ' + name,
@@ -1412,7 +1412,7 @@ class MainFrame extends React.Component<Props, State> {
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
         if (wasSaved) {
-          this.props.unsavedChangesManagement.sealUnsavedChanges();
+          this.props.unsavedChanges.sealUnsavedChanges();
           this._showSnackMessage(i18n._(t`Project properly saved`));
         }
       },
@@ -1459,7 +1459,7 @@ class MainFrame extends React.Component<Props, State> {
       .then(
         ({ wasSaved, fileMetadata }) => {
           if (wasSaved) {
-            this.props.unsavedChangesManagement.sealUnsavedChanges();
+            this.props.unsavedChanges.sealUnsavedChanges();
             this._showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
@@ -1481,7 +1481,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   askToCloseProject = (): Promise<void> => {
-    if (this.props.unsavedChangesManagement.hasUnsavedChanges) {
+    if (this.props.unsavedChanges.hasUnsavedChanges) {
       if (!this.state.currentProject) return Promise.resolve();
       const { i18n } = this.props;
 
@@ -1767,12 +1767,8 @@ class MainFrame extends React.Component<Props, State> {
                 this.renameEventsFunctionsExtension
               }
               onRenameExternalEvents={this.renameExternalEvents}
-              onSaveProject={() => {
-                this.saveProject();
-              }}
-              onSaveProjectAs={() => {
-                this.saveProjectAs();
-              }}
+              onSaveProject={this.saveProject}
+              onSaveProjectAs={this.saveProjectAs}
               onCloseProject={() => {
                 this.askToCloseProject();
               }}
@@ -1795,7 +1791,7 @@ class MainFrame extends React.Component<Props, State> {
                 );
               }}
               freezeUpdate={!projectManagerOpen}
-              unsavedChangesManagement={this.props.unsavedChangesManagement}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
           {!currentProject && (
@@ -1895,9 +1891,7 @@ class MainFrame extends React.Component<Props, State> {
             <PlatformSpecificAssetsDialog
               project={this.state.currentProject}
               open
-              onApply={() => {
-                this.openPlatformSpecificAssets(false);
-              }}
+              onApply={() => this.openPlatformSpecificAssets(false)}
               onClose={() => this.openPlatformSpecificAssets(false)}
               resourceSources={resourceSources}
               onChooseResource={this._onChooseResource}

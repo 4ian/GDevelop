@@ -1549,6 +1549,7 @@ class MainFrame extends React.Component<Props, State> {
 
   _onEditorTabActive = (editorTab: EditorTab) => {
     this.updateToolbar();
+    this.forceUpdateObjectsList();
   };
 
   _onCloseEditorTab = (editorTab: EditorTab) => {
@@ -1600,6 +1601,15 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     editorTab.editorRef.updateToolbar();
+  }
+
+  forceUpdateObjectsList() {
+    const editorTab = getCurrentTab(this.state.editorTabs);
+    if (
+      editorTab.key.startsWith('layout') &&
+      !editorTab.key.startsWith('layout events')
+    )
+      editorTab.editorRef.forceUpdateObjectsList();
   }
 
   openAboutDialog = (open: boolean = true) => {

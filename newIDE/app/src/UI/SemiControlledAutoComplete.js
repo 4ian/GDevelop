@@ -34,11 +34,7 @@ type Props = {|
   dataSource: DataSource,
 
   id?: string,
-  onBlur?: (event: {|
-    currentTarget: {|
-      value: string,
-    |},
-  |}) => void,
+  onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
@@ -145,10 +141,9 @@ const filterFunction = (
 const handleChange = (
   event: SyntheticKeyboardEvent<HTMLInputElement>,
   option: Option | string,
-  props: Props,
-  ref: { current: ?HTMLInputElement }
+  props: Props
 ): void => {
-  if (option !== null && option.type !== 'separator') {
+  if (option.type !== 'separator') {
     if (typeof option === 'string') props.onChange(option);
     else {
       if (option.onClick) option.onClick();
@@ -158,14 +153,12 @@ const handleChange = (
           : props.onChange(option.value);
     }
   }
-  if (event.key === 'Enter' && ref.current) ref.current.blur();
 };
 
 const getDefaultStylingProps = (
   params: Object,
   value: string,
-  props: Props,
-  ref: { current: ?HTMLInputElement }
+  props: Props
 ): Object => {
   const { InputProps, inputProps, InputLabelProps, ...other } = params;
   return {
@@ -178,9 +171,6 @@ const getDefaultStylingProps = (
     inputProps: {
       ...inputProps,
       className: null,
-      onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
-        if (event.key === 'Enter') handleChange(event, value, props, ref);
-      },
     },
   };
 };
@@ -192,6 +182,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props: Props, ref) {
     const input = React.useRef((null: ?HTMLInputElement));
     const [state, setState] = useState<State>({ inputValue: null });
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
     const classes = useStyles();
 
     React.useImperativeHandle(ref, () => ({
@@ -214,18 +205,27 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       event: SyntheticKeyboardEvent<HTMLInputElement>,
       value: string,
       reason: string
-    ): void => setState({ inputValue: value });
+    ): void => {
+      setState({ inputValue: value });
+      if (!isMenuOpen) setIsMenuOpen(true);
+    };
 
     return (
       <I18n>
         {({ i18n }) => (
           <Autocomplete
             freeSolo
-            blurOnSelect
             classes={classes}
-            onChange={(event, option: Option | string) =>
-              handleChange(event, option, props, input)
-            }
+            onChange={(
+              event: SyntheticKeyboardEvent<HTMLInputElement>,
+              option: Option | string | null
+            ) => {
+              if (option !== null) {
+                handleChange(event, option, props);
+                setIsMenuOpen(false);
+              }
+            }}
+            open={isMenuOpen}
             style={styles.container}
             inputValue={currentInputValue}
             value={currentInputValue}
@@ -240,12 +240,11 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               filterFunction(options, state, currentInputValue)
             }
             renderInput={params => {
-              const { InputProps, ...other } = getDefaultStylingProps(
-                params,
-                currentInputValue,
-                props,
-                input
-              );
+              const {
+                InputProps,
+                inputProps,
+                ...other
+              } = getDefaultStylingProps(params, currentInputValue, props);
               return (
                 <TextField
                   InputProps={{
@@ -254,6 +253,25 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                       typeof props.hintText === 'string'
                         ? props.hintText
                         : i18n._(props.hintText),
+                  }}
+                  inputProps={{
+                    ...inputProps,
+                    onFocus: (
+                      event: SyntheticFocusEvent<HTMLInputElement>
+                    ): void => {
+                      if (input.current)
+                        input.current.selectionStart =
+                          input.current.value.length;
+                      if (!isMenuOpen) setIsMenuOpen(true);
+                    },
+                    onBlur: (
+                      event: SyntheticFocusEvent<HTMLInputElement>
+                    ): void => {
+                      setTimeout(() => setState({ inputValue: null }));
+                      setIsMenuOpen(false);
+                      props.onChange(event.currentTarget.value);
+                      if (props.onBlur) props.onBlur(event);
+                    },
                   }}
                   {...other}
                   {...computeTextFieldStyleProps(props)}

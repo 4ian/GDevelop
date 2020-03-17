@@ -274,7 +274,7 @@ type State = {|
   projectPropertiesDialogOpen: boolean,
   variablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
-  layoutVariablesDialogOpen: boolean,
+  name: any,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -287,8 +287,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
-    layoutVariablesDialogOpen: false,
-    layoutName: '',
+    name: null,
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -306,16 +305,16 @@ export default class ProjectManager extends React.Component<Props, State> {
     }
   }
 
-  _onEditLayoutVariable = (open: boolean, name: string) => {
-    this.setState({ layoutVariablesDialogOpen: open, layoutName: name });
+  _onEditLayoutVariable = (name: any = null) => {
+    this.setState({ name });
   };
 
   getLayoutVariables = () => {
     const { project } = this.props;
-    const { layoutName } = this.state;
-    if (!project || !project.hasLayoutNamed(layoutName)) return null;
+    const { name } = this.state;
+    if (!project || !project.hasLayoutNamed(name)) return null;
 
-    return project.getLayout(layoutName).getVariables();
+    return project.getLayout(name).getVariables();
   };
 
   _onEditName = (kind: ?string, name: string) => {
@@ -738,7 +737,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       }}
                       onEditName={() => this._onEditName('layout', name)}
                       onEditLayoutVariable={() =>
-                        this._onEditLayoutVariable(true, name)
+                        this._onEditLayoutVariable(name)
                       }
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
@@ -760,12 +759,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 )
             }
           />
-          {!!this.state.layoutVariablesDialogOpen && (
+          {!!this.state.name && (
             <VariablesEditorDialog
-              open={this.state.layoutVariablesDialogOpen}
+              open={!!this.state.name}
               variablesContainer={this.getLayoutVariables()}
-              onCancel={() => this._onEditLayoutVariable(false)}
-              onApply={() => this._onEditLayoutVariable(false)}
+              onCancel={() => this._onEditLayoutVariable(null)}
+              onApply={() => this._onEditLayoutVariable(null)}
               title={<Trans>Scene Variables</Trans>}
               emptyExplanationMessage={
                 <Trans>

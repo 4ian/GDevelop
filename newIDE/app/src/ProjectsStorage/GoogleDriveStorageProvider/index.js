@@ -393,7 +393,7 @@ export default ({
                 closeDialog();
                 resolve({ wasSaved: false, fileMetadata });
               }}
-              onSave={({ selectedFileOrFolder, newFileName, onError }) => {
+              onSave={({ selectedFileOrFolder, newFileName }) => {
                 const content = serializeToJSON(project);
 
                 if (selectedFileOrFolder.type === 'FOLDER') {

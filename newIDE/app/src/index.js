@@ -8,7 +8,6 @@ import {
   installAnalyticsEvents,
 } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
-import { installFullstory } from './Utils/Analytics/Fullstory';
 import { register } from './serviceWorker';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
@@ -33,7 +32,6 @@ class Bootstrapper extends Component<{}, State> {
   componentDidMount() {
     installAnalyticsEvents(this.authentification);
     installRaven();
-    installFullstory();
     GD_STARTUP_TIMES.push(["bootstrapperComponentDidMount", performance.now()]);
 
     initializeGDevelopJs().then(gd => {

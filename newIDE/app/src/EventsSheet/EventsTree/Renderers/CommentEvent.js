@@ -141,6 +141,11 @@ export default class CommentEvent extends React.Component<
             }}
             fullWidth
             id="comment-title"
+            onKeyUp={event => {
+              if (event.key === 'Escape') {
+                this.endEditing();
+              }
+            }}
           />
         ) : (
           <span

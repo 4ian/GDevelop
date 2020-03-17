@@ -207,70 +207,72 @@ const Instruction = (props: Props) => {
         // the subinstructions list inside the connectDropTarget/connectDragSource
         // as otherwise this can confuse react-dnd ("Expected to find a valid target")
         // (surely due to components re-mounting/rerendering ?).
-        const instructionElement = connectDropTarget(
-          connectDragSource(
-            <div
-              style={styles.container}
-              className={classNames({
-                [selectableArea]: true,
-                [selectedArea]: props.selected,
-              })}
-              onClick={e => {
-                e.stopPropagation();
+        const instructionDragSourceElement = connectDragSource(
+          <div
+            style={styles.container}
+            className={classNames({
+              [selectableArea]: true,
+              [selectedArea]: props.selected,
+            })}
+            onClick={e => {
+              e.stopPropagation();
 
-                if (props.screenType === 'touch' && props.selected) {
-                  // On touch screens, tapping again a selected instruction should edit it.
-                  props.onDoubleClick();
-                } else {
-                  props.onClick();
-                }
-              }}
-              onDoubleClick={e => {
-                e.stopPropagation();
+              if (props.screenType === 'touch' && props.selected) {
+                // On touch screens, tapping again a selected instruction should edit it.
                 props.onDoubleClick();
-              }}
-              onContextMenu={e => {
-                e.stopPropagation();
-                props.onContextMenu(e.clientX, e.clientY);
-              }}
-              onKeyPress={event => {
-                if (event.key === 'Enter') {
-                  props.onDoubleClick();
-                  event.stopPropagation();
-                  event.preventDefault();
-                } else if (event.key === ' ') {
-                  props.onClick();
-                  event.stopPropagation();
-                  event.preventDefault();
-                }
-              }}
-              tabIndex={0}
-            >
-              {instruction.isInverted() && (
-                <img
-                  className={classNames({
-                    [icon]: true,
-                  })}
-                  src="res/contraire.png"
-                  alt="Condition is negated"
-                />
-              )}
+              } else {
+                props.onClick();
+              }
+            }}
+            onDoubleClick={e => {
+              e.stopPropagation();
+              props.onDoubleClick();
+            }}
+            onContextMenu={e => {
+              e.stopPropagation();
+              props.onContextMenu(e.clientX, e.clientY);
+            }}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                props.onDoubleClick();
+                event.stopPropagation();
+                event.preventDefault();
+              } else if (event.key === ' ') {
+                props.onClick();
+                event.stopPropagation();
+                event.preventDefault();
+              }
+            }}
+            tabIndex={0}
+          >
+            {instruction.isInverted() && (
               <img
                 className={classNames({
                   [icon]: true,
                 })}
-                src={metadata.getSmallIconFilename()}
-                alt=""
+                src="res/contraire.png"
+                alt="Condition is negated"
               />
-              {renderInstructionText(metadata)}
-            </div>
-          )
+            )}
+            <img
+              className={classNames({
+                [icon]: true,
+              })}
+              src={metadata.getSmallIconFilename()}
+              alt=""
+            />
+            {renderInstructionText(metadata)}
+          </div>
         );
+
+        const instructionDragSourceDropTargetElement = instructionDragSourceElement
+          ? connectDropTarget(instructionDragSourceElement)
+          : null;
 
         return (
           <React.Fragment>
             {isOver && <DropIndicator canDrop={canDrop} />}
-            {instructionElement}
+            {instructionDragSourceDropTargetElement}
             {metadata.canHaveSubInstructions() && (
               <InstructionsList
                 style={

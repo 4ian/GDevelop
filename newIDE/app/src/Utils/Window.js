@@ -83,6 +83,13 @@ export default class Window {
     this.show();
   }
 
+  static quit() {
+    if (!electron) return;
+
+    const electronApp = electron.remote.app;
+    electronApp.quit();
+  }
+
   static show() {
     if (!electron) return;
 

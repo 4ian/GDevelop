@@ -51,7 +51,7 @@ export default ({ builds, userProfile, onDownload }: Props) => {
           <EmptyMessage>
             <Trans>
               This is the list of builds that you've done. Note that you can
-              download games generated during to 7 days, after which they are
+              download games generated during last 7 days, after which they are
               removed.
             </Trans>
           </EmptyMessage>
@@ -69,7 +69,7 @@ export default ({ builds, userProfile, onDownload }: Props) => {
         ) : builds.length === 0 ? (
           <EmptyMessage>
             <Trans>
-              You don't have any builds on the online services for now
+              You don't have any builds on the online services for now.
             </Trans>
           </EmptyMessage>
         ) : (

@@ -92,8 +92,8 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
-
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
+
 const gd = global.gd;
 
 const styles = {
@@ -1703,6 +1703,7 @@ class MainFrame extends React.Component<Props, State> {
       this.state.loadingProject ||
       this.state.previewLoading ||
       this.props.loading;
+
     return (
       <div className="main-frame">
         <ProjectTitlebar fileMetadata={currentFileMetadata} />

@@ -1889,7 +1889,9 @@ class MainFrame extends React.Component<Props, State> {
           (resourceSource, index): React.Node => {
             const Component = resourceSource.component;
             return (
-              <PreferencesContext.Consumer>
+              <PreferencesContext.Consumer
+                key={`${resourceSource.name}-consumer`}
+              >
                 {({ getLastUsedPath, setLastUsedPath }) => {
                   return (
                     <Component

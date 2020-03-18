@@ -932,6 +932,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n, storageProviderOperations } = this.props;
     const sceneEditorOptions = {
       name,
+      type: 'SceneEditor',
       renderEditor: ({ isActive, editorRef }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
@@ -973,6 +974,7 @@ class MainFrame extends React.Component<Props, State> {
     };
     const eventsEditorOptions = {
       name: name + ' ' + i18n._(t`(Events)`),
+      type: 'eventsEditor',
       renderEditor: ({ isActive, editorRef }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
@@ -1040,6 +1042,7 @@ class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
+          type: 'ExternalEventsEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <ExternalEventsEditor
               project={this.state.currentProject}
@@ -1075,6 +1078,7 @@ class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
+          type: 'ExternalLayoutEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <PreferencesContext.Consumer>
               {({ values }) => (
@@ -1135,6 +1139,7 @@ class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name: name + ' ' + i18n._(t`(Extension)`),
+          type: 'EventsFunctionsExtensionEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
               project={this.state.currentProject}
@@ -1170,6 +1175,7 @@ class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name: i18n._(t`Resources`),
+          type: 'ResourcesEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <ResourcesEditor
               project={this.state.currentProject}
@@ -1205,6 +1211,7 @@ class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name: i18n._(t`Start Page`),
+          type: 'StartPage',
           renderEditor: ({ isActive, editorRef }) => (
             <StartPage
               project={this.state.currentProject}
@@ -1241,6 +1248,7 @@ class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name: i18n._(t`Debugger`),
+          type: 'DebuggerEditor',
           renderEditor: ({ isActive, editorRef }) => (
             <DebuggerEditor
               project={this.state.currentProject}
@@ -1605,9 +1613,7 @@ class MainFrame extends React.Component<Props, State> {
 
   forceUpdateObjectsList() {
     const editorTab = getCurrentTab(this.state.editorTabs);
-    if (
-      editorTab.key.startsWith('layout ' + editorTab.name)
-    )
+    if (editorTab.type === 'SceneEditor')
       editorTab.editorRef.forceUpdateObjectsList();
   }
 

@@ -17,6 +17,9 @@ SpriteExtension::SpriteExtension() {
   auto& spriteConditions = GetAllConditionsForObject("Sprite");
   auto& spriteExpressions = GetAllExpressionsForObject("Sprite");
   auto& spriteStrExpressions = GetAllStrExpressionsForObject("Sprite");
+  spriteActions["CreateMaskFromColorOnActualImage"]
+      .SetFunctionName("makeColorTransparent")
+      .SetIncludeFile("spriteruntimeobject.js");
   spriteActions["ChangeBlendMode"]
       .SetFunctionName("setBlendMode")
       .SetIncludeFile("spriteruntimeobject.js");
@@ -153,7 +156,6 @@ SpriteExtension::SpriteExtension() {
               .AddParameter("color", _("Color to make transparent"))
               .SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
       }
-
   */
 }
 

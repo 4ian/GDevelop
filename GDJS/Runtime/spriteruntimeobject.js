@@ -1029,6 +1029,100 @@ gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
 //Other :
 
 /**
+ * Load an image from the image manager and load it as texture for the object.
+ *
+ * @param {gdjs.RuntimeScene} runtimeScene The scene where living the object
+ * @param {string} imageName Name of the texture to load for replace on current object.
+ * @param {number} x X position of the object
+ * @param {number} y Y position of the object
+ * @param {boolean} useTransparency
+ */
+gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function(
+  runtimeScene,
+  imageName,
+  x,
+  y,
+  useTransparency
+) {
+    /*
+  if ( this._animationFrameDirty ) {
+    this._updateAnimationFrame();
+  }
+  var objectSprite = this._renderer.getRendererObject(); //get sprite in renderer of the object.
+
+  this.currentSprite.makeTextureASeparateTexture(); // ??
+
+    var texture = runtimeScene.getGame().getImageManager().getPIXITexture(imageName);
+
+    this.objectSprite.texture = texture; //remplace la texture par une autre.
+
+
+  // Make sure the coordinates are correct.
+  if (x < 0 || x >= objectSprite.getWidth()) return;
+  if (y < 0 || y >= objectSprite.getHeight()) return;
+
+  // Update texture and pixel perfect collision mask 
+  objectSprite.setSprite(runtimeScene, imageName);  
+  objectSprite.setX(x);
+  objectSprite.setY(y);
+
+  //Setup the hitbox to default
+  this.hasCustomHitBoxes = false;
+  */
+
+};
+
+/**
+ * Pick a color on sprite and apply a mask on it for make color transparent.
+ * @param {gdjs.string} rgbColor Color to make transparent, in RGB format ("128;200;255"). 
+ */
+gdjs.SpriteRuntimeObject.prototype.makeColorTransparent = function(
+  rgbColor, threshold
+) {
+    //   if ( this._animationFrameDirty ) {
+    //     this._updateAnimationFrame();
+    //   }
+    //  var objectSprite = this._renderer.getRendererObject(); //get sprite in renderer of the object.
+
+    // create filter
+    var uniforms = {
+        u_colorToRemove: [rgbColor.r/255.0, rgbColor.g/255.0, rgbColor.b/255.0],
+        u_threshold: threshold
+    };
+
+    var fragSrc = `
+        precision lowp float;
+        varying vec2 vTextureCoord;
+        uniform sampler2D uSampler;
+
+        uniform vec3 u_colorToRemove;
+        uniform float u_threshold;
+
+        void main() {
+
+            vec2 coord = vTextureCoord;
+            vec4 texColor = texture2D(uSampler, coord);
+            vec4 colorToRemove = vec4(u_colorToRemove,0.0);		
+
+            vec3 transparent_diff = texColor.rgb - colorToRemove.rgb;
+            float transparent_distance = length(transparent_diff);
+
+            if(transparent_distance < u_threshold)
+                discard;
+
+            gl_FragColor = vec4(vec3(texColor.rgb),texColor.a);
+
+        }
+`.split('\n').reduce((c, a) => c + a.trim() + '\n');
+
+    var filter = new PIXI.Filter(null, fragSrc, uniforms);
+    //filter.uniforms.u_colorToRemove = [229/255.0, 17/255.0, 254/255.0];
+    //filter.uniforms.u_threshold = 0.1;
+
+    this._renderer.setShader(filter);
+  };
+
+/**
  * @param obj The target object
  * @param scene The scene containing the object
  * @deprecated

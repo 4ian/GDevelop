@@ -135,3 +135,12 @@ gdjs.SpriteRuntimeObjectPixiRenderer.getAnimationFrameWidth = function(pixiTextu
 gdjs.SpriteRuntimeObjectPixiRenderer.getAnimationFrameHeight = function(pixiTexture) {
     return pixiTexture.height;
 };
+
+gdjs.SpriteRuntimeObjectPixiRenderer.setSprite = function(runtimeScene, imageName) {
+    this._spriteDirty = true;
+    this._sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getPIXITexture(imageName));
+};
+
+gdjs.SpriteRuntimeObjectPixiRenderer.prototype.setShader = function(PixiFilter) {
+     this._sprite.shader  = filter;
+};

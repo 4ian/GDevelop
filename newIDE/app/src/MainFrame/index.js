@@ -1105,6 +1105,7 @@ class MainFrame extends React.Component<Props, State> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               openInstructionOrExpression={this._openInstructionOrExpression}
               onCreateEventsFunction={this._onCreateEventsFunction}
+              previewButtonSettings={emptyPreviewButtonSettings}
               isActive={isActive}
               ref={editorRef}
             />

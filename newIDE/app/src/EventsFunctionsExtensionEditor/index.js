@@ -38,6 +38,11 @@ import EditorNavigator, {
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
+import {
+  type PreviewButtonSettings,
+  emptyPreviewButtonSettings,
+} from '../MainFrame/Toolbar/PreviewButtons';
+
 const gd = global.gd;
 
 type Props = {|
@@ -58,6 +63,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
+  previewButtonSettings: PreviewButtonSettings,
 |};
 
 type State = {|
@@ -582,6 +588,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 events={selectedEventsFunction.getEvents()}
                 showPreviewButton={false}
                 onPreview={options => {}}
+                previewButtonSettings={emptyPreviewButtonSettings}
                 showNetworkPreviewButton={false}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}

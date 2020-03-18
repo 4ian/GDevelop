@@ -67,6 +67,7 @@ import {
 } from '../Utils/TagsHelper';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -117,6 +118,7 @@ const initialEditorsSmallWindow = {
 };
 
 type Props = {|
+  previewButtonSettings: PreviewButtonSettings,
   initialInstances: gdInitialInstancesContainer,
   initialUiSettings: Object,
   layout: gdLayout,
@@ -221,6 +223,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
+        previewButtonSettings={this.props.previewButtonSettings}
         showPreviewButton={this.props.showPreviewButton}
         onPreview={() => this.props.onPreview({})}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}

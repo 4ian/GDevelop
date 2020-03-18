@@ -43,6 +43,10 @@ export default class ExternalLayoutEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  performRefresh() {
+    return null;
+  }
+
   getSerializedElements() {
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();

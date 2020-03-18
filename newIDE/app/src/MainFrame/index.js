@@ -1557,7 +1557,7 @@ class MainFrame extends React.Component<Props, State> {
 
   _onEditorTabActive = (editorTab: EditorTab) => {
     this.updateToolbar();
-    this.forceUpdateObjectsList();
+    editorTab.editorRef.performRefresh();
   };
 
   _onCloseEditorTab = (editorTab: EditorTab) => {
@@ -1609,12 +1609,6 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     editorTab.editorRef.updateToolbar();
-  }
-
-  forceUpdateObjectsList() {
-    const editorTab = getCurrentTab(this.state.editorTabs);
-    if (editorTab.type === 'SceneEditor')
-      editorTab.editorRef.forceUpdateObjectsList();
   }
 
   openAboutDialog = (open: boolean = true) => {

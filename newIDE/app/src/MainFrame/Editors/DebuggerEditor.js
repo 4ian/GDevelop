@@ -17,6 +17,10 @@ export default class DebuggerEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  performRefresh() {
+    return null;
+  }
+
   componentWillReceiveProps() {
     this._checkHasSubscription();
   }

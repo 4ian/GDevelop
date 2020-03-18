@@ -13,7 +13,6 @@ import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
-import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import {
   enumerateLayouts,
   enumerateExternalEvents,
@@ -271,7 +270,6 @@ type State = {|
   projectPropertiesDialogOpen: boolean,
   variablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
-  scenePropertiesDialogOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -284,7 +282,6 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
-    scenePropertiesDialogOpen: false,
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -668,13 +665,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
               />,
               <ListItem
-                key="Scene-Variables"
-                primaryText={<Trans>Scene-Properties</Trans>}
-                onClick={() =>
-                  this.setState({ scenePropertiesDialogOpen: true })
-                }
-              />,
-              <ListItem
                 key="global-variables"
                 primaryText={<Trans>Global variables</Trans>}
                 leftIcon={<VariableTree />}
@@ -993,15 +983,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                 representing the number of levels unlocked by the player.
               </Trans>
             }
-          />
-        )}
-        {this.state.scenePropertiesDialogOpen && (
-          <ScenePropertiesDialog
-            open={this.state.scenePropertiesDialogOpen}
-            project={project}
-            onClose={() => this.setState({ scenePropertiesDialogOpen: false })}
-            onApply={() => this.setState({ scenePropertiesDialogOpen: false })}
-            onChangeSubscription={this.props.onChangeSubscription}
           />
         )}
         {this.state.projectPropertiesDialogOpen && (

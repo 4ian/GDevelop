@@ -185,7 +185,7 @@ module.exports = {
         "SetTime",
         _("Set time"),
         _("Set the time of the video object in seconds"),
-        _("time"),
+        _("the time"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"

@@ -34,7 +34,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   SECTION("Identifier") {
     SECTION("Object or expression completions when type is string") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForObject("My"),
+          gd::ExpressionCompletionDescription::ForObject("string", "My"),
           gd::ExpressionCompletionDescription::ForExpression("string", "My")};
       REQUIRE(getCompletionsFor("string", "My", 0) == expectedCompletions);
       REQUIRE(getCompletionsFor("string", "My", 1) == expectedCompletions);
@@ -42,7 +42,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
     SECTION("Object or expression completions when type is number") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForObject("My"),
+          gd::ExpressionCompletionDescription::ForObject("number", "My"),
           gd::ExpressionCompletionDescription::ForExpression("number", "My")};
       REQUIRE(getCompletionsFor("number", "My", 0) == expectedCompletions);
       REQUIRE(getCompletionsFor("number", "My", 1) == expectedCompletions);
@@ -50,14 +50,17 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
     SECTION("Object when type is an object") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForObject("My")};
+          gd::ExpressionCompletionDescription::ForObject("object", "My")};
       REQUIRE(getCompletionsFor("object", "My", 0) == expectedCompletions);
       REQUIRE(getCompletionsFor("object", "My", 1) == expectedCompletions);
       REQUIRE(getCompletionsFor("object", "My", 2) == expectedEmptyCompletions);
+    }
 
+    SECTION("Object when type is an object (alternate type)") {
       // Also test alternate types also considered as objects (but that can
-      // result
-      // in different code generation):
+      // result in different code generation):
+      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForObject("objectPtr", "My")};
       REQUIRE(getCompletionsFor("objectPtr", "My", 0) == expectedCompletions);
       REQUIRE(getCompletionsFor("objectPtr", "My", 1) == expectedCompletions);
       REQUIRE(getCompletionsFor("objectPtr", "My", 2) ==
@@ -66,7 +69,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   }
   SECTION("Operator (number)") {
     std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-        gd::ExpressionCompletionDescription::ForObject(""),
+        gd::ExpressionCompletionDescription::ForObject("number", ""),
         gd::ExpressionCompletionDescription::ForExpression("number", "")};
     REQUIRE(getCompletionsFor("number", "1 + ", 1) == expectedCompletions);
     REQUIRE(getCompletionsFor("number", "1 + ", 2) == expectedCompletions);
@@ -74,7 +77,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   }
   SECTION("Operator (string)") {
     std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-        gd::ExpressionCompletionDescription::ForObject(""),
+        gd::ExpressionCompletionDescription::ForObject("string", ""),
         gd::ExpressionCompletionDescription::ForExpression("string", "")};
     REQUIRE(getCompletionsFor("string", "\"a\" + ", 3) == expectedCompletions);
     REQUIRE(getCompletionsFor("string", "\"a\" + ", 4) == expectedCompletions);
@@ -101,6 +104,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedInformativeCompletions);
       REQUIRE(getCompletionsFor("string", "Function(", 9) ==
               expectedEmptyCompletions);
+      REQUIRE(getCompletionsFor("string", "Function()", 9) ==
+              expectedInformativeCompletions);
     }
     SECTION("Unknown function, test with arguments") {
       REQUIRE(getCompletionsFor("string", "Function(1", 9) ==
@@ -109,7 +114,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedEmptyCompletions);
 
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForObject("a"),
+          gd::ExpressionCompletionDescription::ForObject("unknown", "a"),
           gd::ExpressionCompletionDescription::ForExpression("unknown", "a")};
       REQUIRE(getCompletionsFor("string", "Function(a", 9) ==
               expectedCompletions);
@@ -128,7 +133,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     SECTION("Test 1") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
-              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+              gd::ExpressionCompletionDescription::ForObject("string",
+                                                             "MyObject")};
       std::vector<gd::ExpressionCompletionDescription>
           expectedBehaviorOrFunctionCompletions{
               gd::ExpressionCompletionDescription::ForBehavior("Func",
@@ -154,7 +160,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     SECTION("Test 1") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
-              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+              gd::ExpressionCompletionDescription::ForObject("string",
+                                                             "MyObject")};
       std::vector<gd::ExpressionCompletionDescription>
           expectedBehaviorOrFunctionCompletions{
               gd::ExpressionCompletionDescription::ForBehavior("Func",
@@ -180,6 +187,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedInformativeFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.Func(", 14) ==
               expectedEmptyCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.Func()", 14) ==
+              expectedInformativeFunctionCompletions);
     }
   }
 
@@ -187,7 +196,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     SECTION("Test 1") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
-              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+              gd::ExpressionCompletionDescription::ForObject("string",
+                                                             "MyObject")};
       std::vector<gd::ExpressionCompletionDescription>
           expectedBehaviorCompletions{
               gd::ExpressionCompletionDescription::ForBehavior("MyBehavior",
@@ -218,7 +228,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     SECTION("Test 2") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
-              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+              gd::ExpressionCompletionDescription::ForObject("string",
+                                                             "MyObject")};
       std::vector<gd::ExpressionCompletionDescription>
           expectedBehaviorCompletions{
               gd::ExpressionCompletionDescription::ForBehavior("MyBehavior",
@@ -248,7 +259,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     SECTION("Test 1") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
-              gd::ExpressionCompletionDescription::ForObject("MyObject")};
+              gd::ExpressionCompletionDescription::ForObject("string",
+                                                             "MyObject")};
       std::vector<gd::ExpressionCompletionDescription>
           expectedBehaviorCompletions{
               gd::ExpressionCompletionDescription::ForBehavior("MyBehavior",
@@ -282,6 +294,14 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 23) ==
               expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 24) ==
+              expectedFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 25) ==
+              expectedInformativeFunctionCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 26) ==
+              expectedEmptyCompletions);
+      REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func()", 26) ==
+              expectedInformativeFunctionCompletions);
     }
   }
 }

@@ -18,7 +18,7 @@ import { type EnumeratedInstructionOrExpressionMetadata } from '../../Instructio
 import { List, ListItem } from '../../UI/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
-import ScrollView from '../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs, Tab } from '../../UI/Tabs';
 import Subheader from '../../UI/Subheader';
 import {
@@ -85,7 +85,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 > {
   state = { searchText: '', selectedObjectTags: [] };
   _searchBar = React.createRef<SearchBar>();
-  _scrollView = React.createRef<typeof ScrollView>();
+  _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItem>();
 
   instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = enumerateFreeInstructions(
@@ -104,7 +104,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       this._searchBar.current.focus();
     }
     if (this._selectedItem.current && this._scrollView.current) {
-      // $FlowFixMe - improper typing of ScrollView?
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
   }

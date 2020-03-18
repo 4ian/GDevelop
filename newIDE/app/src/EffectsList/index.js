@@ -65,7 +65,7 @@ export default function EffectsList(props: Props) {
 
   const allEffectMetadata = React.useMemo(
     () => enumerateEffectsMetadata(props.project),
-    []
+    [props.project]
   );
 
   const forceUpdate = useForceUpdate();

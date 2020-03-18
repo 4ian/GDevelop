@@ -5,7 +5,14 @@
 gdjs.PixiFiltersTools = {};
 
 gdjs.PixiFiltersTools.clampValue = function(value, min, max) { return Math.max(min, Math.min(max, value)); };
-gdjs.PixiFiltersTools.clampKernelSize = function(value) { return (([5, 7, 9, 11, 13, 15].indexOf(value) !== -1) ? value : 5); };
+gdjs.PixiFiltersTools.clampKernelSize = function(value, min, max) {
+    var len = Math.round((max - min) / 2 + 1);
+    var arr = new Array(len);
+    for (var i = 0; i < len; i++) {
+        arr[i] = min + 2 * i;
+    }
+    return ((arr.indexOf(value) !== -1) ? value : min);
+};
 
 /** Object.<string, gdjsPixiFiltersToolsFilterCreator> */
 gdjs.PixiFiltersTools._filterCreators = {};

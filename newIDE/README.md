@@ -168,6 +168,6 @@ The editor, the game engine and extensions are always in development. Your contr
 
 - Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
 
-- To submit your changes, you have first to create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
+- To submit your changes, you have to first create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
-- Finally, make sure that the tests pass (refer to this README and to the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS)) for learning how to run tests.
+- Finally, make sure that the tests pass (refer to this README and to the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS) for learning how to run tests).

@@ -380,8 +380,6 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Opacity (0-255)"), "", false)
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName("setOpacity")
@@ -427,8 +425,6 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Speed "), "", false)
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName("setPlaybackSpeed")

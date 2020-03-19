@@ -285,10 +285,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getLastUsedPath(project: gdProject, kind: ResourceKind) {
     const projectName = project.getName();
-    const values = this.state.values;
-    const curProjectPaths = values.projectLastUsedPaths[projectName];
-    if (curProjectPaths && curProjectPaths[kind]) {
-      return curProjectPaths[kind];
+    const { values } = this.state;
+    const projectPaths = values.projectLastUsedPaths[projectName];
+    if (projectPaths && projectPaths[kind]) {
+      return projectPaths[kind];
     }
     return '';
   }
@@ -297,7 +297,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     const projectName = project.getName();
 
     const { values } = this.state;
-    const newProjectLastUsedPaths = values.projectLastUsedPaths[projectName] || {};
+    const newProjectLastUsedPaths =
+      values.projectLastUsedPaths[projectName] || {};
     newProjectLastUsedPaths[kind] = latestPath;
 
     this.setState(
@@ -307,7 +308,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           projectLastUsedPaths: {
             ...values.projectLastUsedPaths,
             [projectName]: newProjectLastUsedPaths,
-          }
+          },
         },
       },
       () => this._persistValuesToLocalStorage(this.state)

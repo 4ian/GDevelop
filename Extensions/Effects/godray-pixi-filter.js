@@ -5,8 +5,8 @@ gdjs.PixiFiltersTools.registerFilterCreator('Godray', {
     return godrayFilter;
   },
   update: function(filter, layer) {
-    if (filter.animated) {
-      filter.time += layer.getElapsedTime() / 1000;
+    if (filter.animationSpeed !== 0) {
+      filter.time += layer.getElapsedTime() / 1000 * filter.animationSpeed;
     }
   },
   updateDoubleParameter: function(filter, parameterName, value) {
@@ -22,15 +22,14 @@ gdjs.PixiFiltersTools.registerFilterCreator('Godray', {
       filter.x = value;
     } else if (parameterName === 'y') {
       filter.y = value;
+    } else if (parameterName === 'animationSpeed') {
+      filter.animationSpeed = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {},
   updateBooleanParameter: function(filter, parameterName, value) {
     if (parameterName === 'parallel') {
       filter.parallel = value;
-    }
-    if (parameterName === 'animated') {
-      filter.animated = value;
     }
   },
 });

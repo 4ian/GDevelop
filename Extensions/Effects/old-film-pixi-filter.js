@@ -1,13 +1,16 @@
 gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
   makePIXIFilter: function(layer, effectData) {
     var oldFilmFilter = new PIXI.filters.OldFilmFilter();
-
+    oldFilmFilter._animationTimer = 0;
     return oldFilmFilter;
   },  
   update: function(filter, layer) {
-    if (filter.animated) {
-      filter.time += layer.getElapsedTime() / 1000;
-      filter.seed = Math.random();
+    if (filter.animationSpeed !== 0) {
+      filter._animationTimer += filter.animationSpeed;
+      if (filter._animationTimer >= 1) {
+        filter.seed = Math.random();
+        filter._animationTimer = 0
+      }
     }
   },
   updateDoubleParameter: function(filter, parameterName, value) {
@@ -38,11 +41,10 @@ gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
     else if (parameterName === 'vignettingBlur') {
       filter.vignettingBlur = value;
     }
-  },
-  updateStringParameter: function(filter, parameterName, value) {},
-  updateBooleanParameter: function(filter, parameterName, value) {
-    if (parameterName === 'animated') {
-      filter.animated = value;
+    else if (parameterName === 'animationSpeed') {
+      filter.animationSpeed = value;
     }
   },
+  updateStringParameter: function(filter, parameterName, value) {},
+  updateBooleanParameter: function(filter, parameterName, value) {},
 });

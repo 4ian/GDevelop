@@ -27,7 +27,7 @@ export default class SceneEditorContainer extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
-  performRefresh() {
+  forceUpdateEditor() {
     if (this.editor) this.editor.forceUpdateObjectsList();
   }
 

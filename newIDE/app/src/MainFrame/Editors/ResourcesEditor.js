@@ -7,8 +7,8 @@ export default class ResourcesEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
-  performRefresh() {
-    return null;
+  forceUpdateEditor() {
+    // No updates to be done.
   }
 
   render() {

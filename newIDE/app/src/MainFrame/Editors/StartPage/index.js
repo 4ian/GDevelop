@@ -53,8 +53,8 @@ class StartPage extends BaseEditor {
     if (this.props.setToolbar) this.props.setToolbar(null);
   }
 
-  performRefresh() {
-    return null;
+  forceUpdateEditor() {
+    // No updates to be done
   }
 
   render() {

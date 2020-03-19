@@ -11,8 +11,8 @@ export default class EventsEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
-  performRefresh() {
-    return null;
+  forceUpdateEditor() {
+    // No updates to be done.
   }
 
   getSerializedElements() {

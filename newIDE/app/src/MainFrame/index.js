@@ -1613,7 +1613,9 @@ class MainFrame extends React.Component<Props, State> {
     this.updateToolbar();
     // Ensure the editors shown on the screen are updated. This is for
     // example useful if global objects have been updated in another editor.
-    editorTab.editorRef.forceUpdateEditor();
+    if (editorTab.editorRef) {
+      editorTab.editorRef.forceUpdateEditor();
+    }
   };
 
   _onCloseEditorTab = (editorTab: EditorTab) => {

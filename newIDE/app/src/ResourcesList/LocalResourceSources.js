@@ -256,7 +256,8 @@ const selectLocalResourcePath = (
       paths => {
         if (!paths) return resolve([]);
 
-        setLastUsedPath(project, kind, paths[0]);
+        const lastUsedPath = path.parse(paths[0]).dir;
+        setLastUsedPath(project, kind, lastUsedPath);
 
         const outsideProjectFolderPaths = paths.filter(
           path => !isPathInProjectFolder(project, path)

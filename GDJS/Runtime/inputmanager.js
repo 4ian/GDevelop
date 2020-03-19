@@ -43,7 +43,7 @@ gdjs.InputManager.MOUSE_MIDDLE_BUTTON = 2;
 
 /**
  * Should be called whenever a key is pressed
- * @param {number} keyCode The key code associated to the key press.
+ * @param {string} keyCode The key code (event.code) associated to the key press.
  */
 gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
   this._pressedKeys.put(keyCode, true);
@@ -52,7 +52,7 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
 
 /**
  * Should be called whenever a key is released
- * @param {number} keyCode The key code associated to the key release.
+ * @param {string} keyCode The key code (event.code) associated to the key release.
  */
 gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
   this._pressedKeys.put(keyCode, false);
@@ -61,7 +61,7 @@ gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
 
 /**
  * Return the code of the last key that was pressed.
- * @return {number} The code of the last key pressed.
+ * @return {string} The code of the last key pressed.
  */
 gdjs.InputManager.prototype.getLastPressedKey = function() {
   return this._lastPressedKey;
@@ -69,7 +69,7 @@ gdjs.InputManager.prototype.getLastPressedKey = function() {
 
 /**
  * Return true if the key corresponding to keyCode is pressed.
- * @param {number} keyCode The key code to be tested.
+ * @param {string} keyCode The key code (event.code) to be tested.
  */
 gdjs.InputManager.prototype.isKeyPressed = function(keyCode) {
   return (
@@ -79,7 +79,7 @@ gdjs.InputManager.prototype.isKeyPressed = function(keyCode) {
 
 /**
  * Return true if the key corresponding to keyCode was released during the last frame.
- * @param {number} keyCode The key code to be tested.
+ * @param {string} keyCode The key code (event.code) to be tested.
  */
 gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
   return (

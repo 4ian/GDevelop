@@ -8,27 +8,27 @@ describe('gdjs.InputManager', function() {
   it('should handle keyboards events', function() {
     expect(inputManager.anyKeyPressed()).to.be(false);
 
-    inputManager.onKeyPressed(32);
-    expect(inputManager.getLastPressedKey()).to.be(32);
-    inputManager.onKeyPressed(33);
-    expect(inputManager.getLastPressedKey()).to.be(33);
-    expect(inputManager.isKeyPressed(32)).to.be(true);
-    expect(inputManager.isKeyPressed(30)).to.be(false);
-    inputManager.onKeyReleased(32);
-    expect(inputManager.isKeyPressed(32)).to.be(false);
-    expect(inputManager.wasKeyReleased(32)).to.be(true);
+    inputManager.onKeyPressed('Space');
+    expect(inputManager.getLastPressedKey()).to.be('Space');
+    inputManager.onKeyPressed('PageUp');
+    expect(inputManager.getLastPressedKey()).to.be('PageUp');
+    expect(inputManager.isKeyPressed('Space')).to.be(true);
+    expect(inputManager.isKeyPressed('Escape')).to.be(false);
+    inputManager.onKeyReleased('Space');
+    expect(inputManager.isKeyPressed('Space')).to.be(false);
+    expect(inputManager.wasKeyReleased('Space')).to.be(true);
 
     expect(inputManager.anyKeyPressed()).to.be(true);
 
     inputManager.onFrameEnded();
-    expect(inputManager.wasKeyReleased(32)).to.be(false);
+    expect(inputManager.wasKeyReleased('Space')).to.be(false);
 
     expect(inputManager.anyKeyPressed()).to.be(true);
-    expect(inputManager.isKeyPressed(33)).to.be(true);
+    expect(inputManager.isKeyPressed('PageUp')).to.be(true);
 
     inputManager.onFrameEnded();
-    inputManager.onKeyReleased(33);
-    expect(inputManager.wasKeyReleased(33)).to.be(true);
+    inputManager.onKeyReleased('PageUp');
+    expect(inputManager.wasKeyReleased('PageUp')).to.be(true);
     expect(inputManager.anyKeyPressed()).to.be(false);
   });
 

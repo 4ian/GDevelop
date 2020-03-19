@@ -286,7 +286,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _getLastUsedPath(project: gdProject, kind: ResourceKind) {
     const projectName = project.getName();
     const values = this.state.values;
-    const curProjectPaths = values.lastUsedPath[projectName];
+    const curProjectPaths = values.projectLastUsedPaths[projectName];
     if (curProjectPaths && curProjectPaths[kind]) {
       return curProjectPaths[kind];
     }
@@ -296,12 +296,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _setLastUsedPath(project: gdProject, kind: ResourceKind, latestPath: string) {
     const projectName = project.getName();
     const values = this.state.values;
-    if (values.lastUsedPath[projectName])
-      values.lastUsedPath[projectName][kind] = latestPath;
+    if (values.projectLastUsedPaths[projectName])
+      values.projectLastUsedPaths[projectName][kind] = latestPath;
     else {
       const path: { [ResourceKind]: string } = {};
       path[kind] = latestPath;
-      values.lastUsedPath[projectName] = path;
+      values.projectLastUsedPaths[projectName] = path;
     }
 
     this.setState(

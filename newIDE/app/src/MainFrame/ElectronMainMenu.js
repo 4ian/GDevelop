@@ -175,6 +175,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         { type: 'separator' },
         {
           label: i18n._(t`Export (web, iOS, Android)...`),
+          accelerator: 'CommandOrControl+E',
           onClickSendEvent: 'main-menu-export',
         },
         { type: 'separator' },

@@ -2858,7 +2858,7 @@ describe('libGD.js', function() {
           expect(completionDescription.getCompletionKind()).toBe(
             gd.ExpressionCompletionDescription.Object
           );
-          expect(completionDescription.getType()).toBe('');
+          expect(completionDescription.getType()).toBe('number');
           expect(completionDescription.getPrefix()).toBe('');
         } else {
           expect(completionDescription.getCompletionKind()).toBe(
@@ -2877,7 +2877,7 @@ describe('libGD.js', function() {
           expect(completionDescription.getCompletionKind()).toBe(
             gd.ExpressionCompletionDescription.Object
           );
-          expect(completionDescription.getType()).toBe('');
+          expect(completionDescription.getType()).toBe('number');
           expect(completionDescription.getPrefix()).toBe('');
         } else {
           expect(completionDescription.getCompletionKind()).toBe(
@@ -2896,7 +2896,7 @@ describe('libGD.js', function() {
           expect(completionDescription.getCompletionKind()).toBe(
             gd.ExpressionCompletionDescription.Object
           );
-          expect(completionDescription.getType()).toBe('');
+          expect(completionDescription.getType()).toBe('number');
           expect(completionDescription.getPrefix()).toBe('My');
         } else {
           expect(completionDescription.getCompletionKind()).toBe(
@@ -2957,7 +2957,7 @@ describe('libGD.js', function() {
             expect(completionDescription.getCompletionKind()).toBe(
               gd.ExpressionCompletionDescription.Object
             );
-            expect(completionDescription.getType()).toBe('');
+            expect(completionDescription.getType()).toBe('string');
             expect(completionDescription.getPrefix()).toBe('a');
           } else {
             expect(completionDescription.getCompletionKind()).toBe(

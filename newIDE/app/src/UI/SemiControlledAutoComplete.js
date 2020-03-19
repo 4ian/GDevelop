@@ -59,6 +59,11 @@ const styles = {
   listItem: {
     padding: 0,
     margin: 0,
+    display: 'inline-block',
+    whiteSpace: 'nowrap',
+    width: 'calc(100%)',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 };
 

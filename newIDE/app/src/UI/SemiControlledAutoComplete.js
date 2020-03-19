@@ -178,7 +178,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props: Props, ref) {
     const input = React.useRef((null: ?HTMLInputElement));
     const [inputValue, setInputValue] = useState((null: string | null));
-    const [isMenuOpen, setIsMenuOpen] = useState(true);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const classes = useStyles();
 
     React.useImperativeHandle(ref, () => ({
@@ -254,10 +254,10 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                     onFocus: (
                       event: SyntheticFocusEvent<HTMLInputElement>
                     ): void => {
+                      setIsMenuOpen(true);
                       if (input.current)
                         input.current.selectionStart =
                           input.current.value.length;
-                      if (!isMenuOpen) setIsMenuOpen(true);
                     },
                     onBlur: (
                       event: SyntheticFocusEvent<HTMLInputElement>

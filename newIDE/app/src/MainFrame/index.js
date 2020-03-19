@@ -1889,13 +1889,10 @@ class MainFrame extends React.Component<Props, State> {
           (resourceSource, index): React.Node => {
             const Component = resourceSource.component;
             return (
-              <PreferencesContext.Consumer
-                key={`${resourceSource.name}-consumer`}
-              >
+              <PreferencesContext.Consumer key={resourceSource.name}>
                 {({ getLastUsedPath, setLastUsedPath }) => {
                   return (
                     <Component
-                      key={resourceSource.name}
                       ref={dialog =>
                         (this._resourceSourceDialogs[
                           resourceSource.name

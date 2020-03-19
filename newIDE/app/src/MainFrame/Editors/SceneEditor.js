@@ -27,6 +27,10 @@ export default class SceneEditorContainer extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  forceUpdateEditor() {
+    if (this.editor) this.editor.forceUpdateObjectsList();
+  }
+
   getSerializedElements() {
     const layout = this.getLayout();
     if (!layout) return {};

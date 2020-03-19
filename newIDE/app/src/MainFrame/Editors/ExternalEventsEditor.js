@@ -28,6 +28,10 @@ export default class ExternalEventsEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  forceUpdateEditor() {
+    // No updates to be done.
+  }
+
   getSerializedElements() {
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();

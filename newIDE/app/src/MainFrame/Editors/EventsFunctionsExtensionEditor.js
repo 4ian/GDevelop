@@ -18,6 +18,10 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  forceUpdateEditor() {
+    // No updates to be done.
+  }
+
   shouldComponentUpdate(nextProps: *) {
     // This optimization is a bit more cautious than the one is BaseEditor,
     // to still be notified when isActive goes from true to false.

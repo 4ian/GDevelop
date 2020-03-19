@@ -5,11 +5,11 @@ gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
     return oldFilmFilter;
   },  
   update: function(filter, layer) {
-    if (filter.animationSpeed !== 0) {
-      filter._animationTimer += filter.animationSpeed;
-      if (filter._animationTimer >= 1) {
+    if (filter.animationFrequency !== 0) { 
+      filter._animationTimer += layer.getElapsedTime() / 1000;
+      if (filter._animationTimer >= 1 / filter.animationFrequency) {
         filter.seed = Math.random();
-        filter._animationTimer = 0
+        filter._animationTimer = 0;
       }
     }
   },
@@ -41,8 +41,8 @@ gdjs.PixiFiltersTools.registerFilterCreator('OldFilm', {
     else if (parameterName === 'vignettingBlur') {
       filter.vignettingBlur = value;
     }
-    else if (parameterName === 'animationSpeed') {
-      filter.animationSpeed = value;
+    else if (parameterName === 'animationFrequency') {
+      filter.animationFrequency = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {},

@@ -5,12 +5,12 @@ gdjs.PixiFiltersTools.registerFilterCreator('CRT', {
     return crtFilter;
   },
   update: function(filter, layer) {
-    if (filter.animationSpeed !== 0) {
-      filter.time += layer.getElapsedTime() / 1000 * filter.animationSpeed;
-      filter._animationTimer += filter.animationSpeed;
-      if (filter._animationTimer >= 1) {
+    if (filter.animationFrequency !== 0) { 
+      filter._animationTimer += layer.getElapsedTime() / 1000;
+      if (filter._animationTimer >= 1 / filter.animationFrequency) {
         filter.seed = Math.random();
-        filter._animationTimer = 0
+        filter.time += layer.getElapsedTime() / 1000;
+        filter._animationTimer = 0;
       }
     }
   },
@@ -31,8 +31,8 @@ gdjs.PixiFiltersTools.registerFilterCreator('CRT', {
       filter.vignettingAlpha = value;
     } else if (parameterName === 'vignettingBlur') {
       filter.vignettingBlur = value;
-    } else if (parameterName === 'animationSpeed') {
-      filter.animationSpeed = value;
+    } else if (parameterName === 'animationFrequency') {
+      filter.animationFrequency = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {},

@@ -434,15 +434,11 @@ module.exports = {
         .setType('number')
     );
     crtProperties.set(
-      'animationSpeed',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Animation Speed (between 0 and 1)'))
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Animation Frequency'))
         .setType('number')
-        .setDescription(
-          _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed)'
-          )
-        )
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const displacementEffect = extension
@@ -618,15 +614,11 @@ module.exports = {
         .setDescription('The resolution of the displacement image')
     );
     glitchProperties.set(
-      'animationSpeed',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Animation Speed (between 0 and 1)'))
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Animation Frequency'))
         .setType('number')
-        .setDescription(
-          _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed)'
-          )
-        )
+        .setDescription('Number of updates per second (0: no updates)')
     );
     glitchProperties.set(
       'redX',
@@ -711,15 +703,11 @@ module.exports = {
         .setType('boolean')
     );
     godrayProperties.set(
-      'animationSpeed',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Animation Speed'))
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Animation Frequency'))
         .setType('number')
-        .setDescription(
-          _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
-          )
-        )
+        .setDescription('Number of updates per second (0: no updates)')
     );
     godrayProperties.set(
       'lacunarity',
@@ -912,15 +900,11 @@ module.exports = {
         .setDescription('Blur intensity of the vignette')
     );
     oldFilmProperties.set(
-      'animationSpeed',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Animation Speed (between 0 and 1)'))
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Animation Frequency'))
         .setType('number')
-        .setDescription(
-          _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed)'
-          )
-        )
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const outlineEffect = extension
@@ -1072,15 +1056,11 @@ module.exports = {
         .setDescription(_('Ending alpha (1 by default)'))
     );
     reflectionProperties.set(
-      'animationSpeed',
+      'animationFrequency',
       new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Animation Speed of waves'))
+        .setLabel(_('Animation Frequency of waves'))
         .setType('number')
-        .setDescription(
-          _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
-          )
-        )
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const rgbSplitEffect = extension

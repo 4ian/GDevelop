@@ -12,6 +12,7 @@ import type { PreferencesValues } from './PreferencesContext';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+const path = optionalRequire('path');
 
 type Props = {|
   children: React.Node,
@@ -284,9 +285,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _getLastUsedPath(project: gdProject, kind: ResourceKind) {
-    const projectName = project.getName();
+    const projectPath = path.dirname(project.getProjectFile());
     const { values } = this.state;
-    const projectPaths = values.projectLastUsedPaths[projectName];
+    const projectPaths = values.projectLastUsedPaths[projectPath];
     if (projectPaths && projectPaths[kind]) {
       return projectPaths[kind];
     }
@@ -294,11 +295,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setLastUsedPath(project: gdProject, kind: ResourceKind, latestPath: string) {
-    const projectName = project.getName();
+    const projectPath = path.dirname(project.getProjectFile());
 
     const { values } = this.state;
     const newProjectLastUsedPaths =
-      values.projectLastUsedPaths[projectName] || {};
+      values.projectLastUsedPaths[projectPath] || {};
     newProjectLastUsedPaths[kind] = latestPath;
 
     this.setState(
@@ -307,7 +308,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...values,
           projectLastUsedPaths: {
             ...values.projectLastUsedPaths,
-            [projectName]: newProjectLastUsedPaths,
+            [projectPath]: newProjectLastUsedPaths,
           },
         },
       },

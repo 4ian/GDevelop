@@ -1191,20 +1191,20 @@ module.exports = {
     const zoomBlurProperties = zoomBlurEffect.getProperties();
     zoomBlurProperties.set(
       'centerX',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center X'))
         .setType('number')
     );
     zoomBlurProperties.set(
       'centerY',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center Y'))
         .setType('number')
     );
     zoomBlurProperties.set(
       'innerRadius',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
-        .setLabel(_('Inner radius (between 0 and 1, 0.5 is mid-way)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '200')
+        .setLabel(_('Inner radius'))
         .setType('number')
     );
     zoomBlurProperties.set(

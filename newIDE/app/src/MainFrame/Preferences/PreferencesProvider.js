@@ -295,19 +295,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setLastUsedPath(project: gdProject, kind: ResourceKind, latestPath: string) {
     const projectName = project.getName();
-    const values = this.state.values;
-    if (values.projectLastUsedPaths[projectName])
-      values.projectLastUsedPaths[projectName][kind] = latestPath;
-    else {
-      const path: { [ResourceKind]: string } = {};
-      path[kind] = latestPath;
-      values.projectLastUsedPaths[projectName] = path;
-    }
+
+    const { values } = this.state;
+    const newProjectLastUsedPaths = values.projectLastUsedPaths[projectName] || {};
+    newProjectLastUsedPaths[kind] = latestPath;
 
     this.setState(
       {
         values: {
           ...values,
+          projectLastUsedPaths: {
+            ...values.projectLastUsedPaths,
+            [projectName]: newProjectLastUsedPaths,
+          }
         },
       },
       () => this._persistValuesToLocalStorage(this.state)

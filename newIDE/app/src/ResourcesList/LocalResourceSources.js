@@ -5,8 +5,8 @@ import type { ResourceKind } from './ResourceSource.flow';
 import { type ResourceSourceComponentProps } from './ResourceSource.flow';
 import { Component } from 'react';
 import {
-  copyAllToProjectFolder,
   isPathInProjectFolder,
+  copyAllToProjectFolder,
 } from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');

@@ -41,10 +41,7 @@ export const create = (authentification: Authentification) => {
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
     >
-      {({
-        i18n,
-        eventsFunctionsExtensionsState,
-      }) => (
+      {({ i18n, eventsFunctionsExtensionsState }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[

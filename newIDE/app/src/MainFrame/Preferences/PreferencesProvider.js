@@ -19,6 +19,7 @@ type Props = {|
 |};
 
 type State = Preferences;
+
 const LocalStorageItem = 'gd-preferences';
 
 export default class PreferencesProvider extends React.Component<Props, State> {

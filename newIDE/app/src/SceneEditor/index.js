@@ -15,6 +15,7 @@ import InstancesList from '../InstancesEditor/InstancesList';
 import LayersList from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import SceneVariablesEditorDialog from '../VariablesList/SceneVariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from './InstancesSelection';
@@ -124,7 +125,6 @@ type Props = {|
   onOpenDebugger: () => void,
   onOpenMoreSettings: () => void,
   onPreview: (options: PreviewOptions) => void,
-  onLayoutVariablesDialogClose: () => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
   showNetworkPreviewButton: boolean,
@@ -133,7 +133,6 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
-  layoutVariablesDialogOpen: boolean,
 |};
 
 type State = {|
@@ -205,7 +204,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       }),
 
       showObjectsListInfoBar: false,
-      layoutVariablesDialogOpen: this.props.layoutVariablesDialogOpen || false,
+      layoutVariablesDialogOpen: false,
       showPropertiesInfoBar: false,
 
       selectedObjectTags: [],
@@ -346,10 +345,6 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editLayoutVariables = (open: boolean = true) => {
-    if (this.props.onLayoutVariablesDialogClose) {
-      this.props.onLayoutVariablesDialogClose();
-      return;
-    }
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
@@ -1239,24 +1234,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         )}
         {!!this.state.layoutVariablesDialogOpen && (
-          <VariablesEditorDialog
+          <SceneVariablesEditorDialog
             open
-            variablesContainer={layout.getVariables()}
-            onCancel={() => this.editLayoutVariables(false)}
-            onApply={() => this.editLayoutVariables(false)}
-            title={<Trans>Scene Variables</Trans>}
-            emptyExplanationMessage={
-              <Trans>
-                Scene variables can be used to store any value or text during
-                the game.
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                For example, you can have a variable called Score representing
-                the current score of the player.
-              </Trans>
-            }
+            layout={layout}
+            onEditLayoutVariables={() => this.editLayoutVariables(false)}
           />
         )}
         <ContextMenu

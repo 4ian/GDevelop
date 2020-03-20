@@ -39,7 +39,7 @@ import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import SceneEditor from '../SceneEditor';
+import SceneVariablesEditorDialog from '../VariablesList/SceneVariablesEditorDialog';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -275,7 +275,7 @@ type State = {|
   projectPropertiesDialogOpen: boolean,
   variablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
-  name: any,
+  currentLayoutName: null | string,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -306,17 +306,16 @@ export default class ProjectManager extends React.Component<Props, State> {
     }
   }
 
-  _onEditLayoutVariable = (name: any = null) => {
-    this.setState({ name });
+  _onEditLayoutVariable = (currentLayoutName: null | string) => {
+    this.setState({ currentLayoutName });
   };
 
   getLayout = () => {
     const { project } = this.props;
-    const { name } = this.state;
-    if (!project || !project.hasLayoutNamed(name)) return null;
+    const { currentLayoutName } = this.state;
+    if (!project || !project.hasLayoutNamed(currentLayoutName)) return null;
 
-    console.log(project.getLayout(name));
-    return project.getLayout(name);
+    return project.getLayout(currentLayoutName);
   };
 
   _onEditName = (kind: ?string, name: string) => {
@@ -761,18 +760,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                 )
             }
           />
-          {!!this.state.name && (
-            <SceneEditor
+          {!!this.state.currentLayoutName && (
+            <SceneVariablesEditorDialog
+              open
               layout={this.getLayout()}
-              layoutVariablesDialogOpen={true}
-              project={project}
-              initialInstances={this.getLayout().getInitialInstances()}
-              initialUiSettings={serializeToJSObject(
-                this.getLayout().getAssociatedSettings()
-              )}
-              onLayoutVariablesDialogClose={() =>
-                this._onEditLayoutVariable(null)
-              }
+              onEditLayoutVariables={() => this._onEditLayoutVariable(null)}
             />
           )}
           <ProjectStructureItem

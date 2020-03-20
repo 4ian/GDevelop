@@ -171,7 +171,7 @@ export const initialPreferences = {
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
-  getLastUsedPath: (project: gdProject, kind: ResourceKind) => null,
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
 };
 

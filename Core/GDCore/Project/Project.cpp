@@ -7,6 +7,7 @@
 #include "Project.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <cctype>
 #include <SFML/System/Utf.hpp>
 #include <fstream>
 #include <map>
@@ -947,6 +948,8 @@ void Project::SerializeTo(SerializerElement& element) const {
 
 bool Project::ValidateObjectName(const gd::String& name) {
   if (name.empty()) return false;
+
+  if (isdigit(name[0])) return false;
 
   gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";

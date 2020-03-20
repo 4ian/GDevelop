@@ -2,6 +2,23 @@
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterValues } from './ExpressionParametersEditorDialog';
 
+const filterOutOptionalParameters = (
+  array: Array<string>,
+  expressionMetadata: Object,
+  firstParameterIndex: number
+) => {
+  const parametersCount = expressionMetadata.getParametersCount();
+
+  return array.filter((parameter, index) => {
+    if (index < firstParameterIndex) return false;
+
+    return (
+      index < parametersCount &&
+      !expressionMetadata.getParameter(index).isOptional()
+    );
+  });
+};
+
 const filterOutCodeOnlyParameters = (
   array: Array<string>,
   expressionMetadata: Object,
@@ -19,6 +36,18 @@ const filterOutCodeOnlyParameters = (
   });
 };
 
+const filterParameters = (
+  array: Array<string>,
+  expressionMetadata: Object,
+  firstParameterIndex: number
+) => {
+  return filterOutOptionalParameters(
+    filterOutCodeOnlyParameters(array, expressionMetadata, firstParameterIndex),
+    expressionMetadata,
+    firstParameterIndex
+  );
+};
+
 export const formatExpressionCall = (
   expressionInfo: EnumeratedInstructionOrExpressionMetadata,
   parameterValues: ParameterValues
@@ -28,7 +57,7 @@ export const formatExpressionCall = (
   if (expressionInfo.scope.objectMetadata) {
     const objectName = parameterValues[0];
 
-    const functionArgs = filterOutCodeOnlyParameters(
+    const functionArgs = filterParameters(
       parameterValues,
       expressionInfo.metadata,
       1
@@ -38,14 +67,14 @@ export const formatExpressionCall = (
     const objectName = parameterValues[0];
     const behaviorName = parameterValues[1];
 
-    const functionArgs = filterOutCodeOnlyParameters(
+    const functionArgs = filterParameters(
       parameterValues,
       expressionInfo.metadata,
       2
     ).join(', ');
     return `${objectName}.${behaviorName}::${functionName}(${functionArgs})`;
   } else {
-    const functionArgs = filterOutCodeOnlyParameters(
+    const functionArgs = filterParameters(
       parameterValues,
       expressionInfo.metadata,
       0

@@ -434,11 +434,15 @@ module.exports = {
         .setType('number')
     );
     crtProperties.set(
-      'animationFrequency',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Animation Frequency'))
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Animation Speed'))
         .setType('number')
-        .setDescription('Number of updates per second (0: no updates)')
+        .setDescription(
+          _(
+            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
+          )
+        )
     );
 
     const displacementEffect = extension
@@ -703,11 +707,15 @@ module.exports = {
         .setType('boolean')
     );
     godrayProperties.set(
-      'animationFrequency',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Animation Frequency'))
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Animation Speed'))
         .setType('number')
-        .setDescription('Number of updates per second (0: no updates)')
+        .setDescription(
+          _(
+            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
+          )
+        )
     );
     godrayProperties.set(
       'lacunarity',
@@ -1056,11 +1064,15 @@ module.exports = {
         .setDescription(_('Ending alpha (1 by default)'))
     );
     reflectionProperties.set(
-      'animationFrequency',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Animation Frequency of waves'))
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Animation Speed'))
         .setType('number')
-        .setDescription('Number of updates per second (0: no updates)')
+        .setDescription(
+          _(
+            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
+          )
+        )
     );
 
     const rgbSplitEffect = extension

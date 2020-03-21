@@ -32,10 +32,17 @@ import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
 import Divider from '@material-ui/core/Divider';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
+import EditorNavigator, {
+  type EditorNavigatorInterface,
+} from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
+import {
+  type PreviewButtonSettings,
+  emptyPreviewButtonSettings,
+} from '../MainFrame/Toolbar/PreviewButtons';
+
 const gd = global.gd;
 
 type Props = {|
@@ -56,6 +63,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
+  previewButtonSettings: PreviewButtonSettings,
 |};
 
 type State = {|
@@ -85,8 +93,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
   editor: ?EventsSheet;
   _editorMosaic: ?EditorMosaic;
-  // $FlowFixMe
-  _editorNavigator: ?EditorNavigator;
+  _editorNavigator: ?EditorNavigatorInterface;
   _globalObjectsContainer: ?gdObjectsContainer;
   _objectsContainer: ?gdObjectsContainer;
 
@@ -524,7 +531,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       parameters: {
         type: 'primary',
-        title: <Trans>Function Configuration</Trans>,
+        title: t`Function Configuration`,
         toolbarControls: [],
         renderEditor: () => (
           <Background>
@@ -581,6 +588,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 events={selectedEventsFunction.getEvents()}
                 showPreviewButton={false}
                 onPreview={options => {}}
+                previewButtonSettings={emptyPreviewButtonSettings}
                 showNetworkPreviewButton={false}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}
@@ -609,7 +617,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'free-functions-list': {
         type: 'primary',
-        title: <Trans>Functions</Trans>,
+        title: t`Functions`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>
@@ -651,7 +659,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'behavior-functions-list': {
         type: 'primary',
-        title: <Trans>Behavior functions</Trans>,
+        title: t`Behavior functions`,
         renderEditor: () =>
           selectedEventsBasedBehavior ? (
             <I18n>
@@ -722,7 +730,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
       'behaviors-list': {
         type: 'secondary',
-        title: <Trans>Behaviors</Trans>,
+        title: t`Behaviors`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>

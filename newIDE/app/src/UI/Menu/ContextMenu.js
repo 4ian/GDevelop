@@ -39,28 +39,18 @@ class MaterialUIContextMenu extends React.Component {
 
   render() {
     return (
-      <div>
-        <div
-          ref={element => (this.anchorEl = element)}
-          style={{
-            position: 'fixed',
-            pointerEvents: 'none',
-            left: this.state.anchorX,
-            top: this.state.anchorY,
-          }}
-        />
-        <Menu
-          open={this.state.open}
-          anchorEl={this.anchorEl}
-          onClose={this._onClose}
-          TransitionComponent={Fade}
-          {...this.menuImplementation.getMenuProps()}
-        >
-          {this.menuImplementation.buildFromTemplate(
-            this.props.buildMenuTemplate()
-          )}
-        </Menu>
-      </div>
+      <Menu
+        open={this.state.open}
+        anchorPosition={{ left: this.state.anchorX, top: this.state.anchorY }}
+        anchorReference={'anchorPosition'}
+        onClose={this._onClose}
+        TransitionComponent={Fade}
+        {...this.menuImplementation.getMenuProps()}
+      >
+        {this.menuImplementation.buildFromTemplate(
+          this.props.buildMenuTemplate()
+        )}
+      </Menu>
     );
   }
 }

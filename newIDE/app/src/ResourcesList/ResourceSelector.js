@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import SemiControlledAutoComplete, {
   type DataSource,
+  type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import Add from '@material-ui/icons/Add';
@@ -60,7 +61,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
   allResourcesNames: Array<string>;
   autoCompleteData: DataSource;
-  _autoComplete: ?SemiControlledAutoComplete;
+  _autoComplete: ?SemiControlledAutoCompleteInterface;
 
   focus() {
     if (this._autoComplete) this._autoComplete.focus();

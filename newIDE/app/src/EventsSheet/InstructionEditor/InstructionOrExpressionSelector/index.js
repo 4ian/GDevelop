@@ -14,7 +14,7 @@ import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../../UI/EmptyMessage';
-import ScrollView from '../../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
 import { ListItem } from '../../../UI/List';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
@@ -54,7 +54,7 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
     searchResults: [],
   };
   _searchBar: ?SearchBar;
-  _scrollView = React.createRef<typeof ScrollView>();
+  _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItem>();
 
   initialInstructionTypePath = findInTree(
@@ -67,7 +67,6 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
       this._searchBar.focus();
     }
     if (this._selectedItem.current && this._scrollView.current) {
-      // $FlowFixMe - improper typing of ScrollView?
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
   }

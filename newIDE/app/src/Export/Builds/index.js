@@ -82,7 +82,11 @@ export default class Builds extends Component<Props, State> {
 
   render() {
     return (
-      <BuildsList builds={this.state.builds} onDownload={this._download} />
+      <BuildsList
+        builds={this.state.builds}
+        userProfile={this.props.userProfile}
+        onDownload={this._download}
+      />
     );
   }
 }

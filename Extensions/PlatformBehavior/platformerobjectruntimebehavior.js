@@ -11,7 +11,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  * @augments {gdjs.RuntimeBehavior}
  * @constructor
  */
-gdjs.PlatformerObjectRuntimeBehavior = function(
+gdjs.PlatformerObjectRuntimeBehavior = function (
   runtimeScene,
   behaviorData,
   owner
@@ -31,6 +31,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(
   this._roundCoordinates = behaviorData.roundCoordinates;
   this._gravity = behaviorData.gravity;
   this._maxFallingSpeed = behaviorData.maxFallingSpeed;
+  this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed
   this._acceleration = behaviorData.acceleration;
   this._deceleration = behaviorData.deceleration;
   this._maxSpeed = behaviorData.maxSpeed;
@@ -73,7 +74,7 @@ gdjs.registerBehavior(
   gdjs.PlatformerObjectRuntimeBehavior
 );
 
-gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function (
   runtimeScene
 ) {
   var LEFTKEY = 37;
@@ -127,9 +128,9 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   if (this._isOnFloor && this._oldHeight !== object.getHeight()) {
     object.setY(
       this._floorLastY -
-        object.getHeight() +
-        (object.getY() - object.getDrawableY()) -
-        1
+      object.getHeight() +
+      (object.getY() - object.getDrawableY()) -
+      1
     );
   }
   this._oldHeight = object.getHeight();
@@ -295,7 +296,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
 
     object.setX(
       object.getX() +
-        (requestedDeltaX > 0 ? this._xGrabTolerance : -this._xGrabTolerance)
+      (requestedDeltaX > 0 ? this._xGrabTolerance : -this._xGrabTolerance)
     );
     var collidingPlatform = this._getCollidingPlatform();
     if (
@@ -306,7 +307,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
     }
     object.setX(
       object.getX() +
-        (requestedDeltaX > 0 ? -this._xGrabTolerance : this._xGrabTolerance)
+      (requestedDeltaX > 0 ? -this._xGrabTolerance : this._xGrabTolerance)
     );
 
     //Check if we can grab the collided platform
@@ -314,8 +315,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
       var oldY = object.getY();
       object.setY(
         collidingPlatform.owner.getY() +
-          collidingPlatform.getYGrabOffset() -
-          this._yGrabOffset
+        collidingPlatform.getYGrabOffset() -
+        this._yGrabOffset
       );
       if (
         !this._isCollidingWith(
@@ -401,7 +402,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
 
           object.setY(
             object.getY() -
-              (Math.abs(requestedDeltaX * this._slopeClimbingFactor) - step)
+            (Math.abs(requestedDeltaX * this._slopeClimbingFactor) - step)
           ); //Try to add the decimal part.
           if (
             gdjs.RuntimeObject.collisionTest(
@@ -554,7 +555,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   this._hasReallyMoved = Math.abs(object.getX() - oldX) >= 1;
 };
 
-gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPostEvents = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPostEvents = function (
   runtimeScene
 ) {
   //Scene change is not supported
@@ -574,7 +575,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPostEvents = function(
  * @param platform The platform the object is in collision with
  * @param y The value in pixels on Y axis the object wants to move to
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._canGrab = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype._canGrab = function (
   platform,
   requestedDeltaY
 ) {
@@ -591,7 +592,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._canGrab = function(
 /**
  * Mark the platformer object has not being grabbing any platform.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._releaseGrabbedPlatform = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype._releaseGrabbedPlatform = function () {
   this._isGrabbingPlatform = false; //Ensure nothing is grabbed.
   this._grabbedPlatform = null;
 };
@@ -603,7 +604,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._releaseGrabbedPlatform = functio
  * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
  * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWith = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWith = function (
   candidates,
   exceptThisOne,
   excludeJumpThrus
@@ -640,7 +641,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWith = function(
  * @param candidates The platform to be tested for collision
  * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms = function (
   candidates,
   excludeJumpThrus
 ) {
@@ -674,7 +675,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms = function
  * @param candidates The platform to be tested for collision
  * @param exceptTheseOnes The platforms to be excluded from the test
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWithExcluding = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWithExcluding = function (
   candidates,
   exceptTheseOnes
 ) {
@@ -703,7 +704,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWithExcluding = funct
  * Overlapped jump thru and ladders are excluded.
  * _updatePotentialCollidingObjects and _updateOverlappedJumpThru should have been called before.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._getCollidingPlatform = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype._getCollidingPlatform = function () {
   for (var i = 0; i < this._potentialCollidingObjects.length; ++i) {
     var platform = this._potentialCollidingObjects[i];
 
@@ -729,7 +730,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._getCollidingPlatform = function(
  * Note: _updatePotentialCollidingObjects must have been called before.
  * @private
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._updateOverlappedJumpThru = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype._updateOverlappedJumpThru = function () {
   this._overlappedJumpThru.length = 0;
   for (var i = 0; i < this._potentialCollidingObjects.length; ++i) {
     var platform = this._potentialCollidingObjects[i];
@@ -752,7 +753,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._updateOverlappedJumpThru = funct
  * Note: _updatePotentialCollidingObjects must have been called before.
  * @private
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._isOverlappingLadder = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype._isOverlappingLadder = function () {
   for (var i = 0; i < this._potentialCollidingObjects.length; ++i) {
     var platform = this._potentialCollidingObjects[i];
 
@@ -771,7 +772,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isOverlappingLadder = function()
   return false;
 };
 
-gdjs.PlatformerObjectRuntimeBehavior.prototype._isIn = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype._isIn = function (
   platformArray,
   id
 ) {
@@ -786,7 +787,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isIn = function(
  * Update _potentialCollidingObjects member with platforms near the object.
  * @private
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype._updatePotentialCollidingObjects = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype._updatePotentialCollidingObjects = function (
   maxMovementLength
 ) {
   this._manager.getAllPlatformsAround(
@@ -833,7 +834,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._updatePotentialCollidingObjects 
  * Simulate a control action in the Platformer Object by specifying an input.
  * @param {string} input The string expression of the control action [Left,Right,Up,Down,Ladder,Jump,Release].
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateControl = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateControl = function (
   input
 ) {
   if (input === 'Left') this._leftKey = true;
@@ -849,7 +850,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateControl = function(
  * Get the gravity of the Platformer Object.
  * @returns {number} The current gravity.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getGravity = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getGravity = function () {
   return this._gravity;
 };
 
@@ -857,15 +858,23 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getGravity = function() {
  * Get the maximum falling speed of the Platformer Object.
  * @returns {number} The maximum falling speed.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxFallingSpeed = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxFallingSpeed = function () {
   return this._maxFallingSpeed;
+};
+
+/**
+ * Get the maximum speed of Climbing the ladder
+ * @returns {number} The current speed of climbing the ladder
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getladderClimbingSpeed = function () {
+  return this._ladderClimbingSpeed;
 };
 
 /**
  * Get the acceleration value of the Platformer Object.
  * @returns {number} The current acceleration.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getAcceleration = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getAcceleration = function () {
   return this._acceleration;
 };
 
@@ -873,7 +882,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getAcceleration = function() {
  * Get the deceleration of the Platformer Object.
  * @returns {number} The current deceleration.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getDeceleration = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getDeceleration = function () {
   return this._deceleration;
 };
 
@@ -881,7 +890,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getDeceleration = function() {
  * Get the maximum speed of the Platformer Object.
  * @returns {number} The maximum speed.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxSpeed = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxSpeed = function () {
   return this._maxSpeed;
 };
 
@@ -889,7 +898,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxSpeed = function() {
  * Get the jump speed of the Platformer Object.
  * @returns {number} The jump speed.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSpeed = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSpeed = function () {
   return this._jumpSpeed;
 };
 
@@ -897,7 +906,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSpeed = function() {
  * Set the gravity of the Platformer Object.
  * @param {number} gravity The new gravity.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setGravity = function(gravity) {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setGravity = function (gravity) {
   this._gravity = gravity;
 };
 
@@ -905,17 +914,27 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setGravity = function(gravity) {
  * Set the maximum falling speed of the Platformer Object.
  * @param {number} maxFallingSpeed The maximum falling speed.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxFallingSpeed = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxFallingSpeed = function (
   maxFallingSpeed
 ) {
   this._maxFallingSpeed = maxFallingSpeed;
 };
 
 /**
+* Set the maximum speed of Climbing the ladder
+* @param {number} ladderClimbingSpeed The maximum speed of climbing the ladder
+*/
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setladderClimbingSpeed = function (
+  ladderClimbingSpeed
+) {
+  this._ladderClimbingSpeed = ladderClimbingSpeed;
+};
+
+/**
  * Set the acceleration of the Platformer Object.
  * @param {number} acceleration The new acceleration.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setAcceleration = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setAcceleration = function (
   acceleration
 ) {
   this._acceleration = acceleration;
@@ -925,7 +944,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setAcceleration = function(
  * Set the deceleration of the Platformer Object.
  * @param {number} deceleration The new deceleration.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setDeceleration = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setDeceleration = function (
   deceleration
 ) {
   this._deceleration = deceleration;
@@ -935,7 +954,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setDeceleration = function(
  * Set the maximum speed of the Platformer Object.
  * @param {number} maxSpeed The new maximum speed.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxSpeed = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxSpeed = function (
   maxSpeed
 ) {
   this._maxSpeed = maxSpeed;
@@ -945,7 +964,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxSpeed = function(
  * Set the jump speed of the Platformer Object.
  * @param {number} jumpSpeed The new jump speed.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setJumpSpeed = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setJumpSpeed = function (
   jumpSpeed
 ) {
   this._jumpSpeed = jumpSpeed;
@@ -955,7 +974,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setJumpSpeed = function(
  * Set the maximum slope angle of the Platformer Object.
  * @param {number} slopeMaxAngle The new maximum slope angle.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setSlopeMaxAngle = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setSlopeMaxAngle = function (
   slopeMaxAngle
 ) {
   if (slopeMaxAngle < 0 || slopeMaxAngle >= 90) return;
@@ -970,7 +989,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setSlopeMaxAngle = function(
 /**
  * Allow the Platformer Object to jump again.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanJump = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanJump = function () {
   this._canJump = true;
 };
 
@@ -978,7 +997,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanJump = function() {
  * Set if the Platformer Object can grab platforms.
  * @param {boolean} enable Enable / Disable grabbing of platforms.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanGrabPlatforms = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanGrabPlatforms = function (
   enable
 ) {
   this._canGrabPlatforms = enable;
@@ -991,7 +1010,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanGrabPlatforms = function(
  * Ignore the default controls of the Platformer Object.
  * @param {boolean} ignore Enable / Disable default controls.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.ignoreDefaultControls = function(
+gdjs.PlatformerObjectRuntimeBehavior.prototype.ignoreDefaultControls = function (
   ignore
 ) {
   this._ignoreDefaultControls = ignore;
@@ -1000,49 +1019,49 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.ignoreDefaultControls = function(
 /**
  * Simulate the "Left" control of the Platformer Object.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateLeftKey = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateLeftKey = function () {
   this._leftKey = true;
 };
 
 /**
  * Simulate the "Right" control of the Platformer Object.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateRightKey = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateRightKey = function () {
   this._rightKey = true;
 };
 
 /**
  * Simulate the "Ladder" control of the Platformer Object.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateLadderKey = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateLadderKey = function () {
   this._ladderKey = true;
 };
 
 /**
  * Simulate the "Up" control of the Platformer Object.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateUpKey = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateUpKey = function () {
   this._upKey = true;
 };
 
 /**
  * Simulate the "Down" control of the Platformer Object.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateDownKey = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateDownKey = function () {
   this._downKey = true;
 };
 
 /**
  * Simulate the "Jump" control of the Platformer Object.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateJumpKey = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateJumpKey = function () {
   this._jumpKey = true;
 };
 
 /**
  * Simulate the "Release" control of the Platformer Object.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateReleaseKey = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateReleaseKey = function () {
   this._releaseKey = true;
 };
 
@@ -1050,7 +1069,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateReleaseKey = function() {
  * Check if the Platformer Object is on the floor.
  * @returns {boolean} Returns true if on the floor and false if not.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnFloor = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnFloor = function () {
   return this._isOnFloor;
 };
 
@@ -1058,7 +1077,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnFloor = function() {
  * Check if the Platformer Object is on a ladder.
  * @returns {boolean} Returns true if on a ladder and false if not.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnLadder = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnLadder = function () {
   return this._isOnLadder;
 };
 
@@ -1066,7 +1085,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnLadder = function() {
  * Check if the Platformer Object is jumping.
  * @returns {boolean} Returns true if jumping and false if not.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.isJumping = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.isJumping = function () {
   return this._jumping;
 };
 
@@ -1074,7 +1093,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.isJumping = function() {
  * Check if the Platformer Object is grabbing a platform.
  * @returns {boolean} Returns true if a platform is grabbed and false if not.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.isGrabbingPlatform = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.isGrabbingPlatform = function () {
   return this._isGrabbingPlatform;
 };
 
@@ -1082,7 +1101,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.isGrabbingPlatform = function() {
  * Check if the Platformer Object is falling.
  * @returns {boolean} Returns true if it is falling and false if not.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.isFalling = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.isFalling = function () {
   return (
     !this._isOnFloor &&
     !this._isGrabbingPlatform &&
@@ -1095,7 +1114,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.isFalling = function() {
  * Check if the Platformer Object is moving.
  * @returns {boolean} Returns true if it is moving and false if not.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.isMoving = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.isMoving = function () {
   return (
     (this._hasReallyMoved && this._currentSpeed !== 0) ||
     this._currentJumpSpeed !== 0 ||

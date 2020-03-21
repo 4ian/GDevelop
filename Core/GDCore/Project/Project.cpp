@@ -946,7 +946,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 #endif
 }
 
-bool Project::ValidateObjectName(const gd::String& name) {
+bool Project::ValidateName(const gd::String& name) {
   if (name.empty()) return false;
 
   if (isdigit(name[0])) return false;

@@ -632,9 +632,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     ) {
       showWarningBox('Another object or group with this name already exists.');
       return false;
-    } else if (!gd.Project.validateObjectName(newName)) {
+    } else if (!gd.Project.validateName(newName)) {
       showWarningBox(
-        'Please ensure that object name do not start with a digit and contains only alphanumeric characters (0-9, a-z) and underscores'
+        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.'
       );
       return false;
     }

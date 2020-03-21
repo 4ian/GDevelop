@@ -1611,6 +1611,11 @@ class MainFrame extends React.Component<Props, State> {
 
   _onEditorTabActive = (editorTab: EditorTab) => {
     this.updateToolbar();
+    // Ensure the editors shown on the screen are updated. This is for
+    // example useful if global objects have been updated in another editor.
+    if (editorTab.editorRef) {
+      editorTab.editorRef.forceUpdateEditor();
+    }
   };
 
   _onCloseEditorTab = (editorTab: EditorTab) => {
@@ -1957,13 +1962,22 @@ class MainFrame extends React.Component<Props, State> {
           (resourceSource, index): React.Node => {
             const Component = resourceSource.component;
             return (
-              <Component
-                key={resourceSource.name}
-                ref={dialog =>
-                  (this._resourceSourceDialogs[resourceSource.name] = dialog)
-                }
-                i18n={i18n}
-              />
+              <PreferencesContext.Consumer key={resourceSource.name}>
+                {({ getLastUsedPath, setLastUsedPath }) => {
+                  return (
+                    <Component
+                      ref={dialog =>
+                        (this._resourceSourceDialogs[
+                          resourceSource.name
+                        ] = dialog)
+                      }
+                      i18n={i18n}
+                      getLastUsedPath={getLastUsedPath}
+                      setLastUsedPath={setLastUsedPath}
+                    />
+                  );
+                }}
+              </PreferencesContext.Consumer>
             );
           }
         )}

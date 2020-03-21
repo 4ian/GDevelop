@@ -4,11 +4,12 @@ import * as React from 'react';
 import PreferencesContext, {
   initialPreferences,
   type Preferences,
-  type PreferencesValues,
   type AlertMessageIdentifier,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
+import type { PreferencesValues } from './PreferencesContext';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -44,6 +45,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
+    getLastUsedPath: this._getLastUsedPath.bind(this),
+    setLastUsedPath: this._setLastUsedPath.bind(this),
   };
 
   componentDidMount() {
@@ -280,6 +283,38 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
 
     return preferences;
+  }
+
+  _getLastUsedPath(project: gdProject, kind: ResourceKind) {
+    const projectPath = project.getProjectFile();
+    const { values } = this.state;
+    const projectPaths = values.projectLastUsedPaths[projectPath];
+    if (projectPaths && projectPaths[kind]) {
+      return projectPaths[kind];
+    }
+    if (!projectPath) return null;
+  }
+
+  _setLastUsedPath(project: gdProject, kind: ResourceKind, latestPath: string) {
+    const projectPath = project.getProjectFile();
+
+    const { values } = this.state;
+    const newProjectLastUsedPaths =
+      values.projectLastUsedPaths[projectPath] || {};
+    newProjectLastUsedPaths[kind] = latestPath;
+
+    this.setState(
+      {
+        values: {
+          ...values,
+          projectLastUsedPaths: {
+            ...values.projectLastUsedPaths,
+            [projectPath]: newProjectLastUsedPaths,
+          },
+        },
+      },
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   render() {

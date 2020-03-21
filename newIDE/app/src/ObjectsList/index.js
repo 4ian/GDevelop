@@ -183,15 +183,19 @@ export default class ObjectsList extends React.Component<Props, State> {
     this.setState({ newObjectDialogOpen: true });
   };
 
-  _deleteObject = (objectWithContext: ObjectWithContext) => {
+  _deleteObject = (objectWithContext: ObjectWithContext, { askForConfirmation }: {| askForConfirmation: boolean |}) => {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      "Are you sure you want to remove this object? This can't be undone."
-    );
-    if (!answer) return;
+    console.log(askForConfirmation);
+
+    if (askForConfirmation) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        "Are you sure you want to remove this object? This can't be undone."
+      );
+      if (!answer) return;
+    }
 
     // It's important to call onDeleteObject, because the parent might
     // have to do some refactoring/clean up work before the object is deleted
@@ -222,7 +226,7 @@ export default class ObjectsList extends React.Component<Props, State> {
 
   _cutObject = (objectWithContext: ObjectWithContext) => {
     this._copyObject(objectWithContext);
-    this._deleteObject(objectWithContext);
+    this._deleteObject(objectWithContext, { askForConfirmation: false });
   };
 
   _duplicateObject = (objectWithContext: ObjectWithContext) => {
@@ -459,7 +463,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: 'Delete',
-        click: () => this._deleteObject(objectWithContext),
+        click: () => this._deleteObject(objectWithContext, { askForConfirmation: true }),
       },
       { type: 'separator' },
       {

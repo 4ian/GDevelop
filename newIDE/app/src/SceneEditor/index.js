@@ -598,16 +598,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { project, layout } = this.props;
 
     //eslint-disable-next-line
-    const answer = confirm(
-      'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
-    );
 
     if (global) {
       gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
         project,
         object.getName(),
         /* isObjectGroup=*/ false,
-        !!answer
       );
     } else {
       gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
@@ -615,7 +611,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         layout,
         object.getName(),
         /* isObjectGroup=*/ false,
-        !!answer
       );
     }
     done(true);

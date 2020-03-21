@@ -35,6 +35,7 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
         fullWidth
         value={value}
         onChange={onChange}
+        onRequestClose={this.props.onRequestClose}
         openOnFocus={isInline}
         dataSource={layerNames.map(layerName => ({
           text: layerName ? `"${layerName}"` : '"" (Base layer)',

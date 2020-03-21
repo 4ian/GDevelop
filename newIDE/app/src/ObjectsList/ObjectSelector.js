@@ -19,6 +19,7 @@ type Props = {|
 
   onChoose?: string => void,
   onChange: string => void,
+  onRequestClose?: () => void,
   value: string,
   errorTextIfInvalid?: React.Node,
 
@@ -99,6 +100,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       noGroups,
       errorTextIfInvalid,
       margin,
+      onRequestClose,
       ...rest
     } = this.props;
 
@@ -121,6 +123,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         value={value}
         onChange={onChange}
         onChoose={onChoose}
+        onRequestClose={onRequestClose}
         dataSource={objectAndGroups}
         errorText={hasValidChoice ? undefined : errorTextIfInvalid}
         ref={field => (this._field = field)}

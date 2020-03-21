@@ -35,6 +35,7 @@ type Props = {|
 
   id?: string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
+  onRequestClose?: () => void,
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
@@ -154,6 +155,7 @@ const handleChange = (
           : props.onChange(option.value);
     }
   }
+  if (props.onRequestClose) props.onRequestClose();
 };
 
 const getDefaultStylingProps = (
@@ -172,6 +174,11 @@ const getDefaultStylingProps = (
     inputProps: {
       ...inputProps,
       className: null,
+      disabled: props.disabled,
+      onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
+        if (event.key === 'Escape' && props.onRequestClose)
+          props.onRequestClose();
+      },
     },
   };
 };

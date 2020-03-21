@@ -957,7 +957,7 @@ bool Project::ValidateObjectName(const gd::String& name) {
 }
 
 gd::String Project::GetBadObjectNameWarning() {
-  return _("Please use only letters, digits\nand underscores ( _ ).");
+  return _("Object names cannot be started with a digit\nand can only contain letters, digits and underscores (_)");
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {

@@ -634,7 +634,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       return false;
     } else if (!gd.Project.validateObjectName(newName)) {
       showWarningBox(
-        'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your object name.'
+        'Please ensure that object name do not start with a digit and contains only alphanumeric characters (0-9, a-z) and underscores'
       );
       return false;
     }

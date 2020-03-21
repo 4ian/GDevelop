@@ -1,6 +1,12 @@
 gdjs.PixiFiltersTools.registerFilterCreator('RadialBlur', {
   makePIXIFilter: function(layer, effectData) {
     var radialBlurFilter = new PIXI.filters.RadialBlurFilter();
+    PIXI.filters.RadialBlurFilter.prototype.apply = function(filterManager, input, output, clear) {
+      this.center[0] = Math.round(this._centerX * input.sourceFrame.width);
+      this.center[1] = Math.round(this._centerY * input.sourceFrame.height);
+      this.uniforms.uKernelSize = this._angle !== 0 ? this.kernelSize : 0;
+      filterManager.applyFilter(this, input, output, clear);
+    }
 
     return radialBlurFilter;
   },
@@ -17,10 +23,10 @@ gdjs.PixiFiltersTools.registerFilterCreator('RadialBlur', {
       filter.kernelSize = gdjs.PixiFiltersTools.clampKernelSize(value, 3, 25);
     }
     else if (parameterName === 'centerX') {
-      filter.center[0] = value;
+      filter._centerX = value;
     }
     else if (parameterName === 'centerY') {
-      filter.center[1] = value;
+      filter._centerY = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {

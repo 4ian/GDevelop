@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -109,6 +110,7 @@ export type PreferencesValues = {|
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
+  projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
 |};
 
 /**
@@ -130,6 +132,12 @@ export type Preferences = {|
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setShowEffectParameterNames: (enabled: boolean) => void,
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
+  setLastUsedPath: (
+    project: gdProject,
+    kind: ResourceKind,
+    path: string
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -147,6 +155,7 @@ export const initialPreferences = {
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
+    projectLastUsedPaths: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -162,6 +171,8 @@ export const initialPreferences = {
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
+  setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

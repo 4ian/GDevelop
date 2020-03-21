@@ -33,6 +33,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
 
   double GetGravity() const { return gravity; };
   double GetMaxFallingSpeed() const { return maxFallingSpeed; };
+  double GetLadderClimbingSpeed() const {return ladderClimbingSpeed};
   double GetAcceleration() const { return acceleration; };
   double GetDeceleration() const { return deceleration; };
   double GetMaxSpeed() const { return maxSpeed; };
@@ -45,6 +46,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
   };
   void SetAcceleration(double acceleration_) { acceleration = acceleration_; };
   void SetDeceleration(double deceleration_) { deceleration = deceleration_; };
+  void SetLadderClimbingSpeed(double ladderClimbingSpeed) { ladderClimbingSpeed = ladderClimbingSpeed_; };
   void SetMaxSpeed(double maxSpeed_) { maxSpeed = maxSpeed_; };
   void SetJumpSpeed(double jumpSpeed_) { jumpSpeed = jumpSpeed_; };
   bool SetSlopeMaxAngle(double slopeMaxAngle_);
@@ -180,6 +182,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
                            ///< X and Y axis.
   double gravity;          ///< In pixels.seconds^-2
   double maxFallingSpeed;  ///< In pixels.seconds^-1
+  double ladderClimbingSpeed;
   double acceleration;     ///< In pixels.seconds^-2
   double deceleration;     ///< In pixels.seconds^-2
   double maxSpeed;         ///< In pixels.seconds^-1

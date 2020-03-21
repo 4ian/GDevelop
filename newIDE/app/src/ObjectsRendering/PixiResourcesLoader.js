@@ -147,122 +147,116 @@ export default class PixiResourcesLoader {
     return loadedTextures[resourceName];
   }
 
-  static createTileSetResource(
-    tiledData: any,
-    tex: any,
-    requestedTileSetId: string,
-    onLoad: any => void
-  ) {
-    // Todo implement tileset index and use it instead of 0
-    const { tilewidth, tilecount, tileheight, tiles } = tiledData.tilesets[0];
-    console.log('NEW TILESET data::', tilewidth, tilecount, tileheight, tiles);
-    const textureCache = new Array(tilecount).fill(0).map((_, frame) => {
-      const cols = Math.floor(tex.width / tilewidth);
-      const x = ((frame - 1) % cols) * tilewidth;
-      const y = Math.floor((frame - 1) / cols) * tileheight;
-      const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
-      const texture = new PIXI.Texture(tex, rect);
-      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-      texture.cacheAsBitmap = true;
-
-      return texture;
-    });
-    const newTileset = {
-      width: tex.width,
-      height: tex.height,
-      tilewidth,
-      tileheight,
-      texture: tex,
-      textureCache,
-      layers: tiledData.layers,
-      tiles,
-      tilecount,
-    };
-    onLoad(newTileset);
-    loadedTileSets[requestedTileSetId] = newTileset;
-  }
-
-  // If a Tileset changes (json or image), a tilemap using it needs to re-render
-  // The tileset needs to be rebuilt for use
-  // But we need to have the capacity to instance a tilemap, so more than one tilemaps with different tileset layers
-  // We need to cache the tileset somewhere, the tilemap instance will have to re-render it
-  // Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
-  // tileset id == jsonResourceName + imageResourcename
   static getPIXITileSet(
     project: gdProject,
     imageResourceName: string,
     jsonResourceName: string,
-    onLoad: any => null
+    onLoad: () => any
   ) {
     const texture = this.getPIXITexture(project, imageResourceName);
-    const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;
+    // console.log(project.getJsonManager())
+    class TileSet {
+      constructor({ tiled, texture, offset }) {
+        const tileset = tiled.tilesets[0];
+        const { tileheight, tilewidth, tilecount, tiles } = tileset;
+        this.tilewidth = tilewidth;
+        this.tileheight = tileheight;
+        this.offset = offset || 0;
+        this.texture = texture;
+        this.textureCache = [];
+        this.scaleMode = PIXI.SCALE_MODES.NEAREST;
+        this.layers = tiled.layers;
+        this.tiles = tiles;
+        this.prepareTextures(tilecount);
+      }
+      get width() {
+        return this.texture.width;
+      }
+      get height() {
+        return this.texture.height;
+      }
+      prepareTextures(count) {
+        var size =
+          count ||
+          (this.width / this.tilewidth) * (this.height / this.tileheight);
 
-    // If the tileset is already in the cache, just load it
-    if (loadedTileSets[requestedTileSetId]) {
-      onLoad(loadedTileSets[requestedTileSetId]);
-      return;
+        this.textureCache = new Array(size)
+          .fill(0)
+          .map((_, frame) => this.prepareTexture(frame));
+      }
+      prepareTexture(frame) {
+        var cols = Math.floor(this.width / this.tilewidth);
+        var x = ((frame - this.offset) % cols) * this.tilewidth;
+        var y = Math.floor((frame - this.offset) / cols) * this.tileheight;
+        var rect = new PIXI.Rectangle(x, y, this.tilewidth, this.tileheight);
+        var texture = new PIXI.Texture(this.texture, rect);
+
+        texture.baseTexture.scaleMode = this.scaleMode;
+        texture.cacheAsBitmap = true;
+
+        return texture;
+      }
+      getFrame(frame) {
+        if (!this.textureCache[frame]) {
+          this.prepareTexture(frame);
+        }
+
+        return this.textureCache[frame];
+      }
     }
-    // Otherwise proceed to creating it as an object that can easily be consumed by a tilemap
+
     ResourcesLoader.getResourceJsonData(project, jsonResourceName).then(
-      tiledData => {
-        this.createTileSetResource(
-          tiledData,
+      tiled => {
+        console.log(tiled);
+
+        const TILESET = new TileSet({
           texture,
-          requestedTileSetId,
-          onLoad
-        );
+          offset: 1,
+          tiled,
+        });
+
+        console.log('>>>', TILESET);
+        onLoad(TILESET);
+        // return TILESET;
       }
     );
   }
 
-  // Add options here
-  static updatePIXITileMap(
-    tileSet: any,
-    tileMap: any,
-    render: 'index' | 'visible' | 'all',
-    layerIndex: number
-  ) {
+  static updatePIXITileMap(tileSet: any, tileMap: any) {
     if (!tileMap || !tileSet) return;
-
-    tileSet.layers.forEach((layer, index) => {
-      if (render === 'index' && layerIndex !== index) return;
-      else if (render === 'visible' && !layer.visible) return;
-
-      // todo filter groups
+    console.log('RELOADING', tileSet, tileMap);
+    tileSet.layers.forEach(layer => {
+      if (!layer.visible) return;
       if (layer.type === 'objectgroup') {
         layer.objects.forEach(object => {
-          const { gid, x, y, visible } = object;
-          if (render === 'visible' && !visible) return;
-          if (tileSet.textureCache[gid]) {
-            tileMap.addFrame(
-              tileSet.textureCache[gid],
-              x,
-              y - tileSet.tileheight
-            );
+          var { gid, id, width, height, x, y, visible } = object;
+          if (visible === false) return;
+          if (tileSet.getFrame(gid)) {
+            tileMap.addFrame(tileSet.getFrame(gid), x, y - tileSet.tileheight);
           }
         });
       } else if (layer.type === 'tilelayer') {
-        let ind = 0;
-        for (let i = 0; i < layer.height; i++) {
-          for (let j = 0; j < layer.width; j++) {
-            const xPos = tileSet.tilewidth * j;
-            const yPos = tileSet.tileheight * i;
+        var ind = 0;
+        for (var i = 0; i < layer.height; i++) {
+          for (var j = 0; j < layer.width; j++) {
+            var xPos = tileSet.tilewidth * j;
+            var yPos = tileSet.tileheight * i;
 
-            const tileUid = layer.data[ind];
+            var tileUid = layer.data[ind];
 
             if (tileUid !== 0) {
-              const tileData = tileSet.tiles.find(
+              var tileData = tileSet.tiles.find(
                 tile => tile.id === tileUid - 1
               );
 
               // Animated tiles have a limitation with only being able to use frames arranged one to each other on the image resource
               if (tileData && tileData.animation) {
                 tileMap
-                  .addFrame(tileSet.textureCache[tileUid], xPos, yPos)
+                  .addFrame(tileSet.getFrame(tileUid), xPos, yPos)
                   .tileAnimX(tileSet.tilewidth, tileData.animation.length);
               } else {
                 // Non animated props dont require tileAnimX or Y
-                tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos);
+                tileMap.addFrame(tileSet.getFrame(tileUid), xPos, yPos);
               }
             }
 

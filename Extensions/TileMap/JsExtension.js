@@ -417,6 +417,30 @@ module.exports = {
     ) {
       return 'JsPlatform/Extensions/skeletonicon.png';
     };
+
+    RenderedTileMapInstance.prototype._getTileset = function(onready) {
+      // Get the tileset resource to use
+      // const tilemapAtlasImage = this._associatedObject
+      //   .getProperties(this.project)
+      //   .get('tilemapAtlasImage')
+      //   .getValue();
+      // const tiledFile = this._associatedObject
+      //   .getProperties(this.project)
+      //   .get('tiledFile')
+      //   .getValue();
+      // try {
+      //   const tileSet = this._pixiResourcesLoader.getPIXITileSet(
+      //     this._project,
+      //     tilemapAtlasImage,
+      //     tiledFile
+      //   );
+      //   console.log(tileSet);
+      //   onready(tileSet);
+      // } catch (e) {
+      //   console.error('Tileset failed to load', e);
+      //   onready(null);
+      // }
+    };
     /**
      * This is called to update the Tilemap
      */
@@ -430,17 +454,6 @@ module.exports = {
         .getProperties(this.project)
         .get('tiledFile')
         .getValue();
-      const layerIndex = parseInt(
-        this._associatedObject
-          .getProperties(this.project)
-          .get('layerIndex')
-          .getValue(),
-        0
-      );
-      const render = this._associatedObject
-        .getProperties(this.project)
-        .get('render')
-        .getValue();
 
       this._pixiResourcesLoader.getPIXITileSet(
         this._project,
@@ -451,34 +464,24 @@ module.exports = {
           if (tileset && this._pixiObject) {
             this._pixiResourcesLoader.updatePIXITileMap(
               tileset,
-              this._pixiObject,
-              render,
-              layerIndex
+              this._pixiObject
             );
-
-            console.log(
-              'update list-->',
-              this._associatedObject.getProperties(this.project),
-              this._associatedObject.getProperties(this.project).get('render')
-            );
-
-            // this._associatedObject.getProperties(this.project).set(
-            //   'render',
-            //   new gd.PropertyDescriptor(this._pixiObject.render)
-            //     .setType('choice')
-            //     .addExtraInfo('er')
-            //     .addExtraInfo('ff')
-            //     .addExtraInfo('iggndex')
-            //     .setLabel('Render')
-            // );
-            // this._associatedObject
-            //   .getProperties(this.project)
-            //   .get('render')
-            //   .addExtraInfo('TEST');
-            // .getValue();
           }
         }
       );
+
+      // this._tileSet = this._getTileset(tileSet => {
+      //   console.log('Update');
+      //   this._tileSet = tileSet;
+      //   console.log('TRY', this._tileSet, this._pixiObject);
+
+      //   if (this._tileSet !== null && this._pixiObject !== null) {
+      //     this._pixiResourcesLoader.updatePIXITileMap(
+      //       this._tileSet,
+      //       this._pixiObject
+      //     );
+      //   }
+      // });
     };
     /**
      * This is called to update the PIXI object on the scene editor

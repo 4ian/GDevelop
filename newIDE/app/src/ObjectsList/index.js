@@ -183,7 +183,10 @@ export default class ObjectsList extends React.Component<Props, State> {
     this.setState({ newObjectDialogOpen: true });
   };
 
-  _deleteObject = (objectWithContext: ObjectWithContext, { askForConfirmation }: {| askForConfirmation: boolean |}) => {
+  _deleteObject = (
+    objectWithContext: ObjectWithContext,
+    { askForConfirmation }: {| askForConfirmation: boolean |}
+  ) => {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
@@ -463,7 +466,8 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: 'Delete',
-        click: () => this._deleteObject(objectWithContext, { askForConfirmation: true }),
+        click: () =>
+          this._deleteObject(objectWithContext, { askForConfirmation: true }),
       },
       { type: 'separator' },
       {

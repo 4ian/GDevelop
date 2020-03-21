@@ -603,14 +603,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
         project,
         object.getName(),
-        /* isObjectGroup=*/ false,
+        /* isObjectGroup=*/ false
       );
     } else {
       gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
         project,
         layout,
         object.getName(),
-        /* isObjectGroup=*/ false,
+        /* isObjectGroup=*/ false
       );
     }
     done(true);

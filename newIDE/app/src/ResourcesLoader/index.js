@@ -1,4 +1,5 @@
 // @flow
+import axios from 'axios';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -145,5 +146,23 @@ export default class ResourcesLoader {
     }
 
     return resourceName;
+  }
+
+  /**
+   * Get the fully qualified URL/filename associated with the given resource.
+   */
+  static getResourceJsonData(project: gdProject, resourceName: string) {
+    if (!project.getResourcesManager().hasResource(resourceName))
+      return Promise.reject(); // TODO or something if resource does not exist
+
+    // Get the resource
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'json') return Promise.reject(); // TODO something if resource is not json
+
+    // Get its URL (can be a path locally, but we still call it a URL)
+    const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName);
+
+    // Use axios to do a request to the fullUrl. Double check if it works with local paths.
+    return axios.get(fullUrl).then(response => response.data);
   }
 }

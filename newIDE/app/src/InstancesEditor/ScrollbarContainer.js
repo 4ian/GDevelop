@@ -29,18 +29,18 @@ type ScrollableComponent = {
   getViewPosition: () => ?ViewPosition,
 };
 
-type Props = {
+type Props = {|
   wrappedEditorRef: ?(?ScrollableComponent) => void,
-};
+|};
 
-type State = {
+type State = {|
   xValue: number,
   yValue: number,
   xMin: number,
   xMax: number,
   yMin: number,
   yMax: number,
-};
+|};
 
 const noop = () => {};
 

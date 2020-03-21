@@ -385,6 +385,8 @@ struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
                                                ///separator, if any.
   ExpressionParserLocation
       openingParenthesisLocation;  ///< Location of the "(".
+  ExpressionParserLocation
+      closingParenthesisLocation;  ///< Location of the ")".
 };
 
 /**

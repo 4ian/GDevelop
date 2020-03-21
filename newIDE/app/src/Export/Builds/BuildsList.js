@@ -11,12 +11,14 @@ import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import BuildProgress from './BuildProgress';
+import { type UserProfile } from '../../Profile/UserProfileContext';
 import format from 'date-fns/format';
 import difference_in_calendar_days from 'date-fns/difference_in_calendar_days';
 import Text from '../../UI/Text';
 
 type Props = {|
   builds: ?Array<Build>,
+  userProfile: UserProfile,
   onDownload: (build: Build, key: BuildArtifactKeyName) => void,
 |};
 
@@ -41,7 +43,7 @@ const formatBuildText = (
   }
 };
 
-export default ({ builds, onDownload }: Props) => {
+export default ({ builds, userProfile, onDownload }: Props) => {
   return (
     <Column noMargin expand>
       <Line>
@@ -49,19 +51,23 @@ export default ({ builds, onDownload }: Props) => {
           <EmptyMessage>
             <Trans>
               This is the list of builds that you've done. Note that you can
-              download games generated during to 7 days, after which they are
-              removed.
+              download games generated during the last 7 days, after which they
+              are removed.
             </Trans>
           </EmptyMessage>
         </Column>
       </Line>
       <Line>
-        {!builds ? (
+        {!userProfile.authenticated ? (
+          <EmptyMessage>
+            <Trans>You need to login first to see your builds.</Trans>
+          </EmptyMessage>
+        ) : !builds ? (
           <PlaceholderLoader />
         ) : builds.length === 0 ? (
           <EmptyMessage>
             <Trans>
-              You don't have any builds on the online services for now
+              You don't have any builds on the online services for now.
             </Trans>
           </EmptyMessage>
         ) : (

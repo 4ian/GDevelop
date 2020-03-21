@@ -7,6 +7,10 @@ export default class ResourcesEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  forceUpdateEditor() {
+    // No updates to be done.
+  }
+
   render() {
     const { project } = this.props;
 

@@ -8,7 +8,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('ZoomBlur', {
   },
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === 'centerX') {
-      filter.center[0]= Math.round(window.innerWidth * value);
+      filter.center[0] = Math.round(window.innerWidth * value);
     }
     else if (parameterName === 'centerY') {
       filter.center[1] = Math.round(window.innerHeight * value);

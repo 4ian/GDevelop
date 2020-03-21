@@ -13,12 +13,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-export default ({
-  onClose,
-  storageProviders,
-  onChooseProvider,
-  onCreateNewProject,
-}: Props) => {
+export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
   return (
     <I18n>
       {({ i18n }) => (

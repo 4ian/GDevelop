@@ -37,6 +37,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
   double GetDeceleration() const { return deceleration; };
   double GetMaxSpeed() const { return maxSpeed; };
   double GetJumpSpeed() const { return jumpSpeed; };
+  double GetLadderClimbingSpeed() const { return ladderClimbingSpeed; };
   double GetSlopeMaxAngle() const { return slopeMaxAngle; };
 
   void SetGravity(double gravity_) { gravity = gravity_; };
@@ -47,6 +48,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
   void SetDeceleration(double deceleration_) { deceleration = deceleration_; };
   void SetMaxSpeed(double maxSpeed_) { maxSpeed = maxSpeed_; };
   void SetJumpSpeed(double jumpSpeed_) { jumpSpeed = jumpSpeed_; };
+  void SetLadderClimbingSpeed(double ladderClimbingSpeed_) { ladderClimbingSpeed = ladderClimbingSpeed_; };
   bool SetSlopeMaxAngle(double slopeMaxAngle_);
   void SetCanJump() { canJump = true; };
   void SetCanGrabPlatforms(bool enable);
@@ -184,6 +186,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
   double deceleration;     ///< In pixels.seconds^-2
   double maxSpeed;         ///< In pixels.seconds^-1
   double jumpSpeed;        ///< In pixels.seconds^-1
+  double ladderClimbingSpeed; ///< In pixels.seconds^-1
   double slopeMaxAngle;    ///< In degrees
   double slopeClimbingFactor;  ///< Equals to tan(slopeMaxAngle).
   bool canGrabPlatforms;  ///< True to allow the object to grab platform ledges.

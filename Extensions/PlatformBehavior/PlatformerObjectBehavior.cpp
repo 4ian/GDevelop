@@ -39,6 +39,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("canGrabPlatforms", false);
   behaviorContent.SetAttribute("yGrabOffset", 0);
   behaviorContent.SetAttribute("xGrabTolerance", 10);
+  behaviorContent.SetAttribute("ladderClimbingSpeed", 150);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -80,6 +81,8 @@ PlatformerObjectBehavior::GetProperties(
                     ? "true"
                     : "false")
       .SetType("Boolean");
+   properties[_("Ladder climbing speed")].SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("ladderClimbingSpeed")));
 
   return properties;
 }
@@ -112,6 +115,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
       behaviorContent.SetAttribute("maxSpeed", value.To<double>());
     else if (name == _("Jump speed"))
       behaviorContent.SetAttribute("jumpSpeed", value.To<double>());
+    else if (name == _("Ladder climbing speed"))
+      behaviorContent.SetAttribute("ladderClimbingSpeed", value.To<double>());
     else if (name == _("Slope max. angle")) {
       double newMaxAngle = value.To<double>();
       if (newMaxAngle < 0 || newMaxAngle >= 90) return false;

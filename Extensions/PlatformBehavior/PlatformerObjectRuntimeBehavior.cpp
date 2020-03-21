@@ -43,6 +43,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       currentSpeed(0),
       jumping(false),
       currentJumpSpeed(0),
+      ladderClimbingSpeed(150),
       canJump(false),
       hasReallyMoved(false),
       isGrabbingPlatform(false),
@@ -68,6 +69,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
   deceleration = behaviorContent.GetDoubleAttribute("deceleration");
   maxSpeed = behaviorContent.GetDoubleAttribute("maxSpeed");
   jumpSpeed = behaviorContent.GetDoubleAttribute("jumpSpeed");
+  ladderClimbingSpeed = behaviorContent.GetDoubleAttribute("ladderClimbingSpeed");
   ignoreDefaultControls =
       behaviorContent.GetBoolAttribute("ignoreDefaultControls");
   SetSlopeMaxAngle(behaviorContent.GetDoubleAttribute("slopeMaxAngle"));
@@ -245,8 +247,8 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
     downKey |=
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
-    if (upKey) requestedDeltaY -= 150 * timeDelta;
-    if (downKey) requestedDeltaY += 150 * timeDelta;
+    if (upKey) requestedDeltaY -= ladderClimbingSpeed * timeDelta;
+    if (downKey) requestedDeltaY += ladderClimbingSpeed * timeDelta;
 
     // Coming to an extremity of a ladder
     if (!IsOverlappingLadder(potentialObjects)) {

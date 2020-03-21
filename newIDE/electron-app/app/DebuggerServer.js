@@ -61,5 +61,5 @@ module.exports = {
     webSockets[id].send(message, err => {
       cb(err);
     });
-  }
+  },
 };

@@ -1,21 +1,20 @@
 // @flow
 import * as React from 'react';
+import { useState } from 'react';
 import { I18n } from '@lingui/react';
-import Downshift from 'downshift';
 import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
-import Divider from '@material-ui/core/Divider';
-import Paper from '@material-ui/core/Paper';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from './ListIcon';
-import Popper from '@material-ui/core/Popper';
-import muiZIndex from '@material-ui/core/styles/zIndex';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import { computeTextFieldStyleProps } from './TextField';
 import { MarkdownText } from './MarkdownText';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import ListItem from '@material-ui/core/ListItem';
+import { computeTextFieldStyleProps } from './TextField';
+import { makeStyles } from '@material-ui/core/styles';
+import muiZIndex from '@material-ui/core/styles/zIndex';
 
-export type DataSource = Array<
+type Option =
   | {|
       type: 'separator',
     |}
@@ -24,91 +23,9 @@ export type DataSource = Array<
       value: string, // The value to show on screen and to be selected
       onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
-    |}
->;
+    |};
 
-const styles = {
-  container: {
-    position: 'relative',
-  },
-  inputRoot: {
-    flexWrap: 'wrap',
-  },
-  inputInput: {
-    width: 'auto',
-    flexGrow: 1,
-  },
-  menuPopper: {
-    // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
-    // There will be only one AutoComplete opened at a time, so it's fair to put the
-    // highest z index. If this is breaking, check the z-index of material-ui.
-    zIndex: muiZIndex.tooltip + 100,
-  },
-  menuPaper: {
-    marginTop: 8,
-    // Limit the size of the menu:
-    maxHeight: 250,
-    overflowY: 'auto',
-  },
-};
-
-function renderTextField(textFieldProps) {
-  const { InputProps, ...other } = textFieldProps;
-
-  return (
-    <TextField
-      InputProps={{
-        style: styles.inputRoot,
-        ...InputProps,
-      }}
-      // eslint-disable-next-line react/jsx-no-duplicate-props
-      inputProps={{
-        style: styles.inputInput,
-      }}
-      {...other}
-    />
-  );
-}
-
-function renderItem(itemProps) {
-  const { item, index, menuItemProps, highlightedIndex, selected } = itemProps;
-
-  if (item.type === 'separator') {
-    return <Divider key={'separator-' + index} />;
-  }
-
-  const isHighlighted = highlightedIndex === index;
-
-  return (
-    <MenuItem
-      {...menuItemProps}
-      dense
-      key={
-        item.value
-          ? 'item-with-value-' + item.value
-          : 'item-without-value' + index
-      }
-      selected={isHighlighted}
-      component="div"
-      style={{
-        fontWeight: selected ? 500 : 400,
-      }}
-    >
-      {item.renderIcon && <ListItemIcon>{item.renderIcon()}</ListItemIcon>}
-      {item.value}
-    </MenuItem>
-  );
-}
-
-const filterDataSource = (dataSource: DataSource, inputValue: string) => {
-  const lowercaseInputValue = inputValue.toLowerCase();
-  return dataSource.filter(item => {
-    if (item.type === 'separator') return true;
-    if (!item.text) return true;
-
-    return item.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
-  });
-};
+export type DataSource = Array<Option>;
 
 type Props = {|
   value: string,
@@ -117,11 +34,7 @@ type Props = {|
   dataSource: DataSource,
 
   id?: string,
-  onBlur?: (event: {|
-    currentTarget: {|
-      value: string,
-    |},
-  |}) => void,
+  onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
@@ -133,225 +46,248 @@ type Props = {|
   openOnFocus?: boolean,
 |};
 
-type State = {|
-  inputValue: string | null,
+export type SemiControlledAutoCompleteInterface = {|
+  focus: () => void,
+  forceInputValueTo: (newValue: string) => void,
 |};
 
-/**
- * An autocomplete field, showing options as the user type (or when the user presses down button).
- * Options can be chosen with keyboard or mouse.
- *
- * Supports divider between items and special items with `onClick` prop that when present is called
- * when the item is selected (and value is not changed).
- */
-export default class SemiControlledAutoComplete extends React.Component<
-  Props,
-  State
-> {
-  _input = React.createRef<HTMLInputElement>();
-  state = {
-    inputValue: null,
-  };
+const styles = {
+  container: {
+    position: 'relative',
+    width: '100%',
+  },
+  listItem: {
+    padding: 0,
+    margin: 0,
+    display: 'inline-block',
+    whiteSpace: 'nowrap',
+    width: 'calc(100%)',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
 
-  /**
-   * Allow to override the value being written in the autocomplete, if any.
-   * Usually you don't want to do that as the point of having a "SemiControlled" auto-complete
-   * is that the value being written by the user is the source of truth.
-   *
-   * In some cases, you want to force a new value when the auto-complete is focused (for example,
-   * if you opened a native dialog selector that is going to make the auto-complete focused/blurred/
-   * focused again, in a manner that depends on the OS).
-   * Call this function to do so.
-   *
-   * @param newValue The new value to set in the auto complete. If the field is not being focused,
-   * nothing will be forced (the value props will be used when the field is focused).
-   */
-  forceInputValueTo(newValue: string) {
-    if (this.state.inputValue !== null) {
-      this.setState({
-        inputValue: newValue,
-      });
+const useStyles = makeStyles({
+  option: {
+    cursor: 'default',
+  },
+  listbox: {
+    padding: 0,
+    margin: 0,
+  },
+  input: {
+    width: 'auto',
+    flexGrow: 1,
+  },
+  inputRoot: {
+    flexWrap: 'wrap',
+  },
+  popper: {
+    zIndex: muiZIndex.tooltip + 100,
+  },
+});
+
+const renderItem = (option: Option, state: Object): React.Node => {
+  if (option.type && option.type === 'separator') {
+    return (
+      <ListItem
+        divider
+        disableGutters
+        component={'div'}
+        style={styles.listItem}
+      />
+    );
+  }
+  return (
+    <ListItem component={'div'} style={styles.listItem}>
+      {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
+      {option.value}
+    </ListItem>
+  );
+};
+
+const isOptionDisabled = (option: Option) =>
+  option.type === 'separator' ? true : false;
+
+const filterFunction = (
+  options: DataSource,
+  state: Object,
+  value: string
+): DataSource => {
+  const lowercaseInputValue = value.toLowerCase();
+  const optionList = options.filter(option => {
+    if (option.type === 'separator') return true;
+    if (!option.text) return true;
+    return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
+  });
+
+  if (
+    !optionList.filter(option => option.type !== 'separator' && option.value)
+      .length
+  )
+    return [];
+
+  // Remove divider(s) if they are at the start or end of array
+  while (
+    optionList[optionList.length - 1] !== undefined &&
+    optionList[optionList.length - 1].type !== undefined
+  )
+    optionList.pop();
+  while (optionList[0] !== undefined && optionList[0].type !== undefined)
+    optionList.shift();
+
+  return optionList;
+};
+
+const handleChange = (
+  event: SyntheticKeyboardEvent<HTMLInputElement>,
+  option: Option | string,
+  props: Props
+): void => {
+  if (option.type !== 'separator') {
+    if (typeof option === 'string') props.onChange(option);
+    else {
+      if (option.onClick) option.onClick();
+      else
+        props.onChoose
+          ? props.onChoose(option.value)
+          : props.onChange(option.value);
     }
   }
+};
 
-  focus() {
-    if (this._input.current) this._input.current.focus();
-  }
+const getDefaultStylingProps = (
+  params: Object,
+  value: string,
+  props: Props
+): Object => {
+  const { InputProps, inputProps, InputLabelProps, ...other } = params;
+  return {
+    ...other,
+    InputProps: {
+      ...InputProps,
+      className: null,
+      endAdornment: null,
+    },
+    inputProps: {
+      ...inputProps,
+      className: null,
+    },
+  };
+};
 
-  render() {
-    const { props, state } = this;
-    const currentInputValue =
-      state.inputValue !== null ? state.inputValue : props.value;
+const getOptionLabel = (option: Option, value: string): string =>
+  option.value ? option.value : value;
+
+export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
+  function SemiControlledAutoComplete(props: Props, ref) {
+    const input = React.useRef((null: ?HTMLInputElement));
+    const [inputValue, setInputValue] = useState((null: string | null));
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const classes = useStyles();
+
+    React.useImperativeHandle(ref, () => ({
+      focus: () => {
+        if (input.current) input.current.focus();
+      },
+      forceInputValueTo: (newValue: string) => {
+        if (inputValue !== null) setInputValue(newValue);
+      },
+    }));
+
+    const currentInputValue = inputValue !== null ? inputValue : props.value;
 
     const helperText = props.helperMarkdownText ? (
       <MarkdownText source={props.helperMarkdownText} />
     ) : null;
 
+    const handleInputChange = (
+      event: SyntheticKeyboardEvent<HTMLInputElement>,
+      value: string,
+      reason: string
+    ): void => {
+      setInputValue(value);
+      if (!isMenuOpen) setIsMenuOpen(true);
+    };
+
     return (
       <I18n>
         {({ i18n }) => (
-          <Downshift
-            inputValue={currentInputValue}
-            onChange={selectedItem => {
-              if (selectedItem !== null) {
-                if (selectedItem.onClick) {
-                  selectedItem.onClick();
-
-                  // Reset the value shown to the current value,
-                  // as the menu item clicked is not a "value" to be
-                  // chosen.
-                  this.setState({
-                    inputValue: props.value,
-                  });
-                } else {
-                  // Call onChoose, if available, as this is a real selection
-                  // of an item (contrary to onChange, which can be called even
-                  // with a partial input when the field is blurred)
-                  if (props.onChoose) props.onChoose(selectedItem.value);
-                  else props.onChange(selectedItem.value);
-                }
+          <Autocomplete
+            freeSolo
+            classes={classes}
+            onChange={(
+              event: SyntheticKeyboardEvent<HTMLInputElement>,
+              option: Option | string | null
+            ) => {
+              if (option !== null) {
+                handleChange(event, option, props);
+                setIsMenuOpen(false);
               }
             }}
-            onInputValueChange={inputValue => {
-              this.setState({ inputValue });
-            }}
-            itemToString={item =>
-              item ? (item.type === 'separator' ? '' : item.value) : ''
+            open={isMenuOpen}
+            style={styles.container}
+            inputValue={currentInputValue}
+            value={currentInputValue}
+            onInputChange={handleInputChange}
+            options={props.dataSource}
+            renderOption={renderItem}
+            getOptionDisabled={isOptionDisabled}
+            getOptionLabel={(option: Option) =>
+              getOptionLabel(option, currentInputValue)
             }
-          >
-            {({
-              getInputProps,
-              getItemProps,
-              getLabelProps,
-              getMenuProps,
-
-              // Actions:
-              closeMenu,
-              openMenu,
-
-              // State:
-              highlightedIndex,
-              inputValue,
-              isOpen,
-              selectedItem,
-            }) => {
-              const { onBlur, ...inputProps } = getInputProps({
-                placeholder:
-                  typeof props.hintText === 'string'
-                    ? props.hintText
-                    : i18n._(props.hintText),
-                disabled: props.disabled,
-              });
-
-              // Wrap onBlur to close the menu and commit the changes to the value
-              const wrappedOnBlur = event => {
-                onBlur(event);
-
-                // Downshift will, after the blur event, reset the state so that the
-                // input value is itemToString applied to the selected item - which can
-                // be null as we allow whatever value is entered, even an incomplete one.
-                // Use a setTimeout to clear the inputValue just after Downshift has
-                // changed inputValue.
-                // (this is purely "visual", the onChange props is properly called, this
-                // being done or not)
-                setTimeout(() => {
-                  this.setState({
-                    inputValue: null,
-                  });
-                });
-
-                // Also close the menu
-                closeMenu();
-
-                // Call onChange with whatever value is entered, even an incomplete one.
-                props.onChange(event.currentTarget.value);
-
-                if (props.onBlur) props.onBlur(event);
-              };
-
-              const onFocus = event => {
-                if (props.openOnFocus) openMenu();
-                this.setState({
-                  inputValue: props.value,
-                });
-              };
-
+            filterOptions={(options: DataSource, state) =>
+              filterFunction(options, state, currentInputValue)
+            }
+            renderInput={params => {
+              const {
+                InputProps,
+                inputProps,
+                ...other
+              } = getDefaultStylingProps(params, currentInputValue, props);
               return (
-                <div
-                  style={{
-                    ...styles.container,
-                    flexGrow: props.fullWidth ? 1 : undefined,
+                <TextField
+                  InputProps={{
+                    ...InputProps,
+                    placeholder:
+                      typeof props.hintText === 'string'
+                        ? props.hintText
+                        : i18n._(props.hintText),
                   }}
-                >
-                  {renderTextField({
-                    disabled: props.disabled,
-                    label: props.floatingLabelText,
-                    id: props.id,
-
-                    // Error handling:
-                    error: !!props.errorText,
-                    helperText: props.errorText || helperText,
-
-                    // Display:
-                    InputLabelProps: getLabelProps({ shrink: true }),
-
-                    // Events:
-                    InputProps: {
-                      // We wrap the onBlur/onFocus as we're a "semi controlled" field
-                      onBlur: wrappedOnBlur,
-                      onFocus: onFocus,
+                  inputProps={{
+                    ...inputProps,
+                    onFocus: (
+                      event: SyntheticFocusEvent<HTMLInputElement>
+                    ): void => {
+                      setIsMenuOpen(true);
+                      if (input.current)
+                        input.current.selectionStart =
+                          input.current.value.length;
                     },
-
-                    // Props for the input field from downshift:
-                    inputProps,
-
-                    // Style:
-                    style: props.textFieldStyle,
-                    fullWidth: props.fullWidth,
-                    ...computeTextFieldStyleProps(props),
-
-                    inputRef: this._input,
-                  })}
-                  <Popper
-                    open={isOpen}
-                    anchorEl={this._input.current}
-                    style={styles.menuPopper}
-                  >
-                    <div
-                      {...(isOpen
-                        ? getMenuProps({}, { suppressRefError: true })
-                        : {})}
-                    >
-                      {isOpen ? (
-                        <Paper
-                          style={{
-                            ...styles.menuPaper,
-                            width: this._input.current
-                              ? this._input.current.clientWidth
-                              : undefined,
-                          }}
-                          square
-                        >
-                          {filterDataSource(props.dataSource, inputValue).map(
-                            (item, index) =>
-                              renderItem({
-                                item,
-                                index,
-                                menuItemProps: getItemProps({ item, index }),
-                                highlightedIndex,
-                                selected: item === selectedItem,
-                              })
-                          )}
-                        </Paper>
-                      ) : null}
-                    </div>
-                  </Popper>
-                </div>
+                    onBlur: (
+                      event: SyntheticFocusEvent<HTMLInputElement>
+                    ): void => {
+                      setInputValue(null);
+                      setIsMenuOpen(false);
+                      props.onChange(event.currentTarget.value);
+                      if (props.onBlur) props.onBlur(event);
+                    },
+                  }}
+                  {...other}
+                  {...computeTextFieldStyleProps(props)}
+                  style={props.textFieldStyle}
+                  label={props.floatingLabelText}
+                  inputRef={input}
+                  disabled={props.disabled}
+                  error={!!props.errorText}
+                  helperText={helperText || props.errorText}
+                  fullWidth={props.fullWidth}
+                />
               );
             }}
-          </Downshift>
+          />
         )}
       </I18n>
     );
   }
-}
+);

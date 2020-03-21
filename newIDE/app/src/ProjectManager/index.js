@@ -123,6 +123,7 @@ type ItemProps = {|
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
+  onDuplicate: () => void,
   canPaste: () => boolean,
   canMoveUp: boolean,
   onMoveUp: () => void,
@@ -204,6 +205,10 @@ class Item extends React.Component<ItemProps, {||}> {
                 label: 'Paste',
                 enabled: this.props.canPaste(),
                 click: () => this.props.onPaste(),
+              },
+              {
+                label: 'Duplicate',
+                click: () => this.props.onDuplicate(),
               },
               { type: 'separator' },
               {
@@ -342,6 +347,11 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _duplicateLayout = (layout: gdLayout, index: number) => {
+    this._copyLayout(layout);
+    this._pasteLayout(index);
+  };
+
   _addLayout = (index: number) => {
     const { project } = this.props;
 
@@ -439,6 +449,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _duplicateExternalEvents = (
+    externalEvents: gdExternalEvents,
+    index: number
+  ) => {
+    this._copyExternalEvents(externalEvents);
+    this._pasteExternalEvents(index);
+  };
+
   _moveUpExternalEvents = (index: number) => {
     const { project } = this.props;
     if (index <= 0) return;
@@ -487,6 +505,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _duplicateExternalLayout = (
+    externalLayout: gdExternalLayout,
+    index: number
+  ) => {
+    this._copyExternalLayout(externalLayout);
+    this._pasteExternalLayout(index);
+  };
+
   _moveUpExternalLayout = (index: number) => {
     const { project } = this.props;
     if (index <= 0) return;
@@ -517,6 +543,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   ) => {
     this._copyEventsFunctionsExtension(eventsFunctionsExtension);
     this.props.onDeleteEventsFunctionsExtension(eventsFunctionsExtension);
+  };
+
+  _duplicateEventsFunctionsExtension = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    index: number
+  ) => {
+    this._copyEventsFunctionsExtension(eventsFunctionsExtension);
+    this._pasteEventsFunctionsExtension(index);
   };
 
   _pasteEventsFunctionsExtension = (index: number) => {
@@ -721,6 +755,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
                       onPaste={() => this._pasteLayout(i)}
+                      onDuplicate={() => this._duplicateLayout(layout, i)}
                       canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
                       canMoveUp={i !== 0}
                       onMoveUp={() => this._moveUpLayout(i)}
@@ -781,6 +816,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onCopy={() => this._copyExternalEvents(externalEvents)}
                       onCut={() => this._cutExternalEvents(externalEvents)}
                       onPaste={() => this._pasteExternalEvents(i)}
+                      onDuplicate={() =>
+                        this._duplicateExternalEvents(externalEvents, i)
+                      }
                       canPaste={() =>
                         Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
                       }
@@ -843,6 +881,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onCopy={() => this._copyExternalLayout(externalLayout)}
                       onCut={() => this._cutExternalLayout(externalLayout)}
                       onPaste={() => this._pasteExternalLayout(i)}
+                      onDuplicate={() =>
+                        this._duplicateExternalLayout(externalLayout, i)
+                      }
                       canPaste={() =>
                         Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
                       }
@@ -924,6 +965,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                         )
                       }
                       onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                      onDuplicate={() =>
+                        this._duplicateEventsFunctionsExtension(
+                          eventsFunctionsExtension,
+                          i
+                        )
+                      }
                       canPaste={() =>
                         Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)
                       }

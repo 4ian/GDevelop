@@ -2,6 +2,7 @@
 import * as React from 'react';
 import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor';
 import BaseEditor from './BaseEditor';
+import { emptyPreviewButtonSettings } from '../Toolbar/PreviewButtons';
 
 const styles = {
   container: {
@@ -15,6 +16,10 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
+  }
+
+  forceUpdateEditor() {
+    // No updates to be done.
   }
 
   shouldComponentUpdate(nextProps: *) {
@@ -85,6 +90,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           initiallyFocusedBehaviorName={this.props.initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
           ref={editor => (this.editor = editor)}
+          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </div>
     );

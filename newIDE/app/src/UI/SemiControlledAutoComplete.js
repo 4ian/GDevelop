@@ -142,20 +142,17 @@ const filterFunction = (
 
 const handleChange = (
   event: SyntheticKeyboardEvent<HTMLInputElement>,
-  option: Option | string,
+  option: Option,
   props: Props
 ): void => {
   if (option.type !== 'separator') {
-    if (typeof option === 'string') props.onChange(option);
+    if (option.onClick) option.onClick();
     else {
-      if (option.onClick) option.onClick();
-      else
-        props.onChoose
-          ? props.onChoose(option.value)
-          : props.onChange(option.value);
+      if (props.onChoose) props.onChoose(option.value);
+      props.onChange(option.value);
+      if (props.onRequestClose) props.onRequestClose();
     }
   }
-  if (props.onRequestClose) props.onRequestClose();
 };
 
 const getDefaultStylingProps = (
@@ -225,7 +222,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             classes={classes}
             onChange={(
               event: SyntheticKeyboardEvent<HTMLInputElement>,
-              option: Option | string | null
+              option: Option | null
             ) => {
               if (option !== null) {
                 handleChange(event, option, props);

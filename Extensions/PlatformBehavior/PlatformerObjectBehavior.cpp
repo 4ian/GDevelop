@@ -30,6 +30,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("roundCoordinates", true);
   behaviorContent.SetAttribute("gravity", 1000);
   behaviorContent.SetAttribute("maxFallingSpeed", 700);
+  behaviorContent.SetAttribute("ladderClimbingSpeed", 150);
   behaviorContent.SetAttribute("acceleration", 1500);
   behaviorContent.SetAttribute("deceleration", 1500);
   behaviorContent.SetAttribute("maxSpeed", 250);
@@ -55,6 +56,8 @@ PlatformerObjectBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
   properties[_("Acceleration")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
+  properties[_("Ladder Climbing Speed")].SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("ladderClimbingSpeed")));
   properties[_("Deceleration")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
   properties[_("Max. speed")].SetValue(
@@ -104,6 +107,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
       behaviorContent.SetAttribute("gravity", value.To<double>());
     else if (name == _("Max. falling speed"))
       behaviorContent.SetAttribute("maxFallingSpeed", value.To<double>());
+    else if (name == _("Ladder Climbing Speed"))
+      behaviorContent.SetAttribute("ladderClimbingSpeed", value.To<double>());
     else if (name == _("Acceleration"))
       behaviorContent.SetAttribute("acceleration", value.To<double>());
     else if (name == _("Deceleration"))

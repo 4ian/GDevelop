@@ -957,7 +957,7 @@ bool Project::ValidateObjectName(const gd::String& name) {
 }
 
 gd::String Project::GetBadObjectNameWarning() {
-  return _("Object names cannot be started with a digit\nand can only contain letters, digits and underscores (_)");
+  return _("This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.");
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {

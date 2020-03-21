@@ -149,12 +149,12 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
  * This step is needed for any object before adding Instances of it to the scene.
  * @param {ObjectData} objectData The objectData of the object to register.
  */
-gdjs.registerObject = function(objectData) {
-        this._objects.put(objectData.name, objectData);
-        this._instances.put(objectData.name, []); //Also reserve an array for the instances
-        this._instancesCache.put(objectData.name, []); //and for cached instances
-        this._objectsCtor.put(objectData.name, gdjs.getObjectConstructor(objectType)); //And cache the constructor for the performance sake
-    }
+gdjs.RuntimeScene.prototype.registerObject = function(objectData) {
+    this._objects.put(objectData.name, objectData);
+    this._instances.put(objectData.name, []); //Also reserve an array for the instances
+    this._instancesCache.put(objectData.name, []); //and for cached instances
+    this._objectsCtor.put(objectData.name, gdjs.getObjectConstructor(objectData.type)); //And cache the constructor for the performance sake
+}
 
 /**
  * Called when a scene is "paused", i.e it will be not be rendered again

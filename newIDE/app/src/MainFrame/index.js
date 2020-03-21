@@ -1962,13 +1962,22 @@ class MainFrame extends React.Component<Props, State> {
           (resourceSource, index): React.Node => {
             const Component = resourceSource.component;
             return (
-              <Component
-                key={resourceSource.name}
-                ref={dialog =>
-                  (this._resourceSourceDialogs[resourceSource.name] = dialog)
-                }
-                i18n={i18n}
-              />
+              <PreferencesContext.Consumer key={resourceSource.name}>
+                {({ getLastUsedPath, setLastUsedPath }) => {
+                  return (
+                    <Component
+                      ref={dialog =>
+                        (this._resourceSourceDialogs[
+                          resourceSource.name
+                        ] = dialog)
+                      }
+                      i18n={i18n}
+                      getLastUsedPath={getLastUsedPath}
+                      setLastUsedPath={setLastUsedPath}
+                    />
+                  );
+                }}
+              </PreferencesContext.Consumer>
             );
           }
         )}

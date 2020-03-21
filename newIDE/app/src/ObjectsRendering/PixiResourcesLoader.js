@@ -8,6 +8,7 @@ const gd: libGDevelop = global.gd;
 const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
+const loadedTilesets = {};
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
@@ -144,6 +145,126 @@ export default class PixiResourcesLoader {
     );
 
     return loadedTextures[resourceName];
+  }
+
+  static getPIXITileSet(
+    project: gdProject,
+    imageResourceName: string,
+    jsonResourceName: string,
+    onLoad: () => any
+  ) {
+    const texture = this.getPIXITexture(project, imageResourceName);
+    // console.log(project.getJsonManager())
+    class TileSet {
+      constructor({ tiled, texture, offset }) {
+        const tileset = tiled.tilesets[0];
+        const { tileheight, tilewidth, tilecount, tiles } = tileset;
+        this.tilewidth = tilewidth;
+        this.tileheight = tileheight;
+        this.offset = offset || 0;
+        this.texture = texture;
+        this.textureCache = [];
+        this.scaleMode = PIXI.SCALE_MODES.NEAREST;
+        this.layers = tiled.layers;
+        this.tiles = tiles;
+        this.prepareTextures(tilecount);
+      }
+      get width() {
+        return this.texture.width;
+      }
+      get height() {
+        return this.texture.height;
+      }
+      prepareTextures(count) {
+        var size =
+          count ||
+          (this.width / this.tilewidth) * (this.height / this.tileheight);
+
+        this.textureCache = new Array(size)
+          .fill(0)
+          .map((_, frame) => this.prepareTexture(frame));
+      }
+      prepareTexture(frame) {
+        var cols = Math.floor(this.width / this.tilewidth);
+        var x = ((frame - this.offset) % cols) * this.tilewidth;
+        var y = Math.floor((frame - this.offset) / cols) * this.tileheight;
+        var rect = new PIXI.Rectangle(x, y, this.tilewidth, this.tileheight);
+        var texture = new PIXI.Texture(this.texture, rect);
+
+        texture.baseTexture.scaleMode = this.scaleMode;
+        texture.cacheAsBitmap = true;
+
+        return texture;
+      }
+      getFrame(frame) {
+        if (!this.textureCache[frame]) {
+          this.prepareTexture(frame);
+        }
+
+        return this.textureCache[frame];
+      }
+    }
+
+    ResourcesLoader.getResourceJsonData(project, jsonResourceName).then(
+      tiled => {
+        console.log(tiled);
+
+        const TILESET = new TileSet({
+          texture,
+          offset: 1,
+          tiled,
+        });
+
+        console.log('>>>', TILESET);
+        onLoad(TILESET);
+        // return TILESET;
+      }
+    );
+  }
+
+  static updatePIXITileMap(tileSet: any, tileMap: any) {
+    if (!tileMap || !tileSet) return;
+    console.log('RELOADING', tileSet, tileMap);
+    tileSet.layers.forEach(layer => {
+      if (!layer.visible) return;
+      if (layer.type === 'objectgroup') {
+        layer.objects.forEach(object => {
+          var { gid, id, width, height, x, y, visible } = object;
+          if (visible === false) return;
+          if (tileSet.getFrame(gid)) {
+            tileMap.addFrame(tileSet.getFrame(gid), x, y - tileSet.tileheight);
+          }
+        });
+      } else if (layer.type === 'tilelayer') {
+        var ind = 0;
+        for (var i = 0; i < layer.height; i++) {
+          for (var j = 0; j < layer.width; j++) {
+            var xPos = tileSet.tilewidth * j;
+            var yPos = tileSet.tileheight * i;
+
+            var tileUid = layer.data[ind];
+
+            if (tileUid !== 0) {
+              var tileData = tileSet.tiles.find(
+                tile => tile.id === tileUid - 1
+              );
+
+              // Animated tiles have a limitation with only being able to use frames arranged one to each other on the image resource
+              if (tileData && tileData.animation) {
+                tileMap
+                  .addFrame(tileSet.getFrame(tileUid), xPos, yPos)
+                  .tileAnimX(tileSet.tilewidth, tileData.animation.length);
+              } else {
+                // Non animated props dont require tileAnimX or Y
+                tileMap.addFrame(tileSet.getFrame(tileUid), xPos, yPos);
+              }
+            }
+
+            ind += 1;
+          }
+        }
+      }
+    });
   }
 
   /**

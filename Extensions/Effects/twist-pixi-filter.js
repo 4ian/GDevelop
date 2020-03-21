@@ -1,11 +1,15 @@
 gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
   makePIXIFilter: function(layer, effectData) {
     var twistFilter = new PIXI.filters.TwistFilter();
+    PIXI.filters.TwistFilter.prototype.apply = function(filterManager, input, output, clear) {
+      this.offset[0] = Math.round(this._offsetX * input.sourceFrame.width);
+      this.offset[1] = Math.round(this._offsetY * input.sourceFrame.height);
+      filterManager.applyFilter(this, input, output, clear);
+    }
 
     return twistFilter;
   },
-  update: function(filter, layer) {
-  },
+  update: function(filter, layer) { },
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === 'radius') {
       filter.radius = value;
@@ -17,10 +21,10 @@ gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
       filter.padding = value;
     }
     else if (parameterName === 'offsetX') {
-      filter.offset[0] = value;
+      filter._offsetX = value;
     }
     else if (parameterName === 'offsetY') {
-      filter.offset[1] = value;
+      filter._offsetY = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {

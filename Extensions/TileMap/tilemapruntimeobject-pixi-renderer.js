@@ -43,27 +43,27 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   return this._pixiObject
 }
 
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTiledFile = function() {
+gdjs.RuntimeObjectPixiRenderer.prototype.updateTiledFile = function() {
   this._pixiObject._style.tiledFile = this._object._tiledFile
   //this._pixiObject.dirty = true;
   this.updatePosition()
 }
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapAtlasImage = function() {
+gdjs.RuntimeObjectPixiRenderer.prototype.updateTilemapAtlasImage = function() {
   this._pixiObject._style.tilemapAtlasImage = this._object._tilemapAtlasImage
   //this._pixiObject.dirty = true;
   this.updatePosition()
 }
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateRender = function() {
+gdjs.RuntimeObjectPixiRenderer.prototype.updateRender = function() {
   this._pixiObject._style.render = this._object._render
   //this._pixiObject.dirty = true;
   this.updatePosition()
 }
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
+gdjs.RuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
   this._pixiObject._style.layerIndex = this._object._layerIndex
   //this._pixiObject.dirty = true;
   this.updatePosition()
 }
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateVisible = function() {
+gdjs.RuntimeObjectPixiRenderer.prototype.updateVisible = function() {
   this._pixiObject._style.visible = this._object._visible
   //this._pixiObject.dirty = true;
   this.updatePosition()

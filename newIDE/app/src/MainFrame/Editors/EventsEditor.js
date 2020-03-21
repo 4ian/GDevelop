@@ -11,6 +11,10 @@ export default class EventsEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  forceUpdateEditor() {
+    // No updates to be done.
+  }
+
   getSerializedElements() {
     const layout = this.getLayout();
     if (!layout) return {};

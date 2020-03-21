@@ -43,6 +43,10 @@ export default class ExternalLayoutEditor extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  forceUpdateEditor() {
+    // No updates to be done.
+  }
+
   getSerializedElements() {
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
@@ -132,6 +136,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
             onPreview={options =>
               this.props.onPreview(project, layout, externalLayout, options)
             }
+            previewButtonSettings={this.props.previewButtonSettings}
             onOpenDebugger={this.props.onOpenDebugger}
             onOpenMoreSettings={this.openLayoutChooser}
             isActive={isActive}

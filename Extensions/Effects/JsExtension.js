@@ -436,13 +436,20 @@ module.exports = {
     crtProperties.set(
       'animationSpeed',
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Animation Speed'))
+        .setLabel(_('Animation Speed of Interlaced Lines'))
         .setType('number')
         .setDescription(
           _(
             '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
           )
         )
+    );
+    crtProperties.set(
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Animation Frequency of Noise'))
+        .setType('number')
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const displacementEffect = extension

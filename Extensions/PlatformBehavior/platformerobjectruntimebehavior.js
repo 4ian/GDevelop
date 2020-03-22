@@ -31,6 +31,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(
   this._roundCoordinates = behaviorData.roundCoordinates;
   this._gravity = behaviorData.gravity;
   this._maxFallingSpeed = behaviorData.maxFallingSpeed;
+  this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed;
   this._acceleration = behaviorData.acceleration;
   this._deceleration = behaviorData.deceleration;
   this._maxSpeed = behaviorData.maxSpeed;
@@ -262,8 +263,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
         .getGame()
         .getInputManager()
         .isKeyPressed(DOWNKEY);
-    if (this._upKey) requestedDeltaY -= 150 * timeDelta;
-    if (this._downKey) requestedDeltaY += 150 * timeDelta;
+    if (this._upKey) requestedDeltaY -= this._ladderClimbingSpeed * timeDelta;
+    if (this._downKey) requestedDeltaY += this._ladderClimbingSpeed * timeDelta;
 
     //Coming to an extremity of a ladder
     if (!this._isOverlappingLadder()) {

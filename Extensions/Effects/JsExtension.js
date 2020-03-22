@@ -406,7 +406,7 @@ module.exports = {
     crtProperties.set(
       'verticalLine',
       new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('Vertical line (true or false)'))
+        .setLabel(_('Show vertical lines'))
         .setType('boolean')
     );
     crtProperties.set(
@@ -1235,7 +1235,7 @@ module.exports = {
         .setLabel(_('strength (between 0 and 5)'))
         .setType('number')
     );
-    
+
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

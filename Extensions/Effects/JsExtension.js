@@ -381,31 +381,31 @@ module.exports = {
     const crtProperties = crtEffect.getProperties();
     crtProperties.set(
       'lineWidth',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel(_('Line width (between 0 and 5)'))
         .setType('number')
     );
     crtProperties.set(
       'lineContrast',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.25')
         .setLabel(_('Line contrast (between 0 and 1)'))
         .setType('number')
     );
     crtProperties.set(
       'noise',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.1')
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
         .setLabel(_('Noise (between 0 and 1)'))
         .setType('number')
     );
     crtProperties.set(
       'curvature',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel(_('Curvature (between 0 and 10)'))
         .setType('number')
     );
     crtProperties.set(
       'verticalLine',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
         .setLabel(_('Vertical line (true or false)'))
         .setType('boolean')
     );
@@ -446,7 +446,7 @@ module.exports = {
     );
     crtProperties.set(
       'animationFrequency',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
         .setLabel(_('Animation Frequency of Noise'))
         .setType('number')
         .setDescription('Number of updates per second (0: no updates)')
@@ -626,7 +626,7 @@ module.exports = {
     );
     glitchProperties.set(
       'animationFrequency',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
         .setLabel(_('Animation Frequency'))
         .setType('number')
         .setDescription('Number of updates per second (0: no updates)')
@@ -916,7 +916,7 @@ module.exports = {
     );
     oldFilmProperties.set(
       'animationFrequency',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
         .setLabel(_('Animation Frequency'))
         .setType('number')
         .setDescription('Number of updates per second (0: no updates)')

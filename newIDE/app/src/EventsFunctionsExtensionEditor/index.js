@@ -230,7 +230,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (isExtensionLifecycleEventsFunction(newName)) {
       showWarningBox(
         i18n._(
-          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+          t`This name is reserved for a lifecycle function of the extension. Choose another name for your function.`
         )
       );
       return done(false);

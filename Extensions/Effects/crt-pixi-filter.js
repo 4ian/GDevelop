@@ -6,7 +6,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('CRT', {
   },
   update: function(filter, layer) {
     if (filter.animationSpeed !== 0) { 
-      // Multiply by 10 so that the default value shows use a sensible speed
+      // Multiply by 10 so that the default value is a sensible speed
       filter.time += layer.getElapsedTime() / 1000 * 10 * filter.animationSpeed;
     } 
     if (filter.animationFrequency !== 0) { 

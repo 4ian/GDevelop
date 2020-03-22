@@ -121,8 +121,8 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
       !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Left");
   rightKey |=
       !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Right");
-  if (leftKey) currentSpeed -= ladderClimbingSpeed * timeDelta;
-  if (rightKey) currentSpeed += ladderClimbingSpeed * timeDelta;
+  if (leftKey) currentSpeed -= acceleration * timeDelta;
+  if (rightKey) currentSpeed += acceleration * timeDelta;
 
   // Take deceleration into account only if no key is pressed.
   if (leftKey == rightKey) {

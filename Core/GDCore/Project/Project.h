@@ -848,7 +848,7 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Default implementation check if objectName is only composed of a-z,A-Z,0-9
    * or _ characters an if does not conflict with an expression.
    */
-  static bool ValidateObjectName(const gd::String& objectName);
+  static bool ValidateName(const gd::String& objectName);
 
   /**
    * Return a message that will be displayed when an invalid object name has

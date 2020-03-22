@@ -436,18 +436,18 @@ module.exports = {
     crtProperties.set(
       'animationSpeed',
       new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Animation Speed of Interlaced Lines'))
+        .setLabel(_('Interlaced Lines Speed'))
         .setType('number')
         .setDescription(
           _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
           )
         )
     );
     crtProperties.set(
       'animationFrequency',
       new gd.PropertyDescriptor(/* defaultValue= */ '60')
-        .setLabel(_('Frequency of Noise'))
+        .setLabel(_('Noise Frequency'))
         .setType('number')
         .setDescription('Number of updates per second (0: no updates)')
     );

@@ -845,7 +845,7 @@ class MainFrame extends React.Component<Props, State> {
     if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`TThis name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
         )
       );
       return;

@@ -324,7 +324,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
         )
       );
       return;

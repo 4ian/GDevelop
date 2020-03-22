@@ -76,6 +76,7 @@ export default function BehaviorMethodSelectorDialog({
           key={'close'}
         />,
       ]}
+      modal
       open
       noMargin
       title={<Trans>Choose a new extension function</Trans>}

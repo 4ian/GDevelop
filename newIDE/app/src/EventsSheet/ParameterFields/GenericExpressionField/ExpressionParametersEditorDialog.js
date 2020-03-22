@@ -69,7 +69,6 @@ export default class ExpressionParametersEditorDialog extends Component<
             onClick={() => this.props.onDone(this.state.parameterValues)}
           />
         }
-        modal
         noMargin
         onRequestClose={this.props.onRequestClose}
       >

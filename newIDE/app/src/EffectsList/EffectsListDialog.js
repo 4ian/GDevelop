@@ -42,7 +42,6 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
             key={'Apply'}
           />,
         ]}
-        modal
         open
         onRequestClose={onApply}
         title={<Trans>Effects</Trans>}

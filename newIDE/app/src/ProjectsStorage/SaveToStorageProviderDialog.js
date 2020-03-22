@@ -28,6 +28,7 @@ export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
               onClick={onClose}
             />,
           ]}
+          modal
           open
           noMargin
           maxWidth="sm"

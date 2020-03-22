@@ -107,6 +107,7 @@ export default class LanguageDialog extends Component<Props, State> {
                     />,
                   ]}
                   onRequestClose={() => onClose(this.state.languageDidChange)}
+                  modal
                   open={open}
                   title={<Trans>Language</Trans>}
                 >

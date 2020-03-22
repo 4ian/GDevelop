@@ -39,8 +39,7 @@ type Props = {|
   secondaryActions?: React.Node,
   onRequestClose?: () => void,
 
-  modal?: boolean, // Force the user to use one of the actions in the Dialog. Clicking outside the Dialog will not trigger the onRequestClose.
-  enableBackdropClick?: boolean, //Changes default behaviour of dialog. Clicking outside will trigger the onRequestClose.
+  modal?: boolean, //Changes default behaviour of dialog. Clicking outside the dialog box will trigger the onRequestClose.
 
   children: React.Node, // The content of the dialog
 
@@ -81,7 +80,7 @@ export default (props: Props) => {
     flexRowBody,
     flexBody,
     noTitleMargin,
-    enableBackdropClick,
+    modal,
   } = props;
   const dialogActions = secondaryActions ? (
     <React.Fragment>
@@ -106,9 +105,7 @@ export default (props: Props) => {
           fullWidth
           fullScreen={size === 'small'}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick={
-            enableBackdropClick !== undefined ? false : true
-          }
+          disableBackdropClick={modal !== undefined ? false : true}
         >
           {title && (
             <DialogTitle

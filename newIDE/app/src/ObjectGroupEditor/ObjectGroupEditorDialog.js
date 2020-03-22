@@ -32,7 +32,6 @@ export class ObjectGroupEditorDialog extends Component {
         key={group.ptr}
         actions={actions}
         noMargin
-        modal
         onRequestClose={this.props.onCancel}
         open={this.props.open}
         title={`Edit ${group.getName()} group`}

@@ -102,6 +102,7 @@ export class SubscriptionCheckDialog extends React.Component<
             onClick={this._closeDialog}
           />,
         ]}
+        modal
         onRequestClose={this._closeDialog}
         open={open}
         title={this.props.title}

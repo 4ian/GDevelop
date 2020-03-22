@@ -86,6 +86,7 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
         ]}
         actions={actions}
         open
+        modal
         noMargin
         title={<Trans>Choose a new behavior function ("method")</Trans>}
         onRequestClose={this.props.onCancel}

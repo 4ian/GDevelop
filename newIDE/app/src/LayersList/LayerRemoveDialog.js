@@ -59,7 +59,7 @@ export default class VariablesEditorDialog extends Component {
       <Dialog
         title={<Trans>Objects on {this.props.layerRemoved}</Trans>}
         actions={actions}
-        modal={true}
+        modal
         open={this.props.open}
         onRequestClose={this.props.onCancel}
       >

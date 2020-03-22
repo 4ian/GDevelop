@@ -47,6 +47,7 @@ export default ({
               onClick={onCreateNewProject}
             />,
           ]}
+          modal
           open
           noMargin
           maxWidth="sm"

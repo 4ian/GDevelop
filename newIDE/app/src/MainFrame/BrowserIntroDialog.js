@@ -36,6 +36,7 @@ export default class BetaIntroDialog extends Component {
                 key="close"
               />,
             ]}
+            modal
             open={open}
             onRequestClose={onClose}
           >

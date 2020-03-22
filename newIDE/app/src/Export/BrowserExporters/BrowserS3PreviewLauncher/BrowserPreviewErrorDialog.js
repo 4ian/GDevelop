@@ -29,7 +29,6 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
             ]}
             title={<Trans>Could not launch the preview</Trans>}
             onRequestClose={onClose}
-            modal
             open
           >
             <Line>

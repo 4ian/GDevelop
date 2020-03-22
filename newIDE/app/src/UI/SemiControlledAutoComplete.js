@@ -148,8 +148,9 @@ const handleChange = (
   if (option.type !== 'separator') {
     if (option.onClick) option.onClick();
     else {
-      if (props.onChoose) props.onChoose(option.value);
-      props.onChange(option.value);
+      props.onChoose
+        ? props.onChoose(option.value)
+        : props.onChange(option.value);
       if (props.onRequestClose) props.onRequestClose();
     }
   }
@@ -275,6 +276,12 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                       setIsMenuOpen(false);
                       props.onChange(event.currentTarget.value);
                       if (props.onBlur) props.onBlur(event);
+                    },
+                    onMouseDown: (
+                      event: SyntheticMouseEvent<HTMLInputElement>
+                    ): void => {
+                      if (input.current && !input.current.value.length)
+                        setIsMenuOpen(!isMenuOpen);
                     },
                   }}
                   {...other}

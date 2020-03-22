@@ -33,7 +33,6 @@ type Props = {|
   canBeReset?: boolean,
   initialResourceName: string,
   onChange: string => void,
-  onRequestClose?: () => void,
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
   hintText?: MessageDescriptor,
@@ -170,7 +169,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
       () => {
         if (!this.state.notExistingError) {
           if (this.props.onChange) this.props.onChange(resourceName);
-          if (this.props.onRequestClose) this.props.onRequestClose();
         }
       }
     );

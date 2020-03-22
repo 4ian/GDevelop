@@ -6,7 +6,8 @@ gdjs.PixiFiltersTools.registerFilterCreator('CRT', {
   },
   update: function(filter, layer) {
     if (filter.animationSpeed !== 0) { 
-      filter.time += layer.getElapsedTime() / 100 * filter.animationSpeed;
+      // Multiply by 10 so that the default value shows use a sensible speed
+      filter.time += layer.getElapsedTime() / 1000 * 10 * filter.animationSpeed;
     } 
     if (filter.animationFrequency !== 0) { 
       filter._animationTimer += layer.getElapsedTime() / 1000;

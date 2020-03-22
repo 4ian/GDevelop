@@ -447,7 +447,7 @@ module.exports = {
     crtProperties.set(
       'animationFrequency',
       new gd.PropertyDescriptor(/* defaultValue= */ '60')
-        .setLabel(_('Animation Frequency of Noise'))
+        .setLabel(_('Frequency of Noise'))
         .setType('number')
         .setDescription('Number of updates per second (0: no updates)')
     );
@@ -905,14 +905,12 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
         .setLabel(_('Vignetting Alpha (between 0 and 1)'))
         .setType('number')
-        .setDescription('Amount of opacity of vignette')
     );
     oldFilmProperties.set(
       'vignettingBlur',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
         .setLabel(_('Vignetting Blur (between 0 and 1)'))
         .setType('number')
-        .setDescription('Blur intensity of the vignette')
     );
     oldFilmProperties.set(
       'animationFrequency',

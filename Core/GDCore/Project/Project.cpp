@@ -956,10 +956,6 @@ bool Project::ValidateName(const gd::String& name) {
   return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
 }
 
-gd::String Project::GetBadObjectNameWarning() {
-  return _("This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.");
-}
-
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that
   // traverse the whole project (this time for events) and ExposeProjectEffects

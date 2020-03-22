@@ -27,6 +27,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       roundCoordinates(true),
       gravity(1000),
       maxFallingSpeed(700),
+      ladderClimbingSpeed(150),
       acceleration(1500),
       deceleration(1500),
       maxSpeed(250),
@@ -64,6 +65,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       behaviorContent.GetBoolAttribute("roundCoordinates", false);
   gravity = behaviorContent.GetDoubleAttribute("gravity");
   maxFallingSpeed = behaviorContent.GetDoubleAttribute("maxFallingSpeed");
+  ladderClimbingSpeed = behaviorContent.GetDoubleAttribute("ladderCLimbingSpeed");
   acceleration = behaviorContent.GetDoubleAttribute("acceleration");
   deceleration = behaviorContent.GetDoubleAttribute("deceleration");
   maxSpeed = behaviorContent.GetDoubleAttribute("maxSpeed");
@@ -119,8 +121,8 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
       !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Left");
   rightKey |=
       !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Right");
-  if (leftKey) currentSpeed -= acceleration * timeDelta;
-  if (rightKey) currentSpeed += acceleration * timeDelta;
+  if (leftKey) currentSpeed -= ladderClimbingSpeed * timeDelta;
+  if (rightKey) currentSpeed += ladderClimbingSpeed * timeDelta;
 
   // Take deceleration into account only if no key is pressed.
   if (leftKey == rightKey) {
@@ -245,8 +247,8 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
     downKey |=
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
-    if (upKey) requestedDeltaY -= 150 * timeDelta;
-    if (downKey) requestedDeltaY += 150 * timeDelta;
+    if (upKey) requestedDeltaY -= ladderCLimbingSpeed * timeDelta;
+    if (downKey) requestedDeltaY += ladderCLimbingSpeed * timeDelta;
 
     // Coming to an extremity of a ladder
     if (!IsOverlappingLadder(potentialObjects)) {

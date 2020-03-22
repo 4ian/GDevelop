@@ -33,6 +33,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
 
   double GetGravity() const { return gravity; };
   double GetMaxFallingSpeed() const { return maxFallingSpeed; };
+  double GetLadderClimbingSpeed() const { return ladderClimbingSpeed; };
   double GetAcceleration() const { return acceleration; };
   double GetDeceleration() const { return deceleration; };
   double GetMaxSpeed() const { return maxSpeed; };
@@ -43,6 +44,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
   void SetMaxFallingSpeed(double maxFallingSpeed_) {
     maxFallingSpeed = maxFallingSpeed_;
   };
+  void SetLadderClimbingSpeed(double ladderClimbingSpeed_) { ladderClimbingSpeed=ladderClimbingSpeed_; };
   void SetAcceleration(double acceleration_) { acceleration = acceleration_; };
   void SetDeceleration(double deceleration_) { deceleration = deceleration_; };
   void SetMaxSpeed(double maxSpeed_) { maxSpeed = maxSpeed_; };
@@ -176,16 +178,17 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
                              // edge is also at X position 10). This parameter
                              // "ignoreTouchingEdges" will be passed to all
                              // collision handling functions.
-  bool roundCoordinates;   ///< true to round coordinates when trying to move on
-                           ///< X and Y axis.
-  double gravity;          ///< In pixels.seconds^-2
-  double maxFallingSpeed;  ///< In pixels.seconds^-1
-  double acceleration;     ///< In pixels.seconds^-2
-  double deceleration;     ///< In pixels.seconds^-2
-  double maxSpeed;         ///< In pixels.seconds^-1
-  double jumpSpeed;        ///< In pixels.seconds^-1
-  double slopeMaxAngle;    ///< In degrees
-  double slopeClimbingFactor;  ///< Equals to tan(slopeMaxAngle).
+  bool roundCoordinates;     ///< true to round coordinates when trying to move on
+                             ///< X and Y axis.
+  double gravity;             ///< In pixels.seconds^-2
+  double maxFallingSpeed;     ///< In pixels.seconds^-1
+  double ladderClimbingSpeed; ///< In pixels.seconds^-1
+  double acceleration;        ///< In pixels.seconds^-2
+  double deceleration;        ///< In pixels.seconds^-2
+  double maxSpeed;            ///< In pixels.seconds^-1
+  double jumpSpeed;           ///< In pixels.seconds^-1
+  double slopeMaxAngle;       ///< In degrees
+  double slopeClimbingFactor; ///< Equals to tan(slopeMaxAngle).
   bool canGrabPlatforms;  ///< True to allow the object to grab platform ledges.
   double yGrabOffset;
   double xGrabTolerance;  ///< Maximum distance, in pixels, on X axis that can

@@ -145,7 +145,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 };
 
 /**
- * Registration of {@link gdjs.RuntimeObject}. 
+ * Registers a {@link gdjs.RuntimeObject}. 
  * This step is needed for any object before adding Instances of it to the scene.
  * @param {ObjectData} objectData The objectData of the object to register.
  */

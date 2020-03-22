@@ -102,27 +102,15 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
         this._initialBehaviorSharedData.put(data.name, data);
     }
 
-    var that = this;
-    function loadObject(objData) {
-        var objectName = objData.name;
-        var objectType = objData.type;
-
-        that._objects.put(objectName, objData);
-        that._instances.put(objectName, []); //Also reserve an array for the instances
-        that._instancesCache.put(objectName, []); //and for cached instances
-        //And cache the constructor for the performance sake:
-        that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
-    }
-
-    //Load objects: Global objects first...
+    //Registering objects: Global objects first...
     var initialGlobalObjectsData = this.getGame().getInitialObjectsData();
     for(var i = 0, len = initialGlobalObjectsData.length;i<len;++i) {
-        loadObject(initialGlobalObjectsData[i]);
+        this.registerObject(initialGlobalObjectsData[i]);
     }
     //...then the scene objects
     this._initialObjectsData = sceneData.objects;
     for(var i = 0, len = this._initialObjectsData.length;i<len;++i) {
-        loadObject(this._initialObjectsData[i]);
+        this.registerObject(this._initialObjectsData[i]);
     }
 
     //Create initial instances of objects
@@ -155,6 +143,17 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     this._isLoaded = true;
     this._timeManager.reset();
 };
+
+/**
+ * Register a {@link gdjs.RuntimeObject} so that instances of it can be used in the scene.
+ * @param {ObjectData} objectData The data for the object to register.
+ */
+gdjs.RuntimeScene.prototype.registerObject = function(objectData) {
+    this._objects.put(objectData.name, objectData);
+    this._instances.put(objectData.name, []); //Also reserve an array for the instances
+    this._instancesCache.put(objectData.name, []); //and for cached instances
+    this._objectsCtor.put(objectData.name, gdjs.getObjectConstructor(objectData.type)); //And cache the constructor for the performance sake
+}
 
 /**
  * Called when a scene is "paused", i.e it will be not be rendered again

@@ -65,7 +65,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       behaviorContent.GetBoolAttribute("roundCoordinates", false);
   gravity = behaviorContent.GetDoubleAttribute("gravity");
   maxFallingSpeed = behaviorContent.GetDoubleAttribute("maxFallingSpeed");
-  ladderClimbingSpeed = behaviorContent.GetDoubleAttribute("ladderCLimbingSpeed");
+  ladderClimbingSpeed = behaviorContent.GetDoubleAttribute("ladderClimbingSpeed");
   acceleration = behaviorContent.GetDoubleAttribute("acceleration");
   deceleration = behaviorContent.GetDoubleAttribute("deceleration");
   maxSpeed = behaviorContent.GetDoubleAttribute("maxSpeed");

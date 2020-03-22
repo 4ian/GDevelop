@@ -381,31 +381,31 @@ module.exports = {
     const crtProperties = crtEffect.getProperties();
     crtProperties.set(
       'lineWidth',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel(_('Line width (between 0 and 5)'))
         .setType('number')
     );
     crtProperties.set(
       'lineContrast',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.25')
         .setLabel(_('Line contrast (between 0 and 1)'))
         .setType('number')
     );
     crtProperties.set(
       'noise',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.1')
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
         .setLabel(_('Noise (between 0 and 1)'))
         .setType('number')
     );
     crtProperties.set(
       'curvature',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel(_('Curvature (between 0 and 10)'))
         .setType('number')
     );
     crtProperties.set(
       'verticalLine',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
         .setLabel(_('Vertical line (true or false)'))
         .setType('boolean')
     );
@@ -434,10 +434,22 @@ module.exports = {
         .setType('number')
     );
     crtProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (Enable animations)'))
-        .setType('boolean')
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Interlaced Lines Speed'))
+        .setType('number')
+        .setDescription(
+          _(
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
+          )
+        )
+    );
+    crtProperties.set(
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
+        .setLabel(_('Noise Frequency'))
+        .setType('number')
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const displacementEffect = extension
@@ -613,10 +625,11 @@ module.exports = {
         .setDescription('The resolution of the displacement image')
     );
     glitchProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (Enable animations)'))
-        .setType('boolean')
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
+        .setLabel(_('Animation Frequency'))
+        .setType('number')
+        .setDescription('Number of updates per second (0: no updates)')
     );
     glitchProperties.set(
       'redX',
@@ -701,10 +714,15 @@ module.exports = {
         .setType('boolean')
     );
     godrayProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (animate rays)'))
-        .setType('boolean')
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Animation Speed'))
+        .setType('number')
+        .setDescription(
+          _(
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
+          )
+        )
     );
     godrayProperties.set(
       'lacunarity',
@@ -887,20 +905,19 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
         .setLabel(_('Vignetting Alpha (between 0 and 1)'))
         .setType('number')
-        .setDescription('The size of the noise particles')
     );
     oldFilmProperties.set(
       'vignettingBlur',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
         .setLabel(_('Vignetting Blur (between 0 and 1)'))
         .setType('number')
-        .setDescription('Blur intensity of the vignette')
     );
     oldFilmProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (Enable animations)'))
-        .setType('boolean')
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
+        .setLabel(_('Animation Frequency'))
+        .setType('number')
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const outlineEffect = extension
@@ -1052,10 +1069,15 @@ module.exports = {
         .setDescription(_('Ending alpha (1 by default)'))
     );
     reflectionProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('Animate waves'))
-        .setType('boolean')
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Animation Speed'))
+        .setType('number')
+        .setDescription(
+          _(
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
+          )
+        )
     );
 
     const rgbSplitEffect = extension

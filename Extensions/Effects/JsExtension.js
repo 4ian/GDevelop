@@ -720,7 +720,7 @@ module.exports = {
         .setType('number')
         .setDescription(
           _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
           )
         )
     );
@@ -1075,7 +1075,7 @@ module.exports = {
         .setType('number')
         .setDescription(
           _(
-            '(E.g., 0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed)'
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
           )
         )
     );

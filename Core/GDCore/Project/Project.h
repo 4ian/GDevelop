@@ -843,21 +843,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   ///@{
 
   /**
-   * Return true if \a objectName can be used as name for an object.
-   *
-   * Default implementation check if objectName is only composed of a-z,A-Z,0-9
-   * or _ characters an if does not conflict with an expression.
+   * Return true if \a name is valid (can be used safely for an object,
+   * behavior, events function name, etc...).
    */
-  static bool ValidateObjectName(const gd::String& objectName);
-
-  /**
-   * Return a message that will be displayed when an invalid object name has
-   * been entered.
-   *
-   * \note This message will be displayed by the IDE into a tooltip.
-   */
-  static gd::String GetBadObjectNameWarning();
-
+  static bool ValidateName(const gd::String& name);
 ///@}
 
 /** \name External source files

@@ -359,7 +359,7 @@ interface Project {
     [Ref] VariablesContainer GetVariables();
     [Ref] ResourcesManager GetResourcesManager();
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
-    boolean STATIC_ValidateObjectName([Const] DOMString name);
+    boolean STATIC_ValidateName([Const] DOMString name);
     boolean IsDirty();
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

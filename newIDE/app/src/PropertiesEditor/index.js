@@ -13,6 +13,7 @@ import Edit from '@material-ui/icons/Edit';
 import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { hexToRGBColor } from '../Utils/ColorTransformer';
+import FormHelperText from '@material-ui/core/FormHelperText';
 
 import {
   type ResourceKind,
@@ -231,8 +232,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
               getFieldLabel(this.props.instances, field)
             ) : (
               <React.Fragment>
-                {getFieldLabel(this.props.instances, field)} -{' '}
-                <MarkdownText source={description} />
+                {getFieldLabel(this.props.instances, field)}{' '}
+                <FormHelperText style={{ display: 'inline' }}>
+                  <MarkdownText source={description} />
+                </FormHelperText>
               </React.Fragment>
             )
           }

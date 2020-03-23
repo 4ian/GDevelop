@@ -1,13 +1,16 @@
 gdjs.PixiFiltersTools.registerFilterCreator('Glitch', {
   makePIXIFilter: function(layer, effectData) {
     var glitchFilter = new PIXI.filters.GlitchFilter();
-
+    glitchFilter._animationTimer = 0;
     return glitchFilter;
   },
   update: function(filter, layer) {
-    if (filter.animated) {
-      filter.time += layer.getElapsedTime() / 1000;
-      filter.seed = Math.random();
+    if (filter.animationFrequency !== 0) { 
+      filter._animationTimer += layer.getElapsedTime() / 1000;
+      if (filter._animationTimer >= 1 / filter.animationFrequency) {
+        filter.seed = Math.random();
+        filter._animationTimer = 0;
+      }
     }
   },
   updateDoubleParameter: function(filter, parameterName, value) {
@@ -47,14 +50,14 @@ gdjs.PixiFiltersTools.registerFilterCreator('Glitch', {
     else if (parameterName === 'blueY') {
       filter.blue.y = value;
     }
+    else if (parameterName === 'animationFrequency') {
+      filter.animationFrequency = value;
+    }
 
   },
   updateStringParameter: function(filter, parameterName, value) {},
   updateBooleanParameter: function(filter, parameterName, value) {
-    if (parameterName === 'animated') {
-      filter.animated = value;
-    }
-    else if (parameterName === 'average') {
+    if (parameterName === 'average') {
       filter.average = value;
     }
   },

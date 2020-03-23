@@ -113,3 +113,11 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getWidth = function() {
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
   return this._pixiObject.height;
 };
+
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setWidth = function(newWidth) {
+  this._pixiObject.width = newWidth;
+};
+
+gdjs.BBTextRuntimeObjectPixiRenderer.prototype.setHeight = function(newHeight) {
+  this._pixiObject.height = newHeight;
+};

@@ -64,3 +64,12 @@ gdjs.TextRuntimeObjectCocosRenderer.prototype.getWidth = function() {
 gdjs.TextRuntimeObjectCocosRenderer.prototype.getHeight = function() {
     return this._text.height;
 };
+
+gdjs.TextRuntimeObjectCocosRenderer.prototype.setWidth = function(newWidth) {
+    this._text.width = newWidth;
+};
+
+gdjs.TextRuntimeObjectCocosRenderer.prototype.setHeight = function(newHeight) {
+    this._text.height = newHeight;
+};
+

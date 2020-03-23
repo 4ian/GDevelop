@@ -271,6 +271,22 @@ gdjs.TextRuntimeObject.prototype.getHeight = function() {
 };
 
 /**
+ * Set the width of the text.
+ * @param {number} width The new width.
+ */
+gdjs.TextRuntimeObject.prototype.setWidth = function(width) {
+    this._renderer.setWidth(width);
+};
+
+/**
+ * Set the height of the text.
+ * @param {number} height The new height.
+ */
+gdjs.TextRuntimeObject.prototype.setHeight = function(height) {
+    this._renderer.setHeight(height);
+};
+
+/**
  * Get scale of the text.
  */
 gdjs.TextRuntimeObject.prototype.getScale = function() {

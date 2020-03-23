@@ -214,3 +214,18 @@ gdjs.BBTextRuntimeObject.prototype.getWidth = function() {
 gdjs.BBTextRuntimeObject.prototype.getHeight = function() {
   return this._renderer.getHeight();
 };
+
+
+/**
+ * Set the width of the object.
+ */
+gdjs.BBTextRuntimeObject.prototype.setWidth = function(newWidth) {
+  return this._renderer.setWidth(newWidth);
+};
+
+/**
+ * Set the height of the object.
+ */
+gdjs.BBTextRuntimeObject.prototype.setHeight = function(newHeight) {
+  return this._renderer.setHeight(newHeight);
+};

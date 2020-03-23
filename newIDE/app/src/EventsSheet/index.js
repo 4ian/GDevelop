@@ -175,6 +175,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       onCut: () => this.cutSelection(),
       onPaste: () => this.pasteEventsOrInstructions(),
       onSearch: () => this._toggleSearchPanel(),
+      onQuitSearch: () => this._quitSearchPanel(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
     },
@@ -279,6 +280,12 @@ export default class EventsSheet extends React.Component<Props, State> {
         }
       }
     );
+  };
+
+  _quitSearchPanel = () => {
+    if (this.state.showSearchPanel) {
+      this.setState({ showSearchPanel: false });
+    }
   };
 
   addSubEvents = () => {

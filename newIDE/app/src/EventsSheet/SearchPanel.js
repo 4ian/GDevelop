@@ -116,6 +116,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
               }
               hintText={t`Text to search in parameters`}
               onChange={(e, searchText) => this.setState({ searchText })}
+              onKeyPress={event => {
+                if (event.charCode === 13) {
+                  //enter key pressed
+                  if (this.searchTextField) this.searchTextField.blur();
+                  this.launchSearch();
+                }
+              }}
               value={searchText}
               fullWidth
             />
@@ -124,7 +131,10 @@ export default class SearchPanel extends PureComponent<Props, State> {
               disabled={!searchText}
               primary
               label={<Trans>Search</Trans>}
-              onClick={this.launchSearch}
+              onClick={() => {
+                this.launchSearch();
+                onGoToNextSearchResult();
+              }}
             />
           </Line>
           <Line alignItems="baseline" noMargin>

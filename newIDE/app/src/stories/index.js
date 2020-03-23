@@ -3788,6 +3788,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       project={testProject.project}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
+      onClose={action('close')}
       onApply={action('apply')}
       onRenameProperty={action('property rename')}
     />
@@ -3797,6 +3798,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       project={testProject.project}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}
+      onClose={action('close')}
       onApply={action('apply')}
       onRenameProperty={action('property rename')}
     />

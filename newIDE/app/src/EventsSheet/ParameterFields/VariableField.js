@@ -33,6 +33,7 @@ export default class VariableField extends Component<Props, {||}> {
       onOpenDialog,
       parameterMetadata,
       variablesContainer,
+      onRequestClose,
     } = this.props;
 
     const description = parameterMetadata
@@ -53,6 +54,7 @@ export default class VariableField extends Component<Props, {||}> {
             fullWidth
             value={value}
             onChange={onChange}
+            onRequestClose={onRequestClose}
             dataSource={enumerateVariables(variablesContainer).map(
               variableName => ({
                 text: variableName,

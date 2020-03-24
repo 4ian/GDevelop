@@ -7,7 +7,6 @@ import EventsBasedBehaviorEditor from './index';
 import HelpButton from '../UI/HelpButton';
 
 type Props = {|
-  onClose: () => void,
   onApply: () => void,
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -21,7 +20,6 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
 > {
   render() {
     const {
-      onClose,
       onApply,
       eventsBasedBehavior,
       eventsFunctionsExtension,
@@ -38,11 +36,6 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
           />,
         ]}
         actions={[
-          <FlatButton
-          key="close"
-          label={<Trans>Close</Trans>}
-          onClick={onClose}
-        />,
           <FlatButton
             label={<Trans>Apply</Trans>}
             primary

@@ -238,6 +238,14 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             options={props.dataSource}
             renderOption={renderItem}
             getOptionDisabled={isOptionDisabled}
+            ListboxProps={{
+              onClick: (event: SyntheticMouseEvent<HTMLUListElement>) => {
+                event.nativeEvent.stopImmediatePropagation();
+              },
+              onTouchEnd: (event: SyntheticTouchEvent<HTMLUListElement>) => {
+                event.nativeEvent.stopImmediatePropagation();
+              },
+            }}
             getOptionLabel={(option: Option) =>
               getOptionLabel(option, currentInputValue)
             }

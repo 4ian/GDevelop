@@ -42,18 +42,22 @@ gdjs.InputManager.MOUSE_RIGHT_BUTTON = 1;
 gdjs.InputManager.MOUSE_MIDDLE_BUTTON = 2;
 
 /**
- * Holds the keyCodes of the keys which only have left / right
- * variants and should thus default to their left variant values
- * if necessary.
+ * Holds the raw keyCodes of the keys which only have left/right
+ * variants and should default to their left variant values
+ * if location is not specified.
  *
- * @constant {number}
+ * @constant {Array<number>}
  */
-gdjs.InputManager.DEFAULT_LEFT_VARIANT_KEYS = [16, 17, 18, 91];
+gdjs.InputManager._DEFAULT_LEFT_VARIANT_KEYS = [16, 17, 18, 91];
 
 /**
- * Returns the location aware keyCode.
+ * Returns the "location-aware" keyCode, given a raw keyCode
+ * and location. The location corresponds to KeyboardEvent.location,
+ * which should be 0 for standard keys, 1 for left keys,
+ * 2 for right keys, and 3 for numpad keys.
  *
- * @private
+ * @param {number} keyCode The raw key code
+ * @param {?number} location The location
  */
 gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
   keyCode,
@@ -68,7 +72,7 @@ gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
     return keyCode + 1000 * location;
   }
 
-  if (gdjs.InputManager.DEFAULT_LEFT_VARIANT_KEYS.indexOf(keyCode) !== -1) {
+  if (gdjs.InputManager._DEFAULT_LEFT_VARIANT_KEYS.indexOf(keyCode) !== -1) {
     return keyCode + 1000;
   }
 
@@ -79,7 +83,7 @@ gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
  * Should be called whenever a key is pressed. The location corresponds to
  * KeyboardEvent.location, which should be 0 for standard keys, 1 for left keys,
  * 2 for right keys, and 3 for numpad keys.
- * @param {number} keyCode The key code associated to the key press.
+ * @param {number} keyCode The raw key code associated to the key press.
  * @param {number=} location The location of the event.
  */
 gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
@@ -93,7 +97,7 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
  * Should be called whenever a key is released. The location corresponds to
  * KeyboardEvent.location, which should be 0 for standard keys, 1 for left keys,
  * 2 for right keys, and 3 for numpad keys.
- * @param {number} keyCode The key code associated to the key release.
+ * @param {number} keyCode The raw key code associated to the key release.
  * @param {number=} location The location of the event.
  */
 gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
@@ -104,15 +108,15 @@ gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
 };
 
 /**
- * Return the code of the last key that was pressed.
- * @return {number} The code of the last key pressed.
+ * Return the location-aware code of the last key that was pressed.
+ * @return {number} The location-aware code of the last key pressed.
  */
 gdjs.InputManager.prototype.getLastPressedKey = function() {
   return this._lastPressedKey;
 };
 
 /**
- * Return true if the key corresponding to keyCode is pressed.
+ * Return true if the key corresponding to the location-aware keyCode is pressed.
  * @param {number} locationAwareKeyCode The location-aware key code to be tested.
  */
 gdjs.InputManager.prototype.isKeyPressed = function(locationAwareKeyCode) {
@@ -123,7 +127,7 @@ gdjs.InputManager.prototype.isKeyPressed = function(locationAwareKeyCode) {
 };
 
 /**
- * Return true if the key corresponding to keyCode was released during the last frame.
+ * Return true if the key corresponding to the location-aware keyCode was released during the last frame.
  * @param {number} locationAwareKeyCode The location-aware key code to be tested.
  */
 gdjs.InputManager.prototype.wasKeyReleased = function(locationAwareKeyCode) {
@@ -134,7 +138,7 @@ gdjs.InputManager.prototype.wasKeyReleased = function(locationAwareKeyCode) {
 };
 
 /**
- * Return true if any key is pressed
+ * Return true if any key is pressed.
  */
 gdjs.InputManager.prototype.anyKeyPressed = function() {
   for (var keyCode in this._pressedKeys.items) {
@@ -149,7 +153,8 @@ gdjs.InputManager.prototype.anyKeyPressed = function() {
 };
 
 /**
- * Should be called when the mouse is moved.<br>
+ * Should be called when the mouse is moved.
+ *
  * Please note that the coordinates must be expressed relative to the view position.
  *
  * @param {number} x The mouse new X position
@@ -179,7 +184,7 @@ gdjs.InputManager.prototype.getMouseY = function() {
 };
 
 /**
- * Should be called whenever a mouse button is pressed
+ * Should be called whenever a mouse button is pressed.
  * @param {number} buttonCode The mouse button code associated to the event.
  * See gdjs.InputManager.MOUSE_LEFT_BUTTON, gdjs.InputManager.MOUSE_RIGHT_BUTTON, gdjs.InputManager.MOUSE_MIDDLE_BUTTON
  */
@@ -189,7 +194,7 @@ gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
 };
 
 /**
- * Should be called whenever a mouse button is released
+ * Should be called whenever a mouse button is released.
  * @param {number} buttonCode The mouse button code associated to the event. (see onMouseButtonPressed)
  */
 gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {

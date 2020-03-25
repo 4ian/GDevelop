@@ -119,10 +119,10 @@ gdjs.TopDownMovementRuntimeBehavior.prototype.getAngle = function() {
 gdjs.TopDownMovementRuntimeBehavior.prototype.doStepPreEvents = function(
   runtimeScene
 ) {
-  var LEFTKEY = 'ArrowLeft';
-  var UPKEY = 'ArrowUp';
-  var RIGHTKEY = 'ArrowRight';
-  var DOWNKEY = 'ArrowDown';
+  var LEFTKEY = 37;
+  var UPKEY = 38;
+  var RIGHTKEY = 39;
+  var DOWNKEY = 40;
   var object = this.owner;
   var timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 

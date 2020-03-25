@@ -8,28 +8,46 @@ describe('gdjs.InputManager', function() {
   it('should handle keyboards events', function() {
     expect(inputManager.anyKeyPressed()).to.be(false);
 
-    inputManager.onKeyPressed('Space');
-    expect(inputManager.getLastPressedKey()).to.be('Space');
-    inputManager.onKeyPressed('PageUp');
-    expect(inputManager.getLastPressedKey()).to.be('PageUp');
-    expect(inputManager.isKeyPressed('Space')).to.be(true);
-    expect(inputManager.isKeyPressed('Escape')).to.be(false);
-    inputManager.onKeyReleased('Space');
-    expect(inputManager.isKeyPressed('Space')).to.be(false);
-    expect(inputManager.wasKeyReleased('Space')).to.be(true);
+    inputManager.onKeyPressed(32);
+    expect(inputManager.getLastPressedKey()).to.be(32);
+    inputManager.onKeyPressed(33);
+    expect(inputManager.getLastPressedKey()).to.be(33);
+    expect(inputManager.isKeyPressed(32)).to.be(true);
+    expect(inputManager.isKeyPressed(30)).to.be(false);
+    inputManager.onKeyReleased(32);
+    expect(inputManager.isKeyPressed(32)).to.be(false);
+    expect(inputManager.wasKeyReleased(32)).to.be(true);
 
     expect(inputManager.anyKeyPressed()).to.be(true);
 
     inputManager.onFrameEnded();
-    expect(inputManager.wasKeyReleased('Space')).to.be(false);
+    expect(inputManager.wasKeyReleased(32)).to.be(false);
 
     expect(inputManager.anyKeyPressed()).to.be(true);
-    expect(inputManager.isKeyPressed('PageUp')).to.be(true);
+    expect(inputManager.isKeyPressed(33)).to.be(true);
 
     inputManager.onFrameEnded();
-    inputManager.onKeyReleased('PageUp');
-    expect(inputManager.wasKeyReleased('PageUp')).to.be(true);
+    inputManager.onKeyReleased(33);
+    expect(inputManager.wasKeyReleased(33)).to.be(true);
     expect(inputManager.anyKeyPressed()).to.be(false);
+
+    // Pressed Right shift
+    inputManager.onKeyPressed(16, 2);
+    expect(inputManager.anyKeyPressed()).to.be(true);
+    expect(inputManager.getLastPressedKey()).to.be(2016);
+    expect(inputManager.isKeyPressed(2016)).to.be(true);
+    expect(inputManager.isKeyPressed(1016)).to.be(false);
+    expect(inputManager.isKeyPressed(16)).to.be(false);
+    expect(inputManager.isKeyPressed(-16)).to.be(true);
+
+    inputManager.onKeyReleased(16, 2);
+    expect(inputManager.wasKeyReleased(2016)).to.be(true);
+    expect(inputManager.anyKeyPressed()).to.be(false);
+    expect(inputManager.getLastPressedKey()).to.be(2016);
+    expect(inputManager.wasKeyReleased(2016)).to.be(true);
+    expect(inputManager.wasKeyReleased(1016)).to.be(false);
+    expect(inputManager.wasKeyReleased(16)).to.be(false);
+    expect(inputManager.wasKeyReleased(-16)).to.be(true);
   });
 
   it('should handle mouse events', function() {

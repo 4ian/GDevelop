@@ -42,26 +42,56 @@ gdjs.InputManager.MOUSE_RIGHT_BUTTON = 1;
 gdjs.InputManager.MOUSE_MIDDLE_BUTTON = 2;
 
 /**
- * Should be called whenever a key is pressed
- * @param {string} keyCode The key code (event.code) associated to the key press.
+ * Returns the location-modified keyCode.
+ *
+ * @private
  */
-gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
-  this._pressedKeys.put(keyCode, true);
-  this._lastPressedKey = keyCode;
+gdjs.InputManager.prototype.getModifiedKeyCode = function(keyCode, location) {
+  if (keyCode > 0 && location) {
+    // If it is a numpad number, do not modify it.
+    if (96 <= keyCode && keyCode <= 105) {
+      return keyCode;
+    }
+
+    if (
+      location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ||
+      location === KeyboardEvent.DOM_KEY_LOCATION_NUMPAD
+    ) {
+      return keyCode + 1000;
+    }
+  }
+
+  // Keys with unspecified locations are treated as standard keys.
+  return keyCode;
+};
+
+/**
+ * Should be called whenever a key is pressed
+ * @param {number} keyCode The key code associated to the key press.
+ * @param {number} location The location of the event.
+ */
+gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
+  var modifiedKeyCode = this.getModifiedKeyCode(keyCode, location);
+
+  this._pressedKeys.put(modifiedKeyCode, true);
+  this._lastPressedKey = modifiedKeyCode;
 };
 
 /**
  * Should be called whenever a key is released
- * @param {string} keyCode The key code (event.code) associated to the key release.
+ * @param {number} keyCode The key code associated to the key release.
+ * @param {number} location The location of the event.
  */
-gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
-  this._pressedKeys.put(keyCode, false);
-  this._releasedKeys.put(keyCode, true);
+gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
+  var modifiedKeyCode = this.getModifiedKeyCode(keyCode, location);
+
+  this._pressedKeys.put(modifiedKeyCode, false);
+  this._releasedKeys.put(modifiedKeyCode, true);
 };
 
 /**
  * Return the code of the last key that was pressed.
- * @return {string} The code of the last key pressed.
+ * @return {number} The code of the last key pressed.
  */
 gdjs.InputManager.prototype.getLastPressedKey = function() {
   return this._lastPressedKey;
@@ -69,22 +99,54 @@ gdjs.InputManager.prototype.getLastPressedKey = function() {
 
 /**
  * Return true if the key corresponding to keyCode is pressed.
- * @param {string} keyCode The key code (event.code) to be tested.
+ * @param {number} modifiedKeyCode The key code (with location modifiers) to be tested.
  */
-gdjs.InputManager.prototype.isKeyPressed = function(keyCode) {
-  return (
-    this._pressedKeys.containsKey(keyCode) && this._pressedKeys.get(keyCode)
-  );
+gdjs.InputManager.prototype.isKeyPressed = function(modifiedKeyCode) {
+  if (modifiedKeyCode > 0) {
+    return (
+      this._pressedKeys.containsKey(modifiedKeyCode) &&
+      this._pressedKeys.get(modifiedKeyCode)
+    );
+  }
+
+  var possibleKeyCodes = [-modifiedKeyCode, 1000 - modifiedKeyCode];
+  // If any of the possible keys have been pressed, return true.
+  for (var i = 0; i < possibleKeyCodes.length; i++) {
+    if (
+      this._pressedKeys.containsKey(possibleKeyCodes[i]) &&
+      this._pressedKeys.get(possibleKeyCodes[i])
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 };
 
 /**
  * Return true if the key corresponding to keyCode was released during the last frame.
- * @param {string} keyCode The key code (event.code) to be tested.
+ * @param {number} modifiedKeyCode The key code (with location modifiers) to be tested.
  */
-gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
-  return (
-    this._releasedKeys.containsKey(keyCode) && this._releasedKeys.get(keyCode)
-  );
+gdjs.InputManager.prototype.wasKeyReleased = function(modifiedKeyCode) {
+  if (modifiedKeyCode > 0) {
+    return (
+      this._releasedKeys.containsKey(modifiedKeyCode) &&
+      this._releasedKeys.get(modifiedKeyCode)
+    );
+  }
+
+  var possibleKeyCodes = [-modifiedKeyCode, 1000 - modifiedKeyCode];
+  // If any of the possible keys have been pressed, return true.
+  for (var i = 0; i < possibleKeyCodes.length; i++) {
+    if (
+      this._releasedKeys.containsKey(possibleKeyCodes[i]) &&
+      this._releasedKeys.get(possibleKeyCodes[i])
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 };
 
 /**

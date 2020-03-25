@@ -76,13 +76,12 @@ gdjs.registerBehavior(
 gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   runtimeScene
 ) {
-  var LEFTKEY = 'ArrowLeft';
-  var UPKEY = 'ArrowUp';
-  var RIGHTKEY = 'ArrowRight';
-  var DOWNKEY = 'ArrowDown';
-  var LSHIFTKEY = 'ShiftLeft';
-  var RSHIFTKEY = 'ShiftRight';
-  var SPACEKEY = 'Space';
+  var LEFTKEY = 37;
+  var UPKEY = 38;
+  var RIGHTKEY = 39;
+  var DOWNKEY = 40;
+  var ANYSHIFTKEY = -16;
+  var SPACEKEY = 32;
   var object = this.owner;
   var timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 
@@ -355,11 +354,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
     (runtimeScene
       .getGame()
       .getInputManager()
-      .isKeyPressed(LSHIFTKEY) ||
-      runtimeScene
-        .getGame()
-        .getInputManager()
-        .isKeyPressed(RSHIFTKEY) ||
+      .isKeyPressed(ANYSHIFTKEY) ||
       runtimeScene
         .getGame()
         .getInputManager()

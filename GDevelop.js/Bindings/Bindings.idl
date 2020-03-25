@@ -1683,7 +1683,7 @@ interface ExpressionCompletionDescription {
   [Const, Ref] DOMString GetPrefix();
   [Const, Ref] DOMString GetObjectName();
   [Const, Ref] DOMString GetBehaviorName();
-  boolean IsInformative();
+  boolean IsExact();
 };
 
 interface VectorExpressionCompletionDescription {

@@ -18,6 +18,7 @@ type CommonProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   isInline?: boolean,
+  onRequestClose?: () => void,
   resourceSources?: Array<ResourceSource>,
   onChooseResource?: ChooseResourceFunction,
   resourceExternalEditors?: Array<ResourceExternalEditor>,

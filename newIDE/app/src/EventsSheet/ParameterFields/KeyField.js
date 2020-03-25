@@ -89,13 +89,10 @@ const keyNames = [
   'Pause',
   'RControl',
   'LControl',
-  'Any Control',
   'RAlt',
   'LAlt',
-  'Any Alt',
   'RShift',
   'LShift',
-  'Any Shift',
 ];
 
 const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;

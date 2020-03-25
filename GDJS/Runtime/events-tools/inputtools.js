@@ -74,7 +74,7 @@ gdjs.evtTools.input.lastPressedKey = function(runtimeScene) {
 };
 
 /**
- * Hashmap associated each name of a key to its keyCode, adding 1000 if is is a right/numpad variant.
+ * Hashmap associated each name of a key to its location-aware keyCode.
  * @memberof gdjs.evtTools
  */
 gdjs.evtTools.input.keysNameToCode = {

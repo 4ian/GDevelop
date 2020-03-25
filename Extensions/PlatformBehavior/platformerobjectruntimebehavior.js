@@ -355,7 +355,11 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
     (runtimeScene
       .getGame()
       .getInputManager()
-      .isKeyPressed(ANYSHIFTKEY) ||
+      .isKeyPressed(LSHIFTKEY) ||
+      runtimeScene
+        .getGame()
+        .getInputManager()
+        .isKeyPressed(RSHIFTKEY) ||
       runtimeScene
         .getGame()
         .getInputManager()

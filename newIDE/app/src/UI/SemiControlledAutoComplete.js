@@ -247,7 +247,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               // This change was implemented in this PR https://github.com/4ian/GDevelop/pull/1586,
               // which is meant to solve this issue, https://github.com/4ian/GDevelop/issues/1562
               // Important takeaway: Never try to catch these events, our underlying assumption is that we don't need these events
-              // anymore after selection of option. Stopping propagation of events is never a good idea, 
+              // anymore after selection of option. Stopping propagation of events is never a good idea,
               // but this is meant to be a hack and not a proper solution.
               onClick: (event: SyntheticMouseEvent<HTMLUListElement>) => {
                 event.nativeEvent.stopImmediatePropagation();

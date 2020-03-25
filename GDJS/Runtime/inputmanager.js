@@ -42,51 +42,65 @@ gdjs.InputManager.MOUSE_RIGHT_BUTTON = 1;
 gdjs.InputManager.MOUSE_MIDDLE_BUTTON = 2;
 
 /**
- * Returns the location-modified keyCode.
+ * Holds the keyCodes of the keys which only have left / right
+ * variants and should thus default to their left variant values
+ * if necessary.
+ *
+ * @constant {number}
+ */
+gdjs.InputManager.DEFAULT_LEFT_VARIANT_KEYS = [16, 17, 18, 91];
+
+/**
+ * Returns the location aware keyCode.
  *
  * @private
  */
-gdjs.InputManager.prototype.getModifiedKeyCode = function(keyCode, location) {
-  if (keyCode > 0 && location) {
+gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
+  keyCode,
+  location
+) {
+  if (location) {
     // If it is a numpad number, do not modify it.
     if (96 <= keyCode && keyCode <= 105) {
       return keyCode;
     }
 
-    if (
-      location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ||
-      location === KeyboardEvent.DOM_KEY_LOCATION_NUMPAD
-    ) {
-      return keyCode + 1000;
-    }
+    return keyCode + 1000 * location;
   }
 
-  // Keys with unspecified locations are treated as standard keys.
+  if (gdjs.InputManager.DEFAULT_LEFT_VARIANT_KEYS.includes(keyCode)) {
+    return keyCode + 1000;
+  }
+
   return keyCode;
 };
 
 /**
- * Should be called whenever a key is pressed
+ * Should be called whenever a key is pressed. The location corresponds to
+ * KeyboardEvent.location, which should be 0 for standard keys, 1 for left keys,
+ * 2 for right keys, and 3 for numpad keys.
  * @param {number} keyCode The key code associated to the key press.
  * @param {number} location The location of the event.
  */
 gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
-  var modifiedKeyCode = this.getModifiedKeyCode(keyCode, location);
+  var locationAwareKeyCode = this._getLocationAwareKeyCode(keyCode, location);
 
-  this._pressedKeys.put(modifiedKeyCode, true);
-  this._lastPressedKey = modifiedKeyCode;
+  this._pressedKeys.put(locationAwareKeyCode, true);
+  this._lastPressedKey = locationAwareKeyCode;
 };
 
 /**
- * Should be called whenever a key is released
+ * Should be called whenever a key is released. The location corresponds to
+ * KeyboardEvent.location, which should be 0 for standard keys, 1 for left keys,
+ * 2 for right keys, and 3 for numpad keys.
  * @param {number} keyCode The key code associated to the key release.
  * @param {number} location The location of the event.
  */
 gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
-  var modifiedKeyCode = this.getModifiedKeyCode(keyCode, location);
+  var locationAwareKeyCode = this._getLocationAwareKeyCode(keyCode, location);
 
-  this._pressedKeys.put(modifiedKeyCode, false);
-  this._releasedKeys.put(modifiedKeyCode, true);
+  this._pressedKeys.put(locationAwareKeyCode, false);
+  this._releasedKeys.put(locationAwareKeyCode, true);
 };
 
 /**
@@ -99,54 +113,24 @@ gdjs.InputManager.prototype.getLastPressedKey = function() {
 
 /**
  * Return true if the key corresponding to keyCode is pressed.
- * @param {number} modifiedKeyCode The key code (with location modifiers) to be tested.
+ * @param {number} locationAwareKeyCode The location-aware key code to be tested.
  */
-gdjs.InputManager.prototype.isKeyPressed = function(modifiedKeyCode) {
-  if (modifiedKeyCode > 0) {
-    return (
-      this._pressedKeys.containsKey(modifiedKeyCode) &&
-      this._pressedKeys.get(modifiedKeyCode)
-    );
-  }
-
-  var possibleKeyCodes = [-modifiedKeyCode, 1000 - modifiedKeyCode];
-  // If any of the possible keys have been pressed, return true.
-  for (var i = 0; i < possibleKeyCodes.length; i++) {
-    if (
-      this._pressedKeys.containsKey(possibleKeyCodes[i]) &&
-      this._pressedKeys.get(possibleKeyCodes[i])
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+gdjs.InputManager.prototype.isKeyPressed = function(locationAwareKeyCode) {
+  return (
+    this._pressedKeys.containsKey(locationAwareKeyCode) &&
+    this._pressedKeys.get(locationAwareKeyCode)
+  );
 };
 
 /**
  * Return true if the key corresponding to keyCode was released during the last frame.
- * @param {number} modifiedKeyCode The key code (with location modifiers) to be tested.
+ * @param {number} locationAwareKeyCode The location-aware key code to be tested.
  */
-gdjs.InputManager.prototype.wasKeyReleased = function(modifiedKeyCode) {
-  if (modifiedKeyCode > 0) {
-    return (
-      this._releasedKeys.containsKey(modifiedKeyCode) &&
-      this._releasedKeys.get(modifiedKeyCode)
-    );
-  }
-
-  var possibleKeyCodes = [-modifiedKeyCode, 1000 - modifiedKeyCode];
-  // If any of the possible keys have been pressed, return true.
-  for (var i = 0; i < possibleKeyCodes.length; i++) {
-    if (
-      this._releasedKeys.containsKey(possibleKeyCodes[i]) &&
-      this._releasedKeys.get(possibleKeyCodes[i])
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+gdjs.InputManager.prototype.wasKeyReleased = function(locationAwareKeyCode) {
+  return (
+    this._releasedKeys.containsKey(locationAwareKeyCode) &&
+    this._releasedKeys.get(locationAwareKeyCode)
+  );
 };
 
 /**

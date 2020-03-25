@@ -885,7 +885,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     // Move of the event in the list is handled by EventsTree.
     // This could be refactored and put here if the drag'n'drop of events
     // is reworked at some point.
-
     this._saveChangesToHistory();
   };
 

@@ -688,7 +688,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     object.setName(newName);
-
     done(true);
   };
 
@@ -720,7 +719,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         !!answer
       );
     }
-
     done(true);
   };
 

@@ -30,7 +30,7 @@ type ShortcutCallbacks = {|
   onSearch?: () => void,
   onZoomOut?: () => void,
   onZoomIn?: () => void,
-  onQuitSearch?: () => void,
+  onEscape?: () => void,
 |};
 
 type ConstructorArgs = {|
@@ -112,7 +112,7 @@ export default class KeyboardShortcuts {
       onSearch,
       onZoomOut,
       onZoomIn,
-      onQuitSearch,
+      onEscape,
     } = this._shortcutCallbacks;
 
     if (onMove) {
@@ -155,8 +155,8 @@ export default class KeyboardShortcuts {
     if (onSearch && this._isControlOrCmdPressed() && evt.which === F_KEY) {
       onSearch();
     }
-    if (onQuitSearch && evt.which === ESC_KEY) {
-      onQuitSearch();
+    if (onEscape && evt.which === ESC_KEY) {
+      onEscape();
     }
 
     if (isMacLike()) {

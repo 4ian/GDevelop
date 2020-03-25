@@ -23,8 +23,8 @@ gdjs.PixiFiltersTools.registerFilterCreator("Reflection", {
     return reflectionFilter;
   },
   update: function(filter, layer) {
-    if (filter.animated) {
-      filter.time -= layer.getElapsedTime() / 1000;
+    if (filter.animationSpeed !== 0) { 
+      filter.time += layer.getElapsedTime() / 1000 * filter.animationSpeed;
     }
   },
   updateDoubleParameter: function(filter, parameterName, value) {
@@ -55,14 +55,15 @@ gdjs.PixiFiltersTools.registerFilterCreator("Reflection", {
     if (parameterName === "alphaEnding") {
       filter.alpha[1] = value;
     }
+
+    if (parameterName === "animationSpeed") {
+      filter.animationSpeed = value;
+    }
   },
   updateStringParameter: function(filter, parameterName, value) {},
   updateBooleanParameter: function(filter, parameterName, value) {
     if (parameterName === "mirror") {
       filter.mirror = value;
-    }
-    if (parameterName === "animated") {
-      filter.animated = value;
     }
   }
 });

@@ -14,7 +14,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('Blur', {
       return;
 
     if (parameterName === 'kernelSize') {
-      value = gdjs.PixiFiltersTools.clampKernelSize(value);
+      value = gdjs.PixiFiltersTools.clampKernelSize(value, 5, 15);
     }
 
     filter[parameterName] = value;

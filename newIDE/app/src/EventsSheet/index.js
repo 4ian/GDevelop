@@ -81,6 +81,7 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 const gd = global.gd;
 
 type Props = {|
@@ -92,6 +93,7 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   showPreviewButton: boolean,
   showNetworkPreviewButton: boolean,
+  previewButtonSettings: PreviewButtonSettings,
   onPreview: (options: PreviewOptions) => void,
   onOpenDebugger: () => void,
   onOpenSettings?: ?() => void,
@@ -108,7 +110,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 type State = {|
   history: HistoryState,
@@ -223,6 +225,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
 
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (this.state.history !== prevState.history)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+  }
+
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
@@ -245,6 +252,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         showPreviewButton={this.props.showPreviewButton}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onPreview={() => this.props.onPreview({})}
+        previewButtonSettings={this.props.previewButtonSettings}
         onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         onOpenDebugger={() => {
           this.props.onOpenDebugger();
@@ -313,7 +321,6 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   addNewEvent = (type: string, context: ?EventContext): Array<gdBaseEvent> => {
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
     let insertTopOfSelection = false;
@@ -603,7 +610,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
     this.setState(
       {
         selection: clearSelection(),
@@ -724,7 +730,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
     this.setState({ history: newHistory }, () => this.updateToolbar());
   };
 
@@ -739,7 +744,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
     this.setState({ history: newHistory }, () => this.updateToolbar());
   };
 
@@ -822,7 +826,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     standardEvt.getActions().push_back(action);
     action.delete();
 
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
     this.deleteSelection({ deleteInstructions: false });
   };
 
@@ -847,7 +850,6 @@ export default class EventsSheet extends React.Component<Props, State> {
       .getSubEvents()
       .insertEvents(eventsList, 0, eventsList.getEventsCount(), 0);
 
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
     this.deleteSelection({ deleteInstructions: false });
   };
 
@@ -866,7 +868,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     this._saveChangesToHistory(() => {
       if (this._eventsTree) this._eventsTree.forceEventsUpdate();
     });
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
   };
 
   _searchInEvents = (
@@ -884,7 +885,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     // Move of the event in the list is handled by EventsTree.
     // This could be refactored and put here if the drag'n'drop of events
     // is reworked at some point.
-    this.props.unsavedChangesManagement.triggerUnsavedChanges();
+
     this._saveChangesToHistory();
   };
 
@@ -936,7 +937,6 @@ export default class EventsSheet extends React.Component<Props, State> {
           this.closeInstructionEditor(true);
           ensureSingleOnceInstructions(instrsList);
           if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-          this.props.unsavedChangesManagement.triggerUnsavedChanges();
         }}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}

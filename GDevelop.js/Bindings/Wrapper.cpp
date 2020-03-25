@@ -451,7 +451,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_CreateNewGDJSProject CreateNewGDJSProject
 #define STATIC_InitializePlatforms InitializePlatforms
-#define STATIC_ValidateObjectName ValidateObjectName
+#define STATIC_ValidateName ValidateName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(gd::String(x))
 #define STATIC_IsObject IsObject

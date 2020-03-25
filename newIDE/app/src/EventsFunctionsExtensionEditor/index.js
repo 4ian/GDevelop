@@ -39,6 +39,11 @@ import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensi
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import {
+  type PreviewButtonSettings,
+  emptyPreviewButtonSettings,
+} from '../MainFrame/Toolbar/PreviewButtons';
+
 const gd = global.gd;
 
 type Props = {|
@@ -59,7 +64,8 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
+  previewButtonSettings: PreviewButtonSettings,
 |};
 
 type State = {|
@@ -215,10 +221,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
         )
       );
       return;
@@ -249,10 +255,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
         )
       );
       return done(false);
@@ -317,10 +323,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
         )
       );
       return;
@@ -584,6 +590,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 events={selectedEventsFunction.getEvents()}
                 showPreviewButton={false}
                 onPreview={options => {}}
+                previewButtonSettings={emptyPreviewButtonSettings}
                 showNetworkPreviewButton={false}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}
@@ -597,7 +604,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onOpenDebugger={() => {}}
                 onCreateEventsFunction={this.props.onCreateEventsFunction}
                 onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
-                unsavedChangesManagement={this.props.unsavedChangesManagement}
+                unsavedChanges={this.props.unsavedChanges}
               />
             </Background>
           ) : (
@@ -859,7 +866,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               this._editBehavior(null);
             }}
             onRenameProperty={(oldName, newName) =>

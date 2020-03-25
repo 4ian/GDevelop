@@ -100,10 +100,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     );
     ipcRenderer.on(
       ('main-menu-create': MainMenuEvent),
-      event =>
-        this._editor &&
-        this._editor.askToCloseProject() &&
-        this._editor.openCreateDialog()
+      event => this._editor && this._editor.openCreateDialog()
     );
     ipcRenderer.on(
       ('main-menu-open-project-manager': MainMenuEvent),
@@ -178,6 +175,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         { type: 'separator' },
         {
           label: i18n._(t`Export (web, iOS, Android)...`),
+          accelerator: 'CommandOrControl+E',
           onClickSendEvent: 'main-menu-export',
         },
         { type: 'separator' },

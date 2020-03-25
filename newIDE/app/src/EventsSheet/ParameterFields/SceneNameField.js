@@ -1,14 +1,16 @@
 // @flow
 import React, { Component } from 'react';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
 import { enumerateLayouts } from '../../ProjectManager/EnumerateProjectItems';
 
 export default class SceneNameField extends Component<
   ParameterFieldProps,
   {||}
 > {
-  _field: ?SemiControlledAutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   focus() {
     if (this._field) this._field.focus();

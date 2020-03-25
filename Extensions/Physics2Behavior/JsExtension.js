@@ -754,8 +754,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('setShapeScale')
-      
+      .setFunctionName('setShapeScale')  
       .setGetter('getShapeScale');
 
     aut
@@ -790,8 +789,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
-      .setFunctionName('setDensity')
-      
+      .setFunctionName('setDensity')     
       .setGetter('getDensity');
 
     aut
@@ -840,7 +838,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setFriction')
-      
       .setGetter('getFriction');
 
     aut
@@ -889,7 +886,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRestitution')
-      
       .setGetter('getRestitution');
 
     aut
@@ -938,7 +934,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setLinearDamping')
-      
       .setGetter('getLinearDamping');
 
     aut
@@ -987,7 +982,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setAngularDamping')
-      
       .setGetter('getAngularDamping');
 
     aut
@@ -1036,7 +1030,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setGravityScale')
-      
       .setGetter('getGravityScale');
 
     aut
@@ -1157,7 +1150,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setLinearVelocityX')
-      
       .setGetter('getLinearVelocityX');
 
     aut
@@ -1204,7 +1196,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setLinearVelocityY')
-      
       .setGetter('getLinearVelocityY');
 
     aut
@@ -1280,7 +1271,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setAngularVelocity')
-      
       .setGetter('getAngularVelocity');
 
     aut
@@ -1729,7 +1719,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setDistanceJointLength')
-      
       .setGetter('getDistanceJointLength');
 
     aut
@@ -1762,7 +1751,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setDistanceJointFrequency')
-      
       .setGetter('getDistanceJointFrequency');
 
     aut
@@ -1795,7 +1783,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setDistanceJointDampingRatio')
-      
       .setGetter('getDistanceJointDampingRatio');
 
     aut
@@ -2091,7 +2078,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRevoluteJointMotorSpeed')
-      
       .setGetter('getRevoluteJointMotorSpeed');
 
     aut
@@ -2124,7 +2110,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRevoluteJointMaxMotorTorque')
-      
       .setGetter('getRevoluteJointMaxMotorTorque');
 
     aut
@@ -2405,7 +2390,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setPrismaticJointMotorSpeed')
-      
       .setGetter('getPrismaticJointMotorSpeed');
 
     aut
@@ -2438,7 +2422,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setPrismaticJointMaxMotorForce')
-      
       .setGetter('getPrismaticJointMaxMotorForce');
 
     aut
@@ -2709,7 +2692,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setGearJointRatio')
-      
       .setGetter('getGearJointRatio');
 
     aut
@@ -2835,7 +2817,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMouseJointMaxForce')
-      
       .setGetter('getMouseJointMaxForce');
 
     aut
@@ -2868,7 +2849,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMouseJointFrequency')
-      
       .setGetter('getMouseJointFrequency');
 
     aut
@@ -2901,7 +2881,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMouseJointDampingRatio')
-      
       .setGetter('getMouseJointDampingRatio');
 
     aut
@@ -3071,7 +3050,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointMotorSpeed')
-      
       .setGetter('getWheelJointMotorSpeed');
 
     aut
@@ -3104,7 +3082,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointMaxMotorTorque')
-      
       .setGetter('getWheelJointMaxMotorTorque');
 
     aut
@@ -3151,7 +3128,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointFrequency')
-      
       .setGetter('getWheelJointFrequency');
 
     aut
@@ -3184,7 +3160,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWheelJointDampingRatio')
-      
       .setGetter('getWheelJointDampingRatio');
 
     aut
@@ -3281,7 +3256,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWeldJointFrequency')
-      
       .setGetter('getWeldJointFrequency');
 
     aut
@@ -3314,7 +3288,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setWeldJointDampingRatio')
-      
       .setGetter('getWeldJointDampingRatio');
 
     aut
@@ -3390,7 +3363,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setRopeJointMaxLength')
-      
       .setGetter('getRopeJointMaxLength');
 
     aut
@@ -3459,7 +3431,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setFrictionJointMaxForce')
-      
       .setGetter('getFrictionJointMaxForce');
 
     aut
@@ -3492,7 +3463,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setFrictionJointMaxTorque')
-      
       .setGetter('getFrictionJointMaxTorque');
 
     aut
@@ -3610,7 +3580,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointAngularOffset')
-      
       .setGetter('getMotorJointAngularOffset');
 
     aut
@@ -3643,7 +3612,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointMaxForce')
-      
       .setGetter('getMotorJointMaxForce');
 
     aut
@@ -3676,7 +3644,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointMaxTorque')
-      
       .setGetter('getMotorJointMaxTorque');
 
     aut
@@ -3709,7 +3676,6 @@ module.exports = {
       .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName('setMotorJointCorrectionFactor')
-      
       .setGetter('getMotorJointCorrectionFactor');
 
     aut

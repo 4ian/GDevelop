@@ -27,6 +27,10 @@ export default class SceneEditorContainer extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  forceUpdateEditor() {
+    if (this.editor) this.editor.forceUpdateObjectsList();
+  }
+
   getSerializedElements() {
     const layout = this.getLayout();
     if (!layout) return {};
@@ -76,6 +80,7 @@ export default class SceneEditorContainer extends BaseEditor {
         onPreview={(options: PreviewOptions) =>
           this.props.onPreview(project, layout, options)
         }
+        previewButtonSettings={this.props.previewButtonSettings}
         onOpenDebugger={this.props.onOpenDebugger}
         isActive={isActive}
       />

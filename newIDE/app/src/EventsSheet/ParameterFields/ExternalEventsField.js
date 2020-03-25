@@ -41,6 +41,7 @@ export default class ExternalEventsField extends React.Component<
     const {
       value,
       onChange,
+      onRequestClose,
       isInline,
       project,
       parameterMetadata,
@@ -59,6 +60,7 @@ export default class ExternalEventsField extends React.Component<
         id="external-events-field"
         value={value}
         onChange={onChange}
+        onRequestClose={onRequestClose}
         dataSource={getList(project)}
         openOnFocus={!isInline}
         ref={field => (this._field = field)}

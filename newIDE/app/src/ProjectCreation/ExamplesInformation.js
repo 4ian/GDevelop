@@ -487,10 +487,6 @@ module.exports = {
         "name": "Physics2"
       },
       {
-        "fullName": "Advanced control features",
-        "name": "BuiltinAdvanced"
-      },
-      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       },
@@ -512,16 +508,24 @@ module.exports = {
     "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\n",
     "usedExtensions": [
       {
-        "fullName": "Sprite",
-        "name": "Sprite"
-      },
-      {
         "fullName": "Text object",
         "name": "TextObject"
       },
       {
-        "fullName": "Tiled Sprite Object",
-        "name": "TiledSpriteObject"
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
       },
       {
         "fullName": "",
@@ -536,8 +540,8 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "Variable features",
@@ -546,6 +550,10 @@ module.exports = {
       {
         "fullName": "External layouts",
         "name": "BuiltinExternalLayouts"
+      },
+      {
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       }
     ]
   },

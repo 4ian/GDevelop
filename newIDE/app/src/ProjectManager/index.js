@@ -124,6 +124,7 @@ type ItemProps = {|
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
+  onDuplicate: () => void,
   canPaste: () => boolean,
   canMoveUp: boolean,
   onMoveUp: () => void,
@@ -206,6 +207,10 @@ class Item extends React.Component<ItemProps, {||}> {
                 enabled: this.props.canPaste(),
                 click: () => this.props.onPaste(),
               },
+              {
+                label: 'Duplicate',
+                click: () => this.props.onDuplicate(),
+              },
               { type: 'separator' },
               {
                 label: 'Move up',
@@ -262,7 +267,7 @@ type Props = {|
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 
 type State = {|
@@ -341,7 +346,17 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.setName(newName); // Unserialization has overwritten the name.
     newLayout.updateBehaviorsSharedData(project);
 
-    this.forceUpdate();
+    this._onModifiedObject();
+  };
+
+  _duplicateLayout = (layout: gdLayout, index: number) => {
+    this._copyLayout(layout);
+    this._pasteLayout(index);
+  };
+
+  _duplicateLayout = (layout: gdLayout, index: number) => {
+    this._copyLayout(layout);
+    this._pasteLayout(index);
   };
 
   _addLayout = (index: number) => {
@@ -355,7 +370,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.setName(newName);
     newLayout.updateBehaviorsSharedData(project);
 
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _addExternalEvents = (index: number) => {
@@ -365,7 +380,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasExternalEventsNamed(name)
     );
     project.insertNewExternalEvents(newName, index + 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _addExternalLayout = (index: number) => {
@@ -375,7 +390,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasExternalLayoutNamed(name)
     );
     project.insertNewExternalLayout(newName, index + 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _addEventsFunctionsExtension = (index: number) => {
@@ -385,7 +400,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasEventsFunctionsExtensionNamed(name)
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _moveUpLayout = (index: number) => {
@@ -393,7 +408,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapLayouts(index, index - 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _moveDownLayout = (index: number) => {
@@ -401,7 +416,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getLayoutsCount() - 1) return;
 
     project.swapLayouts(index, index + 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _copyExternalEvents = (externalEvents: gdExternalEvents) => {
@@ -438,7 +453,23 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     newExternalEvents.setName(newName); // Unserialization has overwritten the name.
 
-    this.forceUpdate();
+    this._onModifiedObject();
+  };
+
+  _duplicateExternalEvents = (
+    externalEvents: gdExternalEvents,
+    index: number
+  ) => {
+    this._copyExternalEvents(externalEvents);
+    this._pasteExternalEvents(index);
+  };
+
+  _duplicateExternalEvents = (
+    externalEvents: gdExternalEvents,
+    index: number
+  ) => {
+    this._copyExternalEvents(externalEvents);
+    this._pasteExternalEvents(index);
   };
 
   _moveUpExternalEvents = (index: number) => {
@@ -446,7 +477,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapExternalEvents(index, index - 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _moveDownExternalEvents = (index: number) => {
@@ -454,7 +485,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getExternalEventsCount() - 1) return;
 
     project.swapExternalEvents(index, index + 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _copyExternalLayout = (externalLayout: gdExternalLayout) => {
@@ -485,8 +516,23 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
     newExternalLayout.setName(newName); // Unserialization has overwritten the name.
+    this._onModifiedObject();
+  };
 
-    this.forceUpdate();
+  _duplicateExternalLayout = (
+    externalLayout: gdExternalLayout,
+    index: number
+  ) => {
+    this._copyExternalLayout(externalLayout);
+    this._pasteExternalLayout(index);
+  };
+
+  _duplicateExternalLayout = (
+    externalLayout: gdExternalLayout,
+    index: number
+  ) => {
+    this._copyExternalLayout(externalLayout);
+    this._pasteExternalLayout(index);
   };
 
   _moveUpExternalLayout = (index: number) => {
@@ -494,7 +540,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapExternalLayouts(index, index - 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _moveDownExternalLayout = (index: number) => {
@@ -502,7 +548,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getExternalLayoutsCount() - 1) return;
 
     project.swapExternalLayouts(index, index + 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _copyEventsFunctionsExtension = (
@@ -519,6 +565,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   ) => {
     this._copyEventsFunctionsExtension(eventsFunctionsExtension);
     this.props.onDeleteEventsFunctionsExtension(eventsFunctionsExtension);
+  };
+
+  _duplicateEventsFunctionsExtension = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    index: number
+  ) => {
+    this._copyEventsFunctionsExtension(eventsFunctionsExtension);
+    this._pasteEventsFunctionsExtension(index);
   };
 
   _pasteEventsFunctionsExtension = (index: number) => {
@@ -547,7 +601,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
 
-    this.forceUpdate();
+    this._onModifiedObject();
     this.props.onReloadEventsFunctionsExtensions();
   };
 
@@ -556,7 +610,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapEventsFunctionsExtensions(index, index - 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _moveDownEventsFunctionsExtension = (index: number) => {
@@ -564,7 +618,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getEventsFunctionsExtensionsCount() - 1) return;
 
     project.swapEventsFunctionsExtensions(index, index + 1);
-    this.forceUpdate();
+    this._onModifiedObject();
   };
 
   _renderMenu() {
@@ -629,6 +683,11 @@ export default class ProjectManager extends React.Component<Props, State> {
 
   _onRequestSearch = () => {
     /* Do nothing for now, but we could open the first result. */
+  };
+
+  _onModifiedObject = () => {
+    this.forceUpdate();
+    this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   render() {
@@ -711,28 +770,19 @@ export default class ProjectManager extends React.Component<Props, State> {
                       editingName={
                         renamedItemKind === 'layout' && renamedItemName === name
                       }
-                      onEdit={() => {
-                        this.props.onOpenLayout(name);
-                      }}
-                      onDelete={() => {
-                        return this.props.onDeleteLayout(layout);
-                      }}
+                      onEdit={() => this.props.onOpenLayout(name)}
+                      onDelete={() => this.props.onDeleteLayout(layout)}
                       addLabel={'Add a New Scene'}
-                      onAdd={() => {
-                        this._addLayout(i);
-                      }}
+                      onAdd={() => this._addLayout(i)}
                       onRename={newName => {
                         this.props.onRenameLayout(name, newName);
                         this._onEditName(null, '');
                       }}
-                      onEditName={() => {
-                        return this._onEditName('layout', name);
-                      }}
+                      onEditName={() => this._onEditName('layout', name)}
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
-                      onPaste={() => {
-                        return this._pasteLayout(i);
-                      }}
+                      onPaste={() => this._pasteLayout(i)}
+                      onDuplicate={() => this._duplicateLayout(layout, i)}
                       canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
                       canMoveUp={i !== 0}
                       onMoveUp={() => this._moveUpLayout(i)}
@@ -777,30 +827,25 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemKind === 'external-events' &&
                         renamedItemName === name
                       }
-                      onEdit={() => {
-                        return this.props.onOpenExternalEvents(name);
-                      }}
-                      onDelete={() => {
-                        this.props.onDeleteExternalEvents(externalEvents);
-                      }}
+                      onEdit={() => this.props.onOpenExternalEvents(name)}
+                      onDelete={() =>
+                        this.props.onDeleteExternalEvents(externalEvents)
+                      }
                       addLabel={'Add New External Events'}
-                      onAdd={() => {
-                        return this._addExternalEvents(i);
-                      }}
+                      onAdd={() => this._addExternalEvents(i)}
                       onRename={newName => {
                         this.props.onRenameExternalEvents(name, newName);
                         this._onEditName(null, '');
                       }}
-                      onEditName={() => {
-                        this._onEditName('external-events', name);
-                      }}
+                      onEditName={() =>
+                        this._onEditName('external-events', name)
+                      }
                       onCopy={() => this._copyExternalEvents(externalEvents)}
-                      onCut={() => {
-                        this._cutExternalEvents(externalEvents);
-                      }}
-                      onPaste={() => {
-                        this._pasteExternalEvents(i);
-                      }}
+                      onCut={() => this._cutExternalEvents(externalEvents)}
+                      onPaste={() => this._pasteExternalEvents(i)}
+                      onDuplicate={() =>
+                        this._duplicateExternalEvents(externalEvents, i)
+                      }
                       canPaste={() =>
                         Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
                       }
@@ -863,6 +908,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onCopy={() => this._copyExternalLayout(externalLayout)}
                       onCut={() => this._cutExternalLayout(externalLayout)}
                       onPaste={() => this._pasteExternalLayout(i)}
+                      onDuplicate={() =>
+                        this._duplicateExternalLayout(externalLayout, i)
+                      }
                       canPaste={() =>
                         Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
                       }
@@ -913,18 +961,16 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemKind === 'events-functions-extension' &&
                         renamedItemName === name
                       }
-                      onEdit={() => {
-                        this.props.onOpenEventsFunctionsExtension(name);
-                      }}
-                      onDelete={() => {
-                        return this.props.onDeleteEventsFunctionsExtension(
+                      onEdit={() =>
+                        this.props.onOpenEventsFunctionsExtension(name)
+                      }
+                      onDelete={() =>
+                        this.props.onDeleteEventsFunctionsExtension(
                           eventsFunctionsExtension
-                        );
-                      }}
+                        )
+                      }
                       addLabel={'Add a New Extension'}
-                      onAdd={() => {
-                        this._addEventsFunctionsExtension(i);
-                      }}
+                      onAdd={() => this._addEventsFunctionsExtension(i)}
                       onRename={newName => {
                         this.props.onRenameEventsFunctionsExtension(
                           name,
@@ -946,6 +992,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                         )
                       }
                       onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                      onDuplicate={() =>
+                        this._duplicateEventsFunctionsExtension(
+                          eventsFunctionsExtension,
+                          i
+                        )
+                      }
                       canPaste={() =>
                         Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)
                       }
@@ -993,7 +1045,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             variablesContainer={project.getVariables()}
             onCancel={() => this.setState({ variablesEditorOpen: false })}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               this.setState({ variablesEditorOpen: false });
             }}
             emptyExplanationMessage={
@@ -1018,7 +1070,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false })
             }
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}

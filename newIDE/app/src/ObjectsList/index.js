@@ -95,7 +95,7 @@ type Props = {|
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
   getThumbnail: (project: gdProject, object: Object) => string,
-  unsavedChangesManagement: UnsavedChanges,
+  unsavedChanges: UnsavedChanges,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -183,6 +183,10 @@ export default class ObjectsList extends React.Component<Props, State> {
     this.setState({ newObjectDialogOpen: true });
   };
 
+  _onModifiedObject = () => {
+    this.forceUpdate();
+    this.props.unsavedChanges.triggerUnsavedChanges();
+  };
   _deleteObject = (objectWithContext: ObjectWithContext) => {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
@@ -207,7 +211,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         objectsContainer.removeObject(object.getName());
       }
 
-      this.forceUpdate();
+      this._onModifiedObject();
     });
   };
 
@@ -270,7 +274,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
     newObject.setName(newName); // Unserialization has overwritten the name.
 
-    this.forceUpdate();
+    this._onModifiedObject();
     if (onObjectPasted) onObjectPasted(newObject);
 
     return { object: newObject, global };
@@ -306,7 +310,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         if (!doRename) return;
 
         object.setName(newName);
-        this.forceUpdate();
+        this._onModifiedObject();
       });
     }
   };
@@ -394,7 +398,7 @@ export default class ObjectsList extends React.Component<Props, State> {
   };
 
   forceUpdateList = () => {
-    this.forceUpdate();
+    this._onModifiedObject();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
@@ -579,7 +583,7 @@ export default class ObjectsList extends React.Component<Props, State> {
             }
             onCancel={() => this._editVariables(null)}
             onApply={() => {
-              this.props.unsavedChangesManagement.triggerUnsavedChanges();
+              this.props.unsavedChanges.triggerUnsavedChanges();
               return this._editVariables(null);
             }}
             title={<Trans>Object Variables</Trans>}

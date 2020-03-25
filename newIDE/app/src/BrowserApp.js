@@ -61,7 +61,7 @@ export const create = (authentification: Authentification) => {
             initialFileMetadataToOpen,
           }) => (
             <UnsavedChangesContext.Consumer>
-              {unsavedChangesManagement => (
+              {unsavedChanges => (
                 <MainFrame
                   i18n={i18n}
                   eventsFunctionsExtensionsState={
@@ -96,7 +96,7 @@ export const create = (authentification: Authentification) => {
                     filterExamples: !Window.isDev(),
                   })}
                   initialFileMetadataToOpen={initialFileMetadataToOpen}
-                  unsavedChangesManagement={unsavedChangesManagement}
+                  unsavedChanges={unsavedChanges}
                 />
               )}
             </UnsavedChangesContext.Consumer>

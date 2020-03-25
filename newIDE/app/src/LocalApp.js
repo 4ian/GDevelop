@@ -63,7 +63,7 @@ export const create = (authentification: Authentification) => {
                 editedElementName={appArguments['edited-element-name']}
               >
                 <UnsavedChangesContext.Consumer>
-                  {unsavedChangesManagement => (
+                  {unsavedChanges => (
                     <MainFrame
                       i18n={i18n}
                       eventsFunctionsExtensionsState={
@@ -77,7 +77,7 @@ export const create = (authentification: Authentification) => {
                       }
                       resourceExternalEditors={localResourceExternalEditors}
                       initialFileMetadataToOpen={initialFileMetadataToOpen}
-                      unsavedChangesManagement={unsavedChangesManagement}
+                      unsavedChanges={unsavedChanges}
                     />
                   )}
                 </UnsavedChangesContext.Consumer>
@@ -109,7 +109,7 @@ export const create = (authentification: Authentification) => {
               initialFileMetadataToOpen,
             }) => (
               <UnsavedChangesContext.Consumer>
-                {unsavedChangesManagement => (
+                {unsavedChanges => (
                   <ElectronMainMenu i18n={i18n}>
                     <MainFrame
                       i18n={i18n}
@@ -149,7 +149,7 @@ export const create = (authentification: Authentification) => {
                         filterExamples: !isDev,
                       })}
                       initialFileMetadataToOpen={initialFileMetadataToOpen}
-                      unsavedChangesManagement={unsavedChangesManagement}
+                      unsavedChanges={unsavedChanges}
                     />
                   </ElectronMainMenu>
                 )}

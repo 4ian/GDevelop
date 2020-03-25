@@ -89,8 +89,7 @@ module.exports = {
     const advancedBloomEffect = extension
       .addEffect('AdvancedBloom')
       .setFullName(_('Advanced bloom'))
-      .setDescription(_('Applies a Bloom Effect.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
+      .setDescription(_('Applies a bloom effect.'))
       .addIncludeFile(
         'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
       )
@@ -256,7 +255,7 @@ module.exports = {
     );
     blurProperties.set(
       'resolution',
-      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+      new gd.PropertyDescriptor(/* defaultValue= */ '5')
         .setLabel(_('Kernel size (one of these values: 5, 7, 9, 11, 13, 15)'))
         .setType('number')
     );
@@ -272,6 +271,39 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ '0.8')
         .setLabel(_('Brightness (between 0 and 1)'))
         .setType('number')
+    );
+
+    const bulgePinchEffect = extension
+      .addEffect('BulgePinch')
+      .setFullName(_('Bulge Pinch'))
+      .setDescription(_('Bulges or pinches the image in a circle.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-bulge-pinch.js')
+      .addIncludeFile('Extensions/Effects/bulge-pinch-pixi-filter.js');
+    const bulgePinchProperties = bulgePinchEffect.getProperties();
+    bulgePinchProperties.set(
+      'centerX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center X (between 0 and 1, 0.5 is image middle)'))
+        .setType('number')
+    );
+    bulgePinchProperties.set(
+      'centerY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center Y (between 0 and 1, 0.5 is image middle)'))
+        .setType('number')
+    );
+    bulgePinchProperties.set(
+      'radius',
+      new gd.PropertyDescriptor(/* defaultValue= */ '100')
+        .setLabel(_('Radius'))
+        .setType('number')
+    );
+    bulgePinchProperties.set(
+      'strength',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('strength (between -1 and 1)'))
+        .setType('number')
+        .setDescription(_('-1 is strong pinch, 0 is no effect, 1 is strong bulge'))
     );
 
     const colorMapEffect = extension
@@ -349,32 +381,32 @@ module.exports = {
     const crtProperties = crtEffect.getProperties();
     crtProperties.set(
       'lineWidth',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel(_('Line width (between 0 and 5)'))
         .setType('number')
     );
     crtProperties.set(
       'lineContrast',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.25')
         .setLabel(_('Line contrast (between 0 and 1)'))
         .setType('number')
     );
     crtProperties.set(
       'noise',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.1')
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
         .setLabel(_('Noise (between 0 and 1)'))
         .setType('number')
     );
     crtProperties.set(
       'curvature',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
         .setLabel(_('Curvature (between 0 and 10)'))
         .setType('number')
     );
     crtProperties.set(
       'verticalLine',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Vertical line (true or false)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
+        .setLabel(_('Show vertical lines'))
         .setType('boolean')
     );
     crtProperties.set(
@@ -402,10 +434,22 @@ module.exports = {
         .setType('number')
     );
     crtProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (Enable animations)'))
-        .setType('boolean')
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Interlaced Lines Speed'))
+        .setType('number')
+        .setDescription(
+          _(
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
+          )
+        )
+    );
+    crtProperties.set(
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
+        .setLabel(_('Noise Frequency'))
+        .setType('number')
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const displacementEffect = extension
@@ -520,6 +564,110 @@ module.exports = {
         .setType('boolean')
     );
 
+    const glitchEffect = extension
+      .addEffect('Glitch')
+      .setFullName(_('Glitch'))
+      .setDescription(_('Applies a glitch effect to an object.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-glitch.js')
+      .addIncludeFile('Extensions/Effects/glitch-pixi-filter.js');
+    const glitchProperties = glitchEffect.getProperties();
+    glitchProperties.set(
+      'slices',
+      new gd.PropertyDescriptor(/* defaultValue= */ '5')
+        .setLabel(_('Slices (between 2 and infinite)'))
+        .setType('number')
+        .setDescription('The maximum number of slices')
+    );
+    glitchProperties.set(
+      'offset',
+      new gd.PropertyDescriptor(/* defaultValue= */ '100')
+        .setLabel(_('Offset (between -400 and 400)'))
+        .setType('number')
+        .setDescription('The maximum offset amount of slices')
+    );
+    glitchProperties.set(
+      'direction',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Direction (between -180 and 180)'))
+        .setType('number')
+        .setDescription('The angle in degree of the offset of slices')
+    );
+    glitchProperties.set(
+      'fillMode',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Fill Mode (between 0 and 4)'))
+        .setType('number')
+        .setDescription(
+          _(
+            'The fill mode of the space after the offset.(0: TRANSPARENT, 1: ORIGINAL, 2: LOOP, 3: CLAMP, 4: MIRROR)'
+          )
+        )
+    );
+    glitchProperties.set(
+      'average',
+      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
+        .setLabel(_('Average'))
+        .setType('boolean')
+        .setDescription('Divide the bands roughly based on equal amounts')
+    );
+    glitchProperties.set(
+      'minSize',
+      new gd.PropertyDescriptor(/* defaultValue= */ '8')
+        .setLabel(_('Min Size'))
+        .setType('number')
+        .setDescription('Minimum size of individual slice')
+    );
+    glitchProperties.set(
+      'sampleSize',
+      new gd.PropertyDescriptor(/* defaultValue= */ '512')
+        .setLabel(_('Sample Size'))
+        .setType('number')
+        .setDescription('The resolution of the displacement image')
+    );
+    glitchProperties.set(
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
+        .setLabel(_('Animation Frequency'))
+        .setType('number')
+        .setDescription('Number of updates per second (0: no updates)')
+    );
+    glitchProperties.set(
+      'redX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Red X offset (between -50 and 50)'))
+        .setType('number')
+    );
+    glitchProperties.set(
+      'redY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '2')
+        .setLabel(_('Red Y offset (between -50 and 50)'))
+        .setType('number')
+    );
+    glitchProperties.set(
+      'greenX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '10')
+        .setLabel(_('Green X offset (between -50 and 50)'))
+        .setType('number')
+    );
+    glitchProperties.set(
+      'greenY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '-4')
+        .setLabel(_('Green Y offset (between -50 and 50)'))
+        .setType('number')
+    );
+    glitchProperties.set(
+      'blueX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '10')
+        .setLabel(_('Blue X offset (between -50 and 50)'))
+        .setType('number')
+    );
+    glitchProperties.set(
+      'blueY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '-4')
+        .setLabel(_('Blue Y offset (between -50 and 50)'))
+        .setType('number')
+    );
+
     const glowEffect = extension
       .addEffect('Glow')
       .setFullName(_('Glow'))
@@ -566,10 +714,15 @@ module.exports = {
         .setType('boolean')
     );
     godrayProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (animate rays)'))
-        .setType('boolean')
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Animation Speed'))
+        .setType('number')
+        .setDescription(
+          _(
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
+          )
+        )
     );
     godrayProperties.set(
       'lacunarity',
@@ -752,20 +905,19 @@ module.exports = {
       new gd.PropertyDescriptor(/* defaultValue= */ '1.0')
         .setLabel(_('Vignetting Alpha (between 0 and 1)'))
         .setType('number')
-        .setDescription('The size of the noise particles')
     );
     oldFilmProperties.set(
       'vignettingBlur',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.3')
         .setLabel(_('Vignetting Blur (between 0 and 1)'))
         .setType('number')
-        .setDescription('Blur intensity of the vignette')
     );
     oldFilmProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Animated (Enable animations)'))
-        .setType('boolean')
+      'animationFrequency',
+      new gd.PropertyDescriptor(/* defaultValue= */ '60')
+        .setLabel(_('Animation Frequency'))
+        .setType('number')
+        .setDescription('Number of updates per second (0: no updates)')
     );
 
     const outlineEffect = extension
@@ -803,6 +955,47 @@ module.exports = {
         .setLabel(_('Size'))
         .setType('number')
         .setDescription(_('Size of the pixels (10 pixels by default)'))
+    );
+
+    const radialBlurEffect = extension
+      .addEffect('RadialBlur')
+      .setFullName(_('Radial Blur'))
+      .setDescription(_('Applies a Motion blur to an object.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-radial-blur.js')
+      .addIncludeFile('Extensions/Effects/radial-blur-pixi-filter.js');
+    const radialBlurProperties = radialBlurEffect.getProperties();
+    radialBlurProperties.set(
+      'radius',
+      new gd.PropertyDescriptor(/* defaultValue= */ '-1')
+        .setLabel(_('Radius'))
+        .setType('number')
+        .setDescription(_('The maximum size of the blur radius, -1 is infinite'))
+    );
+    radialBlurProperties.set(
+      'angle',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Angle (between -180 and 180)'))
+        .setType('number')
+        .setDescription(_('The angle in degree of the motion for blur effect'))
+    );
+    radialBlurProperties.set(
+      'kernelSize',
+      new gd.PropertyDescriptor(/* defaultValue= */ '5')
+        .setLabel(_('Kernel Size (between 3 and 25)'))
+        .setType('number')
+        .setDescription(_('The kernel size of the blur filter (Odd number)'))
+    );
+    radialBlurProperties.set(
+      'centerX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center X'))
+        .setType('number')
+    );
+    radialBlurProperties.set(
+      'centerY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center Y'))
+        .setType('number')
     );
 
     const reflectionEffect = extension
@@ -876,10 +1069,15 @@ module.exports = {
         .setDescription(_('Ending alpha (1 by default)'))
     );
     reflectionProperties.set(
-      'animated',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'false')
-        .setLabel(_('Animate waves'))
-        .setType('boolean')
+      'animationSpeed',
+      new gd.PropertyDescriptor(/* defaultValue= */ '1')
+        .setLabel(_('Animation Speed'))
+        .setType('number')
+        .setDescription(
+          _(
+            '0: Pause, 0.5: Half speed, 1: Normal speed, 2: Double speed, etc...'
+          )
+        )
     );
 
     const rgbSplitEffect = extension
@@ -961,6 +1159,51 @@ module.exports = {
         .setType('number')
     );
 
+    const twistEffect = extension
+      .addEffect('Twist')
+      .setFullName(_('Twist'))
+      .setDescription(
+        _(
+          'Applies a twist effect making objects appear twisted in the given direction.'
+        )
+      )
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-twist.js')
+      .addIncludeFile('Extensions/Effects/twist-pixi-filter.js');
+    const twistProperties = twistEffect.getProperties();
+    twistProperties.set(
+      'radius',
+      new gd.PropertyDescriptor(/* defaultValue= */ '200')
+        .setLabel(_('Radius'))
+        .setType('number')
+        .setDescription(_('The radius of the twist'))
+    );
+    twistProperties.set(
+      'angle',
+      new gd.PropertyDescriptor(/* defaultValue= */ '4')
+        .setLabel(_('Angle (between -10 and 10)'))
+        .setType('number')
+        .setDescription(_('The angle in degree of the twist'))
+    );
+    twistProperties.set(
+      'padding',
+      new gd.PropertyDescriptor(/* defaultValue= */ '20')
+        .setLabel(_('Padding'))
+        .setType('number')
+        .setDescription(_('Padding for filter area'))
+    );
+    twistProperties.set(
+      'offsetX',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center X'))
+        .setType('number')
+    );
+    twistProperties.set(
+      'offsetY',
+      new gd.PropertyDescriptor(/* defaultValue= */ '0')
+        .setLabel(_('Center Y'))
+        .setType('number')
+    );
+
     const zoomBlurEffect = extension
       .addEffect('ZoomBlur')
       .setFullName(_('Zoom blur'))
@@ -992,7 +1235,7 @@ module.exports = {
         .setLabel(_('strength (between 0 and 5)'))
         .setType('number')
     );
-    
+
     return extension;
   },
   runExtensionSanityTests: function(gd, extension) {

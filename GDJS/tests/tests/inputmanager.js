@@ -34,18 +34,16 @@ describe('gdjs.InputManager', function() {
     // Pressed Right shift
     inputManager.onKeyPressed(16, 2);
     expect(inputManager.anyKeyPressed()).to.be(true);
-    expect(inputManager.getLastPressedKey()).to.be(2016);
-    expect(inputManager.isKeyPressed(2016)).to.be(true);
-    expect(inputManager.isKeyPressed(1016)).to.be(false);
+    expect(inputManager.getLastPressedKey()).to.be(1016);
+    expect(inputManager.isKeyPressed(1016)).to.be(true);
     expect(inputManager.isKeyPressed(16)).to.be(false);
     expect(inputManager.isKeyPressed(-16)).to.be(true);
 
     inputManager.onKeyReleased(16, 2);
-    expect(inputManager.wasKeyReleased(2016)).to.be(true);
+    expect(inputManager.wasKeyReleased(1016)).to.be(true);
     expect(inputManager.anyKeyPressed()).to.be(false);
-    expect(inputManager.getLastPressedKey()).to.be(2016);
-    expect(inputManager.wasKeyReleased(2016)).to.be(true);
-    expect(inputManager.wasKeyReleased(1016)).to.be(false);
+    expect(inputManager.getLastPressedKey()).to.be(1016);
+    expect(inputManager.wasKeyReleased(1016)).to.be(true);
     expect(inputManager.wasKeyReleased(16)).to.be(false);
     expect(inputManager.wasKeyReleased(-16)).to.be(true);
   });

@@ -68,7 +68,7 @@ gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
     return keyCode + 1000 * location;
   }
 
-  if (gdjs.InputManager.DEFAULT_LEFT_VARIANT_KEYS.includes(keyCode)) {
+  if (gdjs.InputManager.DEFAULT_LEFT_VARIANT_KEYS.indexOf(keyCode) !== -1) {
     return keyCode + 1000;
   }
 

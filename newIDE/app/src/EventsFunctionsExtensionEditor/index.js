@@ -862,6 +862,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             project={project}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
+            onClose={() => this._editBehavior(null)}
             onApply={() => this._editBehavior(null)}
             onRenameProperty={(oldName, newName) =>
               this._onBehaviorPropertyRenamed(

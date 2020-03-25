@@ -34,18 +34,21 @@ describe('gdjs.InputManager', function() {
     // Pressed Right shift
     inputManager.onKeyPressed(16, 2);
     expect(inputManager.anyKeyPressed()).to.be(true);
-    expect(inputManager.getLastPressedKey()).to.be(1016);
-    expect(inputManager.isKeyPressed(1016)).to.be(true);
-    expect(inputManager.isKeyPressed(16)).to.be(false);
-    expect(inputManager.isKeyPressed(-16)).to.be(true);
+    expect(inputManager.getLastPressedKey()).to.be(2016);
+    expect(inputManager.isKeyPressed(2016)).to.be(true);
+    expect(inputManager.isKeyPressed(1016)).to.be(false);
+
+    // Pressed Control with no location - expect to default to left.
+    inputManager.onKeyPressed(17);
+    expect(inputManager.getLastPressedKey()).to.be(1017);
+    expect(inputManager.isKeyPressed(1017)).to.be(true);
+    expect(inputManager.isKeyPressed(2017)).to.be(false);
 
     inputManager.onKeyReleased(16, 2);
-    expect(inputManager.wasKeyReleased(1016)).to.be(true);
-    expect(inputManager.anyKeyPressed()).to.be(false);
-    expect(inputManager.getLastPressedKey()).to.be(1016);
-    expect(inputManager.wasKeyReleased(1016)).to.be(true);
-    expect(inputManager.wasKeyReleased(16)).to.be(false);
-    expect(inputManager.wasKeyReleased(-16)).to.be(true);
+    expect(inputManager.wasKeyReleased(2016)).to.be(true);
+    expect(inputManager.getLastPressedKey()).to.be(1017);
+    expect(inputManager.wasKeyReleased(2016)).to.be(true);
+    expect(inputManager.wasKeyReleased(1016)).to.be(false);
   });
 
   it('should handle mouse events', function() {

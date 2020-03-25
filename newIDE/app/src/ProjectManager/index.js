@@ -359,6 +359,11 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._pasteLayout(index);
   };
 
+  _duplicateLayout = (layout: gdLayout, index: number) => {
+    this._copyLayout(layout);
+    this._pasteLayout(index);
+  };
+
   _addLayout = (index: number) => {
     const { project } = this.props;
 
@@ -472,6 +477,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._pasteExternalEvents(index);
   };
 
+  _duplicateExternalEvents = (
+    externalEvents: gdExternalEvents,
+    index: number
+  ) => {
+    this._copyExternalEvents(externalEvents);
+    this._pasteExternalEvents(index);
+  };
+
   _moveUpExternalEvents = (index: number) => {
     const { project } = this.props;
     if (index <= 0) return;
@@ -517,6 +530,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
     newExternalLayout.setName(newName); // Unserialization has overwritten the name.
     this._onModifiedObject();
+  };
+
+  _duplicateExternalLayout = (
+    externalLayout: gdExternalLayout,
+    index: number
+  ) => {
+    this._copyExternalLayout(externalLayout);
+    this._pasteExternalLayout(index);
   };
 
   _duplicateExternalLayout = (

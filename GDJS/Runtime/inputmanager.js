@@ -80,7 +80,7 @@ gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
  * KeyboardEvent.location, which should be 0 for standard keys, 1 for left keys,
  * 2 for right keys, and 3 for numpad keys.
  * @param {number} keyCode The key code associated to the key press.
- * @param {number} location The location of the event.
+ * @param {number=} location The location of the event.
  */
 gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
   var locationAwareKeyCode = this._getLocationAwareKeyCode(keyCode, location);
@@ -94,7 +94,7 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
  * KeyboardEvent.location, which should be 0 for standard keys, 1 for left keys,
  * 2 for right keys, and 3 for numpad keys.
  * @param {number} keyCode The key code associated to the key release.
- * @param {number} location The location of the event.
+ * @param {number=} location The location of the event.
  */
 gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
   var locationAwareKeyCode = this._getLocationAwareKeyCode(keyCode, location);

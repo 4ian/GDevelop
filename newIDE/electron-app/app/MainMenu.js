@@ -16,13 +16,15 @@ const buildMainMenuFor = (window, mainMenuTemplate) => {
     menuTemplate.map(menuItemTemplate => {
       const hasOnClick =
         menuItemTemplate.onClickSendEvent || menuItemTemplate.onClickOpenLink;
+      const argument = menuItemTemplate.argument;
 
       return {
         ...menuItemTemplate,
         click: hasOnClick
           ? function() {
               if (menuItemTemplate.onClickSendEvent) {
-                window.webContents.send(menuItemTemplate.onClickSendEvent);
+                if (argument) window.webContents.send(menuItemTemplate.onClickSendEvent, argument);
+                else window.webContents.send(menuItemTemplate.onClickSendEvent);
               }
 
               if (menuItemTemplate.onClickOpenLink) {

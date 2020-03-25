@@ -15,6 +15,7 @@ type Props = {|
 
 type MainMenuEvent =
   | 'main-menu-open'
+  | 'main-menu-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
   | 'main-menu-close'
@@ -37,6 +38,7 @@ type MenuItemTemplate =
       accelerator?: string,
       enabled?: boolean,
       label?: string,
+      argument?: Object,
     |}
   | {|
       submenu: Array<MenuItemTemplate>,
@@ -78,6 +80,13 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
       ('main-menu-open': MainMenuEvent),
       event => this._editor && this._editor.chooseProject()
     );
+    ipcRenderer.on('main-menu-recent', (event, fileMetadata) => {
+      if (this._editor) {
+        this._editor.openFromFileMetadata(fileMetadata).then(() => {
+          this._editor && this._editor.openSceneOrProjectManager();
+        });
+      }
+    });
     ipcRenderer.on(
       ('main-menu-save': MainMenuEvent),
       event => this._editor && this._editor.saveProject()
@@ -145,6 +154,26 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     }
   }
 
+  getRecentFiles = () => {
+    const recentFiles = localStorage.getItem('gd-recent-files');
+    if (recentFiles) {
+      const parsedData = JSON.parse(recentFiles);
+      const menuArray = [];
+      for (const prop in parsedData) {
+        console.log(parsedData[prop]);
+        if (ipcRenderer) {
+          menuArray.push({
+            label: parsedData[prop],
+            onClickSendEvent: 'main-menu-recent',
+            argument: { fileIdentifier: parsedData[prop] },
+          });
+        }
+      }
+      return menuArray;
+    }
+    return [{ label: 'No recent files' }];
+  };
+
   _buildAndSendMenuTemplate() {
     const { i18n } = this.props;
     const fileTemplate = {
@@ -160,6 +189,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
           label: i18n._(t`Open...`),
           accelerator: 'CommandOrControl+O',
           onClickSendEvent: 'main-menu-open',
+        },
+        {
+          label: i18n._(t`Open Recent...`),
+          submenu: this.getRecentFiles(),
         },
         { type: 'separator' },
         {

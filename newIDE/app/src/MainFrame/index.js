@@ -1408,9 +1408,20 @@ class MainFrame extends React.Component<Props, State> {
       .then(fileMetadata => {
         if (!fileMetadata) return;
 
-        return this.openFromFileMetadata(fileMetadata).then(() =>
-          this.openSceneOrProjectManager()
-        );
+        return this.openFromFileMetadata(fileMetadata).then(() => {
+          this.openSceneOrProjectManager();
+          const recentFiles = localStorage.getItem('gd-recent-files');
+          if (recentFiles) {
+            const parsedData = JSON.parse(recentFiles);
+            parsedData.push(fileMetadata.fileIdentifier);
+            localStorage.setItem('gd-recent-files', JSON.stringify(parsedData));
+          } else {
+            localStorage.setItem(
+              'gd-recent-files',
+              JSON.stringify([fileMetadata.fileIdentifier])
+            );
+          }
+        });
       })
       .catch(error => {
         const errorMessage = storageProviderOperations.getOpenErrorMessage

@@ -46,6 +46,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     searchInConditions: true,
     searchInEventStrings: true,
     searchInSelection: false,
+    searchCount: false,
   };
 
   focus = () => {

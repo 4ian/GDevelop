@@ -1,15 +1,12 @@
 gdjs.PixiFiltersTools.registerFilterCreator('ZoomBlur', {
   makePIXIFilter: function(layer, effectData) {
     var zoomBlurFilter = new PIXI.filters.ZoomBlurFilter();
-    PIXI.filters.ZoomBlurFilter.prototype.apply = function(filterManager, input, output, clear) {
-      this.center[0] = Math.round(this._centerX * input.sourceFrame.width);
-      this.center[1] = Math.round(this._centerY * input.sourceFrame.height);
-      filterManager.applyFilter(this, input, output, clear);
-    }
 
     return zoomBlurFilter;
   },
   update: function(filter, layer) {
+    filter.center[0] = Math.round(filter._centerX * layer.getWidth());
+    filter.center[1] = Math.round(filter._centerY * layer.getHeight());
   },
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === 'centerX') {

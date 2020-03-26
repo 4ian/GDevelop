@@ -322,8 +322,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getRecentFiles() {
     const { values } = this.state;
-    const recentFiles = values.recentFiles
-    if(values.recentFiles) {
+    if (values.recentFiles) {
       return values.recentFiles;
     }
     return null;
@@ -332,18 +331,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _setRecentFiles(data: FileMetadata) {
     const { values } = this.state;
     if (values.recentFiles.length > 5) values.recentFiles.pop();
-    if(!values.recentFiles.some(item => item.fileIdentifier === data.fileIdentifier)) {
-      this.setState({
-    values: {
-      ...values,
-      recentFiles: [
-        data,
-        ...values.recentFiles,
-      ]
-    }
-  },
-  () => this._persistValuesToLocalStorage(this.state)
-  );
+    if (
+      !values.recentFiles.some(
+        item => item.fileIdentifier === data.fileIdentifier
+      )
+    ) {
+      this.setState(
+        {
+          values: {
+            ...values,
+            recentFiles: [data, ...values.recentFiles],
+          },
+        },
+        () => this._persistValuesToLocalStorage(this.state)
+      );
     }
   }
 

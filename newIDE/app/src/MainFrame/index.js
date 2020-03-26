@@ -232,8 +232,9 @@ class MainFrame extends React.Component<Props, State> {
   }
 
   componentDidUpdate() {
-    const { setRecentFiles, values } = this.context;
-    if (this.state.currentFileMetadata) setRecentFiles(this.state.currentFileMetadata);
+    const { setRecentFiles } = this.context;
+    if (this.state.currentFileMetadata)
+      setRecentFiles(this.state.currentFileMetadata);
   }
 
   _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {

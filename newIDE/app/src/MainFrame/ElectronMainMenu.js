@@ -6,7 +6,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
 import PreferencesContext from './Preferences/PreferencesContext';
-import {type FileMetadata} from '../ProjectsStorage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -163,8 +162,8 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
       return {
         label: item.fileIdentifier,
         onClickSendEvent: 'main-menu-recent',
-        argument: item
-      }
+        argument: item,
+      };
     });
   }
 

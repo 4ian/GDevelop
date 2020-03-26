@@ -231,11 +231,6 @@ class MainFrame extends React.Component<Props, State> {
     console.info('Startup times:', getStartupTimesSummary());
   }
 
-  componentDidUpdate() {
-    const { setRecentFiles } = this.context;
-    if (this.state.currentFileMetadata)
-      setRecentFiles(this.state.currentFileMetadata);
-  }
 
   _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
     const { storageProviderOperations, initialFileMetadataToOpen } = this.props;
@@ -1416,6 +1411,7 @@ class MainFrame extends React.Component<Props, State> {
 
         return this.openFromFileMetadata(fileMetadata).then(() => {
           this.openSceneOrProjectManager();
+          this.context.setRecentFiles(fileMetadata);
         });
       })
       .catch(error => {

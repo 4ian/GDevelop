@@ -330,7 +330,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setRecentFiles(data: FileMetadata) {
     const { values } = this.state;
-    if (values.recentFiles.length > 5) values.recentFiles.pop();
+    if (values.recentFiles.length >= 5) values.recentFiles.pop();
     if (
       !values.recentFiles.some(
         item => item.fileIdentifier === data.fileIdentifier

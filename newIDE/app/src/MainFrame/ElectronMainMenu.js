@@ -73,7 +73,6 @@ type RootMenuTemplate =
 class ElectronMainMenu extends React.Component<Props, {||}> {
   _editor: ?MainFrame;
   _language: ?string;
-  recentFiles: Array<MenuItemTemplate>;
 
   componentDidMount() {
     if (!ipcRenderer) return;
@@ -83,9 +82,10 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
       event => this._editor && this._editor.chooseProject()
     );
     ipcRenderer.on('main-menu-recent', (event, fileMetadata) => {
-      if (this._editor) {
-        this._editor.openFromFileMetadata(fileMetadata).then(() => {
-          this._editor && this._editor.openSceneOrProjectManager();
+      const editor = this._editor;
+      if (editor) {
+          editor.openFromFileMetadata(fileMetadata).then(() => {
+          editor.openSceneOrProjectManager();
         });
       }
     });
@@ -156,9 +156,8 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     }
   }
 
-  componentWillMount() {
-    const { getRecentFiles } = this.context;
-    this.recentFiles = getRecentFiles().map(item => {
+  _recentFiles(): Array<MenuItemTemplate> {
+    return this.context.getRecentFiles().map(item => {
       return {
         label: item.fileIdentifier,
         onClickSendEvent: 'main-menu-recent',
@@ -168,6 +167,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
   }
 
   _buildAndSendMenuTemplate() {
+    console.log(this._recentFiles());
     const { i18n } = this.props;
     const fileTemplate = {
       label: i18n._(t`File`),
@@ -185,7 +185,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         },
         {
           label: i18n._(t`Open Recent...`),
-          submenu: this.recentFiles,
+          submenu: this._recentFiles(),
         },
         { type: 'separator' },
         {

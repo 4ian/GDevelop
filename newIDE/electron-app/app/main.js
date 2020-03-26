@@ -45,7 +45,7 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 });
 
 // See registerGdideProtocol (used for HTML modules support)
-protocol.registerStandardSchemes(['gdide']);
+protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -71,7 +71,9 @@ app.on('ready', function() {
     x: args.x,
     y: args.y,
     webPreferences: {
-      webSecurity: false, // Allow to access to local files
+      webSecurity: false, // Allow to access to local files,
+      nodeIntegration: true,
+      webviewTag: true,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#f0f0f0',

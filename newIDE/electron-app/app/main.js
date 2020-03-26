@@ -73,7 +73,6 @@ app.on('ready', function() {
     webPreferences: {
       webSecurity: false, // Allow to access to local files,
       nodeIntegration: true,
-      webviewTag: true,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#f0f0f0',

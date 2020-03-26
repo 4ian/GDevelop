@@ -231,6 +231,11 @@ class MainFrame extends React.Component<Props, State> {
     console.info('Startup times:', getStartupTimesSummary());
   }
 
+  componentDidUpdate() {
+    const { setRecentFiles, values } = this.context;
+    if (this.state.currentFileMetadata) setRecentFiles(this.state.currentFileMetadata);
+  }
+
   _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
     const { storageProviderOperations, initialFileMetadataToOpen } = this.props;
 
@@ -1410,17 +1415,6 @@ class MainFrame extends React.Component<Props, State> {
 
         return this.openFromFileMetadata(fileMetadata).then(() => {
           this.openSceneOrProjectManager();
-          const recentFiles = localStorage.getItem('gd-recent-files');
-          if (recentFiles) {
-            const parsedData = JSON.parse(recentFiles);
-            parsedData.push(fileMetadata.fileIdentifier);
-            localStorage.setItem('gd-recent-files', JSON.stringify(parsedData));
-          } else {
-            localStorage.setItem(
-              'gd-recent-files',
-              JSON.stringify([fileMetadata.fileIdentifier])
-            );
-          }
         });
       })
       .catch(error => {
@@ -2076,5 +2070,5 @@ class MainFrame extends React.Component<Props, State> {
     );
   }
 }
-
+MainFrame.contextType = PreferencesContext;
 export default MainFrame;

@@ -5,6 +5,8 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
+import PreferencesContext from './Preferences/PreferencesContext';
+import {type FileMetadata} from '../ProjectsStorage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -72,6 +74,7 @@ type RootMenuTemplate =
 class ElectronMainMenu extends React.Component<Props, {||}> {
   _editor: ?MainFrame;
   _language: ?string;
+  recentFiles: Array<MenuItemTemplate>;
 
   componentDidMount() {
     if (!ipcRenderer) return;
@@ -154,25 +157,16 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     }
   }
 
-  getRecentFiles = () => {
-    const recentFiles = localStorage.getItem('gd-recent-files');
-    if (recentFiles) {
-      const parsedData = JSON.parse(recentFiles);
-      const menuArray = [];
-      for (const prop in parsedData) {
-        console.log(parsedData[prop]);
-        if (ipcRenderer) {
-          menuArray.push({
-            label: parsedData[prop],
-            onClickSendEvent: 'main-menu-recent',
-            argument: { fileIdentifier: parsedData[prop] },
-          });
-        }
+  componentWillMount() {
+    const { getRecentFiles } = this.context;
+    this.recentFiles = getRecentFiles().map(item => {
+      return {
+        label: item.fileIdentifier,
+        onClickSendEvent: 'main-menu-recent',
+        argument: item
       }
-      return menuArray;
-    }
-    return [{ label: 'No recent files' }];
-  };
+    });
+  }
 
   _buildAndSendMenuTemplate() {
     const { i18n } = this.props;
@@ -192,7 +186,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         },
         {
           label: i18n._(t`Open Recent...`),
-          submenu: this.getRecentFiles(),
+          submenu: this.recentFiles,
         },
         { type: 'separator' },
         {
@@ -400,5 +394,6 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     });
   }
 }
+ElectronMainMenu.contextType = PreferencesContext;
 
 export default ElectronMainMenu;

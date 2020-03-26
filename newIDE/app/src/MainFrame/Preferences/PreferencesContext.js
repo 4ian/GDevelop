@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import { type FileMetadata } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -111,6 +112,7 @@ export type PreferencesValues = {|
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
+  recentFiles: Array<FileMetadata>,
 |};
 
 /**
@@ -138,6 +140,8 @@ export type Preferences = {|
     kind: ResourceKind,
     path: string
   ) => void,
+  getRecentFiles: () => Object,
+  setRecentFiles: (data: FileMetadata) => void,
 |};
 
 export const initialPreferences = {
@@ -156,6 +160,7 @@ export const initialPreferences = {
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
+    recentFiles: [],
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -173,6 +178,8 @@ export const initialPreferences = {
   setShowEffectParameterNames: (enabled: boolean) => {},
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
+  getRecentFiles: () => {},
+  setRecentFiles: (data: FileMetadata) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

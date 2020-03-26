@@ -6,6 +6,7 @@ import PreferencesContext, {
   type Preferences,
   type AlertMessageIdentifier,
 } from './PreferencesContext';
+import { type FileMetadata } from '../../ProjectsStorage';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
 import type { PreferencesValues } from './PreferencesContext';
@@ -47,6 +48,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
     getLastUsedPath: this._getLastUsedPath.bind(this),
     setLastUsedPath: this._setLastUsedPath.bind(this),
+    getRecentFiles: this._getRecentFiles.bind(this),
+    setRecentFiles: this._setRecentFiles.bind(this),
   };
 
   componentDidMount() {
@@ -315,6 +318,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       },
       () => this._persistValuesToLocalStorage(this.state)
     );
+  }
+
+  _getRecentFiles() {
+    const { values } = this.state;
+    const recentFiles = values.recentFiles
+    if(values.recentFiles) {
+      return values.recentFiles;
+    }
+    return null;
+  }
+
+  _setRecentFiles(data: FileMetadata) {
+    const { values } = this.state;
+    if (values.recentFiles.length > 5) values.recentFiles.pop();
+    if(!values.recentFiles.some(item => item.fileIdentifier === data.fileIdentifier)) {
+      this.setState({
+    values: {
+      ...values,
+      recentFiles: [
+        data,
+        ...values.recentFiles,
+      ]
+    }
+  },
+  () => this._persistValuesToLocalStorage(this.state)
+  );
+    }
   }
 
   render() {

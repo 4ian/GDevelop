@@ -33,7 +33,7 @@ type State = {|
   searchInConditions: boolean,
   searchInEventStrings: boolean,
   searchInSelection: boolean,
-  searchCount: boolean,
+  isSearchCountOne: boolean,
 |};
 
 export default class SearchPanel extends PureComponent<Props, State> {
@@ -46,7 +46,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     searchInConditions: true,
     searchInEventStrings: true,
     searchInSelection: false,
-    searchCount: false,
+    isSearchCountOne: false,
   };
 
   focus = () => {
@@ -118,13 +118,15 @@ export default class SearchPanel extends PureComponent<Props, State> {
               }
               hintText={t`Text to search in parameters`}
               onChange={(e, searchText) => {
-                this.setState({ searchText });
-                this.setState({ searchCount: false });
+                this.setState({
+                  searchText,
+                  isSearchCountOne: false,
+                });
               }}
               onKeyPress={event => {
                 if (event.key === 'Enter') {
                   this.launchSearch();
-                  this.setState({ searchCount: true });
+                  this.setState({ isSearchCountOne: true });
                 }
               }}
               value={searchText}
@@ -136,13 +138,12 @@ export default class SearchPanel extends PureComponent<Props, State> {
               primary
               label={<Trans>Search</Trans>}
               onClick={() => {
-                if (this.state.searchCount) {
+                if (this.state.isSearchCountOne) {
                   onGoToNextSearchResult();
                 } else {
                   this.launchSearch();
-                  this.setState({ searchCount: true });
+                  this.setState({ isSearchCountOne: true });
                 }
-                //onGoToNextSearchResult();
               }}
             />
           </Line>

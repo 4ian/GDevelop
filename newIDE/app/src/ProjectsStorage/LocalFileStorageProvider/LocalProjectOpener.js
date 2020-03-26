@@ -29,21 +29,16 @@ export const onOpenWithPicker = (): Promise<?FileMetadata> => {
     if (!dialog) return reject('Not supported');
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showOpenDialog(
-      browserWindow,
-      {
-        title: 'Open a project',
-        properties: ['openFile'],
-        message:
-          'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
-        filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
-      },
-      paths => {
-        if (!paths || !paths.length) return resolve(null);
+    const paths = dialog.showOpenDialogSync(browserWindow, {
+      title: 'Open a project',
+      properties: ['openFile'],
+      message:
+        'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
+      filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
+    });
 
-        return resolve({ fileIdentifier: paths[0] });
-      }
-    );
+    if (!paths || !paths.length) return resolve(null);
+    return resolve({ fileIdentifier: paths[0] });
   });
 };
 

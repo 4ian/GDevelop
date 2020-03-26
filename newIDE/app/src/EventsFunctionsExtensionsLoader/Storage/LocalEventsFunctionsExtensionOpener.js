@@ -27,25 +27,20 @@ export default class LocalEventsFunctionsExtensionOpener {
       if (!dialog) return reject('Not supported');
 
       const browserWindow = electron.remote.getCurrentWindow();
-      dialog.showOpenDialog(
-        browserWindow,
-        {
-          title: 'Import an extension in the project',
-          properties: ['openFile'],
-          message: 'Choose an extension file to import (.json file)',
-          filters: [
-            {
-              name: 'GDevelop 5 "events based" extension',
-              extensions: ['json'],
-            },
-          ],
-        },
-        paths => {
-          if (!paths || !paths.length) return resolve(null);
+      const paths = dialog.showOpenDialogSync(browserWindow, {
+        title: 'Import an extension in the project',
+        properties: ['openFile'],
+        message: 'Choose an extension file to import (.json file)',
+        filters: [
+          {
+            name: 'GDevelop 5 "events based" extension',
+            extensions: ['json'],
+          },
+        ],
+      });
 
-          return resolve(paths[0]);
-        }
-      );
+      if (!paths || !paths.length) return resolve(null);
+      return resolve(paths[0]);
     });
   };
 

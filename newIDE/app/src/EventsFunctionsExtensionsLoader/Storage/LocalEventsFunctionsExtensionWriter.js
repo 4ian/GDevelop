@@ -34,24 +34,19 @@ export default class LocalEventsFunctionsExtensionWriter {
       if (!dialog) return reject('Not supported');
 
       const browserWindow = electron.remote.getCurrentWindow();
-      dialog.showSaveDialog(
-        browserWindow,
-        {
-          title: 'Export an extension of the project',
-          filters: [
-            {
-              name: 'GDevelop 5 "events based" extension',
-              extensions: ['json'],
-            },
-          ],
-          defaultPath: 'Extension.json',
-        },
-        path => {
-          if (!path) return resolve(null);
+      const path = dialog.showSaveDialogSync(browserWindow, {
+        title: 'Export an extension of the project',
+        filters: [
+          {
+            name: 'GDevelop 5 "events based" extension',
+            extensions: ['json'],
+          },
+        ],
+        defaultPath: 'Extension.json',
+      });
 
-          return resolve(path);
-        }
-      );
+      if (!path) return resolve(null);
+      return resolve(path);
     });
   };
 

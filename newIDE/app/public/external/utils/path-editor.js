@@ -219,11 +219,11 @@ const selectBaseFolderPath = headerObject => {
   if (!state.projectBasePath) {
     state.projectBasePath = state.folderPath;
   }
-  const selectedDir = dialog.showOpenDialog(remote.getCurrentWindow(), {
+  const selectedDir = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
     properties: ['openDirectory'],
     defaultPath: state.projectBasePath,
   });
-  if (!selectedDir) {
+  if (!selectedDir || !selectedDir.length) {
     return;
   }
   const selectedDirPath = selectedDir[0];

@@ -245,39 +245,36 @@ const selectLocalResourcePath = (
     const latestPath = getLastUsedPath(project, kind) || projectPath;
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showOpenDialog(
-      browserWindow,
-      {
-        title: options.title,
-        properties,
-        filters: [{ name: options.name, extensions: options.extensions }],
-        defaultPath: latestPath,
-      },
-      paths => {
-        if (!paths) return resolve([]);
 
-        const lastUsedPath = path.parse(paths[0]).dir;
-        setLastUsedPath(project, kind, lastUsedPath);
+    const paths = dialog.showOpenDialogSync(browserWindow, {
+      title: options.title,
+      properties,
+      filters: [{ name: options.name, extensions: options.extensions }],
+      defaultPath: latestPath,
+    });
 
-        const outsideProjectFolderPaths = paths.filter(
-          path => !isPathInProjectFolder(project, path)
-        );
+    if (!paths) return resolve([]);
 
-        if (outsideProjectFolderPaths.length) {
-          // eslint-disable-next-line
-          const answer = confirm(
-            i18n._(
-              t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-            )
-          );
+    const lastUsedPath = path.parse(paths[0]).dir;
+    setLastUsedPath(project, kind, lastUsedPath);
 
-          if (answer) {
-            return resolve(copyAllToProjectFolder(project, paths));
-          }
-        }
-
-        return resolve(paths);
-      }
+    const outsideProjectFolderPaths = paths.filter(
+      path => !isPathInProjectFolder(project, path)
     );
+
+    if (outsideProjectFolderPaths.length) {
+      // eslint-disable-next-line
+      const answer = confirm(
+        i18n._(
+          t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
+        )
+      );
+
+      if (answer) {
+        return resolve(copyAllToProjectFolder(project, paths));
+      }
+    }
+
+    return resolve(paths);
   });
 };

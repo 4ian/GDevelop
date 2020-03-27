@@ -47,6 +47,8 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
+app.allowRendererProcessReuse = true;
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
   app.quit();

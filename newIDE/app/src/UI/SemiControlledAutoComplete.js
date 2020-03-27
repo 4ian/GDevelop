@@ -35,6 +35,7 @@ type Props = {|
 
   id?: string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
+  onRequestClose?: () => void,
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
@@ -141,17 +142,16 @@ const filterFunction = (
 
 const handleChange = (
   event: SyntheticKeyboardEvent<HTMLInputElement>,
-  option: Option | string,
+  option: Option,
   props: Props
 ): void => {
   if (option.type !== 'separator') {
-    if (typeof option === 'string') props.onChange(option);
+    if (option.onClick) option.onClick();
     else {
-      if (option.onClick) option.onClick();
-      else
-        props.onChoose
-          ? props.onChoose(option.value)
-          : props.onChange(option.value);
+      props.onChoose
+        ? props.onChoose(option.value)
+        : props.onChange(option.value);
+      if (props.onRequestClose) props.onRequestClose();
     }
   }
 };
@@ -172,6 +172,11 @@ const getDefaultStylingProps = (
     inputProps: {
       ...inputProps,
       className: null,
+      disabled: props.disabled,
+      onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
+        if (event.key === 'Escape' && props.onRequestClose)
+          props.onRequestClose();
+      },
     },
   };
 };
@@ -218,7 +223,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             classes={classes}
             onChange={(
               event: SyntheticKeyboardEvent<HTMLInputElement>,
-              option: Option | string | null
+              option: Option | null
             ) => {
               if (option !== null) {
                 handleChange(event, option, props);
@@ -271,6 +276,12 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                       setIsMenuOpen(false);
                       props.onChange(event.currentTarget.value);
                       if (props.onBlur) props.onBlur(event);
+                    },
+                    onMouseDown: (
+                      event: SyntheticMouseEvent<HTMLInputElement>
+                    ): void => {
+                      if (input.current && !input.current.value.length)
+                        setIsMenuOpen(!isMenuOpen);
                     },
                   }}
                   {...other}

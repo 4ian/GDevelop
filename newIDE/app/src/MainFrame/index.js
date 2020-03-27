@@ -842,10 +842,10 @@ class MainFrame extends React.Component<Props, State> {
       return;
     }
 
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.`
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
         )
       );
       return;

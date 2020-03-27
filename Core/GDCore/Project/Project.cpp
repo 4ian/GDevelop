@@ -7,6 +7,7 @@
 #include "Project.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <cctype>
 #include <SFML/System/Utf.hpp>
 #include <fstream>
 #include <map>
@@ -945,16 +946,14 @@ void Project::SerializeTo(SerializerElement& element) const {
 #endif
 }
 
-bool Project::ValidateObjectName(const gd::String& name) {
+bool Project::ValidateName(const gd::String& name) {
   if (name.empty()) return false;
+
+  if (isdigit(name[0])) return false;
 
   gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
   return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
-}
-
-gd::String Project::GetBadObjectNameWarning() {
-  return _("Please use only letters, digits\nand underscores ( _ ).");
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {

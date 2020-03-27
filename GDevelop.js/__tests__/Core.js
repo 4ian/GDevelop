@@ -93,11 +93,11 @@ describe('libGD.js', function() {
     });
 
     it('should validate object names', function() {
-      expect(gd.Project.validateObjectName('ThisNameIs_Ok_123')).toBe(true);
-      expect(gd.Project.validateObjectName('ThisName IsNot_Ok_123')).toBe(
+      expect(gd.Project.validateName('ThisNameIs_Ok_123')).toBe(true);
+      expect(gd.Project.validateName('ThisName IsNot_Ok_123')).toBe(
         false
       );
-      expect(gd.Project.validateObjectName('ThisNameIsNot_Ok!')).toBe(false);
+      expect(gd.Project.validateName('ThisNameIsNot_Ok!')).toBe(false);
     });
 
     it('should have a list of extensions', function() {

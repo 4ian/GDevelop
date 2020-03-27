@@ -178,7 +178,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
                              // edge is also at X position 10). This parameter
                              // "ignoreTouchingEdges" will be passed to all
                              // collision handling functions.
-    bool roundCoordinates;   ///< true to round coordinates when trying to move on
+  bool roundCoordinates;   ///< true to round coordinates when trying to move on
                            ///< X and Y axis.
   double gravity;          ///< In pixels.seconds^-2
   double maxFallingSpeed;  ///< In pixels.seconds^-1

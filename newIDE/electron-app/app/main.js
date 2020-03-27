@@ -47,6 +47,7 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
+// Set to true, will be default value in future Electron versions
 app.allowRendererProcessReuse = true;
 
 // Quit when all windows are closed.

@@ -162,8 +162,25 @@ type Props = {
   i18n: I18n,
 };
 
-class MainFrame extends React.Component<Props, State> {
-  state = {
+export type MainFrameInterface = {|
+  loadFromSerializedProject: (serializedProject: gdSerializerElement,fileMetadata: ?FileMetadata) => Promise<void>,
+  loadFromProject: (project: gdProject,fileMetadata: ?FileMetadata) => Promise<void>,
+  openFromFileMetadata: (fileMetadata: FileMetadata) => Promise<void>,
+  closeApp: () => void,
+  closeProject: () => Promise<void>,
+  
+
+
+
+|}
+
+function useForceUpdate(){
+    const [value, setValue] = React.useState(0);
+    return () => setValue(value => ++value);
+}
+
+const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref) => {
+  const [state, setState] = React.useState<State>({
     createDialogOpen: false,
     exportDialogOpen: false,
     introDialogOpen: false,
@@ -192,21 +209,76 @@ class MainFrame extends React.Component<Props, State> {
     gdjsDevelopmentWatcherEnabled: false,
     isPreviewFirstSceneOverriden: false,
     previewFirstSceneName: '',
-  };
-  toolbar = null;
-  _resourceSourceDialogs = {};
-  _previewLauncher: ?PreviewLauncherInterface = null;
+  });
+  let toolbar = React.useRef(null);
+  let _resourceSourceDialogs = {};
+  const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
+  const { addRecentFile } = React.useContext(PreferencesContext);
+  const forceUpdate = useForceUpdate();
 
-  componentWillMount() {
-    if (!this.props.integratedEditor) this.openStartPage();
-  }
+  React.useImperativeHandle(ref, () => ({
+    loadFromSerializedProject: (serializedProject: gdSerializerElement, fileMetadata: ?FileMetadata) => {loadFromSerializedProject(serializedProject, fileMetadata)},
+    loadFromProject: (project: gdProject, fileMetadata: ?FileMetadata) => {loadFromProject(project, fileMetadata)},
+    openFromFileMetadata: (fileMetadata: FileMetadata) => {openFromFileMetadata(fileMetadata)},
+    closeApp: () => {closeApp()},
+    closeProject: () => {closeProject()},
+    getSerializedElements: () => {getSerializedElements()},
+    toggleProjectManager: () => {toggleProjectManager()},
+    openProjectManager: () => {openProjectManager()},
+    setEditorToolbar: () => {setEditorToolbar()},
+    addLayout: () => {addLayout()},
+    addExternalLayout: () => {addExternalLayout()},
+    addExternalEvents: () => {addExternalEvents()},
+    addEventsFunctionsExtension: () => {addEventsFunctionsExtension()},
+    deleteLayout: () => {deleteLayout()},
+    deleteExternalLayout: () => {deleteExternalLayout()},
+    deleteExternalEvents: () => {deleteExternalEvents()},
+    deleteEventsFunctionsExtension: () => {deleteEventsFunctionsExtension()},
+    renameLayout: () => {renameLayout()},
+    renameExternalLayout: () => {renameExternalLayout()},
+    renameExternalEvents: () => {renameExternalEvents()},
+    renameEventsFunctionsExtension: () => {renameEventsFunctionsExtension()},
+    openLayout: () => {openLayout()},
+    openExternalLayout: () => {openExternalLayout()},
+    openEventsFunctionsExtension: () => {openEventsFunctionsExtension()},
+    openResources: () => {openResources()},
+    openStartPage:() => {openStartPage()},
+    openDebugger: () => {openDebugger()},
+    openCreateDialog: () => {openCreateDialog()},
+    chooseProject: () => {chooseProject()},
+    chooseProjectWithStorageProviderPicker: () => {chooseProjectWithStorageProviderPicker()},
+    saveProject: () => {saveProject()},
+    saveProjectAs: () => {saveProjectAs()},
+    saveProjectAsWithStorageProvider: () => {saveProjectAsWithStorageProvider()},
+    askToCloseProject: () => {askToCloseProject()},
+    openSceneOrProjectManager: () => {openSceneOrProjectManager()},
+    openExportDialog: () => {openExportDialog()},
+    openPreferences: () => {openPreferences()},
+    openLanguage: () => {openLanguage()},
+    openProfile: () => {openProfile()},
+    openSubscription: () => {openSubscription()},
+    updateToolbar: () => {updateToolbar()},
+    openAboutDialog: () => {openAboutDialog()},
+    openOpenFromStorageProviderDialog: () => {openOpenFromStorageProviderDialog()},
+    openSaveToStorageProviderDialog: () => {openSaveToStorageProviderDialog()},
+    openPlatformSpecificAssets: () => {openPlatformSpecificAssets()},
+    openHelpFinderDialog: () => {openHelpFinderDialog()},
+    setUpdateStatus: () => {setUpdateStatus()},
+    simulateUpdateDownloaded: () => {simulateUpdateDownloaded()},
+    simulateUpdateAvailable: () => {simulateUpdateAvailable()},
+  }));
 
-  componentDidMount() {
+  // componentWillMount() {
+  //   if (!this.props.integratedEditor) this.openStartPage();
+  // }
+
+  React.useEffect(() => {
+    if(!props.integratedEditor) openStartPage();
     GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
 
-    const { initialFileMetadataToOpen } = this.props;
+    const { initialFileMetadataToOpen } = props;
 
-    this._loadExtensions()
+    _loadExtensions()
       .catch(() => {
         /* Ignore errors */
       })
@@ -215,24 +287,25 @@ class MainFrame extends React.Component<Props, State> {
         // to avoid the watcher interfering with the extension loading (by updating GDJS,
         // which could lead in the extension loading failing for some extensions as file
         // are removed/copied).
-        this.setState({
+        setState({ ...state,
+          ...state,
           gdjsDevelopmentWatcherEnabled: true,
         });
       });
     if (initialFileMetadataToOpen) {
-      this._openInitialFileMetadata(/* isAfterUserInteraction= */ false);
-    } else if (this.props.introDialog && !Window.isDev())
-      this._openIntroDialog(true);
+      _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
+    } else if (props.introDialog && !Window.isDev())
+      _openIntroDialog(true);
 
     GD_STARTUP_TIMES.push([
       'MainFrameComponentDidMountFinished',
       performance.now(),
     ]);
     console.info('Startup times:', getStartupTimesSummary());
-  }
+  }, []);
 
-  _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
-    const { storageProviderOperations, initialFileMetadataToOpen } = this.props;
+  const _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
+    const { storageProviderOperations, initialFileMetadataToOpen } = props;
 
     if (!initialFileMetadataToOpen) return;
 
@@ -240,16 +313,16 @@ class MainFrame extends React.Component<Props, State> {
       !isAfterUserInteraction &&
       storageProviderOperations.doesInitialOpenRequireUserInteraction
     ) {
-      this._openOpenConfirmDialog(true);
+      _openOpenConfirmDialog(true);
       return;
     }
 
-    this.openFromFileMetadata(initialFileMetadataToOpen).then(() =>
-      this.openSceneOrProjectManager()
+    openFromFileMetadata(initialFileMetadataToOpen).then(() =>
+      openSceneOrProjectManager()
     );
   };
 
-  _languageDidChange() {
+  const _languageDidChange = () => {
     // A change in the language will automatically be applied
     // on all React components, as it's handled by GDI18nProvider.
     // We still have this method that will be called when the language
@@ -257,11 +330,11 @@ class MainFrame extends React.Component<Props, State> {
     // extensions so that they declare all objects/actions/condition/etc...
     // using the new language.
     gd.JsPlatform.get().reloadBuiltinExtensions();
-    this._loadExtensions().catch(() => {});
+    _loadExtensions().catch(() => {});
   }
 
-  _loadExtensions = (): Promise<void> => {
-    const { extensionsLoader, i18n } = this.props;
+  const _loadExtensions = (): Promise<void> => {
+    const { extensionsLoader, i18n } = props;
     if (!extensionsLoader) {
       console.info(
         'No extensions loader specified, skipping extensions loading.'
@@ -303,7 +376,7 @@ class MainFrame extends React.Component<Props, State> {
       });
   };
 
-  loadFromSerializedProject = (
+  const loadFromSerializedProject = (
     serializedProject: gdSerializerElement,
     fileMetadata: ?FileMetadata
   ): Promise<void> => {
@@ -312,19 +385,19 @@ class MainFrame extends React.Component<Props, State> {
         const newProject = gd.ProjectHelper.createNewGDJSProject();
         newProject.unserializeFrom(serializedProject);
 
-        return this.loadFromProject(newProject, fileMetadata);
+        return loadFromProject(newProject, fileMetadata);
       },
       time => console.info(`Unserialization took ${time} ms`)
     );
   };
 
-  loadFromProject = (
+  const loadFromProject = (
     project: gdProject,
     fileMetadata: ?FileMetadata
   ): Promise<void> => {
-    const { eventsFunctionsExtensionsState } = this.props;
+    const { eventsFunctionsExtensionsState } = props;
 
-    return this.closeProject().then(() => {
+    return closeProject().then(() => {
       // Make sure that the ResourcesLoader cache is emptied, so that
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
@@ -332,8 +405,9 @@ class MainFrame extends React.Component<Props, State> {
       // TODO: Pixi cache should also be burst
 
       return new Promise(resolve => {
-        this.setState(
+        setState(
           {
+            ...state,
             currentProject: project,
             currentFileMetadata: fileMetadata,
           },
@@ -355,8 +429,8 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  openFromFileMetadata = (fileMetadata: FileMetadata): Promise<void> => {
-    const { i18n, storageProviderOperations } = this.props;
+  const openFromFileMetadata = (fileMetadata: FileMetadata): Promise<void> => {
+    const { i18n, storageProviderOperations } = props;
     const {
       hasAutoSave,
       onGetAutoSave,
@@ -413,7 +487,7 @@ class MainFrame extends React.Component<Props, State> {
       });
     };
 
-    this.setState({ loadingProject: true });
+    setState({ ...state, loadingProject: true });
 
     // Try to find an autosave (and ask user if found)
     return checkForAutosave()
@@ -435,7 +509,7 @@ class MainFrame extends React.Component<Props, State> {
         }
 
         const serializedProject = gd.Serializer.fromJSObject(content);
-        return this.loadFromSerializedProject(
+        return loadFromSerializedProject(
           serializedProject,
           // Note that fileMetadata is the original, unchanged one, even if we're loading
           // an autosave. If we're for some reason loading an autosave, we still consider
@@ -462,37 +536,39 @@ class MainFrame extends React.Component<Props, State> {
           error
         );
       })
-      .then(() => this.setState({ loadingProject: false }));
+      .then(() => setState({ ...state, loadingProject: false }));
   };
 
-  closeApp = (): void => {
+  const closeApp = (): void => {
     return Window.quit();
   };
 
-  closeProject = (): Promise<void> => {
-    const { currentProject } = this.state;
-    const { eventsFunctionsExtensionsState } = this.props;
+  const closeProject = (): Promise<void> => {
+    const { currentProject } = state;
+    const { eventsFunctionsExtensionsState } = props;
     if (!currentProject) return Promise.resolve();
 
     return new Promise(resolve => {
-      this.openProjectManager(false);
-      this.setState(
+      openProjectManager(false);
+      setState(
         {
-          editorTabs: closeProjectTabs(this.state.editorTabs, currentProject),
+          ...state,
+          editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         },
         () => {
           eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
             currentProject
           );
           currentProject.delete();
-          this.setState(
+          setState(
             {
+              ...state,
               currentProject: null,
               isPreviewFirstSceneOverriden: false,
               previewFirstSceneName: '',
             },
             () => {
-              this.updateToolbar();
+              updateToolbar();
               resolve();
             }
           );
@@ -501,8 +577,8 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  getSerializedElements = () => {
-    const editorTab = getCurrentTab(this.state.editorTabs);
+  const getSerializedElements = () => {
+    const editorTab = getCurrentTab(state.editorTabs);
     if (!editorTab || !editorTab.editorRef) {
       console.warn('No active editor or reference to the editor');
       return {};
@@ -511,38 +587,41 @@ class MainFrame extends React.Component<Props, State> {
     return editorTab.editorRef.getSerializedElements();
   };
 
-  toggleProjectManager = () => {
-    if (!this.refs.toolbar)
-      this.setState({
-        projectManagerOpen: !this.state.projectManagerOpen,
+  const toggleProjectManager = () => {
+    if (!toolbar.current)
+      setState({
+        ...state,
+        projectManagerOpen: !state.projectManagerOpen,
       });
   };
 
-  openProjectManager = (open: boolean = true) => {
-    this.setState({
+  const openProjectManager = (open: boolean = true) => {
+    setState({
+      ...state,
       projectManagerOpen: open,
     });
   };
 
-  setEditorToolbar = (editorToolbar: any) => {
-    if (!this.toolbar) return;
+  const setEditorToolbar = (editorToolbar: any) => {
+    if (!toolbar.current) return;
 
-    this.toolbar.setEditorToolbar(editorToolbar);
+    toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  _togglePreviewFirstSceneOverride = () => {
-    this.setState(
+  const _togglePreviewFirstSceneOverride = () => {
+    setState(
       {
-        isPreviewFirstSceneOverriden: !this.state.isPreviewFirstSceneOverriden,
+        ...state,
+        isPreviewFirstSceneOverriden: !state.isPreviewFirstSceneOverriden,
       },
       () => {
-        this.updateToolbar();
+        updateToolbar();
       }
     );
   };
 
-  addLayout = () => {
-    const { currentProject } = this.state;
+  const addLayout = () => {
+    const { currentProject } = state;
     if (!currentProject) return;
 
     const name = newNameGenerator('New scene', name =>
@@ -553,11 +632,11 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getLayoutsCount()
     );
     newLayout.updateBehaviorsSharedData(currentProject);
-    this.forceUpdate();
+    forceUpdate();
   };
 
-  addExternalLayout = () => {
-    const { currentProject } = this.state;
+  const addExternalLayout = () => {
+    const { currentProject } = state;
     if (!currentProject) return;
 
     const name = newNameGenerator('NewExternalLayout', name =>
@@ -567,11 +646,11 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalLayoutsCount()
     );
-    this.forceUpdate();
+    forceUpdate();
   };
 
-  addExternalEvents = () => {
-    const { currentProject } = this.state;
+  const addExternalEvents = () => {
+    const { currentProject } = state;
     if (!currentProject) return;
 
     const name = newNameGenerator('NewExternalEvents', name =>
@@ -581,11 +660,11 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalEventsCount()
     );
-    this.forceUpdate();
+    forceUpdate();
   };
 
-  addEventsFunctionsExtension = () => {
-    const { currentProject } = this.state;
+  const addEventsFunctionsExtension = () => {
+    const { currentProject } = state;
     if (!currentProject) return;
 
     const name = newNameGenerator('NewExtension', name =>
@@ -595,12 +674,12 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getEventsFunctionsExtensionsCount()
     );
-    this.forceUpdate();
+    forceUpdate();
   };
 
-  deleteLayout = (layout: gdLayout) => {
-    const { currentProject } = this.state;
-    const { i18n } = this.props;
+  const deleteLayout = (layout: gdLayout) => {
+    const { currentProject } = state;
+    const { i18n } = props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
@@ -611,20 +690,21 @@ class MainFrame extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    this.setState(
+    setState(
       {
-        editorTabs: closeLayoutTabs(this.state.editorTabs, layout),
+        ...state,
+        editorTabs: closeLayoutTabs(state.editorTabs, layout),
       },
       () => {
         currentProject.removeLayout(layout.getName());
-        this.forceUpdate();
+        forceUpdate();
       }
     );
   };
 
-  deleteExternalLayout = (externalLayout: gdExternalLayout) => {
-    const { currentProject } = this.state;
-    const { i18n } = this.props;
+  const deleteExternalLayout = (externalLayout: gdExternalLayout) => {
+    const { currentProject } = state;
+    const { i18n } = props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
@@ -635,23 +715,24 @@ class MainFrame extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    this.setState(
+    setState(
       {
+        ...state,
         editorTabs: closeExternalLayoutTabs(
-          this.state.editorTabs,
+          state.editorTabs,
           externalLayout
         ),
       },
       () => {
         currentProject.removeExternalLayout(externalLayout.getName());
-        this.forceUpdate();
+        forceUpdate();
       }
     );
   };
 
-  deleteExternalEvents = (externalEvents: gdExternalEvents) => {
-    const { currentProject } = this.state;
-    const { i18n } = this.props;
+  const deleteExternalEvents = (externalEvents: gdExternalEvents) => {
+    const { currentProject } = state;
+    const { i18n } = props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
@@ -662,25 +743,26 @@ class MainFrame extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    this.setState(
+    setState(
       {
+        ...state,
         editorTabs: closeExternalEventsTabs(
-          this.state.editorTabs,
+          state.editorTabs,
           externalEvents
         ),
       },
       () => {
         currentProject.removeExternalEvents(externalEvents.getName());
-        this.forceUpdate();
+        forceUpdate();
       }
     );
   };
 
-  deleteEventsFunctionsExtension = (
+  const deleteEventsFunctionsExtension = (
     externalLayout: gdEventsFunctionsExtension
   ) => {
-    const { currentProject } = this.state;
-    const { i18n, eventsFunctionsExtensionsState } = this.props;
+    const { currentProject } = state;
+    const { i18n, eventsFunctionsExtensionsState } = props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
@@ -691,16 +773,17 @@ class MainFrame extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    this.setState(
+    setState(
       {
+        ...state,
         editorTabs: closeEventsFunctionsExtensionTabs(
-          this.state.editorTabs,
+          state.editorTabs,
           externalLayout
         ),
       },
       () => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
-        this.forceUpdate();
+        forceUpdate();
       }
     );
 
@@ -711,9 +794,9 @@ class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  renameLayout = (oldName: string, newName: string) => {
-    const { currentProject } = this.state;
-    const { i18n } = this.props;
+  const renameLayout = (oldName: string, newName: string) => {
+    const { currentProject } = state;
+    const { i18n } = props;
     if (!currentProject) return;
 
     if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
@@ -731,20 +814,21 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     const layout = currentProject.getLayout(oldName);
-    this.setState(
+    setState(
       {
-        editorTabs: closeLayoutTabs(this.state.editorTabs, layout),
+        ...state,
+        editorTabs: closeLayoutTabs(state.editorTabs, layout),
       },
       () => {
         layout.setName(newName);
-        this.forceUpdate();
+        forceUpdate();
       }
     );
   };
 
-  renameExternalLayout = (oldName: string, newName: string) => {
-    const { currentProject } = this.state;
-    const { i18n } = this.props;
+  const renameExternalLayout = (oldName: string, newName: string) => {
+    const { currentProject } = state;
+    const { i18n } = props;
     if (!currentProject) return;
 
     if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
@@ -765,23 +849,24 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     const externalLayout = currentProject.getExternalLayout(oldName);
-    this.setState(
+    setState(
       {
+        ...state,
         editorTabs: closeExternalLayoutTabs(
-          this.state.editorTabs,
+          state.editorTabs,
           externalLayout
         ),
       },
       () => {
         externalLayout.setName(newName);
-        this.forceUpdate();
+        forceUpdate();
       }
     );
   };
 
-  renameExternalEvents = (oldName: string, newName: string) => {
-    const { currentProject } = this.state;
-    const { i18n } = this.props;
+  const renameExternalEvents = (oldName: string, newName: string) => {
+    const { currentProject } = state;
+    const { i18n } = props;
     if (!currentProject) return;
 
     if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
@@ -802,24 +887,25 @@ class MainFrame extends React.Component<Props, State> {
     }
 
     const externalEvents = currentProject.getExternalEvents(oldName);
-    this.setState(
+    setState(
       {
+        ...state,
         editorTabs: closeExternalEventsTabs(
-          this.state.editorTabs,
+          state.editorTabs,
           externalEvents
         ),
       },
       () => {
         externalEvents.setName(newName);
-        this.forceUpdate();
+        forceUpdate();
       }
     );
   };
 
-  renameEventsFunctionsExtension = (oldName: string, newName: string) => {
-    const { currentProject } = this.state;
-    const { i18n } = this.props;
-    const { eventsFunctionsExtensionsState } = this.props;
+  const renameEventsFunctionsExtension = (oldName: string, newName: string) => {
+    const { currentProject } = state;
+    const { i18n } = props;
+    const { eventsFunctionsExtensionsState } = props;
     if (!currentProject) return;
 
     if (
@@ -854,10 +940,11 @@ class MainFrame extends React.Component<Props, State> {
     const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
       oldName
     );
-    this.setState(
+    setState(
       {
+        ...state,
         editorTabs: closeEventsFunctionsExtensionTabs(
-          this.state.editorTabs,
+          state.editorTabs,
           eventsFunctionsExtension
         ),
       },
@@ -875,23 +962,23 @@ class MainFrame extends React.Component<Props, State> {
           currentProject
         );
 
-        this.forceUpdate();
+        forceUpdate();
       }
     );
   };
 
-  _launchLayoutPreview = (
+  const _launchLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
     options: PreviewOptions
   ) => {
-    const { _previewLauncher } = this;
-    const { previewFirstSceneName, isPreviewFirstSceneOverriden } = this.state;
+    const { previewFirstSceneName, isPreviewFirstSceneOverriden } = state;
 
-    if (!_previewLauncher) return;
+    if (!_previewLauncher.current) return;
 
-    this.setState(
+    setState(
       {
+        ...state,
         previewLoading: true,
       },
       () => {
@@ -902,7 +989,7 @@ class MainFrame extends React.Component<Props, State> {
           }
         }
 
-        _previewLauncher
+        _previewLauncher.current
           .launchLayoutPreview(project, previewedLayout, options)
           .catch(error => {
             console.error(
@@ -911,7 +998,8 @@ class MainFrame extends React.Component<Props, State> {
             );
           })
           .then(() => {
-            this.setState({
+            setState({ 
+              ...state,
               previewLoading: false,
             });
           });
@@ -919,21 +1007,21 @@ class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  _launchExternalLayoutPreview = (
+  const _launchExternalLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
     externalLayout: gdExternalLayout,
     options: PreviewOptions
   ) => {
-    const { _previewLauncher } = this;
-    if (!_previewLauncher) return;
+    if (!_previewLauncher.current) return;
 
-    this.setState(
+    setState(
       {
+        ...state,
         previewLoading: true,
       },
       () => {
-        _previewLauncher
+        _previewLauncher.current
           .launchExternalLayoutPreview(project, layout, externalLayout, options)
           .catch(error => {
             console.error(
@@ -942,7 +1030,7 @@ class MainFrame extends React.Component<Props, State> {
             );
           })
           .then(() => {
-            this.setState({
+            setState({ ...state,
               previewLoading: false,
             });
           });
@@ -950,14 +1038,14 @@ class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  openLayout = (
+  const openLayout = (
     name: string,
     {
       openEventsEditor = true,
       openSceneEditor = true,
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
-    const { i18n, storageProviderOperations } = this.props;
+    const { i18n, storageProviderOperations } = props;
     const sceneEditorOptions = {
       label: name,
       renderEditor: ({ isActive, editorRef }) => (
@@ -965,21 +1053,21 @@ class MainFrame extends React.Component<Props, State> {
           {({ values }) => (
             <SceneEditor
               previewButtonSettings={{
-                isPreviewFirstSceneOverriden: this.state
+                isPreviewFirstSceneOverriden: state
                   .isPreviewFirstSceneOverriden,
                 togglePreviewFirstSceneOverride: () =>
-                  this._togglePreviewFirstSceneOverride(),
-                previewFirstSceneName: this.state.previewFirstSceneName,
+                  _togglePreviewFirstSceneOverride(),
+                previewFirstSceneName: state.previewFirstSceneName,
                 useSceneAsPreviewFirstScene: () => {
-                  this._setPreviewFirstScene(name);
+                  _setPreviewFirstScene(name);
                 },
               }}
-              project={this.state.currentProject}
+              project={state.currentProject}
               layoutName={name}
-              setToolbar={this.setEditorToolbar}
+              setToolbar={setEditorToolbar}
               onPreview={(project, layout, options) => {
-                this._launchLayoutPreview(project, layout, options);
-                const { currentFileMetadata } = this.state;
+                _launchLayoutPreview(project, layout, options);
+                const { currentFileMetadata } = state;
                 if (
                   values.autosaveOnPreview &&
                   storageProviderOperations.onAutoSaveProject &&
@@ -991,16 +1079,16 @@ class MainFrame extends React.Component<Props, State> {
                   );
                 }
               }}
-              showPreviewButton={!!this.props.renderPreviewLauncher}
+              showPreviewButton={!!props.renderPreviewLauncher}
               showNetworkPreviewButton={
-                this._previewLauncher &&
-                this._previewLauncher.canDoNetworkPreview()
+                _previewLauncher.current &&
+                _previewLauncher.current.canDoNetworkPreview()
               }
-              onOpenDebugger={this.openDebugger}
-              onEditObject={this.props.onEditObject}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
+              onOpenDebugger={openDebugger}
+              onEditObject={props.onEditObject}
+              resourceSources={props.resourceSources}
+              onChooseResource={_onChooseResource}
+              resourceExternalEditors={props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
             />
@@ -1015,22 +1103,22 @@ class MainFrame extends React.Component<Props, State> {
         <PreferencesContext.Consumer>
           {({ values }) => (
             <EventsEditor
-              project={this.state.currentProject}
+              project={state.currentProject}
               layoutName={name}
-              setToolbar={this.setEditorToolbar}
+              setToolbar={setEditorToolbar}
               previewButtonSettings={{
-                isPreviewFirstSceneOverriden: this.state
+                isPreviewFirstSceneOverriden: state
                   .isPreviewFirstSceneOverriden,
                 togglePreviewFirstSceneOverride: () =>
-                  this._togglePreviewFirstSceneOverride(),
-                previewFirstSceneName: this.state.previewFirstSceneName,
+                  _togglePreviewFirstSceneOverride(),
+                previewFirstSceneName: state.previewFirstSceneName,
                 useSceneAsPreviewFirstScene: () => {
-                  this._setPreviewFirstScene(name);
+                  _setPreviewFirstScene(name);
                 },
               }}
               onPreview={(project, layout, options) => {
-                this._launchLayoutPreview(project, layout, options);
-                const { currentFileMetadata } = this.state;
+                _launchLayoutPreview(project, layout, options);
+                const { currentFileMetadata } = state;
                 if (
                   values.autosaveOnPreview &&
                   storageProviderOperations.onAutoSaveProject &&
@@ -1042,24 +1130,24 @@ class MainFrame extends React.Component<Props, State> {
                   );
                 }
               }}
-              showPreviewButton={!!this.props.renderPreviewLauncher}
+              showPreviewButton={!!props.renderPreviewLauncher}
               showNetworkPreviewButton={
-                this._previewLauncher &&
-                this._previewLauncher.canDoNetworkPreview()
+                _previewLauncher.current &&
+                _previewLauncher.current.canDoNetworkPreview()
               }
-              onOpenDebugger={this.openDebugger}
-              onOpenExternalEvents={this.openExternalEvents}
+              onOpenDebugger={openDebugger}
+              onOpenExternalEvents={openExternalEvents}
               onOpenLayout={name =>
-                this.openLayout(name, {
+                openLayout(name, {
                   openEventsEditor: true,
                   openSceneEditor: false,
                 })
               }
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              openInstructionOrExpression={this._openInstructionOrExpression}
-              onCreateEventsFunction={this._onCreateEventsFunction}
+              resourceSources={props.resourceSources}
+              onChooseResource={_onChooseResource}
+              resourceExternalEditors={props.resourceExternalEditors}
+              openInstructionOrExpression={_openInstructionOrExpression}
+              onCreateEventsFunction={_onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
             />
@@ -1071,40 +1159,41 @@ class MainFrame extends React.Component<Props, State> {
     };
 
     const tabsWithSceneEditor = openSceneEditor
-      ? openEditorTab(this.state.editorTabs, sceneEditorOptions)
-      : this.state.editorTabs;
+      ? openEditorTab(state.editorTabs, sceneEditorOptions)
+      : state.editorTabs;
     const tabsWithSceneAndEventsEditors = openEventsEditor
       ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
       : tabsWithSceneEditor;
 
-    this.setState({ editorTabs: tabsWithSceneAndEventsEditors }, () =>
-      this.updateToolbar()
+    setState({ ...state, editorTabs: tabsWithSceneAndEventsEditors }, () =>
+      updateToolbar()
     );
-    this.openProjectManager(false);
+    openProjectManager(false);
   };
 
-  openExternalEvents = (name: string) => {
-    this.setState(
+  const openExternalEvents = (name: string) => {
+    setState(
       {
-        editorTabs: openEditorTab(this.state.editorTabs, {
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
           label: name,
           renderEditor: ({ isActive, editorRef }) => (
             <ExternalEventsEditor
-              project={this.state.currentProject}
+              project={state.currentProject}
               externalEventsName={name}
-              setToolbar={this.setEditorToolbar}
-              onOpenExternalEvents={this.openExternalEvents}
+              setToolbar={setEditorToolbar}
+              onOpenExternalEvents={openExternalEvents}
               onOpenLayout={name =>
-                this.openLayout(name, {
+                openLayout(name, {
                   openEventsEditor: true,
                   openSceneEditor: false,
                 })
               }
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              openInstructionOrExpression={this._openInstructionOrExpression}
-              onCreateEventsFunction={this._onCreateEventsFunction}
+              resourceSources={props.resourceSources}
+              onChooseResource={_onChooseResource}
+              resourceExternalEditors={props.resourceExternalEditors}
+              openInstructionOrExpression={_openInstructionOrExpression}
+              onCreateEventsFunction={_onCreateEventsFunction}
               previewButtonSettings={emptyPreviewButtonSettings}
               isActive={isActive}
               ref={editorRef}
@@ -1113,32 +1202,33 @@ class MainFrame extends React.Component<Props, State> {
           key: 'external events ' + name,
         }),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
-    this.openProjectManager(false);
+    openProjectManager(false);
   };
 
-  openExternalLayout = (name: string) => {
-    const { storageProviderOperations } = this.props;
-    this.setState(
+  const openExternalLayout = (name: string) => {
+    const { storageProviderOperations } = props;
+    setState(
       {
-        editorTabs: openEditorTab(this.state.editorTabs, {
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
           label: name,
           renderEditor: ({ isActive, editorRef }) => (
             <PreferencesContext.Consumer>
               {({ values }) => (
                 <ExternalLayoutEditor
-                  project={this.state.currentProject}
+                  project={state.currentProject}
                   externalLayoutName={name}
-                  setToolbar={this.setEditorToolbar}
+                  setToolbar={setEditorToolbar}
                   onPreview={(project, layout, externalLayout, options) => {
-                    this._launchExternalLayoutPreview(
+                    _launchExternalLayoutPreview(
                       project,
                       layout,
                       externalLayout,
                       options
                     );
-                    const { currentFileMetadata } = this.state;
+                    const { currentFileMetadata } = state;
                     if (
                       values.autosaveOnPreview &&
                       storageProviderOperations.onAutoSaveProject &&
@@ -1150,17 +1240,17 @@ class MainFrame extends React.Component<Props, State> {
                       );
                     }
                   }}
-                  showPreviewButton={!!this.props.renderPreviewLauncher}
+                  showPreviewButton={!!props.renderPreviewLauncher}
                   showNetworkPreviewButton={
-                    this._previewLauncher &&
-                    this._previewLauncher.canDoNetworkPreview()
+                    _previewLauncher.current &&
+                    _previewLauncher.current.canDoNetworkPreview()
                   }
                   previewButtonSettings={emptyPreviewButtonSettings}
-                  onOpenDebugger={this.openDebugger}
-                  onEditObject={this.props.onEditObject}
-                  resourceSources={this.props.resourceSources}
-                  onChooseResource={this._onChooseResource}
-                  resourceExternalEditors={this.props.resourceExternalEditors}
+                  onOpenDebugger={openDebugger}
+                  onEditObject={props.onEditObject}
+                  resourceSources={props.resourceSources}
+                  onChooseResource={_onChooseResource}
+                  resourceExternalEditors={props.resourceExternalEditors}
                   isActive={isActive}
                   ref={editorRef}
                 />
@@ -1170,38 +1260,39 @@ class MainFrame extends React.Component<Props, State> {
           key: 'external layout ' + name,
         }),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
-    this.openProjectManager(false);
+    openProjectManager(false);
   };
 
-  openEventsFunctionsExtension = (
+  const openEventsFunctionsExtension = (
     name: string,
     initiallyFocusedFunctionName?: string,
     initiallyFocusedBehaviorName?: ?string
   ) => {
-    const { i18n, eventsFunctionsExtensionsState } = this.props;
-    this.setState(
+    const { i18n, eventsFunctionsExtensionsState } = props;
+    setState(
       {
-        editorTabs: openEditorTab(this.state.editorTabs, {
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
           label: name + ' ' + i18n._(t`(Extension)`),
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
-              project={this.state.currentProject}
+              project={state.currentProject}
               eventsFunctionsExtensionName={name}
-              setToolbar={this.setEditorToolbar}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
+              setToolbar={setEditorToolbar}
+              resourceSources={props.resourceSources}
+              onChooseResource={_onChooseResource}
+              resourceExternalEditors={props.resourceExternalEditors}
               isActive={isActive}
               initiallyFocusedFunctionName={initiallyFocusedFunctionName}
               initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
-              openInstructionOrExpression={this._openInstructionOrExpression}
-              onCreateEventsFunction={this._onCreateEventsFunction}
+              openInstructionOrExpression={_openInstructionOrExpression}
+              onCreateEventsFunction={_onCreateEventsFunction}
               ref={editorRef}
               onLoadEventsFunctionsExtensions={() => {
                 eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                  this.state.currentProject
+                  state.currentProject
                 );
               }}
             />
@@ -1209,21 +1300,22 @@ class MainFrame extends React.Component<Props, State> {
           key: 'events functions extension ' + name,
         }),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
-    this.openProjectManager(false);
+    openProjectManager(false);
   };
 
-  openResources = () => {
-    const { i18n } = this.props;
-    this.setState(
+  const openResources = () => {
+    const { i18n } = props;
+    setState(
       {
-        editorTabs: openEditorTab(this.state.editorTabs, {
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
           label: i18n._(t`Resources`),
           renderEditor: ({ isActive, editorRef }) => (
             <ResourcesEditor
-              project={this.state.currentProject}
-              setToolbar={this.setEditorToolbar}
+              project={state.currentProject}
+              setToolbar={setEditorToolbar}
               onDeleteResource={(resource: gdResource, cb: boolean => void) => {
                 // TODO: Project wide refactoring of objects/events using the resource
                 cb(true);
@@ -1238,41 +1330,42 @@ class MainFrame extends React.Component<Props, State> {
               }}
               isActive={isActive}
               ref={editorRef}
-              onChooseResource={this._onChooseResource}
-              resourceSources={this.props.resourceSources}
+              onChooseResource={_onChooseResource}
+              resourceSources={props.resourceSources}
             />
           ),
           key: 'resources',
         }),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
   };
 
-  openStartPage = () => {
-    const { i18n, storageProviders } = this.props;
-    this.setState(
+  const openStartPage = () => {
+    const { i18n, storageProviders } = props;
+    setState(
       {
-        editorTabs: openEditorTab(this.state.editorTabs, {
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
           label: i18n._(t`Start Page`),
           renderEditor: ({ isActive, editorRef }) => (
             <StartPage
-              project={this.state.currentProject}
-              setToolbar={this.setEditorToolbar}
+              project={state.currentProject}
+              setToolbar={setEditorToolbar}
               canOpen={
                 !!storageProviders.filter(
                   ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                 ).length
               }
-              onOpen={this.chooseProject}
-              onCreate={() => this.openCreateDialog()}
-              onOpenProjectManager={() => this.openProjectManager()}
+              onOpen={chooseProject}
+              onCreate={() => openCreateDialog()}
+              onOpenProjectManager={() => openProjectManager()}
               onCloseProject={() => {
-                this.askToCloseProject();
+                askToCloseProject();
               }}
-              onOpenAboutDialog={() => this.openAboutDialog()}
-              onOpenHelpFinder={() => this.openHelpFinderDialog()}
-              onOpenLanguageDialog={() => this.openLanguage()}
+              onOpenAboutDialog={() => openAboutDialog()}
+              onOpenHelpFinder={() => openHelpFinderDialog()}
+              onOpenLanguageDialog={() => openLanguage()}
               isActive={isActive}
               ref={editorRef}
             />
@@ -1281,37 +1374,38 @@ class MainFrame extends React.Component<Props, State> {
           closable: false,
         }),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
   };
 
-  openDebugger = () => {
-    const { i18n } = this.props;
-    this.setState(
+  const openDebugger = () => {
+    const { i18n } = props;
+    setState(
       {
-        editorTabs: openEditorTab(this.state.editorTabs, {
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
           label: i18n._(t`Debugger`),
           renderEditor: ({ isActive, editorRef }) => (
             <DebuggerEditor
-              project={this.state.currentProject}
-              setToolbar={this.setEditorToolbar}
+              project={state.currentProject}
+              setToolbar={setEditorToolbar}
               isActive={isActive}
               ref={editorRef}
-              onChangeSubscription={() => this.openSubscription(true)}
+              onChangeSubscription={() => openSubscription(true)}
             />
           ),
           key: 'debugger',
         }),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
   };
 
-  _openInstructionOrExpression = (
+  const _openInstructionOrExpression = (
     extension: gdPlatformExtension,
     type: string
   ) => {
-    const { currentProject } = this.state;
+    const { currentProject } = state;
     if (!currentProject) return;
 
     const extensionName = extension.getName();
@@ -1323,7 +1417,7 @@ class MainFrame extends React.Component<Props, State> {
       const functionName = getFunctionNameFromType(type);
 
       const foundTab = getEventsFunctionsExtensionEditor(
-        this.state.editorTabs,
+        state.editorTabs,
         eventsFunctionsExtension
       );
       if (foundTab) {
@@ -1332,12 +1426,13 @@ class MainFrame extends React.Component<Props, State> {
           functionName.name,
           functionName.behaviorName
         );
-        this.setState(state => ({
-          editorTabs: changeCurrentTab(state.editorTabs, foundTab.tabIndex),
+        setState(prevState => ({
+          ...state,
+          editorTabs: changeCurrentTab(prevState.editorTabs, foundTab.tabIndex),
         }));
       } else {
         // Open a new editor for the extension and the given function
-        this.openEventsFunctionsExtension(
+        openEventsFunctionsExtension(
           extensionName,
           functionName.name,
           functionName.behaviorName
@@ -1351,13 +1446,13 @@ class MainFrame extends React.Component<Props, State> {
     }
   };
 
-  _onCreateEventsFunction = (
+  const _onCreateEventsFunction = (
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => {
-    const { currentProject } = this.state;
+    const { currentProject } = state;
     if (!currentProject) return;
-    const { eventsFunctionsExtensionsState } = this.props;
+    const { eventsFunctionsExtensionsState } = props;
 
     // Names are assumed to be already validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
@@ -1380,27 +1475,27 @@ class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  openCreateDialog = (open: boolean = true) => {
-    this.setState({
+  const openCreateDialog = (open: boolean = true) => {
+    setState({ ...state,
       createDialogOpen: open,
     });
   };
 
-  chooseProject = () => {
-    const { storageProviders } = this.props;
+  const chooseProject = () => {
+    const { storageProviders } = props;
 
     if (
       storageProviders.filter(({ hiddenInOpenDialog }) => !hiddenInOpenDialog)
         .length > 1
     ) {
-      this.openOpenFromStorageProviderDialog();
+      openOpenFromStorageProviderDialog();
     } else {
-      this.chooseProjectWithStorageProviderPicker();
+      chooseProjectWithStorageProviderPicker();
     }
   };
 
-  chooseProjectWithStorageProviderPicker = () => {
-    const { storageProviderOperations, i18n } = this.props;
+  const chooseProjectWithStorageProviderPicker = () => {
+    const { storageProviderOperations, i18n } = props;
     if (!storageProviderOperations.onOpenWithPicker) return;
 
     storageProviderOperations
@@ -1408,9 +1503,10 @@ class MainFrame extends React.Component<Props, State> {
       .then(fileMetadata => {
         if (!fileMetadata) return;
 
-        return this.openFromFileMetadata(fileMetadata).then(() =>
-          this.openSceneOrProjectManager()
-        );
+        return openFromFileMetadata(fileMetadata).then(() => {
+          openSceneOrProjectManager();
+          addRecentFile(fileMetadata);
+        });
       })
       .catch(error => {
         const errorMessage = storageProviderOperations.getOpenErrorMessage
@@ -1425,26 +1521,26 @@ class MainFrame extends React.Component<Props, State> {
       });
   };
 
-  saveProject = () => {
-    const { currentProject, currentFileMetadata } = this.state;
+  const saveProject = () => {
+    const { currentProject, currentFileMetadata } = state;
     if (!currentProject) return;
     if (!currentFileMetadata) {
-      return this.saveProjectAs();
+      return saveProjectAs();
     }
 
-    const { i18n, storageProviderOperations } = this.props;
+    const { i18n, storageProviderOperations } = props;
     const { onSaveProject } = storageProviderOperations;
     if (!onSaveProject) {
-      return this.saveProjectAs();
+      return saveProjectAs();
     }
 
-    saveUiSettings(this.state.editorTabs);
-    this._showSnackMessage(i18n._(t`Saving...`));
+    saveUiSettings(state.editorTabs);
+    _showSnackMessage(i18n._(t`Saving...`));
 
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
         if (wasSaved) {
-          this._showSnackMessage(i18n._(t`Project properly saved`));
+          _showSnackMessage(i18n._(t`Project properly saved`));
         }
       },
       err => {
@@ -1458,9 +1554,9 @@ class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  saveProjectAs = () => {
-    const { currentProject } = this.state;
-    const { storageProviders, storageProviderOperations } = this.props;
+  const saveProjectAs = () => {
+    const { currentProject } = state;
+    const { storageProviders, storageProviderOperations } = props;
     if (!currentProject) return;
 
     if (
@@ -1468,18 +1564,18 @@ class MainFrame extends React.Component<Props, State> {
         .length > 1 ||
       !storageProviderOperations.onSaveProjectAs
     ) {
-      this.openSaveToStorageProviderDialog();
+      openSaveToStorageProviderDialog();
     } else {
-      this.saveProjectAsWithStorageProvider();
+      saveProjectAsWithStorageProvider();
     }
   };
 
-  saveProjectAsWithStorageProvider = () => {
-    const { currentProject, currentFileMetadata } = this.state;
+  const saveProjectAsWithStorageProvider = () => {
+    const { currentProject, currentFileMetadata } = state;
     if (!currentProject) return;
 
-    saveUiSettings(this.state.editorTabs);
-    const { i18n, storageProviderOperations } = this.props;
+    saveUiSettings(state.editorTabs);
+    const { i18n, storageProviderOperations } = props;
 
     if (!storageProviderOperations.onSaveProjectAs) {
       return;
@@ -1490,10 +1586,10 @@ class MainFrame extends React.Component<Props, State> {
       .then(
         ({ wasSaved, fileMetadata }) => {
           if (wasSaved) {
-            this._showSnackMessage(i18n._(t`Project properly saved`));
+            _showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
-              this.setState({
+              setState({ ...state,
                 currentFileMetadata: fileMetadata,
               });
             }
@@ -1510,9 +1606,9 @@ class MainFrame extends React.Component<Props, State> {
       );
   };
 
-  askToCloseProject = (): Promise<void> => {
-    if (!this.state.currentProject) return Promise.resolve();
-    const { i18n } = this.props;
+  const askToCloseProject = (): Promise<void> => {
+    if (!state.currentProject) return Promise.resolve();
+    const { i18n } = props;
 
     //eslint-disable-next-line
     const answer = confirm(
@@ -1522,95 +1618,97 @@ class MainFrame extends React.Component<Props, State> {
     );
     if (!answer) return Promise.resolve();
 
-    return this.closeProject();
+    return closeProject();
   };
 
-  openSceneOrProjectManager = () => {
-    const { currentProject } = this.state;
+  const openSceneOrProjectManager = () => {
+    const { currentProject } = state;
     if (!currentProject) return;
 
     if (currentProject.getLayoutsCount() === 1) {
-      this.openLayout(currentProject.getLayoutAt(0).getName(), {
+      openLayout(currentProject.getLayoutAt(0).getName(), {
         openSceneEditor: true,
         openEventsEditor: true,
       });
     } else {
-      this.openProjectManager();
+      openProjectManager();
     }
   };
 
-  openExportDialog = (open: boolean = true) => {
-    this.setState({
+  const openExportDialog = (open: boolean = true) => {
+    setState({ ...state,
       exportDialogOpen: open,
     });
   };
 
-  _openIntroDialog = (open: boolean = true) => {
-    this.setState({
+  const _openIntroDialog = (open: boolean = true) => {
+    setState({ ...state,
       introDialogOpen: open,
     });
   };
 
-  _openOpenConfirmDialog = (open: boolean = true) => {
-    this.setState({
+  const _openOpenConfirmDialog = (open: boolean = true) => {
+    setState({ ...state,
       openConfirmDialogOpen: open,
     });
   };
 
-  _openGenericDialog = (open: boolean = true) => {
-    this.setState({
+  const _openGenericDialog = (open: boolean = true) => {
+    setState({ ...state,
       genericDialogOpen: open,
       genericDialog: null,
     });
   };
 
-  openPreferences = (open: boolean = true) => {
-    this.setState({
+  const openPreferences = (open: boolean = true) => {
+    setState({ ...state,
       preferencesDialogOpen: open,
     });
   };
 
-  openLanguage = (open: boolean = true) => {
-    this.setState({
+  const openLanguage = (open: boolean = true) => {
+    setState({ ...state,
       languageDialogOpen: open,
     });
   };
 
-  openProfile = (open: boolean = true) => {
-    this.setState({
+  const openProfile = (open: boolean = true) => {
+    setState({ ...state,
       profileDialogOpen: open,
     });
   };
 
-  openSubscription = (open: boolean = true) => {
-    this.setState({
+  const openSubscription = (open: boolean = true) => {
+    setState({ ...state,
       subscriptionDialogOpen: open,
     });
   };
 
-  _setPreviewFirstScene = (name: string) => {
-    this.setState(
+  const _setPreviewFirstScene = (name: string) => {
+    setState(
       {
+        ...state,
         previewFirstSceneName: name,
         isPreviewFirstSceneOverriden: true,
       },
       () => {
-        this.updateToolbar();
+        updateToolbar();
       }
     );
   };
 
-  _onChangeEditorTab = (value: number) => {
-    this.setState(
+  const _onChangeEditorTab = (value: number) => {
+    setState(
       {
-        editorTabs: changeCurrentTab(this.state.editorTabs, value),
+        ...state,
+        editorTabs: changeCurrentTab(state.editorTabs, value),
       },
-      () => this._onEditorTabActive(getCurrentTab(this.state.editorTabs))
+      () => _onEditorTabActive(getCurrentTab(state.editorTabs))
     );
   };
 
-  _onEditorTabActive = (editorTab: EditorTab) => {
-    this.updateToolbar();
+  const _onEditorTabActive = (editorTab: EditorTab) => {
+    updateToolbar();
     // Ensure the editors shown on the screen are updated. This is for
     // example useful if global objects have been updated in another editor.
     if (editorTab.editorRef) {
@@ -1618,94 +1716,97 @@ class MainFrame extends React.Component<Props, State> {
     }
   };
 
-  _onCloseEditorTab = (editorTab: EditorTab) => {
-    saveUiSettings(this.state.editorTabs);
-    this.setState(
+  const _onCloseEditorTab = (editorTab: EditorTab) => {
+    saveUiSettings(state.editorTabs);
+    setState(
       {
-        editorTabs: closeEditorTab(this.state.editorTabs, editorTab),
+        ...state,
+        editorTabs: closeEditorTab(state.editorTabs, editorTab),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
   };
 
-  _onCloseOtherEditorTabs = (editorTab: EditorTab) => {
-    saveUiSettings(this.state.editorTabs);
-    this.setState(
+  const _onCloseOtherEditorTabs = (editorTab: EditorTab) => {
+    saveUiSettings(state.editorTabs);
+    setState(
       {
-        editorTabs: closeOtherEditorTabs(this.state.editorTabs, editorTab),
+        ...state,
+        editorTabs: closeOtherEditorTabs(state.editorTabs, editorTab),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
   };
 
-  _onCloseAllEditorTabs = () => {
-    saveUiSettings(this.state.editorTabs);
-    this.setState(
+  const _onCloseAllEditorTabs = () => {
+    saveUiSettings(state.editorTabs);
+    setState(
       {
-        editorTabs: closeAllEditorTabs(this.state.editorTabs),
+        ...state,
+        editorTabs: closeAllEditorTabs(state.editorTabs),
       },
-      () => this.updateToolbar()
+      () => updateToolbar()
     );
   };
 
-  _onChooseResource = (
+  const _onChooseResource = (
     sourceName: string,
     multiSelection: boolean = true
   ): Promise<Array<any>> => {
-    const { currentProject } = this.state;
-    const resourceSourceDialog = this._resourceSourceDialogs[sourceName];
+    const { currentProject } = state;
+    const resourceSourceDialog = _resourceSourceDialogs[sourceName];
     if (!resourceSourceDialog) return Promise.resolve([]);
 
     return resourceSourceDialog.chooseResources(currentProject, multiSelection);
   };
 
-  updateToolbar() {
-    const editorTab = getCurrentTab(this.state.editorTabs);
+  const updateToolbar = () => {
+    const editorTab = getCurrentTab(state.editorTabs);
     if (!editorTab || !editorTab.editorRef) {
-      this.setEditorToolbar(null);
+      setEditorToolbar(null);
       return;
     }
 
     editorTab.editorRef.updateToolbar();
   }
 
-  openAboutDialog = (open: boolean = true) => {
-    this.setState({
+  const openAboutDialog = (open: boolean = true) => {
+    setState({ ...state,
       aboutDialogOpen: open,
     });
   };
 
-  openOpenFromStorageProviderDialog = (open: boolean = true) => {
-    this.setState({
+  const openOpenFromStorageProviderDialog = (open: boolean = true) => {
+    setState({ ...state,
       openFromStorageProviderDialogOpen: open,
     });
   };
 
-  openSaveToStorageProviderDialog = (open: boolean = true) => {
+  const openSaveToStorageProviderDialog = (open: boolean = true) => {
     if (open) {
       // Ensure the project manager is closed as Google Drive storage provider
       // display a picker that does not play nice with material-ui's overlays.
-      this.openProjectManager(false);
+      openProjectManager(false);
     }
-    this.setState({
+    setState({ ...state,
       saveToStorageProviderDialogOpen: open,
     });
   };
 
-  openPlatformSpecificAssets = (open: boolean = true) => {
-    this.setState({
+  const openPlatformSpecificAssets = (open: boolean = true) => {
+    setState({ ...state,
       platformSpecificAssetsDialogOpen: open,
     });
   };
 
-  openHelpFinderDialog = (open: boolean = true) => {
-    this.setState({
+  const openHelpFinderDialog = (open: boolean = true) => {
+    setState({ ...state,
       helpFinderDialogOpen: open,
     });
   };
 
-  setUpdateStatus = (updateStatus: UpdateStatus) => {
-    this.setState({
+  const setUpdateStatus = (updateStatus: UpdateStatus) => {
+    setState({ ...state,
       updateStatus,
     });
 
@@ -1715,12 +1816,12 @@ class MainFrame extends React.Component<Props, State> {
       const notification = new window.Notification(notificationTitle, {
         body: notificationBody,
       });
-      notification.onclick = () => this.openAboutDialog(true);
+      notification.onclick = () => openAboutDialog(true);
     }
   };
 
-  simulateUpdateDownloaded = () =>
-    this.setUpdateStatus({
+  const simulateUpdateDownloaded = () =>
+    setUpdateStatus({
       status: 'update-downloaded',
       message: 'update-downloaded',
       info: {
@@ -1728,342 +1829,341 @@ class MainFrame extends React.Component<Props, State> {
       },
     });
 
-  simulateUpdateAvailable = () =>
-    this.setUpdateStatus({
+  const simulateUpdateAvailable = () =>
+    setUpdateStatus({
       status: 'update-available',
       message: 'Update available',
     });
 
-  _showSnackMessage = (snackMessage: string) =>
-    this.setState({
+  const _showSnackMessage = (snackMessage: string) =>
+    setState({ ...state,
       snackMessage,
       snackMessageOpen: true,
     });
 
-  _closeSnackMessage = () =>
-    this.setState({
+  const _closeSnackMessage = () =>
+    setState({ ...state,
       snackMessageOpen: false,
     });
 
-  render() {
-    const {
-      currentProject,
-      currentFileMetadata,
-      genericDialog,
-      projectManagerOpen,
-      profileDialogOpen,
-      subscriptionDialogOpen,
-      updateStatus,
-      aboutDialogOpen,
-      helpFinderDialogOpen,
-      eventsFunctionsExtensionsError,
-    } = this.state;
-    const {
-      renderExportDialog,
-      renderCreateDialog,
-      introDialog,
-      resourceSources,
-      renderPreviewLauncher,
-      resourceExternalEditors,
-      eventsFunctionsExtensionsState,
-      useStorageProvider,
-      i18n,
-      renderGDJSDevelopmentWatcher,
-    } = this.props;
-    const showLoader =
-      this.state.loadingProject ||
-      this.state.previewLoading ||
-      this.props.loading;
 
-    return (
-      <div className="main-frame">
-        <ProjectTitlebar fileMetadata={currentFileMetadata} />
-        <Drawer
-          open={projectManagerOpen}
-          PaperProps={{
-            style: styles.drawerContent,
-          }}
-          onClose={this.toggleProjectManager}
-        >
-          <EditorBar
-            title={currentProject ? currentProject.getName() : 'No project'}
-            displayRightCloseButton
-            onClose={this.toggleProjectManager}
-          />
-          {currentProject && (
-            <ProjectManager
-              project={currentProject}
-              onOpenExternalEvents={this.openExternalEvents}
-              onOpenLayout={this.openLayout}
-              onOpenExternalLayout={this.openExternalLayout}
-              onOpenEventsFunctionsExtension={this.openEventsFunctionsExtension}
-              onAddLayout={this.addLayout}
-              onAddExternalLayout={this.addExternalLayout}
-              onAddEventsFunctionsExtension={this.addEventsFunctionsExtension}
-              onAddExternalEvents={this.addExternalEvents}
-              onDeleteLayout={this.deleteLayout}
-              onDeleteExternalLayout={this.deleteExternalLayout}
-              onDeleteEventsFunctionsExtension={
-                this.deleteEventsFunctionsExtension
-              }
-              onDeleteExternalEvents={this.deleteExternalEvents}
-              onRenameLayout={this.renameLayout}
-              onRenameExternalLayout={this.renameExternalLayout}
-              onRenameEventsFunctionsExtension={
-                this.renameEventsFunctionsExtension
-              }
-              onRenameExternalEvents={this.renameExternalEvents}
-              onSaveProject={this.saveProject}
-              onSaveProjectAs={this.saveProjectAs}
-              onCloseProject={() => {
-                this.askToCloseProject();
-              }}
-              onExportProject={this.openExportDialog}
-              onOpenPreferences={() => this.openPreferences(true)}
-              onOpenProfile={() => this.openProfile(true)}
-              onOpenResources={() => {
-                this.openResources();
-                this.openProjectManager(false);
-              }}
-              onOpenPlatformSpecificAssets={() =>
-                this.openPlatformSpecificAssets()
-              }
-              onChangeSubscription={() => this.openSubscription(true)}
-              eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
-              onReloadEventsFunctionsExtensions={() => {
-                // Check if load is sufficient
-                eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-                  currentProject
-                );
-              }}
-              freezeUpdate={!projectManagerOpen}
-            />
-          )}
-          {!currentProject && (
-            <EmptyMessage>
-              <Trans>To begin, open or create a new project.</Trans>
-            </EmptyMessage>
-          )}
-        </Drawer>
-        <Toolbar
-          ref={toolbar => (this.toolbar = toolbar)}
-          showProjectIcons={!this.props.integratedEditor}
-          hasProject={!!this.state.currentProject}
-          toggleProjectManager={this.toggleProjectManager}
-          exportProject={() => this.openExportDialog(true)}
-          requestUpdate={this.props.requestUpdate}
-          simulateUpdateDownloaded={this.simulateUpdateDownloaded}
-          simulateUpdateAvailable={this.simulateUpdateAvailable}
+  const {
+    currentProject,
+    currentFileMetadata,
+    genericDialog,
+    projectManagerOpen,
+    profileDialogOpen,
+    subscriptionDialogOpen,
+    updateStatus,
+    aboutDialogOpen,
+    helpFinderDialogOpen,
+    eventsFunctionsExtensionsError,
+  } = state;
+  const {
+    renderExportDialog,
+    renderCreateDialog,
+    introDialog,
+    resourceSources,
+    renderPreviewLauncher,
+    resourceExternalEditors,
+    eventsFunctionsExtensionsState,
+    useStorageProvider,
+    i18n,
+    renderGDJSDevelopmentWatcher,
+  } = props;
+  const showLoader =
+    state.loadingProject ||
+    state.previewLoading ||
+    props.loading;
+    
+  return (
+    <div className="main-frame">
+      <ProjectTitlebar fileMetadata={currentFileMetadata} />
+      <Drawer
+        open={projectManagerOpen}
+        PaperProps={{
+          style: styles.drawerContent,
+        }}
+        onClose={toggleProjectManager}
+      >
+        <EditorBar
+          title={currentProject ? currentProject.getName() : 'No project'}
+          displayRightCloseButton
+          onClose={toggleProjectManager}
         />
-        <ClosableTabs hideLabels={!!this.props.integratedEditor}>
-          {getEditors(this.state.editorTabs).map((editorTab, id) => {
-            const isCurrentTab =
-              getCurrentTabIndex(this.state.editorTabs) === id;
-            return (
-              <ClosableTab
-                label={editorTab.label}
-                key={editorTab.key}
-                active={isCurrentTab}
-                onClick={() => this._onChangeEditorTab(id)}
-                onClose={() => this._onCloseEditorTab(editorTab)}
-                onCloseOthers={() => this._onCloseOtherEditorTabs(editorTab)}
-                onCloseAll={this._onCloseAllEditorTabs}
-                onActivated={() => this._onEditorTabActive(editorTab)}
-                closable={editorTab.closable}
-              />
-            );
-          })}
-        </ClosableTabs>
-        {getEditors(this.state.editorTabs).map((editorTab, id) => {
-          const isCurrentTab = getCurrentTabIndex(this.state.editorTabs) === id;
+        {currentProject && (
+          <ProjectManager
+            project={currentProject}
+            onOpenExternalEvents={openExternalEvents}
+            onOpenLayout={openLayout}
+            onOpenExternalLayout={openExternalLayout}
+            onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
+            onAddLayout={addLayout}
+            onAddExternalLayout={addExternalLayout}
+            onAddEventsFunctionsExtension={addEventsFunctionsExtension}
+            onAddExternalEvents={addExternalEvents}
+            onDeleteLayout={deleteLayout}
+            onDeleteExternalLayout={deleteExternalLayout}
+            onDeleteEventsFunctionsExtension={
+              deleteEventsFunctionsExtension
+            }
+            onDeleteExternalEvents={deleteExternalEvents}
+            onRenameLayout={renameLayout}
+            onRenameExternalLayout={renameExternalLayout}
+            onRenameEventsFunctionsExtension={
+              renameEventsFunctionsExtension
+            }
+            onRenameExternalEvents={renameExternalEvents}
+            onSaveProject={saveProject}
+            onSaveProjectAs={saveProjectAs}
+            onCloseProject={() => {
+              askToCloseProject();
+            }}
+            onExportProject={openExportDialog}
+            onOpenPreferences={() => openPreferences(true)}
+            onOpenProfile={() => openProfile(true)}
+            onOpenResources={() => {
+              openResources();
+              openProjectManager(false);
+            }}
+            onOpenPlatformSpecificAssets={() =>
+              openPlatformSpecificAssets()
+            }
+            onChangeSubscription={() => openSubscription(true)}
+            eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
+            onReloadEventsFunctionsExtensions={() => {
+              // Check if load is sufficient
+              eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+                currentProject
+              );
+            }}
+            freezeUpdate={!projectManagerOpen}
+          />
+        )}
+        {!currentProject && (
+          <EmptyMessage>
+            <Trans>To begin, open or create a new project.</Trans>
+          </EmptyMessage>
+        )}
+      </Drawer>
+      <Toolbar
+        ref={toolbarRef => (toolbar.current = toolbarRef)}
+        showProjectIcons={!props.integratedEditor}
+        hasProject={!!state.currentProject}
+        toggleProjectManager={toggleProjectManager}
+        exportProject={() => openExportDialog(true)}
+        requestUpdate={props.requestUpdate}
+        simulateUpdateDownloaded={simulateUpdateDownloaded}
+        simulateUpdateAvailable={simulateUpdateAvailable}
+      />
+      <ClosableTabs hideLabels={!!props.integratedEditor}>
+        {getEditors(state.editorTabs).map((editorTab, id) => {
+          const isCurrentTab =
+            getCurrentTabIndex(state.editorTabs) === id;
           return (
-            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
-              <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
-            </TabContentContainer>
+            <ClosableTab
+              label={editorTab.label}
+              key={editorTab.key}
+              active={isCurrentTab}
+              onClick={() => _onChangeEditorTab(id)}
+              onClose={() => _onCloseEditorTab(editorTab)}
+              onCloseOthers={() => _onCloseOtherEditorTabs(editorTab)}
+              onCloseAll={_onCloseAllEditorTabs}
+              onActivated={() => _onEditorTabActive(editorTab)}
+              closable={editorTab.closable}
+            />
           );
         })}
-        <LoaderModal show={showLoader} />
-        <HelpFinder
-          open={helpFinderDialogOpen}
-          onClose={() => this.openHelpFinderDialog(false)}
-        />
-        <Snackbar
-          open={this.state.snackMessageOpen}
-          autoHideDuration={3000}
-          onClose={this._closeSnackMessage}
-          ContentProps={{
-            'aria-describedby': 'snackbar-message',
-          }}
-          message={<span id="snackbar-message">{this.state.snackMessage}</span>}
-        />
-        {!!renderExportDialog &&
-          this.state.exportDialogOpen &&
-          renderExportDialog({
-            onClose: () => this.openExportDialog(false),
-            onChangeSubscription: () => {
-              this.openExportDialog(false);
-              this.openSubscription(true);
-            },
-            project: this.state.currentProject,
-          })}
-        {!!renderCreateDialog &&
-          this.state.createDialogOpen &&
-          renderCreateDialog({
-            open: this.state.createDialogOpen,
-            onClose: () => this.openCreateDialog(false),
-            onOpen: (storageProvider, fileMetadata) => {
-              this.openCreateDialog(false);
-              // eslint-disable-next-line
-              useStorageProvider(storageProvider)
-                .then(() => this.openFromFileMetadata(fileMetadata))
-                .then(() => this.openSceneOrProjectManager());
-            },
-            onCreate: (project, storageProvider, fileMetadata) => {
-              this.openCreateDialog(false);
-              // eslint-disable-next-line
-              useStorageProvider(storageProvider)
-                .then(() => this.loadFromProject(project, fileMetadata))
-                .then(() => this.openSceneOrProjectManager());
-            },
-          })}
-        {!!introDialog &&
-          React.cloneElement(introDialog, {
-            open: this.state.introDialogOpen,
-            onClose: () => this._openIntroDialog(false),
-          })}
-        {!!this.state.currentProject &&
-          this.state.platformSpecificAssetsDialogOpen && (
-            <PlatformSpecificAssetsDialog
-              project={this.state.currentProject}
-              open
-              onApply={() => this.openPlatformSpecificAssets(false)}
-              onClose={() => this.openPlatformSpecificAssets(false)}
-              resourceSources={resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
-            />
-          )}
-        {!!genericDialog &&
-          React.cloneElement(genericDialog, {
-            open: this.state.genericDialogOpen,
-            onClose: () => this._openGenericDialog(false),
-          })}
-        {!!renderPreviewLauncher &&
-          renderPreviewLauncher(
-            {
-              onExport: () => this.openExportDialog(true),
-              onChangeSubscription: () => this.openSubscription(true),
-            },
-            (previewLauncher: ?PreviewLauncherInterface) => {
-              this._previewLauncher = previewLauncher;
-            }
-          )}
-        {resourceSources.map(
-          (resourceSource, index): React.Node => {
-            const Component = resourceSource.component;
-            return (
-              <PreferencesContext.Consumer key={resourceSource.name}>
-                {({ getLastUsedPath, setLastUsedPath }) => {
-                  return (
-                    <Component
-                      ref={dialog =>
-                        (this._resourceSourceDialogs[
-                          resourceSource.name
-                        ] = dialog)
-                      }
-                      i18n={i18n}
-                      getLastUsedPath={getLastUsedPath}
-                      setLastUsedPath={setLastUsedPath}
-                    />
-                  );
-                }}
-              </PreferencesContext.Consumer>
-            );
+      </ClosableTabs>
+      {getEditors(state.editorTabs).map((editorTab, id) => {
+        const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+        return (
+          <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+            <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
+          </TabContentContainer>
+        );
+      })}
+      <LoaderModal show={showLoader} />
+      <HelpFinder
+        open={helpFinderDialogOpen}
+        onClose={() => openHelpFinderDialog(false)}
+      />
+      <Snackbar
+        open={state.snackMessageOpen}
+        autoHideDuration={3000}
+        onClose={_closeSnackMessage}
+        ContentProps={{
+          'aria-describedby': 'snackbar-message',
+        }}
+        message={<span id="snackbar-message">{state.snackMessage}</span>}
+      />
+      {!!renderExportDialog &&
+        state.exportDialogOpen &&
+        renderExportDialog({
+          onClose: () => openExportDialog(false),
+          onChangeSubscription: () => {
+            openExportDialog(false);
+            openSubscription(true);
+          },
+          project: state.currentProject,
+        })}
+      {!!renderCreateDialog &&
+        state.createDialogOpen &&
+        renderCreateDialog({
+          open: state.createDialogOpen,
+          onClose: () => openCreateDialog(false),
+          onOpen: (storageProvider, fileMetadata) => {
+            openCreateDialog(false);
+            // eslint-disable-next-line
+            useStorageProvider(storageProvider)
+              .then(() => openFromFileMetadata(fileMetadata))
+              .then(() => openSceneOrProjectManager());
+          },
+          onCreate: (project, storageProvider, fileMetadata) => {
+            openCreateDialog(false);
+            // eslint-disable-next-line
+            useStorageProvider(storageProvider)
+              .then(() => loadFromProject(project, fileMetadata))
+              .then(() => openSceneOrProjectManager());
+          },
+        })}
+      {!!introDialog &&
+        React.cloneElement(introDialog, {
+          open: state.introDialogOpen,
+          onClose: () => _openIntroDialog(false),
+        })}
+      {!!state.currentProject &&
+        state.platformSpecificAssetsDialogOpen && (
+          <PlatformSpecificAssetsDialog
+            project={state.currentProject}
+            open
+            onApply={() => openPlatformSpecificAssets(false)}
+            onClose={() => openPlatformSpecificAssets(false)}
+            resourceSources={resourceSources}
+            onChooseResource={_onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
+          />
+        )}
+      {!!genericDialog &&
+        React.cloneElement(genericDialog, {
+          open: state.genericDialogOpen,
+          onClose: () => _openGenericDialog(false),
+        })}
+      {!!renderPreviewLauncher &&
+        renderPreviewLauncher(
+          {
+            onExport: () => openExportDialog(true),
+            onChangeSubscription: () => openSubscription(true),
+          },
+          (previewLauncher: ?PreviewLauncherInterface) => {
+            _previewLauncher.current = previewLauncher;
           }
         )}
-        {profileDialogOpen && (
-          <ProfileDialog
-            open
-            onClose={() => this.openProfile(false)}
-            onChangeSubscription={() => this.openSubscription(true)}
-          />
-        )}
-        {subscriptionDialogOpen && (
-          <SubscriptionDialog
-            onClose={() => {
-              this.openSubscription(false);
-            }}
-            open
-          />
-        )}
-        {this.state.preferencesDialogOpen && (
-          <PreferencesDialog onClose={() => this.openPreferences(false)} />
-        )}
-        {this.state.languageDialogOpen && (
-          <LanguageDialog
-            open
-            onClose={languageChanged => {
-              this.openLanguage(false);
-              if (languageChanged) {
-                this._languageDidChange();
-              }
-            }}
-          />
-        )}
-        {aboutDialogOpen && (
-          <AboutDialog
-            open
-            onClose={() => this.openAboutDialog(false)}
-            updateStatus={updateStatus}
-          />
-        )}
-        {this.state.openFromStorageProviderDialogOpen && (
-          <OpenFromStorageProviderDialog
-            onClose={() => this.openOpenFromStorageProviderDialog(false)}
-            storageProviders={this.props.storageProviders}
-            onChooseProvider={storageProvider => {
-              this.openOpenFromStorageProviderDialog(false);
-              useStorageProvider(storageProvider).then(() => {
-                this.chooseProjectWithStorageProviderPicker();
-              });
-            }}
-            onCreateNewProject={() => {
-              this.openOpenFromStorageProviderDialog(false);
-              this.openCreateDialog(true);
-            }}
-          />
-        )}
-        {this.state.saveToStorageProviderDialogOpen && (
-          <SaveToStorageProviderDialog
-            onClose={() => this.openSaveToStorageProviderDialog(false)}
-            storageProviders={this.props.storageProviders}
-            onChooseProvider={storageProvider => {
-              this.openSaveToStorageProviderDialog(false);
-              useStorageProvider(storageProvider).then(() => {
-                this.saveProjectAsWithStorageProvider();
-              });
-            }}
-          />
-        )}
-        {this.state.openConfirmDialogOpen && (
-          <OpenConfirmDialog
-            onClose={() => {
-              this._openOpenConfirmDialog(false);
-            }}
-            onConfirm={() => {
-              this._openOpenConfirmDialog(false);
-              this._openInitialFileMetadata(/* isAfterUserInteraction= */ true);
-            }}
-          />
-        )}
-        <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
-        <ChangelogDialogContainer />
-        {this.state.gdjsDevelopmentWatcherEnabled &&
-          renderGDJSDevelopmentWatcher &&
-          renderGDJSDevelopmentWatcher()}
-      </div>
-    );
-  }
-}
+      {resourceSources.map(
+        (resourceSource, index): React.Node => {
+          const Component = resourceSource.component;
+          return (
+            <PreferencesContext.Consumer key={resourceSource.name}>
+              {({ getLastUsedPath, setLastUsedPath }) => {
+                return (
+                  <Component
+                    ref={dialog =>
+                      (_resourceSourceDialogs[
+                        resourceSource.name
+                      ] = dialog)
+                    }
+                    i18n={i18n}
+                    getLastUsedPath={getLastUsedPath}
+                    setLastUsedPath={setLastUsedPath}
+                  />
+                );
+              }}
+            </PreferencesContext.Consumer>
+          );
+        }
+      )}
+      {profileDialogOpen && (
+        <ProfileDialog
+          open
+          onClose={() => openProfile(false)}
+          onChangeSubscription={() => openSubscription(true)}
+        />
+      )}
+      {subscriptionDialogOpen && (
+        <SubscriptionDialog
+          onClose={() => {
+            openSubscription(false);
+          }}
+          open
+        />
+      )}
+      {state.preferencesDialogOpen && (
+        <PreferencesDialog onClose={() => openPreferences(false)} />
+      )}
+      {state.languageDialogOpen && (
+        <LanguageDialog
+          open
+          onClose={languageChanged => {
+            openLanguage(false);
+            if (languageChanged) {
+              _languageDidChange();
+            }
+          }}
+        />
+      )}
+      {aboutDialogOpen && (
+        <AboutDialog
+          open
+          onClose={() => openAboutDialog(false)}
+          updateStatus={updateStatus}
+        />
+      )}
+      {state.openFromStorageProviderDialogOpen && (
+        <OpenFromStorageProviderDialog
+          onClose={() => openOpenFromStorageProviderDialog(false)}
+          storageProviders={props.storageProviders}
+          onChooseProvider={storageProvider => {
+            openOpenFromStorageProviderDialog(false);
+            useStorageProvider(storageProvider).then(() => {
+              chooseProjectWithStorageProviderPicker();
+            });
+          }}
+          onCreateNewProject={() => {
+            openOpenFromStorageProviderDialog(false);
+            openCreateDialog(true);
+          }}
+        />
+      )}
+      {state.saveToStorageProviderDialogOpen && (
+        <SaveToStorageProviderDialog
+          onClose={() => openSaveToStorageProviderDialog(false)}
+          storageProviders={props.storageProviders}
+          onChooseProvider={storageProvider => {
+            openSaveToStorageProviderDialog(false);
+            useStorageProvider(storageProvider).then(() => {
+              saveProjectAsWithStorageProvider();
+            });
+          }}
+        />
+      )}
+      {state.openConfirmDialogOpen && (
+        <OpenConfirmDialog
+          onClose={() => {
+            _openOpenConfirmDialog(false);
+          }}
+          onConfirm={() => {
+            _openOpenConfirmDialog(false);
+            _openInitialFileMetadata(/* isAfterUserInteraction= */ true);
+          }}
+        />
+      )}
+      <CloseConfirmDialog shouldPrompt={!!state.currentProject} />
+      <ChangelogDialogContainer />
+      {state.gdjsDevelopmentWatcherEnabled &&
+        renderGDJSDevelopmentWatcher &&
+        renderGDJSDevelopmentWatcher()}
+    </div>
+  );
+});
 
 export default MainFrame;

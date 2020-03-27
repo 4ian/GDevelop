@@ -49,7 +49,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getLastUsedPath: this._getLastUsedPath.bind(this),
     setLastUsedPath: this._setLastUsedPath.bind(this),
     getRecentFiles: this._getRecentFiles.bind(this),
-    setRecentFiles: this._setRecentFiles.bind(this),
+    addRecentFile: this._addRecentFile.bind(this),
   };
 
   componentDidMount() {
@@ -328,7 +328,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return null;
   }
 
-  _setRecentFiles(data: FileMetadata) {
+  _addRecentFile(data: FileMetadata) {
     const { values } = this.state;
     if (values.recentFiles.length >= 5) values.recentFiles.pop();
     if (

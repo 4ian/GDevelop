@@ -140,8 +140,8 @@ export type Preferences = {|
     kind: ResourceKind,
     path: string
   ) => void,
-  getRecentFiles: () => Object,
-  setRecentFiles: (data: FileMetadata) => void,
+  getRecentFiles: () => [],
+  addRecentFile: (data: FileMetadata) => void,
 |};
 
 export const initialPreferences = {
@@ -178,8 +178,8 @@ export const initialPreferences = {
   setShowEffectParameterNames: (enabled: boolean) => {},
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
-  getRecentFiles: () => {},
-  setRecentFiles: (data: FileMetadata) => {},
+  getRecentFiles: () => [],
+  addRecentFile: (fileMetadata: FileMetadata) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -70,105 +70,123 @@ type RootMenuTemplate =
  * Forward events received from Electron main process
  * to the underlying child React component.
  */
-class ElectronMainMenu extends React.Component<Props, {||}> {
-  _editor: ?MainFrame;
-  _language: ?string;
 
-  componentDidMount() {
+function ElectronMainMenu(props: Props) {
+  const _editor = React.useRef((null: ?MainFrame));
+  const _language = React.useRef((null: ?string));
+  const _recentFiles = React.useRef(([]: Array<MenuItemTemplate>));
+  const { getRecentFiles } = React.useContext(PreferencesContext);
+
+  React.useEffect(() => {
+    _checkRecentFilesAndUpdate();
+    if (props.i18n.language !== _language.current) {
+      _buildAndSendMenuTemplate();
+      _language.current = props.i18n.language;
+    }
+  });
+
+  React.useEffect(() => {
     if (!ipcRenderer) return;
 
     ipcRenderer.on(
       ('main-menu-open': MainMenuEvent),
-      event => this._editor && this._editor.chooseProject()
+      event => _editor.current && _editor.current.chooseProject()
     );
     ipcRenderer.on('main-menu-recent', (event, fileMetadata) => {
-      const editor = this._editor;
+      const editor = _editor.current;
       if (editor) {
-          editor.openFromFileMetadata(fileMetadata).then(() => {
+        editor.openFromFileMetadata(fileMetadata).then(() => {
           editor.openSceneOrProjectManager();
         });
       }
     });
     ipcRenderer.on(
       ('main-menu-save': MainMenuEvent),
-      event => this._editor && this._editor.saveProject()
+      event => _editor.current && _editor.current.saveProject()
     );
     ipcRenderer.on(
       ('main-menu-save-as': MainMenuEvent),
-      event => this._editor && this._editor.saveProjectAs()
+      event => _editor.current && _editor.current.saveProjectAs()
     );
     ipcRenderer.on(
       ('main-menu-close': MainMenuEvent),
-      event => this._editor && this._editor.askToCloseProject()
+      event => _editor.current && _editor.current.askToCloseProject()
     );
     ipcRenderer.on(
       ('main-menu-close-app': MainMenuEvent),
-      event => this._editor && this._editor.closeApp()
+      event => _editor.current && _editor.current.closeApp()
     );
     ipcRenderer.on(
       ('main-menu-export': MainMenuEvent),
-      event => this._editor && this._editor.openExportDialog()
+      event => _editor.current && _editor.current.openExportDialog()
     );
     ipcRenderer.on(
       ('main-menu-create': MainMenuEvent),
-      event => this._editor && this._editor.openCreateDialog()
+      event => _editor.current && _editor.current.openCreateDialog()
     );
     ipcRenderer.on(
       ('main-menu-open-project-manager': MainMenuEvent),
-      event => this._editor && this._editor.openProjectManager()
+      event => _editor.current && _editor.current.openProjectManager()
     );
     ipcRenderer.on(
       ('main-menu-open-start-page': MainMenuEvent),
-      event => this._editor && this._editor.openStartPage()
+      event => _editor.current && _editor.current.openStartPage()
     );
     ipcRenderer.on(
       ('main-menu-open-debugger': MainMenuEvent),
-      event => this._editor && this._editor.openDebugger()
+      event => _editor.current && _editor.current.openDebugger()
     );
     ipcRenderer.on(
       ('main-menu-open-about': MainMenuEvent),
-      event => this._editor && this._editor.openAboutDialog()
+      event => _editor.current && _editor.current.openAboutDialog()
     );
     ipcRenderer.on(
       ('main-menu-open-preferences': MainMenuEvent),
-      event => this._editor && this._editor.openPreferences()
+      event => _editor.current && _editor.current.openPreferences()
     );
     ipcRenderer.on(
       ('main-menu-open-language': MainMenuEvent),
-      event => this._editor && this._editor.openLanguage()
+      event => _editor.current && _editor.current.openLanguage()
     );
     ipcRenderer.on(
       ('main-menu-open-profile': MainMenuEvent),
-      event => this._editor && this._editor.openProfile()
+      event => _editor.current && _editor.current.openProfile()
     );
     ipcRenderer.on(
       ('update-status': MainMenuEvent),
-      (event, status) => this._editor && this._editor.setUpdateStatus(status)
+      (event, status) =>
+        _editor.current && _editor.current.setUpdateStatus(status)
     );
 
-    this._buildAndSendMenuTemplate();
-  }
+    _buildAndSendMenuTemplate();
+  }, []);
 
-  componentDidUpdate() {
-    if (this.props.i18n.language !== this._language) {
-      this._buildAndSendMenuTemplate();
-      this._language = this.props.i18n.language;
-    }
-  }
+  const _compareRecentFilesArray = (): boolean => {
+    if (_recentFiles.current.length !== getRecentFiles().length) return true;
+    if (
+      _recentFiles.current.some((value, index) => {
+        if (value.label)
+          return value.label !== getRecentFiles()[index].fileIdentifier;
+      })
+    )
+      return true;
+    return false;
+  };
 
-  _recentFiles(): Array<MenuItemTemplate> {
-    return this.context.getRecentFiles().map(item => {
-      return {
+  const _checkRecentFilesAndUpdate = (): void => {
+    if (_compareRecentFilesArray()) {
+      _recentFiles.current = getRecentFiles().map(item => ({
         label: item.fileIdentifier,
         onClickSendEvent: 'main-menu-recent',
         argument: item,
-      };
-    });
-  }
+      }));
+      _buildAndSendMenuTemplate();
+    }
+  };
 
-  _buildAndSendMenuTemplate() {
-    console.log(this._recentFiles());
-    const { i18n } = this.props;
+  const _buildAndSendMenuTemplate = () => {
+    console.log('MENU RENDERED', true);
+    const { i18n } = props;
     const fileTemplate = {
       label: i18n._(t`File`),
       submenu: [
@@ -184,8 +202,8 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
           onClickSendEvent: 'main-menu-open',
         },
         {
-          label: i18n._(t`Open Recent...`),
-          submenu: this._recentFiles(),
+          label: i18n._(t`Open Recent`),
+          submenu: _recentFiles.current,
         },
         { type: 'separator' },
         {
@@ -385,14 +403,11 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     if (ipcRenderer) {
       ipcRenderer.send('set-main-menu', template);
     }
-  }
+  };
 
-  render() {
-    return React.cloneElement(this.props.children, {
-      ref: editor => (this._editor = editor),
-    });
-  }
+  return React.cloneElement(props.children, {
+    ref: editor => (_editor.current = editor),
+  });
 }
-ElectronMainMenu.contextType = PreferencesContext;
 
 export default ElectronMainMenu;

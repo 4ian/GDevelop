@@ -140,7 +140,7 @@ export class Toolbar extends PureComponent<Props> {
             {
               label: 'Zoom in',
               click: this.props.zoomIn,
-              accelerator: 'CmdOrCtrl++',
+              accelerator: 'CmdOrCtrl+Plus',
             },
             {
               label: 'Zoom out',

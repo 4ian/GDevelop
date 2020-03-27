@@ -123,7 +123,6 @@ gdjs.TopDownMovementRuntimeBehavior.prototype.doStepPreEvents = function(
   var UPKEY = 38;
   var RIGHTKEY = 39;
   var DOWNKEY = 40;
-  var SHIFTKEY = 16;
   var object = this.owner;
   var timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 

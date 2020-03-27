@@ -14,7 +14,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.dom.tom",
-    "projectFile": "G:\\Games\\Rope Example\\game.json",
+    "projectFile": "G:\\onedrive\\Documents\\GDevelop projects\\Bouncing ball and rope\\bouncing-ball-and-rope.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -176,7 +176,7 @@
         "kind": "image",
         "metadata": "",
         "name": "Ball.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": false
       },
       {
@@ -194,7 +194,7 @@
         "kind": "image",
         "metadata": "",
         "name": "BoundsLine.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": true
       }
     ],
@@ -241,7 +241,7 @@
           "locked": false,
           "name": "Instructions",
           "width": 562,
-          "x": 164,
+          "x": 139,
           "y": 187,
           "zOrder": 1,
           "numberProperties": [],
@@ -256,7 +256,7 @@
           "locked": false,
           "name": "Logo",
           "width": 355,
-          "x": 486,
+          "x": 427,
           "y": 446,
           "zOrder": 2,
           "numberProperties": [],
@@ -271,7 +271,7 @@
           "locked": false,
           "name": "Title",
           "width": 0,
-          "x": 76,
+          "x": 51,
           "y": 33,
           "zOrder": 3,
           "numberProperties": [],
@@ -528,7 +528,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.496
       },
       "objectsGroups": [
         {
@@ -1077,7 +1077,7 @@
               "bullet": false,
               "fixedRotation": true,
               "canSleep": true,
-              "shape": "Polygon",
+              "shape": "Circle",
               "shapeDimensionA": 0,
               "shapeDimensionB": 0,
               "shapeOffsetX": 0,
@@ -1370,7 +1370,7 @@
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "NewObject-1.png",
+                      "image": "BoundsLine.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -1480,18 +1480,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Toujours"
-                  },
-                  "parameters": [
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {

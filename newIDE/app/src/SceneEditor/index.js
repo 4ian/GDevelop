@@ -69,6 +69,7 @@ import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
+
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -751,6 +752,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         );
       }
     }
+
     done(true);
   };
 
@@ -1018,6 +1020,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onDeleteGroup={this._onDeleteGroup}
             onRenameGroup={this._onRenameGroup}
             canRenameGroup={this._canObjectOrGroupUseNewName}
+            unsavedChanges={this.props.unsavedChanges}
           />
         ),
       },
@@ -1122,6 +1125,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
+            unsavedChanges={this.props.unsavedChanges}
           />
         </Drawer>
         <InfoBar
@@ -1238,9 +1242,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             project={project}
             layout={layout}
             onClose={() => this.openSceneProperties(false)}
-            onApply={() => {
-              return this.openSceneProperties(false);
-            }}
+            onApply={() => this.openSceneProperties(false)}
             onEditVariables={() => this.editLayoutVariables(true)}
             onOpenMoreSettings={this.props.onOpenMoreSettings}
           />

@@ -19,6 +19,7 @@ import {
   type GroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
 import { listItemWithoutIconHeight } from '../UI/List';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 // TODO: This component should be updated to be implemented using SortableVirtualizedItemList,
 // so that drag'n'drop is identical to other lists (and to benefit from better typing + future improvements
@@ -139,6 +140,7 @@ type Props = {|
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
   canSetAsGlobalGroup?: boolean,
+  unsavedChanges: UnsavedChanges,
 |};
 
 export default class GroupsListContainer extends React.Component<Props, State> {
@@ -193,7 +195,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
 
     objectGroups.insertNew(name, objectGroups.count());
-    this.forceUpdate();
+    this._onObjectGroupModified();
 
     if (this.props.onGroupAdded) {
       this.props.onGroupAdded();
@@ -219,7 +221,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         objectGroups.remove(group.getName());
       }
 
-      this.forceUpdate();
+      this._onObjectGroupModified();
       if (this.props.onGroupRemoved) {
         this.props.onGroupRemoved();
       }
@@ -256,7 +258,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
         group.setName(newName);
 
-        this.forceUpdate();
+        this._onObjectGroupModified();
         if (this.props.onGroupRenamed) {
           this.props.onGroupRenamed();
         }
@@ -288,7 +290,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       );
     }
 
-    this.forceUpdate();
+    this._onObjectGroupModified();
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
@@ -313,6 +315,11 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     globalObjectGroups.insert(group, globalObjectGroups.count());
     objectGroups.remove(groupName);
+    this._onObjectGroupModified();
+  };
+
+  _onObjectGroupModified = () => {
+    this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 

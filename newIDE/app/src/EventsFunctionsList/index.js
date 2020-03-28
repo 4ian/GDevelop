@@ -17,6 +17,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
@@ -59,6 +60,7 @@ type Props = {|
   ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
   renderHeader?: () => React.Node,
+  unsavedChanges: UnsavedChanges,
 |};
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
@@ -98,7 +100,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       if (!doRemove) return;
 
       eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
-      this.forceUpdate();
+      this._onEventsFunctionModified();
     });
   };
 
@@ -129,7 +131,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.props.onRenameEventsFunction(eventsFunction, newName, doRename => {
       if (!doRename) return;
       eventsFunction.setName(newName);
-      this.forceUpdate();
+      this._onEventsFunctionModified();
     });
   };
 
@@ -150,7 +152,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   forceUpdateList = () => {
-    this.forceUpdate();
+    this._onEventsFunctionModified();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
@@ -192,8 +194,13 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     newEventsFunction.setName(newName);
     this.props.onEventsFunctionAdded(newEventsFunction);
 
-    this.forceUpdate();
+    this._onEventsFunctionModified();
   };
+
+  _onEventsFunctionModified() {
+    this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
+  }
 
   _renderEventsFunctionMenuTemplate = (
     eventsFunction: gdEventsFunction,
@@ -252,7 +259,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         );
         eventsFunction.setFunctionType(parameters.functionType);
         this.props.onEventsFunctionAdded(eventsFunction);
-        this.forceUpdate();
+        this._onEventsFunctionModified();
       }
     );
   };

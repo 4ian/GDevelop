@@ -556,7 +556,7 @@ class MainFrame extends React.Component<Props, State> {
     );
     newLayout.updateBehaviorsSharedData(currentProject);
 
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   addExternalLayout = () => {
@@ -570,7 +570,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalLayoutsCount()
     );
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   addExternalEvents = () => {
@@ -584,7 +584,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalEventsCount()
     );
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   addEventsFunctionsExtension = () => {
@@ -598,7 +598,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getEventsFunctionsExtensionsCount()
     );
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   deleteLayout = (layout: gdLayout) => {
@@ -620,7 +620,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeLayout(layout.getName());
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
   };
@@ -647,7 +647,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeExternalLayout(externalLayout.getName());
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
   };
@@ -674,7 +674,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeExternalEvents(externalEvents.getName());
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
   };
@@ -703,7 +703,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
 
@@ -740,7 +740,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         layout.setName(newName);
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
   };
@@ -777,7 +777,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         externalLayout.setName(newName);
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
   };
@@ -814,7 +814,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         externalEvents.setName(newName);
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
   };
@@ -877,7 +877,7 @@ class MainFrame extends React.Component<Props, State> {
         eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
           currentProject
         );
-        this._onModifiedObject();
+        this._onProjectItemModified();
       }
     );
   };
@@ -1357,7 +1357,7 @@ class MainFrame extends React.Component<Props, State> {
     }
   };
 
-  _onModifiedObject = () => {
+  _onProjectItemModified = () => {
     this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };

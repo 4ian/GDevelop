@@ -4,6 +4,7 @@ import * as React from 'react';
 import { type StorageProvider, type FileMetadata } from '../index';
 import DownloadSaveAsDialog from './DownloadSaveAsDialog';
 import SaveAlt from '@material-ui/icons/SaveAlt';
+
 /**
  * "Storage" allowing to download a copy of the game.
  * Used for the web-app.

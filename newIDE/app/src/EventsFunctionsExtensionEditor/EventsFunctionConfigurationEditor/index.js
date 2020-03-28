@@ -10,6 +10,8 @@ import ScrollView from '../../UI/ScrollView';
 import { Column } from '../../UI/Grid';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+
 const gd = global.gd;
 
 type Props = {|
@@ -24,6 +26,7 @@ type Props = {|
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
+  unsavedChanges: UnsavedChanges,
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
@@ -195,6 +198,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             onDeleteGroup={this._onDeleteGroup}
             onGroupsUpdated={onParametersOrGroupsUpdated}
             canSetAsGlobalGroup={false}
+            unsavedChanges={this.props.unsavedChanges}
           />
         ) : null}
       </Column>

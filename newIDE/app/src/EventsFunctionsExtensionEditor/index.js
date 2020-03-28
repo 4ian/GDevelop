@@ -38,11 +38,11 @@ import EditorNavigator, {
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import {
   type PreviewButtonSettings,
   emptyPreviewButtonSettings,
 } from '../MainFrame/Toolbar/PreviewButtons';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const gd = global.gd;
 
@@ -66,6 +66,7 @@ type Props = {|
   initiallyFocusedBehaviorName: ?string,
   unsavedChanges: UnsavedChanges,
   previewButtonSettings: PreviewButtonSettings,
+  unsavedChanges: UnsavedChanges,
 |};
 
 type State = {|
@@ -555,6 +556,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._loadEventsFunctionFrom(project, selectedEventsFunction);
                   this.forceUpdate();
                 }}
+                unsavedChanges={this.props.unsavedChanges}
               />
             ) : (
               <EmptyMessage>
@@ -655,6 +657,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     <Divider />
                   </React.Fragment>
                 )}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
           </I18n>
@@ -716,6 +719,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       <Divider />
                     </React.Fragment>
                   )}
+                  unsavedChanges={this.props.unsavedChanges}
                 />
               )}
             </I18n>
@@ -751,6 +755,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._onEventsBasedBehaviorRenamed
                 }
                 onEditProperties={this._editBehavior}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
           </I18n>

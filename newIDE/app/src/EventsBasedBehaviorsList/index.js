@@ -17,6 +17,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -55,6 +56,7 @@ type Props = {|
     eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
+  unsavedChanges: UnsavedChanges,
 |};
 
 export default class EventsBasedBehaviorsList extends React.Component<
@@ -97,7 +99,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       if (!doRemove) return;
 
       eventsBasedBehaviorsList.remove(eventsBasedBehavior.getName());
-      this.forceUpdate();
+      this._onEventsBasedBehaviorModified();
     });
   };
 
@@ -131,7 +133,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       doRename => {
         if (!doRename) return;
         eventsBasedBehavior.setName(newName);
-        this.forceUpdate();
+        this._onEventsBasedBehaviorModified();
         this.props.onEventsBasedBehaviorRenamed(eventsBasedBehavior);
       }
     );
@@ -155,7 +157,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
   };
 
   forceUpdateList = () => {
-    this.forceUpdate();
+    this._onEventsBasedBehaviorModified();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
@@ -199,7 +201,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
     newEventsBasedBehavior.setName(newName);
 
-    this.forceUpdate();
+    this._onEventsBasedBehaviorModified();
   };
 
   _renderEventsBasedBehaviorMenuTemplate = (
@@ -254,8 +256,13 @@ export default class EventsBasedBehaviorsList extends React.Component<
       name,
       eventsBasedBehaviorsList.getCount()
     );
-    this.forceUpdate();
+    this._onEventsBasedBehaviorModified();
   };
+
+  _onEventsBasedBehaviorModified() {
+    this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
+  }
 
   render() {
     const {

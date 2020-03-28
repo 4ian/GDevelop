@@ -3146,12 +3146,17 @@ storiesOf('ObjectGroupsList', module)
   .add('default', () => (
     <SerializedObjectDisplay object={testProject.testLayout}>
       <div style={{ height: 250 }}>
-        <ObjectGroupsList
-          globalObjectGroups={testProject.project.getObjectGroups()}
-          objectGroups={testProject.testLayout.getObjectGroups()}
-          onEditGroup={() => {}}
-          canRenameGroup={() => true}
-        />
+        <UnsavedChangesContext.Consumer>
+          {unsavedChanges => (
+            <ObjectGroupsList
+              globalObjectGroups={testProject.project.getObjectGroups()}
+              objectGroups={testProject.testLayout.getObjectGroups()}
+              onEditGroup={() => {}}
+              canRenameGroup={() => true}
+              unsavedChanges={unsavedChanges}
+            />
+          )}
+        </UnsavedChangesContext.Consumer>
       </div>
     </SerializedObjectDisplay>
   ));
@@ -3666,47 +3671,62 @@ storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(muiDecorator)
   .add('default, for a free function (i.e: no behavior)', () => (
     <FixedHeightFlexContainer height={500}>
-      <EventsFunctionConfigurationEditor
-        project={testProject.project}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
-        helpPagePath="/events/functions"
-        eventsFunction={testProject.testEventsFunction}
-        eventsBasedBehavior={null}
-        onParametersOrGroupsUpdated={action(
-          'Parameters or groups were updated'
+      <UnsavedChangesContext.Consumer>
+        {unsavedChanges => (
+          <EventsFunctionConfigurationEditor
+            project={testProject.project}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            helpPagePath="/events/functions"
+            eventsFunction={testProject.testEventsFunction}
+            eventsBasedBehavior={null}
+            onParametersOrGroupsUpdated={action(
+              'Parameters or groups were updated'
+            )}
+            unsavedChanges={unsavedChanges}
+          />
         )}
-      />
+      </UnsavedChangesContext.Consumer>
     </FixedHeightFlexContainer>
   ))
   .add('default, for an events based behavior function', () => (
     <FixedHeightFlexContainer height={500}>
-      <EventsFunctionConfigurationEditor
-        project={testProject.project}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
-        helpPagePath="/events/functions"
-        eventsFunction={testProject.testBehaviorEventsFunction}
-        eventsBasedBehavior={testProject.testEventsBasedBehavior}
-        onParametersOrGroupsUpdated={action(
-          'Parameters or groups were updated'
+      <UnsavedChangesContext.Consumer>
+        {unsavedChanges => (
+          <EventsFunctionConfigurationEditor
+            project={testProject.project}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            helpPagePath="/events/functions"
+            eventsFunction={testProject.testBehaviorEventsFunction}
+            eventsBasedBehavior={testProject.testEventsBasedBehavior}
+            onParametersOrGroupsUpdated={action(
+              'Parameters or groups were updated'
+            )}
+            unsavedChanges={unsavedChanges}
+          />
         )}
-      />
+      </UnsavedChangesContext.Consumer>
     </FixedHeightFlexContainer>
   ))
   .add('default, for an events based behavior lifecycle function', () => (
     <FixedHeightFlexContainer height={500}>
-      <EventsFunctionConfigurationEditor
-        project={testProject.project}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
-        helpPagePath="/events/functions"
-        eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
-        eventsBasedBehavior={testProject.testEventsBasedBehavior}
-        onParametersOrGroupsUpdated={action(
-          'Parameters or groups were updated'
+      <UnsavedChangesContext.Consumer>
+        {unsavedChanges => (
+          <EventsFunctionConfigurationEditor
+            project={testProject.project}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            helpPagePath="/events/functions"
+            eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
+            eventsBasedBehavior={testProject.testEventsBasedBehavior}
+            onParametersOrGroupsUpdated={action(
+              'Parameters or groups were updated'
+            )}
+            unsavedChanges={unsavedChanges}
+          />
         )}
-      />
+      </UnsavedChangesContext.Consumer>
     </FixedHeightFlexContainer>
   ));
 
@@ -3714,19 +3734,24 @@ storiesOf('EventsFunctionsList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <FixedHeightFlexContainer height={500}>
-      <EventsFunctionsList
-        project={testProject.project}
-        eventsFunctionsContainer={testProject.testEventsFunctionsExtension}
-        selectedEventsFunction={testProject.testEventsFunctionsExtension.getEventsFunctionAt(
-          1
+      <UnsavedChangesContext.Consumer>
+        {unsavedChanges => (
+          <EventsFunctionsList
+            project={testProject.project}
+            eventsFunctionsContainer={testProject.testEventsFunctionsExtension}
+            selectedEventsFunction={testProject.testEventsFunctionsExtension.getEventsFunctionAt(
+              1
+            )}
+            onSelectEventsFunction={action('select')}
+            onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
+            onAddEventsFunction={cb => cb({ functionType: 0, name: null })}
+            onEventsFunctionAdded={() => {}}
+            onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
+            canRename={() => true}
+            unsavedChanges={unsavedChanges}
+          />
         )}
-        onSelectEventsFunction={action('select')}
-        onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
-        onAddEventsFunction={cb => cb({ functionType: 0, name: null })}
-        onEventsFunctionAdded={() => {}}
-        onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
-        canRename={() => true}
-      />
+      </UnsavedChangesContext.Consumer>
     </FixedHeightFlexContainer>
   ));
 

@@ -39,8 +39,8 @@ import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
@@ -346,17 +346,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.setName(newName); // Unserialization has overwritten the name.
     newLayout.updateBehaviorsSharedData(project);
 
-    this._onModifiedObject();
-  };
-
-  _duplicateLayout = (layout: gdLayout, index: number) => {
-    this._copyLayout(layout);
-    this._pasteLayout(index);
-  };
-
-  _duplicateLayout = (layout: gdLayout, index: number) => {
-    this._copyLayout(layout);
-    this._pasteLayout(index);
+    this._onProjectItemModified();
   };
 
   _duplicateLayout = (layout: gdLayout, index: number) => {
@@ -375,7 +365,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.setName(newName);
     newLayout.updateBehaviorsSharedData(project);
 
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _addExternalEvents = (index: number) => {
@@ -385,7 +375,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasExternalEventsNamed(name)
     );
     project.insertNewExternalEvents(newName, index + 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _addExternalLayout = (index: number) => {
@@ -395,7 +385,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasExternalLayoutNamed(name)
     );
     project.insertNewExternalLayout(newName, index + 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _addEventsFunctionsExtension = (index: number) => {
@@ -405,7 +395,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasEventsFunctionsExtensionNamed(name)
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _moveUpLayout = (index: number) => {
@@ -413,7 +403,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapLayouts(index, index - 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _moveDownLayout = (index: number) => {
@@ -421,7 +411,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getLayoutsCount() - 1) return;
 
     project.swapLayouts(index, index + 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _copyExternalEvents = (externalEvents: gdExternalEvents) => {
@@ -458,23 +448,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     newExternalEvents.setName(newName); // Unserialization has overwritten the name.
 
-    this._onModifiedObject();
-  };
-
-  _duplicateExternalEvents = (
-    externalEvents: gdExternalEvents,
-    index: number
-  ) => {
-    this._copyExternalEvents(externalEvents);
-    this._pasteExternalEvents(index);
-  };
-
-  _duplicateExternalEvents = (
-    externalEvents: gdExternalEvents,
-    index: number
-  ) => {
-    this._copyExternalEvents(externalEvents);
-    this._pasteExternalEvents(index);
+    this._onProjectItemModified();
   };
 
   _duplicateExternalEvents = (
@@ -490,7 +464,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapExternalEvents(index, index - 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _moveDownExternalEvents = (index: number) => {
@@ -498,7 +472,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getExternalEventsCount() - 1) return;
 
     project.swapExternalEvents(index, index + 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _copyExternalLayout = (externalLayout: gdExternalLayout) => {
@@ -529,23 +503,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
     newExternalLayout.setName(newName); // Unserialization has overwritten the name.
-    this._onModifiedObject();
-  };
-
-  _duplicateExternalLayout = (
-    externalLayout: gdExternalLayout,
-    index: number
-  ) => {
-    this._copyExternalLayout(externalLayout);
-    this._pasteExternalLayout(index);
-  };
-
-  _duplicateExternalLayout = (
-    externalLayout: gdExternalLayout,
-    index: number
-  ) => {
-    this._copyExternalLayout(externalLayout);
-    this._pasteExternalLayout(index);
+    this._onProjectItemModified();
   };
 
   _duplicateExternalLayout = (
@@ -561,7 +519,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapExternalLayouts(index, index - 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _moveDownExternalLayout = (index: number) => {
@@ -569,7 +527,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getExternalLayoutsCount() - 1) return;
 
     project.swapExternalLayouts(index, index + 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _copyEventsFunctionsExtension = (
@@ -622,7 +580,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
 
-    this._onModifiedObject();
+    this._onProjectItemModified();
     this.props.onReloadEventsFunctionsExtensions();
   };
 
@@ -631,7 +589,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapEventsFunctionsExtensions(index, index - 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _moveDownEventsFunctionsExtension = (index: number) => {
@@ -639,7 +597,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getEventsFunctionsExtensionsCount() - 1) return;
 
     project.swapEventsFunctionsExtensions(index, index + 1);
-    this._onModifiedObject();
+    this._onProjectItemModified();
   };
 
   _renderMenu() {
@@ -706,7 +664,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     /* Do nothing for now, but we could open the first result. */
   };
 
-  _onModifiedObject = () => {
+  _onProjectItemModified = () => {
     this.forceUpdate();
     this.props.unsavedChanges.triggerUnsavedChanges();
   };

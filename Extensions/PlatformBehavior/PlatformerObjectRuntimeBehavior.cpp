@@ -450,7 +450,7 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
       // this extra check).
       bool canLand = requestedDeltaY >= 0;
 
-      // Check if landing on a new floor: (Exclude already overlapped jump truh)
+      // Check if landing on a new floor: (Exclude already overlapped jump thru)
       std::set<PlatformRuntimeBehavior*> collidingObjects =
           GetPlatformsCollidingWith(potentialObjects, overlappedJumpThru);
       if (canLand && !collidingObjects.empty()) {  // Just landed on floor

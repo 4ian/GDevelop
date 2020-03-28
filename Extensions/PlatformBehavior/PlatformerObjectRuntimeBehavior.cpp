@@ -247,8 +247,8 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
     downKey |=
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
-    if (upKey) requestedDeltaY -= ladderCLimbingSpeed * timeDelta;
-    if (downKey) requestedDeltaY += ladderCLimbingSpeed * timeDelta;
+    if (upKey) requestedDeltaY -= ladderClimbingSpeed * timeDelta;
+    if (downKey) requestedDeltaY += ladderClimbingSpeed * timeDelta;
 
     // Coming to an extremity of a ladder
     if (!IsOverlappingLadder(potentialObjects)) {

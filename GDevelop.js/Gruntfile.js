@@ -5,7 +5,7 @@ module.exports = function(grunt) {
   const path = require('path');
   const isWin = /^win/.test(process.platform);
   const isDev = grunt.option('dev') || false;
-  const useMinGW = grunt.option('force-use-MinGW') || false;
+  const useMinGW = grunt.option('use-MinGW') || false;
 
   const buildOutputPath = '../Binaries/embuild/GDevelop.js/';
   const buildPath = '../Binaries/embuild';

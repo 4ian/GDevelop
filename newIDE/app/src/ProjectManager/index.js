@@ -40,6 +40,8 @@ import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
+import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -130,6 +132,7 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
+  addonMenuOptions?: Array<Object>,
   style?: ?Object,
 |};
 
@@ -165,6 +168,61 @@ class Item extends React.Component<ItemProps, {||}> {
       <div style={styles.itemName}>{this.props.primaryText}</div>
     );
 
+    const menuTemplate = [
+      {
+        label: 'Edit',
+        click: () => this.props.onEdit(),
+      },
+      {
+        label: 'Rename',
+        click: () => this.props.onEditName(),
+      },
+      {
+        label: 'Delete',
+        click: () => this.props.onDelete(),
+      },
+      {
+        label: this.props.addLabel,
+        visible: !!this.props.onAdd,
+        click: () => this.props.onAdd(),
+      },
+      { type: 'separator' },
+      {
+        label: 'Copy',
+        click: () => this.props.onCopy(),
+      },
+      {
+        label: 'Cut',
+        click: () => this.props.onCut(),
+      },
+      {
+        label: 'Paste',
+        enabled: this.props.canPaste(),
+        click: () => this.props.onPaste(),
+      },
+      {
+        label: 'Duplicate',
+        click: () => this.props.onDuplicate(),
+      },
+      { type: 'separator' },
+      {
+        label: 'Move up',
+        enabled: this.props.canMoveUp,
+        click: () => this.props.onMoveUp(),
+      },
+      {
+        label: 'Move down',
+        enabled: this.props.canMoveDown,
+        click: () => this.props.onMoveDown(),
+      },
+    ];
+
+    // Append the addon menu options (if provided) to base menu
+    const addedMenu = this.props.addonMenuOptions;
+    if (addedMenu && addedMenu.length !== 0) {
+      menuTemplate.push({ type: 'separator' }, ...addedMenu);
+    }
+
     return (
       <ThemeConsumer>
         {muiTheme => (
@@ -175,54 +233,7 @@ class Item extends React.Component<ItemProps, {||}> {
             }}
             primaryText={label}
             displayMenuButton
-            buildMenuTemplate={() => [
-              {
-                label: 'Edit',
-                click: () => this.props.onEdit(),
-              },
-              {
-                label: 'Rename',
-                click: () => this.props.onEditName(),
-              },
-              {
-                label: 'Delete',
-                click: () => this.props.onDelete(),
-              },
-              {
-                label: this.props.addLabel,
-                visible: !!this.props.onAdd,
-                click: () => this.props.onAdd(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Copy',
-                click: () => this.props.onCopy(),
-              },
-              {
-                label: 'Cut',
-                click: () => this.props.onCut(),
-              },
-              {
-                label: 'Paste',
-                enabled: this.props.canPaste(),
-                click: () => this.props.onPaste(),
-              },
-              {
-                label: 'Duplicate',
-                click: () => this.props.onDuplicate(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Move up',
-                enabled: this.props.canMoveUp,
-                click: () => this.props.onMoveUp(),
-              },
-              {
-                label: 'Move down',
-                enabled: this.props.canMoveDown,
-                click: () => this.props.onMoveDown(),
-              },
-            ]}
+            buildMenuTemplate={() => menuTemplate}
             onClick={() => {
               // It's essential to discard clicks when editing the name,
               // to avoid weird opening of an editor (accompanied with a
@@ -271,24 +282,30 @@ type Props = {|
 |};
 
 type State = {|
+  lastOpenLayout: ?gdLayout,
   renamedItemKind: ?string,
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
-  variablesEditorOpen: boolean,
+  projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
+  layoutPropertiesDialogOpen: boolean,
+  layoutVariablesDialogOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBar;
 
   state = {
+    lastOpenLayout: null,
     renamedItemKind: null,
     renamedItemName: '',
     searchText: '',
     projectPropertiesDialogOpen: false,
-    variablesEditorOpen: false,
+    projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
+    layoutPropertiesDialogOpen: false,
+    layoutVariablesDialogOpen: false,
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -366,6 +383,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();
+  };
+
+  _onOpenLayoutProperties = (layout: gdLayout) => {
+    this.setState({ lastOpenLayout: layout, layoutPropertiesDialogOpen: true });
+  };
+
+  _onOpenLayoutVariables = (layout: gdLayout) => {
+    this.setState({ lastOpenLayout: layout, layoutVariablesDialogOpen: true });
   };
 
   _addExternalEvents = (index: number) => {
@@ -709,7 +734,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                 key="global-variables"
                 primaryText={<Trans>Global variables</Trans>}
                 leftIcon={<VariableTree />}
-                onClick={() => this.setState({ variablesEditorOpen: true })}
+                onClick={() =>
+                  this.setState({ projectVariablesEditorOpen: true })
+                }
               />,
               <ListItem
                 key="icons"
@@ -768,6 +795,18 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onMoveUp={() => this._moveUpLayout(i)}
                       canMoveDown={i !== project.getLayoutsCount() - 1}
                       onMoveDown={() => this._moveDownLayout(i)}
+                      addonMenuOptions={[
+                        {
+                          label: 'Edit scene properties',
+                          enabled: true,
+                          click: () => this._onOpenLayoutProperties(layout),
+                        },
+                        {
+                          label: 'Edit scene variables',
+                          enabled: true,
+                          click: () => this._onOpenLayoutVariables(layout),
+                        },
+                      ]}
                     />
                   );
                 })
@@ -1019,15 +1058,17 @@ export default class ProjectManager extends React.Component<Props, State> {
           onRequestSearch={this._onRequestSearch}
           onChange={this._onSearchChange}
         />
-        {this.state.variablesEditorOpen && (
+        {this.state.projectVariablesEditorOpen && (
           <VariablesEditorDialog
             open
             variablesContainer={project.getVariables()}
-            onCancel={() => this.setState({ variablesEditorOpen: false })}
+            onCancel={() =>
+              this.setState({ projectVariablesEditorOpen: false })
+            }
             onApply={() => {
               if (this.props.unsavedChanges)
                 this.props.unsavedChanges.triggerUnsavedChanges();
-              this.setState({ variablesEditorOpen: false });
+              this.setState({ projectVariablesEditorOpen: false });
             }}
             emptyExplanationMessage={
               <Trans>
@@ -1056,6 +1097,37 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {this.state.layoutPropertiesDialogOpen && this.state.lastOpenLayout && (
+          <ScenePropertiesDialog
+            open={this.state.layoutPropertiesDialogOpen}
+            layout={this.state.lastOpenLayout}
+            project={this.props.project}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this.setState({ layoutPropertiesDialogOpen: false });
+            }}
+            onClose={() => this.setState({ layoutPropertiesDialogOpen: false })}
+            onEditVariables={() =>
+              this.setState({
+                layoutPropertiesDialogOpen: false,
+                layoutVariablesDialogOpen: true,
+              })
+            }
+          />
+        )}
+        {this.state.layoutVariablesDialogOpen && this.state.lastOpenLayout && (
+          <SceneVariablesDialog
+            open={this.state.layoutVariablesDialogOpen}
+            layout={this.state.lastOpenLayout}
+            onClose={() => this.setState({ layoutVariablesDialogOpen: false })}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this.setState({ layoutVariablesDialogOpen: false });
+            }}
           />
         )}
         {this.state.extensionsSearchDialogOpen && (

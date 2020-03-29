@@ -21,7 +21,7 @@ type Props = {|
   project: gdProject,
   onApply?: () => void,
   onClose: () => void,
-  onOpenMoreSettings: () => void,
+  onOpenMoreSettings?: () => void,
   onEditVariables: () => void,
 |};
 
@@ -201,7 +201,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             label={<Trans>Open advanced settings</Trans>}
             fullWidth
             onClick={() => {
-              this.props.onOpenMoreSettings();
+              this.props.onOpenMoreSettings && this.props.onOpenMoreSettings();
               this.props.onClose();
             }}
           />

@@ -162,25 +162,31 @@ type Props = {
   i18n: I18n,
 };
 
-export type MainFrameInterface = {|
-  loadFromSerializedProject: (serializedProject: gdSerializerElement,fileMetadata: ?FileMetadata) => Promise<void>,
-  loadFromProject: (project: gdProject,fileMetadata: ?FileMetadata) => Promise<void>,
-  openFromFileMetadata: (fileMetadata: FileMetadata) => Promise<void>,
-  closeApp: () => void,
-  closeProject: () => Promise<void>,
-  
 
-
-
-|}
-
-function useForceUpdate(){
-    const [value, setValue] = React.useState(0);
-    return () => setValue(value => ++value);
+const useForceUpdate = () => {
+  const [value, setValue] = React.useState(0);
+  return (state: State) => setValue(value => ++value);
 }
 
-const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref) => {
-  const [state, setState] = React.useState<State>({
+const useStateWithCallback = (initialValue: State) => {
+  const [state, setState] = React.useState(initialValue);
+  const callback = React.useRef((null: (State => void) | null));
+  const useStateWithCB = (newValue: ((State => State) | State), cb: ?(State => void)): void => {
+    setState(newValue);
+    if (cb) callback.current = cb;
+  }
+  React.useEffect(() => {
+    if(callback.current) {
+      callback.current(state);
+      callback.current = null;
+    }
+  }, [callback, state]);
+  return [state, useStateWithCB];
+}
+
+
+const MainFrame = (props: Props) => {
+  const [state, setState] = useStateWithCallback({
     createDialogOpen: false,
     exportDialogOpen: false,
     introDialogOpen: false,
@@ -210,67 +216,11 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
     isPreviewFirstSceneOverriden: false,
     previewFirstSceneName: '',
   });
-  let toolbar = React.useRef(null);
-  let _resourceSourceDialogs = {};
+  const toolbar = React.useRef(null);
+  const _resourceSourceDialogs = React.useRef({});
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
-  const { addRecentFile } = React.useContext(PreferencesContext);
+  //const { addRecentFile } = React.useContext(PreferencesContext);
   const forceUpdate = useForceUpdate();
-
-  React.useImperativeHandle(ref, () => ({
-    loadFromSerializedProject: (serializedProject: gdSerializerElement, fileMetadata: ?FileMetadata) => {loadFromSerializedProject(serializedProject, fileMetadata)},
-    loadFromProject: (project: gdProject, fileMetadata: ?FileMetadata) => {loadFromProject(project, fileMetadata)},
-    openFromFileMetadata: (fileMetadata: FileMetadata) => {openFromFileMetadata(fileMetadata)},
-    closeApp: () => {closeApp()},
-    closeProject: () => {closeProject()},
-    getSerializedElements: () => {getSerializedElements()},
-    toggleProjectManager: () => {toggleProjectManager()},
-    openProjectManager: () => {openProjectManager()},
-    setEditorToolbar: () => {setEditorToolbar()},
-    addLayout: () => {addLayout()},
-    addExternalLayout: () => {addExternalLayout()},
-    addExternalEvents: () => {addExternalEvents()},
-    addEventsFunctionsExtension: () => {addEventsFunctionsExtension()},
-    deleteLayout: () => {deleteLayout()},
-    deleteExternalLayout: () => {deleteExternalLayout()},
-    deleteExternalEvents: () => {deleteExternalEvents()},
-    deleteEventsFunctionsExtension: () => {deleteEventsFunctionsExtension()},
-    renameLayout: () => {renameLayout()},
-    renameExternalLayout: () => {renameExternalLayout()},
-    renameExternalEvents: () => {renameExternalEvents()},
-    renameEventsFunctionsExtension: () => {renameEventsFunctionsExtension()},
-    openLayout: () => {openLayout()},
-    openExternalLayout: () => {openExternalLayout()},
-    openEventsFunctionsExtension: () => {openEventsFunctionsExtension()},
-    openResources: () => {openResources()},
-    openStartPage:() => {openStartPage()},
-    openDebugger: () => {openDebugger()},
-    openCreateDialog: () => {openCreateDialog()},
-    chooseProject: () => {chooseProject()},
-    chooseProjectWithStorageProviderPicker: () => {chooseProjectWithStorageProviderPicker()},
-    saveProject: () => {saveProject()},
-    saveProjectAs: () => {saveProjectAs()},
-    saveProjectAsWithStorageProvider: () => {saveProjectAsWithStorageProvider()},
-    askToCloseProject: () => {askToCloseProject()},
-    openSceneOrProjectManager: () => {openSceneOrProjectManager()},
-    openExportDialog: () => {openExportDialog()},
-    openPreferences: () => {openPreferences()},
-    openLanguage: () => {openLanguage()},
-    openProfile: () => {openProfile()},
-    openSubscription: () => {openSubscription()},
-    updateToolbar: () => {updateToolbar()},
-    openAboutDialog: () => {openAboutDialog()},
-    openOpenFromStorageProviderDialog: () => {openOpenFromStorageProviderDialog()},
-    openSaveToStorageProviderDialog: () => {openSaveToStorageProviderDialog()},
-    openPlatformSpecificAssets: () => {openPlatformSpecificAssets()},
-    openHelpFinderDialog: () => {openHelpFinderDialog()},
-    setUpdateStatus: () => {setUpdateStatus()},
-    simulateUpdateDownloaded: () => {simulateUpdateDownloaded()},
-    simulateUpdateAvailable: () => {simulateUpdateAvailable()},
-  }));
-
-  // componentWillMount() {
-  //   if (!this.props.integratedEditor) this.openStartPage();
-  // }
 
   React.useEffect(() => {
     if(!props.integratedEditor) openStartPage();
@@ -287,10 +237,10 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
         // to avoid the watcher interfering with the extension loading (by updating GDJS,
         // which could lead in the extension loading failing for some extensions as file
         // are removed/copied).
-        setState({ ...state,
+        setState(state =>({
           ...state,
           gdjsDevelopmentWatcherEnabled: true,
-        });
+        }));
       });
     if (initialFileMetadataToOpen) {
       _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
@@ -321,6 +271,23 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       openSceneOrProjectManager()
     );
   };
+
+  React.useEffect(() => {
+    updateToolbar();
+  }, [state.editorTabs, state.isPreviewFirstSceneOverriden, state.previewFirstSceneName]);
+
+  React.useEffect(() => {
+    const promise = new Promise((resolve) => {
+      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        state.currentProject
+      );
+      if (state.currentFileMetadata && state.currentProject) {
+        state.currentProject.setProjectFile(state.currentFileMetadata.fileIdentifier);
+      }
+      resolve();
+    })
+    promise.then(() => openSceneOrProjectManager());
+  },[state.currentProject, state.currentFileMetadata]);
 
   const _languageDidChange = () => {
     // A change in the language will automatically be applied
@@ -403,31 +370,14 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
       // TODO: Pixi cache should also be burst
-
-      return new Promise(resolve => {
-        setState(
-          {
-            ...state,
-            currentProject: project,
-            currentFileMetadata: fileMetadata,
-          },
-          () => {
-            // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
-            // their editor will take care of reloading them.
-            eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-              project
-            );
-
-            if (fileMetadata) {
-              project.setProjectFile(fileMetadata.fileIdentifier);
-            }
-
-            resolve();
-          }
-        );
-      });
-    });
-  };
+      setState(state =>
+        ({
+          ...state,
+          currentProject: project,
+          currentFileMetadata: fileMetadata,
+        }));
+      //code shifted into useEffect
+      })};
 
   const openFromFileMetadata = (fileMetadata: FileMetadata): Promise<void> => {
     const { i18n, storageProviderOperations } = props;
@@ -487,7 +437,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       });
     };
 
-    setState({ ...state, loadingProject: true });
+    setState(state => ({ ...state, loadingProject: true }));
 
     // Try to find an autosave (and ask user if found)
     return checkForAutosave()
@@ -536,7 +486,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           error
         );
       })
-      .then(() => setState({ ...state, loadingProject: false }));
+      .then(() => setState(state => ({ ...state, loadingProject: false })));
   };
 
   const closeApp = (): void => {
@@ -550,25 +500,25 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
 
     return new Promise(resolve => {
       openProjectManager(false);
-      setState(
-        {
+      setState(state =>
+        ({
           ...state,
           editorTabs: closeProjectTabs(state.editorTabs, currentProject),
-        },
-        () => {
+        }),
+        (state) => {
           eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
             currentProject
           );
           currentProject.delete();
-          setState(
-            {
+          setState(state =>
+            ({
               ...state,
               currentProject: null,
               isPreviewFirstSceneOverriden: false,
               previewFirstSceneName: '',
-            },
-            () => {
-              updateToolbar();
+            }),
+            (state) => {
+              updateToolbar(state);
               resolve();
             }
           );
@@ -589,17 +539,17 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
 
   const toggleProjectManager = () => {
     if (!toolbar.current)
-      setState({
+      setState(state => ({
         ...state,
         projectManagerOpen: !state.projectManagerOpen,
-      });
+      }));
   };
 
   const openProjectManager = (open: boolean = true) => {
-    setState({
+    setState(state => ({
       ...state,
       projectManagerOpen: open,
-    });
+    }));
   };
 
   const setEditorToolbar = (editorToolbar: any) => {
@@ -609,14 +559,11 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
   };
 
   const _togglePreviewFirstSceneOverride = () => {
-    setState(
-      {
+    setState(state => 
+      ({
         ...state,
         isPreviewFirstSceneOverriden: !state.isPreviewFirstSceneOverriden,
-      },
-      () => {
-        updateToolbar();
-      }
+      }),
     );
   };
 
@@ -632,7 +579,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       currentProject.getLayoutsCount()
     );
     newLayout.updateBehaviorsSharedData(currentProject);
-    forceUpdate();
+    forceUpdate(state);
   };
 
   const addExternalLayout = () => {
@@ -646,7 +593,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       name,
       currentProject.getExternalLayoutsCount()
     );
-    forceUpdate();
+    forceUpdate(state);
   };
 
   const addExternalEvents = () => {
@@ -660,7 +607,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       name,
       currentProject.getExternalEventsCount()
     );
-    forceUpdate();
+    forceUpdate(state);
   };
 
   const addEventsFunctionsExtension = () => {
@@ -674,7 +621,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       name,
       currentProject.getEventsFunctionsExtensionsCount()
     );
-    forceUpdate();
+    forceUpdate(state);
   };
 
   const deleteLayout = (layout: gdLayout) => {
@@ -690,14 +637,14 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
     );
     if (!answer) return;
 
-    setState(
-      {
+    setState(state => 
+      ({
         ...state,
         editorTabs: closeLayoutTabs(state.editorTabs, layout),
-      },
-      () => {
+      }),
+      (state) => {
         currentProject.removeLayout(layout.getName());
-        forceUpdate();
+        forceUpdate(state);
       }
     );
   };
@@ -715,17 +662,17 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
     );
     if (!answer) return;
 
-    setState(
-      {
+    setState(state =>
+      ({
         ...state,
         editorTabs: closeExternalLayoutTabs(
           state.editorTabs,
           externalLayout
         ),
-      },
-      () => {
+      }),
+      (state) => {
         currentProject.removeExternalLayout(externalLayout.getName());
-        forceUpdate();
+        forceUpdate(state);
       }
     );
   };
@@ -743,17 +690,17 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
     );
     if (!answer) return;
 
-    setState(
-      {
+    setState(state =>
+      ({
         ...state,
         editorTabs: closeExternalEventsTabs(
           state.editorTabs,
           externalEvents
         ),
-      },
-      () => {
+      }),
+      (state) => {
         currentProject.removeExternalEvents(externalEvents.getName());
-        forceUpdate();
+        forceUpdate(state);
       }
     );
   };
@@ -781,9 +728,9 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           externalLayout
         ),
       },
-      () => {
+      (state) => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
-        forceUpdate();
+        forceUpdate(state);
       }
     );
 
@@ -819,9 +766,9 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
         ...state,
         editorTabs: closeLayoutTabs(state.editorTabs, layout),
       },
-      () => {
+      (state) => {
         layout.setName(newName);
-        forceUpdate();
+        forceUpdate(state);
       }
     );
   };
@@ -857,9 +804,9 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           externalLayout
         ),
       },
-      () => {
+      (state) => {
         externalLayout.setName(newName);
-        forceUpdate();
+        forceUpdate(state);
       }
     );
   };
@@ -895,9 +842,9 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           externalEvents
         ),
       },
-      () => {
+      (state) => {
         externalEvents.setName(newName);
-        forceUpdate();
+        forceUpdate(state);
       }
     );
   };
@@ -948,7 +895,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           eventsFunctionsExtension
         ),
       },
-      () => {
+      (state) => {
         // Refactor the project to update the instructions (and later expressions)
         // of this extension:
         gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
@@ -962,7 +909,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           currentProject
         );
 
-        forceUpdate();
+        forceUpdate(state);
       }
     );
   };
@@ -981,7 +928,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
         ...state,
         previewLoading: true,
       },
-      () => {
+      (state) => {
         let previewedLayout = layout;
         if (previewFirstSceneName && isPreviewFirstSceneOverriden) {
           if (project.hasLayoutNamed(previewFirstSceneName)) {
@@ -989,7 +936,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           }
         }
 
-        _previewLauncher.current
+        if (_previewLauncher.current) _previewLauncher.current
           .launchLayoutPreview(project, previewedLayout, options)
           .catch(error => {
             console.error(
@@ -1020,8 +967,8 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
         ...state,
         previewLoading: true,
       },
-      () => {
-        _previewLauncher.current
+      (state) => {
+        if (_previewLauncher.current) _previewLauncher.current
           .launchExternalLayoutPreview(project, layout, externalLayout, options)
           .catch(error => {
             console.error(
@@ -1030,9 +977,9 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
             );
           })
           .then(() => {
-            setState({ ...state,
+            setState(state => ({ ...state,
               previewLoading: false,
-            });
+            }));
           });
       }
     );
@@ -1045,6 +992,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       openSceneEditor = true,
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
+    console.log("openLayout called");
     const { i18n, storageProviderOperations } = props;
     const sceneEditorOptions = {
       label: name,
@@ -1165,9 +1113,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
       : tabsWithSceneEditor;
 
-    setState({ ...state, editorTabs: tabsWithSceneAndEventsEditors }, () =>
-      updateToolbar()
-    );
+    setState(state => ({ ...state, editorTabs: tabsWithSceneAndEventsEditors }));
     openProjectManager(false);
   };
 
@@ -1202,7 +1148,6 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           key: 'external events ' + name,
         }),
       },
-      () => updateToolbar()
     );
     openProjectManager(false);
   };
@@ -1260,7 +1205,6 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           key: 'external layout ' + name,
         }),
       },
-      () => updateToolbar()
     );
     openProjectManager(false);
   };
@@ -1300,7 +1244,6 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           key: 'events functions extension ' + name,
         }),
       },
-      () => updateToolbar()
     );
     openProjectManager(false);
   };
@@ -1336,15 +1279,14 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           ),
           key: 'resources',
         }),
-      },
-      () => updateToolbar()
+      }
     );
   };
 
   const openStartPage = () => {
     const { i18n, storageProviders } = props;
-    setState(
-      {
+    setState(state => 
+      ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
           label: i18n._(t`Start Page`),
@@ -1372,10 +1314,8 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           ),
           key: 'start page',
           closable: false,
-        }),
-      },
-      () => updateToolbar()
-    );
+        })
+      }));
   };
 
   const openDebugger = () => {
@@ -1396,8 +1336,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           ),
           key: 'debugger',
         }),
-      },
-      () => updateToolbar()
+      }
     );
   };
 
@@ -1476,9 +1415,9 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
   };
 
   const openCreateDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       createDialogOpen: open,
-    });
+    }));
   };
 
   const chooseProject = () => {
@@ -1505,7 +1444,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
 
         return openFromFileMetadata(fileMetadata).then(() => {
           openSceneOrProjectManager();
-          addRecentFile(fileMetadata);
+          //addRecentFile(fileMetadata);
         });
       })
       .catch(error => {
@@ -1589,9 +1528,9 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
             _showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
-              setState({ ...state,
+              setState(state => ({ ...state,
                 currentFileMetadata: fileMetadata,
-              });
+              }));
             }
           }
         },
@@ -1636,52 +1575,52 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
   };
 
   const openExportDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       exportDialogOpen: open,
-    });
+    }));
   };
 
   const _openIntroDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       introDialogOpen: open,
-    });
+    }));
   };
 
   const _openOpenConfirmDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       openConfirmDialogOpen: open,
-    });
+    }));
   };
 
   const _openGenericDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       genericDialogOpen: open,
       genericDialog: null,
-    });
+    }));
   };
 
   const openPreferences = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       preferencesDialogOpen: open,
-    });
+    }));
   };
 
   const openLanguage = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       languageDialogOpen: open,
-    });
+    }));
   };
 
   const openProfile = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       profileDialogOpen: open,
-    });
+    }));
   };
 
   const openSubscription = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       subscriptionDialogOpen: open,
-    });
+    }));
   };
 
   const _setPreviewFirstScene = (name: string) => {
@@ -1690,20 +1629,17 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
         ...state,
         previewFirstSceneName: name,
         isPreviewFirstSceneOverriden: true,
-      },
-      () => {
-        updateToolbar();
       }
     );
   };
 
   const _onChangeEditorTab = (value: number) => {
-    setState(
-      {
+    setState(state =>
+      ({
         ...state,
         editorTabs: changeCurrentTab(state.editorTabs, value),
-      },
-      () => _onEditorTabActive(getCurrentTab(state.editorTabs))
+      }),
+      (state) => _onEditorTabActive(getCurrentTab(state.editorTabs))
     );
   };
 
@@ -1722,8 +1658,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       {
         ...state,
         editorTabs: closeEditorTab(state.editorTabs, editorTab),
-      },
-      () => updateToolbar()
+      }
     );
   };
 
@@ -1733,8 +1668,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       {
         ...state,
         editorTabs: closeOtherEditorTabs(state.editorTabs, editorTab),
-      },
-      () => updateToolbar()
+      }
     );
   };
 
@@ -1744,8 +1678,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       {
         ...state,
         editorTabs: closeAllEditorTabs(state.editorTabs),
-      },
-      () => updateToolbar()
+      }
     );
   };
 
@@ -1754,14 +1687,14 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
     multiSelection: boolean = true
   ): Promise<Array<any>> => {
     const { currentProject } = state;
-    const resourceSourceDialog = _resourceSourceDialogs[sourceName];
+    const resourceSourceDialog = _resourceSourceDialogs.current[sourceName];
     if (!resourceSourceDialog) return Promise.resolve([]);
 
     return resourceSourceDialog.chooseResources(currentProject, multiSelection);
   };
 
-  const updateToolbar = () => {
-    const editorTab = getCurrentTab(state.editorTabs);
+  const updateToolbar = (_state = state) => {
+    const editorTab = getCurrentTab(_state.editorTabs);
     if (!editorTab || !editorTab.editorRef) {
       setEditorToolbar(null);
       return;
@@ -1771,15 +1704,15 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
   }
 
   const openAboutDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       aboutDialogOpen: open,
-    });
+    }));
   };
 
   const openOpenFromStorageProviderDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       openFromStorageProviderDialogOpen: open,
-    });
+    }));
   };
 
   const openSaveToStorageProviderDialog = (open: boolean = true) => {
@@ -1788,27 +1721,27 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
       // display a picker that does not play nice with material-ui's overlays.
       openProjectManager(false);
     }
-    setState({ ...state,
+    setState(state => ({ ...state,
       saveToStorageProviderDialogOpen: open,
-    });
+    }));
   };
 
   const openPlatformSpecificAssets = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       platformSpecificAssetsDialogOpen: open,
-    });
+    }));
   };
 
   const openHelpFinderDialog = (open: boolean = true) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       helpFinderDialogOpen: open,
-    });
+    }));
   };
 
   const setUpdateStatus = (updateStatus: UpdateStatus) => {
-    setState({ ...state,
+    setState(state => ({ ...state,
       updateStatus,
-    });
+    }));
 
     const notificationTitle = getUpdateNotificationTitle(updateStatus);
     const notificationBody = getUpdateNotificationBody(updateStatus);
@@ -1836,15 +1769,15 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
     });
 
   const _showSnackMessage = (snackMessage: string) =>
-    setState({ ...state,
+    setState(state => ({ ...state,
       snackMessage,
       snackMessageOpen: true,
-    });
+    }));
 
   const _closeSnackMessage = () =>
-    setState({ ...state,
+    setState(state => ({ ...state,
       snackMessageOpen: false,
-    });
+    }));
 
 
   const {
@@ -1947,7 +1880,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
         )}
       </Drawer>
       <Toolbar
-        ref={toolbarRef => (toolbar.current = toolbarRef)}
+        ref={toolbar}
         showProjectIcons={!props.integratedEditor}
         hasProject={!!state.currentProject}
         toggleProjectManager={toggleProjectManager}
@@ -2023,8 +1956,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
             openCreateDialog(false);
             // eslint-disable-next-line
             useStorageProvider(storageProvider)
-              .then(() => loadFromProject(project, fileMetadata))
-              .then(() => openSceneOrProjectManager());
+              .then(() => loadFromProject(project, fileMetadata));
           },
         })}
       {!!introDialog &&
@@ -2068,7 +2000,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
                 return (
                   <Component
                     ref={dialog =>
-                      (_resourceSourceDialogs[
+                      (_resourceSourceDialogs.current[
                         resourceSource.name
                       ] = dialog)
                     }
@@ -2124,7 +2056,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           storageProviders={props.storageProviders}
           onChooseProvider={storageProvider => {
             openOpenFromStorageProviderDialog(false);
-            useStorageProvider(storageProvider).then(() => {
+            props.useStorageProvider(storageProvider).then(() => {
               chooseProjectWithStorageProviderPicker();
             });
           }}
@@ -2140,7 +2072,7 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
           storageProviders={props.storageProviders}
           onChooseProvider={storageProvider => {
             openSaveToStorageProviderDialog(false);
-            useStorageProvider(storageProvider).then(() => {
+            props.useStorageProvider(storageProvider).then(() => {
               saveProjectAsWithStorageProvider();
             });
           }}
@@ -2164,6 +2096,6 @@ const MainFrame = React.forwardRef<Props, MainFrameInterface>((props: Props, ref
         renderGDJSDevelopmentWatcher()}
     </div>
   );
-});
+  }
 
-export default MainFrame;
+  export default MainFrame;

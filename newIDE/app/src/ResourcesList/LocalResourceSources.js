@@ -235,46 +235,49 @@ const selectLocalResourcePath = (
   ) => void,
   kind: ResourceKind
 ): Promise<Array<string>> => {
-  return new Promise((resolve, reject) => {
-    if (!dialog) return reject('Not supported');
+  if (!dialog) return Promise.reject('Not supported');
 
-    const properties = ['openFile'];
-    if (options.multiSelections) properties.push('multiSelections');
-    const projectPath = path.dirname(project.getProjectFile());
+  const properties = ['openFile'];
+  if (options.multiSelections) properties.push('multiSelections');
+  const projectPath = path.dirname(project.getProjectFile());
 
-    const latestPath = getLastUsedPath(project, kind) || projectPath;
+  const latestPath = getLastUsedPath(project, kind) || projectPath;
 
-    const browserWindow = electron.remote.getCurrentWindow();
+  const browserWindow = electron.remote.getCurrentWindow();
 
-    const paths = dialog.showOpenDialogSync(browserWindow, {
+  return dialog
+    .showOpenDialog(browserWindow, {
       title: options.title,
       properties,
       filters: [{ name: options.name, extensions: options.extensions }],
       defaultPath: latestPath,
-    });
+    })
+    .then(({ filePaths }) => {
+      if (!filePaths) return [];
 
-    if (!paths) return resolve([]);
+      const lastUsedPath = path.parse(filePaths[0]).dir;
+      setLastUsedPath(project, kind, lastUsedPath);
 
-    const lastUsedPath = path.parse(paths[0]).dir;
-    setLastUsedPath(project, kind, lastUsedPath);
-
-    const outsideProjectFolderPaths = paths.filter(
-      path => !isPathInProjectFolder(project, path)
-    );
-
-    if (outsideProjectFolderPaths.length) {
-      // eslint-disable-next-line
-      const answer = confirm(
-        i18n._(
-          t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-        )
+      const outsideProjectFolderPaths = filePaths.filter(
+        path => !isPathInProjectFolder(project, path)
       );
 
-      if (answer) {
-        return resolve(copyAllToProjectFolder(project, paths));
-      }
-    }
+      if (outsideProjectFolderPaths.length) {
+        // eslint-disable-next-line
+        const answer = confirm(
+          i18n._(
+            t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
+          )
+        );
 
-    return resolve(paths);
-  });
+        if (answer) {
+          return copyAllToProjectFolder(project, filePaths);
+        }
+      }
+
+      return filePaths;
+    })
+    .catch(err => {
+      console.error('An error occured while opening resource.', err);
+    });
 };

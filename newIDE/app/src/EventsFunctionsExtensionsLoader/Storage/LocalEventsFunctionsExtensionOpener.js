@@ -23,11 +23,11 @@ const readJSONFile = (filepath: string): Promise<Object> => {
 
 export default class LocalEventsFunctionsExtensionOpener {
   static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
-    return new Promise((resolve, reject) => {
-      if (!dialog) return reject('Not supported');
+    if (!dialog) return Promise.reject('Not supported');
+    const browserWindow = electron.remote.getCurrentWindow();
 
-      const browserWindow = electron.remote.getCurrentWindow();
-      const paths = dialog.showOpenDialogSync(browserWindow, {
+    return dialog
+      .showOpenDialog(browserWindow, {
         title: 'Import an extension in the project',
         properties: ['openFile'],
         message: 'Choose an extension file to import (.json file)',
@@ -37,11 +37,14 @@ export default class LocalEventsFunctionsExtensionOpener {
             extensions: ['json'],
           },
         ],
+      })
+      .then(({ filePaths }) => {
+        if (!filePaths || !filePaths.length) return null;
+        return filePaths[0];
+      })
+      .catch(err => {
+        console.error('An error occured while importing the extension.', err);
       });
-
-      if (!paths || !paths.length) return resolve(null);
-      return resolve(paths[0]);
-    });
   };
 
   static readEventsFunctionExtensionFile = (

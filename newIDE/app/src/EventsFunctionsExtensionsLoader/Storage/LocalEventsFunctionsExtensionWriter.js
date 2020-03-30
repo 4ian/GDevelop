@@ -30,11 +30,11 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
 
 export default class LocalEventsFunctionsExtensionWriter {
   static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
-    return new Promise((resolve, reject) => {
-      if (!dialog) return reject('Not supported');
+    if (!dialog) return Promise.reject('Not supported');
+    const browserWindow = electron.remote.getCurrentWindow();
 
-      const browserWindow = electron.remote.getCurrentWindow();
-      const path = dialog.showSaveDialogSync(browserWindow, {
+    return dialog
+      .showSaveDialog(browserWindow, {
         title: 'Export an extension of the project',
         filters: [
           {
@@ -43,11 +43,14 @@ export default class LocalEventsFunctionsExtensionWriter {
           },
         ],
         defaultPath: 'Extension.json',
+      })
+      .then(({ filePath }) => {
+        if (!filePath) return null;
+        return filePath;
+      })
+      .catch(err => {
+        console.error('An error occured while exporting the extension.', err);
       });
-
-      if (!path) return resolve(null);
-      return resolve(path);
-    });
   };
 
   static writeEventsFunctionsExtension = (

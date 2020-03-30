@@ -56,7 +56,7 @@ type Props = {|
     eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class EventsBasedBehaviorsList extends React.Component<
@@ -260,7 +260,8 @@ export default class EventsBasedBehaviorsList extends React.Component<
   };
 
   _onEventsBasedBehaviorModified() {
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   }
 

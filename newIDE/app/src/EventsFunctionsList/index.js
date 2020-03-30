@@ -60,7 +60,7 @@ type Props = {|
   ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
   renderHeader?: () => React.Node,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
@@ -198,7 +198,8 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   _onEventsFunctionModified() {
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   }
 

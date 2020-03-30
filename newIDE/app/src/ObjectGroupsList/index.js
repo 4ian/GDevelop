@@ -140,7 +140,7 @@ type Props = {|
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
   canSetAsGlobalGroup?: boolean,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class GroupsListContainer extends React.Component<Props, State> {
@@ -319,7 +319,8 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   };
 
   _onObjectGroupModified = () => {
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 

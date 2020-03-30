@@ -110,7 +110,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 type State = {|
   history: HistoryState,
@@ -227,7 +227,8 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.state.history !== prevState.history)
-      this.props.unsavedChanges.triggerUnsavedChanges();
+      if (this.props.unsavedChanges)
+        this.props.unsavedChanges.triggerUnsavedChanges();
   }
 
   updateToolbar() {

@@ -64,9 +64,8 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
   previewButtonSettings: PreviewButtonSettings,
-  unsavedChanges: UnsavedChanges,
 |};
 
 type State = {|
@@ -871,7 +870,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
             onApply={() => {
-              this.props.unsavedChanges.triggerUnsavedChanges();
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
               this._editBehavior(null);
             }}
             onRenameProperty={(oldName, newName) =>

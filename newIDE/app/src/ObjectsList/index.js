@@ -97,7 +97,7 @@ type Props = {|
   canRenameObject: (newName: string) => boolean,
 
   getThumbnail: (project: gdProject, object: Object) => string,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -488,7 +488,8 @@ export default class ObjectsList extends React.Component<Props, State> {
   };
 
   _onObjectModified = (shouldForceUpdateList: boolean) => {
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
 
     if (shouldForceUpdateList) this.forceUpdateList();
     else this.forceUpdate();

@@ -16,5 +16,5 @@ export type EditorProps = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onSizeUpdated: () => void,
   objectName: string,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};

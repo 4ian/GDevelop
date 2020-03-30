@@ -38,7 +38,8 @@ class LayersListBody extends Component<*, LayersListBodyState> {
   };
 
   _onLayerModified = () => {
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 
@@ -125,7 +126,7 @@ type Props = {|
     newName: string,
     cb: (done: boolean) => void
   ) => void,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 type State = {|
@@ -160,7 +161,8 @@ export default class LayersList extends Component<Props, State> {
   };
 
   _onLayerModified = () => {
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 

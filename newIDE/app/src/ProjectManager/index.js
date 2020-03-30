@@ -267,7 +267,7 @@ type Props = {|
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 type State = {|
@@ -666,7 +666,8 @@ export default class ProjectManager extends React.Component<Props, State> {
 
   _onProjectItemModified = () => {
     this.forceUpdate();
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   render() {
@@ -1024,7 +1025,8 @@ export default class ProjectManager extends React.Component<Props, State> {
             variablesContainer={project.getVariables()}
             onCancel={() => this.setState({ variablesEditorOpen: false })}
             onApply={() => {
-              this.props.unsavedChanges.triggerUnsavedChanges();
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
               this.setState({ variablesEditorOpen: false });
             }}
             emptyExplanationMessage={
@@ -1049,7 +1051,8 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false })
             }
             onApply={() => {
-              this.props.unsavedChanges.triggerUnsavedChanges();
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}

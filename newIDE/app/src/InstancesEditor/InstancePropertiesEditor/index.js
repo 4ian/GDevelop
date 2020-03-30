@@ -22,7 +22,7 @@ type Props = {|
   onEditObjectByName: string => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {

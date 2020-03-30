@@ -161,7 +161,7 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
-  unsavedChanges: UnsavedChanges,
+  unsavedChanges?: UnsavedChanges,
 };
 
 class MainFrame extends React.Component<Props, State> {
@@ -1358,7 +1358,8 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   _onProjectItemModified = () => {
-    this.props.unsavedChanges.triggerUnsavedChanges();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 
@@ -1455,7 +1456,8 @@ class MainFrame extends React.Component<Props, State> {
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
         if (wasSaved) {
-          this.props.unsavedChanges.sealUnsavedChanges();
+          if (this.props.unsavedChanges)
+            this.props.unsavedChanges.sealUnsavedChanges();
           this._showSnackMessage(i18n._(t`Project properly saved`));
         }
       },
@@ -1502,7 +1504,8 @@ class MainFrame extends React.Component<Props, State> {
       .then(
         ({ wasSaved, fileMetadata }) => {
           if (wasSaved) {
-            this.props.unsavedChanges.sealUnsavedChanges();
+            if (this.props.unsavedChanges)
+              this.props.unsavedChanges.sealUnsavedChanges();
             this._showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
@@ -1524,7 +1527,10 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   askToCloseProject = (): Promise<void> => {
-    if (this.props.unsavedChanges.hasUnsavedChanges) {
+    if (
+      this.props.unsavedChanges &&
+      this.props.unsavedChanges.hasUnsavedChanges
+    ) {
       if (!this.state.currentProject) return Promise.resolve();
       const { i18n } = this.props;
 
@@ -1952,7 +1958,8 @@ class MainFrame extends React.Component<Props, State> {
               project={this.state.currentProject}
               open
               onApply={() => {
-                this.props.unsavedChanges.triggerUnsavedChanges();
+                if (this.props.unsavedChanges)
+                  this.props.unsavedChanges.triggerUnsavedChanges();
                 this.openPlatformSpecificAssets(false);
               }}
               onClose={() => this.openPlatformSpecificAssets(false)}

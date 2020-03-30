@@ -276,8 +276,5 @@ const selectLocalResourcePath = (
       }
 
       return filePaths;
-    })
-    .catch(err => {
-      console.error('An error occured while opening resource.', err);
     });
 };

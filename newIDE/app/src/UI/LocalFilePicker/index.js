@@ -50,9 +50,6 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
       })
       .then(({ filePath }) => {
         this.props.onChange(filePath || '');
-      })
-      .catch(err => {
-        console.error('An error occured while saving file.', err);
       });
   };
 

@@ -39,9 +39,6 @@ export const onOpenWithPicker = (): Promise<?FileMetadata> => {
     .then(({ filePaths }) => {
       if (!filePaths || !filePaths.length) return null;
       return { fileIdentifier: filePaths[0] };
-    })
-    .catch(err => {
-      console.error('An error occured while opening the project.', err);
     });
 };
 

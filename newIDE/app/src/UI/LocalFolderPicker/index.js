@@ -53,9 +53,6 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
       .then(({ filePaths }) => {
         if (!filePaths || !filePaths.length) return;
         this.props.onChange(filePaths[0]);
-      })
-      .catch(err => {
-        console.error('An error occured while opening the file/folder.', err);
       });
   };
 

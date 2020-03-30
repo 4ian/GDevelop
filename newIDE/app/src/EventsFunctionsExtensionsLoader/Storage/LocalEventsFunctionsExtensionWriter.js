@@ -47,9 +47,6 @@ export default class LocalEventsFunctionsExtensionWriter {
       .then(({ filePath }) => {
         if (!filePath) return null;
         return filePath;
-      })
-      .catch(err => {
-        console.error('An error occured while exporting the extension.', err);
       });
   };
 

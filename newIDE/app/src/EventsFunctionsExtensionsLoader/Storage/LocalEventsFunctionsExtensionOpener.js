@@ -41,9 +41,6 @@ export default class LocalEventsFunctionsExtensionOpener {
       .then(({ filePaths }) => {
         if (!filePaths || !filePaths.length) return null;
         return filePaths[0];
-      })
-      .catch(err => {
-        console.error('An error occured while importing the extension.', err);
       });
   };
 

@@ -538,7 +538,7 @@ const MainFrame = (props: Props) => {
   };
 
   const toggleProjectManager = () => {
-    if (!toolbar.current)
+    if (!!toolbar.current)
       setState(state => ({
         ...state,
         projectManagerOpen: !state.projectManagerOpen,
@@ -914,6 +914,12 @@ const MainFrame = (props: Props) => {
     );
   };
 
+  const [_layoutPreview, _setLayoutPreview] = React.useState({
+    project: null,
+    layout: null,
+    options: null
+  }); 
+
   const _launchLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
@@ -923,36 +929,46 @@ const MainFrame = (props: Props) => {
 
     if (!_previewLauncher.current) return;
 
-    setState(
-      {
+    setState(state =>
+      ({
         ...state,
         previewLoading: true,
-      },
-      (state) => {
-        let previewedLayout = layout;
-        if (previewFirstSceneName && isPreviewFirstSceneOverriden) {
-          if (project.hasLayoutNamed(previewFirstSceneName)) {
-            previewedLayout = project.getLayout(previewFirstSceneName);
-          }
-        }
-
-        if (_previewLauncher.current) _previewLauncher.current
-          .launchLayoutPreview(project, previewedLayout, options)
-          .catch(error => {
-            console.error(
-              'Error caught while launching preview, this should never happen.',
-              error
-            );
-          })
-          .then(() => {
-            setState({ 
-              ...state,
-              previewLoading: false,
-            });
-          });
-      }
-    );
+      }));
+    
+    _setLayoutPreview({
+      project: project,
+      layout: layout,
+      options: options
+    });
+    //callback shifted to useEffect
   };
+
+  React.useEffect(() => {
+    const previewedLayout = _layoutPreview.layout;
+    const project = _layoutPreview.project;
+    const options = _layoutPreview.options;
+    if (state.previewFirstSceneName && state.isPreviewFirstSceneOverriden) {
+      if (project && project.hasLayoutNamed(state.previewFirstSceneName)) {
+        _setLayoutPreview(layoutPreview => ({
+          ...layoutPreview,
+          layout: project.getLayout(state.previewFirstSceneName)}));
+      }
+    }
+      if (project && previewedLayout && options && _previewLauncher.current) _previewLauncher.current
+      .launchLayoutPreview(project, previewedLayout, options)
+      .catch(error => {
+        console.error(
+          'Error caught while launching preview, this should never happen.',
+          error
+        );
+      })
+      .then(() => {
+        setState(state => ({ 
+          ...state,
+          previewLoading: false,
+        }));
+      });
+  },[_layoutPreview]);
 
   const _launchExternalLayoutPreview = (
     project: gdProject,
@@ -977,7 +993,8 @@ const MainFrame = (props: Props) => {
             );
           })
           .then(() => {
-            setState(state => ({ ...state,
+            setState(state => ({
+              ...state,
               previewLoading: false,
             }));
           });
@@ -992,7 +1009,6 @@ const MainFrame = (props: Props) => {
       openSceneEditor = true,
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
-    console.log("openLayout called");
     const { i18n, storageProviderOperations } = props;
     const sceneEditorOptions = {
       label: name,
@@ -1066,15 +1082,15 @@ const MainFrame = (props: Props) => {
               }}
               onPreview={(project, layout, options) => {
                 _launchLayoutPreview(project, layout, options);
-                const { currentFileMetadata } = state;
+                //const { currentFileMetadata } = state;
                 if (
                   values.autosaveOnPreview &&
                   storageProviderOperations.onAutoSaveProject &&
-                  currentFileMetadata
+                  state.currentFileMetadata
                 ) {
                   storageProviderOperations.onAutoSaveProject(
                     project,
-                    currentFileMetadata
+                    state.currentFileMetadata
                   );
                 }
               }}
@@ -1813,7 +1829,7 @@ const MainFrame = (props: Props) => {
     <div className="main-frame">
       <ProjectTitlebar fileMetadata={currentFileMetadata} />
       <Drawer
-        open={projectManagerOpen}
+        open={state.projectManagerOpen}
         PaperProps={{
           style: styles.drawerContent,
         }}
@@ -1824,9 +1840,9 @@ const MainFrame = (props: Props) => {
           displayRightCloseButton
           onClose={toggleProjectManager}
         />
-        {currentProject && (
+        {state.currentProject && (
           <ProjectManager
-            project={currentProject}
+            project={state.currentProject}
             onOpenExternalEvents={openExternalEvents}
             onOpenLayout={openLayout}
             onOpenExternalLayout={openExternalLayout}

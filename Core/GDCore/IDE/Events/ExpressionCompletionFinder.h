@@ -115,23 +115,21 @@ struct ExpressionCompletionDescription {
   const gd::String& GetBehaviorName() const { return behaviorName; }
 
   /**
-   * \brief Set if the completion description is informative, i.e: it's not used
-   * to
-   * complete anything. Rather, it should display information about what is
+   * \brief Set if the completion description is exact, i.e: it's not used
+   * to complete anything. Rather, it should display information about what is
    * described by the completion.
    */
-  ExpressionCompletionDescription& SetIsInformative(bool isInformative_) {
-    isInformative = isInformative_;
+  ExpressionCompletionDescription& SetIsExact(bool isExact_) {
+    isExact = isExact_;
     return *this;
   }
 
   /**
-   * \brief Check if the completion description is informative, i.e: it's not
-   * used to
-   * complete anything. Rather, it should display information about what is
-   * described by the completion.
+   * \brief Check if the completion description is exact, i.e: it's not
+   * used to complete anything. Rather, it should display information
+   * about what is described by the completion.
    */
-  bool IsInformative() const { return isInformative; }
+  bool IsExact() const { return isExact; }
 
   /** Default constructor, only to be used by Emscripten bindings. */
   ExpressionCompletionDescription() : completionKind(Object){};
@@ -147,14 +145,14 @@ struct ExpressionCompletionDescription {
         prefix(prefix_),
         objectName(objectName_),
         behaviorName(behaviorName_),
-        isInformative(false) {}
+        isExact(false) {}
 
   CompletionKind completionKind;
   gd::String type;
   gd::String prefix;
   gd::String objectName;
   gd::String behaviorName;
-  bool isInformative;
+  bool isExact;
 };
 
 /**
@@ -165,7 +163,7 @@ std::ostream& operator<<(std::ostream& os,
   os << "{ " << value.GetCompletionKind() << ", " << value.GetType() << ", "
      << value.GetPrefix() << ", " << value.GetObjectName() << ", "
      << value.GetBehaviorName() << ", "
-     << (value.IsInformative() ? "informative" : "non-informative") << " }";
+     << (value.IsExact() ? "exact" : "non-exact") << " }";
   return os;
 }
 
@@ -310,7 +308,7 @@ class GD_CORE_API ExpressionCompletionFinder
                                                            node.functionName,
                                                            node.objectName,
                                                            node.behaviorName)
-                .SetIsInformative(isCaretOnParenthesis));
+                .SetIsExact(isCaretOnParenthesis));
       }
     } else if (!node.objectName.empty()) {
       // Object function
@@ -330,13 +328,13 @@ class GD_CORE_API ExpressionCompletionFinder
 
         completions.push_back(ExpressionCompletionDescription::ForExpression(
                                   node.type, node.functionName, node.objectName)
-                                  .SetIsInformative(isCaretOnParenthesis));
+                                  .SetIsExact(isCaretOnParenthesis));
       }
     } else {
       // Free function
       completions.push_back(ExpressionCompletionDescription::ForExpression(
                                 node.type, node.functionName)
-                                .SetIsInformative(isCaretOnParenthesis));
+                                .SetIsExact(isCaretOnParenthesis));
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {

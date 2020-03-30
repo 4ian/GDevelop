@@ -180,22 +180,20 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("mute");
 
-    object
+     object
       .addAction(
         "SetTime",
         _("Set time"),
         _("Set the time of the video object in seconds"),
-        _("Set time of _PARAM0_: _PARAM1__PARAM2_ seconds"),
+        _("the time"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Time in seconds"), "", false)
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName("setCurrentTime")
-      .setManipulatedType("number")
       .setGetter("getCurrentTime");
 
     object
@@ -211,11 +209,9 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Value"), "", false)
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName("setVolume")
-      .setManipulatedType("number")
       .setGetter("getVolume");
 
     object
@@ -384,11 +380,9 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Opacity (0-255)"), "", false)
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName("setOpacity")
-      .setManipulatedType("number")
       .setGetter("getOpacity");
 
     object
@@ -431,11 +425,9 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Speed "), "", false)
+      .useStandardOperatorParameters("number")
       .getCodeExtraInformation()
       .setFunctionName("setPlaybackSpeed")
-      .setManipulatedType("number")
       .setGetter("getPlaybackSpeed");
 
     object

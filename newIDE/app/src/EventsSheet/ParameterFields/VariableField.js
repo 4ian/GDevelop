@@ -6,7 +6,9 @@ import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
 import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
@@ -17,7 +19,7 @@ type Props = {
 };
 
 export default class VariableField extends Component<Props, {||}> {
-  _field: ?SemiControlledAutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   focus() {
     if (this._field) this._field.focus();
@@ -31,6 +33,7 @@ export default class VariableField extends Component<Props, {||}> {
       onOpenDialog,
       parameterMetadata,
       variablesContainer,
+      onRequestClose,
     } = this.props;
 
     const description = parameterMetadata
@@ -51,6 +54,7 @@ export default class VariableField extends Component<Props, {||}> {
             fullWidth
             value={value}
             onChange={onChange}
+            onRequestClose={onRequestClose}
             dataSource={enumerateVariables(variablesContainer).map(
               variableName => ({
                 text: variableName,

@@ -6,14 +6,17 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import InstancesSelection from './InstancesSelection';
+import PreviewButtons, {
+  type PreviewButtonSettings,
+} from '../MainFrame/Toolbar/PreviewButtons.js';
 
 type Props = {|
+  previewButtonSettings: PreviewButtonSettings,
   showPreviewButton: boolean,
   onPreview: () => void,
   showNetworkPreviewButton: boolean,
   onNetworkPreview: () => void,
   onOpenDebugger: () => void,
-  showPreviewButton: boolean,
   openObjectsList: () => void,
   openObjectGroupsList: () => void,
   openProperties: () => void,
@@ -41,34 +44,15 @@ export class Toolbar extends PureComponent<Props> {
   render() {
     return (
       <ToolbarGroup lastChild>
-        {this.props.showPreviewButton && (
-          <ToolbarIcon
-            onClick={this.props.onPreview}
-            src="res/ribbon_default/preview32.png"
-            tooltip={t`Launch a preview of the scene`}
-          />
-        )}
-        {this.props.showNetworkPreviewButton && (
-          <ElementWithMenu
-            element={
-              <ToolbarIcon
-                src="res/ribbon_default/bug32.png"
-                tooltip={t`Advanced preview options (debugger, network preview...)`}
-              />
-            }
-            buildMenuTemplate={() => [
-              {
-                label: 'Network preview (Preview over WiFi/LAN)',
-                click: () => this.props.onNetworkPreview(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Preview with debugger and performance profiler',
-                click: () => this.props.onOpenDebugger(),
-              },
-            ]}
-          />
-        )}
+        <PreviewButtons
+          showPreviewButton={this.props.showPreviewButton}
+          onPreview={this.props.onPreview}
+          previewButtonSettings={this.props.previewButtonSettings}
+          onNetworkPreview={this.props.onNetworkPreview}
+          onOpenDebugger={this.props.onOpenDebugger}
+          showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        />
+
         {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.openObjectsList}

@@ -92,6 +92,8 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
+
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd = global.gd;
@@ -132,6 +134,8 @@ type State = {|
   helpFinderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
+  isPreviewFirstSceneOverriden: boolean,
+  previewFirstSceneName: string,
 |};
 
 type Props = {
@@ -186,6 +190,8 @@ class MainFrame extends React.Component<Props, State> {
     helpFinderDialogOpen: false,
     eventsFunctionsExtensionsError: null,
     gdjsDevelopmentWatcherEnabled: false,
+    isPreviewFirstSceneOverriden: false,
+    previewFirstSceneName: '',
   };
   toolbar = null;
   _resourceSourceDialogs = {};
@@ -482,6 +488,8 @@ class MainFrame extends React.Component<Props, State> {
           this.setState(
             {
               currentProject: null,
+              isPreviewFirstSceneOverriden: false,
+              previewFirstSceneName: '',
             },
             () => {
               this.updateToolbar();
@@ -520,6 +528,17 @@ class MainFrame extends React.Component<Props, State> {
     if (!this.toolbar) return;
 
     this.toolbar.setEditorToolbar(editorToolbar);
+  };
+
+  _togglePreviewFirstSceneOverride = () => {
+    this.setState(
+      {
+        isPreviewFirstSceneOverriden: !this.state.isPreviewFirstSceneOverriden,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
   };
 
   addLayout = () => {
@@ -823,10 +842,10 @@ class MainFrame extends React.Component<Props, State> {
       return;
     }
 
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.`
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
         )
       );
       return;
@@ -867,6 +886,8 @@ class MainFrame extends React.Component<Props, State> {
     options: PreviewOptions
   ) => {
     const { _previewLauncher } = this;
+    const { previewFirstSceneName, isPreviewFirstSceneOverriden } = this.state;
+
     if (!_previewLauncher) return;
 
     this.setState(
@@ -874,8 +895,15 @@ class MainFrame extends React.Component<Props, State> {
         previewLoading: true,
       },
       () => {
+        let previewedLayout = layout;
+        if (previewFirstSceneName && isPreviewFirstSceneOverriden) {
+          if (project.hasLayoutNamed(previewFirstSceneName)) {
+            previewedLayout = project.getLayout(previewFirstSceneName);
+          }
+        }
+
         _previewLauncher
-          .launchLayoutPreview(project, layout, options)
+          .launchLayoutPreview(project, previewedLayout, options)
           .catch(error => {
             console.error(
               'Error caught while launching preview, this should never happen.',
@@ -931,11 +959,21 @@ class MainFrame extends React.Component<Props, State> {
   ) => {
     const { i18n, storageProviderOperations } = this.props;
     const sceneEditorOptions = {
-      name,
+      label: name,
       renderEditor: ({ isActive, editorRef }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
             <SceneEditor
+              previewButtonSettings={{
+                isPreviewFirstSceneOverriden: this.state
+                  .isPreviewFirstSceneOverriden,
+                togglePreviewFirstSceneOverride: () =>
+                  this._togglePreviewFirstSceneOverride(),
+                previewFirstSceneName: this.state.previewFirstSceneName,
+                useSceneAsPreviewFirstScene: () => {
+                  this._setPreviewFirstScene(name);
+                },
+              }}
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
@@ -972,7 +1010,7 @@ class MainFrame extends React.Component<Props, State> {
       key: 'layout ' + name,
     };
     const eventsEditorOptions = {
-      name: name + ' ' + i18n._(t`(Events)`),
+      label: name + ' ' + i18n._(t`(Events)`),
       renderEditor: ({ isActive, editorRef }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
@@ -980,6 +1018,16 @@ class MainFrame extends React.Component<Props, State> {
               project={this.state.currentProject}
               layoutName={name}
               setToolbar={this.setEditorToolbar}
+              previewButtonSettings={{
+                isPreviewFirstSceneOverriden: this.state
+                  .isPreviewFirstSceneOverriden,
+                togglePreviewFirstSceneOverride: () =>
+                  this._togglePreviewFirstSceneOverride(),
+                previewFirstSceneName: this.state.previewFirstSceneName,
+                useSceneAsPreviewFirstScene: () => {
+                  this._setPreviewFirstScene(name);
+                },
+              }}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 const { currentFileMetadata } = this.state;
@@ -1039,7 +1087,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name,
+          label: name,
           renderEditor: ({ isActive, editorRef }) => (
             <ExternalEventsEditor
               project={this.state.currentProject}
@@ -1057,6 +1105,7 @@ class MainFrame extends React.Component<Props, State> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               openInstructionOrExpression={this._openInstructionOrExpression}
               onCreateEventsFunction={this._onCreateEventsFunction}
+              previewButtonSettings={emptyPreviewButtonSettings}
               isActive={isActive}
               ref={editorRef}
             />
@@ -1074,7 +1123,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name,
+          label: name,
           renderEditor: ({ isActive, editorRef }) => (
             <PreferencesContext.Consumer>
               {({ values }) => (
@@ -1106,6 +1155,7 @@ class MainFrame extends React.Component<Props, State> {
                     this._previewLauncher &&
                     this._previewLauncher.canDoNetworkPreview()
                   }
+                  previewButtonSettings={emptyPreviewButtonSettings}
                   onOpenDebugger={this.openDebugger}
                   onEditObject={this.props.onEditObject}
                   resourceSources={this.props.resourceSources}
@@ -1134,7 +1184,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name: name + ' ' + i18n._(t`(Extension)`),
+          label: name + ' ' + i18n._(t`(Extension)`),
           renderEditor: ({ isActive, editorRef }) => (
             <EventsFunctionsExtensionEditor
               project={this.state.currentProject}
@@ -1169,7 +1219,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name: i18n._(t`Resources`),
+          label: i18n._(t`Resources`),
           renderEditor: ({ isActive, editorRef }) => (
             <ResourcesEditor
               project={this.state.currentProject}
@@ -1204,7 +1254,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name: i18n._(t`Start Page`),
+          label: i18n._(t`Start Page`),
           renderEditor: ({ isActive, editorRef }) => (
             <StartPage
               project={this.state.currentProject}
@@ -1240,7 +1290,7 @@ class MainFrame extends React.Component<Props, State> {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
-          name: i18n._(t`Debugger`),
+          label: i18n._(t`Debugger`),
           renderEditor: ({ isActive, editorRef }) => (
             <DebuggerEditor
               project={this.state.currentProject}
@@ -1538,6 +1588,18 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
+  _setPreviewFirstScene = (name: string) => {
+    this.setState(
+      {
+        previewFirstSceneName: name,
+        isPreviewFirstSceneOverriden: true,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
+  };
+
   _onChangeEditorTab = (value: number) => {
     this.setState(
       {
@@ -1549,6 +1611,11 @@ class MainFrame extends React.Component<Props, State> {
 
   _onEditorTabActive = (editorTab: EditorTab) => {
     this.updateToolbar();
+    // Ensure the editors shown on the screen are updated. This is for
+    // example useful if global objects have been updated in another editor.
+    if (editorTab.editorRef) {
+      editorTab.editorRef.forceUpdateEditor();
+    }
   };
 
   _onCloseEditorTab = (editorTab: EditorTab) => {
@@ -1794,7 +1861,7 @@ class MainFrame extends React.Component<Props, State> {
               getCurrentTabIndex(this.state.editorTabs) === id;
             return (
               <ClosableTab
-                label={editorTab.name}
+                label={editorTab.label}
                 key={editorTab.key}
                 active={isCurrentTab}
                 onClick={() => this._onChangeEditorTab(id)}
@@ -1895,13 +1962,22 @@ class MainFrame extends React.Component<Props, State> {
           (resourceSource, index): React.Node => {
             const Component = resourceSource.component;
             return (
-              <Component
-                key={resourceSource.name}
-                ref={dialog =>
-                  (this._resourceSourceDialogs[resourceSource.name] = dialog)
-                }
-                i18n={i18n}
-              />
+              <PreferencesContext.Consumer key={resourceSource.name}>
+                {({ getLastUsedPath, setLastUsedPath }) => {
+                  return (
+                    <Component
+                      ref={dialog =>
+                        (this._resourceSourceDialogs[
+                          resourceSource.name
+                        ] = dialog)
+                      }
+                      i18n={i18n}
+                      getLastUsedPath={getLastUsedPath}
+                      setLastUsedPath={setLastUsedPath}
+                    />
+                  );
+                }}
+              </PreferencesContext.Consumer>
             );
           }
         )}

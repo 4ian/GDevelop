@@ -1,4 +1,4 @@
-var fs = require("fs");
+var fs = require('fs');
 
 // This is a certificate generated from the private key below,
 // with passphrase 12345.
@@ -55,5 +55,5 @@ sqczMCnO4bcMHH0Oasnedk1KMALpeg+B6X+ClAr+9NvAmMPztkptVF+zyVjGBv3k
 module.exports = {
   cert: cert,
   key: key,
-  passphrase: "12345"
+  passphrase: '12345',
 };

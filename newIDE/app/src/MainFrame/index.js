@@ -276,19 +276,6 @@ const MainFrame = (props: Props) => {
     updateToolbar();
   }, [state.editorTabs, state.isPreviewFirstSceneOverriden, state.previewFirstSceneName]);
 
-  React.useEffect(() => {
-    const promise = new Promise((resolve) => {
-      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-        state.currentProject
-      );
-      if (state.currentFileMetadata && state.currentProject) {
-        state.currentProject.setProjectFile(state.currentFileMetadata.fileIdentifier);
-      }
-      resolve();
-    })
-    promise.then(() => openSceneOrProjectManager());
-  },[state.currentProject, state.currentFileMetadata]);
-
   const _languageDidChange = () => {
     // A change in the language will automatically be applied
     // on all React components, as it's handled by GDI18nProvider.
@@ -378,6 +365,19 @@ const MainFrame = (props: Props) => {
         }));
       //code shifted into useEffect
       })};
+
+  React.useEffect(() => {
+    const loadFromProjectCallback = new Promise((resolve) => {
+      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        state.currentProject
+      );
+      if (state.currentFileMetadata && state.currentProject) {
+        state.currentProject.setProjectFile(state.currentFileMetadata.fileIdentifier);
+      }
+      resolve();
+    })
+    loadFromProjectCallback.then(() => openSceneOrProjectManager());
+  }, [state.currentProject, state.currentFileMetadata]);
 
   const openFromFileMetadata = (fileMetadata: FileMetadata): Promise<void> => {
     const { i18n, storageProviderOperations } = props;

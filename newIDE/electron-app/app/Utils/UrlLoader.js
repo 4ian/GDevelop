@@ -1,9 +1,9 @@
-const { protocol } = require("electron");
-const fs = require("fs");
-const path = require("path");
+const { protocol } = require('electron');
+const fs = require('fs');
+const path = require('path');
 
-const developmentServerBaseUrl = "http://localhost:3000";
-const appPublicFolderBaseUrl = path.join(__dirname + "/../www");
+const developmentServerBaseUrl = 'http://localhost:3000';
+const appPublicFolderBaseUrl = path.join(__dirname + '/../www');
 
 /**
  * Load the given path, relative to the app public folder.
@@ -15,7 +15,7 @@ const load = ({ isDev, devTools, path, window }) => {
     window.openDevTools();
   } else {
     // Production (with npm run build)
-    window.loadURL("file://" + appPublicFolderBaseUrl + path);
+    window.loadURL('file://' + appPublicFolderBaseUrl + path);
     if (devTools) window.openDevTools();
   }
 };
@@ -27,38 +27,38 @@ const load = ({ isDev, devTools, path, window }) => {
 const registerGdideProtocol = ({ isDev }) => {
   if (isDev) {
     protocol.registerHttpProtocol(
-      "gdide",
+      'gdide',
       (request, callback) => {
         callback({
           method: request.method,
           referrer: request.referrer,
-          url: request.url.replace("gdide://", developmentServerBaseUrl + "/")
+          url: request.url.replace('gdide://', developmentServerBaseUrl + '/'),
         });
       },
       error => {
         if (error) {
-          console.error("Error while registering gdide protocol:", error);
+          console.error('Error while registering gdide protocol:', error);
         }
       }
     );
   } else {
     // Production (with npm run build)
     protocol.registerBufferProtocol(
-      "gdide",
+      'gdide',
       (request, callback) => {
         fs.readFile(
-          request.url.replace("gdide://", appPublicFolderBaseUrl + "/"),
+          request.url.replace('gdide://', appPublicFolderBaseUrl + '/'),
           (error, buffer) => {
             if (error) {
-              console.error("While while loading " + request.url, error);
+              console.error('While while loading ' + request.url, error);
             }
-            callback({ mimeType: "text/javascript", data: buffer });
+            callback({ mimeType: 'text/javascript', data: buffer });
           }
         );
       },
       error => {
         if (error) {
-          console.error("Error while registering gdide protocol:", error);
+          console.error('Error while registering gdide protocol:', error);
         }
       }
     );
@@ -67,5 +67,5 @@ const registerGdideProtocol = ({ isDev }) => {
 
 module.exports = {
   load,
-  registerGdideProtocol
+  registerGdideProtocol,
 };

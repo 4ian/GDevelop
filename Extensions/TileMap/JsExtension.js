@@ -430,10 +430,13 @@ module.exports = {
         .getProperties(this.project)
         .get('tiledFile')
         .getValue();
-      const layerIndex = this._associatedObject
-        .getProperties(this.project)
-        .get('layerIndex')
-        .getValue();
+      const layerIndex = parseInt(
+        this._associatedObject
+          .getProperties(this.project)
+          .get('layerIndex')
+          .getValue(),
+        0
+      );
       const render = this._associatedObject
         .getProperties(this.project)
         .get('render')
@@ -454,7 +457,7 @@ module.exports = {
             );
 
             console.log(
-              'update list',
+              'update list-->',
               this._associatedObject.getProperties(this.project),
               this._associatedObject.getProperties(this.project).get('render')
             );

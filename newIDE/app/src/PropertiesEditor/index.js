@@ -492,10 +492,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         if (field.children) {
           if (field.type === 'row') {
             return (
-              <UnsavedChangesContext.Consumer>
+              <UnsavedChangesContext.Consumer key={field.name}>
                 {unsavedChanges => (
                   <PropertiesEditor
-                    key={field.name}
                     schema={field.children}
                     instances={this.props.instances}
                     mode="row"

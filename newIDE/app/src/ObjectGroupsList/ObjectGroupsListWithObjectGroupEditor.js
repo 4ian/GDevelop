@@ -3,6 +3,7 @@ import * as React from 'react';
 import ObjectGroupsList from '.';
 import { ObjectGroupEditorDialog } from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 type Props = {|
   project: ?gdProject,
@@ -22,6 +23,7 @@ type Props = {|
   ) => void,
   onGroupsUpdated?: () => void,
   canSetAsGlobalGroup?: boolean,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 type State = {|
@@ -63,6 +65,7 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
           onGroupRemoved={this.props.onGroupsUpdated}
           onGroupRenamed={this.props.onGroupsUpdated}
           canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
+          unsavedChanges={this.props.unsavedChanges}
         />
         <ObjectGroupEditorDialog
           project={project}

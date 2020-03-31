@@ -34,6 +34,7 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const styles = {
   listContainer: {
@@ -96,6 +97,7 @@ type Props = {|
   canRenameObject: (newName: string) => boolean,
 
   getThumbnail: (project: gdProject, object: Object) => string,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -207,7 +209,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         objectsContainer.removeObject(object.getName());
       }
 
-      this.forceUpdate();
+      this._onObjectModified(false);
     });
   };
 
@@ -270,7 +272,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
     newObject.setName(newName); // Unserialization has overwritten the name.
 
-    this.forceUpdate();
+    this._onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObject);
 
     return { object: newObject, global };
@@ -306,7 +308,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         if (!doRename) return;
 
         object.setName(newName);
-        this.forceUpdate();
+        this._onObjectModified(false);
       });
     }
   };
@@ -357,8 +359,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         )
       );
     });
-
-    this.forceUpdateList();
+    this._onObjectModified(true);
   };
 
   _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
@@ -389,8 +390,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       project,
       project.getObjectsCount()
     );
-
-    this.forceUpdateList();
+    this._onObjectModified(true);
   };
 
   forceUpdateList = () => {
@@ -409,7 +409,7 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     // Force update the list as it's possible that user removed a tag
     // from an object, that should then not be shown anymore in the list.
-    this.forceUpdateList();
+    this._onObjectModified(true);
   };
 
   _selectObject = (objectWithContext: ?ObjectWithContext) => {
@@ -485,6 +485,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         click: () => this._duplicateObject(objectWithContext),
       },
     ];
+  };
+
+  _onObjectModified = (shouldForceUpdateList: boolean) => {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+
+    if (shouldForceUpdateList) this.forceUpdateList();
+    else this.forceUpdate();
   };
 
   render() {

@@ -80,6 +80,7 @@ import {
 import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 const gd = global.gd;
 
@@ -109,6 +110,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
+  unsavedChanges?: UnsavedChanges,
 |};
 type State = {|
   history: HistoryState,
@@ -221,6 +223,12 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
+  }
+
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (this.state.history !== prevState.history)
+      if (this.props.unsavedChanges)
+        this.props.unsavedChanges.triggerUnsavedChanges();
   }
 
   updateToolbar() {

@@ -147,8 +147,35 @@ export default class PixiResourcesLoader {
     return loadedTextures[resourceName];
   }
 
-  // If a Tileset changes (json orimage), a tilemap using it needs to re-render
-  // Also the tileset needs to be rebuilt for use
+  static createTileSetResource(tiledData: any, tex: any) {
+    // Todo implement tileset index and use it instead of 0
+    const { tilewidth, tilecount, tileheight, tiles } = tiledData.tilesets[0];
+    const textureCache = new Array(tilecount).fill(0).map((_, frame) => {
+      const cols = Math.floor(tex.width / tilewidth);
+      const x = ((frame - 1) % cols) * tilewidth;
+      const y = Math.floor((frame - 1) / cols) * tileheight;
+      const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
+      const texture = new PIXI.Texture(tex, rect);
+      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+      texture.cacheAsBitmap = true;
+
+      return texture;
+    });
+    return {
+      width: tex.width,
+      height: tex.height,
+      tilewidth,
+      tileheight,
+      texture: tex,
+      textureCache,
+      layers: tiledData.layers,
+      tiles,
+      tilecount,
+    };
+  }
+
+  // If a Tileset changes (json or image), a tilemap using it needs to re-render
+  // The tileset needs to be rebuilt for use
   // But we need to have the capacity to instance a tilemap, so more than one tilemaps with different tileset layers
   // We need to cache the tileset somewhere, the tilemap instance will have to re-render it
   // Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
@@ -160,46 +187,18 @@ export default class PixiResourcesLoader {
     onLoad: any => null
   ) {
     const texture = this.getPIXITexture(project, imageResourceName);
-
-    // Slices up the tileset into cached textures
-    const createTileSetResource = (tiledData: any, tex: any, offset = 1) => ({
-      width: tex.width,
-      height: tex.height,
-      tilewidth: tiledData.tilesets[0].tilewidth,
-      tileheight: tiledData.tilesets[0].tileheight,
-      texture: tex,
-      textureCache: new Array(tiledData.tilesets[0].tilecount)
-        .fill(0)
-        .map((_, frame) => {
-          const cols = Math.floor(tex.width / tiledData.tilesets[0].tilewidth);
-          const x = ((frame - offset) % cols) * tiledData.tilesets[0].tilewidth;
-          const y =
-            Math.floor((frame - offset) / cols) *
-            tiledData.tilesets[0].tileheight;
-          const rect = new PIXI.Rectangle(
-            x,
-            y,
-            tiledData.tilesets[0].tilewidth,
-            tiledData.tilesets[0].tileheight
-          );
-          const texture = new PIXI.Texture(tex, rect);
-          texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-          texture.cacheAsBitmap = true;
-
-          return texture;
-        }),
-      layers: tiledData.layers,
-      tiles: tiledData.tilesets[0].tiles,
-      tilecount: tiledData.tilesets[0].tilecount,
-    });
-
     const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;
-    if (loadedTileSets[requestedTileSetId])
-      onLoad(loadedTileSets[requestedTileSetId]);
 
+    // If the tileset is already in the cache, just load it
+    if (loadedTileSets[requestedTileSetId]) {
+      onLoad(loadedTileSets[requestedTileSetId]);
+      return;
+    }
+
+    // Otherwise proceed to creating it as an object that can easily be consumed by a tilemap
     ResourcesLoader.getResourceJsonData(project, jsonResourceName).then(
       tiledData => {
-        const newTileset = createTileSetResource(tiledData, texture);
+        const newTileset = this.createTileSetResource(tiledData, texture);
         loadedTileSets[requestedTileSetId] = newTileset;
         onLoad(newTileset);
       }
@@ -210,21 +209,20 @@ export default class PixiResourcesLoader {
   static updatePIXITileMap(
     tileSet: any,
     tileMap: any,
-    render,
+    render: 'index' | 'visible' | 'all',
     layerIndex: number
   ) {
     if (!tileMap || !tileSet) return;
-    console.log('OPTIONS::', render, layerIndex);
+
     tileSet.layers.forEach((layer, index) => {
-      // eslint-disable-next-line eqeqeq
-      if (render === 'index' && layerIndex != index) return;
+      if (render === 'index' && layerIndex !== index) return;
       else if (render === 'visible' && !layer.visible) return;
 
       // todo filter groups
       if (layer.type === 'objectgroup') {
         layer.objects.forEach(object => {
           const { gid, x, y, visible } = object;
-          if (visible === false) return;
+          if (render === 'visible' && !visible) return;
           if (tileSet.textureCache[gid]) {
             tileMap.addFrame(
               tileSet.textureCache[gid],

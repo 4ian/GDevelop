@@ -122,6 +122,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             onClick={() => onCreate(extensionName, eventsFunction)}
           />,
         ]}
+        modal={true}
         open
         onRequestClose={onClose}
         noMargin

@@ -39,7 +39,7 @@ type Props = {|
   secondaryActions?: React.Node,
   onRequestClose?: () => void,
 
-  modal?: boolean, //Force the user to use one of the actions in the Dialog. Clicking outside the Dialog will not trigger the onRequestClose. Hence, Dialog will not close if clicked out of its scope
+  modal?: boolean, //Force the user to use one of the actions in the Dialog. If true, the dialog can't be closed by clicking outside or pressing Escape.
 
   children: React.Node, // The content of the dialog
 
@@ -105,7 +105,8 @@ export default (props: Props) => {
           fullWidth
           fullScreen={size === 'small'}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick={modal !== undefined ? !!modal : false}
+          disableBackdropClick={!!modal}
+          disableEscapeKeyDown={!!modal}
         >
           {title && (
             <DialogTitle

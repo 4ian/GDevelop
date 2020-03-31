@@ -105,7 +105,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             />
           </LeftLoader>,
         ]}
-        modal
+        modal={false}
         open
         onRequestClose={onClose}
       >

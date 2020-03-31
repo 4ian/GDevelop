@@ -158,6 +158,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
           />
         }
         open={this.props.open}
+        modal={true}
         onRequestClose={this.props.onClose}
         maxWidth="sm"
       >

@@ -46,6 +46,7 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
                 onClick={this._makeOnOpen(i18n)}
               />,
             ]}
+            modal={true}
             open
           >
             <Line>

@@ -100,6 +100,7 @@ export default class LoginDialog extends Component<Props, State> {
           if (!loginInProgress && !forgotPasswordInProgress) onClose();
         }}
         maxWidth="sm"
+        modal={true}
         open
       >
         <Column noMargin>
@@ -147,6 +148,7 @@ export default class LoginDialog extends Component<Props, State> {
           />
         </Column>
         <Dialog
+          modal={true}
           open={resetPasswordDialogOpen}
           title={<Trans>Reset your password</Trans>}
           actions={[

@@ -112,6 +112,7 @@ export default class NewObjectDialog extends Component<Props, State> {
           />
         }
         onRequestClose={onClose}
+        modal={false}
         open={open}
         noMargin
       >

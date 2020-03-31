@@ -69,7 +69,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             onClick={onClose}
           />,
         ]}
-        modal
+        modal={false}
         onRequestClose={onClose}
         open={open}
         noMargin

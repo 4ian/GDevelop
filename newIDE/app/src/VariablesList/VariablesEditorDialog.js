@@ -46,6 +46,7 @@ export class VariablesEditorDialog extends Component {
         noMargin
         actions={actions}
         open={open}
+        modal={true}
         onRequestClose={onCancel}
         secondaryActions={secondaryActions}
         title={title}

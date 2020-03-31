@@ -44,6 +44,7 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
             key={'Apply'}
           />,
         ]}
+        modal={true}
         open
         onRequestClose={onApply}
         title={<Trans>Edit the behavior</Trans>}

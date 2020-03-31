@@ -60,7 +60,7 @@ export default class LayoutChooserDialog extends Component {
         open={this.props.open}
         title={this.props.title}
         onRequestClose={this.props.onClose}
-        modal
+        modal={false}
         fullWidth
         maxWidth="sm"
       >

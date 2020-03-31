@@ -1074,23 +1074,29 @@ gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function(
 
 /**
  * Pick a color on sprite and apply a mask on it for make color transparent.
- * @param {gdjs.string} rgbColor Color to make transparent, in RGB format ("128;200;255"). 
+ * @param {string} rgbColor Color to make transparent, in RGB format ("128;200;255"). 
  */
 gdjs.SpriteRuntimeObject.prototype.makeColorTransparent = function(
-  rgbColor, threshold
+  rgbColor,
+  threshold
 ) {
-    //   if ( this._animationFrameDirty ) {
-    //     this._updateAnimationFrame();
-    //   }
-    //  var objectSprite = this._renderer.getRendererObject(); //get sprite in renderer of the object.
 
-    // create filter
-    var uniforms = {
-        u_colorToRemove: [rgbColor.r/255.0, rgbColor.g/255.0, rgbColor.b/255.0],
-        u_threshold: threshold
-    };
+    //https://jsfiddle.net/Babar31/vqyk8gmf/4/
 
-    var fragSrc = `
+  //Convert rgbColor "128;200;255" in [128, 200, 255]
+  var rgbColor = rgbColor.split(';');
+
+  // create filter
+  var uniforms = {
+    u_colorToRemove: [
+      rgbColor[0] / 255.0,
+      rgbColor[1] / 255.0,
+      rgbColor[2] / 255.0,
+    ],
+    u_threshold: threshold,
+  };
+
+  var fragSrc = `
         precision lowp float;
         varying vec2 vTextureCoord;
         uniform sampler2D uSampler;
@@ -1113,14 +1119,21 @@ gdjs.SpriteRuntimeObject.prototype.makeColorTransparent = function(
             gl_FragColor = vec4(vec3(texColor.rgb),texColor.a);
 
         }
-`.split('\n').reduce((c, a) => c + a.trim() + '\n');
+`
+    .split('\n')
+    .reduce((c, a) => c + a.trim() + '\n');
 
-    var filter = new PIXI.Filter(null, fragSrc, uniforms);
-    //filter.uniforms.u_colorToRemove = [229/255.0, 17/255.0, 254/255.0];
-    //filter.uniforms.u_threshold = 0.1;
+  var filter = new PIXI.Filter(null, fragSrc, uniforms);
 
-    this._renderer.setShader(filter);
+  filter.apply = function(filterManager, input, output) {
+    this.uniforms = uniforms;
+
+    // draw the filter...
+    filterManager.applyFilter(this, input, output);
   };
+
+  this._renderer.setFilter(filter);
+};
 
 /**
  * @param obj The target object

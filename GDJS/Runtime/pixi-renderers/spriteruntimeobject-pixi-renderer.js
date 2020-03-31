@@ -141,6 +141,10 @@ gdjs.SpriteRuntimeObjectPixiRenderer.setSprite = function(runtimeScene, imageNam
     this._sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getPIXITexture(imageName));
 };
 
-gdjs.SpriteRuntimeObjectPixiRenderer.prototype.setShader = function(PixiFilter) {
-     this._sprite.shader  = filter;
+gdjs.SpriteRuntimeObjectPixiRenderer.prototype.setShader = function(pixiShader) {
+     this._sprite.shader = pixiShader;
+};
+
+gdjs.SpriteRuntimeObjectPixiRenderer.prototype.setFilter = function(pixiFilter) {
+     this._sprite.filters = [ pixiFilter ];
 };

@@ -363,7 +363,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("color", _("Color to make transparent"));
+      .AddParameter("color", _("Color to make transparent"))
+      .AddParameter("expression", _("Threshold"));
 
   obj.AddAction(
          "ChangeColor",

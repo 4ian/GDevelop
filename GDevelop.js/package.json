@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "grunt build",
+    "build-with-MinGW": "grunt build --use-MinGW",
     "clean": "grunt clean",
     "test": "jest"
   },

@@ -29,24 +29,26 @@ module.exports = {
    * Start a server to serve a folder
    */
   serveFolder: ({ root, useHttps }, onDone) => {
-    if (currentServerParams && currentServerParams.root === root)
-    {
+    if (currentServerParams && currentServerParams.root === root) {
       onDone(null, currentServerParams);
       return;
     }
 
     liveServer.shutdown();
-    getAvailablePort(2929).then(port => {
-      currentServerParams = {
-        port,
-        root,
-        open: false,
-        wait: 1000,
-        https: useHttps ? httpsConfiguration : undefined,
-      };
-      liveServer.start(currentServerParams);
-      onDone(null, currentServerParams);
-    }, err => onDone(err));
+    getAvailablePort(2929).then(
+      port => {
+        currentServerParams = {
+          port,
+          root,
+          open: false,
+          wait: 1000,
+          https: useHttps ? httpsConfiguration : undefined,
+        };
+        liveServer.start(currentServerParams);
+        onDone(null, currentServerParams);
+      },
+      err => onDone(err)
+    );
   },
 
   /**

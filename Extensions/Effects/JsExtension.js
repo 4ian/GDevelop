@@ -987,14 +987,14 @@ module.exports = {
     );
     radialBlurProperties.set(
       'centerX',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center X'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Center X (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
     radialBlurProperties.set(
       'centerY',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center Y'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Center Y (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
 
@@ -1193,14 +1193,14 @@ module.exports = {
     );
     twistProperties.set(
       'offsetX',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center X'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Offset X (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
     twistProperties.set(
       'offsetY',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0')
-        .setLabel(_('Center Y'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
+        .setLabel(_('Offset Y (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
 
@@ -1214,19 +1214,19 @@ module.exports = {
     zoomBlurProperties.set(
       'centerX',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center X (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center X (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
     zoomBlurProperties.set(
       'centerY',
       new gd.PropertyDescriptor(/* defaultValue= */ '0.5')
-        .setLabel(_('Center Y (between 0 and 1, 0.5 is window middle)'))
+        .setLabel(_('Center Y (between 0 and 1, 0.5 is image middle)'))
         .setType('number')
     );
     zoomBlurProperties.set(
       'innerRadius',
-      new gd.PropertyDescriptor(/* defaultValue= */ '0.2')
-        .setLabel(_('Inner radius (between 0 and 1, 0.5 is mid-way)'))
+      new gd.PropertyDescriptor(/* defaultValue= */ '200')
+        .setLabel(_('Inner radius'))
         .setType('number')
     );
     zoomBlurProperties.set(

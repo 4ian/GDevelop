@@ -4,19 +4,25 @@ import ReactDOM from 'react-dom';
 
 const styles = {
   container: {
-    overflowY: 'scroll',
     flex: 1,
   },
 };
 
-type Props = {| children: React.Node, style?: ?Object |};
+type Props = {|
+  children: React.Node,
+  /**
+   * If true, scrollbar won't be shown if the content is not clipped.
+   */
+  autoHideScrollbar?: ?boolean,
+  style?: ?Object,
+|};
 
 export type ScrollViewInterface = {|
   scrollTo: (target: ?React$Component<any, any>) => void,
 |};
 
 export default React.forwardRef<Props, ScrollViewInterface>(
-  ({ children, style }: Props, ref) => {
+  ({ children, autoHideScrollbar, style }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
       /**
@@ -31,7 +37,7 @@ export default React.forwardRef<Props, ScrollViewInterface>(
           if (scrollViewElement) {
             const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
               .top;
-            scrollViewElement.scrollTop = yPosition - scrollViewYPosition;
+            scrollViewElement.scrollTop += yPosition - scrollViewYPosition;
           }
         } else {
           console.error(
@@ -42,7 +48,14 @@ export default React.forwardRef<Props, ScrollViewInterface>(
     }));
 
     return (
-      <div style={{ ...styles.container, ...style }} ref={scrollView}>
+      <div
+        style={{
+          ...styles.container,
+          overflowY: autoHideScrollbar ? 'auto' : 'scroll',
+          ...style,
+        }}
+        ref={scrollView}
+      >
         {children}
       </div>
     );

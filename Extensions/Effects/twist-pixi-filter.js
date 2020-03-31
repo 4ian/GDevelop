@@ -5,6 +5,8 @@ gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
     return twistFilter;
   },
   update: function(filter, layer) {
+    filter.offset[0] = Math.round(filter._offsetX * layer.getWidth());
+    filter.offset[1] = Math.round(filter._offsetY * layer.getHeight());
   },
   updateDoubleParameter: function(filter, parameterName, value) {
     if (parameterName === 'radius') {
@@ -17,10 +19,10 @@ gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
       filter.padding = value;
     }
     else if (parameterName === 'offsetX') {
-      filter.offset[0] = value;
+      filter._offsetX = value;
     }
     else if (parameterName === 'offsetY') {
-      filter.offset[1] = value;
+      filter._offsetY = value;
     }
   },
   updateStringParameter: function(filter, parameterName, value) {

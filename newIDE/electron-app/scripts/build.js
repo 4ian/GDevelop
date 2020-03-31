@@ -16,7 +16,9 @@ if (!args['skip-app-build']) {
 }
 
 const electronBuilder = path.join('node_modules', '.bin', 'electron-builder');
-let electronBuilderArguments = process.argv.slice(2).filter(arg => arg !== '--skip-app-build');
+let electronBuilderArguments = process.argv
+  .slice(2)
+  .filter(arg => arg !== '--skip-app-build');
 shell.exec(
   [electronBuilder, electronBuilderArguments.join(' ')].join(' '),
   code => {

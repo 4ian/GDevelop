@@ -76,6 +76,7 @@ export default function BehaviorMethodSelectorDialog({
           key={'close'}
         />,
       ]}
+      cannotBeDismissed={false}
       open
       noMargin
       title={<Trans>Choose a new extension function</Trans>}
@@ -168,7 +169,7 @@ export default function BehaviorMethodSelectorDialog({
               }
               description={
                 <Trans>
-                  Events that will be run once when the a scene of the game is
+                  Events that will be run once when a scene of the game is
                   loaded, before the scene events.
                 </Trans>
               }

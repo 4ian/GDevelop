@@ -92,6 +92,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+import { type UnsavedChanges } from './UnsavedChangesContext';
 import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -160,6 +161,7 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
+  unsavedChanges?: UnsavedChanges,
 };
 
 const useForceUpdate = () => {
@@ -592,7 +594,7 @@ const MainFrame = (props: Props) => {
       currentProject.getLayoutsCount()
     );
     newLayout.updateBehaviorsSharedData(currentProject);
-    forceUpdate(state);
+    _onProjectItemModified();
   };
 
   const addExternalLayout = () => {
@@ -606,7 +608,7 @@ const MainFrame = (props: Props) => {
       name,
       currentProject.getExternalLayoutsCount()
     );
-    forceUpdate(state);
+    _onProjectItemModified();
   };
 
   const addExternalEvents = () => {
@@ -620,7 +622,7 @@ const MainFrame = (props: Props) => {
       name,
       currentProject.getExternalEventsCount()
     );
-    forceUpdate(state);
+    _onProjectItemModified();
   };
 
   const addEventsFunctionsExtension = () => {
@@ -634,7 +636,7 @@ const MainFrame = (props: Props) => {
       name,
       currentProject.getEventsFunctionsExtensionsCount()
     );
-    forceUpdate(state);
+    _onProjectItemModified();
   };
 
   const deleteLayout = (layout: gdLayout) => {
@@ -657,7 +659,7 @@ const MainFrame = (props: Props) => {
       }),
       state => {
         currentProject.removeLayout(layout.getName());
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
   };
@@ -682,7 +684,7 @@ const MainFrame = (props: Props) => {
       }),
       state => {
         currentProject.removeExternalLayout(externalLayout.getName());
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
   };
@@ -707,7 +709,7 @@ const MainFrame = (props: Props) => {
       }),
       state => {
         currentProject.removeExternalEvents(externalEvents.getName());
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
   };
@@ -737,7 +739,7 @@ const MainFrame = (props: Props) => {
       },
       state => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
 
@@ -775,7 +777,7 @@ const MainFrame = (props: Props) => {
       },
       state => {
         layout.setName(newName);
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
   };
@@ -810,7 +812,7 @@ const MainFrame = (props: Props) => {
       },
       state => {
         externalLayout.setName(newName);
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
   };
@@ -845,7 +847,7 @@ const MainFrame = (props: Props) => {
       },
       state => {
         externalEvents.setName(newName);
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
   };
@@ -909,8 +911,7 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
           currentProject
         );
-
-        forceUpdate(state);
+        _onProjectItemModified();
       }
     );
   };
@@ -1066,6 +1067,7 @@ const MainFrame = (props: Props) => {
               resourceExternalEditors={props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1125,6 +1127,7 @@ const MainFrame = (props: Props) => {
               onCreateEventsFunction={_onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1139,7 +1142,7 @@ const MainFrame = (props: Props) => {
     const tabsWithSceneAndEventsEditors = openEventsEditor
       ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
       : tabsWithSceneEditor;
-
+    
     setState(state => ({
       ...state,
       editorTabs: tabsWithSceneAndEventsEditors,
@@ -1148,69 +1151,72 @@ const MainFrame = (props: Props) => {
   };
 
   const openExternalEvents = (name: string) => {
-    setState({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name,
-        renderEditor: ({ isActive, editorRef }) => (
-          <ExternalEventsEditor
-            project={state.currentProject}
-            externalEventsName={name}
-            setToolbar={setEditorToolbar}
-            onOpenExternalEvents={openExternalEvents}
-            onOpenLayout={name =>
-              openLayout(name, {
-                openEventsEditor: true,
-                openSceneEditor: false,
-              })
-            }
-            resourceSources={props.resourceSources}
-            onChooseResource={_onChooseResource}
-            resourceExternalEditors={props.resourceExternalEditors}
-            openInstructionOrExpression={_openInstructionOrExpression}
-            onCreateEventsFunction={_onCreateEventsFunction}
-            previewButtonSettings={emptyPreviewButtonSettings}
-            isActive={isActive}
-            ref={editorRef}
-          />
-        ),
-        key: 'external events ' + name,
-      }),
-    });
+    setState(state =>
+      ({
+        ...state,
+        editorTabs: openEditorTab(this.state.editorTabs, {
+          label: name,
+          renderEditor: ({ isActive, editorRef }) => (
+            <ExternalEventsEditor
+              project={state.currentProject}
+              externalEventsName={name}
+              setToolbar={setEditorToolbar}
+              onOpenExternalEvents={openExternalEvents}
+              onOpenLayout={name =>
+                openLayout(name, {
+                  openEventsEditor: true,
+                  openSceneEditor: false,
+                })
+              }
+              resourceSources={props.resourceSources}
+              onChooseResource={_onChooseResource}
+              resourceExternalEditors={props.resourceExternalEditors}
+              openInstructionOrExpression={_openInstructionOrExpression}
+              onCreateEventsFunction={_onCreateEventsFunction}
+              previewButtonSettings={emptyPreviewButtonSettings}
+              isActive={isActive}
+              ref={editorRef}
+              unsavedChanges={props.unsavedChanges}
+            />
+          ),
+          key: 'external events ' + name,
+        }),
+      })
+    );
     openProjectManager(false);
   };
 
   const openExternalLayout = (name: string) => {
     const { storageProviderOperations } = props;
-    setState({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name,
-        renderEditor: ({ isActive, editorRef }) => (
-          <PreferencesContext.Consumer>
-            {({ values }) => (
-              <ExternalLayoutEditor
-                project={state.currentProject}
-                externalLayoutName={name}
-                setToolbar={setEditorToolbar}
-                onPreview={(project, layout, externalLayout, options) => {
-                  _launchExternalLayoutPreview(
-                    project,
-                    layout,
-                    externalLayout,
-                    options
-                  );
-                  const { currentFileMetadata } = state;
-                  if (
-                    values.autosaveOnPreview &&
-                    storageProviderOperations.onAutoSaveProject &&
-                    currentFileMetadata
-                  ) {
-                    storageProviderOperations.onAutoSaveProject(
+    setState(state =>
+      ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name,
+          renderEditor: ({ isActive, editorRef }) => (
+            <PreferencesContext.Consumer>
+              {({ values }) => (
+                <ExternalLayoutEditor
+                  project={state.currentProject}
+                  externalLayoutName={name}
+                  setToolbar={setEditorToolbar}
+                  onPreview={(project, layout, externalLayout, options) => {
+                    _launchExternalLayoutPreview(
                       project,
+                      layout,
+                      externalLayout,
+                      options);
+                    const { currentFileMetadata } = state;
+                    if (
+                      values.autosaveOnPreview &&
+                      storageProviderOperations.onAutoSaveProject &&
                       currentFileMetadata
-                    );
-                  }
+                    ) {
+                      storageProviderOperations.onAutoSaveProject(
+                        project,
+                        currentFileMetadata
+                      );
+                    }
                 }}
                 showPreviewButton={!!props.renderPreviewLauncher}
                 showNetworkPreviewButton={
@@ -1231,7 +1237,7 @@ const MainFrame = (props: Props) => {
         ),
         key: 'external layout ' + name,
       }),
-    });
+    }));
     openProjectManager(false);
   };
 
@@ -1241,68 +1247,73 @@ const MainFrame = (props: Props) => {
     initiallyFocusedBehaviorName?: ?string
   ) => {
     const { i18n, eventsFunctionsExtensionsState } = props;
-    setState({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name + ' ' + i18n._(t`(Extension)`),
-        renderEditor: ({ isActive, editorRef }) => (
-          <EventsFunctionsExtensionEditor
-            project={state.currentProject}
-            eventsFunctionsExtensionName={name}
-            setToolbar={setEditorToolbar}
-            resourceSources={props.resourceSources}
-            onChooseResource={_onChooseResource}
-            resourceExternalEditors={props.resourceExternalEditors}
-            isActive={isActive}
-            initiallyFocusedFunctionName={initiallyFocusedFunctionName}
-            initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
-            openInstructionOrExpression={_openInstructionOrExpression}
-            onCreateEventsFunction={_onCreateEventsFunction}
-            ref={editorRef}
-            onLoadEventsFunctionsExtensions={() => {
-              eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                state.currentProject
-              );
-            }}
-          />
-        ),
-        key: 'events functions extension ' + name,
-      }),
-    });
+    setState(state =>
+      ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name + ' ' + i18n._(t`(Extension)`),
+          renderEditor: ({ isActive, editorRef }) => (
+            <EventsFunctionsExtensionEditor
+              project={state.currentProject}
+              eventsFunctionsExtensionName={name}
+              setToolbar={setEditorToolbar}
+              resourceSources={props.resourceSources}
+              onChooseResource={_onChooseResource}
+              resourceExternalEditors={props.resourceExternalEditors}
+              isActive={isActive}
+              initiallyFocusedFunctionName={initiallyFocusedFunctionName}
+              initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
+              openInstructionOrExpression={_openInstructionOrExpression}
+              onCreateEventsFunction={_onCreateEventsFunction}
+              ref={editorRef}
+              onLoadEventsFunctionsExtensions={() => {
+                eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+                  state.currentProject
+                );
+              }}
+              unsavedChanges={props.unsavedChanges}
+            />
+          ),
+          key: 'events functions extension ' + name,
+        }),
+      })
+    );
     openProjectManager(false);
   };
 
   const openResources = () => {
     const { i18n } = props;
-    setState({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: i18n._(t`Resources`),
-        renderEditor: ({ isActive, editorRef }) => (
-          <ResourcesEditor
-            project={state.currentProject}
-            setToolbar={setEditorToolbar}
-            onDeleteResource={(resource: gdResource, cb: boolean => void) => {
-              // TODO: Project wide refactoring of objects/events using the resource
-              cb(true);
-            }}
-            onRenameResource={(
-              resource: gdResource,
-              newName: string,
-              cb: boolean => void
-            ) => {
-              // TODO: Project wide refactoring of objects/events using the resource
-              cb(true);
-            }}
-            isActive={isActive}
-            ref={editorRef}
-            onChooseResource={_onChooseResource}
-            resourceSources={props.resourceSources}
-          />
-        ),
-        key: 'resources',
-      }),
-    });
+    setState(state =>
+      ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: i18n._(t`Resources`),
+          renderEditor: ({ isActive, editorRef }) => (
+            <ResourcesEditor
+              project={state.currentProject}
+              setToolbar={setEditorToolbar}
+              onDeleteResource={(resource: gdResource, cb: boolean => void) => {
+                // TODO: Project wide refactoring of objects/events using the resource
+                cb(true);
+              }}
+              onRenameResource={(
+                resource: gdResource,
+                newName: string,
+                cb: boolean => void
+              ) => {
+                // TODO: Project wide refactoring of objects/events using the resource
+                cb(true);
+              }}
+              isActive={isActive}
+              ref={editorRef}
+              onChooseResource={_onChooseResource}
+              resourceSources={props.resourceSources}
+            />
+          ),
+          key: 'resources',
+        }),
+      })
+    );
   };
 
   const openStartPage = () => {
@@ -1404,6 +1415,12 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const _onProjectItemModified = () => {
+    if (props.unsavedChanges)
+      props.unsavedChanges.triggerUnsavedChanges();
+    forceUpdate(state);
+  };
+
   const _onCreateEventsFunction = (
     extensionName: string,
     eventsFunction: gdEventsFunction
@@ -1496,6 +1513,8 @@ const MainFrame = (props: Props) => {
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
         if (wasSaved) {
+          if (props.unsavedChanges)
+            props.unsavedChanges.sealUnsavedChanges();
           _showSnackMessage(i18n._(t`Project properly saved`));
         }
       },
@@ -1542,6 +1561,8 @@ const MainFrame = (props: Props) => {
       .then(
         ({ wasSaved, fileMetadata }) => {
           if (wasSaved) {
+            if (props.unsavedChanges)
+              props.unsavedChanges.sealUnsavedChanges();
             _showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
@@ -1564,17 +1585,21 @@ const MainFrame = (props: Props) => {
   };
 
   const askToCloseProject = (): Promise<void> => {
-    if (!state.currentProject) return Promise.resolve();
-    const { i18n } = props;
+    if (
+      props.unsavedChanges &&
+      props.unsavedChanges.hasUnsavedChanges
+    ) {
+      if (!state.currentProject) return Promise.resolve();
+      const { i18n } = props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      i18n._(
-        t`Close the project? Any changes that have not been saved will be lost.`
-      )
-    );
-    if (!answer) return Promise.resolve();
-
+      //eslint-disable-next-line
+      const answer = confirm(
+        i18n._(
+          t`Close the project? Any changes that have not been saved will be lost.`
+        )
+      );
+      if (!answer) return Promise.resolve();
+    }
     return closeProject();
   };
 
@@ -1842,6 +1867,7 @@ const MainFrame = (props: Props) => {
               );
             }}
             freezeUpdate={!projectManagerOpen}
+            unsavedChanges={props.unsavedChanges}
           />
         )}
         {!currentProject && (

@@ -67,7 +67,9 @@ import {
 } from '../Utils/TagsHelper';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
+
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -134,6 +136,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 type State = {|
@@ -214,6 +217,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   componentWillMount() {
     this.zOrderFinder = new gd.HighestZOrderFinder();
+  }
+
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (this.state.history !== prevState.history)
+      if (this.props.unsavedChanges)
+        this.props.unsavedChanges.triggerUnsavedChanges();
   }
 
   getUiSettings() {
@@ -917,6 +926,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             ref={propertiesEditor =>
               (this._propertiesEditor = propertiesEditor)
             }
+            unsavedChanges={this.props.unsavedChanges}
           />
         ),
       },
@@ -996,6 +1006,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             getAllObjectTags={this._getAllObjectTags}
             ref={objectsList => (this._objectsList = objectsList)}
+            unsavedChanges={this.props.unsavedChanges}
           />
         ),
       },
@@ -1010,6 +1021,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onDeleteGroup={this._onDeleteGroup}
             onRenameGroup={this._onRenameGroup}
             canRenameGroup={this._canObjectOrGroupUseNewName}
+            unsavedChanges={this.props.unsavedChanges}
           />
         ),
       },
@@ -1114,6 +1126,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
+            unsavedChanges={this.props.unsavedChanges}
           />
         </Drawer>
         <InfoBar

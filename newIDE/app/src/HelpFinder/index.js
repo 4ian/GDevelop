@@ -78,6 +78,7 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
             label={<Trans>Wiki</Trans>}
           />,
         ]}
+        cannotBeDismissed={false}
         open={open}
       >
         <DocSearchArea

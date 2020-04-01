@@ -1,4 +1,10 @@
 // @flow
+/*
+  When to launch a new search :
+    -> enter pressed (searchResultsDirty : false)
+    -> search button pressed
+    -> searchResultsDirty is true, and then make it false.
+*/
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
@@ -33,7 +39,7 @@ type State = {|
   searchInConditions: boolean,
   searchInEventStrings: boolean,
   searchInSelection: boolean,
-  isSearchCountOne: boolean,
+  searchResultsDirty: boolean,
 |};
 
 export default class SearchPanel extends PureComponent<Props, State> {
@@ -46,13 +52,19 @@ export default class SearchPanel extends PureComponent<Props, State> {
     searchInConditions: true,
     searchInEventStrings: true,
     searchInSelection: false,
-    isSearchCountOne: false,
+    searchResultsDirty: false,
   };
 
   focus = () => {
     if (this.searchTextField) {
       this.searchTextField.focus();
     }
+  };
+
+  makeSearchResultsDirty = () => {
+    this.setState({ searchResultsDirty: true }, () => {
+      this.callLaunchSearch();
+    });
   };
 
   launchSearch = () => {
@@ -98,6 +110,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
     });
   };
 
+  callLaunchSearch = () => {
+    if (this.state.searchResultsDirty) {
+      this.launchSearch();
+      this.setState({ searchResultsDirty: false });
+    }
+  };
+
   render() {
     const {
       resultsCount,
@@ -118,15 +137,19 @@ export default class SearchPanel extends PureComponent<Props, State> {
               }
               hintText={t`Text to search in parameters`}
               onChange={(e, searchText) => {
-                this.setState({
-                  searchText,
-                  isSearchCountOne: false,
-                });
+                this.setState(
+                  {
+                    searchText,
+                    searchResultsDirty: true,
+                  },
+                  () => {
+                    this.callLaunchSearch();
+                  }
+                );
               }}
               onKeyPress={event => {
                 if (event.key === 'Enter') {
-                  this.launchSearch();
-                  this.setState({ isSearchCountOne: true });
+                  this.callLaunchSearch();
                 }
               }}
               value={searchText}
@@ -138,11 +161,10 @@ export default class SearchPanel extends PureComponent<Props, State> {
               primary
               label={<Trans>Search</Trans>}
               onClick={() => {
-                if (this.state.isSearchCountOne) {
+                if (!this.state.searchResultsDirty) {
                   onGoToNextSearchResult();
                 } else {
-                  this.launchSearch();
-                  this.setState({ isSearchCountOne: true });
+                  this.callLaunchSearch();
                 }
               }}
             />
@@ -189,7 +211,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={this.state.searchInActions}
                 onCheck={(e, checked) =>
                   this.setState({ searchInActions: checked })
-                }
+                }                
               />
               <InlineCheckbox
                 label={<Trans>Texts</Trans>}

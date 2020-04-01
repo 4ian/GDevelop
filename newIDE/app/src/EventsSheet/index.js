@@ -715,6 +715,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         if (cb) cb();
       }
     );
+    if (this._searchPanel) this._searchPanel.makeSearchResultsDirty();
   };
 
   undo = () => {
@@ -1121,6 +1122,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                             this.setState({
                               inlineEditingChangesMade: true,
                             });
+                            if (this._searchPanel)
+                              this._searchPanel.makeSearchResultsDirty();
                           }}
                           resourceSources={this.props.resourceSources}
                           onChooseResource={this.props.onChooseResource}

@@ -253,7 +253,7 @@ const selectLocalResourcePath = (
       defaultPath: latestPath,
     })
     .then(({ filePaths }) => {
-      if (!filePaths) return [];
+      if (!filePaths || !filePaths.length) return [];
 
       const lastUsedPath = path.parse(filePaths[0]).dir;
       setLastUsedPath(project, kind, lastUsedPath);

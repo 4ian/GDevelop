@@ -128,6 +128,7 @@ export default class ExportDialog extends React.Component<Props, State> {
                 <Dialog
                   title={<Trans>Export project to a standalone game</Trans>}
                   onRequestClose={onClose}
+                  cannotBeDismissed={false}
                   actions={[
                     chosenExporterKey && (
                       <FlatButton

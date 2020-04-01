@@ -60,6 +60,7 @@ export default class ExpressionParametersEditorDialog extends Component<
     return (
       <Dialog
         title={<Trans>Enter the expression parameters</Trans>}
+        cannotBeDismissed={true}
         open
         actions={
           <FlatButton
@@ -69,7 +70,6 @@ export default class ExpressionParametersEditorDialog extends Component<
             onClick={() => this.props.onDone(this.state.parameterValues)}
           />
         }
-        modal
         noMargin
         onRequestClose={this.props.onRequestClose}
       >

@@ -107,7 +107,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                   key={'close'}
                 />,
               ]}
-              modal={true}
+              cannotBeDismissed={true}
               open={this.props.open}
               title={<Trans>Edit Extension Options</Trans>}
               onRequestClose={this.props.onClose}
@@ -198,7 +198,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                     />,
                   ]}
                   open
-                  modal={false}
+                  cannotBeDismissed={false}
                   onRequestClose={() =>
                     this.setState({ exportDialogOpen: false })
                   }

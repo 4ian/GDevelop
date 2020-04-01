@@ -153,7 +153,7 @@ export default class EventTextDialog extends React.Component<Props, State> {
       <Dialog
         title={<Trans>Edit the event text</Trans>}
         onRequestClose={onClose}
-        modal={true}
+        cannotBeDismissed={true}
         open
         noMargin
         actions={[

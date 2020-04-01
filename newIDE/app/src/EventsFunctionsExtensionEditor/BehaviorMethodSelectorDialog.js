@@ -85,7 +85,7 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
           />,
         ]}
         actions={actions}
-        modal={false}
+        cannotBeDismissed={false}
         open
         noMargin
         title={<Trans>Choose a new behavior function ("method")</Trans>}

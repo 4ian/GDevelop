@@ -39,7 +39,7 @@ type Props = {|
   secondaryActions?: React.Node,
   onRequestClose?: () => void,
 
-  modal?: boolean, //Force the user to use one of the actions in the Dialog. If true, the dialog can't be closed by clicking outside or pressing Escape.
+  cannotBeDismissed?: boolean, //Force the user to use one of the actions in the Dialog. If true, the dialog can't be closed by clicking outside or pressing Escape.
 
   children: React.Node, // The content of the dialog
 
@@ -80,7 +80,7 @@ export default (props: Props) => {
     flexRowBody,
     flexBody,
     noTitleMargin,
-    modal,
+    cannotBeDismissed,
   } = props;
   const dialogActions = secondaryActions ? (
     <React.Fragment>
@@ -105,8 +105,8 @@ export default (props: Props) => {
           fullWidth
           fullScreen={size === 'small'}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick={!!modal}
-          disableEscapeKeyDown={!!modal}
+          disableBackdropClick={!!cannotBeDismissed}
+          disableEscapeKeyDown={!!cannotBeDismissed}
         >
           {title && (
             <DialogTitle

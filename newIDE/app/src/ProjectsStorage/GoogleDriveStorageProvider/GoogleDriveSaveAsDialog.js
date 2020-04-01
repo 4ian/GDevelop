@@ -105,7 +105,7 @@ export default (props: Props) => {
           />
         </LeftLoader>,
       ]}
-      modal={true}
+      cannotBeDismissed={true}
       open
       onRequestClose={cancel}
       maxWidth="sm"

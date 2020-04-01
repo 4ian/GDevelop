@@ -60,7 +60,7 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
       <Dialog
         actions={actions}
         open
-        modal={false}
+        cannotBeDismissed={false}
         onRequestClose={onDone}
         maxWidth="sm"
       >

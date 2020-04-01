@@ -68,7 +68,7 @@ export default class ProfileDialog extends Component<Props, State> {
               ),
             ]}
             onRequestClose={onClose}
-            modal={false}
+            cannotBeDismissed={false}
             open={open}
             noMargin
           >

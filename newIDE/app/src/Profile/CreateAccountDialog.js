@@ -97,7 +97,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
           if (!createAccountInProgress) onClose();
         }}
         maxWidth="sm"
-        modal={true}
+        cannotBeDismissed={true}
         open
       >
         <Column noMargin>

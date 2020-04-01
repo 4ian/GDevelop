@@ -31,7 +31,7 @@ export default ({ onClose, onConfirm }: Props) => {
           onClick={onConfirm}
         />,
       ]}
-      modal={false}
+      cannotBeDismissed={false}
       open
       maxWidth="sm"
     >

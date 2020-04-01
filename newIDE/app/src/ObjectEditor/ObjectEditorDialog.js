@@ -61,7 +61,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         actions={actions}
         noMargin
         onRequestClose={this.props.onCancel}
-        modal={false}
+        cannotBeDismissed={true}
         open={this.props.open}
         noTitleMargin
         title={

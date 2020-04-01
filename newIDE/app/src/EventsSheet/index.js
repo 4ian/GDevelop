@@ -905,7 +905,6 @@ export default class EventsSheet extends React.Component<Props, State> {
           this.state.editedInstruction.indexInList === undefined
         }
         anchorEl={this.state.inlineInstructionEditorAnchorEl}
-        modal={true}
         open={true}
         onCancel={() => this.closeInstructionEditor()}
         onSubmit={() => {

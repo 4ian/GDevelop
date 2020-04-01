@@ -47,7 +47,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
         />,
       ]}
       onRequestClose={onClose}
-      modal={true}
+      cannotBeDismissed={true}
       open
       title={<Trans>GDevelop Preferences</Trans>}
       maxWidth="sm"

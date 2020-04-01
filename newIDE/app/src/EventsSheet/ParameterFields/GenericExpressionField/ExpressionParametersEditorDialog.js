@@ -60,7 +60,7 @@ export default class ExpressionParametersEditorDialog extends Component<
     return (
       <Dialog
         title={<Trans>Enter the expression parameters</Trans>}
-        modal={true}
+        cannotBeDismissed={true}
         open
         actions={
           <FlatButton

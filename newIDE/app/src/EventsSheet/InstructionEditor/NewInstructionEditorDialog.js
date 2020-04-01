@@ -283,7 +283,7 @@ export default function NewInstructionEditorDialog({
           ]}
           open={open}
           onRequestClose={onCancel}
-          modal={true}
+          cannotBeDismissed={true}
           maxWidth={false}
           noMargin
           flexRowBody

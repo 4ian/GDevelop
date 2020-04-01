@@ -28,7 +28,7 @@ export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
               onClick={onClose}
             />,
           ]}
-          modal={true}
+          cannotBeDismissed={true}
           open
           noMargin
           maxWidth="sm"

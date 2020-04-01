@@ -39,7 +39,7 @@ export default class SetupGridDialog extends Component {
     return (
       <Dialog
         actions={actions}
-        modal={true}
+        cannotBeDismissed={true}
         open={this.props.open}
         onRequestClose={this.props.onCancel}
       >

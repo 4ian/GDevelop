@@ -191,7 +191,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
             ]}
             secondaryActions={<HelpButton helpPagePath="/behaviors" />}
             open={open}
-            modal={false}
+            cannotBeDismissed={false}
             noMargin
           >
             <Tabs value={currentTab} onChange={this._changeTab}>

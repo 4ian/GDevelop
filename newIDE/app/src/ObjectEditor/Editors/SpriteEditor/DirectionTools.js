@@ -166,7 +166,7 @@ export default class DirectionTools extends Component<Props, State> {
               />
             }
             noMargin
-            modal={true}
+            cannotBeDismissed={false}
             onRequestClose={() => this.openPreview(false)}
             open={this.state.previewOpen}
           >

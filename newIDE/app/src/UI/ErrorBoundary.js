@@ -12,6 +12,18 @@ import Window from '../Utils/Window';
 import Text from './Text';
 import { Line, Spacer } from './Grid';
 
+import {
+  getPlatform,
+  getSystemVersion,
+  getArch,
+  getIDEVersion,
+  getGDCoreVersion,
+} from '../Version';
+
+const systemInfo = getPlatform() + ' ' + getSystemVersion() + ', ' + getArch();
+const releaseBuildInfo =
+  'GDevelop' + getIDEVersion() + ' based on GDevelop.js ' + getGDCoreVersion();
+
 const errorHandler = (error: Error, componentStack: string) => {
   console.error('Error catched by Boundary:', error, componentStack);
   sendErrorMessage('Error catched by error boundary', 'error-boundary', {
@@ -64,6 +76,10 @@ ${error ? error.stack : 'No error found'}
 \`\`\`
 ${componentStack || 'No component stack found'}
 \`\`\`
+
+## Other details
+* ${releaseBuildInfo || 'Release build not found'}
+* ${systemInfo || 'System information not found'}
         `;
         Window.openExternalURL(
           `https://github.com/4ian/GDevelop/issues/new?body=${encodeURIComponent(

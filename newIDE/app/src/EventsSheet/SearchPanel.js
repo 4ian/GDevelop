@@ -211,7 +211,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={this.state.searchInActions}
                 onCheck={(e, checked) =>
                   this.setState({ searchInActions: checked })
-                }                
+                }
               />
               <InlineCheckbox
                 label={<Trans>Texts</Trans>}

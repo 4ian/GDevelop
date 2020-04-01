@@ -1,10 +1,4 @@
 // @flow
-/*
-  When to launch a new search :
-    -> enter pressed (searchResultsDirty : false)
-    -> search button pressed
-    -> searchResultsDirty is true, and then make it false.
-*/
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
@@ -62,9 +56,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
   };
 
   makeSearchResultsDirty = () => {
-    this.setState({ searchResultsDirty: true }, () => {
-      this.callLaunchSearch();
-    });
+    this.setState({ searchResultsDirty: true }); //search results not up to date
   };
 
   launchSearch = () => {
@@ -137,15 +129,10 @@ export default class SearchPanel extends PureComponent<Props, State> {
               }
               hintText={t`Text to search in parameters`}
               onChange={(e, searchText) => {
-                this.setState(
-                  {
-                    searchText,
-                    searchResultsDirty: true,
-                  },
-                  () => {
-                    this.callLaunchSearch();
-                  }
-                );
+                this.setState({
+                  searchText,
+                  searchResultsDirty: true, //search results not up to date
+                });
               }}
               onKeyPress={event => {
                 if (event.key === 'Enter') {

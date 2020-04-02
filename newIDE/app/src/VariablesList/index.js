@@ -244,7 +244,7 @@ export default class VariablesList extends React.Component<Props, State> {
             success = parentVariable.renameChild(name, text);
           }
 
-          this.setState({
+          React.PureComponent({
             nameErrors: {
               ...this.state.nameErrors,
               [variable.ptr]: !success,

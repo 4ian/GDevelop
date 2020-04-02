@@ -12,15 +12,10 @@ import Window from '../Utils/Window';
 import Text from './Text';
 import { Line, Spacer } from './Grid';
 
-import {
-  getPlatform,
-  getSystemVersion,
-  getArch,
-  getIDEVersion,
-  getGDCoreVersion,
-} from '../Version';
+import { getIDEVersion, getGDCoreVersion } from '../Version';
+import { getOperatingSystemDescriptiveName } from '../Utils/Platform';
 
-const systemInfo = getPlatform() + ' ' + getSystemVersion() + ', ' + getArch();
+const systemInfo = getOperatingSystemDescriptiveName();
 const releaseBuildInfo =
   'GDevelop' + getIDEVersion() + ' based on GDevelop.js ' + getGDCoreVersion();
 

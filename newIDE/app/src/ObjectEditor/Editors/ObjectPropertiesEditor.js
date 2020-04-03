@@ -50,6 +50,7 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
                   </Line>
                 ) : null}
                 <PropertiesEditor
+                  unsavedChanges={this.props.unsavedChanges}
                   schema={propertiesSchema}
                   instances={[object]}
                   project={project}

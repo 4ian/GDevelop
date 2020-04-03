@@ -20,6 +20,7 @@ import {
   type EventsFunctionsExtensionOpener,
 } from '../EventsFunctionsExtensionsLoader/Storage';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import { UnsavedChangesContextProvider } from './UnsavedChangesContext';
 
 type Props = {|
   authentification: Authentification,
@@ -49,48 +50,52 @@ export default class Providers extends React.Component<Props, {||}> {
     } = this.props;
     return (
       <DragAndDropContextProvider>
-        <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
-          <PreferencesContext.Consumer>
-            {({ values }) => {
-              const theme = getTheme(values.themeName);
-              return (
-                <GDI18nProvider language={values.language}>
-                  <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
-                    <ThemeProvider theme={theme.muiTheme}>
-                      <UserProfileProvider authentification={authentification}>
-                        <I18n update>
-                          {({ i18n }) => (
-                            <EventsFunctionsExtensionsProvider
-                              i18n={i18n}
-                              eventsFunctionCodeWriter={
-                                eventsFunctionCodeWriter
-                              }
-                              eventsFunctionsExtensionWriter={
-                                eventsFunctionsExtensionWriter
-                              }
-                              eventsFunctionsExtensionOpener={
-                                eventsFunctionsExtensionOpener
-                              }
-                            >
-                              <EventsFunctionsExtensionsContext.Consumer>
-                                {eventsFunctionsExtensionsState =>
-                                  children({
-                                    i18n,
-                                    eventsFunctionsExtensionsState,
-                                  })
+        <UnsavedChangesContextProvider>
+          <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
+            <PreferencesContext.Consumer>
+              {({ values }) => {
+                const theme = getTheme(values.themeName);
+                return (
+                  <GDI18nProvider language={values.language}>
+                    <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
+                      <ThemeProvider theme={theme.muiTheme}>
+                        <UserProfileProvider
+                          authentification={authentification}
+                        >
+                          <I18n update>
+                            {({ i18n }) => (
+                              <EventsFunctionsExtensionsProvider
+                                i18n={i18n}
+                                eventsFunctionCodeWriter={
+                                  eventsFunctionCodeWriter
                                 }
-                              </EventsFunctionsExtensionsContext.Consumer>
-                            </EventsFunctionsExtensionsProvider>
-                          )}
-                        </I18n>
-                      </UserProfileProvider>
-                    </ThemeProvider>
-                  </GDevelopThemeContext.Provider>
-                </GDI18nProvider>
-              );
-            }}
-          </PreferencesContext.Consumer>
-        </PreferencesProvider>
+                                eventsFunctionsExtensionWriter={
+                                  eventsFunctionsExtensionWriter
+                                }
+                                eventsFunctionsExtensionOpener={
+                                  eventsFunctionsExtensionOpener
+                                }
+                              >
+                                <EventsFunctionsExtensionsContext.Consumer>
+                                  {eventsFunctionsExtensionsState =>
+                                    children({
+                                      i18n,
+                                      eventsFunctionsExtensionsState,
+                                    })
+                                  }
+                                </EventsFunctionsExtensionsContext.Consumer>
+                              </EventsFunctionsExtensionsProvider>
+                            )}
+                          </I18n>
+                        </UserProfileProvider>
+                      </ThemeProvider>
+                    </GDevelopThemeContext.Provider>
+                  </GDI18nProvider>
+                );
+              }}
+            </PreferencesContext.Consumer>
+          </PreferencesProvider>
+        </UnsavedChangesContextProvider>
       </DragAndDropContextProvider>
     );
   }

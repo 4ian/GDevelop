@@ -24,6 +24,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -34,6 +35,12 @@ type LayersListBodyState = {|
 class LayersListBody extends Component<*, LayersListBodyState> {
   state = {
     nameErrors: {},
+  };
+
+  _onLayerModified = () => {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
   };
 
   render() {
@@ -79,13 +86,13 @@ class LayersListBody extends Component<*, LayersListBodyState> {
               if (!doRemove) return;
 
               layersContainer.removeLayer(layerName);
-              this.forceUpdate();
+              this._onLayerModified();
             });
           }}
           isVisible={layer.getVisibility()}
           onChangeVisibility={visible => {
             layer.setVisibility(visible);
-            this.forceUpdate();
+            this._onLayerModified();
           }}
         />
       );
@@ -96,7 +103,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
         {containerLayersList}
         <BackgroundColorRow
           layout={layersContainer}
-          onBackgroundColorChanged={() => this.forceUpdate()}
+          onBackgroundColorChanged={() => this._onLayerModified()}
         />
       </TableBody>
     );
@@ -119,7 +126,9 @@ type Props = {|
     newName: string,
     cb: (done: boolean) => void
   ) => void,
+  unsavedChanges?: UnsavedChanges,
 |};
+
 type State = {|
   effectsEditedLayer: ?gdLayer,
 |};
@@ -148,6 +157,12 @@ export default class LayersList extends Component<Props, State> {
       layersContainer.hasLayerNamed(name)
     );
     layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+    this._onLayerModified();
+  };
+
+  _onLayerModified = () => {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 
@@ -185,10 +200,11 @@ export default class LayersList extends Component<Props, State> {
                 layersCount - 1 - oldIndex,
                 layersCount - 1 - newIndex
               );
-              this.forceUpdate();
+              this._onLayerModified();
             }}
             helperClass="sortable-helper"
             useDragHandle
+            unsavedChanges={this.props.unsavedChanges}
           />
         </Table>
         <Column>

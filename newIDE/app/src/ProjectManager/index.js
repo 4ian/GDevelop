@@ -39,9 +39,9 @@ import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';

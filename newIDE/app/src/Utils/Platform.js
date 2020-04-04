@@ -16,31 +16,29 @@ const _isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini
   typeof navigator !== 'undefined' ? navigator.userAgent : ''
 );
 
-const getUserAgent = (): string => {
-  return navigator.userAgent;
+export const getUserAgent = (): string => {
+  return typeof navigator !== 'undefined'
+    ? navigator.userAgent || 'Unknown navigator'
+    : 'Unknown (not a navigator)';
 };
 
-const getArch = (): string => {
-  return process.arch;
+export const getArch = (): string => {
+  return process
+    ? process.arch || 'Unknown architecture'
+    : 'Unknown architecture (web-app)';
 };
 
-const getSystemVersion = (): string => {
-  return process.getSystemVersion;
+export const getSystemVersion = (): string => {
+  return process
+    ? process.getSystemVersion() || 'Unknown system version'
+    : 'Unknown system version (web-app)';
 };
 
-export const getOperatingSystemDescriptiveName = (): string => {
-  if (process === null) {
-    //not an native application, so we are on a web-app
-    return getUserAgent();
-  } else {
-    let platformString;
-    if (process.platform === 'darwin') {
-      platformString = 'macOS';
-    } else {
-      platformString = process.platform;
-    }
-    return platformString + ', ' + getSystemVersion() + ', ' + getArch();
-  }
+export const getPlatformName = (): string => {
+  return process
+    ? process.platform || 'Unknown platform'
+    : (typeof navigator !== 'undefined' ? navigator.platform : '') ||
+        'Unknown platform (web-app)';
 };
 
 export const isWindows = () => _isWindows;

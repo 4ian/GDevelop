@@ -29,7 +29,7 @@ export const getArch = (): string => {
 };
 
 export const getSystemVersion = (): string => {
-  return process
+  return process && process.getSystemVersion
     ? process.getSystemVersion() || 'Unknown system version'
     : 'Unknown system version (web-app)';
 };

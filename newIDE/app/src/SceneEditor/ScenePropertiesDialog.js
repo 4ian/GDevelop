@@ -19,7 +19,7 @@ type Props = {|
   open: boolean,
   layout: gdLayout,
   project: gdProject,
-  onApply?: () => void,
+  onApply: () => void,
   onClose: () => void,
   onOpenMoreSettings?: () => void,
   onEditVariables: () => void,
@@ -74,7 +74,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       this.state.backgroundColor.g,
       this.state.backgroundColor.b
     );
-    if (this.props.onApply) this.props.onApply();
+    this.props.onApply();
   };
 
   render() {

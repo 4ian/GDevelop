@@ -6,7 +6,7 @@ import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 type Props = {|
   open: boolean,
   layout: gdLayout,
-  onApply?: () => void,
+  onApply: () => void,
   onClose: () => void,
 |};
 

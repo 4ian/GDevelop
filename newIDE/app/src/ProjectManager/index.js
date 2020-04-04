@@ -155,27 +155,7 @@ class Item extends React.Component<ItemProps, {||}> {
     }
   }
 
-  render() {
-    const label = this.props.editingName ? (
-      <TextField
-        id="rename-item-field"
-        margin="none"
-        ref={textField => (this.textField = textField)}
-        defaultValue={this.props.primaryText}
-        onBlur={e => this.props.onRename(e.currentTarget.value)}
-        onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
-            if (this.textField) this.textField.blur();
-          }
-        }}
-        fullWidth
-        style={styles.itemTextField}
-      />
-    ) : (
-      <div style={styles.itemName}>{this.props.primaryText}</div>
-    );
-
+  _buildMenuTemplate = () => {
     const menuTemplate = [
       {
         label: 'Edit',
@@ -230,6 +210,29 @@ class Item extends React.Component<ItemProps, {||}> {
     if (addedMenu && addedMenu.length !== 0) {
       menuTemplate.push({ type: 'separator' }, ...addedMenu);
     }
+    return menuTemplate;
+  };
+
+  render() {
+    const label = this.props.editingName ? (
+      <TextField
+        id="rename-item-field"
+        margin="none"
+        ref={textField => (this.textField = textField)}
+        defaultValue={this.props.primaryText}
+        onBlur={e => this.props.onRename(e.currentTarget.value)}
+        onKeyPress={event => {
+          if (event.charCode === 13) {
+            // enter key pressed
+            if (this.textField) this.textField.blur();
+          }
+        }}
+        fullWidth
+        style={styles.itemTextField}
+      />
+    ) : (
+      <div style={styles.itemName}>{this.props.primaryText}</div>
+    );
 
     return (
       <ThemeConsumer>
@@ -241,7 +244,7 @@ class Item extends React.Component<ItemProps, {||}> {
             }}
             primaryText={label}
             displayMenuButton
-            buildMenuTemplate={() => menuTemplate}
+            buildMenuTemplate={this._buildMenuTemplate}
             onClick={() => {
               // It's essential to discard clicks when editing the name,
               // to avoid weird opening of an editor (accompanied with a

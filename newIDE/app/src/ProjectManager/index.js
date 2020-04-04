@@ -114,6 +114,14 @@ const ProjectStructureItem = (props: ProjectStructureItemProps) => (
   </ThemeConsumer>
 );
 
+type ItemOption = {|
+  label?: string,
+  visible?: boolean,
+  enabled?: boolean,
+  click?: () => void,
+  type?: string,
+|};
+
 type ItemProps = {|
   primaryText: string,
   editingName: boolean,
@@ -132,7 +140,7 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
-  addonMenuOptions?: Array<Object>,
+  extraMenuOptions?: Array<ItemOption>,
   style?: ?Object,
 |};
 
@@ -217,8 +225,8 @@ class Item extends React.Component<ItemProps, {||}> {
       },
     ];
 
-    // Append the addon menu options (if provided) to base menu
-    const addedMenu = this.props.addonMenuOptions;
+    // Append the extra menu options (if provided) to base menu
+    const addedMenu = this.props.extraMenuOptions;
     if (addedMenu && addedMenu.length !== 0) {
       menuTemplate.push({ type: 'separator' }, ...addedMenu);
     }
@@ -282,7 +290,8 @@ type Props = {|
 |};
 
 type State = {|
-  lastOpenLayout: ?gdLayout,
+  editedPropertiesLayout: ?gdLayout,
+  editedVariablesLayout: ?gdLayout,
   renamedItemKind: ?string,
   renamedItemName: string,
   searchText: string,
@@ -297,7 +306,8 @@ export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBar;
 
   state = {
-    lastOpenLayout: null,
+    editedPropertiesLayout: null,
+    editedVariablesLayout: null,
     renamedItemKind: null,
     renamedItemName: '',
     searchText: '',
@@ -385,12 +395,12 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _onOpenLayoutProperties = (layout: gdLayout) => {
-    this.setState({ lastOpenLayout: layout, layoutPropertiesDialogOpen: true });
+  _onOpenLayoutProperties = (layout: ?gdLayout) => {
+    this.setState({ editedPropertiesLayout: layout });
   };
 
-  _onOpenLayoutVariables = (layout: gdLayout) => {
-    this.setState({ lastOpenLayout: layout, layoutVariablesDialogOpen: true });
+  _onOpenLayoutVariables = (layout: ?gdLayout) => {
+    this.setState({ editedVariablesLayout: layout });
   };
 
   _addExternalEvents = (index: number) => {
@@ -795,7 +805,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onMoveUp={() => this._moveUpLayout(i)}
                       canMoveDown={i !== project.getLayoutsCount() - 1}
                       onMoveDown={() => this._moveDownLayout(i)}
-                      addonMenuOptions={[
+                      extraMenuOptions={[
                         {
                           label: 'Edit scene properties',
                           enabled: true,
@@ -1099,34 +1109,32 @@ export default class ProjectManager extends React.Component<Props, State> {
             onChangeSubscription={this.props.onChangeSubscription}
           />
         )}
-        {this.state.layoutPropertiesDialogOpen && this.state.lastOpenLayout && (
+        {!!this.state.editedPropertiesLayout && (
           <ScenePropertiesDialog
-            open={this.state.layoutPropertiesDialogOpen}
-            layout={this.state.lastOpenLayout}
+            open={!!this.state.editedPropertiesLayout}
+            layout={this.state.editedPropertiesLayout}
             project={this.props.project}
             onApply={() => {
               if (this.props.unsavedChanges)
                 this.props.unsavedChanges.triggerUnsavedChanges();
-              this.setState({ layoutPropertiesDialogOpen: false });
+              this._onOpenLayoutProperties(null);
             }}
-            onClose={() => this.setState({ layoutPropertiesDialogOpen: false })}
-            onEditVariables={() =>
-              this.setState({
-                layoutPropertiesDialogOpen: false,
-                layoutVariablesDialogOpen: true,
-              })
-            }
+            onClose={() => this._onOpenLayoutProperties(null)}
+            onEditVariables={() => {
+              this._onOpenLayoutVariables(this.state.editedPropertiesLayout);
+              this._onOpenLayoutProperties(null);
+            }}
           />
         )}
-        {this.state.layoutVariablesDialogOpen && this.state.lastOpenLayout && (
+        {!!this.state.editedVariablesLayout && (
           <SceneVariablesDialog
-            open={this.state.layoutVariablesDialogOpen}
-            layout={this.state.lastOpenLayout}
-            onClose={() => this.setState({ layoutVariablesDialogOpen: false })}
+            open={!!this.state.editedVariablesLayout}
+            layout={this.state.editedVariablesLayout}
+            onClose={() => this._onOpenLayoutVariables(null)}
             onApply={() => {
               if (this.props.unsavedChanges)
                 this.props.unsavedChanges.triggerUnsavedChanges();
-              this.setState({ layoutVariablesDialogOpen: false });
+              this._onOpenLayoutVariables(null);
             }}
           />
         )}

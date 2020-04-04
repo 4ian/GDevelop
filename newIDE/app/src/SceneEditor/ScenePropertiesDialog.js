@@ -201,7 +201,8 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             label={<Trans>Open advanced settings</Trans>}
             fullWidth
             onClick={() => {
-              this.props.onOpenMoreSettings && this.props.onOpenMoreSettings();
+              if (this.props.onOpenMoreSettings)
+                this.props.onOpenMoreSettings();
               this.props.onClose();
             }}
           />

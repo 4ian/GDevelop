@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import { GDevelopGamesPreview } from './ApiConfigs';
+import { GDevelopGamePreviews } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
 
 export type UploadedObject = {|
@@ -24,5 +24,5 @@ export const uploadObject = (params: UploadedObject): Promise<any> => {
 };
 
 export const getBaseUrl = () => {
-  return GDevelopGamesPreview.options.destinationBucketBaseUrl;
+  return GDevelopGamePreviews.baseUrl;
 };

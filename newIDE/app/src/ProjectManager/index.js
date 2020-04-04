@@ -155,64 +155,6 @@ class Item extends React.Component<ItemProps, {||}> {
     }
   }
 
-  _buildMenuTemplate = () => {
-    const menuTemplate = [
-      {
-        label: 'Edit',
-        click: () => this.props.onEdit(),
-      },
-      {
-        label: 'Rename',
-        click: () => this.props.onEditName(),
-      },
-      {
-        label: 'Delete',
-        click: () => this.props.onDelete(),
-      },
-      {
-        label: this.props.addLabel,
-        visible: !!this.props.onAdd,
-        click: () => this.props.onAdd(),
-      },
-      { type: 'separator' },
-      {
-        label: 'Copy',
-        click: () => this.props.onCopy(),
-      },
-      {
-        label: 'Cut',
-        click: () => this.props.onCut(),
-      },
-      {
-        label: 'Paste',
-        enabled: this.props.canPaste(),
-        click: () => this.props.onPaste(),
-      },
-      {
-        label: 'Duplicate',
-        click: () => this.props.onDuplicate(),
-      },
-      { type: 'separator' },
-      {
-        label: 'Move up',
-        enabled: this.props.canMoveUp,
-        click: () => this.props.onMoveUp(),
-      },
-      {
-        label: 'Move down',
-        enabled: this.props.canMoveDown,
-        click: () => this.props.onMoveDown(),
-      },
-    ];
-
-    // Append the extra menu options (if provided) to base menu
-    const addedMenu = this.props.extraMenuOptions;
-    if (addedMenu && addedMenu.length !== 0) {
-      menuTemplate.push({ type: 'separator' }, ...addedMenu);
-    }
-    return menuTemplate;
-  };
-
   render() {
     const label = this.props.editingName ? (
       <TextField
@@ -244,7 +186,63 @@ class Item extends React.Component<ItemProps, {||}> {
             }}
             primaryText={label}
             displayMenuButton
-            buildMenuTemplate={this._buildMenuTemplate}
+            buildMenuTemplate={() => {
+              const menuTemplate = [
+                {
+                  label: 'Edit',
+                  click: () => this.props.onEdit(),
+                },
+                {
+                  label: 'Rename',
+                  click: () => this.props.onEditName(),
+                },
+                {
+                  label: 'Delete',
+                  click: () => this.props.onDelete(),
+                },
+                {
+                  label: this.props.addLabel,
+                  visible: !!this.props.onAdd,
+                  click: () => this.props.onAdd(),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Copy',
+                  click: () => this.props.onCopy(),
+                },
+                {
+                  label: 'Cut',
+                  click: () => this.props.onCut(),
+                },
+                {
+                  label: 'Paste',
+                  enabled: this.props.canPaste(),
+                  click: () => this.props.onPaste(),
+                },
+                {
+                  label: 'Duplicate',
+                  click: () => this.props.onDuplicate(),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Move up',
+                  enabled: this.props.canMoveUp,
+                  click: () => this.props.onMoveUp(),
+                },
+                {
+                  label: 'Move down',
+                  enabled: this.props.canMoveDown,
+                  click: () => this.props.onMoveDown(),
+                },
+              ];
+
+              // Append the extra menu options (if provided) to base menu
+              const addedMenu = this.props.extraMenuOptions;
+              if (addedMenu && addedMenu.length !== 0) {
+                menuTemplate.push({ type: 'separator' }, ...addedMenu);
+              }
+              return menuTemplate;
+            }}
             onClick={() => {
               // It's essential to discard clicks when editing the name,
               // to avoid weird opening of an editor (accompanied with a

@@ -185,6 +185,7 @@ import {
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { emptyPreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
+import TextField from '../UI/TextField';
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -204,9 +205,9 @@ const buildFakeMenuTemplate = () => [
   },
 ];
 
-storiesOf('Welcome', module).add('to Storybook', () => (
-  <Welcome showApp={linkTo('Button')} />
-));
+storiesOf('Welcome', module)
+  .addDecorator(muiDecorator)
+  .add('to Storybook', () => <Welcome />);
 
 storiesOf('UI Building Blocks/Buttons', module)
   .addDecorator(muiDecorator)
@@ -359,101 +360,153 @@ storiesOf('UI Building Blocks/SelectField', module)
     />
   ));
 
+storiesOf('UI Building Blocks/TextField', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => {
+    const [value, setValue] = React.useState('Hello World');
+
+    return (
+      <React.Fragment>
+        <TextField value={value} onChange={(_, text) => setValue(text)} />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  });
+
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ValueStateHolder
-      initialValue={'Hello World'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField value={value} onChange={onChange} />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('default (commitOnBlur)', () => (
-    <ValueStateHolder
-      initialValue={'Hello World'}
-      render={(value, onChange) => (
-        <React.Fragment>
+  .add('default', () => {
+    const [value, setValue] = React.useState('Hello World');
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField value={value} onChange={setValue} />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('default (commitOnBlur)', () => {
+    const [value, setValue] = React.useState('Hello World');
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          value={value}
+          onChange={setValue}
+          commitOnBlur
+        />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('example that is storing a float in the state', () => {
+    const [value, setValue] = React.useState(12.35);
+    const field = React.useRef(null);
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          value={value.toString()}
+          onChange={newValue => setValue(parseFloat(newValue))}
+        />
+        <p>
+          State value is {value} ({typeof value})
+        </p>
+      </React.Fragment>
+    );
+  })
+  .add('example that is storing a float in the state (commitOnBlur)', () => {
+    const [value, setValue] = React.useState(12.35);
+    const field = React.useRef(null);
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          value={value.toString()}
+          onChange={newValue => setValue(parseFloat(newValue))}
+          commitOnBlur
+        />
+        <p>
+          State value is {value} ({typeof value})
+        </p>
+      </React.Fragment>
+    );
+  })
+  .add('reduced margin, in a MiniToolbar', () => {
+    const [value, setValue] = React.useState('Some value');
+    const field = React.useRef(null);
+
+    return (
+      <React.Fragment>
+        <MiniToolbar>
+          <MiniToolbarText>Please enter something:</MiniToolbarText>
           <SemiControlledTextField
+            margin="none"
             value={value}
-            onChange={onChange}
+            onChange={setValue}
             commitOnBlur
           />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('example that is storing a float in the state', () => (
-    <ValueStateHolder
-      initialValue={12.35}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField
-            value={value.toString()}
-            onChange={newValue => onChange(parseFloat(newValue))}
-          />
-          <p>
-            State value is {value} ({typeof value})
-          </p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('example that is storing a float in the state (commitOnBlur)', () => (
-    <ValueStateHolder
-      initialValue={12.35}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField
-            value={value.toString()}
-            onChange={newValue => onChange(parseFloat(newValue))}
-            commitOnBlur
-          />
-          <p>
-            State value is {value} ({typeof value})
-          </p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('reduced margin, in a MiniToolbar', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <MiniToolbar>
-            <MiniToolbarText>Please enter something:</MiniToolbarText>
-            <SemiControlledTextField
-              margin="none"
-              value={value}
-              onChange={onChange}
-              commitOnBlur
-            />
-          </MiniToolbar>
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('with a (markdown) helper text', () => (
-    <ValueStateHolder
-      initialValue={'Hello World'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField
-            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-            value={value}
-            onChange={onChange}
-          />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ));
+        </MiniToolbar>
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('with a (markdown) helper text', () => {
+    const [value, setValue] = React.useState('Hello World!');
+    const field = React.useRef(null);
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+          value={value}
+          onChange={setValue}
+        />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('forceSetValue and forceSetSelection', () => {
+    const [value, setValue] = React.useState('Hello World!');
+    const field = React.useRef(null);
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          ref={field}
+          value={value}
+          onChange={setValue}
+        />
+        <p>State value is {value}</p>
+        <p>
+          Clicking on these buttons will focus the field, then do the action
+          after 1 second.
+        </p>
+        <RaisedButton
+          onClick={() => {
+            field.current && field.current.focus();
+            setTimeout(
+              () =>
+                field.current &&
+                field.current.forceSetValue('Forced Hello World'),
+              1000
+            );
+          }}
+          label="Force change the value"
+        />
+        <RaisedButton
+          onClick={() => {
+            field.current && field.current.focus();
+            setTimeout(
+              () => field.current && field.current.forceSetSelection(2, 4),
+              1000
+            );
+          }}
+          label="Change the selection"
+        />
+      </React.Fragment>
+    );
+  });
 
 storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
   <DragAndDropContextProvider>
@@ -961,6 +1014,41 @@ storiesOf('UI Building Blocks/EmptyMessage', module)
     </EmptyMessage>
   ));
 
+storiesOf('UI Building Blocks/Text', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Column>
+      <Text size="title">Title text</Text>
+      <Text size="body">
+        Usual body text. For most usages. Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+        et dolore magna aliqua.
+      </Text>
+      <Text size="body2">
+        Smaller text. For rare use cases. Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+        et dolore magna aliqua.
+      </Text>
+    </Column>
+  ))
+  .add('on a Background', () => (
+    <Background>
+      <Column>
+        <Text size="title">Title text</Text>
+        <Text size="body">
+          Usual body text. For most usages. Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua.
+        </Text>
+        <Text size="body2">
+          Smaller text. For rare use cases. Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua.
+        </Text>
+      </Column>
+    </Background>
+  ));
+
 storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -1003,6 +1091,9 @@ storiesOf('UI Building Blocks/AlertMessage', module)
     <AlertMessage kind="warning">
       Hello World, this is an alert text
     </AlertMessage>
+  ))
+  .add('error', () => (
+    <AlertMessage kind="error">Hello World, this is an alert text</AlertMessage>
   ));
 
 storiesOf('UI Building Blocks/ColorField', module)

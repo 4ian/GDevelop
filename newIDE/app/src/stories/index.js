@@ -8,7 +8,6 @@ import GDevelopJsInitializerDecorator, {
 
 import { storiesOf, addDecorator } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import { linkTo } from '@storybook/addon-links';
 
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
@@ -401,7 +400,6 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   })
   .add('example that is storing a float in the state', () => {
     const [value, setValue] = React.useState(12.35);
-    const field = React.useRef(null);
 
     return (
       <React.Fragment>
@@ -417,7 +415,6 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   })
   .add('example that is storing a float in the state (commitOnBlur)', () => {
     const [value, setValue] = React.useState(12.35);
-    const field = React.useRef(null);
 
     return (
       <React.Fragment>
@@ -434,7 +431,6 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   })
   .add('reduced margin, in a MiniToolbar', () => {
     const [value, setValue] = React.useState('Some value');
-    const field = React.useRef(null);
 
     return (
       <React.Fragment>
@@ -453,7 +449,6 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   })
   .add('with a (markdown) helper text', () => {
     const [value, setValue] = React.useState('Hello World!');
-    const field = React.useRef(null);
 
     return (
       <React.Fragment>

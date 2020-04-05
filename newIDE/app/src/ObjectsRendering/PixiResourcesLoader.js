@@ -140,7 +140,8 @@ export default class PixiResourcesLoader {
       true /* Treats request as cross-origin */,
       false /* autoplay */
     );
-
+    
+    loadedTextures[resourceName].baseTexture.source.preload = "auto";
     return loadedTextures[resourceName];
   }
 

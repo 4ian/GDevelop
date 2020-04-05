@@ -140,7 +140,10 @@ export default class PixiResourcesLoader {
       true /* Treats request as cross-origin */,
       false /* autoplay */
     );
-
+    
+    // Fix compatibility with Chrome 76+. Only useful for Pixi v4, fixed and can be removed with Pixi v5.
+    // See https://github.com/pixijs/pixi.js/issues/5996
+    loadedTextures[resourceName].baseTexture.source.preload = "auto";
     return loadedTextures[resourceName];
   }
 

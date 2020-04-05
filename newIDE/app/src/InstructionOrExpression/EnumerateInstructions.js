@@ -33,6 +33,7 @@ const freeConditionsToAddToObject: ExtensionsExtraInstructions = {
       'Distance',
       'SeDirige',
       'EstTourne',
+      'SourisSurObjet',
     ],
   },
 };

@@ -147,9 +147,15 @@ export default class PixiResourcesLoader {
     return loadedTextures[resourceName];
   }
 
-  static createTileSetResource(tiledData: any, tex: any) {
+  static createTileSetResource(
+    tiledData: any,
+    tex: any,
+    requestedTileSetId: string,
+    onLoad: any => void
+  ) {
     // Todo implement tileset index and use it instead of 0
     const { tilewidth, tilecount, tileheight, tiles } = tiledData.tilesets[0];
+    console.log('NEW TILESET data::', tilewidth, tilecount, tileheight, tiles);
     const textureCache = new Array(tilecount).fill(0).map((_, frame) => {
       const cols = Math.floor(tex.width / tilewidth);
       const x = ((frame - 1) % cols) * tilewidth;
@@ -161,7 +167,7 @@ export default class PixiResourcesLoader {
 
       return texture;
     });
-    return {
+    const newTileset = {
       width: tex.width,
       height: tex.height,
       tilewidth,
@@ -172,6 +178,8 @@ export default class PixiResourcesLoader {
       tiles,
       tilecount,
     };
+    onLoad(newTileset);
+    loadedTileSets[requestedTileSetId] = newTileset;
   }
 
   // If a Tileset changes (json or image), a tilemap using it needs to re-render
@@ -194,13 +202,15 @@ export default class PixiResourcesLoader {
       onLoad(loadedTileSets[requestedTileSetId]);
       return;
     }
-
     // Otherwise proceed to creating it as an object that can easily be consumed by a tilemap
     ResourcesLoader.getResourceJsonData(project, jsonResourceName).then(
       tiledData => {
-        const newTileset = this.createTileSetResource(tiledData, texture);
-        loadedTileSets[requestedTileSetId] = newTileset;
-        onLoad(newTileset);
+        this.createTileSetResource(
+          tiledData,
+          texture,
+          requestedTileSetId,
+          onLoad
+        );
       }
     );
   }

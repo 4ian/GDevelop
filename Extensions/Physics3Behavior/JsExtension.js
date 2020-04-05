@@ -21,8 +21,8 @@ module.exports = {
         'MIT'
       );
   
-      var physics2Behavior = new gd.BehaviorJsImplementation();
-      physics2Behavior.updateProperty = function(
+      var physics3Behavior = new gd.BehaviorJsImplementation();
+      physics3Behavior.updateProperty = function(
         behaviorContent,
         propertyName,
         newValue
@@ -123,7 +123,7 @@ module.exports = {
           return true;
         }
       };
-      physics2Behavior.getProperties = function(behaviorContent) {
+      physics3Behavior.getProperties = function(behaviorContent) {
         var behaviorProperties = new gd.MapStringPropertyDescriptor();
   
         behaviorProperties.set(
@@ -290,7 +290,7 @@ module.exports = {
         return behaviorProperties;
       };
   
-      physics2Behavior.initializeContent = function(behaviorContent) {
+      physics3Behavior.initializeContent = function(behaviorContent) {
         behaviorContent.addChild('bodyType').setStringValue('Dynamic');
         behaviorContent.addChild('bullet').setBoolValue(false);
         behaviorContent.addChild('fixedRotation').setBoolValue(false);
@@ -386,15 +386,15 @@ module.exports = {
         // extension
         .addBehavior(
           'Physics3Behavior',
-          _('Physics Engine 2.0'),
-          'Physics2',
+          _('Physics Engine 3.0'),
+          'Physics3',
           _(
             'Simulate realistic object physics, with gravity, forces, joints, etc.'
           ),
           '',
           'res/physics32.png',
           'Physics3Behavior',
-          physics2Behavior,
+          physics3Behavior,
           sharedData
         )
         .setIncludeFile('Extensions/Physics3Behavior/physics3runtimebehavior.js')

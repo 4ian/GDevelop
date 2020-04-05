@@ -20,6 +20,9 @@ SpriteExtension::SpriteExtension() {
   spriteActions["CreateMaskFromColorOnActualImage"]
       .SetFunctionName("makeColorTransparent")
       .SetIncludeFile("spriteruntimeobject.js");
+  spriteActions["CopyImageOnImageOfSprite"]
+      .SetFunctionName("copyImageOnImageOfCurrentSprite")
+      .SetIncludeFile("spriteruntimeobject.js");
   spriteActions["ChangeBlendMode"]
       .SetFunctionName("setBlendMode")
       .SetIncludeFile("spriteruntimeobject.js");

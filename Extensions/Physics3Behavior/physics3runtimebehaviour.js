@@ -3078,7 +3078,7 @@ gdjs.Physics3SharedData = function(runtimeScene, sharedData) {
     );
   };
   
-  gdjs.Physics2RuntimeBehavior.prototype.getMotorJointAngularOffset = function(
+  gdjs.Physics3RuntimeBehavior.prototype.getMotorJointAngularOffset = function(
     jointId
   ) {
     // Get the joint

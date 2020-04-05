@@ -92,6 +92,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+import { type UnsavedChanges } from './UnsavedChangesContext';
 import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -160,6 +161,7 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
+  unsavedChanges?: UnsavedChanges,
 };
 
 class MainFrame extends React.Component<Props, State> {
@@ -553,7 +555,8 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getLayoutsCount()
     );
     newLayout.updateBehaviorsSharedData(currentProject);
-    this.forceUpdate();
+
+    this._onProjectItemModified();
   };
 
   addExternalLayout = () => {
@@ -567,7 +570,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalLayoutsCount()
     );
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   addExternalEvents = () => {
@@ -581,7 +584,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalEventsCount()
     );
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   addEventsFunctionsExtension = () => {
@@ -595,7 +598,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getEventsFunctionsExtensionsCount()
     );
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   deleteLayout = (layout: gdLayout) => {
@@ -617,7 +620,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeLayout(layout.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -644,7 +647,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeExternalLayout(externalLayout.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -671,7 +674,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeExternalEvents(externalEvents.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -700,7 +703,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
 
@@ -737,7 +740,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         layout.setName(newName);
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -774,7 +777,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         externalLayout.setName(newName);
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -811,7 +814,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         externalEvents.setName(newName);
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -874,8 +877,7 @@ class MainFrame extends React.Component<Props, State> {
         eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
           currentProject
         );
-
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -1003,6 +1005,7 @@ class MainFrame extends React.Component<Props, State> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1062,6 +1065,7 @@ class MainFrame extends React.Component<Props, State> {
               onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1108,6 +1112,7 @@ class MainFrame extends React.Component<Props, State> {
               previewButtonSettings={emptyPreviewButtonSettings}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={this.props.unsavedChanges}
             />
           ),
           key: 'external events ' + name,
@@ -1204,6 +1209,7 @@ class MainFrame extends React.Component<Props, State> {
                   this.state.currentProject
                 );
               }}
+              unsavedChanges={this.props.unsavedChanges}
             />
           ),
           key: 'events functions extension ' + name,
@@ -1351,6 +1357,12 @@ class MainFrame extends React.Component<Props, State> {
     }
   };
 
+  _onProjectItemModified = () => {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
+  };
+
   _onCreateEventsFunction = (
     extensionName: string,
     eventsFunction: gdEventsFunction
@@ -1444,6 +1456,8 @@ class MainFrame extends React.Component<Props, State> {
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
         if (wasSaved) {
+          if (this.props.unsavedChanges)
+            this.props.unsavedChanges.sealUnsavedChanges();
           this._showSnackMessage(i18n._(t`Project properly saved`));
         }
       },
@@ -1490,6 +1504,8 @@ class MainFrame extends React.Component<Props, State> {
       .then(
         ({ wasSaved, fileMetadata }) => {
           if (wasSaved) {
+            if (this.props.unsavedChanges)
+              this.props.unsavedChanges.sealUnsavedChanges();
             this._showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
@@ -1511,17 +1527,21 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   askToCloseProject = (): Promise<void> => {
-    if (!this.state.currentProject) return Promise.resolve();
-    const { i18n } = this.props;
+    if (
+      this.props.unsavedChanges &&
+      this.props.unsavedChanges.hasUnsavedChanges
+    ) {
+      if (!this.state.currentProject) return Promise.resolve();
+      const { i18n } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      i18n._(
-        t`Close the project? Any changes that have not been saved will be lost.`
-      )
-    );
-    if (!answer) return Promise.resolve();
-
+      //eslint-disable-next-line
+      const answer = confirm(
+        i18n._(
+          t`Close the project? Any changes that have not been saved will be lost.`
+        )
+      );
+      if (!answer) return Promise.resolve();
+    }
     return this.closeProject();
   };
 
@@ -1837,6 +1857,7 @@ class MainFrame extends React.Component<Props, State> {
                 );
               }}
               freezeUpdate={!projectManagerOpen}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
           {!currentProject && (
@@ -1936,7 +1957,11 @@ class MainFrame extends React.Component<Props, State> {
             <PlatformSpecificAssetsDialog
               project={this.state.currentProject}
               open
-              onApply={() => this.openPlatformSpecificAssets(false)}
+              onApply={() => {
+                if (this.props.unsavedChanges)
+                  this.props.unsavedChanges.triggerUnsavedChanges();
+                this.openPlatformSpecificAssets(false);
+              }}
               onClose={() => this.openPlatformSpecificAssets(false)}
               resourceSources={resourceSources}
               onChooseResource={this._onChooseResource}

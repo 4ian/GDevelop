@@ -1,6 +1,6 @@
-const electron = require("electron");
+const electron = require('electron');
 const { app, Menu, ipcMain } = electron;
-const package = require("./package.json");
+const package = require('./package.json');
 
 /**
  * Create the editor main menu. Menu items that requires interaction
@@ -32,14 +32,14 @@ const buildMainMenuFor = (window, mainMenuTemplate) => {
           : undefined,
         submenu: menuItemTemplate.submenu
           ? adaptMenuTemplate(menuItemTemplate.submenu)
-          : undefined
+          : undefined,
       };
     });
 
   return Menu.buildFromTemplate(
     mainMenuTemplate.map(rootMenuTemplate => ({
       ...rootMenuTemplate,
-      submenu: adaptMenuTemplate(rootMenuTemplate.submenu)
+      submenu: adaptMenuTemplate(rootMenuTemplate.submenu),
     }))
   );
 };
@@ -50,33 +50,33 @@ const buildMainMenuFor = (window, mainMenuTemplate) => {
  */
 const buildPlaceholderMainMenu = () => {
   const placeholderMenuItem = {
-    label: "GDevelop is loading...",
-    enabled: false
+    label: 'GDevelop is loading...',
+    enabled: false,
   };
 
   const fileTemplate = {
-    label: "File",
-    submenu: [placeholderMenuItem]
+    label: 'File',
+    submenu: [placeholderMenuItem],
   };
 
   const editTemplate = {
-    label: "Edit",
-    submenu: [placeholderMenuItem]
+    label: 'Edit',
+    submenu: [placeholderMenuItem],
   };
 
   const viewTemplate = {
-    label: "View",
-    submenu: [placeholderMenuItem]
+    label: 'View',
+    submenu: [placeholderMenuItem],
   };
 
   const windowTemplate = {
-    role: "window",
-    submenu: [{ role: "minimize" }]
+    role: 'window',
+    submenu: [{ role: 'minimize' }],
   };
 
   const helpTemplate = {
-    role: "help",
-    submenu: [placeholderMenuItem]
+    role: 'help',
+    submenu: [placeholderMenuItem],
   };
 
   const template = [
@@ -84,20 +84,20 @@ const buildPlaceholderMainMenu = () => {
     editTemplate,
     viewTemplate,
     windowTemplate,
-    helpTemplate
+    helpTemplate,
   ];
 
-  if (process.platform === "darwin") {
+  if (process.platform === 'darwin') {
     template.unshift({
-      label: "GDevelop 5",
-      submenu: [placeholderMenuItem]
+      label: 'GDevelop 5',
+      submenu: [placeholderMenuItem],
     });
 
     windowTemplate.submenu = [
-      { role: "minimize" },
-      { role: "zoom" },
-      { type: "separator" },
-      { role: "front" }
+      { role: 'minimize' },
+      { role: 'zoom' },
+      { type: 'separator' },
+      { role: 'front' },
     ];
   }
 

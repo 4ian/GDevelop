@@ -60,8 +60,8 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         secondaryActions={<HelpButton helpPagePath={this.props.helpPagePath} />}
         actions={actions}
         noMargin
-        modal
         onRequestClose={this.props.onCancel}
+        cannotBeDismissed={true}
         open={this.props.open}
         noTitleMargin
         title={

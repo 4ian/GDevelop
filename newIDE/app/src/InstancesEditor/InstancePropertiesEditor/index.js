@@ -13,6 +13,7 @@ import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Text from '../../UI/Text';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 
 type Props = {|
   project: gdProject,
@@ -21,6 +22,7 @@ type Props = {|
   onEditObjectByName: string => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
@@ -148,6 +150,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       >
         <Column>
           <PropertiesEditor
+            unsavedChanges={this.props.unsavedChanges}
             schema={this.schema.concat(instanceSchema)}
             instances={instances}
           />

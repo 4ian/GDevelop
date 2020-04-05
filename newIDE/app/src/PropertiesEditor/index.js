@@ -27,6 +27,9 @@ import {
 } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import { Column } from '../UI/Grid';
+import UnsavedChangesContext, {
+  type UnsavedChanges,
+} from '../MainFrame/UnsavedChangesContext';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -112,6 +115,7 @@ type MandatoryProps = {|
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
   renderExtraDescriptionText?: (extraDescription: string) => string,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 type Props =
@@ -190,6 +194,8 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     // This properties editor is dealing with fields that are
     // responsible to update their state (see field.setValue).
 
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     if (this.props.onInstancesModified)
       this.props.onInstancesModified(instances);
     else this.forceUpdate();
@@ -486,12 +492,16 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         if (field.children) {
           if (field.type === 'row') {
             return (
-              <PropertiesEditor
-                key={field.name}
-                schema={field.children}
-                instances={this.props.instances}
-                mode="row"
-              />
+              <UnsavedChangesContext.Consumer key={field.name}>
+                {unsavedChanges => (
+                  <PropertiesEditor
+                    schema={field.children}
+                    instances={this.props.instances}
+                    mode="row"
+                    unsavedChanges={unsavedChanges}
+                  />
+                )}
+              </UnsavedChangesContext.Consumer>
             );
           }
 

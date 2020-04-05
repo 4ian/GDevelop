@@ -90,6 +90,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           initiallyFocusedBehaviorName={this.props.initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
           ref={editor => (this.editor = editor)}
+          unsavedChanges={this.props.unsavedChanges}
           previewButtonSettings={emptyPreviewButtonSettings}
         />
       </div>

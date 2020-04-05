@@ -8,7 +8,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   container: {

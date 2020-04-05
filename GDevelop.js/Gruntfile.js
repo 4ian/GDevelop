@@ -5,6 +5,7 @@ module.exports = function(grunt) {
   const path = require('path');
   const isWin = /^win/.test(process.platform);
   const isDev = grunt.option('dev') || false;
+  const useMinGW = grunt.option('use-MinGW') || false;
 
   const buildOutputPath = '../Binaries/embuild/GDevelop.js/';
   const buildPath = '../Binaries/embuild';
@@ -16,8 +17,29 @@ module.exports = function(grunt) {
 
   // Use more specific paths on Windows
   if (isWin) {
-    ninjaBinary = path.join(__dirname, 'ninja', 'ninja.exe');
-    makeBinary = `emmake "${ninjaBinary}"`;
+    let makeProgram = '';
+    if (useMinGW) {
+      // Use make from MinGW
+      if (!fs.existsSync('C:\\MinGW\\bin\\mingw32-make.exe')) {
+        console.error(
+          "🔴 Can't find mingw32-make in C:\\MinGW. Make sure MinGW is installed."
+        );
+        return;
+      }
+      const mingwBinary = 'C:\\MinGW\\bin\\mingw32-make';
+      cmakeGeneratorArgs = ['-G "MinGW Makefiles"'];
+      makeProgram = mingwBinary;
+    } else {
+      // Use Ninja (by default)
+      const ninjaBinary = path.join(__dirname, 'ninja', 'ninja.exe');
+      cmakeGeneratorArgs = [
+        '-G "Ninja"',
+        `-DCMAKE_MAKE_PROGRAM="${ninjaBinary}"`,
+      ];
+      makeProgram = ninjaBinary;
+    }
+
+    makeBinary = `emmake "${makeProgram}"`;
     makeArgs = [];
 
     // Find CMake in usual folders or fallback to PATH.
@@ -32,8 +54,6 @@ module.exports = function(grunt) {
         "⚠️ Can't find CMake in its usual Program Files folder. Make sure you have cmake in your PATH instead."
       );
     }
-
-    cmakeGeneratorArgs = ['-G "Ninja"', `-DCMAKE_MAKE_PROGRAM="${ninjaBinary}"`];
   }
 
   grunt.initConfig({

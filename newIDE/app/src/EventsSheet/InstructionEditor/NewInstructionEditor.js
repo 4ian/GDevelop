@@ -13,7 +13,7 @@ import {
   type EnumeratedInstructionOrExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 const gd = global.gd;
 
 /** Helper to get the gdInstructionMetadata of an instruction. */

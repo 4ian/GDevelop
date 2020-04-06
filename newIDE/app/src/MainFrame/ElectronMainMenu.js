@@ -1,32 +1,11 @@
 // @flow
 import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
-import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
-import { type UpdateStatus } from './UpdaterTools';
+import { type MainMenuProps } from './MainMenu.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-
-type Props = {|
-  i18n: I18nType,
-  project: ?gdProject,
-  onChooseProject: () => void,
-  onSaveProject: () => void,
-  onSaveProjectAs: () => void,
-  onCloseProject: () => Promise<void>,
-  onCloseApp: () => void,
-  onExportProject: (open?: boolean) => void,
-  onCreateProject: (open?: boolean) => void,
-  onOpenProjectManager: (open?: boolean) => void,
-  onOpenStartPage: () => void,
-  onOpenDebugger: () => void,
-  onOpenAbout: (open?: boolean) => void,
-  onOpenPreferences: (open?: boolean) => void,
-  onOpenLanguage: (open?: boolean) => void,
-  onOpenProfile: (open?: boolean) => void,
-  setUpdateStatus: UpdateStatus => void,
-|};
 
 type MainMenuEvent =
   | 'main-menu-open'
@@ -82,7 +61,7 @@ type RootMenuTemplate =
  * Forward events received from Electron main process
  * to the underlying child React component.
  */
-class ElectronMainMenu extends React.Component<Props, {||}> {
+class ElectronMainMenu extends React.Component<MainMenuProps, {||}> {
   _language: ?string;
 
   componentDidMount() {
@@ -137,14 +116,14 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
     this._buildAndSendMenuTemplate();
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: MainMenuProps) {
     if (this.props.i18n.language !== this._language) {
       this._buildAndSendMenuTemplate();
       this._language = this.props.i18n.language;
     }
 
     // Update menu if a project has just been opened or closed
-    if (!!prevProps.project !== !!this.props.project) {
+    if (prevProps.project !== this.props.project) {
       this._buildAndSendMenuTemplate();
     }
   }

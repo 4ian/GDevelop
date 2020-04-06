@@ -59,7 +59,7 @@ export const create = (authentification: Authentification) => {
               {unsavedChanges => (
                 <MainFrame
                   i18n={i18n}
-                  mainMenu={ElectronMainMenu}
+                  renderMainMenu={props => <ElectronMainMenu {...props} />}
                   eventsFunctionsExtensionsState={
                     eventsFunctionsExtensionsState
                   }

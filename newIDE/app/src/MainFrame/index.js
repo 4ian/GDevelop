@@ -93,6 +93,7 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import { type UnsavedChanges } from './UnsavedChangesContext';
+import { type MainMenuProps } from './MainMenu.flow';
 import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -142,7 +143,7 @@ type State = {|
 type Props = {
   integratedEditor?: boolean,
   introDialog?: React.Element<*>,
-  mainMenu?: Class<React$Component<*, *>>,
+  renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -1790,7 +1791,7 @@ class MainFrame extends React.Component<Props, State> {
       useStorageProvider,
       i18n,
       renderGDJSDevelopmentWatcher,
-      mainMenu: MainMenu,
+      renderMainMenu: MainMenu,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||

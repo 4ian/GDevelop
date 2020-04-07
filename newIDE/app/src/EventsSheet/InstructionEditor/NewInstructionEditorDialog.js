@@ -17,7 +17,7 @@ import { Column } from '../../UI/Grid';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
 import Background from '../../UI/Background';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import {
   ResponsiveWidthMeasurer,
@@ -283,6 +283,7 @@ export default function NewInstructionEditorDialog({
           ]}
           open={open}
           onRequestClose={onCancel}
+          cannotBeDismissed={true}
           maxWidth={false}
           noMargin
           flexRowBody

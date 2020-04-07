@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import React, { Component } from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
@@ -60,6 +60,7 @@ export default class ExpressionParametersEditorDialog extends Component<
     return (
       <Dialog
         title={<Trans>Enter the expression parameters</Trans>}
+        cannotBeDismissed={true}
         open
         actions={
           <FlatButton
@@ -69,7 +70,6 @@ export default class ExpressionParametersEditorDialog extends Component<
             onClick={() => this.props.onDone(this.state.parameterValues)}
           />
         }
-        modal
         noMargin
         onRequestClose={this.props.onRequestClose}
       >

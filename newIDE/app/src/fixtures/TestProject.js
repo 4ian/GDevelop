@@ -194,22 +194,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   var evt = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-  var evt2 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1);
-  var evt3 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::ForEach', 2);
-  var evt4 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::While', 3);
-  var evt5 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Repeat', 4);
   var evt6 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Group', 5);
-  var evt7 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 6);
   var evt8 = testLayout

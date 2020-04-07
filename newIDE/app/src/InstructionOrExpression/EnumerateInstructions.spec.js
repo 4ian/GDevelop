@@ -1,13 +1,13 @@
 // @flow
 import { createTree } from './CreateTree';
 import {
-  enumerateInstructions,
+  enumerateAllInstructions,
   getObjectParameterIndex,
 } from './EnumerateInstructions';
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
-    const instructions = enumerateInstructions(true);
+    const instructions = enumerateAllInstructions(true);
 
     // Test for the proper presence of a few conditions
     expect(instructions).toEqual(
@@ -24,7 +24,7 @@ describe('EnumerateInstructions', () => {
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',
-          fullGroupName: 'Mouse and touch',
+          fullGroupName: 'Common conditions for all objects/Mouse and touch',
           type: 'SourisSurObjet',
         }),
       ])
@@ -32,7 +32,7 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can enumerate instructions being actions', () => {
-    const instructions = enumerateInstructions(false);
+    const instructions = enumerateAllInstructions(false);
 
     // Test for the proper presence of a few actions
     expect(instructions).toEqual(
@@ -52,7 +52,7 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can create the tree of instructions', () => {
-    const instructions = enumerateInstructions(true);
+    const instructions = enumerateAllInstructions(true);
     expect(createTree(instructions)).toMatchObject({
       Advanced: {
         'Trigger once while true': {
@@ -72,8 +72,8 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can find the object parameter, if any', () => {
-    const actions = enumerateInstructions(false);
-    const conditions = enumerateInstructions(true);
+    const actions = enumerateAllInstructions(false);
+    const conditions = enumerateAllInstructions(true);
 
     const createInstruction = actions.filter(
       ({ type }) => type === 'Create'

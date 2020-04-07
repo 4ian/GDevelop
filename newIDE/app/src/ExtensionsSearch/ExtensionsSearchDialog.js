@@ -102,6 +102,7 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                       />
                     ) : null,
                   ]}
+                  cannotBeDismissed={true}
                   open
                   noMargin
                   onRequestClose={onClose}

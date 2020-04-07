@@ -61,6 +61,9 @@ jobs:
       - run:
           name: Build GDevelop IDE
           command: cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never
+          # Allow Node.js to use more memory
+          environment:
+            NODE_OPTIONS: --max_old_space_size=4096
 
       - run:
           name: Clean dist folder to keep only installers/binaries.

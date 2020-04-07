@@ -2,7 +2,7 @@ import gesture from 'pixi-simple-gesture';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import getObjectByName from '../../Utils/GetObjectByName';
 
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 const gd = global.gd;
 

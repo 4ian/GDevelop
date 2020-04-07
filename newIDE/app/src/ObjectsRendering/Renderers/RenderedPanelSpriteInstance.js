@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 const gd = global.gd;
 
 /**
@@ -80,7 +80,7 @@ RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   );
 
   this._tiled = panelSprite.isTiled();
-  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.extras.TilingSprite;
+  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.TilingSprite;
 
   if (!this._pixiObject) {
     this._pixiObject = new PIXI.Container();

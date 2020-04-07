@@ -13,7 +13,7 @@ import Grid from './Grid';
 import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
 import BackgroundColor from './BackgroundColor';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
@@ -59,18 +59,16 @@ export default class InstancesEditorContainer extends Component {
     // if the project changes).
     const { project } = this.props;
 
-    //This prevents flickering on some mobile devices
-    PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
-
     //Create the renderer and setup the rendering area for scene editor.
     //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
     this.pixiRenderer = PIXI.autoDetectRenderer(
-      this.props.width,
-      this.props.height,
       {
+        width: this.props.width,
+        height: this.props.height,
         preserveDrawingBuffer: true,
         antialias: false,
-      } // Disable anti-aliasing to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
+      }
+      // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
     );
     this.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', e => {

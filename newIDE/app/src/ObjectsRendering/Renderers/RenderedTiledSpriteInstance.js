@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 const gd = global.gd;
 
 /**
@@ -30,7 +30,7 @@ function RenderedTiledSpriteInstance(
   //Setup the PIXI object:
   var tiledSprite = gd.asTiledSpriteObject(associatedObject);
   this._texture = tiledSprite.getTexture();
-  this._pixiObject = new PIXI.extras.TilingSprite(
+  this._pixiObject = new PIXI.TilingSprite(
     this._pixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
     tiledSprite.getWidth(),
     tiledSprite.getHeight()

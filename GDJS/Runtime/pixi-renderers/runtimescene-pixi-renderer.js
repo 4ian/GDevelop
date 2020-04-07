@@ -58,7 +58,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(instances, la
   debugDraw.clear();
   debugDraw.beginFill(0x6868e8);
   debugDraw.lineStyle(1, 0x6868e8, 1);
-  debugDraw.fillAlpha = 0.1;
+  debugDraw.fill.alpha = 0.1;
   debugDraw.alpha = 0.8;
 
   for(var i = 0;i < instances.length;i++) {

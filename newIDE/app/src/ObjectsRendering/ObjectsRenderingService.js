@@ -11,7 +11,7 @@ import RenderedSkeletonInstance from './Renderers/RenderedSkeletonInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import optionalRequire from '../Utils/OptionalRequire';
 const path = optionalRequire('path');
 const gd = global.gd;

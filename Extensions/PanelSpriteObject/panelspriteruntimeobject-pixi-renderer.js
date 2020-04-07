@@ -12,7 +12,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(
       .getImageManager()
       .getPIXITexture(textureName);
 
-    var StretchedSprite = !tiled ? PIXI.Sprite : PIXI.extras.TilingSprite;
+    var StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
 
     this._spritesContainer = new PIXI.Container();
     this._centerSprite = new StretchedSprite(new PIXI.Texture(texture));

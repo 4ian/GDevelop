@@ -1,13 +1,13 @@
 // @flow
 import slugs from 'slugs';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 const gd = global.gd;
 
 const loadedFontFamilies = {};
 const loadedTextures = {};
-const invalidTexture = PIXI.Texture.fromImage('res/error48.png');
+const invalidTexture = PIXI.Texture.from('res/error48.png');
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
@@ -35,7 +35,7 @@ export default class PixiResourcesLoader {
     onComplete: () => void
   ) {
     const resourcesManager = project.getResourcesManager();
-    const loader = PIXI.loader;
+    const loader = PIXI.Loader.shared;
     loader.reset();
     loader.removeAllListeners();
 
@@ -100,9 +100,8 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     if (resource.getKind() !== 'image') return invalidTexture;
 
-    loadedTextures[resourceName] = PIXI.Texture.fromImage(
+    loadedTextures[resourceName] = PIXI.Texture.from(
       ResourcesLoader.getResourceFullUrl(project, resourceName),
-      true /* Treats request as cross-origin */
     );
 
     PixiResourcesLoader._initializeTexture(
@@ -130,15 +129,16 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     if (resource.getKind() !== 'video') return invalidTexture;
 
-    loadedTextures[resourceName] = PIXI.Texture.fromVideo(
+    loadedTextures[resourceName] = PIXI.Texture.from(
       ResourcesLoader.getResourceFullUrl(
         project,
         resourceName,
         true /* Disable cache bursting for video because it prevent the video to be recognized as such? */
       ),
-      PIXI.SCALE_MODES.LINEAR,
-      true /* Treats request as cross-origin */,
-      false /* autoplay */
+      {
+        scaleMode: PIXI.SCALE_MODES.LINEAR,
+        resourceOptions: { autoPlay: false }
+      }
     );
 
     return loadedTextures[resourceName];

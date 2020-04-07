@@ -45,7 +45,7 @@ gdjs.PixiImageManager.prototype.getPIXITexture = function(resourceName) {
 			var res = this._resources[i];
 
 			if (res.name === resourceName && res.kind === "image") {
-				texture = PIXI.Texture.fromImage(res.file);
+				texture = PIXI.Texture.from(res.file);
 				break;
 			}
 		}
@@ -82,7 +82,7 @@ gdjs.PixiImageManager.prototype.getPIXIVideoTexture = function(resourceName) {
 			var res = this._resources[i];
 
 			if (res.name === resourceName && res.kind === "video") {
-				texture = PIXI.Texture.fromVideo(res.file);
+				texture = PIXI.Texture.from(res.file);
 				break;
 			}
 		}
@@ -139,7 +139,7 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
     	return onComplete(totalCount); //Nothing to load.
 
     var loadingCount = 0;
-    var loader = PIXI.loader;
+    var loader = PIXI.Loader.shared;
 	var that = this;
     loader.once('complete', function(loader, loadedFiles) {
     	//Store the loaded textures so that they are ready to use.

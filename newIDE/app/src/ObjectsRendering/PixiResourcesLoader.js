@@ -137,7 +137,9 @@ export default class PixiResourcesLoader {
       ),
       {
         scaleMode: PIXI.SCALE_MODES.LINEAR,
-        resourceOptions: { autoPlay: false }
+        resourceOptions: {
+          autoPlay: false,
+        },
       }
     );
 

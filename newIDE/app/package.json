@@ -17,6 +17,7 @@
     "folder-hash": "^3.0.0",
     "follow-redirects": "^1.2.3",
     "iso-639-1": "^2.0.3",
+    "minimist": "1.2.5",
     "prettier": "1.15.3",
     "react-scripts": "3.4.0",
     "recursive-copy": "^2.0.10",
@@ -75,7 +76,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources && npm run make-version-metadata",
-    "import-resources": "npm run import-zipped-external-editors && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
+    "import-resources": "npm run import-zipped-external-editors && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js --clean && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",
     "start": "npm run import-resources && npm run make-version-metadata && react-scripts start",

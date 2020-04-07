@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import React, { Component } from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';

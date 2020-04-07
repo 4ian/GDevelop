@@ -22,23 +22,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
 
 #if defined(GD_IDE_ONLY)
   extension
-      .AddCondition("SourisSurObjet",
-                    _("The cursor/touch is on an object"),
-                    _("Test if the cursor is over an object, or if the object "
-                      "is being touched."),
-                    _("The cursor/touch is on _PARAM0_"),
-                    _("Mouse and touch"),
-                    "res/conditions/surObjet24.png",
-                    "res/conditions/surObjet.png")
-
-      .AddParameter("objectList", _("Object"))
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("yesorno", _("Accurate test (yes by default)"), "", true)
-      .SetDefaultValue("yes")
-      .AddCodeOnlyParameter("conditionInverted", "")
-      .MarkAsSimple();
-
-  extension
       .AddCondition(
           "IsMouseWheelScrollingUp",
           _("The mouse wheel is scrolling up"),

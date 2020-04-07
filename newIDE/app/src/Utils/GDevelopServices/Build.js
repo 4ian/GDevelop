@@ -47,12 +47,10 @@ export const getBuildArtifactUrl = (
   }
 
   if (keyName === 's3Key') {
-    return `https://s3-eu-west-1.amazonaws.com/gd-games/${
-      build[keyName]
-    }/index.html`;
+    return `https://games.gdevelop-app.com/${build[keyName]}/index.html`;
   }
 
-  return `https://s3-eu-west-1.amazonaws.com/gd-build/${build[keyName]}`;
+  return `https://builds.gdevelop-app.com/${build[keyName]}`;
 };
 
 type UploadOptions = {|

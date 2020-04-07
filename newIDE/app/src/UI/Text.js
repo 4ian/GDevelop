@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 
 type Props = {|
   children: ?React.Node,
-  size?: 'body' | 'title',
+  size?: 'body' | 'body2' | 'title',
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   noShrink?: boolean,
   style?: {|
@@ -27,7 +27,7 @@ type Props = {|
 // consistency of text in the whole app.
 export default ({ children, style, size, align, noShrink }: Props) => (
   <Typography
-    variant={size === 'title' ? 'h6' : 'body1'}
+    variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
     style={{
       ...style,
       flexShrink: noShrink ? 0 : undefined,

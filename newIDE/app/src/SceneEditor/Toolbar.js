@@ -4,6 +4,7 @@ import React, { PureComponent } from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
+import HelpButton from '../UI/HelpButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import InstancesSelection from './InstancesSelection';
 import PreviewButtons, {
@@ -44,6 +45,7 @@ export class Toolbar extends PureComponent<Props> {
   render() {
     return (
       <ToolbarGroup lastChild>
+        <HelpButton helpPagePath="/interface/scene-editor" />
         <PreviewButtons
           showPreviewButton={this.props.showPreviewButton}
           onPreview={this.props.onPreview}

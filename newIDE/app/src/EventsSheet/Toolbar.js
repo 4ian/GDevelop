@@ -4,6 +4,7 @@ import React, { PureComponent } from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
+import HelpButton from '../UI/HelpButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import { type EventMetadata } from './EnumerateEventsMetadata';
 import PreviewButtons, {
@@ -37,6 +38,7 @@ export class Toolbar extends PureComponent<Props> {
   render() {
     return (
       <ToolbarGroup lastChild>
+        <HelpButton helpPagePath="/interface/events-editor" />
         <PreviewButtons
           showPreviewButton={this.props.showPreviewButton}
           onPreview={this.props.onPreview}

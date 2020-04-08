@@ -34,7 +34,7 @@ module.exports = {
           'Adjust gamma, contrast, saturation, brightness, alpha or color-channel shift.'
         )
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-adjustment.js')
       .addIncludeFile('Extensions/Effects/adjustment-pixi-filter.js');
     const adjustmentProperties = adjustmentEffect.getProperties();
     adjustmentProperties.set(
@@ -90,7 +90,9 @@ module.exports = {
       .addEffect('AdvancedBloom')
       .setFullName(_('Advanced bloom'))
       .setDescription(_('Applies a bloom effect.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile(
+        'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
+      )
       .addIncludeFile('Extensions/Effects/advanced-bloom-pixi-filter.js');
     const advancedBloomProperties = advancedBloomEffect.getProperties();
     advancedBloomProperties.set(
@@ -128,7 +130,7 @@ module.exports = {
       .addEffect('Ascii')
       .setFullName(_('ASCII'))
       .setDescription(_('Render the image with ASCII characters only.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-ascii.js')
       .addIncludeFile('Extensions/Effects/ascii-pixi-filter.js');
     const asciiProperties = asciiEffect.getProperties();
     asciiProperties.set(
@@ -142,7 +144,7 @@ module.exports = {
       .addEffect('Bevel')
       .setFullName(_('Beveled edges'))
       .setDescription(_('Add beveled edges around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-bevel.js')
       .addIncludeFile('Extensions/Effects/bevel-pixi-filter.js');
     const bevelProperties = bevelEffect.getProperties();
     bevelProperties.set(
@@ -207,7 +209,6 @@ module.exports = {
       .setDescription(
         _('Alter the rendered image with the specified blend mode.')
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
       .addIncludeFile('Extensions/Effects/blending-mode-pixi-filter.js');
     const blendingModeProperties = blendingModeEffect.getProperties();
     blendingModeProperties.set(
@@ -275,7 +276,7 @@ module.exports = {
       .addEffect('BulgePinch')
       .setFullName(_('Bulge Pinch'))
       .setDescription(_('Bulges or pinches the image in a circle.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-bulge-pinch.js')
       .addIncludeFile('Extensions/Effects/bulge-pinch-pixi-filter.js');
     const bulgePinchProperties = bulgePinchEffect.getProperties();
     bulgePinchProperties.set(
@@ -308,7 +309,7 @@ module.exports = {
       .addEffect('ColorMap')
       .setFullName(_('Color Map'))
       .setDescription(_('Change the color rendered on screen.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/color-map-pixi-filter.js')
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-map.js');
     const colorMapProperties = colorMapEffect.getProperties();
     colorMapProperties.set(
@@ -341,7 +342,7 @@ module.exports = {
       .addEffect('ColorReplace')
       .setFullName(_('Color Replace'))
       .setDescription(_('Effect replacing a color (or similar) by another.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-color-replace.js')
       .addIncludeFile('Extensions/Effects/color-replace-pixi-filter.js');
     const colorReplaceProperties = colorReplaceEffect.getProperties();
     colorReplaceProperties.set(
@@ -374,7 +375,7 @@ module.exports = {
       .addEffect('CRT')
       .setFullName(_('CRT'))
       .setDescription(_('Apply an effect resembling old CRT monitors.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-crt.js')
       .addIncludeFile('Extensions/Effects/crt-pixi-filter.js');
     const crtProperties = crtEffect.getProperties();
     crtProperties.set(
@@ -493,7 +494,7 @@ module.exports = {
           'Applies a dotscreen effect making objects appear to be made out of black and white halftone dots like an old printer.'
         )
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-dot.js')
       .addIncludeFile('Extensions/Effects/dot-pixi-filter.js');
     const dotProperties = dotEffect.getProperties();
     dotProperties.set(
@@ -515,7 +516,7 @@ module.exports = {
       .addEffect('DropShadow')
       .setFullName(_('Drop shadow'))
       .setDescription(_('Add a shadow around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-drop-shadow.js')
       .addIncludeFile('Extensions/Effects/drop-shadow-pixi-filter.js');
     const dropShadowProperties = dropShadowEffect.getProperties();
     dropShadowProperties.set(
@@ -565,7 +566,7 @@ module.exports = {
       .addEffect('Glitch')
       .setFullName(_('Glitch'))
       .setDescription(_('Applies a glitch effect to an object.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-glitch.js')
       .addIncludeFile('Extensions/Effects/glitch-pixi-filter.js');
     const glitchProperties = glitchEffect.getProperties();
     glitchProperties.set(
@@ -669,7 +670,7 @@ module.exports = {
       .addEffect('Glow')
       .setFullName(_('Glow'))
       .setDescription(_('Add a glow effect around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-glow.js')
       .addIncludeFile('Extensions/Effects/glow-pixi-filter.js');
     const glowProperties = glowEffect.getProperties();
     glowProperties.set(
@@ -701,7 +702,7 @@ module.exports = {
       .addEffect('Godray')
       .setFullName(_('Godray'))
       .setDescription(_('Apply and animate atmospheric light rays.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-godray.js')
       .addIncludeFile('Extensions/Effects/godray-pixi-filter.js');
     const godrayProperties = godrayEffect.getProperties();
     godrayProperties.set(
@@ -764,7 +765,7 @@ module.exports = {
       .setDescription(
         _('A much faster blur than Gaussian blur, but more complicated to use.')
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
       .addIncludeFile('Extensions/Effects/kawase-blur-pixi-filter.js');
     const kawaseBlurProperties = kawaseBlurEffect.getProperties();
     kawaseBlurProperties.set(
@@ -841,7 +842,7 @@ module.exports = {
       .addEffect('OldFilm')
       .setFullName(_('Old Film'))
       .setDescription(_('Add a Old film effect around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-old-film.js')
       .addIncludeFile('Extensions/Effects/old-film-pixi-filter.js');
     const oldFilmProperties = oldFilmEffect.getProperties();
     oldFilmProperties.set(
@@ -921,7 +922,7 @@ module.exports = {
       .addEffect('Outline')
       .setFullName(_('Outline'))
       .setDescription(_('Draws an outline around the rendered image.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-outline.js')
       .addIncludeFile('Extensions/Effects/outline-pixi-filter.js');
     const outlineProperties = outlineEffect.getProperties();
     outlineProperties.set(
@@ -943,7 +944,7 @@ module.exports = {
       .setDescription(
         _("Applies a pixelate effect, making display objects appear 'blocky'.")
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-pixelate.js')
       .addIncludeFile('Extensions/Effects/pixelate-pixi-filter.js');
     const pixelateProperties = pixelateEffect.getProperties();
     pixelateProperties.set(
@@ -958,7 +959,7 @@ module.exports = {
       .addEffect('RadialBlur')
       .setFullName(_('Radial Blur'))
       .setDescription(_('Applies a Motion blur to an object.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-radial-blur.js')
       .addIncludeFile('Extensions/Effects/radial-blur-pixi-filter.js');
     const radialBlurProperties = radialBlurEffect.getProperties();
     radialBlurProperties.set(
@@ -1003,7 +1004,7 @@ module.exports = {
           'Applies a reflection effect to simulate the reflection on water with waves.'
         )
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-reflection.js')
       .addIncludeFile('Extensions/Effects/reflection-pixi-filter.js');
     const reflectionProperties = reflectionEffect.getProperties();
     reflectionProperties.set(
@@ -1083,7 +1084,7 @@ module.exports = {
       .setDescription(
         _('Applies a RGB split effect also known as chromatic aberration.')
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-rgb-split.js')
       .addIncludeFile('Extensions/Effects/rgb-split-pixi-filter.js');
     const rgbSplitProperties = rgbSplitEffect.getProperties();
     rgbSplitProperties.set(
@@ -1140,7 +1141,7 @@ module.exports = {
       .addEffect('TiltShift')
       .setFullName(_('Tilt shift'))
       .setDescription(_('Render a tilt-shift-like camera effect.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-tilt-shift.js')
       .addIncludeFile('Extensions/Effects/tilt-shift-pixi-filter.js');
     const tiltShiftProperties = tiltShiftEffect.getProperties();
     tiltShiftProperties.set(
@@ -1164,7 +1165,7 @@ module.exports = {
           'Applies a twist effect making objects appear twisted in the given direction.'
         )
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-twist.js')
       .addIncludeFile('Extensions/Effects/twist-pixi-filter.js');
     const twistProperties = twistEffect.getProperties();
     twistProperties.set(
@@ -1205,7 +1206,7 @@ module.exports = {
       .addEffect('ZoomBlur')
       .setFullName(_('Zoom blur'))
       .setDescription(_('Applies a Zoom blur.'))
-      .addIncludeFile('Extensions/Effects/pixi-filters/pixi-filters.js')
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-zoom-blur.js')
       .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js');
     const zoomBlurProperties = zoomBlurEffect.getProperties();
     zoomBlurProperties.set(

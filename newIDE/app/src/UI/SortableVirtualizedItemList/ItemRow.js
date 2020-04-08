@@ -4,6 +4,7 @@ import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
 import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import ThemeConsumer from '../Theme/ThemeConsumer';
+import { type MenuItemTemplate } from '../Menu/Menu.flow';
 
 const styles = {
   itemName: {
@@ -28,7 +29,7 @@ type Props<Item> = {
   selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
-  buildMenuTemplate: () => Array<any>,
+  buildMenuTemplate: () => Array<MenuItemTemplate>,
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
   connectIconDragSource?: ?(React.Element<any>) => ?React.Node,

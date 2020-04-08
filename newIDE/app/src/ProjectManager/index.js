@@ -42,6 +42,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -114,14 +115,6 @@ const ProjectStructureItem = (props: ProjectStructureItemProps) => (
   </ThemeConsumer>
 );
 
-type ItemOption = {|
-  label?: string,
-  visible?: boolean,
-  enabled?: boolean,
-  click?: () => void,
-  type?: string,
-|};
-
 type ItemProps = {|
   primaryText: string,
   editingName: boolean,
@@ -140,7 +133,7 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
-  buildExtraMenuTemplate?: () => Array<ItemOption>,
+  buildExtraMenuTemplate?: () => Array<MenuItemTemplate>,
   style?: ?Object,
 |};
 

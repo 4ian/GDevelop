@@ -69,23 +69,26 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
                         {
                           label: 'Request update from external editor',
                           disabled: !this.props.requestUpdate,
-                          click: () =>
+                          click: () => {
                             this.props.requestUpdate &&
-                            this.props.requestUpdate(),
+                              this.props.requestUpdate();
+                          },
                         },
                         {
                           label: 'Simulate update downloaded',
                           disabled: !this.props.simulateUpdateDownloaded,
-                          click: () =>
+                          click: () => {
                             this.props.simulateUpdateDownloaded &&
-                            this.props.simulateUpdateDownloaded(),
+                              this.props.simulateUpdateDownloaded();
+                          },
                         },
                         {
                           label: 'Simulate update available',
                           disabled: !this.props.simulateUpdateAvailable,
-                          click: () =>
+                          click: () => {
                             this.props.simulateUpdateAvailable &&
-                            this.props.simulateUpdateAvailable(),
+                              this.props.simulateUpdateAvailable();
+                          },
                         },
                       ]}
                     />

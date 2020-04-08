@@ -29,6 +29,14 @@ FileExtension::FileExtension() {
       "gdjs.evtTools.storage.readNumberFromJSONFile");
   GetAllActions()["LireFichierTxt"].SetFunctionName(
       "gdjs.evtTools.storage.readStringFromJSONFile");
+  GetAllActions()["LireFichierExpGlobal"].SetFunctionName(
+      "gdjs.evtTools.storage.readNumberFromJSONFile");
+  GetAllActions()["LireFichierTxtGlobal"].SetFunctionName(
+      "gdjs.evtTools.storage.readStringFromJSONFile");
+  GetAllActions()["LireFichierExpObject"].SetFunctionName(
+      "gdjs.evtTools.storage.readNumberFromJSONFile");
+  GetAllActions()["LireFichierTxtObject"].SetFunctionName(
+      "gdjs.evtTools.storage.readStringFromJSONFile");
   GetAllActions()["DeleteGroupFichier"].SetFunctionName(
       "gdjs.evtTools.storage.deleteElementFromJSONFile");
   GetAllActions()["DeleteFichier"]

@@ -97,7 +97,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
   extension
       .AddAction(
           "LireFichierExp",
-          _("Read a value"),
+          _("Read a value from scene variable"),
           _("Read the value saved in the specified element and store it in a scene"
             "variable.\nSpecify the structure leading to the element using / "
             "(example : Root/Level/Current)\nSpaces are forbidden in element "
@@ -109,12 +109,46 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
       .AddParameter("string", _("Storage name"))
       .AddParameter("string", _("Group"))
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("scenevar", _("Scene variables"));
+      .AddParameter("scenevar", _("Scene variable"));
+
+  extension
+      .AddAction(
+          "LireFichierExpGlobal",
+          _("Read a value from global variable"),
+          _("Read the value saved in the specified element and store it in a global"
+            "variable.\nSpecify the structure leading to the element using / "
+            "(example : Root/Level/Current)\nSpaces are forbidden in element "
+            "names."),
+          _("Read _PARAM1_ from storage _PARAM0_ and store value in _PARAM3_"),
+          _("Storage"),
+          "res/actions/fichier24.png",
+          "res/actions/fichier.png")
+      .AddParameter("string", _("Storage name"))
+      .AddParameter("string", _("Group"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("globalvar", _("Global variable"));
+
+  extension
+      .AddAction(
+          "LireFichierExpObject",
+          _("Read a value from object variable"),
+          _("Read the value saved in the specified element and store it in an"
+            " object variable.\nSpecify the structure leading to the element "
+            "using / (example : Root/Level/Current)\nSpaces are forbidden in "
+            "element names."),
+          _("Read _PARAM1_ from storage _PARAM0_ and store value in _PARAM3_"),
+          _("Storage"),
+          "res/actions/fichier24.png",
+          "res/actions/fichier.png")
+      .AddParameter("string", _("Storage name"))
+      .AddParameter("string", _("Group"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("objectvar", _("Object variable"));
 
   extension
       .AddAction(
           "LireFichierTxt",
-          _("Read a text"),
+          _("Read a text from scene variable"),
           _("Read the text saved in the specified element and store it in a scene "
             "variable.\nSpecify the structure leading to the element using / "
             "(example : Root/Level/Current)\nSpaces are forbidden in element "
@@ -127,7 +161,43 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
       .AddParameter("string", _("Storage name"))
       .AddParameter("string", _("Group"))
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("scenevar", _("Scene variables"));
+      .AddParameter("scenevar", _("Scene variable"));
+
+  extension
+      .AddAction(
+          "LireFichierTxtGlobal",
+          _("Read a text from scene variable"),
+          _("Read the text saved in the specified element and store it in a global "
+            "variable.\nSpecify the structure leading to the element using / "
+            "(example : Root/Level/Current)\nSpaces are forbidden in element "
+            "names."),
+          _("Read _PARAM1_ from storage _PARAM0_ and store as text in "
+            "_PARAM3_"),
+          _("Storage"),
+          "res/actions/fichier24.png",
+          "res/actions/fichier.png")
+      .AddParameter("string", _("Storage name"))
+      .AddParameter("string", _("Group"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("globalvar", _("Global variable"));
+
+  extension
+      .AddAction(
+          "LireFichierTxtObject",
+          _("Read a text from object variable"),
+          _("Read the text saved in the specified element and store it in an object "
+            "variable.\nSpecify the structure leading to the element using / "
+            "(example : Root/Level/Current)\nSpaces are forbidden in element "
+            "names."),
+          _("Read _PARAM1_ from storage _PARAM0_ and store as text in "
+            "_PARAM3_"),
+          _("Storage"),
+          "res/actions/fichier24.png",
+          "res/actions/fichier.png")
+      .AddParameter("string", _("Storage name"))
+      .AddParameter("string", _("Group"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("objectvar", _("Object variable"));
 
   extension
       .AddAction("DeleteGroupFichier",

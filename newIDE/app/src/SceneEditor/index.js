@@ -69,7 +69,7 @@ import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
-
+import SceneVariablesDialog from './SceneVariablesDialog';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -1249,24 +1249,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         )}
         {!!this.state.layoutVariablesDialogOpen && (
-          <VariablesEditorDialog
+          <SceneVariablesDialog
             open
-            variablesContainer={layout.getVariables()}
-            onCancel={() => this.editLayoutVariables(false)}
+            layout={layout}
             onApply={() => this.editLayoutVariables(false)}
-            title={<Trans>Scene Variables</Trans>}
-            emptyExplanationMessage={
-              <Trans>
-                Scene variables can be used to store any value or text during
-                the game.
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                For example, you can have a variable called Score representing
-                the current score of the player.
-              </Trans>
-            }
+            onClose={() => this.editLayoutVariables(false)}
           />
         )}
         <ContextMenu

@@ -93,6 +93,7 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import { type UnsavedChanges } from './UnsavedChangesContext';
+import { type MainMenuProps } from './MainMenu.flow';
 import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -142,6 +143,7 @@ type State = {|
 type Props = {
   integratedEditor?: boolean,
   introDialog?: React.Element<*>,
+  renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -1789,6 +1791,7 @@ class MainFrame extends React.Component<Props, State> {
       useStorageProvider,
       i18n,
       renderGDJSDevelopmentWatcher,
+      renderMainMenu,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1797,6 +1800,26 @@ class MainFrame extends React.Component<Props, State> {
 
     return (
       <div className="main-frame">
+        {!!renderMainMenu &&
+          renderMainMenu({
+            i18n: i18n,
+            project: this.state.currentProject,
+            onChooseProject: this.chooseProject,
+            onSaveProject: this.saveProject,
+            onSaveProjectAs: this.saveProjectAs,
+            onCloseProject: this.askToCloseProject,
+            onCloseApp: this.closeApp,
+            onExportProject: this.openExportDialog,
+            onCreateProject: this.openCreateDialog,
+            onOpenProjectManager: this.openProjectManager,
+            onOpenStartPage: this.openStartPage,
+            onOpenDebugger: this.openDebugger,
+            onOpenAbout: this.openAboutDialog,
+            onOpenPreferences: this.openPreferences,
+            onOpenLanguage: this.openLanguage,
+            onOpenProfile: this.openProfile,
+            setUpdateStatus: this.setUpdateStatus,
+          })}
         <ProjectTitlebar fileMetadata={currentFileMetadata} />
         <Drawer
           open={projectManagerOpen}

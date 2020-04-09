@@ -1071,6 +1071,9 @@ export default class SceneEditor extends React.Component<Props, State> {
               this.editObject(null);
               this.updateBehaviorsSharedData();
               this.forceUpdateObjectsList();
+
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
             }}
           />
         )}

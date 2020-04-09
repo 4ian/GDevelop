@@ -161,7 +161,7 @@ export default class Window {
     }
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showMessageBox(browserWindow, {
+    dialog.showMessageBoxSync(browserWindow, {
       message,
       type,
       buttons: ['OK'],

@@ -87,7 +87,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
             toolbarControls: [],
             renderEditor: () => (
               <Background>
-                <Column expand noMargin>
+                <Column expand noMargin useMaxHeight>
                   <Line justifyContent="center">
                     <RaisedButton
                       label={<Trans>Refresh</Trans>}
@@ -95,21 +95,19 @@ export default class DebuggerContent extends React.Component<Props, State> {
                       primary
                     />
                   </Line>
-                  <Line expand noMargin>
-                    <InspectorsList
-                      gameData={gameData}
-                      getInspectorDescriptions={getInspectorDescriptions}
-                      onChooseInspector={(
+                  <InspectorsList
+                    gameData={gameData}
+                    getInspectorDescriptions={getInspectorDescriptions}
+                    onChooseInspector={(
+                      selectedInspector,
+                      selectedInspectorFullPath
+                    ) =>
+                      this.setState({
                         selectedInspector,
-                        selectedInspectorFullPath
-                      ) =>
-                        this.setState({
-                          selectedInspector,
-                          selectedInspectorFullPath,
-                        })
-                      }
-                    />
-                  </Line>
+                        selectedInspectorFullPath,
+                      })
+                    }
+                  />
                 </Column>
               </Background>
             ),

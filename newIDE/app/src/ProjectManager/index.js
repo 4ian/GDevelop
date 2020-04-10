@@ -1057,7 +1057,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           value={searchText}
           onRequestSearch={this._onRequestSearch}
           onChange={this._onSearchChange}
-          elevation={24}
+          elevation={3}
         />
         {this.state.projectVariablesEditorOpen && (
           <VariablesEditorDialog

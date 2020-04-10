@@ -30,7 +30,7 @@ type Props = {|
   /** If defined, a help icon button redirecting to this page will be shown */
   helpPagePath?: ?string,
   /** Elevation of Paper Component */
-  elevation?: number
+  elevation?: number,
 |};
 
 type State = {|

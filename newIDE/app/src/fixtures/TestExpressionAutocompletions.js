@@ -89,6 +89,12 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
       isExact: false,
     },
     {
+      kind: 'Object',
+      completion: 'SomeOtherObjectWithALoooooooooooongLoooooooooooongName',
+      addDot: true,
+      isExact: false,
+    },
+    {
       kind: 'Behavior',
       completion: 'PlatformerObject',
       addNamespaceSeparator: true,

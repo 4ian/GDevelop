@@ -19,6 +19,10 @@ const defaultTextStyle = {
   // Cancel the default Text margins.
   marginTop: -5,
   marginBottom: -5,
+
+  // Break words if they are too long to fit on a single line.
+  overflow: 'hidden',
+  overflowWrap: 'break-word',
 };
 
 const AutocompletionIcon = React.memo(({ src }) => (
@@ -192,7 +196,9 @@ const DisplayedObjectAutocompletion = React.forwardRef(
       >
         <AutocompletionIcon src={thumbnail} />
         <Spacer />
-        <Text style={defaultTextStyle}>{title}</Text>
+        <Text style={defaultTextStyle} align="left">
+          {title}
+        </Text>
       </ButtonBase>
     );
   }
@@ -231,7 +237,9 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
       >
         <AutocompletionIcon src={'res/types/behavior.png'} />
         <Spacer />
-        <Text style={defaultTextStyle}>{title}</Text>
+        <Text style={defaultTextStyle} align="left">
+          {title}
+        </Text>
       </ButtonBase>
     );
   }

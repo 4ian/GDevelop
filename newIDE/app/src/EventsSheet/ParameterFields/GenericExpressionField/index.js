@@ -462,12 +462,12 @@ export default class ExpressionField extends React.Component<Props, State> {
                   </Popper>
                 </ClickAwayListener>
               )}
-              {this._fieldElement &&
+              {this._inputElement &&
                 !this.state.popoverOpen &&
                 parameterRenderingService && (
                   <ExpressionAutocompletionsDisplayer
                     project={project}
-                    anchorEl={this._fieldElement}
+                    anchorEl={this._inputElement}
                     expressionAutocompletions={getVisibleAutocompletions(
                       this.state.autocompletions
                     )}

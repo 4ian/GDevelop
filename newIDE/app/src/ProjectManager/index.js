@@ -54,6 +54,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    overflowY: 'hidden',
   },
   list: {
     flex: 1,
@@ -1056,6 +1057,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           value={searchText}
           onRequestSearch={this._onRequestSearch}
           onChange={this._onSearchChange}
+          elevation={24}
         />
         {this.state.projectVariablesEditorOpen && (
           <VariablesEditorDialog

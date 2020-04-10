@@ -6,7 +6,7 @@
 
 /**
  * @memberof gdjs.evtTools
- * @class common
+ * @namespace common
  * @static
  * @private
  */
@@ -106,16 +106,36 @@ gdjs.evtTools.common.logicalNegation = function(bool) {
   return !bool;
 };
 
+/**
+ * Limit an value in a range
+ * @param {number} x Value.
+ * @param {number} min The minimum value.
+ * @param {number} max The  maximum value.
+ * @returns {number} The new value.
+ */
 gdjs.evtTools.common.clamp = function(x, min, max) {
   return Math.min(Math.max(x, min), max);
 };
 
+/**
+ * Hyperbolic arccosine
+ * @param {number} arg Value.
+ * @returns {number} The hyperbolic arccosine for the value.
+ */
 gdjs.evtTools.common.acosh = function(arg) {
   // http://kevin.vanzonneveld.net
   // +   original by: Onno Marsman
   return Math.log(arg + Math.sqrt(arg * arg - 1));
 };
 
+
+/**
+ * Arcsine
+ * @memberof gdjs.evtTools
+ * @class common
+ * @param {number} arg Value.
+ * @returns {number} The arccosine for the value.
+ */
 gdjs.evtTools.common.asinh = function(arg) {
   // http://kevin.vanzonneveld.net
   // +   original by: Onno Marsman

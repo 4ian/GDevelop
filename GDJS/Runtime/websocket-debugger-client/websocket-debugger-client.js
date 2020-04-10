@@ -1,14 +1,64 @@
 /**
+ * An client side implementation of the Debugger
+ * @interface
+ */
+gdjs.DebuggerClient = function() {} // Necessary for Interface definition 
+
+/**
+ * Update a value of the {@link RuntimeGame} instance.
+ * @function
+ * @name gdjs.DebuggerClient#set
+ * @param {?} path - The path to modify.
+ * @param {any} newValue - The new Value.
+ */
+
+/**
+ * Call a method of the {@link RuntimeGame} instance.
+ * @function
+ * @name gdjs.DebuggerClient#call
+ * @param {?} path - The path to the method.
+ * @param {Array<any>} args - The arguments to pass the method.
+ */
+
+/**
+ * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the Server.
+ * @function
+ * @name gdjs.DebuggerClient#sendRuntimeGameDump
+ */
+
+/**
+ * Start Profiling.
+ * @function
+ * @name gdjs.DebuggerClient#sendProfilerStarted
+ */
+
+/**
+ * Stop Profiling.
+ * @function
+ * @name gdjs.DebuggerClient#sendProfilerStopped
+ */
+
+/**
+ * Send Profiling results.
+ * @function
+ * @param {number} framesAverageMeasures The average FPS.
+ * @param {?} stats
+ * @name gdjs.DebuggerClient#sendProfilerStopped
+ */
+
+
+/**
  * This DebuggerClient connects to a websocket server and can dump
  * the data of the current game, and receive message to change a field or
  * call a function on an object of the specified runtimeGame.
  *
  * @memberof gdjs
+ * @implements {gdjs.DebuggerClient}
  * @class WebsocketDebuggerClient
- * @param {gdjs.RuntimeGame} The `gdjs.RuntimeGame` to be debug
+ * @param {gdjs.RuntimeGame} runtimegame -  The `gdjs.RuntimeGame` to be debug
  */
-gdjs.WebsocketDebuggerClient = function(runtimegame) {
-  this._runtimegame = runtimegame;
+gdjs.WebsocketDebuggerClient = function(runtimeGame) {
+  this._runtimegame = runtimeGame;
 
   if (typeof WebSocket === 'undefined') {
     console.log("WebSocket is not defined, debugger won't work");
@@ -271,8 +321,22 @@ gdjs.WebsocketDebuggerClient.prototype.sendProfilerOutput = function(
   );
 };
 
-// This is an alternative to JSON.stringify that ensure that circular reference
-// are replaced by a placeholder.
+/**
+ * A Function used to replace Cycles with a default name.
+ * @callback cycleReplacer
+ * @param {string | number} key - The key corresponding to the value.
+ * @param {any} value - The value.
+ */
+
+/** 
+ * This is an alternative to JSON.stringify that ensure that circular reference
+ * are replaced by a placeholder.
+ * @param {any} obj - The object to serialize.
+ * @param {Function} [replacer] - The value to replace unsafe values with?
+ * @param {number} [maxDepth] - The max serialisation depth.
+ * @param {number} [spaces] - The number of space for indentation.
+ * @param {cycleReplacer} [cycleReplacer] - Function used to replace Cycles with a default name.
+ */
 gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
   obj,
   replacer,
@@ -287,7 +351,13 @@ gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
   );
 };
 
-// JSON serializer that prevent circular references and stop if maxDepth is reached.
+/** 
+ * Generates a JSON serializer that prevent circular references and stop if maxDepth is reached.
+ * @param {Function} [replacer] - The value to replace unsafe values?
+ * @param {cycleReplacer} [cycleReplacer] - Function used to replace Cycles with a default name.
+ * @param {number} [maxDepth] - The max serialisation depth.
+ * @returns {Function}
+ */
 gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
   replacer,
   cycleReplacer,

@@ -95,6 +95,7 @@ import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import { type UnsavedChanges } from './UnsavedChangesContext';
 import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -165,31 +166,8 @@ type Props = {
   unsavedChanges?: UnsavedChanges,
 };
 
-const useStateWithCallback = (initialValue: State) => {
-  const [state, setState] = React.useState(initialValue);
-  const callback = React.useRef(
-    (null: (State => Promise<State> | void) | null)
-  );
-  const useStateWithCB = (newValue: (State => State) | State): Promise<any> => {
-    return new Promise(resolve => {
-      setState(newValue);
-      callback.current = resolve;
-    });
-  };
-  React.useEffect(
-    () => {
-      if (callback.current !== null) {
-        callback.current(state);
-        callback.current = null;
-      }
-    },
-    [callback, state]
-  );
-  return [state, useStateWithCB];
-};
-
 const MainFrame = (props: Props) => {
-  const [state, setState] = useStateWithCallback({
+  const [state, setState]: [State, ((State => State) | State) => Promise<State>] = useStateWithCallback({
     createDialogOpen: false,
     exportDialogOpen: false,
     introDialogOpen: false,
@@ -226,16 +204,12 @@ const MainFrame = (props: Props) => {
   const forceUpdate = useForceUpdate();
 
   React.useEffect(() => {
-    if (!props.integratedEditor) openStartPage();
-    GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
-
-    const { initialFileMetadataToOpen } = props;
-
-    _loadExtensions()
-      .catch(() => {
-        /* Ignore errors */
-      })
-      .then(() => {
+    (async () => {
+      if (!props.integratedEditor) openStartPage();
+      GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
+      const { initialFileMetadataToOpen } = props;
+      try {
+        await _loadExtensions();
         // Enable the GDJS development watcher *after* the extensions are loaded,
         // to avoid the watcher interfering with the extension loading (by updating GDJS,
         // which could lead in the extension loading failing for some extensions as file
@@ -244,16 +218,19 @@ const MainFrame = (props: Props) => {
           ...state,
           gdjsDevelopmentWatcherEnabled: true,
         }));
-      });
-    if (initialFileMetadataToOpen) {
-      _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
-    } else if (props.introDialog && !Window.isDev()) _openIntroDialog(true);
+        if (initialFileMetadataToOpen) {
+          _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
+        } else if (props.introDialog && !Window.isDev()) _openIntroDialog(true);
 
-    GD_STARTUP_TIMES.push([
-      'MainFrameComponentDidMountFinished',
-      performance.now(),
-    ]);
-    console.info('Startup times:', getStartupTimesSummary());
+        GD_STARTUP_TIMES.push([
+          'MainFrameComponentDidMountFinished',
+          performance.now(),
+        ]);
+        console.info('Startup times:', getStartupTimesSummary());
+      } catch {
+        /* Ignore errors */
+      }
+    })();
   }, []);
 
   const _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
@@ -354,25 +331,24 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const loadFromProject = (
+  const loadFromProject = async (
     project: gdProject,
     fileMetadata: ?FileMetadata
-  ): Promise<void> => {
+  ): Promise<State> => {
     const { eventsFunctionsExtensionsState } = props;
 
-    return closeProject().then(() => {
-      // Make sure that the ResourcesLoader cache is emptied, so that
-      // the URL to a resource with a name in the old project is not re-used
-      // for another resource with the same name in the new project.
-      ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
-      return setState(state => ({
-        ...state,
-        currentProject: project,
-        currentFileMetadata: fileMetadata,
-      }));
-      //code shifted into useEffect below
-    });
+    await closeProject();
+    // Make sure that the ResourcesLoader cache is emptied, so that
+    // the URL to a resource with a name in the old project is not re-used
+    // for another resource with the same name in the new project.
+    ResourcesLoader.burstAllUrlsCache();
+    // TODO: Pixi cache should also be burst
+    return setState(state => ({
+      ...state,
+      currentProject: project,
+      currentFileMetadata: fileMetadata,
+    }));
+    //code shifted into useEffect below
   };
 
   React.useEffect(
@@ -520,10 +496,13 @@ const MainFrame = (props: Props) => {
         editorTabs: closeProjectTabs(state.editorTabs, state.currentProject),
       }))
         .then(state => {
-          eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-            state.currentProject
-          );
-          state.currentProject.delete();
+          if(state.currentProject){
+            const { currentProject } = state; 
+            eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+              currentProject
+            );
+            currentProject.delete();
+          }
           return setState(state => ({
             ...state,
             currentProject: null,
@@ -649,7 +628,8 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      state.currentProject.removeLayout(layout.getName());
+      if(state.currentProject)
+        state.currentProject.removeLayout(layout.getName());
       _onProjectItemModified();
     });
   };
@@ -671,7 +651,8 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
     })).then(state => {
-      state.currentProject.removeExternalLayout(externalLayout.getName());
+      if(state.currentProject)
+        state.currentProject.removeExternalLayout(externalLayout.getName());
       _onProjectItemModified();
     });
   };
@@ -692,7 +673,8 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
     })).then(state => {
-      state.currentProject.removeExternalEvents(externalEvents.getName());
+      if(state.currentProject)
+        state.currentProject.removeExternalEvents(externalEvents.getName());
       _onProjectItemModified();
     });
   };
@@ -1663,9 +1645,9 @@ const MainFrame = (props: Props) => {
     return resourceSourceDialog.chooseResources(currentProject, multiSelection);
   };
 
-  const updateToolbar = stateRef => {
-    stateRef = stateRef || state;
-    const editorTab = getCurrentTab(stateRef.editorTabs);
+  const updateToolbar = newState => {
+    newState = newState || state;
+    const editorTab = getCurrentTab(newState.editorTabs);
     if (!editorTab || !editorTab.editorRef) {
       setEditorToolbar(null);
       return;

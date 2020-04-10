@@ -14,6 +14,10 @@ type Props = {|
     marginTop?: number,
     marginBottom?: number,
 
+    // Allow to specify that the text should break words
+    overflow?: 'hidden',
+    overflowWrap?: 'break-word',
+
     // Allow to expand the text
     flex?: 1,
 

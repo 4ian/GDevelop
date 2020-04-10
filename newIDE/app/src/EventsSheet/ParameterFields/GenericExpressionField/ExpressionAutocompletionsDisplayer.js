@@ -302,7 +302,7 @@ export default function ExpressionAutocompletionsDisplayer({
           style={styles.popperStyle}
           open
           anchorEl={anchorEl}
-          placement="top-start"
+          placement="bottom-start"
           disablePortal={
             // We can use a portal to display this component, because even if it
             // used inside a modal, which has a focus trap, it's entirely

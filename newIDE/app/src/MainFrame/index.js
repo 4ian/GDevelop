@@ -1711,17 +1711,20 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
-  _showSnackMessage = (snackMessage: string) =>
-    this.setState({
+  const _showSnackMessage = (snackMessage: string) => {
+    setState(state => ({
+      ...state,
       snackMessage,
       snackMessageOpen: true,
-    });
-
-  _closeSnackMessage = () =>
-    this.setState({
+    }));
+  }
+  const _closeSnackMessage = () => {
+    setState(state => ({
+      ...state,
       snackMessageOpen: false,
-    });
-    
+    }));
+  }
+
     const {
       currentProject,
       currentFileMetadata,
@@ -1733,7 +1736,7 @@ const MainFrame = (props: Props) => {
       aboutDialogOpen,
       helpFinderDialogOpen,
       eventsFunctionsExtensionsError,
-    } = this.state;
+    } = state;
     const {
       renderExportDialog,
       renderCreateDialog,
@@ -1746,33 +1749,33 @@ const MainFrame = (props: Props) => {
       i18n,
       renderGDJSDevelopmentWatcher,
       renderMainMenu,
-    } = this.props;
+    } = props;
     const showLoader =
-      this.state.loadingProject ||
-      this.state.previewLoading ||
-      this.props.loading;
+      state.loadingProject ||
+      state.previewLoading ||
+      props.loading;
 
     return (
       <div className="main-frame">
         {!!renderMainMenu &&
           renderMainMenu({
             i18n: i18n,
-            project: this.state.currentProject,
-            onChooseProject: this.chooseProject,
-            onSaveProject: this.saveProject,
-            onSaveProjectAs: this.saveProjectAs,
-            onCloseProject: this.askToCloseProject,
-            onCloseApp: this.closeApp,
-            onExportProject: this.openExportDialog,
-            onCreateProject: this.openCreateDialog,
-            onOpenProjectManager: this.openProjectManager,
-            onOpenStartPage: this.openStartPage,
-            onOpenDebugger: this.openDebugger,
-            onOpenAbout: this.openAboutDialog,
-            onOpenPreferences: this.openPreferences,
-            onOpenLanguage: this.openLanguage,
-            onOpenProfile: this.openProfile,
-            setUpdateStatus: this.setUpdateStatus,
+            project: state.currentProject,
+            onChooseProject: chooseProject,
+            onSaveProject: saveProject,
+            onSaveProjectAs: saveProjectAs,
+            onCloseProject: askToCloseProject,
+            onCloseApp: closeApp,
+            onExportProject: openExportDialog,
+            onCreateProject: openCreateDialog,
+            onOpenProjectManager: openProjectManager,
+            onOpenStartPage: openStartPage,
+            onOpenDebugger: openDebugger,
+            onOpenAbout: openAboutDialog,
+            onOpenPreferences: openPreferences,
+            onOpenLanguage: openLanguage,
+            onOpenProfile: openProfile,
+            setUpdateStatus: setUpdateStatus,
           })}
         <ProjectTitlebar fileMetadata={currentFileMetadata} />
         <Drawer
@@ -1780,14 +1783,63 @@ const MainFrame = (props: Props) => {
           PaperProps={{
             style: styles.drawerContent,
           }}
-          onClose={this.toggleProjectManager}
+          onClose={toggleProjectManager}
         >
           <EditorBar
             title={currentProject ? currentProject.getName() : 'No project'}
             displayRightCloseButton
-            onClose={this.toggleProjectManager}
+            onClose={toggleProjectManager}
           />
-        )}
+          {currentProject && (
+            <ProjectManager
+              project={currentProject}
+              onOpenExternalEvents={openExternalEvents}
+              onOpenLayout={openLayout}
+              onOpenExternalLayout={openExternalLayout}
+              onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
+              onAddLayout={addLayout}
+              onAddExternalLayout={addExternalLayout}
+              onAddEventsFunctionsExtension={addEventsFunctionsExtension}
+              onAddExternalEvents={addExternalEvents}
+              onDeleteLayout={deleteLayout}
+              onDeleteExternalLayout={deleteExternalLayout}
+              onDeleteEventsFunctionsExtension={
+                deleteEventsFunctionsExtension
+              }
+              onDeleteExternalEvents={deleteExternalEvents}
+              onRenameLayout={renameLayout}
+              onRenameExternalLayout={renameExternalLayout}
+              onRenameEventsFunctionsExtension={
+                renameEventsFunctionsExtension
+              }
+              onRenameExternalEvents={renameExternalEvents}
+              onSaveProject={saveProject}
+              onSaveProjectAs={saveProjectAs}
+              onCloseProject={() => {
+                askToCloseProject();
+              }}
+              onExportProject={openExportDialog}
+              onOpenPreferences={() => openPreferences(true)}
+              onOpenProfile={() => openProfile(true)}
+              onOpenResources={() => {
+                openResources();
+                openProjectManager(false);
+              }}
+              onOpenPlatformSpecificAssets={() =>
+                openPlatformSpecificAssets()
+              }
+              onChangeSubscription={() => openSubscription(true)}
+              eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
+              onReloadEventsFunctionsExtensions={() => {
+                // Check if load is sufficient
+                eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+                  currentProject
+                );
+              }}
+              freezeUpdate={!projectManagerOpen}
+              unsavedChanges={props.unsavedChanges}
+            />
+          )}
         {!currentProject && (
           <EmptyMessage>
             <Trans>To begin, open or create a new project.</Trans>

@@ -2104,7 +2104,15 @@ class MainFrame extends React.Component<Props, State> {
             }}
           />
         )}
-        <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
+        <CloseConfirmDialog
+          shouldPrompt={!!this.state.currentProject}
+          i18n={this.props.i18n}
+          language={this.props.i18n.language}
+          hasUnsavedChanges={
+            !!this.props.unsavedChanges &&
+            this.props.unsavedChanges.hasUnsavedChanges
+          }
+        />
         <ChangelogDialogContainer />
         {this.state.gdjsDevelopmentWatcherEnabled &&
           renderGDJSDevelopmentWatcher &&

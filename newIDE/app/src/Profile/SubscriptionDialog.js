@@ -215,7 +215,11 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                         (descriptionBullet, index) => (
                           <Column key={index} expand>
                             <Line noMargin alignItems="center">
+                             {userProfile.subscription && userProfile.subscription.planId === plan.planId ? (
+                              <CheckCircle style={{...styles.bulletIcon,...{'color':'#00ff00'}}} />
+                               ):
                               <CheckCircle style={styles.bulletIcon} />
+                               }
                               <Text style={styles.bulletText}>
                                 {i18n._(descriptionBullet.message)}{' '}
                                 {descriptionBullet.isLocalAppOnly && (

@@ -124,7 +124,7 @@ export const onSaveProjectAs = (
   if (!dialog) {
     return Promise.reject('Unsupported');
   }
-  const filePath = dialog.showSaveDialog(browserWindow, options);
+  const filePath = dialog.showSaveDialogSync(browserWindow, options);
   if (!filePath) {
     return Promise.resolve({ wasSaved: false, fileMetadata });
   }

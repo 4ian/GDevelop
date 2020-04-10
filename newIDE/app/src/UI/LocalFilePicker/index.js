@@ -41,18 +41,16 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
     if (!dialog || !electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showSaveDialog(
-      browserWindow,
-      {
+    return dialog
+      .showSaveDialog(browserWindow, {
         title: this.props.title,
         filters: this.props.filters,
         message: this.props.message,
         defaultPath: this.props.defaultPath,
-      },
-      filename => {
-        this.props.onChange(filename || '');
-      }
-    );
+      })
+      .then(({ filePath }) => {
+        this.props.onChange(filePath || '');
+      });
   };
 
   render() {

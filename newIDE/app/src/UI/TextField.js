@@ -44,12 +44,17 @@ type Props = {|
       value: string,
     },
   }) => void,
-  onKeyPress?: (event: {| charCode: number, key: string |}) => void,
-  onKeyUp?: (event: {| charCode: number, key: string |}) => void,
+
+  // Advanced DOM events, for exceptional usage:
+  onClick?: () => void,
+  onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
+  onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
+  onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
 
   // Error handling:
   errorText?: React.Node,
 
+  // Labels:
   disabled?: boolean,
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
@@ -230,6 +235,8 @@ export default class TextField extends React.Component<Props, {||}> {
               inputProps: {
                 onKeyPress: props.onKeyPress,
                 onKeyUp: props.onKeyUp,
+                onKeyDown: props.onKeyDown,
+                onClick: props.onClick,
                 // Number field props:
                 max: props.max,
                 min: props.min,

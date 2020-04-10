@@ -5,12 +5,12 @@ import {
   createTree,
   type InstructionOrExpressionTreeNode,
 } from '../../../InstructionOrExpression/CreateTree';
-import { enumerateInstructions } from '../../../InstructionOrExpression/EnumerateInstructions';
+import { enumerateAllInstructions } from '../../../InstructionOrExpression/EnumerateInstructions';
 import {
   type EnumeratedInstructionOrExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   isCondition: boolean,
@@ -28,7 +28,7 @@ const style = {
 
 export default class InstructionSelector extends Component<Props, {||}> {
   instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateInstructions(this.props.isCondition),
+    enumerateAllInstructions(this.props.isCondition),
     this.props.scope
   );
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(

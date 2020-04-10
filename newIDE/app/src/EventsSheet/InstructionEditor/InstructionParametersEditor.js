@@ -21,7 +21,7 @@ import { getExtraInstructionInformation } from '../../Hints';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import IconButton from '../../UI/IconButton';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
 import Text from '../../UI/Text';
 import { getInstructionMetadata } from './NewInstructionEditor';

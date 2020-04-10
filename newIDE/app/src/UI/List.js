@@ -16,6 +16,7 @@ import ElementWithMenu from './Menu/ElementWithMenu';
 import Tooltip from '@material-ui/core/Tooltip';
 import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
+import { type MenuItemTemplate } from './Menu/Menu.flow';
 
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 40;
@@ -32,7 +33,7 @@ type ListItemRightButtonProps =
     |}
   | {|
       displayMenuButton: boolean,
-      buildMenuTemplate: () => Array<any>,
+      buildMenuTemplate: () => Array<MenuItemTemplate>,
     |}
   | {|
       displayLinkButton: boolean,

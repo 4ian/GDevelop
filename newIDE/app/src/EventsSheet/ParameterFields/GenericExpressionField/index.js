@@ -437,12 +437,12 @@ export default class ExpressionField extends React.Component<Props, State> {
                   fullWidth
                 />
               </div>
-              {this._fieldElement && this.state.popoverOpen && (
+              {this._inputElement && this.state.popoverOpen && (
                 <ClickAwayListener onClickAway={this._handleRequestClose}>
                   <Popper
                     style={popoverStyle}
                     open={this.state.popoverOpen}
-                    anchorEl={this._fieldElement}
+                    anchorEl={this._inputElement}
                     placement="bottom"
                     disablePortal={
                       true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */

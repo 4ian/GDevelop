@@ -13,6 +13,8 @@ gdjs.evtTools.common = gdjs.evtTools.common || {};
 
 /**
  * Get the value of a variable. Equivalent of variable.getAsNumber().
+ * @param {gdjs.Variable} variable Variable.
+ * @returns {number} Return the content of the variable as number.
  * @private
  */
 gdjs.evtTools.common.getVariableNumber = function(variable) {
@@ -21,6 +23,8 @@ gdjs.evtTools.common.getVariableNumber = function(variable) {
 
 /**
  * Get the string of a variable. Equivalent of variable.getAsString().
+ * @param {gdjs.Variable} variable Variable.
+ * @returns {string} Return the content of the variable as string.
  * @private
  */
 gdjs.evtTools.common.getVariableString = function(variable) {
@@ -28,6 +32,10 @@ gdjs.evtTools.common.getVariableString = function(variable) {
 };
 
 /**
+ * Check if a scene variable exist in a scene.
+ * @param {gdjs.RuntimeScene} runtimeScene Scene.
+ * @param {string} variableName Name of the variable.
+ * @returns {boolean} Return the true is the scene variable exist.
  * @private
  */
 gdjs.evtTools.common.sceneVariableExists = function(runtimeScene, variableName) {
@@ -35,6 +43,10 @@ gdjs.evtTools.common.sceneVariableExists = function(runtimeScene, variableName) 
 };
 
 /**
+ * Check if a child exist in a global variable in a scene.
+ * @param {gdjs.RuntimeScene} runtimeScene Scene.
+ * @param {string} variableName Name of the variable.
+ * @returns {boolean} Return the true is the global variable.
  * @private
  */
 gdjs.evtTools.common.globalVariableExists = function(runtimeScene, variableName) {
@@ -42,6 +54,10 @@ gdjs.evtTools.common.globalVariableExists = function(runtimeScene, variableName)
 };
 
 /**
+ * Check if a child exist in a variable.
+ * @param {gdjs.Variable} variable Variable.
+ * @param {string} childName Name of the child.
+ * @returns {boolean} Return true if child exist in the variable.
  * @private
  */
 gdjs.evtTools.common.variableChildExists = function(variable, childName) {
@@ -49,6 +65,10 @@ gdjs.evtTools.common.variableChildExists = function(variable, childName) {
 };
 
 /**
+ * Remove an child by a name in a variable.
+ * @param {gdjs.Variable} variable Variable.
+ * @param {string} childName Name of the child.
+ * @returns {gdjs.Variable} Return the new variable without the child removed.
  * @private
  */
 gdjs.evtTools.common.variableRemoveChild = function(variable, childName) {
@@ -56,6 +76,8 @@ gdjs.evtTools.common.variableRemoveChild = function(variable, childName) {
 };
 
 /**
+ * Clear the children in a variable.
+ * @param {gdjs.Variable} variable Variable.
  * @private
  */
 gdjs.evtTools.common.variableClearChildren = function(variable) {
@@ -63,6 +85,9 @@ gdjs.evtTools.common.variableClearChildren = function(variable) {
 };
 
 /**
+ * Get the number of children in a variable.
+ * @param {gdjs.Variable} variable Variable.
+ * @returns {number} Return the number of childs in a variable.
  * @private
  */
 gdjs.evtTools.common.getVariableChildCount = function(variable) {
@@ -72,6 +97,8 @@ gdjs.evtTools.common.getVariableChildCount = function(variable) {
 
 /**
  * Convert a string to a float.
+ * @param {boolean} str Value to convert in float.
+ * @returns {number} Return the value in float.
  * @private
  */
 gdjs.evtTools.common.toNumber = function(str) {
@@ -80,6 +107,8 @@ gdjs.evtTools.common.toNumber = function(str) {
 
 /**
  * Convert a number to a string.
+ * @param {boolean} num Value to convert in string.
+ * @returns {string} Return the value in string.
  * @private
  */
 gdjs.evtTools.common.toString = function(num) {
@@ -90,6 +119,8 @@ gdjs.evtTools.common.toString = function(num) {
 
 /**
  * Negate the boolean.
+ * @param {boolean} bool Value to invert.
+ * @returns {boolean} Value inverted.
  * @private
  */
 gdjs.evtTools.common.logicalNegation = function(bool) {

@@ -9,7 +9,7 @@ gdjs.DebuggerClient = function() {} // Necessary for Interface definition
  * @function
  * @name gdjs.DebuggerClient#set
  * @param {Array<string>} path - The path of the property to modify, starting from the RuntimeGame.
- * @param {any} newValue - The new Value.
+ * @param {any} newValue - The new value.
  */
 
 /**
@@ -41,21 +41,21 @@ gdjs.DebuggerClient = function() {} // Necessary for Interface definition
 /**
  * Send profiling results.
  * @function
- * @param {number} framesAverageMeasures The average FPS.
- * @param {any} stats
+ * @param {any} framesAverageMeasures The measures made for each frames.
+ * @param {any} stats Other measures done during the profiler run.
  * @name gdjs.DebuggerClient#sendProfilerOutput
  */
 
 
 /**
- * This {@link DebuggerClient} connects to a websocket server and can dump
+ * This {@link DebuggerClient} connects to a websocket server, can dump
  * the data of the current game, and receive message to change a field or
- * call a function on an object of the specified {@link RuntimeGame}.
+ * call a function, specified by a path from the {@link RuntimeGame}.
  *
  * @memberof gdjs
  * @implements {gdjs.DebuggerClient}
  * @class WebsocketDebuggerClient
- * @param {gdjs.RuntimeGame} runtimeGame -  The `gdjs.RuntimeGame` to be debug
+ * @param {gdjs.RuntimeGame} runtimeGame -  The `gdjs.RuntimeGame` to be debugged
  */
 gdjs.WebsocketDebuggerClient = function(runtimeGame) {
   this._runtimegame = runtimeGame;
@@ -330,11 +330,11 @@ gdjs.WebsocketDebuggerClient.prototype.sendProfilerOutput = function(
  */
 
 /** 
- * This is an alternative to JSON.stringify that ensure that circular reference
+ * This is an alternative to JSON.stringify that ensure that circular references
  * are replaced by a placeholder.
  * @param {any} obj - The object to serialize.
  * @param {Function} [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
- * @param {number} [maxDepth] - The max serialisation depth.
+ * @param {number} [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
  * @param {number} [spaces] - The number of spaces for indentation.
  * @param {DebuggerClientCycleReplacer} [cycleReplacer] - Function used to replace circular references with a new value.
  */
@@ -356,7 +356,7 @@ gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
  * Generates a JSON serializer that prevent circular references and stop if maxDepth is reached.
  * @param {Function} [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
  * @param {DebuggerClientCycleReplacer} [cycleReplacer] - Function used to replace circular references with a new value.
- * @param {number} [maxDepth] - The max serialisation depth.
+ * @param {number} [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
  * @returns {Function}
  */
 gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(

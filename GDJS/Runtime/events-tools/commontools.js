@@ -127,8 +127,6 @@ gdjs.evtTools.common.acosh = function (arg) {
 
 /**
  * Arcsine
- * @memberof gdjs.evtTools
- * @class common
  * @param {number} arg Value.
  * @returns {number} The arccosine for the value.
  */

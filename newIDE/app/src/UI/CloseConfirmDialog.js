@@ -20,16 +20,10 @@ export default React.memo<Props>(function CloseConfirmDialog({
   hasUnsavedChanges,
 }: Props) {
   const delayElectronClose = React.useRef(true);
-  console.log('Close confirm dialog rendered');
+
   React.useEffect(
     () => {
-      console.log('Setting up with ', [
-        shouldPrompt,
-        i18n,
-        language,
-        hasUnsavedChanges,
-      ]);
-      // if (Window.isDev()) return; // Don't prevent live-reload in development
+      if (Window.isDev()) return; // Don't prevent live-reload in development
 
       const quitMessage = i18n._(t`Are you sure you want to quit GDevelop?`);
       const unsavedChangesMessage = hasUnsavedChanges

@@ -582,6 +582,47 @@ module.exports = {
       }
     ]
   },
+  "cannon-ball-with-physics": {
+    "description": "An example showing how to launch a ball from a cannon when using the Physics engine.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      }
+    ]
+  },
   "car-physics": {
     "description": "A fun, physics based driving game",
     "usedExtensions": [
@@ -1424,7 +1465,7 @@ module.exports = {
     ]
   },
   "flappy-bird": {
-    "description": "A clone of the popular Flappy Bird game, Where you control a bird which has to fly through gaps.\n",
+    "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",

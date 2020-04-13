@@ -16,13 +16,13 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
-        'TileMap',
-        _('TileMap Object'),
-        _('Displays a tiled file tilemap.'),
-        'Todor Imreorov',
-        'Open source (MIT License)'
+        "TileMap",
+        _("TileMap Object"),
+        _("Displays a tiled file tilemap."),
+        "Todor Imreorov",
+        "Open source (MIT License)"
       )
-      .setExtensionHelpPath('/objects/tile_map');
+      .setExtensionHelpPath("/objects/tile_map");
 
     var objectTileMap = new gd.ObjectJsImplementation();
     objectTileMap.updateProperty = function(
@@ -31,8 +31,8 @@ module.exports = {
       newValue
     ) {
       if (propertyName in objectContent) {
-        if (typeof objectContent[propertyName] === 'boolean')
-          objectContent[propertyName] = newValue === '1';
+        if (typeof objectContent[propertyName] === "boolean")
+          objectContent[propertyName] = newValue === "1";
         else objectContent[propertyName] = newValue;
         return true;
       }
@@ -43,50 +43,50 @@ module.exports = {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
-        'tiledFile',
+        "tiledFile",
         new gd.PropertyDescriptor(objectContent.tiledFile)
-          .setType('resource')
-          .addExtraInfo('json')
-          .setLabel(_('Tiled file'))
+          .setType("resource")
+          .addExtraInfo("json")
+          .setLabel(_("Tiled file"))
       );
       objectProperties.set(
-        'tilemapAtlasImage',
+        "tilemapAtlasImage",
         new gd.PropertyDescriptor(objectContent.tilemapAtlasImage)
-          .setType('resource')
-          .addExtraInfo('image')
-          .setLabel(_('Tilemap atlas image'))
+          .setType("resource")
+          .addExtraInfo("image")
+          .setLabel(_("Tilemap atlas image"))
       );
       objectProperties.set(
-        'render',
+        "render",
         new gd.PropertyDescriptor(objectContent.render)
-          .setType('choice')
-          .addExtraInfo('visible')
-          .addExtraInfo('all')
-          .addExtraInfo('index')
-          .setLabel(_('Render'))
+          .setType("choice")
+          .addExtraInfo("visible")
+          .addExtraInfo("all")
+          .addExtraInfo("index")
+          .setLabel(_("Render"))
       );
       objectProperties.set(
-        'layerIndex',
+        "layerIndex",
         new gd.PropertyDescriptor(objectContent.layerIndex.toString())
-          .setType('number')
-          .setLabel(_('Layer index'))
+          .setType("number")
+          .setLabel(_("Layer index"))
       );
       objectProperties.set(
-        'visible',
-        new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Visible'))
+        "visible",
+        new gd.PropertyDescriptor(objectContent.visible ? "true" : "false")
+          .setType("boolean")
+          .setLabel(_("Visible"))
       );
 
       return objectProperties;
     };
     objectTileMap.setRawJSONContent(
       JSON.stringify({
-        tiledFile: '',
-        tilemapAtlasImage: '',
-        render: 'visible',
+        tiledFile: "",
+        tilemapAtlasImage: "",
+        render: "visible",
         layerIndex: 0,
-        visible: true,
+        visible: true
       })
     );
 
@@ -112,18 +112,18 @@ module.exports = {
 
     const object = extension
       .addObject(
-        'TileMap',
-        _('TileMap'),
-        _('Displays a tiled file tilemap'),
-        'JsPlatform/Extensions/skeletonicon.png',
+        "TileMap",
+        _("TileMap"),
+        _("Displays a tiled file tilemap"),
+        "JsPlatform/Extensions/skeletonicon.png",
         objectTileMap
       )
-      .setIncludeFile('Extensions/TileMap/tilemapruntimeobject.js')
+      .setIncludeFile("Extensions/TileMap/tilemapruntimeobject.js")
       .addIncludeFile(
-        'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
+        "Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js"
       )
-      .addIncludeFile('Extensions/TileMap/pixi-tilemap.js')
-      .addIncludeFile('Extensions/TileMap/tileset.js');
+      .addIncludeFile("Extensions/TileMap/pixi-tilemap.js")
+      .addIncludeFile("Extensions/TileMap/tileset.js");
     /**
      * Utility function to add both a setter and a getter to a property from a list.
      * Useful for setting multiple generic properties.
@@ -132,54 +132,54 @@ module.exports = {
     const addSettersAndGettersToObject = (gdObject, properties, objectName) => {
       properties.forEach(property => {
         const parameterType =
-          property.type === 'boolean' ? 'yesorno' : property.type;
+          property.type === "boolean" ? "yesorno" : property.type;
 
         // Add the expression
-        if (parameterType === 'number') {
+        if (parameterType === "number") {
           gdObject
             .addExpression(
               `Get${property.functionName}`,
               property.expressionLabel,
               property.expressionDescription,
-              '',
-              '',
+              "",
+              "",
               property.iconPath,
               property.iconPath
             )
-            .addParameter('object', objectName, objectName, false)
+            .addParameter("object", objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
-        } else if (parameterType === 'string') {
+        } else if (parameterType === "string") {
           gdObject
             .addStrExpression(
               `Get${property.functionName}`,
               property.expressionLabel,
               property.expressionDescription,
-              '',
-              '',
+              "",
+              "",
               property.iconPath,
               property.iconPath
             )
-            .addParameter('object', objectName, objectName, false)
+            .addParameter("object", objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
         }
 
         // Add the action
-        if (parameterType === 'number' || parameterType === 'string') {
+        if (parameterType === "number" || parameterType === "string") {
           const expressionType =
-            parameterType === 'number' ? 'expression' : 'string';
+            parameterType === "number" ? "expression" : "string";
           gdObject
             .addAction(
               `Set${property.functionName}`,
               property.paramLabel,
               property.actionDescription,
               property.actionSentence,
-              '',
+              "",
               property.iconPath,
               property.iconPath
             )
-            .addParameter('object', objectName, objectName, false)
+            .addParameter("object", objectName, objectName, false)
             .useStandardOperatorParameters(parameterType)
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
@@ -191,17 +191,17 @@ module.exports = {
               property.paramLabel,
               property.actionDescription,
               property.actionSentence,
-              '',
+              "",
               property.iconPath,
               property.iconPath
             )
-            .addParameter('object', objectName, objectName, false)
+            .addParameter("object", objectName, objectName, false)
             .addParameter(
               parameterType,
               property.paramLabel,
               property.options
                 ? '["' + property.options.join('", "') + '"]'
-                : '',
+                : "",
               false
             )
             .getCodeExtraInformation()
@@ -210,35 +210,35 @@ module.exports = {
         }
 
         // Add condition
-        if (parameterType === 'string' || parameterType === 'number') {
+        if (parameterType === "string" || parameterType === "number") {
           const propExpressionType =
-            parameterType === 'string' ? 'string' : 'expression';
+            parameterType === "string" ? "string" : "expression";
           gdObject
             .addCondition(
               `Is${property.functionName}`,
               property.paramLabel,
               property.conditionDescription,
               property.conditionSentence,
-              '',
+              "",
               property.iconPath,
               property.iconPath
             )
-            .addParameter('object', objectName, objectName, false)
+            .addParameter("object", objectName, objectName, false)
             .useStandardRelationalOperatorParameters(parameterType)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
-        } else if (parameterType === 'yesorno') {
+        } else if (parameterType === "yesorno") {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
               property.paramLabel,
               property.conditionDescription,
               property.conditionSentence,
-              '',
+              "",
               property.iconPath,
               property.iconPath
             )
-            .addParameter('object', objectName, objectName, false)
+            .addParameter("object", objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
         }
@@ -248,74 +248,74 @@ module.exports = {
 
     const setterAndGetterProperties = [
       {
-        functionName: 'TiledFile',
-        iconPath: 'JsPlatform/Extensions/skeletonicon.png',
-        type: 'jsonResource',
-        paramLabel: _('Tiled file'),
-        actionDescription: _('Set Tiled file'),
-        actionSentence: _('Do _PARAM1__PARAM2_ to the tiled file of _PARAM0_'),
-        conditionSentence: _('The tiled file of _PARAM0_ is _PARAM1__PARAM2_'),
-        conditionDescription: _('Compare the value of the tiled file.'),
-        expressionLabel: _('Get the Tiled file'),
-        expressionDescription: _('Get the Tiled file'),
+        functionName: "TiledFile",
+        iconPath: "JsPlatform/Extensions/skeletonicon.png",
+        type: "jsonResource",
+        paramLabel: _("Tiled file"),
+        actionDescription: _("Set Tiled file"),
+        actionSentence: _("Do _PARAM1__PARAM2_ to the tiled file of _PARAM0_"),
+        conditionSentence: _("The tiled file of _PARAM0_ is _PARAM1__PARAM2_"),
+        conditionDescription: _("Compare the value of the tiled file."),
+        expressionLabel: _("Get the Tiled file"),
+        expressionDescription: _("Get the Tiled file")
       },
       {
-        functionName: 'TilemapAtlasImage',
-        iconPath: 'JsPlatform/Extensions/skeletonicon.png',
-        type: 'image',
-        paramLabel: _('Tilemap atlas image'),
-        actionDescription: _('Set Tilemap atlas image'),
+        functionName: "TilemapAtlasImage",
+        iconPath: "JsPlatform/Extensions/skeletonicon.png",
+        type: "image",
+        paramLabel: _("Tilemap atlas image"),
+        actionDescription: _("Set Tilemap atlas image"),
         actionSentence: _(
-          'Do _PARAM1__PARAM2_ to the tilemap atlas image of _PARAM0_'
+          "Do _PARAM1__PARAM2_ to the tilemap atlas image of _PARAM0_"
         ),
         conditionSentence: _(
-          'The tilemap atlas image of _PARAM0_ is _PARAM1__PARAM2_'
+          "The tilemap atlas image of _PARAM0_ is _PARAM1__PARAM2_"
         ),
         conditionDescription: _(
-          'Compare the value of the tilemap atlas image.'
+          "Compare the value of the tilemap atlas image."
         ),
-        expressionLabel: _('Get the Tilemap atlas image'),
-        expressionDescription: _('Get the Tilemap atlas image'),
+        expressionLabel: _("Get the Tilemap atlas image"),
+        expressionDescription: _("Get the Tilemap atlas image")
       },
       {
-        functionName: 'Render',
-        iconPath: 'JsPlatform/Extensions/skeletonicon.png',
-        type: 'stringWithSelector',
-        paramLabel: _('Render'),
-        options: ['visible', 'all', 'index'],
-        actionDescription: _('Set Render'),
-        actionSentence: _('Set the render of _PARAM0_ to _PARAM1_'),
-        conditionSentence: _('The render of _PARAM0_ is _PARAM1_'),
-        expressionLabel: _('Get the Render'),
-        expressionDescription: _('Get the Render'),
+        functionName: "Render",
+        iconPath: "JsPlatform/Extensions/skeletonicon.png",
+        type: "stringWithSelector",
+        paramLabel: _("Render"),
+        options: ["visible", "all", "index"],
+        actionDescription: _("Set Render"),
+        actionSentence: _("Set the render of _PARAM0_ to _PARAM1_"),
+        conditionSentence: _("The render of _PARAM0_ is _PARAM1_"),
+        expressionLabel: _("Get the Render"),
+        expressionDescription: _("Get the Render")
       },
       {
-        functionName: 'LayerIndex',
-        iconPath: 'JsPlatform/Extensions/skeletonicon.png',
-        type: 'number',
-        paramLabel: _('Layer index'),
-        actionDescription: _('Set Layer index'),
-        actionSentence: _('Do _PARAM1__PARAM2_ to the layer index of _PARAM0_'),
-        conditionSentence: _('The layer index of _PARAM0_ is _PARAM1__PARAM2_'),
-        conditionDescription: _('Compare the value of the layer index.'),
-        expressionLabel: _('Get the Layer index'),
-        expressionDescription: _('Get the Layer index'),
+        functionName: "LayerIndex",
+        iconPath: "JsPlatform/Extensions/skeletonicon.png",
+        type: "number",
+        paramLabel: _("Layer index"),
+        actionDescription: _("Set Layer index"),
+        actionSentence: _("Do _PARAM1__PARAM2_ to the layer index of _PARAM0_"),
+        conditionSentence: _("The layer index of _PARAM0_ is _PARAM1__PARAM2_"),
+        conditionDescription: _("Compare the value of the layer index."),
+        expressionLabel: _("Get the Layer index"),
+        expressionDescription: _("Get the Layer index")
       },
       {
-        functionName: 'Visible',
-        iconPath: 'JsPlatform/Extensions/skeletonicon.png',
-        type: 'boolean',
-        paramLabel: _('Visible'),
-        actionDescription: _('Set Visible'),
-        actionSentence: _('Activate visible for _PARAM0_: _PARAM1_'),
-        conditionSentence: _('Visible is enabled'),
-        conditionDescription: _('Compare the value of the visible.'),
-        expressionLabel: _('Get the Visible'),
-        expressionDescription: _('Get the Visible'),
-      },
+        functionName: "Visible",
+        iconPath: "JsPlatform/Extensions/skeletonicon.png",
+        type: "boolean",
+        paramLabel: _("Visible"),
+        actionDescription: _("Set Visible"),
+        actionSentence: _("Activate visible for _PARAM0_: _PARAM1_"),
+        conditionSentence: _("Visible is enabled"),
+        conditionDescription: _("Compare the value of the visible."),
+        expressionLabel: _("Get the Visible"),
+        expressionDescription: _("Get the Visible")
+      }
     ];
 
-    addSettersAndGettersToObject(object, setterAndGetterProperties, 'TileMap');
+    addSettersAndGettersToObject(object, setterAndGetterProperties, "TileMap");
 
     return extension;
   },
@@ -341,9 +341,9 @@ module.exports = {
    */
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
-      'TileMap::TileMap',
+      "TileMap::TileMap",
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/tile_map_object',
+        helpPagePath: "/objects/tile_map_object"
       })
     );
   },
@@ -358,7 +358,7 @@ module.exports = {
 
     const ImportedExtLib = objectsRenderingService.requireModule(
       __dirname,
-      'pixi-tilemap'
+      "pixi-tilemap"
     );
 
     /**
@@ -415,7 +415,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return 'JsPlatform/Extensions/skeletonicon.png';
+      return "JsPlatform/Extensions/skeletonicon.png";
     };
     /**
      * This is called to update the Tilemap
@@ -424,22 +424,22 @@ module.exports = {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
-        .get('tilemapAtlasImage')
+        .get("tilemapAtlasImage")
         .getValue();
       const tiledFile = this._associatedObject
         .getProperties(this.project)
-        .get('tiledFile')
+        .get("tiledFile")
         .getValue();
       const layerIndex = parseInt(
         this._associatedObject
           .getProperties(this.project)
-          .get('layerIndex')
+          .get("layerIndex")
           .getValue(),
         0
       );
       const render = this._associatedObject
         .getProperties(this.project)
-        .get('render')
+        .get("render")
         .getValue();
 
       this._pixiResourcesLoader.getPIXITileSet(
@@ -447,7 +447,7 @@ module.exports = {
         tilemapAtlasImage,
         tiledFile,
         tileset => {
-          console.log('LOADED', tileset);
+          console.log("LOADED", tileset);
           if (tileset && this._pixiObject) {
             this._pixiResourcesLoader.updatePIXITileMap(
               tileset,
@@ -455,27 +455,6 @@ module.exports = {
               render,
               layerIndex
             );
-
-            console.log(
-              'update list-->',
-              this._associatedObject.getProperties(this.project),
-              this._associatedObject.getProperties(this.project).get('render')
-            );
-
-            // this._associatedObject.getProperties(this.project).set(
-            //   'render',
-            //   new gd.PropertyDescriptor(this._pixiObject.render)
-            //     .setType('choice')
-            //     .addExtraInfo('er')
-            //     .addExtraInfo('ff')
-            //     .addExtraInfo('iggndex')
-            //     .setLabel('Render')
-            // );
-            // this._associatedObject
-            //   .getProperties(this.project)
-            //   .get('render')
-            //   .addExtraInfo('TEST');
-            // .getValue();
           }
         }
       );
@@ -486,37 +465,37 @@ module.exports = {
     RenderedTileMapInstance.prototype.update = function() {
       const tiledFile = this._associatedObject
         .getProperties(this.project)
-        .get('tiledFile')
+        .get("tiledFile")
         .getValue();
       if (this._pixiObject.tiledFile !== tiledFile)
         this._pixiObject.tiledFile = tiledFile;
 
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
-        .get('tilemapAtlasImage')
+        .get("tilemapAtlasImage")
         .getValue();
       if (this._pixiObject.tilemapAtlasImage !== tilemapAtlasImage)
         this._pixiObject.tilemapAtlasImage = tilemapAtlasImage;
 
       const render = this._associatedObject
         .getProperties(this.project)
-        .get('render')
+        .get("render")
         .getValue();
       if (this._pixiObject.render !== render) this._pixiObject.render = render;
 
       const layerIndex = this._associatedObject
         .getProperties(this.project)
-        .get('layerIndex')
+        .get("layerIndex")
         .getValue();
       if (this._pixiObject.layerIndex !== layerIndex)
         this._pixiObject.layerIndex = layerIndex;
 
       const visible = this._associatedObject
         .getProperties(this.project)
-        .get('visible')
+        .get("visible")
         .getValue();
       if (visible !== this._pixiObject._visible) {
-        this._pixiObject._visible = visible === 'true';
+        this._pixiObject._visible = visible === "true";
         this._pixiObject.dirty = true;
       }
 
@@ -547,8 +526,8 @@ module.exports = {
     };
 
     objectsRenderingService.registerInstanceRenderer(
-      'TileMap::TileMap',
+      "TileMap::TileMap",
       RenderedTileMapInstance
     );
-  },
+  }
 };

@@ -95,8 +95,7 @@ class PointsListBody extends Component {
             });
           }}
           onRemove={() => {
-            //eslint-disable-next-line
-            const answer = confirm(
+            const answer = Window.showConfirmDialog(
               "Are you sure you want to remove this point? This can't be undone."
             );
             if (!answer) return;

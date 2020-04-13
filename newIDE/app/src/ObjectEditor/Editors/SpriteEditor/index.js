@@ -22,6 +22,7 @@ import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
+import Window from '../../../Utils/Window';
 import {
   deleteSpritesFromAnimation,
   duplicateSpritesInAnimation,
@@ -255,8 +256,9 @@ class AnimationsListContainer extends React.Component<
   };
 
   removeAnimation = i => {
-    //eslint-disable-next-line
-    const answer = confirm('Are you sure you want to remove this animation?');
+    const answer = Window.showConfirmDialog(
+      'Are you sure you want to remove this animation?'
+    );
 
     if (answer) {
       this.props.spriteObject.removeAnimation(i);

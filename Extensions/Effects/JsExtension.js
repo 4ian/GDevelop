@@ -253,7 +253,7 @@ module.exports = {
         .setType('number')
     );
     blurProperties.set(
-      'resolution',
+      'kernelSize',
       new gd.PropertyDescriptor(/* defaultValue= */ '5')
         .setLabel(_('Kernel size (one of these values: 5, 7, 9, 11, 13, 15)'))
         .setType('number')
@@ -516,6 +516,7 @@ module.exports = {
       .addEffect('DropShadow')
       .setFullName(_('Drop shadow'))
       .setDescription(_('Add a shadow around the rendered image.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-drop-shadow.js')
       .addIncludeFile('Extensions/Effects/drop-shadow-pixi-filter.js');
     const dropShadowProperties = dropShadowEffect.getProperties();

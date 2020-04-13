@@ -192,7 +192,7 @@ export default class PixiResourcesLoader {
     project: gdProject,
     imageResourceName: string,
     jsonResourceName: string,
-    onLoad: any => null
+    onLoad: any => void
   ) {
     const texture = this.getPIXITexture(project, imageResourceName);
     const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;

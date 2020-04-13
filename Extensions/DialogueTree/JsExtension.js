@@ -174,9 +174,8 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('expression', _('Option index number'), '', false)
-      .setDefaultValue('0')
       .getCodeExtraInformation()
-      .setFunctionName('gdjs.dialogueTree.selectPreviousOption');
+      .setFunctionName('gdjs.dialogueTree.selectOption');
 
     extension
       .addAction(

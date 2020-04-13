@@ -168,7 +168,7 @@ module.exports = {
         _(
           'Select option by number. Use this when the dialogue line is of type "options" and the player has pressed a button to change selected option.'
         ),
-        _('Select option by number _PARAM0_'),
+        _('Select option at index _PARAM0_'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'

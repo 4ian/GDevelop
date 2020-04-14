@@ -26,6 +26,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
+import Window from '../Utils/Window';
 import { passFullSize } from '../UI/FullSizeMeasurer';
 import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
@@ -606,8 +607,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
     );
 
@@ -700,8 +700,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { group, global } = groupWithContext;
     const { project, layout } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Do you want to remove all references to this group in events (actions and conditions using the group)?'
     );
 

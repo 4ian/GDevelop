@@ -38,6 +38,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(
   this._canGrabPlatforms = behaviorData.canGrabPlatforms || false;
   this._yGrabOffset = behaviorData.yGrabOffset || 0;
   this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
+  this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
   this._isOnFloor = false;
   this._isOnLadder = false;
   this._floorPlatform = null;
@@ -45,6 +46,8 @@ gdjs.PlatformerObjectRuntimeBehavior = function(
   this._currentSpeed = 0;
   this._jumping = false;
   this._currentJumpSpeed = 0;
+  this._timeSinceCurrentJumpStart = 0;
+  this._jumpKeyHeldSinceJumpStart = false;
   this._canJump = false;
   this._isGrabbingPlatform = false;
   this._grabbedPlatform = null;
@@ -367,6 +370,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   if (this._canJump && this._jumpKey) {
     this._jumping = true;
     this._canJump = false;
+    this._timeSinceCurrentJumpStart = 0;
+    this._jumpKeyHeldSinceJumpStart = true;
     //this._isOnFloor = false; If floor is a very steep slope, the object could go into it.
     this._isOnLadder = false;
     this._currentJumpSpeed = this._jumpSpeed;
@@ -375,9 +380,22 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
     //object.setY(object.getY()-1); //Useless and dangerous
   }
 
+  // Check if the jump key is continuously held since
+  // the beginning of the jump.
+  if (!this._jumpKey) this._jumpKeyHeldSinceJumpStart = false;
+
   if (this._jumping) {
+    this._timeSinceCurrentJumpStart += timeDelta;
     requestedDeltaY -= this._currentJumpSpeed * timeDelta;
-    this._currentJumpSpeed -= this._gravity * timeDelta;
+
+    // Decrease jump speed after the (optional) jump sustain time is over.
+    var sustainJumpSpeed =
+      this._jumpKeyHeldSinceJumpStart &&
+      this._timeSinceCurrentJumpStart < this._jumpSustainTime;
+    if (!sustainJumpSpeed) {
+      this._currentJumpSpeed -= this._gravity * timeDelta;
+    }
+
     if (this._currentJumpSpeed < 0) {
       this._currentJumpSpeed = 0;
       this._jumping = false;
@@ -899,6 +917,14 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSpeed = function() {
 };
 
 /**
+ * Get the jump sustain time of the Platformer Object.
+ * @returns {number} The jump sustain time.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSustainTime = function() {
+  return this._jumpSustainTime;
+};
+
+/**
  * Set the gravity of the Platformer Object.
  * @param {number} gravity The new gravity.
  */
@@ -954,6 +980,16 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setJumpSpeed = function(
   jumpSpeed
 ) {
   this._jumpSpeed = jumpSpeed;
+};
+
+/**
+ * Set the jump sustain time of the Platformer Object.
+ * @param {number} jumpSpeed The new jump sustain time.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setJumpSustainTime = function(
+  jumpSustainTime
+) {
+  this._jumpSustainTime = jumpSustainTime;
 };
 
 /**

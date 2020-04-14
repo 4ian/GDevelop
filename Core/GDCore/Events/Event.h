@@ -12,6 +12,7 @@
 #include <vector>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -136,6 +137,21 @@ class GD_CORE_API BaseEvent {
   };
   virtual std::vector<const gd::Expression*> GetAllExpressions() const {
     std::vector<const gd::Expression*> noExpr;
+    return noExpr;
+  };
+
+  /**
+   * \brief Return a list of all expressions with ParameterMetadata of the event.
+   * \note Used to preprocess or search in the expressions of the event.
+   */
+  virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata() {
+    std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> > noExpr;
+    return noExpr;
+  };
+  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata() const {
+    std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> > noExpr;
     return noExpr;
   };
 

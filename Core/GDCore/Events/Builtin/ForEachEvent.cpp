@@ -37,6 +37,18 @@ vector<gd::Expression*> ForEachEvent::GetAllExpressions() {
 
   return allExpressions;
 }
+
+vector<pair<gd::Expression*, gd::ParameterMetadata> >
+    ForEachEvent::GetAllExpressionsWithMetadata() {
+  vector<pair<gd::Expression*, gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto type = gd::ParameterMetadata().SetType("object");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&objectsToPick, type));
+
+  return allExpressionsWithMetadata;
+}
+
 vector<const gd::InstructionsList*> ForEachEvent::GetAllConditionsVectors()
     const {
   vector<const gd::InstructionsList*> allConditions;
@@ -57,6 +69,17 @@ vector<const gd::Expression*> ForEachEvent::GetAllExpressions() const {
   allExpressions.push_back(&objectsToPick);
 
   return allExpressions;
+}
+
+vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+    ForEachEvent::GetAllExpressionsWithMetadata() const {
+  vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto type = gd::ParameterMetadata().SetType("object");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&objectsToPick, type));
+
+  return allExpressionsWithMetadata;
 }
 
 void ForEachEvent::SerializeTo(SerializerElement& element) const {

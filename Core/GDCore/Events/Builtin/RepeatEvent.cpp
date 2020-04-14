@@ -38,6 +38,17 @@ vector<gd::Expression*> RepeatEvent::GetAllExpressions() {
   return allExpressions;
 }
 
+vector<pair<gd::Expression*, gd::ParameterMetadata> >
+    RepeatEvent::GetAllExpressionsWithMetadata() {
+  vector<pair<gd::Expression*, gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto type = gd::ParameterMetadata().SetType("expression");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&repeatNumberExpression, type));
+
+  return allExpressionsWithMetadata;
+}
+
 vector<const gd::InstructionsList*> RepeatEvent::GetAllConditionsVectors()
     const {
   vector<const gd::InstructionsList*> allConditions;
@@ -58,6 +69,17 @@ vector<const gd::Expression*> RepeatEvent::GetAllExpressions() const {
   allExpressions.push_back(&repeatNumberExpression);
 
   return allExpressions;
+}
+
+vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+    RepeatEvent::GetAllExpressionsWithMetadata() const {
+  vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto type = gd::ParameterMetadata().SetType("expression");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&repeatNumberExpression, type));
+
+  return allExpressionsWithMetadata;
 }
 
 void RepeatEvent::SerializeTo(SerializerElement& element) const {

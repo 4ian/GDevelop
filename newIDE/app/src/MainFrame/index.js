@@ -354,7 +354,6 @@ const MainFrame = (props: Props) => {
     // for another resource with the same name in the new project.
     ResourcesLoader.burstAllUrlsCache();
     // TODO: Pixi cache should also be burst
-    debugger;
     newState = await setState({
       ...newState,
       currentProject: project,
@@ -2034,18 +2033,17 @@ const MainFrame = (props: Props) => {
         />
       )}
       <CloseConfirmDialog
-          shouldPrompt={!!this.state.currentProject}
-          i18n={this.props.i18n}
-          language={this.props.i18n.language}
-          hasUnsavedChanges={
-            !!this.props.unsavedChanges &&
-            this.props.unsavedChanges.hasUnsavedChanges
-          }
-        />
-        <ChangelogDialogContainer />
-        {this.state.gdjsDevelopmentWatcherEnabled &&
-          renderGDJSDevelopmentWatcher &&
-          renderGDJSDevelopmentWatcher()}
+        shouldPrompt={!!state.currentProject}
+        i18n={props.i18n}
+        language={props.i18n.language}
+        hasUnsavedChanges={
+          !!props.unsavedChanges && props.unsavedChanges.hasUnsavedChanges
+        }
+      />
+      <ChangelogDialogContainer />
+      {state.gdjsDevelopmentWatcherEnabled &&
+        renderGDJSDevelopmentWatcher &&
+        renderGDJSDevelopmentWatcher()}
     </div>
   );
 };

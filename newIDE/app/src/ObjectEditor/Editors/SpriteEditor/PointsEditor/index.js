@@ -12,6 +12,7 @@ import {
   copyAnimationsSpritePoints,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
+import Window from '../Utils/Window';
 import every from 'lodash/every';
 const gd = global.gd;
 

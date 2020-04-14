@@ -13,6 +13,7 @@ import NewBehaviorDialog from './NewBehaviorDialog';
 import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import { isNullPtr } from '../Utils/IsNullPtr';
+import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 const gd = global.gd;

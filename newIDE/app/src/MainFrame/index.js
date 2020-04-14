@@ -210,7 +210,7 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(() => {
     console.log(state);
-  })
+  });
 
   React.useEffect(() => {
     (async () => {
@@ -223,7 +223,7 @@ const MainFrame = (props: Props) => {
         // to avoid the watcher interfering with the extension loading (by updating GDJS,
         // which could lead in the extension loading failing for some extensions as file
         // are removed/copied).
-        setState(state => ({
+        await setState(state => ({
           ...state,
           gdjsDevelopmentWatcherEnabled: true,
         }));
@@ -243,7 +243,6 @@ const MainFrame = (props: Props) => {
   }, []);
 
   const _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
-    console.log("_openInitialFileMetadata()");
     const { storageProviderOperations, initialFileMetadataToOpen } = props;
 
     if (!initialFileMetadataToOpen) return;
@@ -256,8 +255,8 @@ const MainFrame = (props: Props) => {
       return;
     }
 
-    openFromFileMetadata(initialFileMetadataToOpen).then((state) =>
-      openSceneOrProjectManager()
+    openFromFileMetadata(initialFileMetadataToOpen).then(state =>
+      openSceneOrProjectManager(state)
     );
   };
 
@@ -285,7 +284,6 @@ const MainFrame = (props: Props) => {
   };
 
   const _loadExtensions = (): Promise<void> => {
-    console.log('_loadExtensions()')
     const { extensionsLoader, i18n } = props;
     if (!extensionsLoader) {
       console.info(
@@ -333,12 +331,10 @@ const MainFrame = (props: Props) => {
     fileMetadata: ?FileMetadata,
     newState: State = state
   ): Promise<State> => {
-    console.log("loadFromSerialisedProject()");
     return timePromise(
       () => {
         const newProject = gd.ProjectHelper.createNewGDJSProject();
         newProject.unserializeFrom(serializedProject);
-
         return loadFromProject(newProject, fileMetadata, newState);
       },
       time => console.info(`Unserialization took ${time} ms`)
@@ -350,7 +346,6 @@ const MainFrame = (props: Props) => {
     fileMetadata: ?FileMetadata,
     newState: State = state
   ): Promise<State> => {
-    console.log("loadFromProject()");
     const { eventsFunctionsExtensionsState } = props;
 
     newState = await closeProject(newState);
@@ -359,25 +354,25 @@ const MainFrame = (props: Props) => {
     // for another resource with the same name in the new project.
     ResourcesLoader.burstAllUrlsCache();
     // TODO: Pixi cache should also be burst
+    debugger;
     newState = await setState({
       ...newState,
       currentProject: project,
       currentFileMetadata: fileMetadata,
     });
+
     eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       project
     );
     if (fileMetadata) {
-      project.setProjectFile(
-        fileMetadata.fileIdentifier
-      );
+      project.setProjectFile(fileMetadata.fileIdentifier);
     }
-    console.log("Returning loadFromProject")
     return newState;
   };
 
-  const openFromFileMetadata = async (fileMetadata: FileMetadata): Promise<any> => {
-    console.log("openFromFileMetadata()");
+  const openFromFileMetadata = async (
+    fileMetadata: FileMetadata
+  ): Promise<any> => {
     const { i18n, storageProviderOperations } = props;
     const {
       hasAutoSave,
@@ -392,7 +387,7 @@ const MainFrame = (props: Props) => {
         fileMetadata,
         storageProviderOperations
       );
-      return Promise.resolve();
+      return Promise.resolve(state);
     }
 
     const checkForAutosave = (): Promise<FileMetadata> => {
@@ -434,44 +429,47 @@ const MainFrame = (props: Props) => {
       });
     };
 
-    let newState = await setState(state => ({ ...state, loadingProject: true }));
+    let newState = await setState(state => ({
+      ...state,
+      loadingProject: true,
+    }));
     let _fileMetadata = await checkForAutosave();
+    let content;
     try {
-       // Try to find an autosave (and ask user if found)
-      const { content } = await onOpen(_fileMetadata);
-      if(!verifyProjectContent(i18n, content)) return;
-      const serializedProject = gd.Serializer.fromJSObject(content);
-      try {
-        newState = await loadFromSerializedProject(
-          serializedProject,
-          // Note that fileMetadata is the original, unchanged one, even if we're loading
-          // an autosave. If we're for some reason loading an autosave, we still consider
-          // that we're opening the file that was originally requested by the user.
-          _fileMetadata,
-          newState
-        )
-        console.log(newState);
-        serializedProject.delete();
-        return setState({ ...newState, loadingProject: false });
-      } catch (error) {
-        serializedProject.delete();
-        const errorMessage = getOpenErrorMessage
-          ? getOpenErrorMessage(error)
-          : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
-        showErrorBox(
-          [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
-            '\n'
-          ),
-          error
-        );
-      }
-    } catch(err) {
+      // Try to find an autosave (and ask user if found)
+      content = (await onOpen(_fileMetadata)).content;
+      if (!verifyProjectContent(i18n, content)) return Promise.resolve(state);
+    } catch (err) {
       // onOpen failed, tried to find again an autosave
       _fileMetadata = await checkForAutosaveAfterFailure();
-      if(_fileMetadata) {
-        return onOpen(_fileMetadata);
-      }
-      throw err;
+      if (_fileMetadata) {
+        content = (await onOpen(_fileMetadata)).content;
+      } else throw err;
+    }
+    const serializedProject = gd.Serializer.fromJSObject(content);
+    try {
+      newState = await loadFromSerializedProject(
+        serializedProject,
+        // Note that fileMetadata is the original, unchanged one, even if we're loading
+        // an autosave. If we're for some reason loading an autosave, we still consider
+        // that we're opening the file that was originally requested by the user.
+        _fileMetadata,
+        newState
+      );
+      console.log(newState);
+      serializedProject.delete();
+      return await setState({ ...newState, loadingProject: false });
+    } catch (error) {
+      serializedProject.delete();
+      const errorMessage = getOpenErrorMessage
+        ? getOpenErrorMessage(error)
+        : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
+      showErrorBox(
+        [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
+          '\n'
+        ),
+        error
+      );
     }
   };
 
@@ -480,29 +478,31 @@ const MainFrame = (props: Props) => {
   };
 
   const closeProject = async (newState: State = state): Promise<State> => {
-    let { currentProject } = state;
-    console.log("closeProject()");
+    let { currentProject } = newState;
+
     const { eventsFunctionsExtensionsState } = props;
     if (!currentProject) return Promise.resolve(newState);
-     
-     
+
     openProjectManager(false);
     newState = await setState(state => ({
       ...state,
       editorTabs: closeProjectTabs(state.editorTabs, currentProject),
     }));
 
-    eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-      currentProject
-    );
-    currentProject.delete();
-    console.log("returning from closeProject()")
-    return setState({
-      ...newState,
+    if (newState.currentProject) {
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+        newState.currentProject
+      );
+    }
+
+    if (newState.currentProject) newState.currentProject.delete();
+
+    return await setState(state => ({
+      ...state,
       currentProject: null,
       isPreviewFirstSceneOverriden: false,
       previewFirstSceneName: '',
-    });
+    }));
   };
 
   const getSerializedElements = () => {
@@ -647,7 +647,7 @@ const MainFrame = (props: Props) => {
 
   const deleteExternalEvents = (externalEvents: gdExternalEvents) => {
     const { i18n } = props;
-    if (!currentProject) return;
+    if (!state.currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
@@ -865,7 +865,6 @@ const MainFrame = (props: Props) => {
     layout: gdLayout,
     options: PreviewOptions
   ) => {
-    console.log("_launchLayoutPreview()");
     const { previewFirstSceneName, isPreviewFirstSceneOverriden } = state;
 
     if (!_previewLauncher.current) return;
@@ -953,7 +952,6 @@ const MainFrame = (props: Props) => {
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
     newState: State = state
   ) => {
-    console.log("Open Layout");
     const { i18n, storageProviderOperations } = props;
     const sceneEditorOptions = {
       label: name,
@@ -971,12 +969,12 @@ const MainFrame = (props: Props) => {
                   _setPreviewFirstScene(name);
                 },
               }}
-              project={state.currentProject}
+              project={newState.currentProject}
               layoutName={name}
               setToolbar={setEditorToolbar}
               onPreview={(project, layout, options) => {
                 _launchLayoutPreview(project, layout, options);
-                const { currentFileMetadata } = state;
+                const { currentFileMetadata } = newState;
                 if (
                   values.autosaveOnPreview &&
                   storageProviderOperations.onAutoSaveProject &&
@@ -1013,7 +1011,7 @@ const MainFrame = (props: Props) => {
         <PreferencesContext.Consumer>
           {({ values }) => (
             <EventsEditor
-              project={state.currentProject}
+              project={newState.currentProject}
               layoutName={name}
               setToolbar={setEditorToolbar}
               previewButtonSettings={{
@@ -1028,15 +1026,15 @@ const MainFrame = (props: Props) => {
               }}
               onPreview={(project, layout, options) => {
                 _launchLayoutPreview(project, layout, options);
-                //const { currentFileMetadata } = state;
+                const { currentFileMetadata } = newState;
                 if (
                   values.autosaveOnPreview &&
                   storageProviderOperations.onAutoSaveProject &&
-                  state.currentFileMetadata
+                  currentFileMetadata
                 ) {
                   storageProviderOperations.onAutoSaveProject(
                     project,
-                    state.currentFileMetadata
+                    currentFileMetadata
                   );
                 }
               }}
@@ -1244,16 +1242,14 @@ const MainFrame = (props: Props) => {
   };
 
   const openStartPage = () => {
-    console.log("openStartPage()");
     const { i18n, storageProviders } = props;
-    const { currentProject } = state;
     setState({
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: i18n._(t`Start Page`),
-        renderEditor: ({ isActive, editorRef }) => (
+        renderEditor: ({ isActive, editorRef, newState }) => (
           <StartPage
-            project={currentProject}
+            project={newState.currentProject}
             setToolbar={setEditorToolbar}
             canOpen={
               !!storageProviders.filter(
@@ -1263,9 +1259,7 @@ const MainFrame = (props: Props) => {
             onOpen={chooseProject}
             onCreate={() => openCreateDialog()}
             onOpenProjectManager={() => openProjectManager()}
-            onCloseProject={() => {
-              askToCloseProject();
-            }}
+            onCloseProject={() => askToCloseProject(newState)}
             onOpenAboutDialog={() => openAboutDialog()}
             onOpenHelpFinder={() => openHelpFinderDialog()}
             onOpenLanguageDialog={() => openLanguage()}
@@ -1281,7 +1275,7 @@ const MainFrame = (props: Props) => {
 
   const openDebugger = () => {
     const { i18n } = props;
-    setState({
+    setState(state => ({
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: i18n._(t`Debugger`),
@@ -1296,7 +1290,7 @@ const MainFrame = (props: Props) => {
         ),
         key: 'debugger',
       }),
-    });
+    }));
   };
 
   const _openInstructionOrExpression = (
@@ -1357,7 +1351,7 @@ const MainFrame = (props: Props) => {
     if (!currentProject) return;
     const { eventsFunctionsExtensionsState } = props;
 
-    // Names are assumed to be already validated
+    // Names are assumed to be alreaStartPagedy validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
       extensionName
     );
@@ -1383,7 +1377,6 @@ const MainFrame = (props: Props) => {
   };
 
   const chooseProject = () => {
-    console.log("chooseProject");
     const { storageProviders } = props;
 
     if (
@@ -1397,7 +1390,6 @@ const MainFrame = (props: Props) => {
   };
 
   const chooseProjectWithStorageProviderPicker = () => {
-    console.log("chooseProjectWithStorageProviderPicker")
     const { storageProviderOperations, i18n } = props;
     if (!storageProviderOperations.onOpenWithPicker) return;
 
@@ -1406,7 +1398,7 @@ const MainFrame = (props: Props) => {
       .then(fileMetadata => {
         if (!fileMetadata) return;
 
-        return openFromFileMetadata(fileMetadata).then((state) => {
+        return openFromFileMetadata(fileMetadata).then(state => {
           openSceneOrProjectManager(state);
           //addRecentFile(fileMetadata);
         });
@@ -1512,10 +1504,9 @@ const MainFrame = (props: Props) => {
       );
   };
 
-  const askToCloseProject = (): Promise<State> => {
-    console.log("askToCloseProject()");
+  const askToCloseProject = (newState: State = state): Promise<State> => {
     if (props.unsavedChanges && props.unsavedChanges.hasUnsavedChanges) {
-      if (!state.currentProject) return Promise.resolve(state);
+      if (!newState.currentProject) return Promise.resolve(newState);
       const { i18n } = props;
 
       //eslint-disable-next-line
@@ -1524,21 +1515,24 @@ const MainFrame = (props: Props) => {
           t`Close the project? Any changes that have not been saved will be lost.`
         )
       );
-      if (!answer) return Promise.resolve(state);
+      if (!answer) return Promise.resolve(newState);
     }
-    return closeProject();
+    return closeProject(newState);
   };
 
   const openSceneOrProjectManager = (newState: State = state) => {
-    console.log("openSceneOrProjectManager()");
     const { currentProject } = newState;
     if (!currentProject) return;
 
     if (currentProject.getLayoutsCount() === 1) {
-      openLayout(currentProject.getLayoutAt(0).getName(), {
-        openSceneEditor: true,
-        openEventsEditor: true,
-      }, newState);
+      openLayout(
+        currentProject.getLayoutAt(0).getName(),
+        {
+          openSceneEditor: true,
+          openEventsEditor: true,
+        },
+        newState
+      );
     } else {
       openProjectManager();
     }
@@ -1752,7 +1746,7 @@ const MainFrame = (props: Props) => {
       {!!renderMainMenu &&
         renderMainMenu({
           i18n: i18n,
-          project: currentProject,
+          project: state.currentProject,
           onChooseProject: chooseProject,
           onSaveProject: saveProject,
           onSaveProjectAs: saveProjectAs,
@@ -1778,7 +1772,9 @@ const MainFrame = (props: Props) => {
         onClose={toggleProjectManager}
       >
         <EditorBar
-          title={currentProject ? currentProject.getName() : 'No project'}
+          title={
+            state.currentProject ? state.currentProject.getName() : 'No project'
+          }
           displayRightCloseButton
           onClose={toggleProjectManager}
         />
@@ -1826,7 +1822,7 @@ const MainFrame = (props: Props) => {
             unsavedChanges={props.unsavedChanges}
           />
         )}
-        {!currentProject && (
+        {!state.currentProject && (
           <EmptyMessage>
             <Trans>To begin, open or create a new project.</Trans>
           </EmptyMessage>
@@ -1835,7 +1831,7 @@ const MainFrame = (props: Props) => {
       <Toolbar
         ref={toolbar}
         showProjectIcons={!props.integratedEditor}
-        hasProject={!!state.currentProject}
+        hasProject={!!currentProject}
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
         requestUpdate={props.requestUpdate}
@@ -1864,7 +1860,9 @@ const MainFrame = (props: Props) => {
         const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
         return (
           <TabContentContainer key={editorTab.key} active={isCurrentTab}>
-            <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
+            <ErrorBoundary>
+              {editorTab.render(isCurrentTab, state)}
+            </ErrorBoundary>
           </TabContentContainer>
         );
       })}
@@ -1899,17 +1897,17 @@ const MainFrame = (props: Props) => {
           onClose: () => openCreateDialog(false),
           onOpen: (storageProvider, fileMetadata) => {
             openCreateDialog(false);
-            // eslint-disable-next-line        
-              useStorageProvider(storageProvider)
+            // eslint-disable-next-line
+            useStorageProvider(storageProvider)
               .then(() => openFromFileMetadata(fileMetadata))
-              .then((state) => openSceneOrProjectManager(state));
+              .then(state => openSceneOrProjectManager(state));
           },
           onCreate: (project, storageProvider, fileMetadata) => {
             openCreateDialog(false);
             // eslint-disable-next-line
-            useStorageProvider(storageProvider).then(() =>
-              loadFromProject(project, fileMetadata)
-            ).then((state) => openSceneOrProjectManager(state));
+            useStorageProvider(storageProvider)
+              .then(() => loadFromProject(project, fileMetadata))
+              .then(state => openSceneOrProjectManager(state));
           },
         })}
       {!!introDialog &&
@@ -1917,9 +1915,9 @@ const MainFrame = (props: Props) => {
           open: state.introDialogOpen,
           onClose: () => _openIntroDialog(false),
         })}
-      {!!state.currentProject && state.platformSpecificAssetsDialogOpen && (
+      {!!currentProject && state.platformSpecificAssetsDialogOpen && (
         <PlatformSpecificAssetsDialog
-          project={state.currentProject}
+          project={currentProject}
           open
           onApply={() => openPlatformSpecificAssets(false)}
           onClose={() => openPlatformSpecificAssets(false)}

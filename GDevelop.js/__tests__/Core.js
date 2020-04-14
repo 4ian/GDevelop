@@ -3336,7 +3336,20 @@ describe('libGD.js', function() {
 
   describe('gd.ExpressionMetadata', () => {
     it('can have parameters', () => {
-      const expressionMetadata = new gd.ExpressionMetadata();
+      const expressionMetadata = new gd.ExpressionMetadata(
+        'extensionNamespace',
+        'name',
+        'fullname',
+        'description',
+        'group',
+        'smallicon'
+      );
+
+      expect(expressionMetadata.getFullName()).toBe('fullname');
+      expect(expressionMetadata.getDescription()).toBe('description');
+      expect(expressionMetadata.getGroup()).toBe('group');
+      expect(expressionMetadata.getSmallIconFilename()).toBe('smallicon');
+      expect(expressionMetadata.isShown()).toBe(true);
 
       expect(expressionMetadata.getParametersCount()).toBe(0);
       expressionMetadata.addParameter('type', 'label', '', false);

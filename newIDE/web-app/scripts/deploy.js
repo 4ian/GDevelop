@@ -33,29 +33,32 @@ isGitClean()
   })
   .then(() => {
     return new Promise(resolve => {
-      fs.stat(path.join('../../app/public/libGD.js'), (err, stats) => {
-        if (err) {
-          shell.echo(
-            `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
-          );
-          shell.exit(1);
-        }
+      fs.stat(
+        path.join(__dirname, '../../app/public/libGD.js'),
+        (err, stats) => {
+          if (err) {
+            shell.echo(
+              `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
+            );
+            shell.exit(1);
+          }
 
-        const sizeInMiB = stats.size / 1024 / 1024;
-        if (sizeInMiB > 5) {
-          shell.echo(
-            `❌ libGD.js size is too big (${sizeInMiB.toFixed(
-              2
-            )}MiB) - are you sure you're not trying to deploy the development version?`
-          );
-          shell.exit(1);
-        }
+          const sizeInMiB = stats.size / 1024 / 1024;
+          if (sizeInMiB > 5) {
+            shell.echo(
+              `❌ libGD.js size is too big (${sizeInMiB.toFixed(
+                2
+              )}MiB) - are you sure you're not trying to deploy the development version?`
+            );
+            shell.exit(1);
+          }
 
-        shell.echo(
-          `✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`
-        );
-        resolve();
-      });
+          shell.echo(
+            `✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`
+          );
+          resolve();
+        }
+      );
     });
   })
   .then(() => {

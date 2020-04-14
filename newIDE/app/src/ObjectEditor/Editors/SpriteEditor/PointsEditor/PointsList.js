@@ -10,6 +10,7 @@ import {
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../../../../Utils/NewNameGenerator';
 import { mapVector } from '../../../../Utils/MapFor';
+import Window from '../../../../Utils/Window';
 import styles from './styles';
 import PointRow from './PointRow';
 import AddPointRow from './AddPointRow';
@@ -95,8 +96,7 @@ class PointsListBody extends Component {
             });
           }}
           onRemove={() => {
-            //eslint-disable-next-line
-            const answer = confirm(
+            const answer = Window.showConfirmDialog(
               "Are you sure you want to remove this point? This can't be undone."
             );
             if (!answer) return;

@@ -339,7 +339,7 @@ gdjs.dialogueTree.selectOption = function(optionIndex) {
   if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
-      this.selectedOption
+      optionIndex
     );
     this.selectedOptionUpdated = true;
   }

@@ -1,14 +1,64 @@
 /**
- * This DebuggerClient connects to a websocket server and can dump
+ * An client side implementation of the Debugger
+ * @interface
+ */
+gdjs.DebuggerClient = function() {} // Necessary for Interface definition 
+
+/**
+ * Update a value, specified by a path starting from the {@link RuntimeGame} instance.
+ * @function
+ * @name gdjs.DebuggerClient#set
+ * @param {Array<string>} path - The path of the property to modify, starting from the RuntimeGame.
+ * @param {any} newValue - The new value.
+ */
+
+/**
+ * Call a method, specified by a path starting from the {@link RuntimeGame} instance.
+ * @function
+ * @name gdjs.DebuggerClient#call
+ * @param {Array<string>} path - The path to the method, starting from the RuntimeGame.
+ * @param {Array<any>} args - The arguments to pass the method.
+ */
+
+/**
+ * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
+ * @function
+ * @name gdjs.DebuggerClient#sendRuntimeGameDump
+ */
+
+/**
+ * Start profiling.
+ * @function
+ * @name gdjs.DebuggerClient#sendProfilerStarted
+ */
+
+/**
+ * Stop profiling.
+ * @function
+ * @name gdjs.DebuggerClient#sendProfilerStopped
+ */
+
+/**
+ * Send profiling results.
+ * @function
+ * @param {any} framesAverageMeasures The measures made for each frames.
+ * @param {any} stats Other measures done during the profiler run.
+ * @name gdjs.DebuggerClient#sendProfilerOutput
+ */
+
+
+/**
+ * This {@link DebuggerClient} connects to a websocket server, can dump
  * the data of the current game, and receive message to change a field or
- * call a function on an object of the specified runtimeGame.
+ * call a function, specified by a path from the {@link RuntimeGame}.
  *
  * @memberof gdjs
+ * @implements {gdjs.DebuggerClient}
  * @class WebsocketDebuggerClient
- * @param {gdjs.RuntimeGame} The `gdjs.RuntimeGame` to be debug
+ * @param {gdjs.RuntimeGame} runtimeGame -  The `gdjs.RuntimeGame` to be debugged
  */
-gdjs.WebsocketDebuggerClient = function(runtimegame) {
-  this._runtimegame = runtimegame;
+gdjs.WebsocketDebuggerClient = function(runtimeGame) {
+  this._runtimegame = runtimeGame;
 
   if (typeof WebSocket === 'undefined') {
     console.log("WebSocket is not defined, debugger won't work");
@@ -271,8 +321,23 @@ gdjs.WebsocketDebuggerClient.prototype.sendProfilerOutput = function(
   );
 };
 
-// This is an alternative to JSON.stringify that ensure that circular reference
-// are replaced by a placeholder.
+/**
+ * A function used to replace circular references with a new value.
+ * @callback DebuggerClientCycleReplacer
+ * @param {string | number} key - The key corresponding to the value.
+ * @param {any} value - The value.
+ * @returns {any} The new value.
+ */
+
+/** 
+ * This is an alternative to JSON.stringify that ensure that circular references
+ * are replaced by a placeholder.
+ * @param {any} obj - The object to serialize.
+ * @param {Function} [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
+ * @param {number} [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
+ * @param {number} [spaces] - The number of spaces for indentation.
+ * @param {DebuggerClientCycleReplacer} [cycleReplacer] - Function used to replace circular references with a new value.
+ */
 gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
   obj,
   replacer,
@@ -287,7 +352,13 @@ gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
   );
 };
 
-// JSON serializer that prevent circular references and stop if maxDepth is reached.
+/** 
+ * Generates a JSON serializer that prevent circular references and stop if maxDepth is reached.
+ * @param {Function} [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
+ * @param {DebuggerClientCycleReplacer} [cycleReplacer] - Function used to replace circular references with a new value.
+ * @param {number} [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
+ * @returns {Function}
+ */
 gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
   replacer,
   cycleReplacer,

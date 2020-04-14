@@ -1,5 +1,8 @@
 // @flow
-import { formatExpressionCall } from './FormatExpressionCall';
+import {
+  formatExpressionCall,
+  getVisibleParameterTypes,
+} from './FormatExpressionCall';
 import {
   filterExpressions,
   enumerateFreeExpressions,
@@ -69,5 +72,13 @@ describe('FormatExpressionCall', () => {
         'PlatformerObject',
       ])
     ).toBe('MyObject.PlatformerObject::JumpSpeed()');
+  });
+
+  it('can returns the visible parameters of a function', () => {
+    const objectsExpressions = enumerateObjectExpressions('number', 'Sprite');
+    const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
+    expect(pointXExpression).not.toBeUndefined();
+
+    expect(getVisibleParameterTypes(pointXExpression)).toEqual(['string']);
   });
 });

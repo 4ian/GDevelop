@@ -397,8 +397,8 @@ const MainFrame = (props: Props) => {
 
       return hasAutoSave(fileMetadata, true).then(canOpenAutosave => {
         if (!canOpenAutosave) return fileMetadata;
-        //eslint-disable-next-line
-        const answer = confirm(
+
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`
           )
@@ -417,8 +417,7 @@ const MainFrame = (props: Props) => {
       return hasAutoSave(fileMetadata, false).then(canOpenAutosave => {
         if (!canOpenAutosave) return null;
 
-        //eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`
           )
@@ -604,8 +603,7 @@ const MainFrame = (props: Props) => {
     const { i18n } = props;
     if (!state.currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this scene? This can't be undone.`
       )
@@ -627,8 +625,7 @@ const MainFrame = (props: Props) => {
     const { i18n } = props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this external layout? This can't be undone.`
       )
@@ -649,8 +646,7 @@ const MainFrame = (props: Props) => {
     const { i18n } = props;
     if (!state.currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove these external events? This can't be undone.`
       )
@@ -674,8 +670,7 @@ const MainFrame = (props: Props) => {
     const { i18n, eventsFunctionsExtensionsState } = props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this extension? This can't be undone.`
       )
@@ -1509,8 +1504,7 @@ const MainFrame = (props: Props) => {
       if (!newState.currentProject) return Promise.resolve(newState);
       const { i18n } = props;
 
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         i18n._(
           t`Close the project? Any changes that have not been saved will be lost.`
         )
@@ -2039,11 +2033,19 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      <CloseConfirmDialog shouldPrompt={!!state.currentProject} />
-      <ChangelogDialogContainer />
-      {state.gdjsDevelopmentWatcherEnabled &&
-        renderGDJSDevelopmentWatcher &&
-        renderGDJSDevelopmentWatcher()}
+      <CloseConfirmDialog
+          shouldPrompt={!!this.state.currentProject}
+          i18n={this.props.i18n}
+          language={this.props.i18n.language}
+          hasUnsavedChanges={
+            !!this.props.unsavedChanges &&
+            this.props.unsavedChanges.hasUnsavedChanges
+          }
+        />
+        <ChangelogDialogContainer />
+        {this.state.gdjsDevelopmentWatcherEnabled &&
+          renderGDJSDevelopmentWatcher &&
+          renderGDJSDevelopmentWatcher()}
     </div>
   );
 };

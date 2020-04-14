@@ -13,6 +13,7 @@ import {
   filterEventsBasedBehaviorsList,
 } from './EnumerateEventsBasedBehaviors';
 import Clipboard from '../Utils/Clipboard';
+import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -88,8 +89,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     const { eventsBasedBehaviorsList } = this.props;
 
     if (askForConfirmation) {
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         "Are you sure you want to remove this behavior? This can't be undone."
       );
       if (!answer) return;

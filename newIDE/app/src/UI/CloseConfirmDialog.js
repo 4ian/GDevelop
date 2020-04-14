@@ -40,8 +40,7 @@ export default React.memo<Props>(function CloseConfirmDialog({
             // which would make Electron to close the window for some weird reason.
             // See https://github.com/electron/electron/issues/7977
             setTimeout(() => {
-              //eslint-disable-next-line
-              const answer = confirm(message);
+              const answer = Window.showConfirmDialog(message);
               if (answer) {
                 // If answer is positive, re-trigger the close
                 delayElectronClose.current = false;

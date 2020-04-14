@@ -9,6 +9,7 @@ import {
   copyAllToProjectFolder,
 } from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import Window from '../Utils/Window';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
 const path = optionalRequire('path');
@@ -263,8 +264,7 @@ const selectLocalResourcePath = (
       );
 
       if (outsideProjectFolderPaths.length) {
-        // eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
           )

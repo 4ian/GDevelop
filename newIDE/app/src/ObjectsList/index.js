@@ -10,6 +10,7 @@ import NewObjectDialog from './NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard from '../Utils/Clipboard';
+import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -189,8 +190,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this object? This can't be undone."
     );
     if (!answer) return;
@@ -376,8 +376,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       return;
     }
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?"
     );
     if (!answer) return;

@@ -10,6 +10,7 @@ import EditorMosaic from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
+import Window from '../Utils/Window';
 
 import {
   type ResourceSource,
@@ -77,8 +78,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     const { project, onDeleteResource } = this.props;
     if (!resource) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this resource? This can't be undone."
     );
     if (!answer) return;

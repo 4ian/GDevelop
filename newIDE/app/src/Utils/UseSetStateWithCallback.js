@@ -3,10 +3,10 @@ import React from 'react';
 export default function useStateWithCallback(initialValue) {
   const [state, setState] = React.useState(initialValue);
   const callback = React.useRef(null);
-  const useStateWithCB = (newValue) => {
+  const useStateWithCB = newValue => {
     return new Promise(resolve => {
-      setState(newValue);
       callback.current = resolve;
+      setState(newValue);
     });
   };
   React.useEffect(
@@ -16,7 +16,7 @@ export default function useStateWithCallback(initialValue) {
         callback.current = null;
       }
     },
-    [callback, state]
+    [state]
   );
   return [state, useStateWithCB];
-};
+}

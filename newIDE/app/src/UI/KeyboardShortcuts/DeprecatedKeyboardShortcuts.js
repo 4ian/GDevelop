@@ -161,25 +161,15 @@ export default class DeprecatedKeyboardShortcuts {
     if (this._isControlPressed() && evt.which === MINUS_KEY) {
       this.onZoomOut();
     }
+    if (evt.which === NUMPAD_SUBTRACT) {
+      this.onZoomOut();
+    }
+
     if (this._isControlPressed() && evt.which === EQUAL_KEY) {
       this.onZoomIn();
     }
-
-    if (isMacLike()) {
-      // Mac specific shortcuts
-      if (evt.which === NUMPAD_SUBTRACT) {
-        this.onZoomOut();
-      }
-      if (evt.which === NUMPAD_ADD) {
-        this.onZoomIn();
-      }
-    } else {
-      if (this._isControlPressed() && evt.which === NUMPAD_SUBTRACT) {
-        this.onZoomOut();
-      }
-      if (this._isControlPressed() && evt.which === NUMPAD_ADD) {
-        this.onZoomIn();
-      }
+    if (evt.which === NUMPAD_ADD) {
+      this.onZoomIn();
     }
 
     if (preventDefault) {

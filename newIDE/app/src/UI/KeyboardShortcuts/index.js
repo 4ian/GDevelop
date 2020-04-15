@@ -1,6 +1,4 @@
 // @flow
-import { isMacLike } from '../../Utils/Platform';
-
 const LEFT_KEY = 37;
 const UP_KEY = 38;
 const RIGHT_KEY = 39;
@@ -156,33 +154,15 @@ export default class KeyboardShortcuts {
     if (onZoomOut && this._isControlOrCmdPressed() && evt.which === MINUS_KEY) {
       onZoomOut();
     }
+    if (onZoomOut && evt.which === NUMPAD_SUBTRACT) {
+      onZoomOut();
+    }
+
     if (onZoomIn && this._isControlOrCmdPressed() && evt.which === EQUAL_KEY) {
       onZoomIn();
     }
-
-    if (isMacLike()) {
-      // Mac specific shortcuts
-      if (onZoomOut && evt.which === NUMPAD_SUBTRACT) {
-        onZoomOut();
-      }
-      if (onZoomIn && evt.which === NUMPAD_ADD) {
-        onZoomIn();
-      }
-    } else {
-      if (
-        onZoomOut &&
-        this._isControlOrCmdPressed() &&
-        evt.which === NUMPAD_SUBTRACT
-      ) {
-        onZoomOut();
-      }
-      if (
-        onZoomIn &&
-        this._isControlOrCmdPressed() &&
-        evt.which === NUMPAD_ADD
-      ) {
-        onZoomIn();
-      }
+    if (onZoomIn && evt.which === NUMPAD_ADD) {
+      onZoomIn();
     }
   };
 }

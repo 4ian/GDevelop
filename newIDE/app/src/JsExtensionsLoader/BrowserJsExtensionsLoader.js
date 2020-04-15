@@ -37,6 +37,11 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'Physics3',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics3Behavior/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'ExampleJsExtension',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),
     objectsRenderingServiceModules: {},

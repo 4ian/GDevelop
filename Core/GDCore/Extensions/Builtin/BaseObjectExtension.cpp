@@ -1072,7 +1072,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition("Raycast",
                     _("Raycast"),
                     _("Sends a ray from the given source position and angle, "
-                      "intersecting the closest object.\nThe instersected "
+                      "intersecting the closest object.\nThe intersected "
                       "object will become the only one taken into account.\nIf "
                       "the condition is inverted, the object to be intersected "
                       "will be the farthest one within the ray radius."),
@@ -1102,7 +1102,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "RaycastToPosition",
           _("Raycast to position"),
           _("Sends a ray from the given source position to the final point, "
-            "intersecting the closest object.\nThe instersected "
+            "intersecting the closest object.\nThe intersected "
             "object will become the only one taken into account.\nIf "
             "the condition is inverted, the object to be intersected "
             "will be the farthest one within the ray radius."),

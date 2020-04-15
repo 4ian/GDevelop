@@ -209,6 +209,8 @@ const MainFrame = (props: Props) => {
   const forceUpdate = useForceUpdate();
 
   React.useEffect(() => {
+    // This is just for testing, to check if we're getting the right state
+    // and gives us an idea about the number of re-renders. 
     console.log(state);
   });
 
@@ -268,7 +270,7 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       state.isPreviewFirstSceneOverriden,
       state.previewFirstSceneName,
-      state.currentProject,
+      //state.currentProject,
     ]
   );
 
@@ -331,46 +333,49 @@ const MainFrame = (props: Props) => {
     fileMetadata: ?FileMetadata,
     newState: State = state
   ): Promise<State> => {
-    return timePromise(
-      () => {
-        const newProject = gd.ProjectHelper.createNewGDJSProject();
-        newProject.unserializeFrom(serializedProject);
-        return loadFromProject(newProject, fileMetadata, newState);
-      },
-      time => console.info(`Unserialization took ${time} ms`)
+    // timePromise(
+    //   () => {
+
+    //   },
+    //   time => console.info(`Unserialization took ${time} ms`)
+    // );
+    const newProject = gd.ProjectHelper.createNewGDJSProject();
+    newProject.unserializeFrom(serializedProject);
+    return loadFromProject(newProject, fileMetadata, newState).then(state =>
+      Promise.resolve(state)
     );
   };
 
-  const loadFromProject = async (
+  const loadFromProject = (
     project: gdProject,
     fileMetadata: ?FileMetadata,
     newState: State = state
   ): Promise<State> => {
     const { eventsFunctionsExtensionsState } = props;
 
-    newState = await closeProject(newState);
-    // Make sure that the ResourcesLoader cache is emptied, so that
-    // the URL to a resource with a name in the old project is not re-used
-    // for another resource with the same name in the new project.
-    ResourcesLoader.burstAllUrlsCache();
-    // TODO: Pixi cache should also be burst
-    newState = await setState({
-      ...newState,
-      currentProject: project,
-      currentFileMetadata: fileMetadata,
+    return closeProject(newState).then(state => {
+      // Make sure that the ResourcesLoader cache is emptied, so that
+      // the URL to a resource with a name in the old project is not re-used
+      // for another resource with the same name in the new project.
+      ResourcesLoader.burstAllUrlsCache();
+      // TODO: Pixi cache should also be burst
+      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        project
+      );
+      if (fileMetadata) {
+        project.setProjectFile(fileMetadata.fileIdentifier);
+      }
+      return setState({
+        ...state,
+        currentProject: project,
+        currentFileMetadata: fileMetadata,
+      });
     });
-
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-      project
-    );
-    if (fileMetadata) {
-      project.setProjectFile(fileMetadata.fileIdentifier);
-    }
-    return newState;
   };
 
-  const openFromFileMetadata = async (
-    fileMetadata: FileMetadata
+  const openFromFileMetadata = (
+    fileMetadata: FileMetadata,
+    newState: State = state
   ): Promise<any> => {
     const { i18n, storageProviderOperations } = props;
     const {
@@ -386,7 +391,7 @@ const MainFrame = (props: Props) => {
         fileMetadata,
         storageProviderOperations
       );
-      return Promise.resolve(state);
+      return Promise.resolve(newState);
     }
 
     const checkForAutosave = (): Promise<FileMetadata> => {
@@ -427,80 +432,90 @@ const MainFrame = (props: Props) => {
       });
     };
 
-    let newState = await setState(state => ({
-      ...state,
-      loadingProject: true,
-    }));
-    let _fileMetadata = await checkForAutosave();
-    let content;
-    try {
+    return setState({ ...newState, loadingProject: true }).then(state => {
       // Try to find an autosave (and ask user if found)
-      content = (await onOpen(_fileMetadata)).content;
-      if (!verifyProjectContent(i18n, content)) return Promise.resolve(state);
-    } catch (err) {
-      // onOpen failed, tried to find again an autosave
-      _fileMetadata = await checkForAutosaveAfterFailure();
-      if (_fileMetadata) {
-        content = (await onOpen(_fileMetadata)).content;
-      } else throw err;
-    }
-    const serializedProject = gd.Serializer.fromJSObject(content);
-    try {
-      newState = await loadFromSerializedProject(
-        serializedProject,
-        // Note that fileMetadata is the original, unchanged one, even if we're loading
-        // an autosave. If we're for some reason loading an autosave, we still consider
-        // that we're opening the file that was originally requested by the user.
-        _fileMetadata,
-        newState
-      );
-      console.log(newState);
-      serializedProject.delete();
-      return await setState({ ...newState, loadingProject: false });
-    } catch (error) {
-      serializedProject.delete();
-      const errorMessage = getOpenErrorMessage
-        ? getOpenErrorMessage(error)
-        : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
-      showErrorBox(
-        [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
-          '\n'
-        ),
-        error
-      );
-    }
+      return checkForAutosave()
+        .then(fileMetadata => onOpen(fileMetadata))
+        .catch(err => {
+          // onOpen failed, tried to find again an autosave
+          return checkForAutosaveAfterFailure().then(fileMetadata => {
+            if (fileMetadata) {
+              return onOpen(fileMetadata);
+            }
+
+            throw err;
+          });
+        })
+        .then(({ content }) => {
+          if (!verifyProjectContent(i18n, content)) {
+            // The content is not recognized and the user was warned. Abort the opening.
+            return;
+          }
+
+          const serializedProject = gd.Serializer.fromJSObject(content);
+          return loadFromSerializedProject(
+            serializedProject,
+            // Note that fileMetadata is the original, unchanged one, even if we're loading
+            // an autosave. If we're for some reason loading an autosave, we still consider
+            // that we're opening the file that was originally requested by the user.
+            fileMetadata,
+            state
+          ).then(
+            state => {
+              serializedProject.delete();
+              return Promise.resolve(state);
+            },
+            err => {
+              serializedProject.delete();
+              throw err;
+            }
+          );
+        })
+        .catch(error => {
+          const errorMessage = getOpenErrorMessage
+            ? getOpenErrorMessage(error)
+            : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
+          showErrorBox(
+            [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
+              '\n'
+            ),
+            error
+          );
+        })
+        .then(state => {
+          if (state) return setState({ ...state, loadingProject: false });
+        });
+    });
   };
 
   const closeApp = (): void => {
     return Window.quit();
   };
 
-  const closeProject = async (newState: State = state): Promise<State> => {
-    let { currentProject } = newState;
-
+  const closeProject = (newState: State = state): Promise<State> => {
     const { eventsFunctionsExtensionsState } = props;
+    const { currentProject, editorTabs } = newState;
     if (!currentProject) return Promise.resolve(newState);
 
     openProjectManager(false);
-    newState = await setState(state => ({
-      ...state,
-      editorTabs: closeProjectTabs(state.editorTabs, currentProject),
-    }));
-
-    if (newState.currentProject) {
-      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-        newState.currentProject
-      );
-    }
-
-    if (newState.currentProject) newState.currentProject.delete();
-
-    return await setState(state => ({
-      ...state,
-      currentProject: null,
-      isPreviewFirstSceneOverriden: false,
-      previewFirstSceneName: '',
-    }));
+    return setState({
+      ...newState,
+      editorTabs: closeProjectTabs(editorTabs, currentProject),
+    }).then(state => {
+      const { currentProject } = state;
+      if (currentProject) {
+        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+          currentProject
+        );
+        currentProject.delete();
+      }
+      return setState({
+        ...state,
+        currentProject: null,
+        isPreviewFirstSceneOverriden: false,
+        previewFirstSceneName: '',
+      }).then(state => Promise.resolve(state));
+    });
   };
 
   const getSerializedElements = () => {
@@ -1250,7 +1265,7 @@ const MainFrame = (props: Props) => {
                 ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
               ).length
             }
-            onOpen={chooseProject}
+            onOpen={() => chooseProject(newState)}
             onCreate={() => openCreateDialog()}
             onOpenProjectManager={() => openProjectManager()}
             onCloseProject={() => askToCloseProject(newState)}
@@ -1370,7 +1385,7 @@ const MainFrame = (props: Props) => {
     setState(state => ({ ...state, createDialogOpen: open }));
   };
 
-  const chooseProject = () => {
+  const chooseProject = (newState: State = state) => {
     const { storageProviders } = props;
 
     if (
@@ -1379,11 +1394,11 @@ const MainFrame = (props: Props) => {
     ) {
       openOpenFromStorageProviderDialog();
     } else {
-      chooseProjectWithStorageProviderPicker();
+      chooseProjectWithStorageProviderPicker(newState);
     }
   };
 
-  const chooseProjectWithStorageProviderPicker = () => {
+  const chooseProjectWithStorageProviderPicker = (newState: State = state) => {
     const { storageProviderOperations, i18n } = props;
     if (!storageProviderOperations.onOpenWithPicker) return;
 
@@ -1392,7 +1407,7 @@ const MainFrame = (props: Props) => {
       .then(fileMetadata => {
         if (!fileMetadata) return;
 
-        return openFromFileMetadata(fileMetadata).then(state => {
+        return openFromFileMetadata(fileMetadata, newState).then(state => {
           openSceneOrProjectManager(state);
           //addRecentFile(fileMetadata);
         });
@@ -1889,18 +1904,24 @@ const MainFrame = (props: Props) => {
           open: state.createDialogOpen,
           onClose: () => openCreateDialog(false),
           onOpen: (storageProvider, fileMetadata) => {
-            openCreateDialog(false);
-            // eslint-disable-next-line
-            useStorageProvider(storageProvider)
-              .then(() => openFromFileMetadata(fileMetadata))
-              .then(state => openSceneOrProjectManager(state));
+            setState(state => ({ ...state, createDialogOpen: false })).then(
+              state => {
+                // eslint-disable-next-line
+                useStorageProvider(storageProvider)
+                  .then(() => openFromFileMetadata(fileMetadata, state))
+                  .then(state => openSceneOrProjectManager(state));
+              }
+            );
           },
           onCreate: (project, storageProvider, fileMetadata) => {
-            openCreateDialog(false);
-            // eslint-disable-next-line
-            useStorageProvider(storageProvider)
-              .then(() => loadFromProject(project, fileMetadata))
-              .then(state => openSceneOrProjectManager(state));
+            setState(state => ({ ...state, createDialogOpen: false })).then(
+              state => {
+                // eslint-disable-next-line
+                useStorageProvider(storageProvider)
+                  .then(() => loadFromProject(project, fileMetadata, state))
+                  .then(state => openSceneOrProjectManager(state));
+              }
+            );
           },
         })}
       {!!introDialog &&

@@ -210,7 +210,7 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(() => {
     // This is just for testing, to check if we're getting the right state
-    // and gives us an idea about the number of re-renders. 
+    // and gives us an idea about the number of re-renders.
     console.log(state);
   });
 

@@ -57,8 +57,18 @@ type RootMenuTemplate =
       submenu: Array<MenuItemTemplate>,
     |};
 
-// Custom hook to run function only once, regardless of prop changes
-const useMountEffect = func => React.useEffect(func, []);
+// Custom hook to register and deregister IPC listener
+const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
+  React.useEffect(
+    () => {
+      if (!ipcRenderer) return;
+      const handler = (event, ...eventArgs) => func(...eventArgs);
+      ipcRenderer.on(ipcEvent, handler);
+      return () => ipcRenderer.removeListener(ipcEvent, handler);
+    },
+    [ipcEvent, func]
+  );
+};
 
 /**
  * Forward events received from Electron main process
@@ -67,55 +77,24 @@ const useMountEffect = func => React.useEffect(func, []);
 const ElectronMainMenu = (props: MainMenuProps) => {
   const { i18n, project } = props;
 
-  useMountEffect(() => {
-    if (!ipcRenderer) return;
-
-    ipcRenderer.on(('main-menu-open': MainMenuEvent), event =>
-      props.onChooseProject()
-    );
-    ipcRenderer.on(('main-menu-save': MainMenuEvent), event =>
-      props.onSaveProject()
-    );
-    ipcRenderer.on(('main-menu-save-as': MainMenuEvent), event =>
-      props.onSaveProjectAs()
-    );
-    ipcRenderer.on(('main-menu-close': MainMenuEvent), event =>
-      props.onCloseProject()
-    );
-    ipcRenderer.on(('main-menu-close-app': MainMenuEvent), event =>
-      props.onCloseApp()
-    );
-    ipcRenderer.on(('main-menu-export': MainMenuEvent), event =>
-      props.onExportProject()
-    );
-    ipcRenderer.on(('main-menu-create': MainMenuEvent), event =>
-      props.onCreateProject()
-    );
-    ipcRenderer.on(('main-menu-open-project-manager': MainMenuEvent), event =>
-      props.onOpenProjectManager()
-    );
-    ipcRenderer.on(('main-menu-open-start-page': MainMenuEvent), event =>
-      props.onOpenStartPage()
-    );
-    ipcRenderer.on(('main-menu-open-debugger': MainMenuEvent), event =>
-      props.onOpenDebugger()
-    );
-    ipcRenderer.on(('main-menu-open-about': MainMenuEvent), event =>
-      props.onOpenAbout()
-    );
-    ipcRenderer.on(('main-menu-open-preferences': MainMenuEvent), event =>
-      props.onOpenPreferences()
-    );
-    ipcRenderer.on(('main-menu-open-language': MainMenuEvent), event =>
-      props.onOpenLanguage()
-    );
-    ipcRenderer.on(('main-menu-open-profile': MainMenuEvent), event =>
-      props.onOpenProfile()
-    );
-    ipcRenderer.on(('update-status': MainMenuEvent), (event, status) =>
-      props.setUpdateStatus(status)
-    );
-  });
+  useIPCEventListener('main-menu-open', props.onChooseProject);
+  useIPCEventListener('main-menu-save', props.onSaveProject);
+  useIPCEventListener('main-menu-save-as', props.onSaveProjectAs);
+  useIPCEventListener('main-menu-close', props.onCloseProject);
+  useIPCEventListener('main-menu-close-app', props.onCloseApp);
+  useIPCEventListener('main-menu-export', props.onExportProject);
+  useIPCEventListener('main-menu-create', props.onCreateProject);
+  useIPCEventListener(
+    'main-menu-open-project-manager',
+    props.onOpenProjectManager
+  );
+  useIPCEventListener('main-menu-open-start-page', props.onOpenStartPage);
+  useIPCEventListener('main-menu-open-debugger', props.onOpenDebugger);
+  useIPCEventListener('main-menu-open-about', props.onOpenAbout);
+  useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);
+  useIPCEventListener('main-menu-open-language', props.onOpenLanguage);
+  useIPCEventListener('main-menu-open-profile', props.onOpenProfile);
+  useIPCEventListener('update-status', props.setUpdateStatus);
 
   const _buildAndSendMenuTemplate = React.useCallback(
     () => {

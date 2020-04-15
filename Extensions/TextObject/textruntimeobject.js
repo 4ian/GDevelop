@@ -93,7 +93,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
     this._shadowAngle = 0;
 
     /** @type {number} */
-    this._padding = 5;
+    this._padding = 50;
 
     /** @type {number} */
     this._scaleX = 1;

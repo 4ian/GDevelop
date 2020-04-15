@@ -97,12 +97,12 @@ gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function() {
   // There is no "smart" resizing to be done here: the rendering of the game
   // should be done with the size set on the game.
   if (
-    this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
-    this._pixiRenderer.height !== this._game.getGameResolutionHeight()
+    this._pixiRenderer.width !== gdjs.evtTools.window.getWindowInnerWidth() ||
+    this._pixiRenderer.height !== gdjs.evtTools.window.getWindowInnerHeight()
   ) {
     this._pixiRenderer.resize(
-      this._game.getGameResolutionWidth(),
-      this._game.getGameResolutionHeight()
+      gdjs.evtTools.window.getWindowInnerWidth(),
+      gdjs.evtTools.window.getWindowInnerHeight()
     );
   }
 
@@ -294,7 +294,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
     //Handle the fact that the game is stretched to fill the canvas.
     pos[0] *= that._game.getGameResolutionWidth() / (that._canvasWidth || 1);
     pos[1] *= that._game.getGameResolutionHeight() / (that._canvasHeight || 1);
-
     return pos;
   }
 

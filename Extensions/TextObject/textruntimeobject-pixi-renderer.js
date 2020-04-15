@@ -34,7 +34,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     var style = this._text.style;
     style.fontStyle = this._object._italic ? 'italic' : 'normal';
     style.fontWeight = this._object._bold ? 'bold' : 'normal';
-    style.fontSize = this._object._characterSize;
+    style.fontSize = this._object._characterSize * 4;
     style.fontFamily = fontName;
 
     if (this._object._useGradient){
@@ -72,6 +72,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     // Prevent spikey outlines by adding a miter limit 
     style.miterLimit = 3;
 
+    this._text.scale.set(0.25,0.25);
     this.updatePosition();
 
     // Manually ask the PIXI object to re-render as we changed a style property

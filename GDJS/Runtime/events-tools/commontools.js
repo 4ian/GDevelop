@@ -12,9 +12,9 @@
 gdjs.evtTools.common = gdjs.evtTools.common || {};
 
 /**
- * Get the value of a variable. Equivalent of variable.getAsNumber().
+ * Get the value of a variable. Equivalent to `variable.getAsNumber()`.
  * @param {gdjs.Variable} variable Variable.
- * @returns {number} Return the content of the variable as number.
+ * @returns {number} The content of the variable, as a number.
  * @private
  */
 gdjs.evtTools.common.getVariableNumber = function(variable) {
@@ -22,9 +22,9 @@ gdjs.evtTools.common.getVariableNumber = function(variable) {
 };
 
 /**
- * Get the string of a variable. Equivalent of variable.getAsString().
+ * Get the string of a variable. Equivalent to `variable.getAsString()`.
  * @param {gdjs.Variable} variable Variable.
- * @returns {string} Return the content of the variable as string.
+ * @returns {string} The content of the variable, as a string.
  * @private
  */
 gdjs.evtTools.common.getVariableString = function(variable) {
@@ -32,10 +32,10 @@ gdjs.evtTools.common.getVariableString = function(variable) {
 };
 
 /**
- * Check if a scene variable exist in a scene.
- * @param {gdjs.RuntimeScene} runtimeScene Scene.
- * @param {string} variableName Name of the variable.
- * @returns {boolean} Return the true is the scene variable exist.
+ * Check if a scene variable exists.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene.
+ * @param {string} variableName Name of the scene variable.
+ * @returns {boolean} true if the scene variable exits, false otherwise.
  * @private
  */
 gdjs.evtTools.common.sceneVariableExists = function(runtimeScene, variableName) {
@@ -43,10 +43,10 @@ gdjs.evtTools.common.sceneVariableExists = function(runtimeScene, variableName) 
 };
 
 /**
- * Check if a child exist in a global variable in a scene.
- * @param {gdjs.RuntimeScene} runtimeScene Scene.
- * @param {string} variableName Name of the variable.
- * @returns {boolean} Return the true is the global variable.
+ * Check if a global variable exists.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene.
+ * @param {string} variableName Name of the global variable.
+ * @returns {boolean} true if the global variable exits, false otherwise.
  * @private
  */
 gdjs.evtTools.common.globalVariableExists = function(runtimeScene, variableName) {
@@ -54,10 +54,10 @@ gdjs.evtTools.common.globalVariableExists = function(runtimeScene, variableName)
 };
 
 /**
- * Check if a child exist in a variable.
+ * Check if a child exists in a variable.
  * @param {gdjs.Variable} variable Variable.
  * @param {string} childName Name of the child.
- * @returns {boolean} Return true if child exist in the variable.
+ * @returns {boolean} true if child exist in the variable, false otherwise.
  * @private
  */
 gdjs.evtTools.common.variableChildExists = function(variable, childName) {
@@ -65,10 +65,10 @@ gdjs.evtTools.common.variableChildExists = function(variable, childName) {
 };
 
 /**
- * Remove an child by a name in a variable.
+ * Remove the child with the given name in a variable.
  * @param {gdjs.Variable} variable Variable.
  * @param {string} childName Name of the child.
- * @returns {gdjs.Variable} Return the new variable without the child removed.
+ * @returns {gdjs.Variable} The new variable, with the child removed.
  * @private
  */
 gdjs.evtTools.common.variableRemoveChild = function(variable, childName) {
@@ -87,7 +87,7 @@ gdjs.evtTools.common.variableClearChildren = function(variable) {
 /**
  * Get the number of children in a variable.
  * @param {gdjs.Variable} variable Variable.
- * @returns {number} Return the number of childs in a variable.
+ * @returns {number} The number of children in the variable.
  * @private
  */
 gdjs.evtTools.common.getVariableChildCount = function(variable) {
@@ -96,9 +96,9 @@ gdjs.evtTools.common.getVariableChildCount = function(variable) {
 };
 
 /**
- * Convert a string to a float.
- * @param {boolean} str Value to convert in float.
- * @returns {number} Return the value in float.
+ * Convert a string to a number.
+ * @param {boolean} str String to convert.
+ * @returns {number} The parsed number, or NaN if invalid.
  * @private
  */
 gdjs.evtTools.common.toNumber = function(str) {
@@ -107,8 +107,8 @@ gdjs.evtTools.common.toNumber = function(str) {
 
 /**
  * Convert a number to a string.
- * @param {boolean} num Value to convert in string.
- * @returns {string} Return the value in string.
+ * @param {number} num Value to convert to a string.
+ * @returns {string} The value as a string.
  * @private
  */
 gdjs.evtTools.common.toString = function(num) {
@@ -119,8 +119,8 @@ gdjs.evtTools.common.toString = function(num) {
 
 /**
  * Negate the boolean.
- * @param {boolean} bool Value to invert.
- * @returns {boolean} Value inverted.
+ * @param {boolean} bool The boolean to negate.
+ * @returns {boolean} The negated value.
  * @private
  */
 gdjs.evtTools.common.logicalNegation = function(bool) {
@@ -128,7 +128,7 @@ gdjs.evtTools.common.logicalNegation = function(bool) {
 };
 
 /**
- * Limit an value in a range
+ * Limit a value to a range.
  * @param {number} x Value.
  * @param {number} min The minimum value.
  * @param {number} max The  maximum value.
@@ -244,9 +244,9 @@ gdjs.evtTools.common.log2 = function(arg) {
 };
 
 /**
- * Sign of a number, check if the value is positive, negative or zero.
+ * Returns the sign of the number. This checks if the value is positive, negative or zero.
  * @param {number} arg Value.
- * @returns {number} Return the sign for the value (1,-1 or 0).
+ * @returns {number} Return the sign for the value (1, -1 or 0).
  */
 gdjs.evtTools.common.sign = function(arg) {
   if (arg === 0) return 0;
@@ -264,19 +264,19 @@ gdjs.evtTools.common.cbrt = function(x) {
 };
 
 /**
- * Nth root
+ * N-th root
  * @param {number} x Base value.
  * @param {number} n Exponent value.
- * @returns {number} Return the nth root for the value.
+ * @returns {number} Return the n-th root for the value.
  */
 gdjs.evtTools.common.nthroot = function(x, n) {
   return Math.pow(x, 1 / n);
 };
 
 /**
- * Modulus for the values.
- * @param {number} x Dividend Value.
- * @param {number} y Divisor Value.
+ * Modulo operation (the remainder after dividing one number by another)
+ * @param {number} x Dividend value.
+ * @param {number} y Divisor value.
  * @returns {number} Return the remainder for the values.
  */
 gdjs.evtTools.common.mod = function(x, y) {
@@ -284,30 +284,30 @@ gdjs.evtTools.common.mod = function(x, y) {
 };
 
 /**
- * Difference between two angles
- * @param {number} angle1 First angle.
- * @param {number} angle2 Second angle
- * @returns {number} Return the difference of the angles.
+ * Returns the difference between two angles, in degrees.
+ * @param {number} angle1 First angle, in degrees.
+ * @param {number} angle2 Second angle, in degrees.
+ * @returns {number} Return the difference of the angles, in degrees.
  */
 gdjs.evtTools.common.angleDifference = function(angle1, angle2) {
   return gdjs.evtTools.common.mod(gdjs.evtTools.common.mod(angle1 - angle2, 360.0) + 180.0, 360.0) - 180.0;
 };
 
 /**
- * Linearly interpolate a to b by x
+ * Runs a linear interpolation between a and b.
  * @param {number} a Start value.
  * @param {number} b End value.
- * @param {number} x The interpolation value between a and b.
- * @returns {number} Return the difference of the angles.
+ * @param {number} x The interpolation value between 0 and 1.
+ * @returns {number} The interpolated value, now between a and b.
  */
 gdjs.evtTools.common.lerp = function(a, b, x) {
   return a + (b - a) * x;
 };
 
 /**
- * Truncate a number
+ * Truncate a number.
  * @param {number} x Value.
- * @returns {number} Return the value without decimals.
+ * @returns {number} Return the value with all decimal places dropped.
  */
 gdjs.evtTools.common.trunc = function(x) {
   return x | 0;

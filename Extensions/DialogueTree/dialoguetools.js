@@ -471,7 +471,7 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
       this.clipTextEnd = 0;
       this.dialogueText = this.dialogueData.text;
       this.commandCalls = [];
-    } else {
+    } else if (this.dialogueBranchTitle === '' || this.dialogueBranchTitle === this.dialogueData.data.title) {
       this.dialogueText +=
         (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
     }

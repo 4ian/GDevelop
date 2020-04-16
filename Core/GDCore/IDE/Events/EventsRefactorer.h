@@ -148,7 +148,8 @@ class GD_CORE_API EventsRefactorer {
                                        gd::String oldName,
                                        gd::String newName);
    /**
-   * Replace all occurences of an object name by another name in a parameter of event.
+   * Replace all occurrences of an object name by another name in an expression
+   * with the specified metadata
    * ( include : objects or objects in math/text expressions ).
    *
    * \return true if something was modified.

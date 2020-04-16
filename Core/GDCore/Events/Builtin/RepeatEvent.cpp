@@ -31,13 +31,6 @@ vector<gd::InstructionsList*> RepeatEvent::GetAllActionsVectors() {
   return allActions;
 }
 
-vector<gd::Expression*> RepeatEvent::GetAllExpressions() {
-  vector<gd::Expression*> allExpressions;
-  allExpressions.push_back(&repeatNumberExpression);
-
-  return allExpressions;
-}
-
 vector<pair<gd::Expression*, gd::ParameterMetadata> >
     RepeatEvent::GetAllExpressionsWithMetadata() {
   vector<pair<gd::Expression*, gd::ParameterMetadata> >
@@ -62,13 +55,6 @@ vector<const gd::InstructionsList*> RepeatEvent::GetAllActionsVectors() const {
   allActions.push_back(&actions);
 
   return allActions;
-}
-
-vector<const gd::Expression*> RepeatEvent::GetAllExpressions() const {
-  vector<const gd::Expression*> allExpressions;
-  allExpressions.push_back(&repeatNumberExpression);
-
-  return allExpressions;
 }
 
 vector<pair<const gd::Expression*, const gd::ParameterMetadata> >

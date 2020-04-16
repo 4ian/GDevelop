@@ -98,9 +98,9 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
 
     if (data && data.command) {
       if (data.command === 'play') {
-        runtimegame.pause(false);
+        runtimeGame.pause(false);
       } else if (data.command === 'pause') {
-        runtimegame.pause(true);
+        runtimeGame.pause(true);
         that.sendRuntimeGameDump();
       } else if (data.command === 'refresh') {
         that.sendRuntimeGameDump();

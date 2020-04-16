@@ -98,9 +98,9 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
 
     if (data && data.command) {
       if (data.command === 'play') {
-        runtimegame.pause(false);
+        runtimeGame.pause(false);
       } else if (data.command === 'pause') {
-        runtimegame.pause(true);
+        runtimeGame.pause(true);
         that.sendRuntimeGameDump();
       } else if (data.command === 'refresh') {
         that.sendRuntimeGameDump();
@@ -109,7 +109,7 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
       } else if (data.command === 'call') {
         that.call(data.path, data.args);
       } else if (data.command === 'profiler.start') {
-        runtimegame.startCurrentSceneProfiler(function(stoppedProfiler) {
+        runtimeGame.startCurrentSceneProfiler(function(stoppedProfiler) {
           that.sendProfilerOutput(
             stoppedProfiler.getFramesAverageMeasures(),
             stoppedProfiler.getStats()
@@ -118,7 +118,7 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
         });
         that.sendProfilerStarted();
       } else if (data.command === 'profiler.stop') {
-        runtimegame.stopCurrentSceneProfiler();
+        runtimeGame.stopCurrentSceneProfiler();
       } else {
         console.info(
           'Unknown command "' + data.command + '" received by the debugger.'

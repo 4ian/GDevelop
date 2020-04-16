@@ -7,51 +7,39 @@ gdjs.IDebuggerClient = function() {}
 
 /**
  * Update a value, specified by a path starting from the {@link RuntimeGame} instance.
- * @function
- * @name gdjs.DebuggerClient#set
  * @param {Array<string>} path - The path of the property to modify, starting from the RuntimeGame.
  * @param {any} newValue - The new value.
  */
-gdjs.IDebuggerClient.set = function(path, newValue) {}
+gdjs.IDebuggerClient.prototype.set = function(path, newValue) {}
 
 /**
  * Call a method, specified by a path starting from the {@link RuntimeGame} instance.
- * @function
- * @name gdjs.DebuggerClient#call
  * @param {Array<string>} path - The path to the method, starting from the RuntimeGame.
  * @param {Array<any>} args - The arguments to pass the method.
  */
-gdjs.IDebuggerClient.call = function(path, args) {}
+gdjs.IDebuggerClient.prototype.call = function(path, args) {}
 
 /**
  * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
- * @function
- * @name gdjs.DebuggerClient#sendRuntimeGameDump
  */
-gdjs.IDebuggerClient.sendRuntimeGameDump = function() {}
+gdjs.IDebuggerClient.prototype.sendRuntimeGameDump = function() {}
 
 /**
  * Start profiling.
- * @function
- * @name gdjs.DebuggerClient#sendProfilerStarted
  */
-gdjs.IDebuggerClient.sendProfilerStrated = function() {}
+gdjs.IDebuggerClient.prototype.sendProfilerStrated = function() {}
 
 /**
  * Stop profiling.
- * @function
- * @name gdjs.DebuggerClient#sendProfilerStopped
  */
-gdjs.IDebuggerClient.sendProfilerStopped = function() {}
+gdjs.IDebuggerClient.prototype.sendProfilerStopped = function() {}
 
 /**
  * Send profiling results.
- * @function
- * @name gdjs.DebuggerClient#sendProfilerOutput
  * @param {any} framesAverageMeasures The measures made for each frames.
  * @param {any} stats Other measures done during the profiler run.
  */
-gdjs.IDebuggerClient.sendProfilerOutput = function(framesAverageMeasures, stats) {}
+gdjs.IDebuggerClient.prototype.sendProfilerOutput = function(framesAverageMeasures, stats) {}
 
 
 /**

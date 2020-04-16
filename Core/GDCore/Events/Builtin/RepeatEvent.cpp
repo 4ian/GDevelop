@@ -35,9 +35,9 @@ vector<pair<gd::Expression*, gd::ParameterMetadata> >
     RepeatEvent::GetAllExpressionsWithMetadata() {
   vector<pair<gd::Expression*, gd::ParameterMetadata> >
       allExpressionsWithMetadata;
-  auto type = gd::ParameterMetadata().SetType("expression");
+  auto metadata = gd::ParameterMetadata().SetType("expression");
   allExpressionsWithMetadata.push_back(
-      std::make_pair(&repeatNumberExpression, type));
+      std::make_pair(&repeatNumberExpression, metadata));
 
   return allExpressionsWithMetadata;
 }
@@ -61,9 +61,9 @@ vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
     RepeatEvent::GetAllExpressionsWithMetadata() const {
   vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
       allExpressionsWithMetadata;
-  auto type = gd::ParameterMetadata().SetType("expression");
+  auto metadata = gd::ParameterMetadata().SetType("expression");
   allExpressionsWithMetadata.push_back(
-      std::make_pair(&repeatNumberExpression, type));
+      std::make_pair(&repeatNumberExpression, metadata));
 
   return allExpressionsWithMetadata;
 }

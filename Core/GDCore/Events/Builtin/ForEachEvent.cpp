@@ -61,9 +61,9 @@ vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
     ForEachEvent::GetAllExpressionsWithMetadata() const {
   vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
       allExpressionsWithMetadata;
-  auto type = gd::ParameterMetadata().SetType("object");
+  auto metadata = gd::ParameterMetadata().SetType("object");
   allExpressionsWithMetadata.push_back(
-      std::make_pair(&objectsToPick, type));
+      std::make_pair(&objectsToPick, metadata));
 
   return allExpressionsWithMetadata;
 }

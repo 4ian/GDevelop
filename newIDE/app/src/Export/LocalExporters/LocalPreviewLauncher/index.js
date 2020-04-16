@@ -89,7 +89,7 @@ export default class LocalPreviewLauncher extends React.Component<
           backgroundColor: '#000000',
           webPreferences: {
             nodeIntegration: true,
-          }
+          },
         },
         previewGamePath: gamePath,
       },

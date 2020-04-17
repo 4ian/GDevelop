@@ -220,7 +220,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State Variable Name'), '', false)
-      .addParameter('expression', _('Variable Value'), '', false)
+      .addParameter('string', _('Variable Value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
 

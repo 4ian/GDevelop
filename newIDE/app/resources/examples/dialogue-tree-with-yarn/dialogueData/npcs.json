@@ -4,8 +4,8 @@
 		"tags": "",
 		"body": "<<avatar sign>> 1[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.||\n2And welcome to yarn's example GD project!>||\n [[Answer:Start2|Start2]]",
 		"position": {
-			"x": -1943,
-			"y": 1078
+			"x": -11,
+			"y": 4172
 		},
 		"colorID": 0
 	},
@@ -14,8 +14,8 @@
 		"tags": "",
 		"body": "<<avatar ant>>[b]Please don't bug me now[/b]... <<wait 1000>>  I am [i]quite[/i] busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
 		"position": {
-			"x": -1425,
-			"y": 1128
+			"x": 507,
+			"y": 4222
 		},
 		"colorID": 0
 	},
@@ -24,8 +24,8 @@
 		"tags": "",
 		"body": "<<if $seenCrumb == true>>\nOh yeah? You saw it on a branch?\nDid you taste it?...\n<<else>>\nOh ha-ha! I can see that you are lying.\n<<endif>>",
 		"position": {
-			"x": -1633,
-			"y": 1410
+			"x": 299,
+			"y": 4504
 		},
 		"colorID": 3
 	},
@@ -34,8 +34,8 @@
 		"tags": "",
 		"body": "Then [b]scram[/b]!\nI don't have time for you...",
 		"position": {
-			"x": -1245,
-			"y": 1414
+			"x": 687,
+			"y": 4508
 		},
 		"colorID": 0
 	},
@@ -44,8 +44,8 @@
 		"tags": "",
 		"body": "<<avatar crumb>> <<set $seenCrumb to true >> You stumbled on a giant crumb.\nWhat would you like to do with it?\n[[ taste it | eatCrumb]] [[ take it| takeCrumb]] [[ nothing |null ]] ",
 		"position": {
-			"x": -1438,
-			"y": 1632
+			"x": 494,
+			"y": 4726
 		},
 		"colorID": 6
 	},
@@ -54,8 +54,8 @@
 		"tags": "",
 		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
 		"position": {
-			"x": -1652,
-			"y": 1883
+			"x": 280,
+			"y": 4977
 		},
 		"colorID": 0
 	},
@@ -64,8 +64,8 @@
 		"tags": "",
 		"body": "The thing is way too heavy 😬 ....",
 		"position": {
-			"x": -1217,
-			"y": 1870
+			"x": 715,
+			"y": 4964
 		},
 		"colorID": 0
 	},
@@ -74,8 +74,8 @@
 		"tags": "",
 		"body": "<<wait 100>> ",
 		"position": {
-			"x": -1137,
-			"y": 1633
+			"x": 795,
+			"y": 4727
 		},
 		"colorID": 0
 	},
@@ -84,8 +84,8 @@
 		"tags": "",
 		"body": "<<avatar ant>>\n3Now scram!||\n<<test>>\n[[ answer: |start3 ]] ",
 		"position": {
-			"x": -1938,
-			"y": 1321
+			"x": -6,
+			"y": 4415
 		},
 		"colorID": 0
 	},
@@ -94,28 +94,28 @@
 		"tags": "",
 		"body": "<<err>>4 text with <<avatar crumb>> command in the middle ||\n5This is my tree||\n6||<<avatar ant>>\n7and my crumb||",
 		"position": {
-			"x": -1946,
-			"y": 1585
+			"x": -14,
+			"y": 4679
 		},
 		"colorID": 0
 	},
 	{
 		"title": "Start",
 		"tags": "",
-		"body": "<<if $debug == 1>>\n[[ answer: |stressTest ]] \n<<else>>\n[[ answer: |Start1 ]] \n<<endif>>",
+		"body": "<<if $debug == true>>\n[[ debug|stressTest ]] \n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
 		"position": {
-			"x": -2165,
-			"y": 755
+			"x": -176,
+			"y": 3867
 		},
 		"colorID": 0
 	},
 	{
 		"title": "stressTest",
 		"tags": "",
-		"body": "Empty Textee",
+		"body": "Empty Textee\ner",
 		"position": {
-			"x": -2249,
-			"y": 1067
+			"x": -317,
+			"y": 4161
 		},
 		"colorID": 0
 	}

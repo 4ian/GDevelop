@@ -635,7 +635,7 @@ gdjs.dialogueTree.getBranchText = function() {
  */
 gdjs.dialogueTree.getVariable = function(key) {
   if (this.dialogueIsRunning && key in this.runner.variables.data) {
-    return this.runner.variables.data[key];
+    return this.runner.variables.get(key);
   }
   return '';
 };
@@ -647,7 +647,7 @@ gdjs.dialogueTree.getVariable = function(key) {
  */
 gdjs.dialogueTree.compareVariable = function(key, value) {
   if (this.dialogueIsRunning && key in this.runner.variables.data) {
-    return this.runner.variables.data[key].toString() === value;
+    return this.runner.variables.get(key).toString() === value;
   }
   return false;
 };
@@ -658,8 +658,11 @@ gdjs.dialogueTree.compareVariable = function(key, value) {
  * @param {string} value The value you want to set
  */
 gdjs.dialogueTree.setVariable = function(key, value) {
-  if (this.dialogueIsRunning && this.runner.variables.data) {
-    this.runner.variables.data[key] = value;
+  if (this.runner.variables) {
+    this.runner.variables.set(
+      key,
+      !isNaN(value) || value === "true" || value === "false" ? eval(value) : value
+    );
   }
 };
 
@@ -690,7 +693,9 @@ gdjs.dialogueTree.loadState = function(inputVariable) {
       gdjs.evtTools.network.variableStructureToJSON(inputVariable)
     );
     gdjs.dialogueTree.runner.visited = loadedState.visited;
-    gdjs.dialogueTree.runner.variables.data = loadedState.variables;
+    Object.entries(gdjs.dialogueTree.runner.variables).forEach(([key, value]) => {
+      gdjs.dialogueTree.runner.variables.set(key, value);
+    });
   } catch (e) {
     console.error(e);
   }

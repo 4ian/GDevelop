@@ -812,7 +812,7 @@
         "kind": "json",
         "metadata": "",
         "name": "dialogueData/npcs.json",
-        "userAdded": true
+        "userAdded": false
       }
     ],
     "resourceFolders": []
@@ -935,6 +935,10 @@
         {
           "name": "Score",
           "value": "0"
+        },
+        {
+          "name": "debugYarn",
+          "value": "true"
         }
       ],
       "instances": [
@@ -6568,7 +6572,7 @@
                       },
                       "parameters": [
                         "\"debug\"",
-                        "1"
+                        "\"1\""
                       ],
                       "subInstructions": []
                     }

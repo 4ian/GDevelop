@@ -122,7 +122,8 @@ gdjs.dialogueTree.completeClippedTextScrolling = function() {
 gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
   if (!this.dialogueIsRunning || this.dialogueDataType  === '') return false;
   if (this.dialogueData && this.dialogueText.length > 0) {
-    console.log("overflow",this.clipTextEnd, this.dialogueText.length)
+  if (gdjs.dialogueTree.getVariable("debug")) console.warn("Scroll completed:",this.clipTextEnd,"/", this.dialogueText.length);
+
     return this.clipTextEnd >= this.dialogueText.length;
   }
   return false;
@@ -199,6 +200,8 @@ gdjs.dialogueTree.isCommandCalled = function(command) {
     if (call.cmd === command) {
       gdjs.dialogueTree.commandParameters = call.params;
       commandCalls.splice(index, 1);
+      if (gdjs.dialogueTree.getVariable("debug")) console.info("CMD:", call);
+
       return true;
     }
   });

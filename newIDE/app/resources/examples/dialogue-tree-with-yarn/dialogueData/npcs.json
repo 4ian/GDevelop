@@ -2,10 +2,10 @@
 	{
 		"title": "Start1",
 		"tags": "",
-		"body": "<<avatar sign>>[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.\n2And welcome to yarn's example GD project!>\n [[Answer:Start2|Start2]]",
+		"body": "<<avatar sign>>[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.\nAnd welcome to yarn's example GD project!\n",
 		"position": {
-			"x": 1941,
-			"y": 7773
+			"x": 2027,
+			"y": 9128
 		},
 		"colorID": 0
 	},
@@ -14,8 +14,8 @@
 		"tags": "",
 		"body": "<<avatar ant>>[b]Please don't bug me now[/b]... <<wait 1000>>  I am [i]quite[/i] busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
 		"position": {
-			"x": 2459,
-			"y": 7823
+			"x": 2545,
+			"y": 9178
 		},
 		"colorID": 0
 	},
@@ -24,8 +24,8 @@
 		"tags": "",
 		"body": "<<if $seenCrumb == true>>\nOh yeah? You saw it on a branch?\nDid you taste it?...\n<<else>>\nOh ha-ha! I can see that you are lying.\n<<endif>>",
 		"position": {
-			"x": 2251,
-			"y": 8105
+			"x": 2337,
+			"y": 9460
 		},
 		"colorID": 3
 	},
@@ -34,8 +34,8 @@
 		"tags": "",
 		"body": "Then [b]scram[/b]!\nI don't have time for you...",
 		"position": {
-			"x": 2639,
-			"y": 8109
+			"x": 2725,
+			"y": 9464
 		},
 		"colorID": 0
 	},
@@ -44,8 +44,8 @@
 		"tags": "",
 		"body": "<<avatar crumb>> <<set $seenCrumb to true >> You stumbled on a giant crumb.\nWhat would you like to do with it?\n[[ taste it | eatCrumb]] [[ take it| takeCrumb]] [[ nothing |null ]] ",
 		"position": {
-			"x": 2446,
-			"y": 8327
+			"x": 2532,
+			"y": 9682
 		},
 		"colorID": 6
 	},
@@ -54,8 +54,8 @@
 		"tags": "",
 		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
 		"position": {
-			"x": 2232,
-			"y": 8578
+			"x": 2318,
+			"y": 9933
 		},
 		"colorID": 0
 	},
@@ -64,8 +64,8 @@
 		"tags": "",
 		"body": "The thing is way too heavy 😬 ....",
 		"position": {
-			"x": 2667,
-			"y": 8565
+			"x": 2753,
+			"y": 9920
 		},
 		"colorID": 0
 	},
@@ -74,18 +74,18 @@
 		"tags": "",
 		"body": "<<wait 100>> ",
 		"position": {
-			"x": 2747,
-			"y": 8328
+			"x": 2833,
+			"y": 9683
 		},
 		"colorID": 0
 	},
 	{
 		"title": "Start",
 		"tags": "",
-		"body": "<<set $debug to true>> \n<<if $debug == true>>\n[[ debug|debug ]] \n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
+		"body": "<<if $debug == true>>\n[[ debug|debug ]] \n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
 		"position": {
-			"x": 1936,
-			"y": 7470
+			"x": 2022,
+			"y": 8825
 		},
 		"colorID": 0
 	},
@@ -94,8 +94,8 @@
 		"tags": "",
 		"body": "0I am another weird node problem to test||<\n<<df>>\n [[Answer:debug|debug0]]",
 		"position": {
-			"x": 1480,
-			"y": 7469
+			"x": 1566,
+			"y": 8824
 		},
 		"colorID": 0
 	},
@@ -104,8 +104,8 @@
 		"tags": "",
 		"body": "<<avatar ant>>\n\n>3Now scram!||<\n<<test>>\n\n[[ answer: |debug2 ]] ",
 		"position": {
-			"x": 1483,
-			"y": 8013
+			"x": 1569,
+			"y": 9368
 		},
 		"colorID": 0
 	},
@@ -114,8 +114,8 @@
 		"tags": "",
 		"body": "<<err>> >4 text with < <<avatar crumb>> >command in the middle ||\n5This is my tree|| <\n\n6||< <<avatar ant>>\n\n>7and my crumb||\n[[ answer: |debug3 ]] ",
 		"position": {
-			"x": 1478,
-			"y": 8243
+			"x": 1564,
+			"y": 9598
 		},
 		"colorID": 0
 	},
@@ -124,8 +124,8 @@
 		"tags": "",
 		"body": "]<<avatar sign>> >1[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.||\n2And welcome to yarn's example GD project!>||\n [[Answer:debug|debug1]]",
 		"position": {
-			"x": 1475,
-			"y": 7770
+			"x": 1561,
+			"y": 9125
 		},
 		"colorID": 0
 	},
@@ -134,8 +134,8 @@
 		"tags": "",
 		"body": "<<only command>>\n[[ answer: |debug4 ]] ",
 		"position": {
-			"x": 1473,
-			"y": 8460
+			"x": 1559,
+			"y": 9815
 		},
 		"colorID": 0
 	},
@@ -144,8 +144,8 @@
 		"tags": "",
 		"body": "one last text",
 		"position": {
-			"x": 1479,
-			"y": 8688
+			"x": 1565,
+			"y": 10043
 		},
 		"colorID": 0
 	}

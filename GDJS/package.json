@@ -16,6 +16,6 @@
   },
   "scripts": {
     "check-types": "tsc",
-	"generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
+    "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
   }
 }

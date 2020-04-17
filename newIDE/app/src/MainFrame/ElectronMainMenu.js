@@ -70,12 +70,234 @@ const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
   );
 };
 
+const buildAndSendMenuTemplate = (project, i18n) => {
+  const fileTemplate = {
+    label: i18n._(t`File`),
+    submenu: [
+      {
+        label: i18n._(t`Create a New Project...`),
+        accelerator: 'CommandOrControl+N',
+        onClickSendEvent: 'main-menu-create',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Open...`),
+        accelerator: 'CommandOrControl+O',
+        onClickSendEvent: 'main-menu-open',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Save`),
+        accelerator: 'CommandOrControl+S',
+        onClickSendEvent: 'main-menu-save',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Save as...`),
+        accelerator: 'CommandOrControl+Alt+S',
+        onClickSendEvent: 'main-menu-save-as',
+        enabled: !!project,
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Export (web, iOS, Android)...`),
+        accelerator: 'CommandOrControl+E',
+        onClickSendEvent: 'main-menu-export',
+        enabled: !!project,
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Close Project`),
+        accelerator: 'CommandOrControl+Shift+W',
+        onClickSendEvent: 'main-menu-close',
+        enabled: !!project,
+      },
+    ],
+  };
+  if (!isMacLike()) {
+    fileTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: i18n._(t`My Profile`),
+        onClickSendEvent: 'main-menu-open-profile',
+      },
+      {
+        label: i18n._(t`Preferences`),
+        onClickSendEvent: 'main-menu-open-preferences',
+      },
+      {
+        label: i18n._(t`Language`),
+        onClickSendEvent: 'main-menu-open-language',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Exit GDevelop`),
+        accelerator: 'Control+Q',
+        onClickSendEvent: 'main-menu-close-app',
+      }
+    );
+  }
+
+  const editTemplate = {
+    label: i18n._(t`Edit`),
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'pasteandmatchstyle' },
+      { role: 'delete' },
+      { role: 'selectall' },
+    ],
+  };
+
+  const viewTemplate = {
+    label: i18n._(t`View`),
+    submenu: [
+      {
+        label: i18n._(t`Show Project Manager`),
+        accelerator: 'CommandOrControl+Alt+P',
+        onClickSendEvent: 'main-menu-open-project-manager',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Show Start Page`),
+        onClickSendEvent: 'main-menu-open-start-page',
+      },
+      {
+        label: i18n._(t`Open Debugger`),
+        onClickSendEvent: 'main-menu-open-debugger',
+        enabled: !!project,
+      },
+      { type: 'separator' },
+      { role: 'toggledevtools' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' },
+    ],
+  };
+
+  const windowTemplate = {
+    role: 'window',
+    submenu: [{ role: 'minimize' }],
+  };
+
+  const helpTemplate = {
+    role: 'help',
+    submenu: [
+      {
+        label: i18n._(t`GDevelop website`),
+        onClickOpenLink: 'http://gdevelop-app.com',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Community Forums`),
+        onClickOpenLink: 'https://forum.gdevelop-app.com',
+      },
+      {
+        label: i18n._(t`Community Discord Chat`),
+        onClickOpenLink: 'https://discord.gg/rjdYHvj',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Contribute to GDevelop`),
+        onClickOpenLink: 'https://gdevelop-app.com/contribute/',
+      },
+      {
+        label: i18n._(t`Create Extensions for GDevelop`),
+        onClickOpenLink:
+          'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Help to Translate GDevelop`),
+        onClickOpenLink: 'https://crowdin.com/project/gdevelop',
+      },
+      {
+        label: i18n._(t`Report a wrong translation`),
+        onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
+      },
+    ],
+  };
+  if (!isMacLike()) {
+    helpTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: i18n._(t`About GDevelop`),
+        onClickSendEvent: 'main-menu-open-about',
+      }
+    );
+  }
+
+  const template: Array<RootMenuTemplate> = [
+    fileTemplate,
+    editTemplate,
+    viewTemplate,
+    windowTemplate,
+    helpTemplate,
+  ];
+
+  if (isMacLike()) {
+    template.unshift({
+      label: i18n._(t`GDevelop 5`),
+      submenu: [
+        {
+          label: i18n._(t`About GDevelop`),
+          onClickSendEvent: 'main-menu-open-about',
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`My Profile`),
+          onClickSendEvent: 'main-menu-open-profile',
+        },
+        {
+          label: i18n._(t`Preferences`),
+          onClickSendEvent: 'main-menu-open-preferences',
+        },
+        {
+          label: i18n._(t`Language`),
+          onClickSendEvent: 'main-menu-open-language',
+        },
+        { type: 'separator' },
+        { role: 'services', submenu: [] },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    });
+
+    editTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: i18n._(t`Speech`),
+        submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
+      }
+    );
+
+    windowTemplate.submenu = [
+      { role: 'minimize' },
+      { role: 'zoom' },
+      { type: 'separator' },
+      { role: 'front' },
+    ];
+  }
+
+  if (ipcRenderer) {
+    ipcRenderer.send('set-main-menu', template);
+  }
+};
+
 /**
  * Forward events received from Electron main process
  * to the MainFrame component.
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
   const { i18n, project } = props;
+  const language = i18n.language;
 
   useIPCEventListener('main-menu-open', props.onChooseProject);
   useIPCEventListener('main-menu-save', props.onSaveProject);
@@ -96,235 +318,11 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   useIPCEventListener('main-menu-open-profile', props.onOpenProfile);
   useIPCEventListener('update-status', props.setUpdateStatus);
 
-  const _buildAndSendMenuTemplate = React.useCallback(
-    () => {
-      const fileTemplate = {
-        label: i18n._(t`File`),
-        submenu: [
-          {
-            label: i18n._(t`Create a New Project...`),
-            accelerator: 'CommandOrControl+N',
-            onClickSendEvent: 'main-menu-create',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Open...`),
-            accelerator: 'CommandOrControl+O',
-            onClickSendEvent: 'main-menu-open',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Save`),
-            accelerator: 'CommandOrControl+S',
-            onClickSendEvent: 'main-menu-save',
-            enabled: !!project,
-          },
-          {
-            label: i18n._(t`Save as...`),
-            accelerator: 'CommandOrControl+Alt+S',
-            onClickSendEvent: 'main-menu-save-as',
-            enabled: !!project,
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Export (web, iOS, Android)...`),
-            accelerator: 'CommandOrControl+E',
-            onClickSendEvent: 'main-menu-export',
-            enabled: !!project,
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Close Project`),
-            accelerator: 'CommandOrControl+Shift+W',
-            onClickSendEvent: 'main-menu-close',
-            enabled: !!project,
-          },
-        ],
-      };
-      if (!isMacLike()) {
-        fileTemplate.submenu.push(
-          { type: 'separator' },
-          {
-            label: i18n._(t`My Profile`),
-            onClickSendEvent: 'main-menu-open-profile',
-          },
-          {
-            label: i18n._(t`Preferences`),
-            onClickSendEvent: 'main-menu-open-preferences',
-          },
-          {
-            label: i18n._(t`Language`),
-            onClickSendEvent: 'main-menu-open-language',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Exit GDevelop`),
-            accelerator: 'Control+Q',
-            onClickSendEvent: 'main-menu-close-app',
-          }
-        );
-      }
-
-      const editTemplate = {
-        label: i18n._(t`Edit`),
-        submenu: [
-          { role: 'undo' },
-          { role: 'redo' },
-          { type: 'separator' },
-          { role: 'cut' },
-          { role: 'copy' },
-          { role: 'paste' },
-          { role: 'pasteandmatchstyle' },
-          { role: 'delete' },
-          { role: 'selectall' },
-        ],
-      };
-
-      const viewTemplate = {
-        label: i18n._(t`View`),
-        submenu: [
-          {
-            label: i18n._(t`Show Project Manager`),
-            accelerator: 'CommandOrControl+Alt+P',
-            onClickSendEvent: 'main-menu-open-project-manager',
-            enabled: !!project,
-          },
-          {
-            label: i18n._(t`Show Start Page`),
-            onClickSendEvent: 'main-menu-open-start-page',
-          },
-          {
-            label: i18n._(t`Open Debugger`),
-            onClickSendEvent: 'main-menu-open-debugger',
-            enabled: !!project,
-          },
-          { type: 'separator' },
-          { role: 'toggledevtools' },
-          { type: 'separator' },
-          { role: 'togglefullscreen' },
-        ],
-      };
-
-      const windowTemplate = {
-        role: 'window',
-        submenu: [{ role: 'minimize' }],
-      };
-
-      const helpTemplate = {
-        role: 'help',
-        submenu: [
-          {
-            label: i18n._(t`GDevelop website`),
-            onClickOpenLink: 'http://gdevelop-app.com',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Community Forums`),
-            onClickOpenLink: 'https://forum.gdevelop-app.com',
-          },
-          {
-            label: i18n._(t`Community Discord Chat`),
-            onClickOpenLink: 'https://discord.gg/rjdYHvj',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Contribute to GDevelop`),
-            onClickOpenLink: 'https://gdevelop-app.com/contribute/',
-          },
-          {
-            label: i18n._(t`Create Extensions for GDevelop`),
-            onClickOpenLink:
-              'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Help to Translate GDevelop`),
-            onClickOpenLink: 'https://crowdin.com/project/gdevelop',
-          },
-          {
-            label: i18n._(t`Report a wrong translation`),
-            onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
-          },
-        ],
-      };
-      if (!isMacLike()) {
-        helpTemplate.submenu.push(
-          { type: 'separator' },
-          {
-            label: i18n._(t`About GDevelop`),
-            onClickSendEvent: 'main-menu-open-about',
-          }
-        );
-      }
-
-      const template: Array<RootMenuTemplate> = [
-        fileTemplate,
-        editTemplate,
-        viewTemplate,
-        windowTemplate,
-        helpTemplate,
-      ];
-
-      if (isMacLike()) {
-        template.unshift({
-          label: i18n._(t`GDevelop 5`),
-          submenu: [
-            {
-              label: i18n._(t`About GDevelop`),
-              onClickSendEvent: 'main-menu-open-about',
-            },
-            { type: 'separator' },
-            {
-              label: i18n._(t`My Profile`),
-              onClickSendEvent: 'main-menu-open-profile',
-            },
-            {
-              label: i18n._(t`Preferences`),
-              onClickSendEvent: 'main-menu-open-preferences',
-            },
-            {
-              label: i18n._(t`Language`),
-              onClickSendEvent: 'main-menu-open-language',
-            },
-            { type: 'separator' },
-            { role: 'services', submenu: [] },
-            { type: 'separator' },
-            { role: 'hide' },
-            { role: 'hideothers' },
-            { role: 'unhide' },
-            { type: 'separator' },
-            { role: 'quit' },
-          ],
-        });
-
-        editTemplate.submenu.push(
-          { type: 'separator' },
-          {
-            label: i18n._(t`Speech`),
-            submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
-          }
-        );
-
-        windowTemplate.submenu = [
-          { role: 'minimize' },
-          { role: 'zoom' },
-          { type: 'separator' },
-          { role: 'front' },
-        ];
-      }
-
-      if (ipcRenderer) {
-        ipcRenderer.send('set-main-menu', template);
-      }
-    },
-    [i18n, project]
-  );
-
   React.useEffect(
     () => {
-      _buildAndSendMenuTemplate();
+      buildAndSendMenuTemplate(project, i18n);
     },
-    [_buildAndSendMenuTemplate, i18n.language]
+    [i18n, language, project]
   );
 
   return null;

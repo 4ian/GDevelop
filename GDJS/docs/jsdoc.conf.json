@@ -50,6 +50,7 @@
     "recurse": true,
     "private": false,
     "lenient": true,
+    "template": "docs/jaguarjs-jsdoc",
     "destination": "../docs/GDJS Runtime Documentation"
   }
 }

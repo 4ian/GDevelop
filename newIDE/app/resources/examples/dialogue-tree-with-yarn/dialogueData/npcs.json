@@ -2,10 +2,10 @@
 	{
 		"title": "Start1",
 		"tags": "",
-		"body": "<<avatar sign>> 1[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.||\n2And welcome to yarn's example GD project!>||\n [[Answer:Start2|Start2]]",
+		"body": "<<avatar sign>>[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.\n2And welcome to yarn's example GD project!>\n [[Answer:Start2|Start2]]",
 		"position": {
-			"x": -11,
-			"y": 4172
+			"x": 1941,
+			"y": 7773
 		},
 		"colorID": 0
 	},
@@ -14,8 +14,8 @@
 		"tags": "",
 		"body": "<<avatar ant>>[b]Please don't bug me now[/b]... <<wait 1000>>  I am [i]quite[/i] busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
 		"position": {
-			"x": 507,
-			"y": 4222
+			"x": 2459,
+			"y": 7823
 		},
 		"colorID": 0
 	},
@@ -24,8 +24,8 @@
 		"tags": "",
 		"body": "<<if $seenCrumb == true>>\nOh yeah? You saw it on a branch?\nDid you taste it?...\n<<else>>\nOh ha-ha! I can see that you are lying.\n<<endif>>",
 		"position": {
-			"x": 299,
-			"y": 4504
+			"x": 2251,
+			"y": 8105
 		},
 		"colorID": 3
 	},
@@ -34,8 +34,8 @@
 		"tags": "",
 		"body": "Then [b]scram[/b]!\nI don't have time for you...",
 		"position": {
-			"x": 687,
-			"y": 4508
+			"x": 2639,
+			"y": 8109
 		},
 		"colorID": 0
 	},
@@ -44,8 +44,8 @@
 		"tags": "",
 		"body": "<<avatar crumb>> <<set $seenCrumb to true >> You stumbled on a giant crumb.\nWhat would you like to do with it?\n[[ taste it | eatCrumb]] [[ take it| takeCrumb]] [[ nothing |null ]] ",
 		"position": {
-			"x": 494,
-			"y": 4726
+			"x": 2446,
+			"y": 8327
 		},
 		"colorID": 6
 	},
@@ -54,8 +54,8 @@
 		"tags": "",
 		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
 		"position": {
-			"x": 280,
-			"y": 4977
+			"x": 2232,
+			"y": 8578
 		},
 		"colorID": 0
 	},
@@ -64,8 +64,8 @@
 		"tags": "",
 		"body": "The thing is way too heavy 😬 ....",
 		"position": {
-			"x": 715,
-			"y": 4964
+			"x": 2667,
+			"y": 8565
 		},
 		"colorID": 0
 	},
@@ -74,48 +74,78 @@
 		"tags": "",
 		"body": "<<wait 100>> ",
 		"position": {
-			"x": 795,
-			"y": 4727
-		},
-		"colorID": 0
-	},
-	{
-		"title": "Start2",
-		"tags": "",
-		"body": "<<avatar ant>>\n3Now scram!||\n<<test>>\n[[ answer: |start3 ]] ",
-		"position": {
-			"x": -6,
-			"y": 4415
-		},
-		"colorID": 0
-	},
-	{
-		"title": "start3",
-		"tags": "",
-		"body": "<<err>>4 text with <<avatar crumb>> command in the middle ||\n5This is my tree||\n6||<<avatar ant>>\n7and my crumb||",
-		"position": {
-			"x": -14,
-			"y": 4679
+			"x": 2747,
+			"y": 8328
 		},
 		"colorID": 0
 	},
 	{
 		"title": "Start",
 		"tags": "",
-		"body": "<<if $debug == true>>\n[[ debug|stressTest ]] \n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
+		"body": "<<set $debug to true>> \n<<if $debug == true>>\n[[ debug|debug ]] \n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
 		"position": {
-			"x": -176,
-			"y": 3867
+			"x": 1936,
+			"y": 7470
 		},
 		"colorID": 0
 	},
 	{
-		"title": "stressTest",
+		"title": "debug",
 		"tags": "",
-		"body": "Empty Textee\ner",
+		"body": "0I am another weird node problem to test||<\n<<df>>\n [[Answer:debug|debug0]]",
 		"position": {
-			"x": -317,
-			"y": 4161
+			"x": 1480,
+			"y": 7469
+		},
+		"colorID": 0
+	},
+	{
+		"title": "debug1",
+		"tags": "",
+		"body": "<<avatar ant>>\n\n>3Now scram!||<\n<<test>>\n\n[[ answer: |debug2 ]] ",
+		"position": {
+			"x": 1483,
+			"y": 8013
+		},
+		"colorID": 0
+	},
+	{
+		"title": "debug2",
+		"tags": "",
+		"body": "<<err>> >4 text with < <<avatar crumb>> >command in the middle ||\n5This is my tree|| <\n\n6||< <<avatar ant>>\n\n>7and my crumb||\n[[ answer: |debug3 ]] ",
+		"position": {
+			"x": 1478,
+			"y": 8243
+		},
+		"colorID": 0
+	},
+	{
+		"title": "debug0",
+		"tags": "",
+		"body": "]<<avatar sign>> >1[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.||\n2And welcome to yarn's example GD project!>||\n [[Answer:debug|debug1]]",
+		"position": {
+			"x": 1475,
+			"y": 7770
+		},
+		"colorID": 0
+	},
+	{
+		"title": "debug3",
+		"tags": "",
+		"body": "<<only command>>\n[[ answer: |debug4 ]] ",
+		"position": {
+			"x": 1473,
+			"y": 8460
+		},
+		"colorID": 0
+	},
+	{
+		"title": "debug4",
+		"tags": "",
+		"body": "one last text",
+		"position": {
+			"x": 1479,
+			"y": 8688
 		},
 		"colorID": 0
 	}

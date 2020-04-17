@@ -6514,14 +6514,6 @@
                     "NPC.VariableString(dialogueBranch)"
                   ],
                   "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "DialogueTree::CompleteClippedTextScrolling"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
                 }
               ],
               "events": [
@@ -6572,8 +6564,25 @@
                       },
                       "parameters": [
                         "\"debug\"",
-                        "\"1\""
+                        "\"true\""
                       ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DialogueTree::CompleteClippedTextScrolling"
+                      },
+                      "parameters": [],
                       "subInstructions": []
                     }
                   ],

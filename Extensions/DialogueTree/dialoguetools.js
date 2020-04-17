@@ -120,8 +120,9 @@ gdjs.dialogueTree.completeClippedTextScrolling = function() {
  * Useful to prevent the user from skipping to next line before the current one has been printed fully.
  */
 gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
-  if (!this.dialogueIsRunning) return false;
-  if (this.dialogueData && this.dialogueText.length) {
+  if (!this.dialogueIsRunning || this.dialogueDataType  === '') return false;
+  if (this.dialogueData && this.dialogueText.length > 0) {
+    console.log("overflow",this.clipTextEnd, this.dialogueText.length)
     return this.clipTextEnd >= this.dialogueText.length;
   }
   return false;
@@ -449,21 +450,22 @@ gdjs.dialogueTree._isLineTypeCommand = function() {
   return this.dialogueData instanceof bondage.CommandResult;
 };
 
-gdjs.dialogueTree._updateTextLine = function(append) {
+gdjs.dialogueTree._updateTextLine = function(append = false) {
   // bondagejs issue https://github.com/hylyh/bondage.js/issues/62 needs to be fixed to support commands on new lines
   if(append) {
     this.dialogueText +=
-      (this.dialogueText === '' ? '' : ' ') + append;
+      (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
   } else {
     this.clipTextEnd = 0;
     this.dialogueText = this.dialogueData.text;
     this.commandCalls = [];
   }
-  this.dialogueDataType = 'text';
+  
   this.dialogueBranchTags = this.dialogueData.data.tags;
   this.dialogueBranchTitle = this.dialogueData.data.title;
   this.dialogueBranchBody = this.dialogueData.data.body;
-  this.dialogueData = this.dialogue.next().value;
+  if(this.dialogueDataType !== '') this.dialogueData = this.dialogue.next().value;
+  this.dialogueDataType = 'text';
 }
 
 /**
@@ -479,11 +481,15 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   this.selectedOptionUpdated = false;
 
   if (gdjs.dialogueTree._isLineTypeText()) {
+    if (this.dialogueDataType === '') {
+      gdjs.dialogueTree._updateTextLine();
+    };
+   
     // We came from another node or another text line, wipe the text
     if(this.dialogueDataType === 'options' || this.dialogueDataType === 'text'){
       gdjs.dialogueTree._updateTextLine();
     } else if(this.dialogueDataType === 'command') {
-        gdjs.dialogueTree._updateTextLine(this.dialogueData.text);
+        gdjs.dialogueTree._updateTextLine(true);
     }
   } else if (gdjs.dialogueTree._isLineTypeOptions()) {
     this.dialogueDataType = 'options';
@@ -493,7 +499,6 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
     this.options = this.dialogueData.options;
     this.selectedOptionUpdated = true;
   } else if (gdjs.dialogueTree._isLineTypeCommand()) {
-    this.dialogueDataType = 'command';
     this.clipTextEnd = 0;
 
     var command = this.dialogueData.text.split(' ');
@@ -509,6 +514,7 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
       time: this.dialogueText.length + offsetTime,
     });
     this.dialogueData = this.dialogue.next().value;
+    this.dialogueDataType = 'command';
     gdjs.dialogueTree.goToNextDialogueLine();
   } else {
     this.dialogueDataType = 'unknown';

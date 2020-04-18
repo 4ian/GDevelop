@@ -12,7 +12,6 @@ import TextField from '../UI/TextField';
 import FlatButton from '../UI/FlatButton';
 import DragHandle from '../UI/DragHandle';
 import styles from './styles';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 type Props = {|
   layerName: string,

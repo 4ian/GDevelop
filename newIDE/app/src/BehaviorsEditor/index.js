@@ -25,7 +25,6 @@ const AddBehaviorLine = ({ onAdd }) => (
         label={<Trans>Add a behavior to the object</Trans>}
         primary
         onClick={onAdd}
-        labelPosition="before"
         icon={<Add />}
       />
     </Line>

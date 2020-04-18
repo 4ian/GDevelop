@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Table, TableHeader, TableHeaderColumn, TableRow } from '../UI/Table';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';

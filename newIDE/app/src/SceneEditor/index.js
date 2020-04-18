@@ -88,12 +88,6 @@ const styles = {
   },
 };
 
-const layersDrawerPaperProps = {
-  style: {
-    width: 500,
-  },
-};
-
 const instancesDrawerPaperProps = {
   style: {
     width: 500,

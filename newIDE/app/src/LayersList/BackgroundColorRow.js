@@ -5,7 +5,6 @@ import React from 'react';
 import TextField from '../UI/TextField';
 
 import styles from './styles';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ColorPicker from '../UI/ColorField/ColorPicker';
 import { TreeTableCell, TreeTableRow } from '../UI/TreeTable';
 

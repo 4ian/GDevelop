@@ -1,15 +1,12 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import Add from '@material-ui/icons/Add';
 import IconButton from '../UI/IconButton';
-import EmptyMessage from '../UI/EmptyMessage';
 import Copy from '../UI/CustomSvgIcons/Copy';
 import Paste from '../UI/CustomSvgIcons/Paste';
 import Delete from '@material-ui/icons/Delete';
 import { Line, Column } from '../UI/Grid';
-import styles from './styles';
 import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
@@ -49,7 +46,6 @@ const EditVariableRow = ({
         primary
         label={<Trans>Add</Trans>}
         onClick={onAdd}
-        labelPosition="before"
         icon={<Add />}
       />
     </Column>

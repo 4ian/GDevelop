@@ -12,7 +12,6 @@ import IconButton from '../UI/IconButton';
 import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import Text from '../UI/Text';
 
 //TODO: Refactor into TreeTable?

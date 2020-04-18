@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
-import styles from './styles';
 import LayerRow from './LayerRow';
 import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import BackgroundColorRow from './BackgroundColorRow';
@@ -194,7 +193,6 @@ export default class LayersList extends Component<Props, State> {
                 label={<Trans>Add a layer</Trans>}
                 primary
                 onClick={this._addLayer}
-                labelPosition="before"
                 icon={<Add />}
               />
             </Line>

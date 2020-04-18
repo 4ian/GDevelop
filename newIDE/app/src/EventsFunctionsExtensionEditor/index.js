@@ -310,7 +310,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
           if (this._editorMosaic)
-            this._editorMosaic.openEditor('behavior-functions-list', 'end', 75);
+            this._editorMosaic.openEditor(
+              'behavior-functions-list',
+              'end',
+              75,
+              'row'
+            );
           if (this._editorNavigator)
             this._editorNavigator.openEditor('behavior-functions-list');
         }

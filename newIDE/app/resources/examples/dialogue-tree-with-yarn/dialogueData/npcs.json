@@ -1,21 +1,21 @@
 [
 	{
-		"title": "Start1",
-		"tags": "",
-		"body": "<<avatar sign>>[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.\nAnd welcome to yarn's example GD project!\n",
-		"position": {
-			"x": 2027,
-			"y": 9128
-		},
-		"colorID": 0
-	},
-	{
 		"title": "ant",
 		"tags": "",
 		"body": "<<avatar ant>>[b]Please don't bug me now[/b]... <<wait 1000>>  I am [i]quite[/i] busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
 		"position": {
-			"x": 2545,
-			"y": 9178
+			"x": 95,
+			"y": 10850
+		},
+		"colorID": 0
+	},
+	{
+		"title": "antcrumbno",
+		"tags": "",
+		"body": "Then [b]scram[/b]!\nI don't have time for you...",
+		"position": {
+			"x": -101,
+			"y": 11125
 		},
 		"colorID": 0
 	},
@@ -24,98 +24,28 @@
 		"tags": "",
 		"body": "<<if $seenCrumb == true>>\nOh yeah? You saw it on a branch?\nDid you taste it?...\n<<else>>\nOh ha-ha! I can see that you are lying.\n<<endif>>",
 		"position": {
-			"x": 2337,
-			"y": 9460
+			"x": 200,
+			"y": 11152
 		},
 		"colorID": 3
-	},
-	{
-		"title": "antcrumbno",
-		"tags": "",
-		"body": "Then [b]scram[/b]!\nI don't have time for you...",
-		"position": {
-			"x": 2725,
-			"y": 9464
-		},
-		"colorID": 0
 	},
 	{
 		"title": "crumb",
 		"tags": "",
 		"body": "<<avatar crumb>> <<set $seenCrumb to true >> You stumbled on a giant crumb.\nWhat would you like to do with it?\n[[ taste it | eatCrumb]] [[ take it| takeCrumb]] [[ nothing |null ]] ",
 		"position": {
-			"x": 2532,
-			"y": 9682
+			"x": -71,
+			"y": 11386
 		},
 		"colorID": 6
-	},
-	{
-		"title": "eatCrumb",
-		"tags": "",
-		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
-		"position": {
-			"x": 2318,
-			"y": 9933
-		},
-		"colorID": 0
-	},
-	{
-		"title": "takeCrumb",
-		"tags": "",
-		"body": "The thing is way too heavy 😬 ....",
-		"position": {
-			"x": 2753,
-			"y": 9920
-		},
-		"colorID": 0
-	},
-	{
-		"title": "null",
-		"tags": "",
-		"body": "<<wait 100>> ",
-		"position": {
-			"x": 2833,
-			"y": 9683
-		},
-		"colorID": 0
-	},
-	{
-		"title": "Start",
-		"tags": "",
-		"body": "<<if $debug == true>>\n[[ debug|debug ]] \n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
-		"position": {
-			"x": 2022,
-			"y": 8825
-		},
-		"colorID": 0
 	},
 	{
 		"title": "debug",
 		"tags": "",
 		"body": "0I am another weird node problem to test||<\n<<df>>\n [[Answer:debug|debug0]]",
 		"position": {
-			"x": 1566,
-			"y": 8824
-		},
-		"colorID": 0
-	},
-	{
-		"title": "debug1",
-		"tags": "",
-		"body": "<<avatar ant>>\n\n>3Now scram!||<\n<<test>>\n\n[[ answer: |debug2 ]] ",
-		"position": {
-			"x": 1569,
-			"y": 9368
-		},
-		"colorID": 0
-	},
-	{
-		"title": "debug2",
-		"tags": "",
-		"body": "<<err>> >4 text with < <<avatar crumb>> >command in the middle ||\n5This is my tree|| <\n\n6||< <<avatar ant>>\n\n>7and my crumb||\n[[ answer: |debug3 ]] ",
-		"position": {
-			"x": 1564,
-			"y": 9598
+			"x": 737,
+			"y": 10831
 		},
 		"colorID": 0
 	},
@@ -124,8 +54,28 @@
 		"tags": "",
 		"body": "]<<avatar sign>> >1[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.||\n2And welcome to yarn's example GD project!>||\n [[Answer:debug|debug1]]",
 		"position": {
-			"x": 1561,
-			"y": 9125
+			"x": 1002,
+			"y": 10830
+		},
+		"colorID": 0
+	},
+	{
+		"title": "debug1",
+		"tags": "",
+		"body": "<<avatar ant>>\n\n>3Now scram!||<\n<<test>>\n\n[[ answer: |debug2 ]] ",
+		"position": {
+			"x": 1242,
+			"y": 10834
+		},
+		"colorID": 0
+	},
+	{
+		"title": "debug2",
+		"tags": "",
+		"body": "<<err>> >4 text with < <<avatar crumb>> >command in the middle ||\n5This is my tree|| <\n\n6||< <<avatar ant>>\n\n>7and my crumb||\n[[ answer: |debug3 ]] ",
+		"position": {
+			"x": 1496,
+			"y": 10837
 		},
 		"colorID": 0
 	},
@@ -134,8 +84,8 @@
 		"tags": "",
 		"body": "<<only command>>\n[[ answer: |debug4 ]] ",
 		"position": {
-			"x": 1559,
-			"y": 9815
+			"x": 1753,
+			"y": 10841
 		},
 		"colorID": 0
 	},
@@ -144,8 +94,98 @@
 		"tags": "",
 		"body": "one last text",
 		"position": {
-			"x": 1565,
-			"y": 10043
+			"x": 1995,
+			"y": 10845
+		},
+		"colorID": 0
+	},
+	{
+		"title": "eatCrumb",
+		"tags": "",
+		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
+		"position": {
+			"x": -134,
+			"y": 11845
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Node1",
+		"tags": "",
+		"body": "node1= Once upon a time you<<command>>  pressed SPACE to progress to the next node. [[Answer:Node2|Node2]]",
+		"position": {
+			"x": 739,
+			"y": 11084
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Node2",
+		"tags": "",
+		"body": "node2= <<big_boi>>2 But suddenly the small boi black box started to move! [[Answer:Node3|Node3]]",
+		"position": {
+			"x": 988,
+			"y": 11076
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Node3",
+		"tags": "",
+		"body": "<<not_a_registered_command>> node3= But something horrible happened! All the text merged to the single text box, this is Node3. Press Space... [[Answer:Node4|Node4]]",
+		"position": {
+			"x": 1222,
+			"y": 11072
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Node4",
+		"tags": "",
+		"body": "node4 I am Node4 and I didn't get merged as I don't have a command!",
+		"position": {
+			"x": 1446,
+			"y": 11067
+		},
+		"colorID": 0
+	},
+	{
+		"title": "null",
+		"tags": "",
+		"body": "<<wait 100>> ",
+		"position": {
+			"x": 198,
+			"y": 11402
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Start",
+		"tags": "",
+		"body": "<<if $debug == true>>\n\n<<if $debugLinks == true>> \n[[ answer: |Node1 ]] \n<<else>> \n[[ debug|debug ]] \n<<endif>>\n\n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
+		"position": {
+			"x": 466,
+			"y": 10848
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Start1",
+		"tags": "",
+		"body": "<<avatar sign>>[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.\nAnd welcome to yarn's example GD project!\n",
+		"position": {
+			"x": 457,
+			"y": 11154
+		},
+		"colorID": 0
+	},
+	{
+		"title": "takeCrumb",
+		"tags": "",
+		"body": "The thing is way too heavy 😬 ....",
+		"position": {
+			"x": 191,
+			"y": 11627
 		},
 		"colorID": 0
 	}

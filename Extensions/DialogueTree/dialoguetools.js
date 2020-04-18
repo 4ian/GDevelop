@@ -164,6 +164,7 @@ gdjs.dialogueTree.commandParametersCount = function() {
  * @param {number} paramIndex The index of the parameter to get.
  */
 gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
+  if (paramIndex === -1 && this.commandParameters.length > 0) return this.commandParameters[0];
   if (
     this.commandParameters &&
     this.commandParameters.length >= paramIndex + 1
@@ -387,13 +388,17 @@ gdjs.dialogueTree.hasSelectedOptionChanged = function() {
  * @param {string} type The type you want to check for ( one of the three above )
  */
 gdjs.dialogueTree.isDialogueLineType = function(type) {
-  if (
-    this.commandCalls &&
-    this.commandCalls.some(function(call) {
-      return gdjs.dialogueTree.clipTextEnd > call.time && call.cmd === 'wait';
-    })
-  ) {
-    return !this.pauseScrolling;
+  if (this.commandCalls) {
+    if (
+      this.commandCalls.some(function(call) {
+        return gdjs.dialogueTree.clipTextEnd > call.time && call.cmd === 'wait';
+      })
+    ) {
+      return !this.pauseScrolling;
+    } 
+    if (this.commandCalls.length > 0 && this.commandParameters.length > 0 && type === 'command') {
+      return true;
+    }
   }
 
   return this.dialogueIsRunning ? this.dialogueDataType === type : false;
@@ -495,6 +500,7 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
         gdjs.dialogueTree._updateTextLine(true);
     }
   } else if (gdjs.dialogueTree._isLineTypeOptions()) {
+    this.commandCalls = [];
     this.dialogueDataType = 'options';
     this.dialogueText = '';
     this.clipTextEnd = 0;

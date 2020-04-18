@@ -6449,7 +6449,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "",
+              "comment": "Enable this to stresstest the DialogueTree extension for regressions",
               "comment2": ""
             },
             {
@@ -6481,7 +6481,28 @@
                   "subInstructions": []
                 }
               ],
-              "events": []
+              "events": [
+                {
+                  "disabled": true,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DialogueTree::SetVariable"
+                      },
+                      "parameters": [
+                        "\"debugLinks\"",
+                        "\"true\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
             },
             {
               "disabled": false,
@@ -7418,8 +7439,58 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "The <<COMMAND>> type can be used to trigger game events - such as changing an avatar picture to happen",
+              "comment": "The <<COMMAND>> type can be used to trigger game events - such as changing an avatar picture to happen,parameter -1 is the name of the command where it came from, from there on it starts from 0",
               "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsDialogueLineType"
+                  },
+                  "parameters": [
+                    "\"command\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Visible"
+                  },
+                  "parameters": [
+                    "commandsDebug"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "commandsDebug",
+                    "+",
+                    "\"<<\"+DialogueTree::CommandParameter(-1)+\">>\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             },
             {
               "disabled": false,

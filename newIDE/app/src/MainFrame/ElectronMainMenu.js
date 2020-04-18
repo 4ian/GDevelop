@@ -292,8 +292,7 @@ const buildAndSendMenuTemplate = (project, i18n) => {
 };
 
 /**
- * Forward events received from Electron main process
- * to the MainFrame component.
+ * Create and update the editor main menu using Electron APIs.
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
   const { i18n, project } = props;

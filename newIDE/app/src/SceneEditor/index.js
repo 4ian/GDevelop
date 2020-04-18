@@ -163,6 +163,7 @@ type State = {|
   showObjectsListInfoBar: boolean,
   layoutVariablesDialogOpen: boolean,
   showPropertiesInfoBar: boolean,
+  showLayersInfoBar: boolean,
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
@@ -211,6 +212,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       showObjectsListInfoBar: false,
       layoutVariablesDialogOpen: false,
       showPropertiesInfoBar: false,
+      showLayersInfoBar: false,
 
       selectedObjectTags: [],
     };
@@ -282,7 +284,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('objects-list', 'end', 75)) {
+    if (!this.editorMosaic.openEditor('objects-list', 'end', 75, 'column')) {
       this.setState({
         showObjectsListInfoBar: true,
       });
@@ -291,7 +293,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 25)) {
+    if (!this.editorMosaic.openEditor('properties', 'start', 25, 'column')) {
       this.setState({
         showPropertiesInfoBar: true,
       });
@@ -300,7 +302,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('object-groups-list', 'end', 75);
+    this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column');
   };
 
   toggleInstancesList = () => {
@@ -308,7 +310,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   toggleLayersList = () => {
-    this.setState({ layersListOpen: !this.state.layersListOpen });
+    if (!this.editorMosaic) return;
+    if (!this.editorMosaic.openEditor('layers', 'end', 75, 'row')) {
+      this.setState({
+        showLayersInfoBar: true,
+      });
+    }
   };
 
   toggleWindowMask = () => {
@@ -929,6 +936,23 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         ),
       },
+      layers: {
+        type: 'secondary',
+        title: t`Layers`,
+        renderEditor: () => (
+          <LayersList
+            project={project}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
+            freezeUpdate={false}
+            onRemoveLayer={this._onRemoveLayer}
+            onRenameLayer={this._onRenameLayer}
+            layersContainer={layout}
+            unsavedChanges={this.props.unsavedChanges}
+          />
+        ),
+      },
       'instances-editor': {
         type: 'primary',
         noTitleBar: true,
@@ -1108,29 +1132,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
           />
         </Drawer>
-        <Drawer
-          open={this.state.layersListOpen}
-          PaperProps={layersDrawerPaperProps}
-          anchor="right"
-          onClose={this.toggleLayersList}
-        >
-          <EditorBar
-            title={<Trans>Layers</Trans>}
-            displayLeftCloseButton
-            onClose={this.toggleLayersList}
-          />
-          <LayersList
-            project={project}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
-            freezeUpdate={!this.state.layersListOpen}
-            onRemoveLayer={this._onRemoveLayer}
-            onRenameLayer={this._onRenameLayer}
-            layersContainer={layout}
-            unsavedChanges={this.props.unsavedChanges}
-          />
-        </Drawer>
         <InfoBar
           identifier="instance-drag-n-drop-explanation"
           message={
@@ -1165,6 +1166,16 @@ export default class SceneEditor extends React.Component<Props, State> {
             </Trans>
           }
           show={!!this.state.showPropertiesInfoBar}
+        />
+        <InfoBar
+          identifier="layers-panel-explanation"
+          message={
+            <Trans>
+              Layers panel is already opened. You can add new layers and apply
+              effects on them from this panel.
+            </Trans>
+          }
+          show={!!this.state.showLayersInfoBar}
         />
         {this.state.setupGridOpen && (
           <SetupGridDialog

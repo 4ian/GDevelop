@@ -63,7 +63,7 @@ const VariableRow = ({
   const limitEditing = origin === 'parent' || origin === 'inherited';
 
   const columns = [
-    <TreeTableCell key="name">
+    <TreeTableCell key="name" expand>
       {depth > 0 && (
         <Indent width={(depth + 1) * styles.tableChildIndentation} />
       )}
@@ -90,7 +90,7 @@ const VariableRow = ({
   ];
   if (!isStructure) {
     columns.push(
-      <TreeTableCell key="value">
+      <TreeTableCell key="value" expand>
         <SemiControlledTextField
           margin="none"
           commitOnBlur
@@ -110,6 +110,7 @@ const VariableRow = ({
   } else {
     columns.push(
       <TreeTableCell
+        expand
         key="value"
         style={limitEditing ? styles.fadedButton : undefined}
       >
@@ -141,18 +142,10 @@ const VariableRow = ({
   );
 
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div>
-          <TreeTableRow
-            style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
-          >
-            {columns}
-          </TreeTableRow>
-          {children}
-        </div>
-      )}
-    </ThemeConsumer>
+    <div>
+      <TreeTableRow>{columns}</TreeTableRow>
+      {children}
+    </div>
   );
 };
 

@@ -373,33 +373,22 @@ export default class VariablesList extends React.Component<Props, State> {
     );
 
     return (
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderColumn>Name</TableHeaderColumn>
-              <TableHeaderColumn>Value</TableHeaderColumn>
-              <TableHeaderColumn style={styles.toolColumnHeader} />
-            </TableRow>
-          </TableHeader>
-        </Table>
-        <SortableVariablesListBody
-          variablesContainer={this.props.variablesContainer}
-          onSortEnd={({ oldIndex, newIndex }) => {
-            this.props.variablesContainer.move(oldIndex, newIndex);
-            this.forceUpdate();
-          }}
-          helperClass="sortable-helper"
-          useDragHandle
-          lockToContainerEdges
-        >
-          {!!containerInheritedVariablesTree.length &&
-            containerInheritedVariablesTree}
-          {!containerVariablesTree.length && this._renderEmpty()}
-          {!!containerVariablesTree.length && containerVariablesTree}
-          {editRow}
-        </SortableVariablesListBody>
-      </div>
+      <SortableVariablesListBody
+        variablesContainer={this.props.variablesContainer}
+        onSortEnd={({ oldIndex, newIndex }) => {
+          this.props.variablesContainer.move(oldIndex, newIndex);
+          this.forceUpdate();
+        }}
+        helperClass="sortable-helper"
+        useDragHandle
+        lockToContainerEdges
+      >
+        {!!containerInheritedVariablesTree.length &&
+          containerInheritedVariablesTree}
+        {!containerVariablesTree.length && this._renderEmpty()}
+        {!!containerVariablesTree.length && containerVariablesTree}
+        {editRow}
+      </SortableVariablesListBody>
     );
   }
 }

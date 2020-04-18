@@ -11,7 +11,7 @@ const styles = {
   },
   xScrollbar: {
     position: 'absolute',
-    top: -11,
+    top: -13,
     left: 0,
     right: 0,
   },
@@ -19,7 +19,7 @@ const styles = {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    left: -11,
+    left: -13,
     transform: 'rotate(180deg)',
   },
 };

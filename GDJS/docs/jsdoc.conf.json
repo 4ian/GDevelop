@@ -23,6 +23,8 @@
       "outputSourceFiles": true,
       "includeDate": false
     },
+	"referenceTitle": "GDevelop JS Runtime Documentation",
+	"collapse": true,
     "applicationName": "GDevelop JS Runtime",
     "footer": "Made with ♥ by Florian Rival and contributors (gdevelop-app.com)",
     "copyright": "GDevelop Copyright © 2008-present Florian Rival",
@@ -50,7 +52,7 @@
     "recurse": true,
     "private": false,
     "lenient": true,
-    "template": "docs/jaguarjs-jsdoc",
+    "template": "docs/jsdoc-template",
     "destination": "../docs/GDJS Runtime Documentation"
   }
 }

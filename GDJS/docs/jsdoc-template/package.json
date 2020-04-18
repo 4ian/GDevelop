@@ -1,0 +1,30 @@
+{
+  "name": "jsdoc-template",
+  "version": "3.3.0",
+  "description": "Braintree JSDoc 3 Template",
+  "main": "publish.js",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/braintree/jsdoc-template"
+  },
+  "author": "Braintreeps <code@getbraintree.com>",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/braintree/jsdoc-template"
+  },
+  "homepage": "https://github.com/braintree/jsdoc-template",
+  "devDependencies": {
+    "eslint": "^6.2.2",
+    "eslint-config-braintree": "^4.0.0",
+    "taffydb": "^2.7.3"
+  }
+}

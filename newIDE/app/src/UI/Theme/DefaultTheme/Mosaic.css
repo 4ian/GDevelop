@@ -1,6 +1,6 @@
 /* Mosaic layout */
 .mosaic-gd-default-theme.mosaic {
-  background-color: #f0f0f0 !important;
+  background-color: #e0e0e0 !important;
 }
 
 /* Mosaic window and tile */
@@ -21,14 +21,17 @@
   background: #9100ce !important;
 }
 
+.mosaic-gd-default-theme .mosaic-split.-column {
+  background-color: #e0e0e0 !important;
+}
+
 /* Separator draggable background */
 .mosaic-gd-default-theme .mosaic-split.-column .mosaic-split-line {
   height: 1px;
-  border-bottom: 1px solid #bbbbbb !important;
   border-top: 1px solid #bbbbbb !important;
-  width: 100px;
+  width: 25px;
   margin: auto;
-  bottom: auto !important;
+  bottom: 1px;
 }
 
 .mosaic-gd-default-theme .mosaic-split:hover .mosaic-split-line {

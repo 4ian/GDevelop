@@ -708,7 +708,7 @@ gdjs.dialogueTree.loadState = function(inputVariable) {
       gdjs.evtTools.network.variableStructureToJSON(inputVariable)
     );
     gdjs.dialogueTree.runner.visited = loadedState.visited;
-    Object.entries(gdjs.dialogueTree.runner.variables).forEach(([key, value]) => {
+    Object.entries(gdjs.dialogueTree.runner.variables).forEach(function([key, value]) {
       gdjs.dialogueTree.runner.variables.set(key, value);
     });
   } catch (e) {

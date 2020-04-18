@@ -314,7 +314,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               'behavior-functions-list',
               'end',
               75,
-              'row'
+              'column'
             );
           if (this._editorNavigator)
             this._editorNavigator.openEditor('behavior-functions-list');

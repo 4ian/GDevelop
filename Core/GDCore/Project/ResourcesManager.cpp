@@ -19,6 +19,8 @@ namespace gd {
 
 gd::String Resource::badStr;
 
+void ResourcesManager::ReportError() { errorOccurred = true; }
+
 Resource ResourcesManager::badResource;
 #if defined(GD_IDE_ONLY)
 ResourceFolder ResourcesManager::badFolder;
@@ -144,6 +146,15 @@ bool ResourcesManager::AddResource(const gd::String& name,
                                    const gd::String& filename,
                                    const gd::String& kind) {
   if (HasResource(name)) return false;
+
+  for (std::size_t i = 0; i < name.size(); ++i) {
+    if ((name[i] >= 48 && name[i] <= 57) || (name[i] >= 65 && name[i] <= 90) ||
+        (name[i] >= 97 && name[i] <= 122)) {
+      continue;
+    } else {
+      ReportError();
+    }
+  }
 
   std::shared_ptr<Resource> res = CreateResource(kind);
   res->SetFile(filename);

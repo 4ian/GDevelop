@@ -386,6 +386,14 @@ class GD_CORE_API ResourcesManager {
   std::shared_ptr<gd::Resource> GetResourceSPtr(const gd::String& name);
 
   /**
+   * \brief Report that an error occurred during code generation ( Event code
+   * won't be generated )
+   */
+  void ReportError();
+
+  bool errorOccurred;          ///< Must be set to true if an error occured.
+
+  /**
    * \brief Add an already constructed resource.
    * \note A copy of the resource is made and stored inside the
    * ResourcesManager.

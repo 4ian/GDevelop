@@ -499,6 +499,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
+  _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
+    this.editObjectByName(instance.getObjectName());
+  };
+
   _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
@@ -963,6 +967,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onDeleteSelection={this.deleteSelection}
                 onInstancesAdded={this._onInstancesAdded}
                 onInstancesSelected={this._onInstancesSelected}
+                onInstanceDoubleClicked={this._onInstanceDoubleClicked}
                 onInstancesMoved={this._onInstancesMoved}
                 onInstancesResized={this._onInstancesResized}
                 onInstancesRotated={this._onInstancesRotated}

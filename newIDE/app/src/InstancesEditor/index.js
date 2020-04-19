@@ -246,6 +246,7 @@ export default class InstancesEditorContainer extends Component {
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
+      onInstanceDoubleClicked: this._onInstanceDoubleClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
       instances: props.initialInstances,
@@ -475,6 +476,10 @@ export default class InstancesEditorContainer extends Component {
 
   _onInstanceClicked = instance => {
     this.pixiRenderer.view.focus();
+  };
+
+  _onInstanceDoubleClicked = instance => {
+    this.props.onInstanceDoubleClicked(instance);
   };
 
   _onOverInstance = instance => {

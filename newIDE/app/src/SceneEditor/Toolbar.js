@@ -5,7 +5,7 @@ import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import InstancesSelection from './InstancesSelection';
+import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import PreviewButtons, {
   type PreviewButtonSettings,
 } from '../MainFrame/Toolbar/PreviewButtons.js';

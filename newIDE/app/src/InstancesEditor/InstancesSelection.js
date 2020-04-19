@@ -1,6 +1,9 @@
 // @flow
 const gd = global.gd;
 
+/**
+ * Represents a list of selected instances.
+ */
 export default class InstancesSelection {
   selection: Array<gdInitialInstance> = [];
 

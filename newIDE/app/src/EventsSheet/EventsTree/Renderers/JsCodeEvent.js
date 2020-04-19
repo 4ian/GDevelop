@@ -46,7 +46,6 @@ const styles = {
 };
 
 type State = {|
-  width: number,
   editing: boolean,
   editingObject: boolean,
   anchorEl: ?any,
@@ -58,18 +57,14 @@ export default class JsCodeEvent extends React.Component<
 > {
   _objectField: ?ObjectField = null;
   state = {
-    width: 0,
     editing: false,
     editingObject: false,
     anchorEl: null,
   };
 
   _input: ?any;
-  _container: ?any;
 
   edit = () => {
-    if (!this._container) return;
-
     this.setState(
       {
         editing: true,
@@ -185,43 +180,45 @@ export default class JsCodeEvent extends React.Component<
     );
 
     return (
-      <Measure onMeasure={({ width }) => this.setState({ width })}>
-        <div
-          style={styles.container}
-          className={classNames({
-            [largeSelectableArea]: true,
-            [largeSelectedArea]: this.props.selected,
-          })}
-          ref={container => (this._container = container)}
-        >
-          {functionStart}
-          <CodeEditor
-            value={jsCodeEvent.getInlineCode()}
-            onChange={this.onChange}
-            width={this.state.width}
-            onEditorMounted={() => this.props.onUpdate()}
-          />
-          {functionEnd}
-          <InlinePopover
-            open={this.state.editingObject}
-            anchorEl={this.state.anchorEl}
-            onRequestClose={this.endObjectEditing}
+      <Measure bounds>
+        {({ measureRef, contentRect }) => (
+          <div
+            style={styles.container}
+            className={classNames({
+              [largeSelectableArea]: true,
+              [largeSelectedArea]: this.props.selected,
+            })}
+            ref={measureRef}
           >
-            <ObjectField
-              project={this.props.project}
-              scope={this.props.scope}
-              globalObjectsContainer={this.props.globalObjectsContainer}
-              objectsContainer={this.props.objectsContainer}
-              value={parameterObjects}
-              onChange={text => {
-                jsCodeEvent.setParameterObjects(text);
-                this.props.onUpdate();
-              }}
-              isInline
-              ref={objectField => (this._objectField = objectField)}
+            {functionStart}
+            <CodeEditor
+              value={jsCodeEvent.getInlineCode()}
+              onChange={this.onChange}
+              width={contentRect.bounds.width}
+              onEditorMounted={() => this.props.onUpdate()}
             />
-          </InlinePopover>
-        </div>
+            {functionEnd}
+            <InlinePopover
+              open={this.state.editingObject}
+              anchorEl={this.state.anchorEl}
+              onRequestClose={this.endObjectEditing}
+            >
+              <ObjectField
+                project={this.props.project}
+                scope={this.props.scope}
+                globalObjectsContainer={this.props.globalObjectsContainer}
+                objectsContainer={this.props.objectsContainer}
+                value={parameterObjects}
+                onChange={text => {
+                  jsCodeEvent.setParameterObjects(text);
+                  this.props.onUpdate();
+                }}
+                isInline
+                ref={objectField => (this._objectField = objectField)}
+              />
+            </InlinePopover>
+          </div>
+        )}
       </Measure>
     );
   }

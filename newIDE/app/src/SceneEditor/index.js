@@ -27,7 +27,7 @@ import {
 } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
 import Window from '../Utils/Window';
-import { passFullSize } from '../UI/FullSizeMeasurer';
+import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import Drawer from '@material-ui/core/Drawer';
@@ -75,9 +75,7 @@ const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
 
-const FullSizeInstancesEditor = passFullSize(addScrollbars(InstancesEditor), {
-  useFlex: true,
-});
+const InstancesEditorWithScrollbars = addScrollbars(InstancesEditor);
 
 const styles = {
   container: {
@@ -957,35 +955,44 @@ export default class SceneEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <ScreenTypeMeasurer>
             {screenType => (
-              <FullSizeInstancesEditor
-                project={project}
-                layout={layout}
-                initialInstances={initialInstances}
-                options={this.state.uiSettings}
-                onChangeOptions={this.setUiSettings}
-                instancesSelection={this.instancesSelection}
-                onDeleteSelection={this.deleteSelection}
-                onInstancesAdded={this._onInstancesAdded}
-                onInstancesSelected={this._onInstancesSelected}
-                onInstanceDoubleClicked={this._onInstanceDoubleClicked}
-                onInstancesMoved={this._onInstancesMoved}
-                onInstancesResized={this._onInstancesResized}
-                onInstancesRotated={this._onInstancesRotated}
-                selectedObjectNames={this.state.selectedObjectNames}
-                onContextMenu={this._onContextMenu}
-                onCopy={() =>
-                  this.copySelection({ useLastCursorPosition: true })
-                }
-                onCut={() => this.cutSelection({ useLastCursorPosition: true })}
-                onPaste={() => this.paste({ useLastCursorPosition: true })}
-                onUndo={this.undo}
-                onRedo={this.redo}
-                onZoomOut={this.zoomOut}
-                onZoomIn={this.zoomIn}
-                wrappedEditorRef={editor => (this.editor = editor)}
-                pauseRendering={!isActive}
-                screenType={screenType}
-              />
+              <FullSizeMeasurer>
+                {({ width, height }) => (
+                  // $FlowFixMe
+                  <InstancesEditorWithScrollbars
+                    project={project}
+                    layout={layout}
+                    initialInstances={initialInstances}
+                    options={this.state.uiSettings}
+                    onChangeOptions={this.setUiSettings}
+                    instancesSelection={this.instancesSelection}
+                    onDeleteSelection={this.deleteSelection}
+                    onInstancesAdded={this._onInstancesAdded}
+                    onInstancesSelected={this._onInstancesSelected}
+                    onInstanceDoubleClicked={this._onInstanceDoubleClicked}
+                    onInstancesMoved={this._onInstancesMoved}
+                    onInstancesResized={this._onInstancesResized}
+                    onInstancesRotated={this._onInstancesRotated}
+                    selectedObjectNames={this.state.selectedObjectNames}
+                    onContextMenu={this._onContextMenu}
+                    onCopy={() =>
+                      this.copySelection({ useLastCursorPosition: true })
+                    }
+                    onCut={() =>
+                      this.cutSelection({ useLastCursorPosition: true })
+                    }
+                    onPaste={() => this.paste({ useLastCursorPosition: true })}
+                    onUndo={this.undo}
+                    onRedo={this.redo}
+                    onZoomOut={this.zoomOut}
+                    onZoomIn={this.zoomIn}
+                    wrappedEditorRef={editor => (this.editor = editor)}
+                    pauseRendering={!isActive}
+                    screenType={screenType}
+                    width={width}
+                    height={height}
+                  />
+                )}
+              </FullSizeMeasurer>
             )}
           </ScreenTypeMeasurer>
         ),

@@ -214,35 +214,49 @@ const MainFrame = (props: Props) => {
     console.log(state);
   });
 
-  React.useEffect(() => {
-    (async () => {
-      if (!props.integratedEditor) openStartPage();
-      GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
-      const { initialFileMetadataToOpen } = props;
-      try {
-        await _loadExtensions();
-        // Enable the GDJS development watcher *after* the extensions are loaded,
-        // to avoid the watcher interfering with the extension loading (by updating GDJS,
-        // which could lead in the extension loading failing for some extensions as file
-        // are removed/copied).
-        await setState(state => ({
-          ...state,
-          gdjsDevelopmentWatcherEnabled: true,
-        }));
-        if (initialFileMetadataToOpen) {
-          _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
-        } else if (props.introDialog && !Window.isDev()) _openIntroDialog(true);
+  const _openIntroDialog = React.useCallback(
+    (open: boolean = true) => {
+      setState(state => ({ ...state, introDialogOpen: open }));
+    },
+    [setState]
+  );
 
+  const { integratedEditor, initialFileMetadataToOpen, introDialog } = props;
+  React.useEffect(
+    () => {
+      (() => {
+        if (!integratedEditor) openStartPage();
         GD_STARTUP_TIMES.push([
-          'MainFrameComponentDidMountFinished',
+          'MainFrameComponentDidMount',
           performance.now(),
         ]);
-        console.info('Startup times:', getStartupTimesSummary());
-      } catch {
-        /* Ignore errors */
-      }
-    })();
-  }, []);
+        _loadExtensions().then(() => 
+          // Enable the GDJS development watcher *after* the extensions are loaded,
+          // to avoid the watcher interfering with the extension loading (by updating GDJS,
+          // which could lead in the extension loading failing for some extensions as file
+          // are removed/copied).
+          setState(state => ({
+            ...state,
+            gdjsDevelopmentWatcherEnabled: true,
+          }))
+        ).then(state => {
+          if (initialFileMetadataToOpen) {
+            _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
+          } else if (introDialog && !Window.isDev()) _openIntroDialog(true);
+
+          GD_STARTUP_TIMES.push([
+            'MainFrameComponentDidMountFinished',
+            performance.now(),
+          ]);
+          console.info('Startup times:', getStartupTimesSummary());
+        })
+        .catch(() => {
+          /* Ignore errors */
+        })
+      })();
+    },
+    [integratedEditor, initialFileMetadataToOpen, setState, _openIntroDialog]
+  );
 
   const _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
     const { storageProviderOperations, initialFileMetadataToOpen } = props;
@@ -257,21 +271,29 @@ const MainFrame = (props: Props) => {
       return;
     }
 
-    openFromFileMetadata(initialFileMetadataToOpen).then(state =>
-      openSceneOrProjectManager(state)
-    );
+    openFromFileMetadata(initialFileMetadataToOpen).then(state => {
+      if (state) openSceneOrProjectManager(state);
+    });
   };
+
+  const updateToolbar = React.useCallback(
+    (newEditorTabs = state.editorTabs) => {
+      const editorTab = getCurrentTab(newEditorTabs);
+      if (!editorTab || !editorTab.editorRef) {
+        setEditorToolbar(null);
+        return;
+      }
+
+      editorTab.editorRef.updateToolbar();
+    },
+    [state.editorTabs]
+  );
 
   React.useEffect(
     () => {
       updateToolbar();
     },
-    [
-      state.editorTabs,
-      state.isPreviewFirstSceneOverriden,
-      state.previewFirstSceneName,
-      //state.currentProject,
-    ]
+    [updateToolbar]
   );
 
   const _languageDidChange = () => {
@@ -333,16 +355,15 @@ const MainFrame = (props: Props) => {
     fileMetadata: ?FileMetadata,
     newState: State = state
   ): Promise<State> => {
-    // timePromise(
-    //   () => {
-
-    //   },
-    //   time => console.info(`Unserialization took ${time} ms`)
-    // );
-    const newProject = gd.ProjectHelper.createNewGDJSProject();
-    newProject.unserializeFrom(serializedProject);
-    return loadFromProject(newProject, fileMetadata, newState).then(state =>
-      Promise.resolve(state)
+    return timePromise(
+      () => {
+        const newProject = gd.ProjectHelper.createNewGDJSProject();
+        newProject.unserializeFrom(serializedProject);
+        return loadFromProject(newProject, fileMetadata, newState).then(state =>
+          Promise.resolve(state)
+        );
+      },
+      time => console.info(`Unserialization took ${time} ms`)
     );
   };
 
@@ -369,6 +390,21 @@ const MainFrame = (props: Props) => {
         ...state,
         currentProject: project,
         currentFileMetadata: fileMetadata,
+      }).then(state => {
+        if (
+          state.editorTabs.editors.length > 1 ||
+          state.isPreviewFirstSceneOverriden
+        )
+          return setState({
+            ...state,
+            editorTabs: closeProjectTabs(
+              state.editorTabs,
+              state.currentProject
+            ),
+            isPreviewFirstSceneOverriden: false,
+            previewFirstSceneName: '',
+          });
+        return Promise.resolve(state);
       });
     });
   };
@@ -376,7 +412,7 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = (
     fileMetadata: FileMetadata,
     newState: State = state
-  ): Promise<any> => {
+  ): Promise<?State> => {
     const { i18n, storageProviderOperations } = props;
     const {
       hasAutoSave,
@@ -481,9 +517,6 @@ const MainFrame = (props: Props) => {
             ),
             error
           );
-        })
-        .then(state => {
-          if (state) return setState({ ...state, loadingProject: false });
         });
     });
   };
@@ -497,24 +530,19 @@ const MainFrame = (props: Props) => {
     const { currentProject, editorTabs } = newState;
     if (!currentProject) return Promise.resolve(newState);
 
-    openProjectManager(false);
+    if (currentProject) {
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      currentProject.delete();
+    }
     return setState({
       ...newState,
+      currentProject: null,
+      currentFileMetadata: null,
       editorTabs: closeProjectTabs(editorTabs, currentProject),
-    }).then(state => {
-      const { currentProject } = state;
-      if (currentProject) {
-        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-          currentProject
-        );
-        currentProject.delete();
-      }
-      return setState({
-        ...state,
-        currentProject: null,
-        isPreviewFirstSceneOverriden: false,
-        previewFirstSceneName: '',
-      }).then(state => Promise.resolve(state));
+      isPreviewFirstSceneOverriden: false,
+      previewFirstSceneName: '',
     });
   };
 
@@ -863,65 +891,45 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const [_layoutPreview, _setLayoutPreview] = React.useState({
-    project: null,
-    layout: null,
-    options: null,
-  });
-
   const _launchLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
     options: PreviewOptions
   ) => {
-    const { previewFirstSceneName, isPreviewFirstSceneOverriden } = state;
-
     if (!_previewLauncher.current) return;
 
     setState(state => ({
       ...state,
       previewLoading: true,
-    }));
-
-    _setLayoutPreview({
-      project: project,
-      layout: layout,
-      options: options,
-    });
-    //callback shifted to useEffect
-  };
-
-  React.useEffect(
-    () => {
-      const previewedLayout = _layoutPreview.layout;
-      const project = _layoutPreview.project;
-      const options = _layoutPreview.options;
-      if (state.previewFirstSceneName && state.isPreviewFirstSceneOverriden) {
-        if (project && project.hasLayoutNamed(state.previewFirstSceneName)) {
-          _setLayoutPreview(layoutPreview => ({
-            ...layoutPreview,
-            layout: project.getLayout(state.previewFirstSceneName),
-          }));
+    }))
+      .then(state => {
+        let previewedLayout = layout;
+        const { previewFirstSceneName, isPreviewFirstSceneOverriden } = state;
+        if (previewFirstSceneName && isPreviewFirstSceneOverriden) {
+          if (project.hasLayoutNamed(previewFirstSceneName)) {
+            previewedLayout = project.getLayout(previewFirstSceneName);
+          }
         }
-      }
-      if (project && previewedLayout && options && _previewLauncher.current)
-        _previewLauncher.current
-          .launchLayoutPreview(project, previewedLayout, options)
-          .catch(error => {
-            console.error(
-              'Error caught while launching preview, this should never happen.',
-              error
-            );
-          })
-          .then(() => {
-            setState(state => ({
-              ...state,
-              previewLoading: false,
-            }));
-          });
-    },
-    [_layoutPreview]
-  );
+        if (_previewLauncher.current)
+          return _previewLauncher.current.launchLayoutPreview(
+            project,
+            previewedLayout,
+            options
+          );
+      })
+      .catch(error => {
+        console.error(
+          'Error caught while launching preview, this should never happen.',
+          error
+        );
+      })
+      .then(() => {
+        setState(state => ({
+          ...state,
+          previewLoading: false,
+        }));
+      });
+  };
 
   const _launchExternalLayoutPreview = (
     project: gdProject,
@@ -964,16 +972,16 @@ const MainFrame = (props: Props) => {
     const { i18n, storageProviderOperations } = props;
     const sceneEditorOptions = {
       label: name,
-      renderEditor: ({ isActive, editorRef }) => (
+      renderEditor: ({ isActive, editorRef, newState }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
             <SceneEditor
               previewButtonSettings={{
                 isPreviewFirstSceneOverriden:
-                  state.isPreviewFirstSceneOverriden,
+                  newState.isPreviewFirstSceneOverriden,
                 togglePreviewFirstSceneOverride: () =>
                   _togglePreviewFirstSceneOverride(),
-                previewFirstSceneName: state.previewFirstSceneName,
+                previewFirstSceneName: newState.previewFirstSceneName,
                 useSceneAsPreviewFirstScene: () => {
                   _setPreviewFirstScene(name);
                 },
@@ -1016,7 +1024,7 @@ const MainFrame = (props: Props) => {
     };
     const eventsEditorOptions = {
       label: name + ' ' + i18n._(t`(Events)`),
-      renderEditor: ({ isActive, editorRef }) => (
+      renderEditor: ({ isActive, editorRef, newState }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
             <EventsEditor
@@ -1025,10 +1033,10 @@ const MainFrame = (props: Props) => {
               setToolbar={setEditorToolbar}
               previewButtonSettings={{
                 isPreviewFirstSceneOverriden:
-                  state.isPreviewFirstSceneOverriden,
+                  newState.isPreviewFirstSceneOverriden,
                 togglePreviewFirstSceneOverride: () =>
                   _togglePreviewFirstSceneOverride(),
-                previewFirstSceneName: state.previewFirstSceneName,
+                previewFirstSceneName: newState.previewFirstSceneName,
                 useSceneAsPreviewFirstScene: () => {
                   _setPreviewFirstScene(name);
                 },
@@ -1086,6 +1094,7 @@ const MainFrame = (props: Props) => {
     setState({
       ...newState,
       editorTabs: tabsWithSceneAndEventsEditors,
+      loadingProject: false,
     });
     openProjectManager(false);
   };
@@ -1095,9 +1104,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: name,
-        renderEditor: ({ isActive, editorRef }) => (
+        renderEditor: ({ isActive, editorRef, newState }) => (
           <ExternalEventsEditor
-            project={state.currentProject}
+            project={newState.currentProject}
             externalEventsName={name}
             setToolbar={setEditorToolbar}
             onOpenExternalEvents={openExternalEvents}
@@ -1130,11 +1139,11 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: name,
-        renderEditor: ({ isActive, editorRef }) => (
+        renderEditor: ({ isActive, editorRef, newState }) => (
           <PreferencesContext.Consumer>
             {({ values }) => (
               <ExternalLayoutEditor
-                project={state.currentProject}
+                project={newState.currentProject}
                 externalLayoutName={name}
                 setToolbar={setEditorToolbar}
                 onPreview={(project, layout, externalLayout, options) => {
@@ -1189,9 +1198,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: name + ' ' + i18n._(t`(Extension)`),
-        renderEditor: ({ isActive, editorRef }) => (
+        renderEditor: ({ isActive, editorRef, newState }) => (
           <EventsFunctionsExtensionEditor
-            project={state.currentProject}
+            project={newState.currentProject}
             eventsFunctionsExtensionName={name}
             setToolbar={setEditorToolbar}
             resourceSources={props.resourceSources}
@@ -1205,7 +1214,7 @@ const MainFrame = (props: Props) => {
             ref={editorRef}
             onLoadEventsFunctionsExtensions={() => {
               eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                state.currentProject
+                newState.currentProject
               );
             }}
             unsavedChanges={props.unsavedChanges}
@@ -1223,9 +1232,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: i18n._(t`Resources`),
-        renderEditor: ({ isActive, editorRef }) => (
+        renderEditor: ({ isActive, editorRef, newState }) => (
           <ResourcesEditor
-            project={state.currentProject}
+            project={newState.currentProject}
             setToolbar={setEditorToolbar}
             onDeleteResource={(resource: gdResource, cb: boolean => void) => {
               // TODO: Project wide refactoring of objects/events using the resource
@@ -1288,9 +1297,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: i18n._(t`Debugger`),
-        renderEditor: ({ isActive, editorRef }) => (
+        renderEditor: ({ isActive, editorRef, newState }) => (
           <DebuggerEditor
-            project={state.currentProject}
+            project={newState.currentProject}
             setToolbar={setEditorToolbar}
             isActive={isActive}
             ref={editorRef}
@@ -1408,7 +1417,7 @@ const MainFrame = (props: Props) => {
         if (!fileMetadata) return;
 
         return openFromFileMetadata(fileMetadata, newState).then(state => {
-          openSceneOrProjectManager(state);
+          if (state) openSceneOrProjectManager(state);
           //addRecentFile(fileMetadata);
         });
       })
@@ -1542,16 +1551,14 @@ const MainFrame = (props: Props) => {
         newState
       );
     } else {
-      openProjectManager();
+      setState({ ...newState, loadingProject: false }).then(state =>
+        openProjectManager()
+      );
     }
   };
 
   const openExportDialog = (open: boolean = true) => {
     setState(state => ({ ...state, exportDialogOpen: open }));
-  };
-
-  const _openIntroDialog = (open: boolean = true) => {
-    setState(state => ({ ...state, introDialogOpen: open }));
   };
 
   const _openOpenConfirmDialog = (open: boolean = true) => {
@@ -1599,9 +1606,11 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const _onEditorTabActive = (editorTab: EditorTab, stateRef) => {
-    stateRef = stateRef || state;
-    updateToolbar(stateRef);
+  const _onEditorTabActive = (
+    editorTab: EditorTab,
+    newState: State = state
+  ) => {
+    updateToolbar(newState.editorTabs);
     // Ensure the editors shown on the screen are updated. This is for
     // example useful if global objects have been updated in another editor.
     if (editorTab.editorRef) {
@@ -1642,16 +1651,6 @@ const MainFrame = (props: Props) => {
     if (!resourceSourceDialog) return Promise.resolve([]);
 
     return resourceSourceDialog.chooseResources(currentProject, multiSelection);
-  };
-
-  const updateToolbar = (newState: State = state) => {
-    const editorTab = getCurrentTab(newState.editorTabs);
-    if (!editorTab || !editorTab.editorRef) {
-      setEditorToolbar(null);
-      return;
-    }
-
-    editorTab.editorRef.updateToolbar();
   };
 
   const openAboutDialog = (open: boolean = true) => {
@@ -1736,7 +1735,6 @@ const MainFrame = (props: Props) => {
   const {
     renderExportDialog,
     renderCreateDialog,
-    introDialog,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -1909,7 +1907,9 @@ const MainFrame = (props: Props) => {
                 // eslint-disable-next-line
                 useStorageProvider(storageProvider)
                   .then(() => openFromFileMetadata(fileMetadata, state))
-                  .then(state => openSceneOrProjectManager(state));
+                  .then(state => {
+                    if (state) openSceneOrProjectManager(state);
+                  });
               }
             );
           },

@@ -64,6 +64,19 @@ bool AddQuotesToFunctionCall(gd::String& expressionStr,
 
 namespace gd {
 
+void EventsListSerialization::UpdateInstructionsFromGD5092(
+    gd::Project& project, gd::InstructionsList& list) {
+      for(std::size_t i=0;i<list.size(); ++i){
+        gd::Instruction& instr=list[i];
+
+        if(instr.GetType() == "Timer"){
+          std::vector<gd::Expression> parameters = instr.GetParameters();
+          std::swap(parameters[1],parameters[2]);
+          instr.SetParameters(parameters);
+        }
+      }
+    }
+
 void EventsListSerialization::UpdateInstructionsFromGD4097(
     gd::Project& project, gd::InstructionsList& list) {
   for (std::size_t i = 0; i < list.size(); ++i) {
@@ -331,6 +344,17 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
                                      97,
                                      0)) {
     UpdateInstructionsFromGD4097(project, instructions);
+  }
+
+  if (VersionWrapper::IsOlderOrEqual(project.GetLastSaveGDMajorVersion(),
+                                     project.GetLastSaveGDMinorVersion(),
+                                     project.GetLastSaveGDBuildVersion(),
+                                     0,
+                                     5,
+                                     0,
+                                     92,
+                                     0)) {
+    UpdateInstructionsFromGD5092(project, instructions);
   }
   // end of compatibility code
 }

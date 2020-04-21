@@ -31,8 +31,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timer24.png",
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("expression", _("Time in seconds"))
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("string", _("Timer's name"))
+      .AddParameter("expression", _("Time in seconds"));
 
   extension
       .AddCondition("TimeScale",

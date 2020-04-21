@@ -230,29 +230,31 @@ const MainFrame = (props: Props) => {
           'MainFrameComponentDidMount',
           performance.now(),
         ]);
-        _loadExtensions().then(() => 
-          // Enable the GDJS development watcher *after* the extensions are loaded,
-          // to avoid the watcher interfering with the extension loading (by updating GDJS,
-          // which could lead in the extension loading failing for some extensions as file
-          // are removed/copied).
-          setState(state => ({
-            ...state,
-            gdjsDevelopmentWatcherEnabled: true,
-          }))
-        ).then(state => {
-          if (initialFileMetadataToOpen) {
-            _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
-          } else if (introDialog && !Window.isDev()) _openIntroDialog(true);
+        _loadExtensions()
+          .then(() =>
+            // Enable the GDJS development watcher *after* the extensions are loaded,
+            // to avoid the watcher interfering with the extension loading (by updating GDJS,
+            // which could lead in the extension loading failing for some extensions as file
+            // are removed/copied).
+            setState(state => ({
+              ...state,
+              gdjsDevelopmentWatcherEnabled: true,
+            }))
+          )
+          .then(state => {
+            if (initialFileMetadataToOpen) {
+              _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
+            } else if (introDialog && !Window.isDev()) _openIntroDialog(true);
 
-          GD_STARTUP_TIMES.push([
-            'MainFrameComponentDidMountFinished',
-            performance.now(),
-          ]);
-          console.info('Startup times:', getStartupTimesSummary());
-        })
-        .catch(() => {
-          /* Ignore errors */
-        })
+            GD_STARTUP_TIMES.push([
+              'MainFrameComponentDidMountFinished',
+              performance.now(),
+            ]);
+            console.info('Startup times:', getStartupTimesSummary());
+          })
+          .catch(() => {
+            /* Ignore errors */
+          });
       })();
     },
     [integratedEditor, initialFileMetadataToOpen, setState, _openIntroDialog]

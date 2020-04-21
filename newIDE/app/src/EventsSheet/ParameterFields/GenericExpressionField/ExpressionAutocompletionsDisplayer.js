@@ -1,0 +1,380 @@
+// @flow
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import * as React from 'react';
+import Popper from '@material-ui/core/Popper';
+import Paper from '@material-ui/core/Paper';
+import muiZIndex from '@material-ui/core/styles/zIndex';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import { type ExpressionAutocompletion } from '../../../ExpressionAutocompletion';
+import Text from '../../../UI/Text';
+import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
+import { getVisibleParameterTypes } from './FormatExpressionCall';
+import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
+import { Column, Line, Spacer } from '../../../UI/Grid';
+import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
+
+const defaultTextStyle = {
+  // Cancel the default Text margins.
+  marginTop: -5,
+  marginBottom: -5,
+
+  // Break words if they are too long to fit on a single line.
+  overflow: 'hidden',
+  overflowWrap: 'break-word',
+};
+
+const AutocompletionIcon = React.memo(({ src }) => (
+  <img
+    alt=""
+    src={src}
+    crossOrigin="anonymous"
+    style={{
+      maxWidth: 16,
+      maxHeight: 16,
+    }}
+  />
+));
+
+const formatParameterTypesString = (
+  parameterRenderingService: ParameterRenderingServiceType,
+  i18n: I18nType,
+  enumeratedExpressionMetadata: EnumeratedInstructionOrExpressionMetadata
+) => {
+  return getVisibleParameterTypes(enumeratedExpressionMetadata)
+    .map(type => {
+      const userFriendlyName = parameterRenderingService.getUserFriendlyTypeName(
+        type
+      );
+
+      return userFriendlyName ? i18n._(userFriendlyName) : type;
+    })
+    .join(', ');
+};
+
+const DisplayedExpressionAutocompletion = React.forwardRef(
+  (
+    {
+      expressionAutocompletion,
+      isSelected,
+      onClick,
+      i18n,
+      parameterRenderingService,
+    }: {|
+      expressionAutocompletion: ExpressionAutocompletion,
+      isSelected: boolean,
+      onClick: () => void,
+      i18n: I18nType,
+      parameterRenderingService: ParameterRenderingServiceType,
+    |},
+    ref
+  ) => {
+    if (!expressionAutocompletion.enumeratedExpressionMetadata) return null;
+
+    const title = isSelected ? (
+      <b>{expressionAutocompletion.completion}</b>
+    ) : (
+      expressionAutocompletion.completion
+    );
+
+    return (
+      <ButtonBase
+        style={styles.button}
+        onMouseDown={() => {
+          // When using a mouse, trigger the onClick on the mouse down
+          // to avoid the blur event of the text field to discard the autocompletions.
+          onClick();
+        }}
+        onClick={() => {
+          onClick();
+        }}
+        ref={ref}
+      >
+        <AutocompletionIcon
+          src={
+            expressionAutocompletion.enumeratedExpressionMetadata.iconFilename
+          }
+        />
+        <Spacer />
+        <Text style={defaultTextStyle} align="left">
+          {title}(
+          <i>
+            {formatParameterTypesString(
+              parameterRenderingService,
+              i18n,
+              expressionAutocompletion.enumeratedExpressionMetadata
+            )}
+          </i>
+          )
+        </Text>
+      </ButtonBase>
+    );
+  }
+);
+
+const DisplayedExactExpressionAutocompletion = ({
+  expressionAutocompletion,
+  i18n,
+  parameterRenderingService,
+}: {|
+  expressionAutocompletion: ExpressionAutocompletion,
+  i18n: I18nType,
+  parameterRenderingService: ParameterRenderingServiceType,
+|}) => {
+  if (!expressionAutocompletion.enumeratedExpressionMetadata) return null;
+
+  return (
+    <Column>
+      <Line noMargin expand alignItems="center">
+        <AutocompletionIcon
+          src={
+            expressionAutocompletion.enumeratedExpressionMetadata.iconFilename
+          }
+        />
+        <Spacer />
+        <Text style={defaultTextStyle} align="left">
+          <b>{expressionAutocompletion.completion}</b>(
+          <i>
+            {formatParameterTypesString(
+              parameterRenderingService,
+              i18n,
+              expressionAutocompletion.enumeratedExpressionMetadata
+            )}
+          </i>
+          )
+        </Text>
+      </Line>
+      <Text style={defaultTextStyle} size="body2">
+        {expressionAutocompletion.enumeratedExpressionMetadata.metadata.getDescription()}
+      </Text>
+    </Column>
+  );
+};
+
+const DisplayedObjectAutocompletion = React.forwardRef(
+  (
+    {
+      project,
+      expressionAutocompletion,
+      isSelected,
+      onClick,
+    }: {|
+      project: ?gdProject,
+      expressionAutocompletion: ExpressionAutocompletion,
+      isSelected: boolean,
+      onClick: () => void,
+    |},
+    ref
+  ) => {
+    const thumbnail =
+      project && expressionAutocompletion.object
+        ? ObjectsRenderingService.getThumbnail(
+            project,
+            expressionAutocompletion.object
+          )
+        : 'res/types/object.png';
+
+    const title = isSelected ? (
+      <b>{expressionAutocompletion.completion}</b>
+    ) : (
+      expressionAutocompletion.completion
+    );
+
+    return (
+      <ButtonBase
+        style={styles.button}
+        onMouseDown={() => {
+          // When using a mouse, trigger the onClick on the mouse down
+          // to avoid the blur event of the text field to discard the autocompletions.
+          onClick();
+        }}
+        onClick={() => {
+          onClick();
+        }}
+        ref={ref}
+      >
+        <AutocompletionIcon src={thumbnail} />
+        <Spacer />
+        <Text style={defaultTextStyle} align="left">
+          {title}
+        </Text>
+      </ButtonBase>
+    );
+  }
+);
+
+const DisplayedBehaviorAutocompletion = React.forwardRef(
+  (
+    {
+      expressionAutocompletion,
+      isSelected,
+      onClick,
+    }: {|
+      expressionAutocompletion: ExpressionAutocompletion,
+      isSelected: boolean,
+      onClick: () => void,
+    |},
+    ref
+  ) => {
+    const title = isSelected ? (
+      <b>{expressionAutocompletion.completion}</b>
+    ) : (
+      expressionAutocompletion.completion
+    );
+    return (
+      <ButtonBase
+        style={styles.button}
+        onMouseDown={() => {
+          // When using a mouse, trigger the onClick on the mouse down
+          // to avoid the blur event of the text field to discard the autocompletions.
+          onClick();
+        }}
+        onClick={() => {
+          onClick();
+        }}
+        ref={ref}
+      >
+        <AutocompletionIcon src={'res/types/behavior.png'} />
+        <Spacer />
+        <Text style={defaultTextStyle} align="left">
+          {title}
+        </Text>
+      </ButtonBase>
+    );
+  }
+);
+
+type Props = {|
+  project: ?gdProject,
+  expressionAutocompletions: Array<ExpressionAutocompletion>,
+  remainingCount: number,
+  selectedCompletionIndex: number,
+  anchorEl: Element,
+  onChoose: (chosenExpressionAutocompletion: ExpressionAutocompletion) => void,
+  parameterRenderingService: ParameterRenderingServiceType,
+|};
+
+const styles = {
+  container: {
+    width: 370,
+    maxHeight: 150,
+    display: 'flex',
+    overflowX: 'hidden',
+  },
+  button: {
+    width: '100%',
+    paddingLeft: 8,
+    paddingRight: 8,
+    justifyContent: 'flex-start',
+  },
+  tooManyTextContainer: {
+    width: '100%',
+  },
+  popperStyle: {
+    // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
+    // There will be only one ExpressionAutocompletionsDisplay opened at a time, so it's fair to put the
+    // highest z index. If this is breaking, check the z-index of material-ui.
+    zIndex: muiZIndex.tooltip + 100,
+  },
+};
+
+export default function ExpressionAutocompletionsDisplayer({
+  project,
+  expressionAutocompletions,
+  remainingCount,
+  selectedCompletionIndex,
+  anchorEl,
+  onChoose,
+  parameterRenderingService,
+}: Props) {
+  const scrollView = React.useRef((null: ?ScrollViewInterface));
+  const selectedAutocompletionElement = React.useRef(
+    (null: ?React$Component<any, any>)
+  );
+  React.useEffect(
+    () => {
+      if (scrollView.current && selectedAutocompletionElement.current) {
+        scrollView.current.scrollTo(selectedAutocompletionElement.current);
+      }
+    },
+    [scrollView, selectedAutocompletionElement, selectedCompletionIndex]
+  );
+
+  if (expressionAutocompletions.length === 0) return null;
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Popper
+          style={styles.popperStyle}
+          open
+          anchorEl={anchorEl}
+          placement="bottom-start"
+          disablePortal={
+            // We can use a portal to display this component, because even if it
+            // used inside a modal, which has a focus trap, it's entirely
+            // controlled by the parent component.
+            false
+          }
+        >
+          <Paper variant="outlined" square style={styles.container}>
+            <ScrollView autoHideScrollbar ref={scrollView}>
+              {expressionAutocompletions.map(
+                (expressionAutocompletion, index) => {
+                  const isSelected = selectedCompletionIndex === index;
+                  const ref = isSelected
+                    ? selectedAutocompletionElement
+                    : undefined;
+
+                  return expressionAutocompletion.kind === 'Expression' ? (
+                    !expressionAutocompletion.isExact ? (
+                      <DisplayedExpressionAutocompletion
+                        key={index}
+                        expressionAutocompletion={expressionAutocompletion}
+                        onClick={() => onChoose(expressionAutocompletion)}
+                        isSelected={isSelected}
+                        i18n={i18n}
+                        parameterRenderingService={parameterRenderingService}
+                        ref={ref}
+                      />
+                    ) : (
+                      <DisplayedExactExpressionAutocompletion
+                        key={index}
+                        expressionAutocompletion={expressionAutocompletion}
+                        i18n={i18n}
+                        parameterRenderingService={parameterRenderingService}
+                      />
+                    )
+                  ) : expressionAutocompletion.kind === 'Object' ? (
+                    <DisplayedObjectAutocompletion
+                      key={index}
+                      project={project}
+                      expressionAutocompletion={expressionAutocompletion}
+                      onClick={() => onChoose(expressionAutocompletion)}
+                      isSelected={isSelected}
+                      ref={ref}
+                    />
+                  ) : expressionAutocompletion.kind === 'Behavior' ? (
+                    <DisplayedBehaviorAutocompletion
+                      key={index}
+                      expressionAutocompletion={expressionAutocompletion}
+                      onClick={() => onChoose(expressionAutocompletion)}
+                      isSelected={isSelected}
+                      ref={ref}
+                    />
+                  ) : null;
+                }
+              )}
+              {remainingCount > 0 && (
+                <Column justifyContent="flex-start">
+                  <Text>And {remainingCount} others...</Text>
+                </Column>
+              )}
+            </ScrollView>
+          </Paper>
+        </Popper>
+      )}
+    </I18n>
+  );
+}

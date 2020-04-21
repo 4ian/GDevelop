@@ -92,6 +92,8 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
+import { type UnsavedChanges } from './UnsavedChangesContext';
+import { type MainMenuProps } from './MainMenu.flow';
 import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -141,6 +143,7 @@ type State = {|
 type Props = {
   integratedEditor?: boolean,
   introDialog?: React.Element<*>,
+  renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -160,6 +163,7 @@ type Props = {
   initialFileMetadataToOpen: ?FileMetadata,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
+  unsavedChanges?: UnsavedChanges,
 };
 
 class MainFrame extends React.Component<Props, State> {
@@ -381,8 +385,7 @@ class MainFrame extends React.Component<Props, State> {
       return hasAutoSave(fileMetadata, true).then(canOpenAutosave => {
         if (!canOpenAutosave) return fileMetadata;
 
-        //eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`
           )
@@ -401,8 +404,7 @@ class MainFrame extends React.Component<Props, State> {
       return hasAutoSave(fileMetadata, false).then(canOpenAutosave => {
         if (!canOpenAutosave) return null;
 
-        //eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`
           )
@@ -553,7 +555,8 @@ class MainFrame extends React.Component<Props, State> {
       currentProject.getLayoutsCount()
     );
     newLayout.updateBehaviorsSharedData(currentProject);
-    this.forceUpdate();
+
+    this._onProjectItemModified();
   };
 
   addExternalLayout = () => {
@@ -567,7 +570,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalLayoutsCount()
     );
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   addExternalEvents = () => {
@@ -581,7 +584,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getExternalEventsCount()
     );
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   addEventsFunctionsExtension = () => {
@@ -595,7 +598,7 @@ class MainFrame extends React.Component<Props, State> {
       name,
       currentProject.getEventsFunctionsExtensionsCount()
     );
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   deleteLayout = (layout: gdLayout) => {
@@ -603,8 +606,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this scene? This can't be undone.`
       )
@@ -617,7 +619,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeLayout(layout.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -627,8 +629,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this external layout? This can't be undone.`
       )
@@ -644,7 +645,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeExternalLayout(externalLayout.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -654,8 +655,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove these external events? This can't be undone.`
       )
@@ -671,7 +671,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeExternalEvents(externalEvents.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -683,8 +683,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n, eventsFunctionsExtensionsState } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this extension? This can't be undone.`
       )
@@ -700,7 +699,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         currentProject.removeEventsFunctionsExtension(externalLayout.getName());
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
 
@@ -737,7 +736,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         layout.setName(newName);
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -774,7 +773,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         externalLayout.setName(newName);
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -811,7 +810,7 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => {
         externalEvents.setName(newName);
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -874,8 +873,7 @@ class MainFrame extends React.Component<Props, State> {
         eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
           currentProject
         );
-
-        this.forceUpdate();
+        this._onProjectItemModified();
       }
     );
   };
@@ -1003,6 +1001,7 @@ class MainFrame extends React.Component<Props, State> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1062,6 +1061,7 @@ class MainFrame extends React.Component<Props, State> {
               onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1108,6 +1108,7 @@ class MainFrame extends React.Component<Props, State> {
               previewButtonSettings={emptyPreviewButtonSettings}
               isActive={isActive}
               ref={editorRef}
+              unsavedChanges={this.props.unsavedChanges}
             />
           ),
           key: 'external events ' + name,
@@ -1204,6 +1205,7 @@ class MainFrame extends React.Component<Props, State> {
                   this.state.currentProject
                 );
               }}
+              unsavedChanges={this.props.unsavedChanges}
             />
           ),
           key: 'events functions extension ' + name,
@@ -1351,6 +1353,12 @@ class MainFrame extends React.Component<Props, State> {
     }
   };
 
+  _onProjectItemModified = () => {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
+  };
+
   _onCreateEventsFunction = (
     extensionName: string,
     eventsFunction: gdEventsFunction
@@ -1444,6 +1452,8 @@ class MainFrame extends React.Component<Props, State> {
     onSaveProject(currentProject, currentFileMetadata).then(
       ({ wasSaved }) => {
         if (wasSaved) {
+          if (this.props.unsavedChanges)
+            this.props.unsavedChanges.sealUnsavedChanges();
           this._showSnackMessage(i18n._(t`Project properly saved`));
         }
       },
@@ -1490,6 +1500,8 @@ class MainFrame extends React.Component<Props, State> {
       .then(
         ({ wasSaved, fileMetadata }) => {
           if (wasSaved) {
+            if (this.props.unsavedChanges)
+              this.props.unsavedChanges.sealUnsavedChanges();
             this._showSnackMessage(i18n._(t`Project properly saved`));
 
             if (fileMetadata) {
@@ -1511,17 +1523,20 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   askToCloseProject = (): Promise<void> => {
-    if (!this.state.currentProject) return Promise.resolve();
-    const { i18n } = this.props;
+    if (
+      this.props.unsavedChanges &&
+      this.props.unsavedChanges.hasUnsavedChanges
+    ) {
+      if (!this.state.currentProject) return Promise.resolve();
+      const { i18n } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      i18n._(
-        t`Close the project? Any changes that have not been saved will be lost.`
-      )
-    );
-    if (!answer) return Promise.resolve();
-
+      const answer = Window.showConfirmDialog(
+        i18n._(
+          t`Close the project? Any changes that have not been saved will be lost.`
+        )
+      );
+      if (!answer) return Promise.resolve();
+    }
     return this.closeProject();
   };
 
@@ -1769,6 +1784,7 @@ class MainFrame extends React.Component<Props, State> {
       useStorageProvider,
       i18n,
       renderGDJSDevelopmentWatcher,
+      renderMainMenu,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1777,6 +1793,26 @@ class MainFrame extends React.Component<Props, State> {
 
     return (
       <div className="main-frame">
+        {!!renderMainMenu &&
+          renderMainMenu({
+            i18n: i18n,
+            project: this.state.currentProject,
+            onChooseProject: this.chooseProject,
+            onSaveProject: this.saveProject,
+            onSaveProjectAs: this.saveProjectAs,
+            onCloseProject: this.askToCloseProject,
+            onCloseApp: this.closeApp,
+            onExportProject: this.openExportDialog,
+            onCreateProject: this.openCreateDialog,
+            onOpenProjectManager: this.openProjectManager,
+            onOpenStartPage: this.openStartPage,
+            onOpenDebugger: this.openDebugger,
+            onOpenAbout: this.openAboutDialog,
+            onOpenPreferences: this.openPreferences,
+            onOpenLanguage: this.openLanguage,
+            onOpenProfile: this.openProfile,
+            setUpdateStatus: this.setUpdateStatus,
+          })}
         <ProjectTitlebar fileMetadata={currentFileMetadata} />
         <Drawer
           open={projectManagerOpen}
@@ -1837,6 +1873,7 @@ class MainFrame extends React.Component<Props, State> {
                 );
               }}
               freezeUpdate={!projectManagerOpen}
+              unsavedChanges={this.props.unsavedChanges}
             />
           )}
           {!currentProject && (
@@ -1936,7 +1973,11 @@ class MainFrame extends React.Component<Props, State> {
             <PlatformSpecificAssetsDialog
               project={this.state.currentProject}
               open
-              onApply={() => this.openPlatformSpecificAssets(false)}
+              onApply={() => {
+                if (this.props.unsavedChanges)
+                  this.props.unsavedChanges.triggerUnsavedChanges();
+                this.openPlatformSpecificAssets(false);
+              }}
               onClose={() => this.openPlatformSpecificAssets(false)}
               resourceSources={resourceSources}
               onChooseResource={this._onChooseResource}
@@ -2056,7 +2097,15 @@ class MainFrame extends React.Component<Props, State> {
             }}
           />
         )}
-        <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
+        <CloseConfirmDialog
+          shouldPrompt={!!this.state.currentProject}
+          i18n={this.props.i18n}
+          language={this.props.i18n.language}
+          hasUnsavedChanges={
+            !!this.props.unsavedChanges &&
+            this.props.unsavedChanges.hasUnsavedChanges
+          }
+        />
         <ChangelogDialogContainer />
         {this.state.gdjsDevelopmentWatcherEnabled &&
           renderGDJSDevelopmentWatcher &&

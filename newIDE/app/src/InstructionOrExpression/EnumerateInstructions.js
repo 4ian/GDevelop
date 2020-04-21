@@ -33,6 +33,7 @@ const freeConditionsToAddToObject: ExtensionsExtraInstructions = {
       'Distance',
       'SeDirige',
       'EstTourne',
+      'SourisSurObjet',
     ],
   },
 };
@@ -176,7 +177,7 @@ const enumerateExtensionInstructions = (
 /**
  * List all the instructions available.
  */
-export const enumerateInstructions = (
+export const enumerateAllInstructions = (
   isCondition: boolean
 ): Array<EnumeratedInstructionOrExpressionMetadata> => {
   let allInstructions = [];
@@ -514,6 +515,7 @@ export const filterInstructionsList = (
     return list;
   };
 
+  // See EnumerateExpressions for a similar logic for expressions
   return favorExactMatch(list.filter(matchCritera));
 };
 

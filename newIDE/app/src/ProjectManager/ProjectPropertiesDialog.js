@@ -170,6 +170,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             />,
           ]}
           title={<Trans>Project properties</Trans>}
+          cannotBeDismissed={true}
           open={this.props.open}
           onRequestClose={this.props.onClose}
         >

@@ -13,6 +13,7 @@ import EventsFunctionsExtensionsContext, {
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../UI/HelpButton';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import Window from '../Utils/Window';
 
 type Props = {|
   project: gdProject,
@@ -38,8 +39,7 @@ const importExtension = (
           if (
             project.hasEventsFunctionsExtensionNamed(serializedExtension.name)
           ) {
-            //eslint-disable-next-line
-            const answer = confirm(
+            const answer = Window.showConfirmDialog(
               i18n._(
                 t`An extension with this name already exists in the project. Importing this extension will replace it: are you sure you want to continue?`
               )
@@ -102,6 +102,7 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                       />
                     ) : null,
                   ]}
+                  cannotBeDismissed={true}
                   open
                   noMargin
                   onRequestClose={onClose}

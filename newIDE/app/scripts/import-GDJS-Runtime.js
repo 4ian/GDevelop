@@ -1,6 +1,7 @@
 const shell = require('shelljs');
 const path = require('path');
 const copy = require('recursive-copy');
+const args = require('minimist')(process.argv.slice(2));
 
 const gdevelopRootPath = path.join(__dirname, '..', '..', '..');
 const destinationPaths = [
@@ -14,7 +15,7 @@ const destinationPaths = [
   ),
 ];
 
-var copyOptions = {
+const copyOptions = {
   overwrite: true,
   expand: true,
   dot: true,
@@ -26,7 +27,10 @@ destinationPaths.forEach(destinationPath => {
     `ℹ️ Copying GDJS and extensions runtime files (*.js) to "${destinationPath}"...`
   );
 
-  shell.rm('-rf', destinationPath);
+  if (args.clean) {
+    shell.echo(`ℹ️ Cleaning destination first...`);
+    shell.rm('-rf', destinationPath);
+  }
   shell.mkdir('-p', destinationPath);
 
   copy(

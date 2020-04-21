@@ -17,6 +17,7 @@ export type AlertMessageIdentifier =
   | 'instance-drag-n-drop-explanation'
   | 'objects-panel-explanation'
   | 'instance-properties-panel-explanation'
+  | 'layers-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used';
@@ -76,6 +77,10 @@ export const allAlertMessages: Array<{
   {
     key: 'instance-properties-panel-explanation',
     label: <Trans>Using the instance properties panel</Trans>,
+  },
+  {
+    key: 'layers-panel-explanation',
+    label: <Trans>Using the layers panel</Trans>,
   },
   {
     key: 'physics2-shape-collisions',

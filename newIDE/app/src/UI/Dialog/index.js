@@ -39,7 +39,7 @@ type Props = {|
   secondaryActions?: React.Node,
   onRequestClose?: () => void,
 
-  modal?: boolean, // Force the user to use one of the actions in the Dialog. Clicking outside the Dialog will not trigger the onRequestClose.
+  cannotBeDismissed?: boolean, //Force the user to use one of the actions in the Dialog. If true, the dialog can't be closed by clicking outside or pressing Escape.
 
   children: React.Node, // The content of the dialog
 
@@ -89,7 +89,6 @@ export default (props: Props) => {
   ) : (
     actions
   );
-
   const dialogContentStyle: DialogContentStyle = {
     ...(noMargin ? styles.noMarginBody : styles.defaultBody),
     ...((flexRowBody ? styles.flexRowBody : {}): DialogContentStyle),
@@ -105,7 +104,8 @@ export default (props: Props) => {
           fullWidth
           fullScreen={size === 'small'}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick
+          disableBackdropClick={false}
+          disableEscapeKeyDown={false}
         >
           {title && (
             <DialogTitle

@@ -42,6 +42,7 @@ import {
   type PreviewButtonSettings,
   emptyPreviewButtonSettings,
 } from '../MainFrame/Toolbar/PreviewButtons';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const gd = global.gd;
 
@@ -63,6 +64,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
+  unsavedChanges?: UnsavedChanges,
   previewButtonSettings: PreviewButtonSettings,
 |};
 
@@ -308,7 +310,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
           if (this._editorMosaic)
-            this._editorMosaic.openEditor('behavior-functions-list', 'end', 75);
+            this._editorMosaic.openEditor(
+              'behavior-functions-list',
+              'end',
+              75,
+              'column'
+            );
           if (this._editorNavigator)
             this._editorNavigator.openEditor('behavior-functions-list');
         }
@@ -553,6 +560,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._loadEventsFunctionFrom(project, selectedEventsFunction);
                   this.forceUpdate();
                 }}
+                unsavedChanges={this.props.unsavedChanges}
               />
             ) : (
               <EmptyMessage>
@@ -602,6 +610,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onOpenDebugger={() => {}}
                 onCreateEventsFunction={this.props.onCreateEventsFunction}
                 onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
+                unsavedChanges={this.props.unsavedChanges}
               />
             </Background>
           ) : (
@@ -652,6 +661,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     <Divider />
                   </React.Fragment>
                 )}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
           </I18n>
@@ -713,6 +723,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       <Divider />
                     </React.Fragment>
                   )}
+                  unsavedChanges={this.props.unsavedChanges}
                 />
               )}
             </I18n>
@@ -748,6 +759,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._onEventsBasedBehaviorRenamed
                 }
                 onEditProperties={this._editBehavior}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
           </I18n>
@@ -862,7 +874,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             project={project}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
-            onApply={() => this._editBehavior(null)}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._editBehavior(null);
+            }}
             onRenameProperty={(oldName, newName) =>
               this._onBehaviorPropertyRenamed(
                 editedEventsBasedBehavior,

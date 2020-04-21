@@ -323,6 +323,7 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
   }
 
   if (jumping) {
+    // TODO: Port the jump sustain feature
     requestedDeltaY -= currentJumpSpeed * timeDelta;
     currentJumpSpeed -= gravity * timeDelta;
     if (currentJumpSpeed < 0) {

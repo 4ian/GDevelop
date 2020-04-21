@@ -13,6 +13,7 @@ import NewBehaviorDialog from './NewBehaviorDialog';
 import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import { isNullPtr } from '../Utils/IsNullPtr';
+import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 const gd = global.gd;
@@ -24,7 +25,6 @@ const AddBehaviorLine = ({ onAdd }) => (
         label={<Trans>Add a behavior to the object</Trans>}
         primary
         onClick={onAdd}
-        labelPosition="before"
         icon={<Add />}
       />
     </Line>
@@ -76,8 +76,7 @@ export default class BehaviorsEditor extends Component {
       },
       () => {
         if (this._hasBehaviorWithType(type)) {
-          //eslint-disable-next-line
-          const answer = confirm(
+          const answer = Window.showConfirmDialog(
             "There is already a behavior of this type attached to the object. It's possible to add again this behavior but it's unusual and may not be always supported properly. Are you sure you want to add again this behavior?"
           );
 
@@ -111,8 +110,7 @@ export default class BehaviorsEditor extends Component {
 
   _onRemoveBehavior = behaviorName => {
     const { object } = this.props;
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this behavior? This can't be undone."
     );
 

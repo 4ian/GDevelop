@@ -6,6 +6,7 @@
 #ifndef JSCODEEVENT_H
 #define JSCODEEVENT_H
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/Expression.h"
 namespace gd {
 class Instruction;
 class Project;
@@ -31,10 +32,15 @@ class JsCodeEvent : public gd::BaseEvent {
   const gd::String& GetInlineCode() const { return inlineCode; };
   void SetInlineCode(const gd::String& code) { inlineCode = code; };
 
-  const gd::String& GetParameterObjects() const { return parameterObjects; };
+  const gd::String& GetParameterObjects() const { return parameterObjects.GetPlainString(); };
   void SetParameterObjects(const gd::String& objectName) {
-    parameterObjects = objectName;
+    parameterObjects = gd::Expression(objectName);
   };
+
+  virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata();
+  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata() const;
 
   virtual void SerializeTo(gd::SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
@@ -44,9 +50,9 @@ class JsCodeEvent : public gd::BaseEvent {
  private:
   void Init(const JsCodeEvent& event);
 
-  gd::String inlineCode;        ///< Contains the Javacript code of the event.
-  gd::String parameterObjects;  ///< Name of the (group of) objects to pass as
-                                ///< parameter.
+  gd::String inlineCode;            ///< Contains the Javacript code of the event.
+  gd::Expression parameterObjects;  ///< Name of the (group of) objects to pass as
+                                    ///< parameter.
   bool useStrict;  ///< Should the generated JS function have "use strict". true
                    ///< by default. Should be removed once all the game engine
                    ///< is using "use strict".

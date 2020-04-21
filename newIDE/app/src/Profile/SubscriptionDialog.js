@@ -86,8 +86,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     sendChoosePlanClicked(plan.planId);
 
     if (subscription.stripeSubscriptionId) {
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         plan.planId
           ? i18n._(t`Are you sure you want to subscribe to this new plan?`)
           : i18n._(t`Are you sure you want to cancel your subscription?`)
@@ -179,6 +178,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                   />,
                 ]}
                 onRequestClose={onClose}
+                cannotBeDismissed={true}
                 open={open}
                 noMargin
               >

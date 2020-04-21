@@ -1,14 +1,59 @@
+/// @ts-check
 /**
- * This DebuggerClient connects to a websocket server and can dump
+ * An client side implementation of the Debugger
+ * @interface
+ */
+gdjs.IDebuggerClient = function() {}
+
+/**
+ * Update a value, specified by a path starting from the {@link RuntimeGame} instance.
+ * @param {Array<string>} path - The path of the property to modify, starting from the RuntimeGame.
+ * @param {any} newValue - The new value.
+ */
+gdjs.IDebuggerClient.prototype.set = function(path, newValue) {}
+
+/**
+ * Call a method, specified by a path starting from the {@link RuntimeGame} instance.
+ * @param {Array<string>} path - The path to the method, starting from the RuntimeGame.
+ * @param {Array<any>} args - The arguments to pass the method.
+ */
+gdjs.IDebuggerClient.prototype.call = function(path, args) {}
+
+/**
+ * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
+ */
+gdjs.IDebuggerClient.prototype.sendRuntimeGameDump = function() {}
+
+/**
+ * Start profiling.
+ */
+gdjs.IDebuggerClient.prototype.sendProfilerStrated = function() {}
+
+/**
+ * Stop profiling.
+ */
+gdjs.IDebuggerClient.prototype.sendProfilerStopped = function() {}
+
+/**
+ * Send profiling results.
+ * @param {any} framesAverageMeasures The measures made for each frames.
+ * @param {any} stats Other measures done during the profiler run.
+ */
+gdjs.IDebuggerClient.prototype.sendProfilerOutput = function(framesAverageMeasures, stats) {}
+
+
+/**
+ * This {@link IDebuggerClient} connects to a websocket server, can dump
  * the data of the current game, and receive message to change a field or
- * call a function on an object of the specified runtimeGame.
+ * call a function, specified by a path from the {@link RuntimeGame}.
  *
  * @memberof gdjs
+ * @implements {gdjs.IDebuggerClient}
  * @class WebsocketDebuggerClient
- * @param {gdjs.RuntimeGame} The `gdjs.RuntimeGame` to be debug
+ * @param {gdjs.RuntimeGame} runtimeGame -  The `gdjs.RuntimeGame` to be debugged
  */
-gdjs.WebsocketDebuggerClient = function(runtimegame) {
-  this._runtimegame = runtimegame;
+gdjs.WebsocketDebuggerClient = function(runtimeGame) {
+  this._runtimegame = runtimeGame;
 
   if (typeof WebSocket === 'undefined') {
     console.log("WebSocket is not defined, debugger won't work");
@@ -48,9 +93,9 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
 
     if (data && data.command) {
       if (data.command === 'play') {
-        runtimegame.pause(false);
+        runtimeGame.pause(false);
       } else if (data.command === 'pause') {
-        runtimegame.pause(true);
+        runtimeGame.pause(true);
         that.sendRuntimeGameDump();
       } else if (data.command === 'refresh') {
         that.sendRuntimeGameDump();
@@ -59,7 +104,7 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
       } else if (data.command === 'call') {
         that.call(data.path, data.args);
       } else if (data.command === 'profiler.start') {
-        runtimegame.startCurrentSceneProfiler(function(stoppedProfiler) {
+        runtimeGame.startCurrentSceneProfiler(function(stoppedProfiler) {
           that.sendProfilerOutput(
             stoppedProfiler.getFramesAverageMeasures(),
             stoppedProfiler.getStats()
@@ -68,7 +113,7 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
         });
         that.sendProfilerStarted();
       } else if (data.command === 'profiler.stop') {
-        runtimegame.stopCurrentSceneProfiler();
+        runtimeGame.stopCurrentSceneProfiler();
       } else {
         console.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -78,6 +123,7 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
       console.info('Debugger received a message with badly formatted data.');
     }
   };
+  return;
 };
 
 gdjs.DebuggerClient = gdjs.WebsocketDebuggerClient; //Register the class to let the engine use it.
@@ -271,8 +317,23 @@ gdjs.WebsocketDebuggerClient.prototype.sendProfilerOutput = function(
   );
 };
 
-// This is an alternative to JSON.stringify that ensure that circular reference
-// are replaced by a placeholder.
+/**
+ * A function used to replace circular references with a new value.
+ * @callback DebuggerClientCycleReplacer
+ * @param {string | number} key - The key corresponding to the value.
+ * @param {any} value - The value.
+ * @returns {any} The new value.
+ */
+
+/** 
+ * This is an alternative to JSON.stringify that ensure that circular references
+ * are replaced by a placeholder.
+ * @param {any} obj - The object to serialize.
+ * @param {Function} [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
+ * @param {number} [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
+ * @param {number} [spaces] - The number of spaces for indentation.
+ * @param {DebuggerClientCycleReplacer} [cycleReplacer] - Function used to replace circular references with a new value.
+ */
 gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
   obj,
   replacer,
@@ -282,12 +343,19 @@ gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
 ) {
   return JSON.stringify(
     obj,
+      // @ts-ignore
     this._depthLimitedSerializer(replacer, cycleReplacer, maxDepth),
     spaces
   );
 };
 
-// JSON serializer that prevent circular references and stop if maxDepth is reached.
+/** 
+ * Generates a JSON serializer that prevent circular references and stop if maxDepth is reached.
+ * @param {Function} [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
+ * @param {DebuggerClientCycleReplacer} [cycleReplacer] - Function used to replace circular references with a new value.
+ * @param {number} [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
+ * @returns {Function}
+ */
 gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
   replacer,
   cycleReplacer,
@@ -296,7 +364,7 @@ gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
   var stack = [],
     keys = [];
 
-  if (cycleReplacer == null)
+  if (cycleReplacer === undefined || cycleReplacer === null)
     cycleReplacer = function(key, value) {
       if (stack[0] === value) return '[Circular ~]';
       return (
@@ -313,6 +381,7 @@ gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
       if (maxDepth != null && thisPos > maxDepth) {
         return '[Max depth reached]';
       } else if (~stack.indexOf(value))
+      // @ts-ignore
         value = cycleReplacer.call(this, key, value);
     } else stack.push(value);
 

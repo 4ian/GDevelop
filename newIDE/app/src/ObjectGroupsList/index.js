@@ -19,6 +19,8 @@ import {
   type GroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
 import { listItemWithoutIconHeight } from '../UI/List';
+import Window from '../Utils/Window';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 // TODO: This component should be updated to be implemented using SortableVirtualizedItemList,
 // so that drag'n'drop is identical to other lists (and to benefit from better typing + future improvements
@@ -139,6 +141,7 @@ type Props = {|
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
   canSetAsGlobalGroup?: boolean,
+  unsavedChanges?: UnsavedChanges,
 |};
 
 export default class GroupsListContainer extends React.Component<Props, State> {
@@ -193,7 +196,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
 
     objectGroups.insertNew(name, objectGroups.count());
-    this.forceUpdate();
+    this._onObjectGroupModified();
 
     if (this.props.onGroupAdded) {
       this.props.onGroupAdded();
@@ -204,8 +207,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const { group, global } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this group? This can't be undone."
     );
     if (!answer) return;
@@ -219,7 +221,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         objectGroups.remove(group.getName());
       }
 
-      this.forceUpdate();
+      this._onObjectGroupModified();
       if (this.props.onGroupRemoved) {
         this.props.onGroupRemoved();
       }
@@ -256,7 +258,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
         group.setName(newName);
 
-        this.forceUpdate();
+        this._onObjectGroupModified();
         if (this.props.onGroupRenamed) {
           this.props.onGroupRenamed();
         }
@@ -288,7 +290,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       );
     }
 
-    this.forceUpdate();
+    this._onObjectGroupModified();
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
@@ -305,14 +307,19 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return;
     }
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?"
     );
     if (!answer) return;
 
     globalObjectGroups.insert(group, globalObjectGroups.count());
     objectGroups.remove(groupName);
+    this._onObjectGroupModified();
+  };
+
+  _onObjectGroupModified = () => {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 

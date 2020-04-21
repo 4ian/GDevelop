@@ -38,6 +38,7 @@ const loadModalWindow = ({
     center: true,
     webPreferences: {
       webSecurity: false,
+      nodeIntegration: true,
     },
   };
 

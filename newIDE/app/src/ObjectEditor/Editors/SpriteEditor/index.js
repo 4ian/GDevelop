@@ -22,6 +22,7 @@ import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
+import Window from '../../../Utils/Window';
 import {
   deleteSpritesFromAnimation,
   duplicateSpritesInAnimation,
@@ -57,7 +58,6 @@ const AddAnimationLine = ({ onAdd, extraTools }) => (
         label={<Trans>Add an animation</Trans>}
         primary
         onClick={onAdd}
-        labelPosition="before"
         icon={<Add />}
       />
     </Line>
@@ -255,8 +255,9 @@ class AnimationsListContainer extends React.Component<
   };
 
   removeAnimation = i => {
-    //eslint-disable-next-line
-    const answer = confirm('Are you sure you want to remove this animation?');
+    const answer = Window.showConfirmDialog(
+      'Are you sure you want to remove this animation?'
+    );
 
     if (answer) {
       this.props.spriteObject.removeAnimation(i);
@@ -471,8 +472,8 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 key="help"
               />,
             ]}
+            cannotBeDismissed={true}
             noMargin
-            modal
             onRequestClose={() => this.openPointsEditor(false)}
             open={this.state.pointsEditorOpen}
           >
@@ -503,7 +504,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               />,
             ]}
             noMargin
-            modal
+            cannotBeDismissed={true}
             onRequestClose={() => this.openCollisionMasksEditor(false)}
             open={this.state.collisionMasksEditorOpen}
           >

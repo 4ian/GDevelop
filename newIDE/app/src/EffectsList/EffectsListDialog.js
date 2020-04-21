@@ -42,7 +42,7 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
             key={'Apply'}
           />,
         ]}
-        modal
+        cannotBeDismissed={true}
         open
         onRequestClose={onApply}
         title={<Trans>Effects</Trans>}

@@ -2,10 +2,11 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import ContextMenu from './ContextMenu';
+import { type MenuItemTemplate } from './Menu.flow';
 
 type Props = {|
   element: React$Element<any>,
-  buildMenuTemplate: () => Array<any>,
+  buildMenuTemplate: () => Array<MenuItemTemplate>,
   openMenuWithSecondaryClick?: boolean,
 |};
 

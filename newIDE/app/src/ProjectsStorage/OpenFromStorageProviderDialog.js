@@ -47,6 +47,7 @@ export default ({
               onClick={onCreateNewProject}
             />,
           ]}
+          cannotBeDismissed={false}
           open
           noMargin
           maxWidth="sm"

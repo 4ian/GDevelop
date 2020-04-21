@@ -113,6 +113,7 @@ export default class ExternalEventsEditor extends BaseEditor {
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
             openInstructionOrExpression={this.props.openInstructionOrExpression}
+            unsavedChanges={this.props.unsavedChanges}
           />
         )}
         {!layout && (

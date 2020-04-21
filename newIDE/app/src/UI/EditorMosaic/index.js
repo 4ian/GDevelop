@@ -37,7 +37,7 @@ const addNode = (
   newNode: MosaicNode | string,
   position: 'start' | 'end',
   splitPercentage: number,
-  direction: 'row' | 'column' = 'row'
+  direction: 'row' | 'column'
 ): MosaicNode => {
   if (!currentNode) return newNode;
 
@@ -78,7 +78,11 @@ const addNode = (
 
   // Or add the node here.
   return {
-    direction,
+    direction:
+      direction === 'row'
+        ? // Direction of split is the opposite of what is requested for the editor
+          'column'
+        : 'row',
     first: position === 'end' ? currentNode : newNode,
     second: position === 'end' ? newNode : currentNode,
     splitPercentage,
@@ -158,7 +162,8 @@ export default class EditorMosaic extends React.Component<Props, State> {
   openEditor = (
     editorName: string,
     position: 'start' | 'end',
-    splitPercentage: number
+    splitPercentage: number,
+    direction: 'row' | 'column'
   ) => {
     const { editors, limitToOneSecondaryEditor } = this.props;
 
@@ -193,7 +198,8 @@ export default class EditorMosaic extends React.Component<Props, State> {
         this.state.mosaicNode,
         editorName,
         position,
-        splitPercentage
+        splitPercentage,
+        direction
       ),
     });
 

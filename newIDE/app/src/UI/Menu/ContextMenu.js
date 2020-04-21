@@ -1,3 +1,4 @@
+// TODO: this needs to be flow-typed
 import React from 'react';
 import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
@@ -11,6 +12,8 @@ class MaterialUIContextMenu extends React.Component {
     super(props);
     this.state = {
       open: false,
+      anchorX: 0,
+      anchorY: 0,
     };
     this.menuImplementation = new MaterialUIMenuImplementation({
       onClose: this._onClose,

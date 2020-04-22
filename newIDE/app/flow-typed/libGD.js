@@ -72,6 +72,9 @@ declare type gdNamedPropertyDescriptorsList = gdEmscriptenObject;
 declare type gdExpressionNode = gdEmscriptenObject;
 declare type gdUniquePtrExpressionNode = gdEmscriptenObject;
 
+declare type gdExpressionCompletionDescription = gdEmscriptenObject;
+declare type gdVectorExpressionCompletionDescription = gdEmscriptenObject;
+
 declare type gdjsExporter = gdEmscriptenObject;
 
 declare type gdEventsContext = gdEmscriptenObject;

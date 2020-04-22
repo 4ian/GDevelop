@@ -8,6 +8,7 @@ export default class InstancesRenderer {
     instances,
     viewPosition,
     onInstanceClicked,
+    onInstanceDoubleClicked,
     onOverInstance,
     onOutInstance,
     onMoveInstance,
@@ -19,6 +20,7 @@ export default class InstancesRenderer {
     this.layout = layout;
     this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
+    this.onInstanceDoubleClicked = onInstanceDoubleClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
     this.onMoveInstance = onMoveInstance;
@@ -95,6 +97,7 @@ export default class InstancesRenderer {
           viewPosition: this.viewPosition,
           layer: layer,
           onInstanceClicked: this.onInstanceClicked,
+          onInstanceDoubleClicked: this.onInstanceDoubleClicked,
           onOverInstance: this.onOverInstance,
           onOutInstance: this.onOutInstance,
           onMoveInstance: this.onMoveInstance,

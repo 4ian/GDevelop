@@ -93,6 +93,7 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import { type UnsavedChanges } from './UnsavedChangesContext';
+import { type MainMenuProps } from './MainMenu.flow';
 import { emptyPreviewButtonSettings } from './Toolbar/PreviewButtons';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -142,6 +143,7 @@ type State = {|
 type Props = {
   integratedEditor?: boolean,
   introDialog?: React.Element<*>,
+  renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -383,8 +385,7 @@ class MainFrame extends React.Component<Props, State> {
       return hasAutoSave(fileMetadata, true).then(canOpenAutosave => {
         if (!canOpenAutosave) return fileMetadata;
 
-        //eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`
           )
@@ -403,8 +404,7 @@ class MainFrame extends React.Component<Props, State> {
       return hasAutoSave(fileMetadata, false).then(canOpenAutosave => {
         if (!canOpenAutosave) return null;
 
-        //eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`
           )
@@ -606,8 +606,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this scene? This can't be undone.`
       )
@@ -630,8 +629,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this external layout? This can't be undone.`
       )
@@ -657,8 +655,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove these external events? This can't be undone.`
       )
@@ -686,8 +683,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n, eventsFunctionsExtensionsState } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this extension? This can't be undone.`
       )
@@ -1534,8 +1530,7 @@ class MainFrame extends React.Component<Props, State> {
       if (!this.state.currentProject) return Promise.resolve();
       const { i18n } = this.props;
 
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         i18n._(
           t`Close the project? Any changes that have not been saved will be lost.`
         )
@@ -1789,6 +1784,7 @@ class MainFrame extends React.Component<Props, State> {
       useStorageProvider,
       i18n,
       renderGDJSDevelopmentWatcher,
+      renderMainMenu,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1797,6 +1793,26 @@ class MainFrame extends React.Component<Props, State> {
 
     return (
       <div className="main-frame">
+        {!!renderMainMenu &&
+          renderMainMenu({
+            i18n: i18n,
+            project: this.state.currentProject,
+            onChooseProject: this.chooseProject,
+            onSaveProject: this.saveProject,
+            onSaveProjectAs: this.saveProjectAs,
+            onCloseProject: this.askToCloseProject,
+            onCloseApp: this.closeApp,
+            onExportProject: this.openExportDialog,
+            onCreateProject: this.openCreateDialog,
+            onOpenProjectManager: this.openProjectManager,
+            onOpenStartPage: this.openStartPage,
+            onOpenDebugger: this.openDebugger,
+            onOpenAbout: this.openAboutDialog,
+            onOpenPreferences: this.openPreferences,
+            onOpenLanguage: this.openLanguage,
+            onOpenProfile: this.openProfile,
+            setUpdateStatus: this.setUpdateStatus,
+          })}
         <ProjectTitlebar fileMetadata={currentFileMetadata} />
         <Drawer
           open={projectManagerOpen}
@@ -2081,7 +2097,15 @@ class MainFrame extends React.Component<Props, State> {
             }}
           />
         )}
-        <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
+        <CloseConfirmDialog
+          shouldPrompt={!!this.state.currentProject}
+          i18n={this.props.i18n}
+          language={this.props.i18n.language}
+          hasUnsavedChanges={
+            !!this.props.unsavedChanges &&
+            this.props.unsavedChanges.hasUnsavedChanges
+          }
+        />
         <ChangelogDialogContainer />
         {this.state.gdjsDevelopmentWatcherEnabled &&
           renderGDJSDevelopmentWatcher &&

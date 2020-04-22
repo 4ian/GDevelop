@@ -23,30 +23,25 @@ const readJSONFile = (filepath: string): Promise<Object> => {
 
 export default class LocalEventsFunctionsExtensionOpener {
   static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
-    return new Promise((resolve, reject) => {
-      if (!dialog) return reject('Not supported');
+    if (!dialog) return Promise.reject('Not supported');
+    const browserWindow = electron.remote.getCurrentWindow();
 
-      const browserWindow = electron.remote.getCurrentWindow();
-      dialog.showOpenDialog(
-        browserWindow,
-        {
-          title: 'Import an extension in the project',
-          properties: ['openFile'],
-          message: 'Choose an extension file to import (.json file)',
-          filters: [
-            {
-              name: 'GDevelop 5 "events based" extension',
-              extensions: ['json'],
-            },
-          ],
-        },
-        paths => {
-          if (!paths || !paths.length) return resolve(null);
-
-          return resolve(paths[0]);
-        }
-      );
-    });
+    return dialog
+      .showOpenDialog(browserWindow, {
+        title: 'Import an extension in the project',
+        properties: ['openFile'],
+        message: 'Choose an extension file to import (.json file)',
+        filters: [
+          {
+            name: 'GDevelop 5 "events based" extension',
+            extensions: ['json'],
+          },
+        ],
+      })
+      .then(({ filePaths }) => {
+        if (!filePaths || !filePaths.length) return null;
+        return filePaths[0];
+      });
   };
 
   static readEventsFunctionExtensionFile = (

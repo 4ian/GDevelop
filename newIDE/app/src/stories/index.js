@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 
 // Keep first as it creates the `global.gd` object:
 import GDevelopJsInitializerDecorator, {
@@ -185,6 +185,12 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { emptyPreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 import TextField from '../UI/TextField';
+import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
+import {
+  getFakePopperJsAnchorElement,
+  makeFakeExpressionAutocompletions,
+  makeFakeExactExpressionAutocompletion,
+} from '../fixtures/TestExpressionAutocompletions';
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -1141,7 +1147,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
     <EditorMosaicPlayground
       renderButtons={({ openEditor }) => (
         <FlatButton
-          onClick={() => openEditor('thirdEditor', 'end', 65)}
+          onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
           label="Open the third editor"
         />
       )}
@@ -1195,15 +1201,15 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
       renderButtons={({ openEditor }) => (
         <React.Fragment>
           <FlatButton
-            onClick={() => openEditor('firstEditor', 'end', 65)}
+            onClick={() => openEditor('firstEditor', 'end', 65, 'column')}
             label="Open the 1st secondary editor"
           />
           <FlatButton
-            onClick={() => openEditor('secondEditor', 'end', 65)}
+            onClick={() => openEditor('secondEditor', 'end', 65, 'column')}
             label="Open the 2nd secondary editor"
           />
           <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
             label="Open the 3rd secondary editor"
           />
         </React.Fragment>
@@ -1256,11 +1262,13 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
       renderButtons={({ openEditor }) => (
         <React.Fragment>
           <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
             label="Open the third editor"
           />
           <FlatButton
-            onClick={() => openEditor('noTransitionsEditor', 'end', 65)}
+            onClick={() =>
+              openEditor('noTransitionsEditor', 'end', 65, 'column')
+            }
             label="Open the editor without transitions"
           />
         </React.Fragment>
@@ -2030,6 +2038,57 @@ storiesOf('ParameterFields', module)
           objectsContainer={testProject.testLayout}
         />
       )}
+    />
+  ));
+
+storiesOf('ExpressionAutcompletionsDisplayer', module)
+  .addDecorator(muiDecorator)
+  .add('autocompletions (first selected)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={makeFakeExpressionAutocompletions()}
+      remainingCount={3}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('autocompletions (second selected)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={makeFakeExpressionAutocompletions()}
+      remainingCount={3}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={1}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('autocompletion for an exact expression', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
+      remainingCount={0}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('empty autocompletions (nothing shown)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject}
+      expressionAutocompletions={[]}
+      remainingCount={0}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
     />
   ));
 

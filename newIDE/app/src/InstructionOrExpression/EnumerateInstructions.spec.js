@@ -24,7 +24,7 @@ describe('EnumerateInstructions', () => {
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',
-          fullGroupName: 'Mouse and touch',
+          fullGroupName: 'Common conditions for all objects/Mouse and touch',
           type: 'SourisSurObjet',
         }),
       ])

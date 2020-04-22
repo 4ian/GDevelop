@@ -25,26 +25,21 @@ const readJSONFile = (filepath: string): Promise<Object> => {
 };
 
 export const onOpenWithPicker = (): Promise<?FileMetadata> => {
-  return new Promise((resolve, reject) => {
-    if (!dialog) return reject('Not supported');
+  if (!dialog) return Promise.reject('Not supported');
+  const browserWindow = electron.remote.getCurrentWindow();
 
-    const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showOpenDialog(
-      browserWindow,
-      {
-        title: 'Open a project',
-        properties: ['openFile'],
-        message:
-          'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
-        filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
-      },
-      paths => {
-        if (!paths || !paths.length) return resolve(null);
-
-        return resolve({ fileIdentifier: paths[0] });
-      }
-    );
-  });
+  return dialog
+    .showOpenDialog(browserWindow, {
+      title: 'Open a project',
+      properties: ['openFile'],
+      message:
+        'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
+      filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
+    })
+    .then(({ filePaths }) => {
+      if (!filePaths || !filePaths.length) return null;
+      return { fileIdentifier: filePaths[0] };
+    });
 };
 
 export const onOpen = (

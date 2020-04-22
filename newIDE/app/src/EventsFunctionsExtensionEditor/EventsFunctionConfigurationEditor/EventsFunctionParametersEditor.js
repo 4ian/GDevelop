@@ -402,7 +402,6 @@ export default class EventsFunctionParametersEditor extends React.Component<
                         primary
                         label={<Trans>Add a parameter</Trans>}
                         onClick={this._addParameter}
-                        labelPosition="before"
                         icon={<Add />}
                       />
                     )}

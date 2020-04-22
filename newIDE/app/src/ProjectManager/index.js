@@ -39,7 +39,10 @@ import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
+import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -51,6 +54,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    overflowY: 'hidden',
   },
   list: {
     flex: 1,
@@ -130,6 +134,7 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
+  buildExtraMenuTemplate?: () => Array<MenuItemTemplate>,
   style?: ?Object,
 |};
 
@@ -180,6 +185,10 @@ class Item extends React.Component<ItemProps, {||}> {
                 label: 'Edit',
                 click: () => this.props.onEdit(),
               },
+              ...(this.props.buildExtraMenuTemplate
+                ? this.props.buildExtraMenuTemplate()
+                : []),
+              { type: 'separator' },
               {
                 label: 'Rename',
                 click: () => this.props.onEditName(),
@@ -271,24 +280,32 @@ type Props = {|
 |};
 
 type State = {|
+  editedPropertiesLayout: ?gdLayout,
+  editedVariablesLayout: ?gdLayout,
   renamedItemKind: ?string,
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
-  variablesEditorOpen: boolean,
+  projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
+  layoutPropertiesDialogOpen: boolean,
+  layoutVariablesDialogOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBar;
 
   state = {
+    editedPropertiesLayout: null,
+    editedVariablesLayout: null,
     renamedItemKind: null,
     renamedItemName: '',
     searchText: '',
     projectPropertiesDialogOpen: false,
-    variablesEditorOpen: false,
+    projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
+    layoutPropertiesDialogOpen: false,
+    layoutVariablesDialogOpen: false,
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -366,6 +383,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();
+  };
+
+  _onOpenLayoutProperties = (layout: ?gdLayout) => {
+    this.setState({ editedPropertiesLayout: layout });
+  };
+
+  _onOpenLayoutVariables = (layout: ?gdLayout) => {
+    this.setState({ editedVariablesLayout: layout });
   };
 
   _addExternalEvents = (index: number) => {
@@ -709,7 +734,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                 key="global-variables"
                 primaryText={<Trans>Global variables</Trans>}
                 leftIcon={<VariableTree />}
-                onClick={() => this.setState({ variablesEditorOpen: true })}
+                onClick={() =>
+                  this.setState({ projectVariablesEditorOpen: true })
+                }
               />,
               <ListItem
                 key="icons"
@@ -768,6 +795,18 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onMoveUp={() => this._moveUpLayout(i)}
                       canMoveDown={i !== project.getLayoutsCount() - 1}
                       onMoveDown={() => this._moveDownLayout(i)}
+                      buildExtraMenuTemplate={() => [
+                        {
+                          label: 'Edit Scene Properties',
+                          enabled: true,
+                          click: () => this._onOpenLayoutProperties(layout),
+                        },
+                        {
+                          label: 'Edit Scene Variables',
+                          enabled: true,
+                          click: () => this._onOpenLayoutVariables(layout),
+                        },
+                      ]}
                     />
                   );
                 })
@@ -1018,16 +1057,19 @@ export default class ProjectManager extends React.Component<Props, State> {
           value={searchText}
           onRequestSearch={this._onRequestSearch}
           onChange={this._onSearchChange}
+          elevation={3}
         />
-        {this.state.variablesEditorOpen && (
+        {this.state.projectVariablesEditorOpen && (
           <VariablesEditorDialog
             open
             variablesContainer={project.getVariables()}
-            onCancel={() => this.setState({ variablesEditorOpen: false })}
+            onCancel={() =>
+              this.setState({ projectVariablesEditorOpen: false })
+            }
             onApply={() => {
               if (this.props.unsavedChanges)
                 this.props.unsavedChanges.triggerUnsavedChanges();
-              this.setState({ variablesEditorOpen: false });
+              this.setState({ projectVariablesEditorOpen: false });
             }}
             emptyExplanationMessage={
               <Trans>
@@ -1056,6 +1098,35 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {!!this.state.editedPropertiesLayout && (
+          <ScenePropertiesDialog
+            open
+            layout={this.state.editedPropertiesLayout}
+            project={this.props.project}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._onOpenLayoutProperties(null);
+            }}
+            onClose={() => this._onOpenLayoutProperties(null)}
+            onEditVariables={() => {
+              this._onOpenLayoutVariables(this.state.editedPropertiesLayout);
+              this._onOpenLayoutProperties(null);
+            }}
+          />
+        )}
+        {!!this.state.editedVariablesLayout && (
+          <SceneVariablesDialog
+            open
+            layout={this.state.editedVariablesLayout}
+            onClose={() => this._onOpenLayoutVariables(null)}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._onOpenLayoutVariables(null);
+            }}
           />
         )}
         {this.state.extensionsSearchDialogOpen && (

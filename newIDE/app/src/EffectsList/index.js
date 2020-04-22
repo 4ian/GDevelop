@@ -258,7 +258,6 @@ export default function EffectsList(props: Props) {
                   primary
                   label={<Trans>Add an effect</Trans>}
                   onClick={addEffect}
-                  labelPosition="before"
                   icon={<Add />}
                 />
               </Line>

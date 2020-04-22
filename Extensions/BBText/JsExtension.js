@@ -410,7 +410,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'BBText::BBText',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/bbtext_object',
+        helpPagePath: '/objects/bbtext',
       })
     );
   },

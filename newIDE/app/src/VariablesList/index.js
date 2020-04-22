@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Table, TableHeader, TableHeaderColumn, TableRow } from '../UI/Table';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
@@ -373,33 +372,22 @@ export default class VariablesList extends React.Component<Props, State> {
     );
 
     return (
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderColumn>Name</TableHeaderColumn>
-              <TableHeaderColumn>Value</TableHeaderColumn>
-              <TableHeaderColumn style={styles.toolColumnHeader} />
-            </TableRow>
-          </TableHeader>
-        </Table>
-        <SortableVariablesListBody
-          variablesContainer={this.props.variablesContainer}
-          onSortEnd={({ oldIndex, newIndex }) => {
-            this.props.variablesContainer.move(oldIndex, newIndex);
-            this.forceUpdate();
-          }}
-          helperClass="sortable-helper"
-          useDragHandle
-          lockToContainerEdges
-        >
-          {!!containerInheritedVariablesTree.length &&
-            containerInheritedVariablesTree}
-          {!containerVariablesTree.length && this._renderEmpty()}
-          {!!containerVariablesTree.length && containerVariablesTree}
-          {editRow}
-        </SortableVariablesListBody>
-      </div>
+      <SortableVariablesListBody
+        variablesContainer={this.props.variablesContainer}
+        onSortEnd={({ oldIndex, newIndex }) => {
+          this.props.variablesContainer.move(oldIndex, newIndex);
+          this.forceUpdate();
+        }}
+        helperClass="sortable-helper"
+        useDragHandle
+        lockToContainerEdges
+      >
+        {!!containerInheritedVariablesTree.length &&
+          containerInheritedVariablesTree}
+        {!containerVariablesTree.length && this._renderEmpty()}
+        {!!containerVariablesTree.length && containerVariablesTree}
+        {editRow}
+      </SortableVariablesListBody>
     );
   }
 }

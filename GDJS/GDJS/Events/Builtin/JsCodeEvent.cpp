@@ -18,9 +18,32 @@ using namespace std;
 
 namespace gdjs {
 
+vector<pair<gd::Expression*, gd::ParameterMetadata> >
+    JsCodeEvent::GetAllExpressionsWithMetadata() {
+  vector<pair<gd::Expression*, gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("object");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&parameterObjects, metadata));
+
+  return allExpressionsWithMetadata;
+}
+
+vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+    JsCodeEvent::GetAllExpressionsWithMetadata() const {
+  vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("object");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&parameterObjects, metadata));
+
+  return allExpressionsWithMetadata;
+}
+
 void JsCodeEvent::SerializeTo(gd::SerializerElement& element) const {
   element.AddChild("inlineCode").SetValue(inlineCode);
-  element.AddChild("parameterObjects").SetValue(parameterObjects);
+  element.AddChild("parameterObjects")
+      .SetValue(parameterObjects.GetPlainString());
   element.AddChild("useStrict").SetValue(useStrict);
 }
 
@@ -28,7 +51,9 @@ void JsCodeEvent::UnserializeFrom(gd::Project& project,
                                   const gd::SerializerElement& element) {
   inlineCode = element.GetChild("inlineCode").GetValue().GetString();
   parameterObjects =
-      element.GetChild("parameterObjects").GetValue().GetString();
+      gd::Expression(element.GetChild("parameterObjects")
+                         .GetValue()
+                         .GetString());
 
   if (!element.HasChild("useStrict")) {
     // Compatibility with GD <= 5.0.0-beta68

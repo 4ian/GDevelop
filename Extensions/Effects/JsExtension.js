@@ -90,6 +90,7 @@ module.exports = {
       .addEffect('AdvancedBloom')
       .setFullName(_('Advanced bloom'))
       .setDescription(_('Applies a bloom effect.'))
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
       .addIncludeFile(
         'Extensions/Effects/pixi-filters/filter-advanced-bloom.js'
       )

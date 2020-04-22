@@ -1,13 +1,22 @@
+// @flow
+import { Trans } from '@lingui/macro';
 import React from 'react';
-import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import Add from '@material-ui/icons/Add';
 import IconButton from '../UI/IconButton';
-import EmptyMessage from '../UI/EmptyMessage';
 import Copy from '../UI/CustomSvgIcons/Copy';
 import Paste from '../UI/CustomSvgIcons/Paste';
 import Delete from '@material-ui/icons/Delete';
+import { Line, Column } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
 
-import styles from './styles';
+type Props = {|
+  onAdd: () => void,
+  onCopy: () => void,
+  hasSelection: boolean,
+  onPaste: () => void,
+  hasClipboard: boolean,
+  onDeleteSelection: () => void,
+|};
 
 const EditVariableRow = ({
   onAdd,
@@ -16,30 +25,31 @@ const EditVariableRow = ({
   onPaste,
   hasClipboard,
   onDeleteSelection,
-}) => (
-  <TreeTableRow>
-    <TreeTableCell style={styles.toolColumnHeader}>
-      <IconButton onClick={onCopy} disabled={!hasSelection}>
-        <Copy />
-      </IconButton>
-      <IconButton onClick={onPaste} disabled={!hasClipboard}>
-        <Paste />
-      </IconButton>
-      <IconButton onClick={onDeleteSelection} disabled={!hasSelection}>
-        <Delete />
-      </IconButton>
-    </TreeTableCell>
+}: Props) => (
+  <Line justifyContent="space-between" alignItems="center">
+    <Column>
+      <Line noMargin>
+        <IconButton onClick={onCopy} disabled={!hasSelection}>
+          <Copy />
+        </IconButton>
+        <IconButton onClick={onPaste} disabled={!hasClipboard}>
+          <Paste />
+        </IconButton>
+        <IconButton onClick={onDeleteSelection} disabled={!hasSelection}>
+          <Delete />
+        </IconButton>
+      </Line>
+    </Column>
 
-    <TreeTableCell>
-      <EmptyMessage style={styles.addVariableMessage} />
-    </TreeTableCell>
-
-    <TreeTableCell style={styles.toolColumn}>
-      <IconButton onClick={onAdd}>
-        <Add />
-      </IconButton>
-    </TreeTableCell>
-  </TreeTableRow>
+    <Column>
+      <RaisedButton
+        primary
+        label={<Trans>Add</Trans>}
+        onClick={onAdd}
+        icon={<Add />}
+      />
+    </Column>
+  </Line>
 );
 
 export default EditVariableRow;

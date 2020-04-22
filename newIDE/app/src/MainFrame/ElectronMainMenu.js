@@ -1,17 +1,11 @@
 // @flow
 import * as React from 'react';
-import MainFrame from '.';
 import optionalRequire from '../Utils/OptionalRequire';
-import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
+import { type MainMenuProps } from './MainMenu.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-
-type Props = {|
-  children: React.Element<typeof MainFrame>,
-  i18n: I18nType,
-|};
 
 type MainMenuEvent =
   | 'main-menu-open'
@@ -63,131 +57,195 @@ type RootMenuTemplate =
       submenu: Array<MenuItemTemplate>,
     |};
 
-/**
- * Forward events received from Electron main process
- * to the underlying child React component.
- */
-class ElectronMainMenu extends React.Component<Props, {||}> {
-  _editor: ?MainFrame;
-  _language: ?string;
+// Custom hook to register and deregister IPC listener
+const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
+  React.useEffect(
+    () => {
+      if (!ipcRenderer) return;
+      const handler = (event, ...eventArgs) => func(...eventArgs);
+      ipcRenderer.on(ipcEvent, handler);
+      return () => ipcRenderer.removeListener(ipcEvent, handler);
+    },
+    [ipcEvent, func]
+  );
+};
 
-  componentDidMount() {
-    if (!ipcRenderer) return;
-
-    ipcRenderer.on(
-      ('main-menu-open': MainMenuEvent),
-      event => this._editor && this._editor.chooseProject()
+const buildAndSendMenuTemplate = (project, i18n) => {
+  const fileTemplate = {
+    label: i18n._(t`File`),
+    submenu: [
+      {
+        label: i18n._(t`Create a New Project...`),
+        accelerator: 'CommandOrControl+N',
+        onClickSendEvent: 'main-menu-create',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Open...`),
+        accelerator: 'CommandOrControl+O',
+        onClickSendEvent: 'main-menu-open',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Save`),
+        accelerator: 'CommandOrControl+S',
+        onClickSendEvent: 'main-menu-save',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Save as...`),
+        accelerator: 'CommandOrControl+Alt+S',
+        onClickSendEvent: 'main-menu-save-as',
+        enabled: !!project,
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Export (web, iOS, Android)...`),
+        accelerator: 'CommandOrControl+E',
+        onClickSendEvent: 'main-menu-export',
+        enabled: !!project,
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Close Project`),
+        accelerator: 'CommandOrControl+Shift+W',
+        onClickSendEvent: 'main-menu-close',
+        enabled: !!project,
+      },
+    ],
+  };
+  if (!isMacLike()) {
+    fileTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: i18n._(t`My Profile`),
+        onClickSendEvent: 'main-menu-open-profile',
+      },
+      {
+        label: i18n._(t`Preferences`),
+        onClickSendEvent: 'main-menu-open-preferences',
+      },
+      {
+        label: i18n._(t`Language`),
+        onClickSendEvent: 'main-menu-open-language',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Exit GDevelop`),
+        accelerator: 'Control+Q',
+        onClickSendEvent: 'main-menu-close-app',
+      }
     );
-    ipcRenderer.on(
-      ('main-menu-save': MainMenuEvent),
-      event => this._editor && this._editor.saveProject()
-    );
-    ipcRenderer.on(
-      ('main-menu-save-as': MainMenuEvent),
-      event => this._editor && this._editor.saveProjectAs()
-    );
-    ipcRenderer.on(
-      ('main-menu-close': MainMenuEvent),
-      event => this._editor && this._editor.askToCloseProject()
-    );
-    ipcRenderer.on(
-      ('main-menu-close-app': MainMenuEvent),
-      event => this._editor && this._editor.closeApp()
-    );
-    ipcRenderer.on(
-      ('main-menu-export': MainMenuEvent),
-      event => this._editor && this._editor.openExportDialog()
-    );
-    ipcRenderer.on(
-      ('main-menu-create': MainMenuEvent),
-      event => this._editor && this._editor.openCreateDialog()
-    );
-    ipcRenderer.on(
-      ('main-menu-open-project-manager': MainMenuEvent),
-      event => this._editor && this._editor.openProjectManager()
-    );
-    ipcRenderer.on(
-      ('main-menu-open-start-page': MainMenuEvent),
-      event => this._editor && this._editor.openStartPage()
-    );
-    ipcRenderer.on(
-      ('main-menu-open-debugger': MainMenuEvent),
-      event => this._editor && this._editor.openDebugger()
-    );
-    ipcRenderer.on(
-      ('main-menu-open-about': MainMenuEvent),
-      event => this._editor && this._editor.openAboutDialog()
-    );
-    ipcRenderer.on(
-      ('main-menu-open-preferences': MainMenuEvent),
-      event => this._editor && this._editor.openPreferences()
-    );
-    ipcRenderer.on(
-      ('main-menu-open-language': MainMenuEvent),
-      event => this._editor && this._editor.openLanguage()
-    );
-    ipcRenderer.on(
-      ('main-menu-open-profile': MainMenuEvent),
-      event => this._editor && this._editor.openProfile()
-    );
-    ipcRenderer.on(
-      ('update-status': MainMenuEvent),
-      (event, status) => this._editor && this._editor.setUpdateStatus(status)
-    );
-
-    this._buildAndSendMenuTemplate();
   }
 
-  componentDidUpdate() {
-    if (this.props.i18n.language !== this._language) {
-      this._buildAndSendMenuTemplate();
-      this._language = this.props.i18n.language;
-    }
+  const editTemplate = {
+    label: i18n._(t`Edit`),
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'pasteandmatchstyle' },
+      { role: 'delete' },
+      { role: 'selectall' },
+    ],
+  };
+
+  const viewTemplate = {
+    label: i18n._(t`View`),
+    submenu: [
+      {
+        label: i18n._(t`Show Project Manager`),
+        accelerator: 'CommandOrControl+Alt+P',
+        onClickSendEvent: 'main-menu-open-project-manager',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Show Start Page`),
+        onClickSendEvent: 'main-menu-open-start-page',
+      },
+      {
+        label: i18n._(t`Open Debugger`),
+        onClickSendEvent: 'main-menu-open-debugger',
+        enabled: !!project,
+      },
+      { type: 'separator' },
+      { role: 'toggledevtools' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' },
+    ],
+  };
+
+  const windowTemplate = {
+    role: 'window',
+    submenu: [{ role: 'minimize' }],
+  };
+
+  const helpTemplate = {
+    role: 'help',
+    submenu: [
+      {
+        label: i18n._(t`GDevelop website`),
+        onClickOpenLink: 'http://gdevelop-app.com',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Community Forums`),
+        onClickOpenLink: 'https://forum.gdevelop-app.com',
+      },
+      {
+        label: i18n._(t`Community Discord Chat`),
+        onClickOpenLink: 'https://discord.gg/rjdYHvj',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Contribute to GDevelop`),
+        onClickOpenLink: 'https://gdevelop-app.com/contribute/',
+      },
+      {
+        label: i18n._(t`Create Extensions for GDevelop`),
+        onClickOpenLink:
+          'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Help to Translate GDevelop`),
+        onClickOpenLink: 'https://crowdin.com/project/gdevelop',
+      },
+      {
+        label: i18n._(t`Report a wrong translation`),
+        onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
+      },
+    ],
+  };
+  if (!isMacLike()) {
+    helpTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: i18n._(t`About GDevelop`),
+        onClickSendEvent: 'main-menu-open-about',
+      }
+    );
   }
 
-  _buildAndSendMenuTemplate() {
-    const { i18n } = this.props;
-    const fileTemplate = {
-      label: i18n._(t`File`),
+  const template: Array<RootMenuTemplate> = [
+    fileTemplate,
+    editTemplate,
+    viewTemplate,
+    windowTemplate,
+    helpTemplate,
+  ];
+
+  if (isMacLike()) {
+    template.unshift({
+      label: i18n._(t`GDevelop 5`),
       submenu: [
         {
-          label: i18n._(t`Create a New Project...`),
-          accelerator: 'CommandOrControl+N',
-          onClickSendEvent: 'main-menu-create',
+          label: i18n._(t`About GDevelop`),
+          onClickSendEvent: 'main-menu-open-about',
         },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Open...`),
-          accelerator: 'CommandOrControl+O',
-          onClickSendEvent: 'main-menu-open',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Save`),
-          accelerator: 'CommandOrControl+S',
-          onClickSendEvent: 'main-menu-save',
-        },
-        {
-          label: i18n._(t`Save as...`),
-          accelerator: 'CommandOrControl+Alt+S',
-          onClickSendEvent: 'main-menu-save-as',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Export (web, iOS, Android)...`),
-          accelerator: 'CommandOrControl+E',
-          onClickSendEvent: 'main-menu-export',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Close Project`),
-          accelerator: 'CommandOrControl+Shift+W',
-          onClickSendEvent: 'main-menu-close',
-        },
-      ],
-    };
-    if (!isMacLike()) {
-      fileTemplate.submenu.push(
         { type: 'separator' },
         {
           label: i18n._(t`My Profile`),
@@ -202,170 +260,71 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
           onClickSendEvent: 'main-menu-open-language',
         },
         { type: 'separator' },
-        {
-          label: i18n._(t`Exit GDevelop`),
-          accelerator: 'Control+Q',
-          onClickSendEvent: 'main-menu-close-app',
-        }
-      );
-    }
-
-    const editTemplate = {
-      label: i18n._(t`Edit`),
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
+        { role: 'services', submenu: [] },
         { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'pasteandmatchstyle' },
-        { role: 'delete' },
-        { role: 'selectall' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
       ],
-    };
-
-    const viewTemplate = {
-      label: i18n._(t`View`),
-      submenu: [
-        {
-          label: i18n._(t`Show Project Manager`),
-          accelerator: 'CommandOrControl+Alt+P',
-          onClickSendEvent: 'main-menu-open-project-manager',
-        },
-        {
-          label: i18n._(t`Show Start Page`),
-          onClickSendEvent: 'main-menu-open-start-page',
-        },
-        {
-          label: i18n._(t`Open Debugger`),
-          onClickSendEvent: 'main-menu-open-debugger',
-        },
-        { type: 'separator' },
-        { role: 'toggledevtools' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' },
-      ],
-    };
-
-    const windowTemplate = {
-      role: 'window',
-      submenu: [{ role: 'minimize' }],
-    };
-
-    const helpTemplate = {
-      role: 'help',
-      submenu: [
-        {
-          label: i18n._(t`GDevelop website`),
-          onClickOpenLink: 'http://gdevelop-app.com',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Community Forums`),
-          onClickOpenLink: 'https://forum.gdevelop-app.com',
-        },
-        {
-          label: i18n._(t`Community Discord Chat`),
-          onClickOpenLink: 'https://discord.gg/rjdYHvj',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Contribute to GDevelop`),
-          onClickOpenLink: 'https://gdevelop-app.com/contribute/',
-        },
-        {
-          label: i18n._(t`Create Extensions for GDevelop`),
-          onClickOpenLink:
-            'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Help to Translate GDevelop`),
-          onClickOpenLink: 'https://crowdin.com/project/gdevelop',
-        },
-        {
-          label: i18n._(t`Report a wrong translation`),
-          onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
-        },
-      ],
-    };
-    if (!isMacLike()) {
-      helpTemplate.submenu.push(
-        { type: 'separator' },
-        {
-          label: i18n._(t`About GDevelop`),
-          onClickSendEvent: 'main-menu-open-about',
-        }
-      );
-    }
-
-    const template: Array<RootMenuTemplate> = [
-      fileTemplate,
-      editTemplate,
-      viewTemplate,
-      windowTemplate,
-      helpTemplate,
-    ];
-
-    if (isMacLike()) {
-      template.unshift({
-        label: i18n._(t`GDevelop 5`),
-        submenu: [
-          {
-            label: i18n._(t`About GDevelop`),
-            onClickSendEvent: 'main-menu-open-about',
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`My Profile`),
-            onClickSendEvent: 'main-menu-open-profile',
-          },
-          {
-            label: i18n._(t`Preferences`),
-            onClickSendEvent: 'main-menu-open-preferences',
-          },
-          {
-            label: i18n._(t`Language`),
-            onClickSendEvent: 'main-menu-open-language',
-          },
-          { type: 'separator' },
-          { role: 'services', submenu: [] },
-          { type: 'separator' },
-          { role: 'hide' },
-          { role: 'hideothers' },
-          { role: 'unhide' },
-          { type: 'separator' },
-          { role: 'quit' },
-        ],
-      });
-
-      editTemplate.submenu.push(
-        { type: 'separator' },
-        {
-          label: i18n._(t`Speech`),
-          submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
-        }
-      );
-
-      windowTemplate.submenu = [
-        { role: 'minimize' },
-        { role: 'zoom' },
-        { type: 'separator' },
-        { role: 'front' },
-      ];
-    }
-
-    if (ipcRenderer) {
-      ipcRenderer.send('set-main-menu', template);
-    }
-  }
-
-  render() {
-    return React.cloneElement(this.props.children, {
-      ref: editor => (this._editor = editor),
     });
+
+    editTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: i18n._(t`Speech`),
+        submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
+      }
+    );
+
+    windowTemplate.submenu = [
+      { role: 'minimize' },
+      { role: 'zoom' },
+      { type: 'separator' },
+      { role: 'front' },
+    ];
   }
-}
+
+  if (ipcRenderer) {
+    ipcRenderer.send('set-main-menu', template);
+  }
+};
+
+/**
+ * Create and update the editor main menu using Electron APIs.
+ */
+const ElectronMainMenu = (props: MainMenuProps) => {
+  const { i18n, project } = props;
+  const language = i18n.language;
+
+  useIPCEventListener('main-menu-open', props.onChooseProject);
+  useIPCEventListener('main-menu-save', props.onSaveProject);
+  useIPCEventListener('main-menu-save-as', props.onSaveProjectAs);
+  useIPCEventListener('main-menu-close', props.onCloseProject);
+  useIPCEventListener('main-menu-close-app', props.onCloseApp);
+  useIPCEventListener('main-menu-export', props.onExportProject);
+  useIPCEventListener('main-menu-create', props.onCreateProject);
+  useIPCEventListener(
+    'main-menu-open-project-manager',
+    props.onOpenProjectManager
+  );
+  useIPCEventListener('main-menu-open-start-page', props.onOpenStartPage);
+  useIPCEventListener('main-menu-open-debugger', props.onOpenDebugger);
+  useIPCEventListener('main-menu-open-about', props.onOpenAbout);
+  useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);
+  useIPCEventListener('main-menu-open-language', props.onOpenLanguage);
+  useIPCEventListener('main-menu-open-profile', props.onOpenProfile);
+  useIPCEventListener('update-status', props.setUpdateStatus);
+
+  React.useEffect(
+    () => {
+      buildAndSendMenuTemplate(project, i18n);
+    },
+    [i18n, language, project]
+  );
+
+  return null;
+};
 
 export default ElectronMainMenu;

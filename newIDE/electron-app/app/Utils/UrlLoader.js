@@ -26,43 +26,30 @@ const load = ({ isDev, devTools, path, window }) => {
  */
 const registerGdideProtocol = ({ isDev }) => {
   if (isDev) {
-    protocol.registerHttpProtocol(
-      'gdide',
-      (request, callback) => {
-        callback({
-          method: request.method,
-          referrer: request.referrer,
-          url: request.url.replace('gdide://', developmentServerBaseUrl + '/'),
-        });
-      },
-      error => {
-        if (error) {
-          console.error('Error while registering gdide protocol:', error);
-        }
-      }
-    );
+    protocol.registerHttpProtocol('gdide', (request, callback) => {
+      callback({
+        method: request.method,
+        referrer: request.referrer,
+        url: request.url.replace('gdide://', developmentServerBaseUrl + '/'),
+      });
+    });
   } else {
     // Production (with npm run build)
-    protocol.registerBufferProtocol(
-      'gdide',
-      (request, callback) => {
-        fs.readFile(
-          request.url.replace('gdide://', appPublicFolderBaseUrl + '/'),
-          (error, buffer) => {
-            if (error) {
-              console.error('While while loading ' + request.url, error);
-            }
-            callback({ mimeType: 'text/javascript', data: buffer });
+    protocol.registerBufferProtocol('gdide', (request, callback) => {
+      fs.readFile(
+        request.url.replace('gdide://', appPublicFolderBaseUrl + '/'),
+        (error, buffer) => {
+          if (error) {
+            console.error('While while loading ' + request.url, error);
           }
-        );
-      },
-      error => {
-        if (error) {
-          console.error('Error while registering gdide protocol:', error);
+          callback({ mimeType: 'text/javascript', data: buffer });
         }
-      }
-    );
+      );
+    });
   }
+
+  const isRegistered = protocol.isProtocolRegistered('gdide');
+  if (!isRegistered) console.error('Error while registering gdide protocol.');
 };
 
 module.exports = {

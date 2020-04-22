@@ -17,7 +17,7 @@ import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
-import InstancesSelection from './InstancesSelection';
+import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
 import Toolbar from './Toolbar';
@@ -26,8 +26,8 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
-import { passFullSize } from '../UI/FullSizeMeasurer';
-import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
+import Window from '../Utils/Window';
+import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import Drawer from '@material-ui/core/Drawer';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -65,18 +65,13 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
-import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
-
+import SceneVariablesDialog from './SceneVariablesDialog';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
-
-const FullSizeInstancesEditor = passFullSize(addScrollbars(InstancesEditor), {
-  useFlex: true,
-});
 
 const styles = {
   container: {
@@ -84,12 +79,6 @@ const styles = {
     flex: 1,
     position: 'relative',
     overflow: 'hidden',
-  },
-};
-
-const layersDrawerPaperProps = {
-  style: {
-    width: 500,
   },
 };
 
@@ -162,6 +151,7 @@ type State = {|
   showObjectsListInfoBar: boolean,
   layoutVariablesDialogOpen: boolean,
   showPropertiesInfoBar: boolean,
+  showLayersInfoBar: boolean,
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
@@ -210,6 +200,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       showObjectsListInfoBar: false,
       layoutVariablesDialogOpen: false,
       showPropertiesInfoBar: false,
+      showLayersInfoBar: false,
 
       selectedObjectTags: [],
     };
@@ -281,7 +272,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('objects-list', 'end', 75)) {
+    if (!this.editorMosaic.openEditor('objects-list', 'end', 75, 'column')) {
       this.setState({
         showObjectsListInfoBar: true,
       });
@@ -290,7 +281,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 25)) {
+    if (!this.editorMosaic.openEditor('properties', 'start', 25, 'column')) {
       this.setState({
         showPropertiesInfoBar: true,
       });
@@ -299,7 +290,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('object-groups-list', 'end', 75);
+    this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column');
   };
 
   toggleInstancesList = () => {
@@ -307,7 +298,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   toggleLayersList = () => {
-    this.setState({ layersListOpen: !this.state.layersListOpen });
+    if (!this.editorMosaic) return;
+    if (!this.editorMosaic.openEditor('layers', 'end', 75, 'row')) {
+      this.setState({
+        showLayersInfoBar: true,
+      });
+    }
   };
 
   toggleWindowMask = () => {
@@ -497,6 +493,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
+  _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
+    this.editObjectByName(instance.getObjectName());
+  };
+
   _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
@@ -606,8 +606,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
     );
 
@@ -700,8 +699,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { group, global } = groupWithContext;
     const { project, layout } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Do you want to remove all references to this group in events (actions and conditions using the group)?'
     );
 
@@ -930,42 +928,55 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         ),
       },
+      layers: {
+        type: 'secondary',
+        title: t`Layers`,
+        renderEditor: () => (
+          <LayersList
+            project={project}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
+            freezeUpdate={false}
+            onRemoveLayer={this._onRemoveLayer}
+            onRenameLayer={this._onRenameLayer}
+            layersContainer={layout}
+            unsavedChanges={this.props.unsavedChanges}
+          />
+        ),
+      },
       'instances-editor': {
         type: 'primary',
         noTitleBar: true,
         renderEditor: () => (
-          <ScreenTypeMeasurer>
-            {screenType => (
-              <FullSizeInstancesEditor
-                project={project}
-                layout={layout}
-                initialInstances={initialInstances}
-                options={this.state.uiSettings}
-                onChangeOptions={this.setUiSettings}
-                instancesSelection={this.instancesSelection}
-                onDeleteSelection={this.deleteSelection}
-                onInstancesAdded={this._onInstancesAdded}
-                onInstancesSelected={this._onInstancesSelected}
-                onInstancesMoved={this._onInstancesMoved}
-                onInstancesResized={this._onInstancesResized}
-                onInstancesRotated={this._onInstancesRotated}
-                selectedObjectNames={this.state.selectedObjectNames}
-                onContextMenu={this._onContextMenu}
-                onCopy={() =>
-                  this.copySelection({ useLastCursorPosition: true })
-                }
-                onCut={() => this.cutSelection({ useLastCursorPosition: true })}
-                onPaste={() => this.paste({ useLastCursorPosition: true })}
-                onUndo={this.undo}
-                onRedo={this.redo}
-                onZoomOut={this.zoomOut}
-                onZoomIn={this.zoomIn}
-                wrappedEditorRef={editor => (this.editor = editor)}
-                pauseRendering={!isActive}
-                screenType={screenType}
-              />
-            )}
-          </ScreenTypeMeasurer>
+          <FullSizeInstancesEditorWithScrollbars
+            project={project}
+            layout={layout}
+            initialInstances={initialInstances}
+            options={this.state.uiSettings}
+            onChangeOptions={this.setUiSettings}
+            instancesSelection={this.instancesSelection}
+            onDeleteSelection={this.deleteSelection}
+            onInstancesAdded={this._onInstancesAdded}
+            onInstancesSelected={this._onInstancesSelected}
+            onInstanceDoubleClicked={this._onInstanceDoubleClicked}
+            onInstancesMoved={this._onInstancesMoved}
+            onInstancesResized={this._onInstancesResized}
+            onInstancesRotated={this._onInstancesRotated}
+            selectedObjectNames={this.state.selectedObjectNames}
+            onContextMenu={this._onContextMenu}
+            onCopy={() => this.copySelection({ useLastCursorPosition: true })}
+            onCut={() => this.cutSelection({ useLastCursorPosition: true })}
+            onPaste={() => this.paste({ useLastCursorPosition: true })}
+            onUndo={this.undo}
+            onRedo={this.redo}
+            onZoomOut={this.zoomOut}
+            onZoomIn={this.zoomIn}
+            wrappedEditorRef={editor => {
+              this.editor = editor;
+            }}
+            pauseRendering={!isActive}
+          />
         ),
       },
       'objects-list': {
@@ -1071,6 +1082,9 @@ export default class SceneEditor extends React.Component<Props, State> {
               this.editObject(null);
               this.updateBehaviorsSharedData();
               this.forceUpdateObjectsList();
+
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
             }}
           />
         )}
@@ -1104,29 +1118,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             style={{
               height: `calc(100% - ${editorBarHeight}px)`,
             }}
-          />
-        </Drawer>
-        <Drawer
-          open={this.state.layersListOpen}
-          PaperProps={layersDrawerPaperProps}
-          anchor="right"
-          onClose={this.toggleLayersList}
-        >
-          <EditorBar
-            title={<Trans>Layers</Trans>}
-            displayLeftCloseButton
-            onClose={this.toggleLayersList}
-          />
-          <LayersList
-            project={project}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
-            freezeUpdate={!this.state.layersListOpen}
-            onRemoveLayer={this._onRemoveLayer}
-            onRenameLayer={this._onRenameLayer}
-            layersContainer={layout}
-            unsavedChanges={this.props.unsavedChanges}
           />
         </Drawer>
         <InfoBar
@@ -1163,6 +1154,16 @@ export default class SceneEditor extends React.Component<Props, State> {
             </Trans>
           }
           show={!!this.state.showPropertiesInfoBar}
+        />
+        <InfoBar
+          identifier="layers-panel-explanation"
+          message={
+            <Trans>
+              Layers panel is already opened. You can add new layers and apply
+              effects on them from this panel.
+            </Trans>
+          }
+          show={!!this.state.showLayersInfoBar}
         />
         {this.state.setupGridOpen && (
           <SetupGridDialog
@@ -1249,24 +1250,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         )}
         {!!this.state.layoutVariablesDialogOpen && (
-          <VariablesEditorDialog
+          <SceneVariablesDialog
             open
-            variablesContainer={layout.getVariables()}
-            onCancel={() => this.editLayoutVariables(false)}
+            layout={layout}
             onApply={() => this.editLayoutVariables(false)}
-            title={<Trans>Scene Variables</Trans>}
-            emptyExplanationMessage={
-              <Trans>
-                Scene variables can be used to store any value or text during
-                the game.
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                For example, you can have a variable called Score representing
-                the current score of the player.
-              </Trans>
-            }
+            onClose={() => this.editLayoutVariables(false)}
           />
         )}
         <ContextMenu

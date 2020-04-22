@@ -202,12 +202,36 @@ export const filterExpressions = (
   searchText: string
 ): Array<EnumeratedInstructionOrExpressionMetadata> => {
   if (!searchText) return list;
+
   const lowercaseSearchText = searchText.toLowerCase();
 
-  return list.filter(enumeratedExpression => {
+  const matchCritera = (
+    enumeratedExpression: EnumeratedInstructionOrExpressionMetadata
+  ) => {
     return (
       enumeratedExpression.type.toLowerCase().indexOf(lowercaseSearchText) !==
       -1
     );
-  });
+  };
+
+  const favorExactMatch = (
+    list: Array<EnumeratedInstructionOrExpressionMetadata>
+  ): Array<EnumeratedInstructionOrExpressionMetadata> => {
+    if (!searchText) {
+      return list;
+    }
+
+    for (var i = 0; i < list.length; ++i) {
+      if (list[i].type.toLowerCase() === lowercaseSearchText) {
+        const exactMatch = list[i];
+        list.splice(i, 1);
+        list.unshift(exactMatch);
+      }
+    }
+
+    return list;
+  };
+
+  // See EnumerateInstructions for a similar logic for instructions
+  return favorExactMatch(list.filter(matchCritera));
 };

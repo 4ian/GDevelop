@@ -76,6 +76,7 @@ const Variable& Variable::GetChild(const gd::String& name) const {
 void Variable::RemoveChild(const gd::String& name) {
   if (!isStructure) return;
   children.erase(name);
+  isStructure = !children.empty();
 }
 
 bool Variable::RenameChild(const gd::String& oldName,
@@ -190,6 +191,7 @@ void Variable::RemoveRecursively(const gd::Variable& variableToRemove) {
       it++;
     }
   }
+  isStructure = !children.empty();
 }
 
 Variable::Variable(const Variable& other)

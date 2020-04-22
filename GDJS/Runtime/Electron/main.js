@@ -17,6 +17,12 @@ function createWindow() {
     useContentSize: true,
     title: "GDJS_GAME_NAME",
     backgroundColor: '#000000'
+    // To be added once upgraded to Electron 8+
+    // (or custom events to be written for each usage of electron
+    // in the game engine):
+    // ,webPreferences: {
+    //   nodeIntegration: true,
+    // }
   });
 
   // Open external link in the OS default browser

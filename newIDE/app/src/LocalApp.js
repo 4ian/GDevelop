@@ -57,46 +57,42 @@ export const create = (authentification: Authentification) => {
           }) => (
             <UnsavedChangesContext.Consumer>
               {unsavedChanges => (
-                <ElectronMainMenu i18n={i18n}>
-                  <MainFrame
-                    i18n={i18n}
-                    eventsFunctionsExtensionsState={
-                      eventsFunctionsExtensionsState
-                    }
-                    renderPreviewLauncher={(props, ref) => (
-                      <LocalPreviewLauncher {...props} ref={ref} />
-                    )}
-                    renderExportDialog={props => (
-                      <ExportDialog
-                        {...props}
-                        exporters={getLocalExporters()}
-                      />
-                    )}
-                    renderCreateDialog={props => (
-                      <CreateProjectDialog
-                        {...props}
-                        examplesComponent={LocalExamples}
-                        startersComponent={LocalStarters}
-                      />
-                    )}
-                    renderGDJSDevelopmentWatcher={
-                      isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
-                    }
-                    storageProviders={storageProviders}
-                    useStorageProvider={useStorageProvider}
-                    storageProviderOperations={currentStorageProviderOperations}
-                    resourceSources={localResourceSources}
-                    resourceExternalEditors={localResourceExternalEditors}
-                    extensionsLoader={makeExtensionsLoader({
-                      gd,
-                      objectsEditorService: ObjectsEditorService,
-                      objectsRenderingService: ObjectsRenderingService,
-                      filterExamples: !isDev,
-                    })}
-                    initialFileMetadataToOpen={initialFileMetadataToOpen}
-                    unsavedChanges={unsavedChanges}
-                  />
-                </ElectronMainMenu>
+                <MainFrame
+                  i18n={i18n}
+                  renderMainMenu={props => <ElectronMainMenu {...props} />}
+                  eventsFunctionsExtensionsState={
+                    eventsFunctionsExtensionsState
+                  }
+                  renderPreviewLauncher={(props, ref) => (
+                    <LocalPreviewLauncher {...props} ref={ref} />
+                  )}
+                  renderExportDialog={props => (
+                    <ExportDialog {...props} exporters={getLocalExporters()} />
+                  )}
+                  renderCreateDialog={props => (
+                    <CreateProjectDialog
+                      {...props}
+                      examplesComponent={LocalExamples}
+                      startersComponent={LocalStarters}
+                    />
+                  )}
+                  renderGDJSDevelopmentWatcher={
+                    isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
+                  }
+                  storageProviders={storageProviders}
+                  useStorageProvider={useStorageProvider}
+                  storageProviderOperations={currentStorageProviderOperations}
+                  resourceSources={localResourceSources}
+                  resourceExternalEditors={localResourceExternalEditors}
+                  extensionsLoader={makeExtensionsLoader({
+                    gd,
+                    objectsEditorService: ObjectsEditorService,
+                    objectsRenderingService: ObjectsRenderingService,
+                    filterExamples: !isDev,
+                  })}
+                  initialFileMetadataToOpen={initialFileMetadataToOpen}
+                  unsavedChanges={unsavedChanges}
+                />
               )}
             </UnsavedChangesContext.Consumer>
           )}

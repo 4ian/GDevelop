@@ -9,6 +9,7 @@ import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
 import { Column } from '../../UI/Grid';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
+import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 
@@ -78,8 +79,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       objectsContainer,
     } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Do you want to remove all references to this group in events (actions and conditions using the group)?'
     );
 

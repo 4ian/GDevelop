@@ -43,20 +43,17 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
     if (!dialog || !electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showOpenDialog(
-      browserWindow,
-      {
+    dialog
+      .showOpenDialog(browserWindow, {
         title,
         properties: ['openDirectory', 'createDirectory'],
         message,
         defaultPath: this.props.defaultPath,
-      },
-      paths => {
-        if (!paths || !paths.length) return;
-
-        this.props.onChange(paths[0]);
-      }
-    );
+      })
+      .then(({ filePaths }) => {
+        if (!filePaths || !filePaths.length) return;
+        this.props.onChange(filePaths[0]);
+      });
   };
 
   _getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {

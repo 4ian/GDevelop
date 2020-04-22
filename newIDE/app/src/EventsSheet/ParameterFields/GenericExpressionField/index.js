@@ -21,6 +21,20 @@ import debounce from 'lodash/debounce';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Paper from '@material-ui/core/Paper';
 import { TextFieldWithButtonLayout } from '../../../UI/Layout';
+import {
+  type ExpressionAutocompletion,
+  insertAutocompletionInExpression,
+  getAutocompletionsFromDescriptions,
+} from '../../../ExpressionAutocompletion';
+import {
+  type AutocompletionsState,
+  getAutocompletionsInitialState,
+  setNewAutocompletions,
+  handleAutocompletionsKeyDown,
+  getVisibleAutocompletions,
+  getRemainingCount,
+} from './ExpressionAutocompletionsHandler';
+import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
 const gd = global.gd;
 
 const styles = {
@@ -67,6 +81,7 @@ type State = {|
   validatedValue: string,
   errorText: ?string,
   errorHighlights: Array<Highlight>,
+  autocompletions: AutocompletionsState,
 |};
 
 type Props = {|
@@ -131,6 +146,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     validatedValue: this.props.value,
     errorText: null,
     errorHighlights: [],
+    autocompletions: getAutocompletionsInitialState(),
   };
 
   componentDidMount() {
@@ -143,12 +159,12 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
-  focus() {
+  focus = () => {
     if (this._field) {
       this._field.focus();
       this._enqueueValidation();
     }
-  }
+  };
 
   _openExpressionPopover = () => {
     this.setState({
@@ -179,15 +195,13 @@ export default class ExpressionField extends React.Component<Props, State> {
   _handleBlur = (event: { currentTarget: { value: string } }) => {
     const value = event.currentTarget.value;
     if (this.props.onChange) this.props.onChange(value);
-    this.setState(
-      {
-        validatedValue: value,
-      },
-      () => {
-        this._enqueueValidation.cancel();
-        this._doValidation();
-      }
-    );
+    this.setState({ validatedValue: value }, () => {
+      this._enqueueValidation.cancel();
+      this._doValidation();
+      this.setState({
+        autocompletions: getAutocompletionsInitialState(),
+      });
+    });
   };
 
   _handleExpressionChosen = (
@@ -240,9 +254,52 @@ export default class ExpressionField extends React.Component<Props, State> {
     }, 5);
   };
 
+  _insertAutocompletion = (
+    expressionAutocompletion: ExpressionAutocompletion
+  ) => {
+    // If the completion is exact, it's not a completion but just
+    // shown for informing the user.
+    if (expressionAutocompletion.isExact) return;
+
+    const caretLocation = this._inputElement
+      ? this._inputElement.selectionStart
+      : 0;
+    const expression = this.state.validatedValue;
+
+    const {
+      expression: newExpression,
+      caretLocation: newCaretLocation,
+    } = insertAutocompletionInExpression(
+      { expression, caretLocation },
+      {
+        completion: expressionAutocompletion.completion,
+        addParenthesis: expressionAutocompletion.addParenthesis,
+        addDot: expressionAutocompletion.addDot,
+        addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
+        addClosingParenthesis: expressionAutocompletion.addClosingParenthesis,
+      }
+    );
+
+    if (this._field) {
+      this._field.forceSetValue(newExpression);
+    }
+    if (this.props.onChange) this.props.onChange(newExpression);
+    this.setState(
+      {
+        validatedValue: newExpression,
+      },
+      () => {
+        this._enqueueValidation();
+        if (this._field) {
+          this._field.forceSetSelection(newCaretLocation, newCaretLocation);
+        }
+      }
+    );
+  };
+
   _enqueueValidation = debounce(() => {
     this._doValidation();
-  }, 500);
+  }, 250);
 
   _doValidation = () => {
     const {
@@ -250,10 +307,11 @@ export default class ExpressionField extends React.Component<Props, State> {
       globalObjectsContainer,
       objectsContainer,
       expressionType,
+      scope,
     } = this.props;
     if (!project) return null;
 
-    // Validation can be time consuming (~1ms for simple expression,
+    // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
 
     const parser = new gd.ExpressionParser2(
@@ -268,9 +326,33 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const { errorText, errorHighlights } = extractErrors(expressionNode);
 
+    const cursorPosition = this._inputElement
+      ? this._inputElement.selectionStart
+      : 0;
+    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      expressionNode,
+      cursorPosition - 1
+    );
+    const newAutocompletions = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        globalObjectsContainer,
+        objectsContainer,
+        scope,
+      },
+      completionDescriptions
+    );
+
     parser.delete();
 
-    this.setState({ errorText, errorHighlights });
+    this.setState(state => ({
+      errorText,
+      errorHighlights,
+      autocompletions: setNewAutocompletions(
+        state.autocompletions,
+        newAutocompletions
+      ),
+    }));
   };
 
   render() {
@@ -339,16 +421,28 @@ export default class ExpressionField extends React.Component<Props, State> {
                   ref={field => (this._field = field)}
                   onFocus={this._handleFocus}
                   errorText={this.state.errorText}
+                  onClick={() => this._enqueueValidation()}
+                  onKeyDown={event => {
+                    const autocompletions = handleAutocompletionsKeyDown(
+                      this.state.autocompletions,
+                      {
+                        event,
+                        onUpdateAutocompletions: this._enqueueValidation,
+                        onInsertAutocompletion: this._insertAutocompletion,
+                      }
+                    );
+                    this.setState({ autocompletions });
+                  }}
                   multiLine
                   fullWidth
                 />
               </div>
-              {this._fieldElement && this.state.popoverOpen && (
+              {this._inputElement && this.state.popoverOpen && (
                 <ClickAwayListener onClickAway={this._handleRequestClose}>
                   <Popper
                     style={popoverStyle}
                     open={this.state.popoverOpen}
-                    anchorEl={this._fieldElement}
+                    anchorEl={this._inputElement}
                     placement="bottom"
                     disablePortal={
                       true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */
@@ -368,6 +462,32 @@ export default class ExpressionField extends React.Component<Props, State> {
                   </Popper>
                 </ClickAwayListener>
               )}
+              {this._inputElement &&
+                !this.state.popoverOpen &&
+                parameterRenderingService && (
+                  <ExpressionAutocompletionsDisplayer
+                    project={project}
+                    anchorEl={this._inputElement}
+                    expressionAutocompletions={getVisibleAutocompletions(
+                      this.state.autocompletions
+                    )}
+                    remainingCount={getRemainingCount(
+                      this.state.autocompletions
+                    )}
+                    selectedCompletionIndex={
+                      this.state.autocompletions.selectedCompletionIndex
+                    }
+                    onChoose={expressionAutocompletion => {
+                      this._insertAutocompletion(expressionAutocompletion);
+
+                      setTimeout(
+                        this.focus,
+                        50 /* Give back the focus to the field after a completion is inserted */
+                      );
+                    }}
+                    parameterRenderingService={parameterRenderingService}
+                  />
+                )}
             </div>
           )}
           renderButton={style => (

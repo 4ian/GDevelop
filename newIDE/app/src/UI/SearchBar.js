@@ -29,6 +29,8 @@ type Props = {|
   buildTagsMenuTemplate?: () => any,
   /** If defined, a help icon button redirecting to this page will be shown */
   helpPagePath?: ?string,
+  /** Elevation of Paper Component */
+  elevation?: number,
 |};
 
 type State = {|
@@ -160,6 +162,7 @@ export default class SearchBar extends React.PureComponent<Props, State> {
         style={{
           ...styles.root,
           ...style,
+          elevation={this.props.elevation || 1},
         }}
       >
         <div style={styles.searchContainer}>

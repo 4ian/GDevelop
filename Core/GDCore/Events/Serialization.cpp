@@ -64,7 +64,7 @@ bool AddQuotesToFunctionCall(gd::String& expressionStr,
 
 namespace gd {
 
-void EventsListSerialization::UpdateInstructionsFromGD5092(
+void EventsListSerialization::UpdateInstructionsFrom4098(
     gd::Project& project, gd::InstructionsList& list) {
       for(std::size_t i=0;i<list.size(); ++i){
         gd::Instruction& instr=list[i];
@@ -350,9 +350,9 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
                                      project.GetLastSaveGDMinorVersion(),
                                      project.GetLastSaveGDBuildVersion(),
                                      0,
-                                     5,
+                                     4,
                                      0,
-                                     92,
+                                     98,
                                      0)) {
     UpdateInstructionsFromGD5092(project, instructions);
   }

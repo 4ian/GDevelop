@@ -83,7 +83,7 @@ class GD_CORE_API EventsListSerialization {
   static void UpdateInstructionsFromGD4097(gd::Project& project,
                                           gd::InstructionsList& list);
 
-  static void UpdateInstructionsFromGD5092(gd::Project& project,
+  static void UpdateInstructionsFromGD4098(gd::Project& project,
                                           gd::InstructionsList& list);
 };
 

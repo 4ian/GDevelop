@@ -162,8 +162,8 @@ export default class SearchBar extends React.PureComponent<Props, State> {
         style={{
           ...styles.root,
           ...style,
-          elevation={this.props.elevation || 1},
         }}
+        elevation={this.props.elevation || 1}
       >
         <div style={styles.searchContainer}>
           <TextField

@@ -58,7 +58,6 @@ const AddAnimationLine = ({ onAdd, extraTools }) => (
         label={<Trans>Add an animation</Trans>}
         primary
         onClick={onAdd}
-        labelPosition="before"
         icon={<Add />}
       />
     </Line>

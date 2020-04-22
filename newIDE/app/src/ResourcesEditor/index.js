@@ -106,7 +106,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   openProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 66)) {
+    if (!this.editorMosaic.openEditor('properties', 'start', 66, 'column')) {
       this.setState({
         showPropertiesInfoBar: true,
       });

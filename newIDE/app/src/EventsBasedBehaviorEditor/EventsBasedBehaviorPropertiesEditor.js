@@ -298,7 +298,6 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                       primary
                       label={<Trans>Add a property</Trans>}
                       onClick={this._addProperty}
-                      labelPosition="before"
                       icon={<Add />}
                     />
                   </Line>

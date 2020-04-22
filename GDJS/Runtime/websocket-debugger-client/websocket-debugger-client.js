@@ -1,59 +1,54 @@
+/// @ts-check
 /**
  * An client side implementation of the Debugger
  * @interface
  */
-gdjs.DebuggerClient = function() {} // Necessary for Interface definition 
+gdjs.IDebuggerClient = function() {}
 
 /**
  * Update a value, specified by a path starting from the {@link RuntimeGame} instance.
- * @function
- * @name gdjs.DebuggerClient#set
  * @param {Array<string>} path - The path of the property to modify, starting from the RuntimeGame.
  * @param {any} newValue - The new value.
  */
+gdjs.IDebuggerClient.prototype.set = function(path, newValue) {}
 
 /**
  * Call a method, specified by a path starting from the {@link RuntimeGame} instance.
- * @function
- * @name gdjs.DebuggerClient#call
  * @param {Array<string>} path - The path to the method, starting from the RuntimeGame.
  * @param {Array<any>} args - The arguments to pass the method.
  */
+gdjs.IDebuggerClient.prototype.call = function(path, args) {}
 
 /**
  * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
- * @function
- * @name gdjs.DebuggerClient#sendRuntimeGameDump
  */
+gdjs.IDebuggerClient.prototype.sendRuntimeGameDump = function() {}
 
 /**
  * Start profiling.
- * @function
- * @name gdjs.DebuggerClient#sendProfilerStarted
  */
+gdjs.IDebuggerClient.prototype.sendProfilerStrated = function() {}
 
 /**
  * Stop profiling.
- * @function
- * @name gdjs.DebuggerClient#sendProfilerStopped
  */
+gdjs.IDebuggerClient.prototype.sendProfilerStopped = function() {}
 
 /**
  * Send profiling results.
- * @function
  * @param {any} framesAverageMeasures The measures made for each frames.
  * @param {any} stats Other measures done during the profiler run.
- * @name gdjs.DebuggerClient#sendProfilerOutput
  */
+gdjs.IDebuggerClient.prototype.sendProfilerOutput = function(framesAverageMeasures, stats) {}
 
 
 /**
- * This {@link DebuggerClient} connects to a websocket server, can dump
+ * This {@link IDebuggerClient} connects to a websocket server, can dump
  * the data of the current game, and receive message to change a field or
  * call a function, specified by a path from the {@link RuntimeGame}.
  *
  * @memberof gdjs
- * @implements {gdjs.DebuggerClient}
+ * @implements {gdjs.IDebuggerClient}
  * @class WebsocketDebuggerClient
  * @param {gdjs.RuntimeGame} runtimeGame -  The `gdjs.RuntimeGame` to be debugged
  */
@@ -98,9 +93,9 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
 
     if (data && data.command) {
       if (data.command === 'play') {
-        runtimegame.pause(false);
+        runtimeGame.pause(false);
       } else if (data.command === 'pause') {
-        runtimegame.pause(true);
+        runtimeGame.pause(true);
         that.sendRuntimeGameDump();
       } else if (data.command === 'refresh') {
         that.sendRuntimeGameDump();
@@ -109,7 +104,7 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
       } else if (data.command === 'call') {
         that.call(data.path, data.args);
       } else if (data.command === 'profiler.start') {
-        runtimegame.startCurrentSceneProfiler(function(stoppedProfiler) {
+        runtimeGame.startCurrentSceneProfiler(function(stoppedProfiler) {
           that.sendProfilerOutput(
             stoppedProfiler.getFramesAverageMeasures(),
             stoppedProfiler.getStats()
@@ -118,7 +113,7 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
         });
         that.sendProfilerStarted();
       } else if (data.command === 'profiler.stop') {
-        runtimegame.stopCurrentSceneProfiler();
+        runtimeGame.stopCurrentSceneProfiler();
       } else {
         console.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -128,6 +123,7 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
       console.info('Debugger received a message with badly formatted data.');
     }
   };
+  return;
 };
 
 gdjs.DebuggerClient = gdjs.WebsocketDebuggerClient; //Register the class to let the engine use it.
@@ -347,6 +343,7 @@ gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
 ) {
   return JSON.stringify(
     obj,
+      // @ts-ignore
     this._depthLimitedSerializer(replacer, cycleReplacer, maxDepth),
     spaces
   );
@@ -367,7 +364,7 @@ gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
   var stack = [],
     keys = [];
 
-  if (cycleReplacer == null)
+  if (cycleReplacer === undefined || cycleReplacer === null)
     cycleReplacer = function(key, value) {
       if (stack[0] === value) return '[Circular ~]';
       return (
@@ -384,6 +381,7 @@ gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
       if (maxDepth != null && thisPos > maxDepth) {
         return '[Max depth reached]';
       } else if (~stack.indexOf(value))
+      // @ts-ignore
         value = cycleReplacer.call(this, key, value);
     } else stack.push(value);
 

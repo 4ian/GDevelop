@@ -17,7 +17,7 @@ IF NOT ERRORLEVEL 0 echo "Error during doc generation"
 cd ..\..
 cd GDJS
 npm install
-jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
+npm run generate-doc
 IF NOT ERRORLEVEL 0 echo "Error during doc generation"
 cd ..
 cd scripts

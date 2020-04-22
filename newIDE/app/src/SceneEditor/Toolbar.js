@@ -5,7 +5,7 @@ import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import InstancesSelection from './InstancesSelection';
+import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import PreviewButtons, {
   type PreviewButtonSettings,
 } from '../MainFrame/Toolbar/PreviewButtons.js';
@@ -140,12 +140,12 @@ export class Toolbar extends PureComponent<Props> {
             {
               label: 'Zoom in',
               click: this.props.zoomIn,
-              accelerator: 'CmdOrCtrl++',
+              accelerator: 'CmdOrCtrl+numadd',
             },
             {
               label: 'Zoom out',
               click: this.props.zoomOut,
-              accelerator: 'CmdOrCtrl+-',
+              accelerator: 'CmdOrCtrl+numsub',
             },
             {
               label: 'Center View',

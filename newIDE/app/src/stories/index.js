@@ -1147,7 +1147,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
     <EditorMosaicPlayground
       renderButtons={({ openEditor }) => (
         <FlatButton
-          onClick={() => openEditor('thirdEditor', 'end', 65)}
+          onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
           label="Open the third editor"
         />
       )}
@@ -1201,15 +1201,15 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
       renderButtons={({ openEditor }) => (
         <React.Fragment>
           <FlatButton
-            onClick={() => openEditor('firstEditor', 'end', 65)}
+            onClick={() => openEditor('firstEditor', 'end', 65, 'column')}
             label="Open the 1st secondary editor"
           />
           <FlatButton
-            onClick={() => openEditor('secondEditor', 'end', 65)}
+            onClick={() => openEditor('secondEditor', 'end', 65, 'column')}
             label="Open the 2nd secondary editor"
           />
           <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
             label="Open the 3rd secondary editor"
           />
         </React.Fragment>
@@ -1262,11 +1262,13 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
       renderButtons={({ openEditor }) => (
         <React.Fragment>
           <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
             label="Open the third editor"
           />
           <FlatButton
-            onClick={() => openEditor('noTransitionsEditor', 'end', 65)}
+            onClick={() =>
+              openEditor('noTransitionsEditor', 'end', 65, 'column')
+            }
             label="Open the editor without transitions"
           />
         </React.Fragment>

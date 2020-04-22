@@ -142,7 +142,7 @@ export type State = {|
   previewFirstSceneName: string,
 |};
 
-type Props = {
+export type Props = {
   integratedEditor?: boolean,
   introDialog?: React.Element<*>,
   renderMainMenu?: MainMenuProps => React.Node,
@@ -257,7 +257,8 @@ const MainFrame = (props: Props) => {
           });
       })();
     },
-    [integratedEditor, initialFileMetadataToOpen, setState, _openIntroDialog]
+    // eslint-disable-next-line
+    []
   );
 
   const _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
@@ -546,16 +547,6 @@ const MainFrame = (props: Props) => {
       isPreviewFirstSceneOverriden: false,
       previewFirstSceneName: '',
     });
-  };
-
-  const getSerializedElements = () => {
-    const editorTab = getCurrentTab(state.editorTabs);
-    if (!editorTab || !editorTab.editorRef) {
-      console.warn('No active editor or reference to the editor');
-      return {};
-    }
-
-    return editorTab.editorRef.getSerializedElements();
   };
 
   const toggleProjectManager = () => {
@@ -974,7 +965,7 @@ const MainFrame = (props: Props) => {
     const { i18n, storageProviderOperations } = props;
     const sceneEditorOptions = {
       label: name,
-      renderEditor: ({ isActive, editorRef, newState }) => (
+      renderEditor: ({ isActive, editorRef, newState, newProps }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
             <SceneEditor
@@ -1005,19 +996,21 @@ const MainFrame = (props: Props) => {
                   );
                 }
               }}
-              showPreviewButton={!!props.renderPreviewLauncher}
+              showPreviewButton={!!newProps.renderPreviewLauncher}
               showNetworkPreviewButton={
                 _previewLauncher.current &&
                 _previewLauncher.current.canDoNetworkPreview()
               }
               onOpenDebugger={openDebugger}
-              onEditObject={props.onEditObject}
-              resourceSources={props.resourceSources}
-              onChooseResource={_onChooseResource}
-              resourceExternalEditors={props.resourceExternalEditors}
+              onEditObject={newProps.onEditObject}
+              resourceSources={newProps.resourceSources}
+              onChooseResource={(sourceName, multiSelection) =>
+                _onChooseResource(sourceName, multiSelection, newState)
+              }
+              resourceExternalEditors={newProps.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
-              unsavedChanges={props.unsavedChanges}
+              unsavedChanges={newProps.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1026,7 +1019,7 @@ const MainFrame = (props: Props) => {
     };
     const eventsEditorOptions = {
       label: name + ' ' + i18n._(t`(Events)`),
-      renderEditor: ({ isActive, editorRef, newState }) => (
+      renderEditor: ({ isActive, editorRef, newState, newProps }) => (
         <PreferencesContext.Consumer>
           {({ values }) => (
             <EventsEditor
@@ -1057,7 +1050,7 @@ const MainFrame = (props: Props) => {
                   );
                 }
               }}
-              showPreviewButton={!!props.renderPreviewLauncher}
+              showPreviewButton={!!newProps.renderPreviewLauncher}
               showNetworkPreviewButton={
                 _previewLauncher.current &&
                 _previewLauncher.current.canDoNetworkPreview()
@@ -1070,14 +1063,20 @@ const MainFrame = (props: Props) => {
                   openSceneEditor: false,
                 })
               }
-              resourceSources={props.resourceSources}
-              onChooseResource={_onChooseResource}
-              resourceExternalEditors={props.resourceExternalEditors}
-              openInstructionOrExpression={_openInstructionOrExpression}
-              onCreateEventsFunction={_onCreateEventsFunction}
+              resourceSources={newProps.resourceSources}
+              onChooseResource={(sourceName, multiSelection) =>
+                _onChooseResource(sourceName, multiSelection, newState)
+              }
+              resourceExternalEditors={newProps.resourceExternalEditors}
+              openInstructionOrExpression={(extension, type) =>
+                _openInstructionOrExpression(extension, type, newState)
+              }
+              onCreateEventsFunction={(extensionName, eventsFunction) =>
+                _onCreateEventsFunction(extensionName, eventsFunction, newState)
+              }
               isActive={isActive}
               ref={editorRef}
-              unsavedChanges={props.unsavedChanges}
+              unsavedChanges={newProps.unsavedChanges}
             />
           )}
         </PreferencesContext.Consumer>
@@ -1106,7 +1105,7 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: name,
-        renderEditor: ({ isActive, editorRef, newState }) => (
+        renderEditor: ({ isActive, editorRef, newState, newProps }) => (
           <ExternalEventsEditor
             project={newState.currentProject}
             externalEventsName={name}
@@ -1118,15 +1117,21 @@ const MainFrame = (props: Props) => {
                 openSceneEditor: false,
               })
             }
-            resourceSources={props.resourceSources}
-            onChooseResource={_onChooseResource}
-            resourceExternalEditors={props.resourceExternalEditors}
-            openInstructionOrExpression={_openInstructionOrExpression}
-            onCreateEventsFunction={_onCreateEventsFunction}
+            resourceSources={newProps.resourceSources}
+            onChooseResource={(sourceName, multiSelection) =>
+              _onChooseResource(sourceName, multiSelection, newState)
+            }
+            resourceExternalEditors={newProps.resourceExternalEditors}
+            openInstructionOrExpression={(extension, type) =>
+              _openInstructionOrExpression(extension, type, newState)
+            }
+            onCreateEventsFunction={(extensionName, eventsFunction) =>
+              _onCreateEventsFunction(extensionName, eventsFunction, newState)
+            }
             previewButtonSettings={emptyPreviewButtonSettings}
             isActive={isActive}
             ref={editorRef}
-            unsavedChanges={props.unsavedChanges}
+            unsavedChanges={newProps.unsavedChanges}
           />
         ),
         key: 'external events ' + name,
@@ -1141,7 +1146,7 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: name,
-        renderEditor: ({ isActive, editorRef, newState }) => (
+        renderEditor: ({ isActive, editorRef, newState, newProps }) => (
           <PreferencesContext.Consumer>
             {({ values }) => (
               <ExternalLayoutEditor
@@ -1167,17 +1172,19 @@ const MainFrame = (props: Props) => {
                     );
                   }
                 }}
-                showPreviewButton={!!props.renderPreviewLauncher}
+                showPreviewButton={!!newProps.renderPreviewLauncher}
                 showNetworkPreviewButton={
                   _previewLauncher.current &&
                   _previewLauncher.current.canDoNetworkPreview()
                 }
                 previewButtonSettings={emptyPreviewButtonSettings}
                 onOpenDebugger={openDebugger}
-                onEditObject={props.onEditObject}
-                resourceSources={props.resourceSources}
-                onChooseResource={_onChooseResource}
-                resourceExternalEditors={props.resourceExternalEditors}
+                onEditObject={newProps.onEditObject}
+                resourceSources={newProps.resourceSources}
+                onChooseResource={(sourceName, multiSelection) =>
+                  _onChooseResource(sourceName, multiSelection, newState)
+                }
+                resourceExternalEditors={newProps.resourceExternalEditors}
                 isActive={isActive}
                 ref={editorRef}
               />
@@ -1200,26 +1207,32 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: name + ' ' + i18n._(t`(Extension)`),
-        renderEditor: ({ isActive, editorRef, newState }) => (
+        renderEditor: ({ isActive, editorRef, newState, newProps }) => (
           <EventsFunctionsExtensionEditor
             project={newState.currentProject}
             eventsFunctionsExtensionName={name}
             setToolbar={setEditorToolbar}
-            resourceSources={props.resourceSources}
-            onChooseResource={_onChooseResource}
-            resourceExternalEditors={props.resourceExternalEditors}
+            resourceSources={newProps.resourceSources}
+            onChooseResource={(sourceName, multiSelection) =>
+              _onChooseResource(sourceName, multiSelection, newState)
+            }
+            resourceExternalEditors={newProps.resourceExternalEditors}
             isActive={isActive}
             initiallyFocusedFunctionName={initiallyFocusedFunctionName}
             initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
-            openInstructionOrExpression={_openInstructionOrExpression}
-            onCreateEventsFunction={_onCreateEventsFunction}
+            openInstructionOrExpression={(extension, type) =>
+              _openInstructionOrExpression(extension, type, newState)
+            }
+            onCreateEventsFunction={(extensionName, eventsFunction) =>
+              _onCreateEventsFunction(extensionName, eventsFunction, newState)
+            }
             ref={editorRef}
             onLoadEventsFunctionsExtensions={() => {
               eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                 newState.currentProject
               );
             }}
-            unsavedChanges={props.unsavedChanges}
+            unsavedChanges={newProps.unsavedChanges}
           />
         ),
         key: 'events functions extension ' + name,
@@ -1234,7 +1247,7 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: i18n._(t`Resources`),
-        renderEditor: ({ isActive, editorRef, newState }) => (
+        renderEditor: ({ isActive, editorRef, newState, newProps }) => (
           <ResourcesEditor
             project={newState.currentProject}
             setToolbar={setEditorToolbar}
@@ -1252,8 +1265,10 @@ const MainFrame = (props: Props) => {
             }}
             isActive={isActive}
             ref={editorRef}
-            onChooseResource={_onChooseResource}
-            resourceSources={props.resourceSources}
+            onChooseResource={(sourceName, multiSelection, newState) =>
+              _onChooseResource(sourceName, multiSelection, newState)
+            }
+            resourceSources={newProps.resourceSources}
           />
         ),
         key: 'resources',
@@ -1267,7 +1282,7 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: i18n._(t`Start Page`),
-        renderEditor: ({ isActive, editorRef, newState }) => (
+        renderEditor: ({ isActive, editorRef, newState, newProps }) => (
           <StartPage
             project={newState.currentProject}
             setToolbar={setEditorToolbar}
@@ -1276,10 +1291,10 @@ const MainFrame = (props: Props) => {
                 ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
               ).length
             }
-            onOpen={() => chooseProject(newState)}
+            onOpen={() => chooseProject(newState, newProps)}
             onCreate={() => openCreateDialog()}
             onOpenProjectManager={() => openProjectManager()}
-            onCloseProject={() => askToCloseProject(newState)}
+            onCloseProject={() => askToCloseProject(newState, newProps)}
             onOpenAboutDialog={() => openAboutDialog()}
             onOpenHelpFinder={() => openHelpFinderDialog()}
             onOpenLanguageDialog={() => openLanguage()}
@@ -1315,9 +1330,10 @@ const MainFrame = (props: Props) => {
 
   const _openInstructionOrExpression = (
     extension: gdPlatformExtension,
-    type: string
+    type: string,
+    newState: State = state
   ) => {
-    const { currentProject } = state;
+    const { currentProject } = newState;
     if (!currentProject) return;
 
     const extensionName = extension.getName();
@@ -1329,7 +1345,7 @@ const MainFrame = (props: Props) => {
       const functionName = getFunctionNameFromType(type);
 
       const foundTab = getEventsFunctionsExtensionEditor(
-        state.editorTabs,
+        newState.editorTabs,
         eventsFunctionsExtension
       );
       if (foundTab) {
@@ -1338,10 +1354,10 @@ const MainFrame = (props: Props) => {
           functionName.name,
           functionName.behaviorName
         );
-        setState(state => ({
-          ...state,
-          editorTabs: changeCurrentTab(state.editorTabs, foundTab.tabIndex),
-        }));
+        setState({
+          ...newState,
+          editorTabs: changeCurrentTab(newState.editorTabs, foundTab.tabIndex),
+        });
       } else {
         // Open a new editor for the extension and the given function
         openEventsFunctionsExtension(
@@ -1365,9 +1381,10 @@ const MainFrame = (props: Props) => {
 
   const _onCreateEventsFunction = (
     extensionName: string,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    newState: State = state
   ) => {
-    const { currentProject } = state;
+    const { currentProject } = newState;
     if (!currentProject) return;
     const { eventsFunctionsExtensionsState } = props;
 
@@ -1396,8 +1413,8 @@ const MainFrame = (props: Props) => {
     setState(state => ({ ...state, createDialogOpen: open }));
   };
 
-  const chooseProject = (newState: State = state) => {
-    const { storageProviders } = props;
+  const chooseProject = (newState: State = state, newProps: Props = props) => {
+    const { storageProviders } = newProps;
 
     if (
       storageProviders.filter(({ hiddenInOpenDialog }) => !hiddenInOpenDialog)
@@ -1405,12 +1422,15 @@ const MainFrame = (props: Props) => {
     ) {
       openOpenFromStorageProviderDialog();
     } else {
-      chooseProjectWithStorageProviderPicker(newState);
+      chooseProjectWithStorageProviderPicker(newState, newProps);
     }
   };
 
-  const chooseProjectWithStorageProviderPicker = (newState: State = state) => {
-    const { storageProviderOperations, i18n } = props;
+  const chooseProjectWithStorageProviderPicker = (
+    newState: State = state,
+    newProps: Props = props
+  ) => {
+    const { storageProviderOperations, i18n } = newProps;
     if (!storageProviderOperations.onOpenWithPicker) return;
 
     storageProviderOperations
@@ -1524,10 +1544,13 @@ const MainFrame = (props: Props) => {
       );
   };
 
-  const askToCloseProject = (newState: State = state): Promise<State> => {
-    if (props.unsavedChanges && props.unsavedChanges.hasUnsavedChanges) {
+  const askToCloseProject = (
+    newState: State = state,
+    newProps: Props = props
+  ): Promise<State> => {
+    const { unsavedChanges } = newProps;
+    if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
       if (!newState.currentProject) return Promise.resolve(newState);
-      const { i18n } = props;
 
       const answer = Window.showConfirmDialog(
         i18n._(
@@ -1646,9 +1669,10 @@ const MainFrame = (props: Props) => {
 
   const _onChooseResource = (
     sourceName: string,
-    multiSelection: boolean = true
+    multiSelection: boolean = true,
+    newState: State = state
   ): Promise<Array<any>> => {
-    const { currentProject } = state;
+    const { currentProject } = newState;
     const resourceSourceDialog = _resourceSourceDialogs.current[sourceName];
     if (!resourceSourceDialog) return Promise.resolve([]);
 
@@ -1869,7 +1893,7 @@ const MainFrame = (props: Props) => {
         return (
           <TabContentContainer key={editorTab.key} active={isCurrentTab}>
             <ErrorBoundary>
-              {editorTab.render(isCurrentTab, state)}
+              {editorTab.render(isCurrentTab, state, props)}
             </ErrorBoundary>
           </TabContentContainer>
         );

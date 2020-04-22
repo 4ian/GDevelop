@@ -53,7 +53,6 @@ type Props = {|
     imageHeight: number,
     imageZoomFactor: number,
   |}) => React.Node,
-  style?: Object,
   onSize?: (number, number) => void,
 |};
 
@@ -136,7 +135,7 @@ export default class ImagePreview extends React.Component<Props, State> {
       <Measure bounds>
         {({ contentRect, measureRef }) => {
           const containerWidth = contentRect.bounds.width;
-          const { resourceName, style, renderOverlay } = this.props;
+          const { resourceName, renderOverlay } = this.props;
           const {
             imageHeight,
             imageWidth,
@@ -196,7 +195,7 @@ export default class ImagePreview extends React.Component<Props, State> {
                 </IconButton>
               </MiniToolbar>
               <div
-                style={{ ...styles.imagePreviewContainer, ...style }}
+                style={styles.imagePreviewContainer}
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;

@@ -7,8 +7,9 @@
 class RuntimeScene;
 
 bool GD_API TimerElapsedTime(RuntimeScene& scene,
-                             double time,
-                             const gd::String& timerName);
+                             const gd::String& timerName
+                             double time
+                             );
 bool GD_API TimerPaused(RuntimeScene& scene, const gd::String& timerName);
 double GD_API GetTimeScale(RuntimeScene& scene);
 double GD_API GetTimerElapsedTimeInSeconds(RuntimeScene& scene,

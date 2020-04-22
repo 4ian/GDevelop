@@ -354,7 +354,7 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
                                      0,
                                      98,
                                      0)) {
-    UpdateInstructionsFromGD5092(project, instructions);
+    UpdateInstructionsFromGD4098(project, instructions);
   }
   // end of compatibility code
 }

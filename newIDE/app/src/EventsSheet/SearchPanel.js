@@ -102,7 +102,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     });
   };
 
-  callLaunchSearch = () => {
+  launchSearchIfResultsDirty = () => {
     if (this.state.searchResultsDirty) {
       this.launchSearch();
       this.setState({ searchResultsDirty: false });
@@ -136,7 +136,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
               }}
               onKeyPress={event => {
                 if (event.key === 'Enter') {
-                  this.callLaunchSearch();
+                  this.launchSearchIfResultsDirty();
                 }
               }}
               value={searchText}
@@ -151,7 +151,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 if (!this.state.searchResultsDirty) {
                   onGoToNextSearchResult();
                 } else {
-                  this.callLaunchSearch();
+                  this.launchSearchIfResultsDirty();
                 }
               }}
             />

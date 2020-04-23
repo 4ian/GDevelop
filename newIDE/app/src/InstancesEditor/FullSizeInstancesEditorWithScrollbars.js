@@ -62,6 +62,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
   componentDidMount() {
     if (this._editor) {
       this._handleViewPositionChange(this._editor.getViewPosition());
+      this._editor.scrollTo(this.props.options.xValue, this.props.options.yValue);
     }
   }
 
@@ -78,6 +79,11 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
         }
       }
     );
+    if(this.props.options.xValue !== xValue){
+      this.props.onChangeOptions({
+        xValue:this.state.xValue
+      });
+    }
   };
 
   _handleYChange = (e: any, value: number) => {
@@ -95,6 +101,11 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
         }
       }
     );
+    if(this.props.options.yValue !== yValue){
+      this.props.onChangeOptions({
+        yValue:this.state.yValue
+      });
+    }
   };
 
   _setAndAdjust = ({ xValue, yValue }: { xValue: number, yValue: number }) => {

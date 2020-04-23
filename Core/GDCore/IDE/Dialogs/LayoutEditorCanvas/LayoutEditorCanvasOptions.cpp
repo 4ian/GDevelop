@@ -21,7 +21,9 @@ LayoutEditorCanvasOptions::LayoutEditorCanvasOptions()
       gridG(180),
       gridB(255),
       zoomFactor(1),
-      windowMask(false) {}
+      windowMask(false),
+      xValue(400),
+      yValue(300) {}
 
 void LayoutEditorCanvasOptions::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("grid", grid);
@@ -35,6 +37,8 @@ void LayoutEditorCanvasOptions::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("gridB", gridB);
   element.SetAttribute("zoomFactor", zoomFactor);
   element.SetAttribute("windowMask", windowMask);
+  element.SetAttribute("xValue", xValue);
+  element.SetAttribute("yValue", yValue);
 }
 
 void LayoutEditorCanvasOptions::UnserializeFrom(
@@ -50,6 +54,8 @@ void LayoutEditorCanvasOptions::UnserializeFrom(
   gridG = element.GetIntAttribute("gridG", 180);
   gridB = element.GetIntAttribute("gridB", 255);
   zoomFactor = element.GetDoubleAttribute("zoomFactor", 1.0);
+  xValue = element.GetIntAttribute("xValue", 400);
+  yValue = element.GetIntAttribute("yValue", 300);
 }
 
 }  // namespace gd

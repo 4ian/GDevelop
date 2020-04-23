@@ -49,6 +49,8 @@ class GD_CORE_API LayoutEditorCanvasOptions {
   int gridB;         ///< Grid blue color in editor
   float zoomFactor;  ///< Stores the zoom factor
   bool windowMask;   ///< True if window mask displayed in editor
+  int xValue;
+  int yValue;
 };
 
 }  // namespace gd

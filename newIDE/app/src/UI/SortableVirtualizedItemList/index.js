@@ -8,7 +8,7 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import DropIndicator from './DropIndicator';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
-import type { WidthType } from '../Reponsive/ResponsiveWidthMeasurer';
+import type { WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
 
 type Props<Item> = {|
   height: number,

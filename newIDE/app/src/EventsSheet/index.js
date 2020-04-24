@@ -177,6 +177,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       onCut: () => this.cutSelection(),
       onPaste: () => this.pasteEventsOrInstructions(),
       onSearch: () => this._toggleSearchPanel(),
+      onEscape: () => this._closeSearchPanel(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
     },
@@ -287,6 +288,10 @@ export default class EventsSheet extends React.Component<Props, State> {
         }
       }
     );
+  };
+
+  _closeSearchPanel = () => {
+    this.setState({ showSearchPanel: false });
   };
 
   addSubEvents = () => {
@@ -718,6 +723,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         if (cb) cb();
       }
     );
+    if (this._searchPanel) this._searchPanel.markSearchResultsDirty();
   };
 
   undo = () => {
@@ -1132,6 +1138,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                             this.setState({
                               inlineEditingChangesMade: true,
                             });
+                            if (this._searchPanel)
+                              this._searchPanel.markSearchResultsDirty();
                           }}
                           resourceSources={this.props.resourceSources}
                           onChooseResource={this.props.onChooseResource}

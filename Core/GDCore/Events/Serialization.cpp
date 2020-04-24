@@ -64,7 +64,7 @@ bool AddQuotesToFunctionCall(gd::String& expressionStr,
 
 namespace gd {
 
-void EventsListSerialization::UpdateInstructionsFrom4098(
+void EventsListSerialization::UpdateInstructionsFromGD4098(
     gd::Project& project, gd::InstructionsList& list) {
       for(std::size_t i=0;i<list.size(); ++i){
         gd::Instruction& instr=list[i];

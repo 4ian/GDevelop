@@ -731,7 +731,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.setState({ history: newHistory }, () => this.updateToolbar());
+    // /!\ Also clear selection, that can contain reference to invalid events or
+    // events not shown on screen.
+    this.setState({ history: newHistory, selection: clearSelection() }, () =>
+      this.updateToolbar()
+    );
   };
 
   redo = () => {
@@ -745,7 +749,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.setState({ history: newHistory }, () => this.updateToolbar());
+    // /!\ Also clear selection, that can contain reference to invalid events or
+    // events not shown on screen.
+    this.setState({ history: newHistory, selection: clearSelection() }, () =>
+      this.updateToolbar()
+    );
   };
 
   _openEventsContextAnalyzer = () => {

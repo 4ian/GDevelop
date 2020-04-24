@@ -55,8 +55,8 @@ export default class SearchPanel extends PureComponent<Props, State> {
     }
   };
 
-  makeSearchResultsDirty = () => {
-    this.setState({ searchResultsDirty: true }); //search results not up to date
+  markSearchResultsDirty = () => {
+    this.setState({ searchResultsDirty: true });
   };
 
   launchSearch = () => {
@@ -131,7 +131,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
               onChange={(e, searchText) => {
                 this.setState({
                   searchText,
-                  searchResultsDirty: true, //search results not up to date
+                  searchResultsDirty: true,
                 });
               }}
               onKeyPress={event => {

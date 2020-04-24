@@ -22,8 +22,9 @@ LayoutEditorCanvasOptions::LayoutEditorCanvasOptions()
       gridB(255),
       zoomFactor(1),
       windowMask(false),
-      xValue(400),
-      yValue(300) {}
+      viewXPosition(400),
+      viewYPosition(300),
+      viewPositionValid(false) {}
 
 void LayoutEditorCanvasOptions::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("grid", grid);
@@ -37,8 +38,9 @@ void LayoutEditorCanvasOptions::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("gridB", gridB);
   element.SetAttribute("zoomFactor", zoomFactor);
   element.SetAttribute("windowMask", windowMask);
-  element.SetAttribute("xValue", xValue);
-  element.SetAttribute("yValue", yValue);
+  element.SetAttribute("viewXPosition", viewXPosition);
+  element.SetAttribute("viewYPosition", viewYPosition);
+  element.SetAttribute("viewPositionValid", viewPositionValid);
 }
 
 void LayoutEditorCanvasOptions::UnserializeFrom(
@@ -46,6 +48,7 @@ void LayoutEditorCanvasOptions::UnserializeFrom(
   grid = element.GetBoolAttribute("grid");
   snap = element.GetBoolAttribute("snap");
   windowMask = element.GetBoolAttribute("windowMask");
+  viewPositionValid = element.GetBoolAttribute("viewPositionValid", false);
   gridWidth = element.GetIntAttribute("gridWidth", 32);
   gridHeight = element.GetIntAttribute("gridHeight", 32);
   gridOffsetX = element.GetIntAttribute("gridOffsetX", 0);
@@ -53,9 +56,9 @@ void LayoutEditorCanvasOptions::UnserializeFrom(
   gridR = element.GetIntAttribute("gridR", 158);
   gridG = element.GetIntAttribute("gridG", 180);
   gridB = element.GetIntAttribute("gridB", 255);
+  viewXPosition = element.GetIntAttribute("viewXPosition", 400);
+  viewYPosition = element.GetIntAttribute("viewYPosition", 300);
   zoomFactor = element.GetDoubleAttribute("zoomFactor", 1.0);
-  xValue = element.GetIntAttribute("xValue", 400);
-  yValue = element.GetIntAttribute("yValue", 300);
 }
 
 }  // namespace gd

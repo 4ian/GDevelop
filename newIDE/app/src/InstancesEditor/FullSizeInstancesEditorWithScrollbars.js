@@ -60,9 +60,15 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
   };
 
   componentDidMount() {
-    if (this._editor) {
-      this._handleViewPositionChange(this._editor.getViewPosition());
-      this._editor.scrollTo(this.props.options.xValue, this.props.options.yValue);
+    const editor = this._editor;
+    if (editor) {
+      this._handleViewPositionChange(editor.getViewPosition());
+      if (this.props.options.viewPositionValid) {
+        editor.scrollTo(
+          this.props.options.viewXPosition,
+          this.props.options.viewYPosition
+        );
+      }
     }
   }
 
@@ -79,9 +85,12 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
         }
       }
     );
-    if(this.props.options.xValue !== xValue){
+
+    //Prevent reduntant calls to onChangeOptions
+    if (this.props.options.viewXPosition !== xValue) {
       this.props.onChangeOptions({
-        xValue:this.state.xValue
+        viewXPosition: this.state.xValue,
+        viewPositionValid: true,
       });
     }
   };
@@ -101,9 +110,12 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
         }
       }
     );
-    if(this.props.options.yValue !== yValue){
+
+    //Prevent reduntant calls to onChangeOptions
+    if (this.props.options.viewYPosition !== yValue) {
       this.props.onChangeOptions({
-        yValue:this.state.yValue
+        viewYPosition: this.state.yValue,
+        viewPositionValid: true,
       });
     }
   };

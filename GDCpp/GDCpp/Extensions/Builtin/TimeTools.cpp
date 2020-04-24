@@ -4,8 +4,7 @@
 
 bool GD_API TimerElapsedTime(RuntimeScene& scene,
                              const gd::String& timerName,
-                             double timeInSeconds
-                             ) {
+                             double timeInSeconds) {
   if (!scene.GetTimeManager().HasTimer(timerName))
     return true;  // Inconsistency to keep compatibility with games relying on
                   // this behavior.

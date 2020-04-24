@@ -76,6 +76,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateText = function() {
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateColor = function() {
   this._pixiObject.textStyles.default.fill = this._object._color;
+  this._pixiObject.dirty = true;
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function() {
@@ -83,10 +84,12 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function() {
   this._pixiObject.dirty = true;
 };
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function() {
-  this._pixiObject.textStyles.default.fontFamily = this._object._fontFamily;
+  this._pixiObject.textStyles.default.fontFamily = this._object._runtimeScene.getGame().getFontManager().getFontFamily(this._object._fontFamily);
+  this._pixiObject.dirty = true;
 };
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
   this._pixiObject.textStyles.default.fontSize = this._object._fontSize + 'px';
+  this._pixiObject.dirty = true;
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

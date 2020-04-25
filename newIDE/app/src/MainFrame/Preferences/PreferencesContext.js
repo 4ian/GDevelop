@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -22,6 +23,13 @@ export type AlertMessageIdentifier =
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used';
+
+export type EditorMosaicName =
+  | 'scene-editor'
+  | 'scene-editor-small'
+  | 'debugger'
+  | 'resources-editor'
+  | 'events-functions-extension-editor';
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -121,6 +129,7 @@ export type PreferencesValues = {|
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
+  defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
 |};
 
 /**
@@ -148,6 +157,11 @@ export type Preferences = {|
     kind: ResourceKind,
     path: string
   ) => void,
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => ?EditorMosaicNode,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -166,6 +180,7 @@ export const initialPreferences = {
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
+    defaultEditorMosaicNodes: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -183,6 +198,11 @@ export const initialPreferences = {
   setShowEffectParameterNames: (enabled: boolean) => {},
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

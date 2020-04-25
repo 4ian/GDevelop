@@ -29,9 +29,7 @@ import Clipboard from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
-import Drawer from '@material-ui/core/Drawer';
 import EditorMosaic from '../UI/EditorMosaic';
-import EditorBar, { editorBarHeight } from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -69,6 +67,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 import SceneVariablesDialog from './SceneVariablesDialog';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -82,7 +81,7 @@ const styles = {
   },
 };
 
-const initialEditors = {
+const initialMosaicEditorNodes = {
   direction: 'row',
   first: 'properties',
   splitPercentage: 23,
@@ -94,7 +93,7 @@ const initialEditors = {
   },
 };
 
-const initialEditorsSmallWindow = {
+const initialMosaicEditorNodesSmallWindow = {
   direction: 'row',
   first: 'instances-editor',
   second: 'objects-list',
@@ -1047,16 +1046,30 @@ export default class SceneEditor extends React.Component<Props, State> {
       <div style={styles.container}>
         <ResponsiveWindowMeasurer>
           {windowWidth => (
-            <EditorMosaic
-              editors={editors}
-              limitToOneSecondaryEditor={windowWidth === 'small'}
-              initialNodes={
-                windowWidth === 'small'
-                  ? initialEditorsSmallWindow
-                  : initialEditors
-              }
-              ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-            />
+            <PreferencesContext.Consumer>
+              {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
+                <EditorMosaic
+                  editors={editors}
+                  limitToOneSecondaryEditor={windowWidth === 'small'}
+                  initialNodes={
+                    windowWidth === 'small'
+                      ? getDefaultEditorMosaicNode('scene-editor-small') ||
+                        initialMosaicEditorNodesSmallWindow
+                      : getDefaultEditorMosaicNode('scene-editor') ||
+                        initialMosaicEditorNodes
+                  }
+                  onPersistNodes={node =>
+                    setDefaultEditorMosaicNode(
+                      windowWidth === 'small'
+                        ? 'scene-editor-small'
+                        : 'scene-editor',
+                      node
+                    )
+                  }
+                  ref={editorMosaic => (this.editorMosaic = editorMosaic)}
+                />
+              )}
+            </PreferencesContext.Consumer>
           )}
         </ResponsiveWindowMeasurer>
         {this.state.editedObjectWithContext && (

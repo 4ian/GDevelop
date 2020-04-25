@@ -3,7 +3,6 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import ContextMenu from './ContextMenu';
 import { type MenuItemTemplate } from './Menu.flow';
-import { I18n } from '@lingui/react';
 
 type Props = {|
   element: React$Element<any>,

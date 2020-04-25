@@ -43,6 +43,7 @@ import {
   emptyPreviewButtonSettings,
 } from '../MainFrame/Toolbar/PreviewButtons';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const gd = global.gd;
 
@@ -79,6 +80,23 @@ type State = {|
     parameters: ?EventsFunctionCreationParameters
   ) => void,
 |};
+
+const initialMosaicEditorNodes = {
+  direction: 'row',
+  first: {
+    direction: 'column',
+    first: 'free-functions-list',
+    second: 'behaviors-list',
+    splitPercentage: 50,
+  },
+  second: {
+    direction: 'column',
+    first: 'parameters',
+    second: 'events-sheet',
+    splitPercentage: 25,
+  },
+  splitPercentage: 25,
+};
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
@@ -831,26 +849,28 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
               />
             ) : (
-              <EditorMosaic
-                ref={editorMosaic => (this._editorMosaic = editorMosaic)}
-                editors={editors}
-                initialNodes={{
-                  direction: 'row',
-                  first: {
-                    direction: 'column',
-                    first: 'free-functions-list',
-                    second: 'behaviors-list',
-                    splitPercentage: 50,
-                  },
-                  second: {
-                    direction: 'column',
-                    first: 'parameters',
-                    second: 'events-sheet',
-                    splitPercentage: 25,
-                  },
-                  splitPercentage: 25,
-                }}
-              />
+              <PreferencesContext.Consumer>
+                {({
+                  getDefaultEditorMosaicNode,
+                  setDefaultEditorMosaicNode,
+                }) => (
+                  <EditorMosaic
+                    ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                    editors={editors}
+                    onPersistNodes={node =>
+                      setDefaultEditorMosaicNode(
+                        'events-functions-extension-editor',
+                        node
+                      )
+                    }
+                    initialNodes={
+                      getDefaultEditorMosaicNode(
+                        'events-functions-extension-editor'
+                      ) || initialMosaicEditorNodes
+                    }
+                  />
+                )}
+              </PreferencesContext.Consumer>
             )
           }
         </ResponsiveWindowMeasurer>

@@ -9,8 +9,8 @@ const styles = {
   cell: {
     display: 'flex',
     alignItems: 'center',
-    paddingLeft: 8,
-    paddingRight: 8,
+    paddingLeft: 4,
+    paddingRight: 4,
   },
 };
 

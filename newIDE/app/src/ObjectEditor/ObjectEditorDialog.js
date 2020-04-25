@@ -26,18 +26,19 @@ export class ObjectEditorDialog extends Component<*, StateType> {
     unsavedChangesDialogOpen: false,
   };
 
+  //Continer for all textfields, dropdowns in a dialog component
+  textFields = {};
+
   _onChangeTab = (value: string) => {
     this.setState({ currentTab: value });
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState !== this.state && !this.state.hasUnsavedChanges) {
-      this.setState({ hasUnsavedChanges: true });
-    }
+  componentDidMount() {
+    this.textFields.newObjectName = this.state.newObjectName;
   }
 
   _openUnsavedChangesDialog = (val: boolean) => {
-    if (!!this.state.hasUnsavedChanges) {
+    if (this.textFields.newObjectName !== this.state.newObjectName) {
       this.setState({
         hasUnsavedChanges: false,
         unsavedChangesDialogOpen: val,

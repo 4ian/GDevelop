@@ -7,7 +7,7 @@ const styles = {
 };
 
 type Props = {|
-  children: ({ width: number, height: number }) => React.Node,
+  children: ({| width: number, height: number |}) => React.Node,
 |};
 
 /**

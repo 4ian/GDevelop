@@ -4120,6 +4120,27 @@ storiesOf('LayersList', module)
       }}
       layersContainer={testProject.testLayout}
     />
+  ))
+  .add('small width', () => (
+    <div style={{ width: 250 }}>
+      <LayersList
+        project={testProject.project}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        freezeUpdate={false}
+        onRemoveLayer={(layerName, cb) => {
+          cb(true);
+        }}
+        onRenameLayer={(oldName, newName, cb) => {
+          cb(true);
+        }}
+        layersContainer={testProject.testLayout}
+      />
+    </div>
   ));
 
 storiesOf('EffectsList', module)

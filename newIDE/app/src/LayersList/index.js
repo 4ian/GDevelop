@@ -112,7 +112,6 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  freezeUpdate: boolean,
   layersContainer: gdLayout,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
@@ -131,13 +130,6 @@ export default class LayersList extends Component<Props, State> {
   state = {
     effectsEditedLayer: null,
   };
-
-  shouldComponentUpdate(nextProps: Props) {
-    // Rendering the component can be costly as it iterates over
-    // every layers, so the prop freezeUpdate allow to ask the component to stop
-    // updating, for example when hidden.
-    return !nextProps.freezeUpdate;
-  }
 
   _editEffects = (effectsEditedLayer: ?gdLayer) => {
     this.setState({

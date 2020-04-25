@@ -12,7 +12,7 @@ const styles = {
   handleColor: '#DDD',
 };
 
-const DragHandle = SortableHandle((props) => (
+const DragHandle = SortableHandle(props => (
   <span style={props.disabled ? styles.disabledHandle : styles.handle}>
     <DragHandleIcon htmlColor={styles.handleColor} />
   </span>

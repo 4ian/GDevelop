@@ -11,6 +11,7 @@ import { Tabs, Tab } from '../UI/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
+import UnsavedChangesDialog from '../UI/UnsavedChangesDialog';
 
 type StateType = {|
   currentTab: string,
@@ -21,20 +22,36 @@ export class ObjectEditorDialog extends Component<*, StateType> {
   state = {
     currentTab: 'properties',
     newObjectName: this.props.objectName,
+    hasUnsavedChanges: false,
+    unsavedChangesDialogOpen: false,
   };
 
   _onChangeTab = (value: string) => {
-    this.setState({
-      currentTab: value,
-    });
+    this.setState({ currentTab: value });
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState !== this.state && !this.state.hasUnsavedChanges) {
+      this.setState({ hasUnsavedChanges: true });
+    }
+  }
+
+  _openUnsavedChangesDialog = (val: boolean) => {
+    if (!!this.state.hasUnsavedChanges) {
+      this.setState({
+        hasUnsavedChanges: false,
+        unsavedChangesDialogOpen: val,
+      });
+    } else this.props.onCancel();
   };
 
   render() {
+    const { unsavedChangesDialogOpen } = this.state;
     const actions = [
       <FlatButton
         key="cancel"
         label={<Trans>Cancel</Trans>}
-        onClick={this.props.onCancel}
+        onClick={() => this._openUnsavedChangesDialog(true)}
       />,
       <FlatButton
         key="apply"
@@ -60,7 +77,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         secondaryActions={<HelpButton helpPagePath={this.props.helpPagePath} />}
         actions={actions}
         noMargin
-        onRequestClose={this.props.onCancel}
+        onRequestClose={() => this._openUnsavedChangesDialog(true)}
         cannotBeDismissed={true}
         open={this.props.open}
         noTitleMargin
@@ -125,6 +142,13 @@ export class ObjectEditorDialog extends Component<*, StateType> {
               () =>
                 this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
             }
+          />
+        )}
+        {!!unsavedChangesDialogOpen && (
+          <UnsavedChangesDialog
+            open={unsavedChangesDialogOpen}
+            onRequestClose={() => this._openUnsavedChangesDialog(false)}
+            onCancel={this.props.onCancel}
           />
         )}
       </Dialog>

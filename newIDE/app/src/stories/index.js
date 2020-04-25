@@ -4111,7 +4111,6 @@ storiesOf('LayersList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      freezeUpdate={false}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4131,7 +4130,6 @@ storiesOf('LayersList', module)
           return Promise.reject();
         }}
         resourceSources={[]}
-        freezeUpdate={false}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}

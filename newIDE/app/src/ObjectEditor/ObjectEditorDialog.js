@@ -26,21 +26,25 @@ export class ObjectEditorDialog extends Component<*, StateType> {
     unsavedChangesDialogOpen: false,
   };
 
-  //Continer for all textfields, dropdowns in a dialog component
-  textFields = {};
+  timeOut = null;
 
   _onChangeTab = (value: string) => {
     this.setState({ currentTab: value });
   };
 
   componentDidMount() {
-    this.textFields.newObjectName = this.state.newObjectName;
+    this.timeOut = setTimeout(() => {
+      this.setState({ hasUnsavedChanges: true });
+    }, 8000);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.timeOut);
   }
 
   _openUnsavedChangesDialog = (val: boolean) => {
-    if (this.textFields.newObjectName !== this.state.newObjectName) {
+    if (!!this.state.hasUnsavedChanges) {
       this.setState({
-        hasUnsavedChanges: false,
         unsavedChangesDialogOpen: val,
       });
     } else this.props.onCancel();

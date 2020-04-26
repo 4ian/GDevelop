@@ -111,6 +111,17 @@ export default class LocalExamples extends Component<Props, State> {
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
+            <Line expand>
+              <Column expand>
+                <LocalFolderPicker
+                  fullWidth
+                  value={this.state.outputPath}
+                  onChange={this._handleChangePath}
+                  type="create-game"
+                />
+              </Column>
+            </Line>
+            <Divider />
             <Line>
               <Column>
                 <Text>
@@ -125,17 +136,6 @@ export default class LocalExamples extends Component<Props, State> {
                   this.createFromExample(i18n, exampleName)
                 }
               />
-            </Line>
-            <Divider />
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={this.state.outputPath}
-                  onChange={this._handleChangePath}
-                  type="create-game"
-                />
-              </Column>
             </Line>
           </Column>
         )}

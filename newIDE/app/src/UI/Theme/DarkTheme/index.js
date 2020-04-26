@@ -41,7 +41,7 @@ const gdevelopTheme = {
   },
   toolbar: {
     backgroundColor: backgroundColor,
-    separatorColor: '#303030',
+    separatorColor: '#4d4d4d',
   },
   closableTabs: {
     fontFamily,
@@ -63,7 +63,7 @@ const gdevelopTheme = {
     groupBackgroundColor: backgroundColor,
     groupTextColor: '#AAA',
     deprecatedGroupTextColor: '#888',
-    separatorColor: '#303030',
+    separatorColor: '#4d4d4d',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: almostWhite,
     errorTextColor: '#ff2e16',

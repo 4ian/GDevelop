@@ -1,14 +1,14 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { type UpdateStatus } from './UpdaterTools';
-import { type State } from './index';
+import { type State, type Props } from './index';
 
 export type MainMenuProps = {|
   i18n: I18nType,
   project: ?gdProject,
   onChooseProject: () => void,
   onSaveProject: () => void,
-  onSaveProjectAs: () => void,
+  onSaveProjectAs: (newState: State, newProps: Props) => void,
   onCloseProject: () => Promise<State>,
   onCloseApp: () => void,
   onExportProject: (open?: boolean) => void,

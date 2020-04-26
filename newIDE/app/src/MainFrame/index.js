@@ -356,13 +356,14 @@ const MainFrame = (props: Props) => {
   const loadFromSerializedProject = (
     serializedProject: gdSerializerElement,
     fileMetadata: ?FileMetadata,
-    newState: State = state
+    newState: State = state,
+    newProps: Props = props
   ): Promise<State> => {
     return timePromise(
       () => {
         const newProject = gd.ProjectHelper.createNewGDJSProject();
         newProject.unserializeFrom(serializedProject);
-        return loadFromProject(newProject, fileMetadata, newState).then(state =>
+        return loadFromProject(newProject, fileMetadata, newState, newProps).then(state =>
           Promise.resolve(state)
         );
       },
@@ -373,9 +374,10 @@ const MainFrame = (props: Props) => {
   const loadFromProject = (
     project: gdProject,
     fileMetadata: ?FileMetadata,
-    newState: State = state
+    newState: State = state,
+    newProps: Props = props
   ): Promise<State> => {
-    const { eventsFunctionsExtensionsState } = props;
+    const { eventsFunctionsExtensionsState } = newProps;
 
     return closeProject(newState).then(state => {
       // Make sure that the ResourcesLoader cache is emptied, so that
@@ -414,9 +416,10 @@ const MainFrame = (props: Props) => {
 
   const openFromFileMetadata = (
     fileMetadata: FileMetadata,
-    newState: State = state
+    newState: State = state,
+    newProps: Props = props
   ): Promise<?State> => {
-    const { i18n, storageProviderOperations } = props;
+    const { i18n, storageProviderOperations } = newProps;
     const {
       hasAutoSave,
       onGetAutoSave,
@@ -430,7 +433,7 @@ const MainFrame = (props: Props) => {
         fileMetadata,
         storageProviderOperations
       );
-      return Promise.resolve(newState);
+      return Promise.resolve();
     }
 
     const checkForAutosave = (): Promise<FileMetadata> => {
@@ -471,7 +474,7 @@ const MainFrame = (props: Props) => {
       });
     };
 
-    return setState({ ...newState, loadingProject: true }).then(state => {
+    return setState(state => ({ ...state, loadingProject: true })).then(state => {
       // Try to find an autosave (and ask user if found)
       return checkForAutosave()
         .then(fileMetadata => onOpen(fileMetadata))
@@ -498,7 +501,8 @@ const MainFrame = (props: Props) => {
             // an autosave. If we're for some reason loading an autosave, we still consider
             // that we're opening the file that was originally requested by the user.
             fileMetadata,
-            state
+            state,
+            newProps
           ).then(
             state => {
               serializedProject.delete();
@@ -539,14 +543,14 @@ const MainFrame = (props: Props) => {
       );
       currentProject.delete();
     }
-    return setState({
-      ...newState,
+    return setState(state => ({
+      ...state,
       currentProject: null,
       currentFileMetadata: null,
       editorTabs: closeProjectTabs(editorTabs, currentProject),
       isPreviewFirstSceneOverriden: false,
       previewFirstSceneName: '',
-    });
+    }));
   };
 
   const toggleProjectManager = () => {
@@ -1092,11 +1096,11 @@ const MainFrame = (props: Props) => {
       ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
       : tabsWithSceneEditor;
 
-    setState({
-      ...newState,
+    setState(state => ({
+      ...state,
       editorTabs: tabsWithSceneAndEventsEditors,
       loadingProject: false,
-    });
+    }));
     openProjectManager(false);
   };
 
@@ -1265,7 +1269,7 @@ const MainFrame = (props: Props) => {
             }}
             isActive={isActive}
             ref={editorRef}
-            onChooseResource={(sourceName, multiSelection, newState) =>
+            onChooseResource={(sourceName, multiSelection) =>
               _onChooseResource(sourceName, multiSelection, newState)
             }
             resourceSources={newProps.resourceSources}
@@ -1278,7 +1282,7 @@ const MainFrame = (props: Props) => {
 
   const openStartPage = () => {
     const { i18n, storageProviders } = props;
-    setState({
+    setState(state => ({
       ...state,
       editorTabs: openEditorTab(state.editorTabs, {
         label: i18n._(t`Start Page`),
@@ -1305,7 +1309,7 @@ const MainFrame = (props: Props) => {
         key: 'start page',
         closable: false,
       }),
-    });
+    }));
   };
 
   const openDebugger = () => {
@@ -1354,10 +1358,10 @@ const MainFrame = (props: Props) => {
           functionName.name,
           functionName.behaviorName
         );
-        setState({
-          ...newState,
+        setState(state => ({
+          ...state,
           editorTabs: changeCurrentTab(newState.editorTabs, foundTab.tabIndex),
-        });
+        }));
       } else {
         // Open a new editor for the extension and the given function
         openEventsFunctionsExtension(
@@ -1438,7 +1442,7 @@ const MainFrame = (props: Props) => {
       .then(fileMetadata => {
         if (!fileMetadata) return;
 
-        return openFromFileMetadata(fileMetadata, newState).then(state => {
+        return openFromFileMetadata(fileMetadata, newState, newProps).then(state => {
           if (state) openSceneOrProjectManager(state);
           //addRecentFile(fileMetadata);
         });
@@ -1645,10 +1649,10 @@ const MainFrame = (props: Props) => {
 
   const _onCloseEditorTab = (editorTab: EditorTab) => {
     saveUiSettings(state.editorTabs);
-    setState({
+    setState(state => ({
       ...state,
       editorTabs: closeEditorTab(state.editorTabs, editorTab),
-    });
+    }));
   };
 
   const _onCloseOtherEditorTabs = (editorTab: EditorTab) => {
@@ -1932,7 +1936,7 @@ const MainFrame = (props: Props) => {
               state => {
                 // eslint-disable-next-line
                 useStorageProvider(storageProvider)
-                  .then(() => openFromFileMetadata(fileMetadata, state))
+                  .then(() => openFromFileMetadata(fileMetadata, state, props))
                   .then(state => {
                     if (state) openSceneOrProjectManager(state);
                   });

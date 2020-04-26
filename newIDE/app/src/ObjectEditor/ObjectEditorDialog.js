@@ -16,6 +16,8 @@ import UnsavedChangesDialog from '../UI/UnsavedChangesDialog';
 type StateType = {|
   currentTab: string,
   newObjectName: string,
+  hasUnsavedChanges: boolean,
+  unsavedChangesDialogOpen: boolean,
 |};
 
 export class ObjectEditorDialog extends Component<*, StateType> {

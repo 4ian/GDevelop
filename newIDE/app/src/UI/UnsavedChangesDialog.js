@@ -8,12 +8,10 @@ import { Trans } from '@lingui/macro';
 type Props = {|
   onRequestClose: () => void,
   onCancel: () => void,
+  open: boolean,
 |};
 
-export default class UnsavedChangesDialog extends React.Component<
-  Props,
-  State
-> {
+export default class UnsavedChangesDialog extends React.Component<Props, *> {
   render() {
     const { onCancel, onRequestClose } = this.props;
     const actions = [

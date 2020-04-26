@@ -94,7 +94,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     });
 
     return (
-      <Column noMargin>
+      <Column noMargin expand>
         {containerLayersList}
         <BackgroundColorRow
           layout={layersContainer}
@@ -163,57 +163,55 @@ export default class LayersList extends Component<Props, State> {
 
     return (
       <Background>
-        <FullSizeMeasurer>
-          {({ width }) => (
-            <ScrollView>
-              <Column noMargin expand>
-                <SortableLayersListBody
-                  key={listKey}
-                  layersContainer={this.props.layersContainer}
-                  onEditEffects={layer => this._editEffects(layer)}
-                  onRemoveLayer={this.props.onRemoveLayer}
-                  onRenameLayer={this.props.onRenameLayer}
-                  onSortEnd={({ oldIndex, newIndex }) => {
-                    const layersCount = this.props.layersContainer.getLayersCount();
-                    this.props.layersContainer.moveLayer(
-                      layersCount - 1 - oldIndex,
-                      layersCount - 1 - newIndex
-                    );
-                    this._onLayerModified();
-                  }}
-                  helperClass="sortable-helper"
-                  useDragHandle
-                  unsavedChanges={this.props.unsavedChanges}
-                  width={width}
-                />
-                <Column>
-                  <Line justifyContent="flex-end" expand>
-                    <RaisedButton
-                      label={<Trans>Add a layer</Trans>}
-                      primary
-                      onClick={this._addLayer}
-                      icon={<Add />}
-                    />
-                  </Line>
-                </Column>
-                {effectsEditedLayer && (
-                  <EffectsListDialog
-                    project={project}
-                    resourceSources={this.props.resourceSources}
-                    onChooseResource={this.props.onChooseResource}
-                    resourceExternalEditors={this.props.resourceExternalEditors}
-                    effectsContainer={effectsEditedLayer}
-                    onApply={() =>
-                      this.setState({
-                        effectsEditedLayer: null,
-                      })
-                    }
-                  />
-                )}
-              </Column>
-            </ScrollView>
+        <ScrollView autoHideScrollbar>
+          <FullSizeMeasurer>
+            {({ width }) => (
+              <SortableLayersListBody
+                key={listKey}
+                layersContainer={this.props.layersContainer}
+                onEditEffects={layer => this._editEffects(layer)}
+                onRemoveLayer={this.props.onRemoveLayer}
+                onRenameLayer={this.props.onRenameLayer}
+                onSortEnd={({ oldIndex, newIndex }) => {
+                  const layersCount = this.props.layersContainer.getLayersCount();
+                  this.props.layersContainer.moveLayer(
+                    layersCount - 1 - oldIndex,
+                    layersCount - 1 - newIndex
+                  );
+                  this._onLayerModified();
+                }}
+                helperClass="sortable-helper"
+                useDragHandle
+                unsavedChanges={this.props.unsavedChanges}
+                width={width}
+              />
+            )}
+          </FullSizeMeasurer>
+          <Column>
+            <Line justifyContent="flex-end" expand>
+              <RaisedButton
+                label={<Trans>Add a layer</Trans>}
+                primary
+                onClick={this._addLayer}
+                icon={<Add />}
+              />
+            </Line>
+          </Column>
+          {effectsEditedLayer && (
+            <EffectsListDialog
+              project={project}
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this.props.onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              effectsContainer={effectsEditedLayer}
+              onApply={() =>
+                this.setState({
+                  effectsEditedLayer: null,
+                })
+              }
+            />
           )}
-        </FullSizeMeasurer>
+        </ScrollView>
       </Background>
     );
   }

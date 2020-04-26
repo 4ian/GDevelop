@@ -4120,8 +4120,8 @@ storiesOf('LayersList', module)
       layersContainer={testProject.testLayout}
     />
   ))
-  .add('small width', () => (
-    <div style={{ width: 250 }}>
+  .add('small width and height', () => (
+    <div style={{ width: 250, height: 200 }}>
       <LayersList
         project={testProject.project}
         resourceExternalEditors={fakeResourceExternalEditors}

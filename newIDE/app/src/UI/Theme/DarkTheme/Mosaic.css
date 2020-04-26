@@ -1,6 +1,6 @@
 /* Mosaic layout */
 .mosaic-gd-dark-theme.mosaic {
-  background-color: #5a5a5a !important;
+  background-color: #4d4d4d !important;
 }
 
 /* Mosaic window and tile */
@@ -26,7 +26,7 @@
 }
 
 .mosaic-gd-dark-theme .mosaic-split.-column {
-  background-color: #5a5a5a !important;
+  background-color: #4d4d4d !important;
 }
 
 /* Separator draggable background */

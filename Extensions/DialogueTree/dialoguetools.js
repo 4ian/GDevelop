@@ -430,13 +430,11 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   this.options = [];
   this.tagParameters = [];
   this.dialogue = this.runner.run(startDialogueNode);
-  this.dialogueData = null;
   this.dialogueText = '';
   this.clipTextEnd = 0;
   this.commandCalls = [];
   this.commandParameters = [];
   this.pauseScrolling = false;
-  this.lineNum = 0;
 
   this.dialogueData = this.dialogue.next().value;
   this.dialogueBranchTags = this.dialogueData.data.tags;
@@ -481,18 +479,15 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   this.selectedOptionUpdated = false;
 
   if (gdjs.dialogueTree._isLineTypeText()) {
-   
-    // bondagejs issue https://github.com/hylyh/bondage.js/issues/62 needs to be fixed to support commands on new lines
-  if(this.dialogueData.text.replace(/\s/g, '').length > 1) {
-    if (this.lineNum === this.dialogueData.lineNum && this.dialogueBranchTitle === this.dialogueData.data.title){
-      this.clipTextEnd = this.dialogueText.length - 1;
-      this.dialogueText +=
-        (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
-    } else {
-      this.clipTextEnd = 0;
-      this.dialogueText = this.dialogueData.text;
-      this.commandCalls = [];
-    }
+
+  if (this.lineNum === this.dialogueData.lineNum && this.dialogueBranchTitle === this.dialogueData.data.title){
+    this.clipTextEnd = this.dialogueText.length - 1;
+    this.dialogueText +=
+      (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
+  } else {
+    this.clipTextEnd = 0;
+    this.dialogueText = this.dialogueData.text;
+    this.commandCalls = [];
   }
 
   this.dialogueBranchTags = this.dialogueData.data.tags;

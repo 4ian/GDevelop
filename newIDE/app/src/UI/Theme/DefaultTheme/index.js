@@ -26,6 +26,12 @@ const backgroundColor = '#f7f7f7';
  */
 const canvasColor = '#f0f0f0';
 
+/**
+ * The alternate background color, for some lists or search box,
+ * to distinguish them from other content.
+ */
+const alternateCanvasColor = '#ffffff';
+
 // GDevelop specific variables:
 const gdevelopTheme = {
   palette: {
@@ -52,7 +58,10 @@ const gdevelopTheme = {
     selectedBorderColor: systemSelectionColor,
   },
   list: {
-    itemsBackgroundColor: '#FFFFFF',
+    itemsBackgroundColor: alternateCanvasColor,
+  },
+  searchBar: {
+    backgroundColor: alternateCanvasColor,
   },
   listItem: {
     groupBackgroundColor: backgroundColor,

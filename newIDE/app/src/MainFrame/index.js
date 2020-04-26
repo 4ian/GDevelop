@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import './MainFrame.css';
+import '../UI/Theme/MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
 import Toolbar from './Toolbar';

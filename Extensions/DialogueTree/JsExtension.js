@@ -45,7 +45,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
-      .addIncludeFile('Extensions/DialogueTree/bondage.min.js')
+      .addIncludeFile('Extensions/DialogueTree/bondage.js/dist/bondage.min.js')
       .setFunctionName('gdjs.dialogueTree.loadFromSceneVariable');
 
     extension
@@ -69,7 +69,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
-      .addIncludeFile('Extensions/DialogueTree/bondage.min.js')
+      .addIncludeFile('Extensions/DialogueTree/bondage.js/dist/bondage.min.js')
       .setFunctionName('gdjs.dialogueTree.loadFromJsonFile');
 
     extension

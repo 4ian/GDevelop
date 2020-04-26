@@ -99,7 +99,7 @@ gdjs.dialogueTree.isRunning = function() {
  * Scroll the clipped text. This can be combined with a timer and user input to control how fast the dialogue line text is scrolling.
  */
 gdjs.dialogueTree.scrollClippedText = function() {
-  if (this.pauseScrolling || !this.dialogueIsRunning || this.clipTextEnd >= this.dialogueText.length) return;
+  if (this.pauseScrolling || !this.dialogueIsRunning) return;
 
   if (this.dialogueText) {
     this.clipTextEnd += 1;
@@ -121,10 +121,10 @@ gdjs.dialogueTree.completeClippedTextScrolling = function() {
  */
 gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
   if (!this.dialogueIsRunning || this.dialogueDataType  === '') return false;
-  if (this.dialogueData && this.dialogueText.length > 0) {
-  if (gdjs.dialogueTree.getVariable("debug")) console.warn("Scroll completed:",this.clipTextEnd,"/", this.dialogueText.length);
-
-    return this.clipTextEnd >= this.dialogueText.length;
+  
+  if (this.dialogueData && this.dialogueText.length > 0 && this.clipTextEnd >= this.dialogueText.length) {
+    if (gdjs.dialogueTree.getVariable("debug")) console.warn("Scroll completed:",this.clipTextEnd,"/", this.dialogueText.length);
+    return true;
   }
   return false;
 };
@@ -428,19 +428,29 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   if (!this.hasDialogueBranch(startDialogueNode)) return;
   this.optionsCount = 0;
   this.options = [];
-  this.dialogueBranchTitle = null;
-  this.dialogueBranchBody = '';
-  this.dialogueBranchTags = [];
   this.tagParameters = [];
   this.dialogue = this.runner.run(startDialogueNode);
   this.dialogueData = null;
-  this.dialogueDataType = '';
   this.dialogueText = '';
   this.clipTextEnd = 0;
   this.commandCalls = [];
   this.commandParameters = [];
   this.pauseScrolling = false;
+  this.lineNum = 0;
+
   this.dialogueData = this.dialogue.next().value;
+  this.dialogueBranchTags = this.dialogueData.data.tags;
+  this.dialogueBranchTitle = this.dialogueData.data.title;
+  this.dialogueBranchBody = this.dialogueData.data.body;
+  this.lineNum = this.dialogueData.lineNum;
+  if (gdjs.dialogueTree._isLineTypeText()){
+    this.dialogueDataType = 'text';
+  } else if (gdjs.dialogueTree._isLineTypeOptions()){
+    this.dialogueDataType = 'options';
+  } else {
+    this.dialogueDataType = 'command';
+  };
+
   this.dialogueIsRunning = true;
   gdjs.dialogueTree.goToNextDialogueLine();
 };
@@ -458,24 +468,6 @@ gdjs.dialogueTree._isLineTypeCommand = function() {
   return this.dialogueData instanceof bondage.CommandResult;
 };
 
-gdjs.dialogueTree._updateTextLine = function(append = false) {
-  // bondagejs issue https://github.com/hylyh/bondage.js/issues/62 needs to be fixed to support commands on new lines
-  if(append) {
-    this.dialogueText +=
-      (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
-  } else {
-    this.clipTextEnd = 0;
-    this.dialogueText = this.dialogueData.text;
-    this.commandCalls = [];
-  }
-  
-  this.dialogueBranchTags = this.dialogueData.data.tags;
-  this.dialogueBranchTitle = this.dialogueData.data.title;
-  this.dialogueBranchBody = this.dialogueData.data.body;
-  if(this.dialogueDataType !== '') this.dialogueData = this.dialogue.next().value;
-  this.dialogueDataType = 'text';
-}
-
 /**
  * This is the main lifecycle function.It runs once only when the user is advancing the dialogue to the next line.
  * Progress Dialogue to the next line. Hook it to your game input.
@@ -489,16 +481,27 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   this.selectedOptionUpdated = false;
 
   if (gdjs.dialogueTree._isLineTypeText()) {
-    if (this.dialogueDataType === '') {
-      gdjs.dialogueTree._updateTextLine();
-    };
    
-    // We came from another node or another text line, wipe the text
-    if(this.dialogueDataType === 'options' || this.dialogueDataType === 'text'){
-      gdjs.dialogueTree._updateTextLine();
-    } else if(this.dialogueDataType === 'command') {
-        gdjs.dialogueTree._updateTextLine(true);
+    // bondagejs issue https://github.com/hylyh/bondage.js/issues/62 needs to be fixed to support commands on new lines
+  if(this.dialogueData.text.replace(/\s/g, '').length > 1) {
+    if (this.lineNum === this.dialogueData.lineNum && this.dialogueBranchTitle === this.dialogueData.data.title){
+      this.clipTextEnd = this.dialogueText.length - 1;
+      this.dialogueText +=
+        (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
+    } else {
+      this.clipTextEnd = 0;
+      this.dialogueText = this.dialogueData.text;
+      this.commandCalls = [];
     }
+  }
+
+  this.dialogueBranchTags = this.dialogueData.data.tags;
+  this.dialogueBranchTitle = this.dialogueData.data.title;
+  this.dialogueBranchBody = this.dialogueData.data.body;
+  this.lineNum = this.dialogueData.lineNum;
+  this.dialogueDataType = 'text';
+
+  this.dialogueData = this.dialogue.next().value;
   } else if (gdjs.dialogueTree._isLineTypeOptions()) {
     this.commandCalls = [];
     this.dialogueDataType = 'options';
@@ -508,8 +511,7 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
     this.options = this.dialogueData.options;
     this.selectedOptionUpdated = true;
   } else if (gdjs.dialogueTree._isLineTypeCommand()) {
-    this.clipTextEnd = 0;
-
+    this.dialogueDataType = 'command';
     var command = this.dialogueData.text.split(' ');
     // If last command was to wait, increase time by one
     var offsetTime =
@@ -523,15 +525,9 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
       time: this.dialogueText.length + offsetTime,
     });
     this.dialogueData = this.dialogue.next().value;
-    this.dialogueDataType = 'command';
     gdjs.dialogueTree.goToNextDialogueLine();
   } else {
     this.dialogueDataType = 'unknown';
-  }
-
-  if (gdjs.dialogueTree._isLineTypeCommand()) {
-    this.dialogueDataType = 'command';
-    gdjs.dialogueTree.goToNextDialogueLine();
   }
 };
 

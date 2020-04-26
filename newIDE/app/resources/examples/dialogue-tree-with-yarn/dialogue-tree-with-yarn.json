@@ -812,7 +812,7 @@
         "kind": "json",
         "metadata": "",
         "name": "dialogueData/npcs.json",
-        "userAdded": false
+        "userAdded": true
       }
     ],
     "resourceFolders": []

@@ -4,8 +4,8 @@
 		"tags": "",
 		"body": "<<avatar ant>>[b]Please don't bug me now[/b]... <<wait 1000>>  I am [i]quite[/i] busy at the moment.\nHave you seen my crumb?\n[[ yes |antcrumbyes ]] [[ no |antcrumbno ]] ",
 		"position": {
-			"x": 95,
-			"y": 10850
+			"x": -778,
+			"y": 10948
 		},
 		"colorID": 0
 	},
@@ -14,8 +14,8 @@
 		"tags": "",
 		"body": "Then [b]scram[/b]!\nI don't have time for you...",
 		"position": {
-			"x": -101,
-			"y": 11125
+			"x": -974,
+			"y": 11223
 		},
 		"colorID": 0
 	},
@@ -24,8 +24,8 @@
 		"tags": "",
 		"body": "<<if $seenCrumb == true>>\nOh yeah? You saw it on a branch?\nDid you taste it?...\n<<else>>\nOh ha-ha! I can see that you are lying.\n<<endif>>",
 		"position": {
-			"x": 200,
-			"y": 11152
+			"x": -673,
+			"y": 11250
 		},
 		"colorID": 3
 	},
@@ -34,8 +34,8 @@
 		"tags": "",
 		"body": "<<avatar crumb>> <<set $seenCrumb to true >> You stumbled on a giant crumb.\nWhat would you like to do with it?\n[[ taste it | eatCrumb]] [[ take it| takeCrumb]] [[ nothing |null ]] ",
 		"position": {
-			"x": -71,
-			"y": 11386
+			"x": -944,
+			"y": 11484
 		},
 		"colorID": 6
 	},
@@ -44,28 +44,28 @@
 		"tags": "",
 		"body": "0I am another weird node problem to test||<\n<<df>>\n [[Answer:debug|debug0]]",
 		"position": {
-			"x": 737,
-			"y": 10831
+			"x": -136,
+			"y": 10929
 		},
 		"colorID": 0
 	},
 	{
 		"title": "debug0",
 		"tags": "",
-		"body": "]<<avatar sign>> >1[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.||\n2And welcome to yarn's example GD project!>||\n [[Answer:debug|debug1]]",
+		"body": "]<<avatar sign>> >1[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.wait test...||<<wait 2000>> \n2And welcome to yarn's example GD project!>||\n [[Answer:debug|debug1]]",
 		"position": {
-			"x": 1002,
-			"y": 10830
+			"x": 129,
+			"y": 10928
 		},
 		"colorID": 0
 	},
 	{
 		"title": "debug1",
 		"tags": "",
-		"body": "<<avatar ant>>\n\n>3Now scram!||<\n<<test>>\n\n[[ answer: |debug2 ]] ",
+		"body": "<<avatar ant>>\n>3Now scram!||<\n<<test>>\n\n[[ answer: |debug2 ]] ",
 		"position": {
-			"x": 1242,
-			"y": 10834
+			"x": 369,
+			"y": 10932
 		},
 		"colorID": 0
 	},
@@ -74,8 +74,8 @@
 		"tags": "",
 		"body": "<<err>> >4 text with < <<avatar crumb>> >command in the middle ||\n5This is my tree|| <\n\n6||< <<avatar ant>>\n\n>7and my crumb||\n[[ answer: |debug3 ]] ",
 		"position": {
-			"x": 1496,
-			"y": 10837
+			"x": 623,
+			"y": 10935
 		},
 		"colorID": 0
 	},
@@ -84,8 +84,8 @@
 		"tags": "",
 		"body": "<<only command>>\n[[ answer: |debug4 ]] ",
 		"position": {
-			"x": 1753,
-			"y": 10841
+			"x": 880,
+			"y": 10939
 		},
 		"colorID": 0
 	},
@@ -94,8 +94,8 @@
 		"tags": "",
 		"body": "one last text",
 		"position": {
-			"x": 1995,
-			"y": 10845
+			"x": 1122,
+			"y": 10943
 		},
 		"colorID": 0
 	},
@@ -104,8 +104,8 @@
 		"tags": "",
 		"body": "Let see <<wait 1000>>.<<wait 200>>.<<wait 200>> .<<wait 200>>these 🥨 are making you thirsty...",
 		"position": {
-			"x": -134,
-			"y": 11845
+			"x": -1007,
+			"y": 11943
 		},
 		"colorID": 0
 	},
@@ -114,8 +114,8 @@
 		"tags": "",
 		"body": "node1= Once upon a time you<<command>>  pressed SPACE to progress to the next node. [[Answer:Node2|Node2]]",
 		"position": {
-			"x": 739,
-			"y": 11084
+			"x": -134,
+			"y": 11182
 		},
 		"colorID": 0
 	},
@@ -124,8 +124,8 @@
 		"tags": "",
 		"body": "node2= <<big_boi>>2 But suddenly the small boi black box started to move! [[Answer:Node3|Node3]]",
 		"position": {
-			"x": 988,
-			"y": 11076
+			"x": 115,
+			"y": 11174
 		},
 		"colorID": 0
 	},
@@ -134,8 +134,8 @@
 		"tags": "",
 		"body": "<<not_a_registered_command>> node3= But something horrible happened! All the text merged to the single text box, this is Node3. Press Space... [[Answer:Node4|Node4]]",
 		"position": {
-			"x": 1222,
-			"y": 11072
+			"x": 349,
+			"y": 11170
 		},
 		"colorID": 0
 	},
@@ -144,8 +144,8 @@
 		"tags": "",
 		"body": "node4 I am Node4 and I didn't get merged as I don't have a command!",
 		"position": {
-			"x": 1446,
-			"y": 11067
+			"x": 573,
+			"y": 11165
 		},
 		"colorID": 0
 	},
@@ -154,8 +154,8 @@
 		"tags": "",
 		"body": "<<wait 100>> ",
 		"position": {
-			"x": 198,
-			"y": 11402
+			"x": -675,
+			"y": 11500
 		},
 		"colorID": 0
 	},
@@ -164,8 +164,8 @@
 		"tags": "",
 		"body": "<<if $debug == true>>\n\n<<if $debugLinks == true>> \n[[ answer: |Node1 ]] \n<<else>> \n[[ debug|debug ]] \n<<endif>>\n\n<<else>>\n[[ start|Start1 ]] \n<<endif>>",
 		"position": {
-			"x": 466,
-			"y": 10848
+			"x": -407,
+			"y": 10946
 		},
 		"colorID": 0
 	},
@@ -174,8 +174,8 @@
 		"tags": "",
 		"body": "<<avatar sign>>[color=#e90b0b]Press Z[/color] to interact with the tree critters 🐜🐛🐞 [color=#07a9b0]Spacebar[/color] to jump.\nAnd welcome to yarn's example GD project!\n",
 		"position": {
-			"x": 457,
-			"y": 11154
+			"x": -416,
+			"y": 11252
 		},
 		"colorID": 0
 	},
@@ -184,8 +184,8 @@
 		"tags": "",
 		"body": "The thing is way too heavy 😬 ....",
 		"position": {
-			"x": 191,
-			"y": 11627
+			"x": -682,
+			"y": 11725
 		},
 		"colorID": 0
 	}

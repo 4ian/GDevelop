@@ -3,24 +3,6 @@
  * @author arthuro555
  */
 
-/*    Initialization of the firebase SDK    */
-
-/** A Timeout function is used to initialize firebase as soon as the project data has been loaded */
-let gdjsWatcher = function() {
-    if (gdjs.projectData === undefined) {
-        setTimeout(gdjsWatcher, 1);
-        return;
-    }
-    let firebaseConfig;
-    try { 
-        firebaseConfig = JSON.parse(gdjs.projectData.properties.firebaseConfig);
-    } catch {
-        console.error("The Firebase configuration is invalid!");
-    }
-    firebase.initializeApp(firebaseConfig);
-};
-gdjsWatcher();
-
 /*    Creation of all Namespaces    */
 
 /**
@@ -107,6 +89,17 @@ gdjs.evtTools.firebase.RC.setDefaultConfig = function(variable) {
 }
 
 /*    CALLBACK REGISTRATION    */
+
+/** Callback to initialize the Firebase SDK */
+gdjs.registerFirstRuntimeSceneLoadedCallback(function(runtimeScene) {
+    let firebaseConfig;
+    try { 
+        firebaseConfig = JSON.parse(runtimeScene.getGame().getGameData().properties.firebaseConfig);
+    } catch {
+        console.error("The Firebase configuration is invalid!");
+    }
+    firebase.initializeApp(firebaseConfig);
+})
 
 /** Callback For Setting the analytics current View to the current Scene */
 gdjs.registerRuntimeSceneLoadedCallback(function(runtimeScene) {

@@ -99,9 +99,9 @@ gdjs.dialogueTree.isRunning = function() {
  * Scroll the clipped text. This can be combined with a timer and user input to control how fast the dialogue line text is scrolling.
  */
 gdjs.dialogueTree.scrollClippedText = function() {
-  if (this.pauseScrolling || !this.dialogueIsRunning) return;
+  if (this.pauseScrolling || !this.dialogueIsRunning || this.clipTextEnd >= this.dialogueText.length) return;
 
-  if (this.dialogueText) {
+  if (this.dialogueText && this.dialogueDataType === 'text') {
     this.clipTextEnd += 1;
   }
 };
@@ -110,7 +110,7 @@ gdjs.dialogueTree.scrollClippedText = function() {
  * Scroll the clipped text to its end, so the entire text is printed. This can be useful in keeping the event sheet logic simpler, while supporting more variation.
  */
 gdjs.dialogueTree.completeClippedTextScrolling = function() {
-  if (this.pauseScrolling || !this.dialogueIsRunning || !this.dialogueText)
+  if (this.pauseScrolling || !this.dialogueIsRunning || !this.dialogueText || this.dialogueDataType !== 'text')
     return;
   this.clipTextEnd = this.dialogueText.length;
 };

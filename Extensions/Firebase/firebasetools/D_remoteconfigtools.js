@@ -1,4 +1,9 @@
 /**
+ * Firebase Tools Collection
+ * @author arthuro555
+ */
+
+/**
  * Remote Config Tools
  * @namespace
  */

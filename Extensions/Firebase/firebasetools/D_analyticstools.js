@@ -1,4 +1,10 @@
 /**
+ * Firebase Tools Collection
+ * @author arthuro555
+ */
+
+
+/**
  * Firebase Analytics Tools
  * @namespace
  */
@@ -46,7 +52,6 @@ gdjs.evtTools.firebase.analytics.setProperty = function(runtimeScene, propertyNa
     } catch {
         properties[propertyName] = propertyData;
     }
-    console.log(properties);
     analytics.setUserProperties(properties);
 }
 

@@ -2005,8 +2005,8 @@
           "locked": false,
           "name": "fullTextDebug",
           "width": 0,
-          "x": 204,
-          "y": 5,
+          "x": 353,
+          "y": 10,
           "zOrder": 49,
           "numberProperties": [],
           "stringProperties": [],
@@ -7519,7 +7519,7 @@
               "comment2": ""
             },
             {
-              "disabled": true,
+              "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [

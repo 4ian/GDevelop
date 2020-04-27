@@ -42,8 +42,9 @@ module.exports = {
           .addParameter('string', _('Additional Data'), '', false)
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.log');
 
         extension
@@ -66,8 +67,9 @@ module.exports = {
           .markAsComplex()
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.setUserID');
         
         extension
@@ -89,8 +91,9 @@ module.exports = {
           .markAsAdvanced()
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.setProperty');
 
         extension
@@ -105,8 +108,9 @@ module.exports = {
           .addParameter('string', _('Setting Name'), '', false)
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
           .setFunctionName('firebase.remoteConfig().getString');
 
         extension
@@ -121,8 +125,9 @@ module.exports = {
           .addParameter('string', _('Setting Name'), '', false)
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
           .setFunctionName('firebase.remoteConfig().getNumber');
 
         extension
@@ -138,8 +143,9 @@ module.exports = {
           .addParameter('number', _('Update Interval in ms'), '', false)
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
           .setFunctionName('gdjs.evtTools.firebase.RC.setAutoUpdateInterval');
         
         extension
@@ -158,15 +164,16 @@ module.exports = {
           .addParameter('scenevar', _('Structure with defaults'), '', false)
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
           .setFunctionName('gdjs.evtTools.firebase.RC.setDefaultConfig');
 
           extension
           .addAction(
             'ForceReload',
             _('Force sync the configuration'),
-            _('Use this to sync the Remote Config with the client at any time. '),
+            _('Use this to sync the Remote Config with the client at any time.'),
             _('Synchronize Remote Config'),
             _('Firebase/Remote Config'),
             'JsPlatform/Extensions/filesystem_save_file24.png',
@@ -174,7 +181,7 @@ module.exports = {
           )
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
           .setFunctionName('firebase.remoteConfig().fetchAndActivate');
 
         return extension;

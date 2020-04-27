@@ -1,29 +1,8 @@
 /**
- * Firebase Tools
- * @author arthuro555
- */
-
-/*    Creation of all Namespaces    */
-
-/**
- * Firebase Event Tools
- * @namespace
- */
-gdjs.evtTools.firebase = {};
-
-/**
  * Firebase Analytics Tools
  * @namespace
  */
 gdjs.evtTools.firebase.analytics = {};
-
-/**
- * Remote Config Tools
- * @namespace
- */
-gdjs.evtTools.firebase.RC = {};
-
-/*    Function Definitions    */
 
 /**
  * Logs an Event/Conversion for that user on the Analytics.
@@ -71,44 +50,12 @@ gdjs.evtTools.firebase.analytics.setProperty = function(runtimeScene, propertyNa
     analytics.setUserProperties(properties);
 }
 
-/**
- * Set the interval between auto-config updates
- */
-gdjs.evtTools.firebase.RC.setAutoUpdateInterval = function(interval) {
-    firebase.remoteConfig().settings = {
-        minimumFetchIntervalMillis: interval,
-    };
-}
-
-/**
- * Set the default offline configuration.
- * @param {gdjs.Variable} variable The Structure is 
- */
-gdjs.evtTools.firebase.RC.setDefaultConfig = function(variable) {
-    firebase.remoteConfig().defaultConfig = JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable));
-}
-
-/*    CALLBACK REGISTRATION    */
-
-/** Callback to initialize the Firebase SDK */
-gdjs.registerFirstRuntimeSceneLoadedCallback(function(runtimeScene) {
-    let firebaseConfig;
-    try { 
-        firebaseConfig = JSON.parse(runtimeScene.getGame().getGameData().properties.firebaseConfig);
-    } catch {
-        console.error("The Firebase configuration is invalid!");
-    }
-    firebase.initializeApp(firebaseConfig);
-})
+/** Initialize Analytics SDK */
+gdjs.registerFirstRuntimeSceneLoadedCallback(function() {
+    gdjs.evtTools.firebase.analytics._analyticsInstance = firebase.analytics();
+});
 
 /** Callback For Setting the analytics current View to the current Scene */
 gdjs.registerRuntimeSceneLoadedCallback(function(runtimeScene) {
     if(runtimeScene.getGame()._analyticsInstance) runtimeScene.getGame()._analyticsInstance.setCurrentScreen(runtimeScene.getName());
-})
-
-// If analytics are present
-if (firebase.analytics !== undefined) {
-    gdjs.registerFirstRuntimeSceneLoadedCallback(function() {
-        gdjs.evtTools.firebase.analytics._analyticsInstance = firebase.analytics();
-    })
-}
+});

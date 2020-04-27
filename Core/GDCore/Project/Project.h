@@ -128,6 +128,18 @@ class GD_CORE_API Project : public ObjectsContainer {
   const gd::String& GetAdMobAppId() const { return adMobAppId; }
 
   /**
+   * \brief Change the project firebase configuration.
+   */
+  void SetFirebaseConfig(const gd::String& firebaseConfig_) {
+    firebaseConfig = firebaseConfig_;
+  };
+
+  /**
+   * \brief Get the project firebase configuration.
+   */
+  const gd::String& GetFirebaseConfig() const { return firebaseConfig; }
+
+  /**
    * Called when project file has changed.
    */
   void SetProjectFile(const gd::String& file) { gameFile = file; }
@@ -958,6 +970,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String orientation;   ///< Lock game orientation (on mobile devices).
                             ///< "default", "landscape" or "portrait".
   gd::String adMobAppId;    ///< AdMob application ID.
+  gd::String firebaseConfig;///< The firebase config.
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String gameFile;                    ///< File of the game

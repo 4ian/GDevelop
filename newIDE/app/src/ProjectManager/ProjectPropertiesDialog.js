@@ -38,6 +38,7 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
+  firebaseConfig: string,
   scaleMode: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
@@ -65,6 +66,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
       adMobAppId: project.getAdMobAppId(),
+      firebaseConfig: project.getFirebaseConfig(),
       scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
@@ -96,6 +98,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      firebaseConfig,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -111,6 +114,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setPackageName(packageName);
     project.setOrientation(orientation);
     project.setAdMobAppId(adMobAppId);
+    project.setFirebaseConfig(firebaseConfig);
     project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.setMinimumFPS(minFPS);
@@ -134,6 +138,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      firebaseConfig,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -416,6 +421,18 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             type="text"
             value={adMobAppId}
             onChange={value => this.setState({ adMobAppId: value })}
+          />
+          <Text size="title">
+            <Trans>Firebase</Trans>
+          </Text>
+          <SemiControlledTextField
+            floatingLabelText={<Trans>Firebase Configuration string</Trans>}
+            fullWidth
+            rows={8}
+            multiLine
+            type="text"
+            value={firebaseConfig}
+            onChange={value => this.setState({ firebaseConfig: value })}
           />
           <Text size="title">
             <Trans>Project files</Trans>

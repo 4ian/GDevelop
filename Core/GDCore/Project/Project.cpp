@@ -52,6 +52,7 @@ Project::Project()
       packageName("com.example.gamename"),
       orientation("landscape"),
       adMobAppId(""),
+      firebaseConfig("{}"),
       folderProject(false),
 #endif
       windowWidth(800),
@@ -594,6 +595,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
   SetAdMobAppId(propElement.GetStringAttribute("adMobAppId", ""));
+  SetFirebaseConfig(propElement.GetStringAttribute("firebaseConfig", ""));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetProjectFile(propElement.GetStringAttribute("projectFile"));
   SetLastCompilationDirectory(propElement
@@ -870,6 +872,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
   propElement.SetAttribute("adMobAppId", adMobAppId);
+  propElement.SetAttribute("firebaseConfig", firebaseConfig);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
@@ -1069,6 +1072,7 @@ void Project::Init(const gd::Project& game) {
   packageName = game.packageName;
   orientation = game.orientation;
   adMobAppId = game.adMobAppId;
+  firebaseConfig = game.firebaseConfig;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;

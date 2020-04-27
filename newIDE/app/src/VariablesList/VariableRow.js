@@ -101,7 +101,7 @@ const VariableRow = ({
               onChangeValue(text);
             }
           }}
-          multiLine
+          multiline
           disabled={origin === 'parent' && depth !== 0}
         />
       </TreeTableCell>

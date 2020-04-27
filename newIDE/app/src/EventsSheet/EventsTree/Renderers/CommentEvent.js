@@ -123,7 +123,7 @@ export default class CommentEvent extends React.Component<
       >
         {this.state.editing ? (
           <TextField
-            multiLine
+            multiline
             margin="none"
             ref={textField => (this._textField = textField)}
             value={commentEvent.getComment()}

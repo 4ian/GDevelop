@@ -479,24 +479,23 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   this.selectedOptionUpdated = false;
 
   if (gdjs.dialogueTree._isLineTypeText()) {
+    if (this.lineNum === this.dialogueData.lineNum && this.dialogueBranchTitle === this.dialogueData.data.title){
+      this.clipTextEnd = this.dialogueText.length - 1;
+      this.dialogueText +=
+        (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
+    } else {
+      this.clipTextEnd = 0;
+      this.dialogueText = this.dialogueData.text;
+      this.commandCalls = [];
+    }
 
-  if (this.lineNum === this.dialogueData.lineNum && this.dialogueBranchTitle === this.dialogueData.data.title){
-    this.clipTextEnd = this.dialogueText.length - 1;
-    this.dialogueText +=
-      (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
-  } else {
-    this.clipTextEnd = 0;
-    this.dialogueText = this.dialogueData.text;
-    this.commandCalls = [];
-  }
+    this.dialogueBranchTags = this.dialogueData.data.tags;
+    this.dialogueBranchTitle = this.dialogueData.data.title;
+    this.dialogueBranchBody = this.dialogueData.data.body;
+    this.lineNum = this.dialogueData.lineNum;
+    this.dialogueDataType = 'text';
 
-  this.dialogueBranchTags = this.dialogueData.data.tags;
-  this.dialogueBranchTitle = this.dialogueData.data.title;
-  this.dialogueBranchBody = this.dialogueData.data.body;
-  this.lineNum = this.dialogueData.lineNum;
-  this.dialogueDataType = 'text';
-
-  this.dialogueData = this.dialogue.next().value;
+    this.dialogueData = this.dialogue.next().value;
   } else if (gdjs.dialogueTree._isLineTypeOptions()) {
     this.commandCalls = [];
     this.dialogueDataType = 'options';

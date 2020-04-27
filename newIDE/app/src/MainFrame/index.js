@@ -1819,6 +1819,9 @@ class MainFrame extends React.Component<Props, State> {
           PaperProps={{
             style: styles.drawerContent,
           }}
+          ModalProps={{
+            keepMounted: true,
+          }}
           onClose={this.toggleProjectManager}
         >
           <EditorBar

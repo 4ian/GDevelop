@@ -169,7 +169,7 @@ module.exports = {
           .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
           .setFunctionName('gdjs.evtTools.firebase.RC.setDefaultConfig');
 
-          extension
+        extension
           .addAction(
             'ForceReload',
             _('Force sync the configuration'),
@@ -183,6 +183,78 @@ module.exports = {
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
           .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
           .setFunctionName('firebase.remoteConfig().fetchAndActivate');
+
+        extension
+          .addAction(
+            'CreateBasicAccount',
+            _('Create account with basic auth'),
+            _('Create an account with e-mail and password as credentials.'),
+            _('Create account with E-Mail _PARAM0_ and password _PARAM1_'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+          .addParameter('string', _('E-Mail'), '', false)
+          .addParameter('string', _('Password'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setFunctionName('firebase.auth().createUserWithEmailAndPassword');
+
+        extension
+          .addAction(
+            'LogInBasicAccount',
+            _('Log into account with basic auth'),
+            _('Sign into an account with e-mail and password as credentials.'),
+            _('Connect to account with E-Mail _PARAM0_ and password _PARAM1_'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+          .addParameter('string', _('E-Mail'), '', false)
+          .addParameter('string', _('Password'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setFunctionName('firebase.auth().signInWithEmailAndPassword');
+        
+        extension
+          .addAction(
+            'AnonymSignIn',
+            _('Sign In as an anonym guest'),
+            _('Sign into a temporary anonymous account.'),
+            _('Authenticate anonymously'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setFunctionName('firebase.auth().signInAnonymously');
+
+        extension
+          .addCondition(
+            'IsSignedIn',
+            _('Is the user signed in?'),
+            _('Checks if the user is signed in.'),
+            _('Check for authentification'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setFunctionName('gdjs.evtTools.firebase.auth.isAuthentified');
 
         return extension;
     },

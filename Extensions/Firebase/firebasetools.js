@@ -35,6 +35,12 @@ gdjs.evtTools.firebase = {};
  */
 gdjs.evtTools.firebase.analytics = {};
 
+/**
+ * Remote Config Tools
+ * @namespace
+ */
+gdjs.evtTools.firebase.RC = {};
+
 /*    Function Definitions    */
 
 /**
@@ -89,6 +95,23 @@ gdjs.evtTools.firebase.analytics.setProperty = function(runtimeScene, propertyNa
     }
     console.log(properties);
     analytics.setUserProperties(properties);
+}
+
+/**
+ * Set the interval between auto-config updates
+ */
+gdjs.evtTools.firebase.RC.setAutoUpdateInterval = function(interval) {
+    firebase.remoteConfig().settings = {
+        minimumFetchIntervalMillis: interval,
+    };
+}
+
+/**
+ * Set the default offline configuration.
+ * @param {gdjs.Variable} variable The Structure is 
+ */
+gdjs.evtTools.firebase.RC.setDefaultConfig = function(variable) {
+    firebase.remoteConfig().defaultConfig = JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable));
 }
 
 /*    CALLBACK REGISTRATION    */

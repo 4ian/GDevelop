@@ -113,6 +113,91 @@ module.exports = {
           .addIncludeFile('Extensions/Firebase/firebasejs/firebase-analytics.js')
           .addIncludeFile('Extensions/Firebase/firebasetools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.setProperty');
+
+        extension
+          .addStrExpression(
+            'GetRCString',
+            _('Get Remote setting as String'),
+            _('Get a setting from Firebase Remote Config as String.'),
+            _('Firebase/Remote Config'),
+            'JsPlatform/Extensions/filesystem_folder24.png',
+            'JsPlatform/Extensions/filesystem_folder32.png'
+          )
+          .addParameter('string', _('Setting Name'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .setFunctionName('firebase.remoteConfig().getString');
+
+        extension
+          .addExpression(
+            'GetRCString',
+            _('Get Remote setting as Number'),
+            _('Get a setting from Firebase Remote Config as Number.'),
+            _('Firebase/Remote Config'),
+            'JsPlatform/Extensions/filesystem_folder24.png',
+            'JsPlatform/Extensions/filesystem_folder32.png'
+          )
+          .addParameter('string', _('Setting Name'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .setFunctionName('firebase.remoteConfig().getNumber');
+
+        extension
+          .addAction(
+            'SetAutoUpdateInterval',
+            _('Set Remote Config Auto Update Inteval'),
+            _('Sets Remote Config Auto Update Inteval.'),
+            _('Set Remote Config Auto Update Inteval to _PARAM0_'),
+            _('Firebase/Remote Config'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+          .addParameter('number', _('Update Interval in ms'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .setFunctionName('gdjs.evtTools.firebase.RC.setAutoUpdateInterval');
+        
+        extension
+          .addAction(
+            'SetDefaultConfig',
+            _('Set the default configuration'),
+            _(
+              'As the Remote Config is online, you need to set a default ' + 
+              'for when there is no internet or the config still loading.'
+            ),
+            _('Set default config to _PARAM0_'),
+            _('Firebase/Remote Config'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+          .addParameter('scenevar', _('Structure with defaults'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools.js')
+          .setFunctionName('gdjs.evtTools.firebase.RC.setDefaultConfig');
+
+          extension
+          .addAction(
+            'ForceReload',
+            _('Force sync the configuration'),
+            _('Use this to sync the Remote Config with the client at any time. '),
+            _('Synchronize Remote Config'),
+            _('Firebase/Remote Config'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-remote-config.js')
+          .setFunctionName('firebase.remoteConfig().fetchAndActivate');
+
         return extension;
     },
     runExtensionSanityTests: function(gd, extension) {

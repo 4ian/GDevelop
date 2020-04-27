@@ -317,7 +317,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             this.props.instances,
             field
           )}
-          multiLine
+          multiline
           style={styles.field}
         />
       );

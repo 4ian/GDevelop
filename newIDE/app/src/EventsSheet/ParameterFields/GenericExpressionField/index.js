@@ -370,7 +370,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       ? parameterMetadata.getDescription()
       : this.props.isInline
       ? undefined
-      : '-'; // We're using multiLine TextField, which does not support having no label.
+      : '-'; // We're using multiline TextField, which does not support having no label.
     const longDescription = parameterMetadata
       ? parameterMetadata.getLongDescription()
       : undefined;
@@ -393,7 +393,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         ? styles.backgroundHighlightingInlineWithFloatingLabel
         : styles.backgroundHighlightingInline
       : // A non-inline GenericExpressionField is shown with a TextField
-        // with variant "filled". As we're using a *multiLine* field, it
+        // with variant "filled". As we're using a *multiline* field, it
         // always put space for the label, even if not provided.
         styles.backgroundHighlightingWithFloatingLabel;
 
@@ -433,7 +433,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                     );
                     this.setState({ autocompletions });
                   }}
-                  multiLine
+                  multiline
                   fullWidth
                 />
               </div>

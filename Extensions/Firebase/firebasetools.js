@@ -44,21 +44,13 @@ gdjs.evtTools.firebase.RC = {};
 /*    Function Definitions    */
 
 /**
- * Enables Firebase Analytics and cache the instance to runtimeGame.
- * @param {gdjs.RuntimeScene} runtimeScene The current {@link gdjs.RuntimeScene} instance.
- */
-gdjs.evtTools.firebase.analytics.enable = function(runtimeScene) {
-    runtimeScene.getGame()._analyticsInstance = runtimeScene.getGame()._analyticsInstance || firebase.analytics();
-}
-
-/**
  * Logs an Event/Conversion for that user on the Analytics.
  * @param {gdjs.RuntimeScene} [runtimeScene] The current {@link gdjs.RuntimeScene} instance.
  * @param {string} eventName The Event being triggered.
  * @param {string} [eventData] Additional Data for the event.
  */
 gdjs.evtTools.firebase.analytics.log = function(runtimeScene, eventName, eventData) {
-    let analytics = runtimeScene.getGame()._analyticsInstance || firebase.analytics();
+    let analytics = gdjs.evtTools.firebase.analytics._analyticsInstance;
     let eventProperties;
     try {
         eventProperties = JSON.parse(eventData);
@@ -75,7 +67,7 @@ gdjs.evtTools.firebase.analytics.log = function(runtimeScene, eventName, eventDa
  * @param {string | number} newUID The new UserID.
  */
 gdjs.evtTools.firebase.analytics.setUserID = function(runtimeScene, newUID) {
-    let analytics = runtimeScene.getGame()._analyticsInstance || firebase.analytics();
+    let analytics = gdjs.evtTools.firebase.analytics._analyticsInstance;
     analytics.setUserId(newUID);
 }
 
@@ -86,7 +78,7 @@ gdjs.evtTools.firebase.analytics.setUserID = function(runtimeScene, newUID) {
  * @param {string} [propertyData] The data associated to the property.
  */
 gdjs.evtTools.firebase.analytics.setProperty = function(runtimeScene, propertyName, propertyData) {
-    let analytics = runtimeScene.getGame()._analyticsInstance || firebase.analytics();
+    let analytics = gdjs.evtTools.firebase.analytics._analyticsInstance;
     let properties = {};
     try {
         properties[propertyName] = JSON.parse(propertyData);
@@ -120,3 +112,10 @@ gdjs.evtTools.firebase.RC.setDefaultConfig = function(variable) {
 gdjs.registerRuntimeSceneLoadedCallback(function(runtimeScene) {
     if(runtimeScene.getGame()._analyticsInstance) runtimeScene.getGame()._analyticsInstance.setCurrentScreen(runtimeScene.getName());
 })
+
+// If analytics are present
+if (firebase.analytics !== undefined) {
+    gdjs.registerFirstRuntimeSceneLoadedCallback(function() {
+        gdjs.evtTools.firebase.analytics._analyticsInstance = firebase.analytics();
+    })
+}

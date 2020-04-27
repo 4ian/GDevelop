@@ -26,27 +26,6 @@ module.exports = {
 
         extension
           .addAction(
-            'EnableAnalytics',
-            _('Enable Firebase Analytics'),
-            _(
-              'Enables analytics on your game.' + 
-              'While analyticas can work without that step you should ' + 
-              'always have this step when using those.'
-              ),
-            _('Enable Firebase Analytics'),
-            _('Firebase/Analytics'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
-          )
-          .addCodeOnlyParameter('currentScene', '')
-          .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools.js')
-          .setFunctionName('gdjs.evtTools.firebase.analytics.enable');
-
-        extension
-          .addAction(
             'AnalyticsLog',
             _('Log an Event'),
             _(

@@ -221,7 +221,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 }
                 hintText={getDescriptionHintText(type)}
                 fullWidth
-                multiLine
+                multiline
                 value={eventsFunction.getDescription()}
                 onChange={text => {
                   eventsFunction.setDescription(text);

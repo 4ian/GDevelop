@@ -41,7 +41,7 @@ type Props = {|
   inputStyle?: Object,
   max?: number,
   min?: number,
-  multiLine?: boolean,
+  multiline?: boolean,
   name?: string,
   step?: number,
   style?: Object,

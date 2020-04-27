@@ -190,8 +190,8 @@ gdjs.dialogueTree.isCommandCalled = function(command) {
 
   if (this.pauseScrolling || !commandCalls) return false;
   return this.commandCalls.some(function(call, index) {
-    if (clipTextEnd < call.time) return false;
-    if (call.cmd === 'wait' && clipTextEnd !== dialogueText.length) {
+    if (clipTextEnd !== 0 && clipTextEnd < call.time) return false;
+    if (call.cmd === 'wait' && (clipTextEnd === 0 || clipTextEnd !== dialogueText.length)) {
       gdjs.dialogueTree.pauseScrolling = true;
       setTimeout(function() {
         gdjs.dialogueTree.pauseScrolling = false;

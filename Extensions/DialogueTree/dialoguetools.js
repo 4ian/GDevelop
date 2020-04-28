@@ -101,7 +101,7 @@ gdjs.dialogueTree.isRunning = function() {
 gdjs.dialogueTree.scrollClippedText = function() {
   if (this.pauseScrolling || !this.dialogueIsRunning) return;
 
-  // Autoscroll commands sothe user doesnt have to press again
+  // Autoscroll commands so the user doesnt have to press again
   if (
     gdjs.dialogueTree._isLineTypeCommand() &&
     this.dialogueDataType === 'text' &&

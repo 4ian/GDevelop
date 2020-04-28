@@ -99,9 +99,22 @@ gdjs.dialogueTree.isRunning = function() {
  * Scroll the clipped text. This can be combined with a timer and user input to control how fast the dialogue line text is scrolling.
  */
 gdjs.dialogueTree.scrollClippedText = function() {
-  if (this.pauseScrolling || !this.dialogueIsRunning || this.clipTextEnd >= this.dialogueText.length) return;
+  if (this.pauseScrolling || !this.dialogueIsRunning) return;
 
-  if (this.dialogueText && this.dialogueDataType === 'text') {
+  // Autoscroll commands sothe user doesnt have to press again
+  if (
+    gdjs.dialogueTree._isLineTypeCommand() &&
+    this.dialogueDataType === 'text' &&
+    this.dialogueBranchTitle === this.dialogueData.data.title &&
+    this.lineNum === this.dialogueData.lineNum &&
+    gdjs.dialogueTree.hasClippedScrollingCompleted()
+  ) {
+    gdjs.dialogueTree.goToNextDialogueLine();
+    return
+  }
+
+  // Increment scrolling of clipped text
+  if (this.dialogueText && this.dialogueDataType === 'text' && this.clipTextEnd < this.dialogueText.length) {
     this.clipTextEnd += 1;
   }
 };

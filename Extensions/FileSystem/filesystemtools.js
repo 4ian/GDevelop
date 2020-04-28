@@ -98,8 +98,8 @@ gdjs.fileSystem.getUserdataPath = function(runtimeScene) {
 };
 
 /**
- * Get the path to 'UserData' folder.
- * @return {string} The path to user*s "home" folder
+ * Get the path to the user's home folder (On Windows C:\\Users\\<USERNAME>\\ for example) folder.
+ * @return {string} The path to user's "home" folder
  */
 gdjs.fileSystem.getUserHomePath = function() {
   const electron = runtimeScene

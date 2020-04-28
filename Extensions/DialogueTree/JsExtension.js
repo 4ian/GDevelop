@@ -591,9 +591,9 @@ module.exports = {
     extension
       .addCondition(
         'WasBranchVisited',
-        _('Branch title has been visited before'),
-        _('Check if the current branch has been visited before'),
-        _('Branch title _PARAM0_ has been visited before'),
+        _('Branch title has been visited'),
+        _('Check if a branch has been visited'),
+        _('Branch title _PARAM0_ has been visited'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'

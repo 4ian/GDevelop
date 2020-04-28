@@ -98,6 +98,17 @@ gdjs.fileSystem.getUserdataPath = function(runtimeScene) {
 };
 
 /**
+ * Get the path to 'UserData' folder.
+ * @return {string} The path to user*s "home" folder
+ */
+gdjs.fileSystem.getUserHomePath = function() {
+  if(require !== undefined) {
+    return require("os").homedir();
+  }
+  return '';
+};
+
+/**
  * Get the path to 'Temp' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to temp folder

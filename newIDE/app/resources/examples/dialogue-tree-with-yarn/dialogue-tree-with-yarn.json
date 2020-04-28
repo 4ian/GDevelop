@@ -812,7 +812,7 @@
         "kind": "json",
         "metadata": "",
         "name": "dialogueData/npcs.json",
-        "userAdded": false
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -6584,6 +6584,75 @@
                     "\"endedChat\""
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "commandsDebug"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "crumb"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::WasBranchVisited"
+                  },
+                  "parameters": [
+                    "\"ant\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Montre"
+                  },
+                  "parameters": [
+                    "crumb",
+                    ""
+                  ],
+                  "subInstructions": []
                 }
               ],
               "events": []
@@ -6739,6 +6808,17 @@
                       },
                       "parameters": [
                         "fullTextDebug",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Montre"
+                      },
+                      "parameters": [
+                        "commandsDebug",
                         ""
                       ],
                       "subInstructions": []
@@ -7542,6 +7622,14 @@
                     "commandsDebug"
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
                 }
               ],
               "actions": [
@@ -7555,14 +7643,6 @@
                     "+",
                     "\"<<\"+DialogueTree::CommandParameter(-1)+\">>\""
                   ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "DialogueTree::GoToNextLine"
-                  },
-                  "parameters": [],
                   "subInstructions": []
                 }
               ],

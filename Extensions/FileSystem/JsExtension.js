@@ -387,9 +387,9 @@ module.exports = {
 
     extension
       .addStrExpression(
-        'UserDirPath',
+        'UserHomePath',
         _('User\'s Home folder'),
-        _('Get the path to user\'s folder. (On Windows C:\\Users\\<USERNAME>\\ for example)'),
+        _('Get the path to the user home folder (On Windows C:\\Users\\<USERNAME>\\ for example).'),
         _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'

@@ -102,10 +102,16 @@ gdjs.fileSystem.getUserdataPath = function(runtimeScene) {
  * @return {string} The path to user*s "home" folder
  */
 gdjs.fileSystem.getUserHomePath = function() {
-  if(require !== undefined) {
-    return require("os").homedir();
+  const electron = runtimeScene
+    .getGame()
+    .getRenderer()
+    .getElectron();
+
+  if (electron) {
+    return electron.remote.app.getPath('home') || '';
+  } else {
+    return '';
   }
-  return '';
 };
 
 /**

@@ -512,6 +512,24 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this._editorNavigator.openEditor('behaviors-list');
   };
 
+  _onEditorNavigatorEditorChanged = (editorName: string) => {
+    // It's important that this method is the same across renders,
+    // to avoid confusing EditorNavigator into thinking it's changed
+    // and immediately calling it, which would trigger an infinite loop.
+    // Search for "callback-prevent-infinite-rerendering" in the codebase.
+
+    this.updateToolbar();
+
+    if (editorName === 'behaviors-list') {
+      this._selectEventsBasedBehavior(null);
+    } else if (
+      editorName === 'free-functions-list' ||
+      editorName === 'behavior-functions-list'
+    ) {
+      this._selectEventsFunction(null, this.state.selectedEventsBasedBehavior);
+    }
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -804,21 +822,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     nextEditor: 'events-sheet',
                   },
                 }}
-                onEditorChanged={editorName => {
-                  this.updateToolbar();
-
-                  if (editorName === 'behaviors-list') {
-                    this._selectEventsBasedBehavior(null);
-                  } else if (
-                    editorName === 'free-functions-list' ||
-                    editorName === 'behavior-functions-list'
-                  ) {
-                    this._selectEventsFunction(
-                      null,
-                      selectedEventsBasedBehavior
-                    );
-                  }
-                }}
+                onEditorChanged={
+                  // It's important that this callback is the same across renders,
+                  // to avoid confusing EditorNavigator into thinking it's changed
+                  // and immediately calling it, which would trigger an infinite loop.
+                  // Search for "callback-prevent-infinite-rerendering" in the codebase.
+                  this._onEditorNavigatorEditorChanged
+                }
               />
             ) : (
               <EditorMosaic

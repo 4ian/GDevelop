@@ -917,7 +917,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
       renderTextField={() => (
         <SemiControlledTextField
           floatingLabelText="Hello"
-          multiLine
+          multiline
           value={'123\n456\n789\nblablabla bla bla'}
           onChange={() => {}}
         />

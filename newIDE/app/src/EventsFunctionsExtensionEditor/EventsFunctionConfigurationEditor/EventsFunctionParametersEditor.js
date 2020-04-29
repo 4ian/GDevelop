@@ -378,7 +378,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 parameter.setLongDescription(text);
                                 this.forceUpdate();
                               }}
-                              multiLine
+                              multiline
                               fullWidth
                               disabled={
                                 false /* Long description, if shown, can always be changed */

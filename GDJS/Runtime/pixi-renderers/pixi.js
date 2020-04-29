@@ -47757,4 +47757,3 @@ var PIXI = (function (exports) {
 
 }({}));
 PIXI.useDeprecated();
-//# sourceMappingURL=pixi-legacy.js.map

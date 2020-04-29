@@ -572,7 +572,7 @@ module.exports = {
         this._videoResource = videoResource;
         this._pixiObject.texture = this._getVideoTexture();
 
-        if (this._pixiObject.texture.noFrame) {
+        if (!this._pixiObject.texture.baseTexture.valid) {
           var that = this;
 
           // Try to display an error texture in case of error, though

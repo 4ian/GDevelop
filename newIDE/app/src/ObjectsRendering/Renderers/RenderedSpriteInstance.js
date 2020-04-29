@@ -146,7 +146,7 @@ RenderedSpriteInstance.prototype.updatePIXITexture = function() {
   this._originY = origin.getY();
 
   if (this._sprite.isDefaultCenterPoint()) {
-    if (this._pixiObject.texture.noFrame) {
+    if (!this._pixiObject.texture.baseTexture.valid) {
       var that = this;
       // We might have to wait for the texture to load
       this._pixiObject.texture.on('update', function() {

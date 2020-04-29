@@ -136,7 +136,7 @@ gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
   if (!this.dialogueIsRunning || this.dialogueDataType  === '') return false;
   
   if (this.dialogueData && this.dialogueText.length > 0 && this.clipTextEnd >= this.dialogueText.length) {
-    if (gdjs.dialogueTree.getVariable("debug")) console.warn("Scroll completed:",this.clipTextEnd,"/", this.dialogueText.length);
+    if (gdjs.dialogueTree.getVariable("debug")) console.warn("Scroll completed:", this.clipTextEnd,"/", this.dialogueText.length);
     return true;
   }
   return false;
@@ -677,10 +677,7 @@ gdjs.dialogueTree.compareVariable = function(key, value) {
  */
 gdjs.dialogueTree.setVariable = function(key, value) {
   if (this.runner.variables) {
-    this.runner.variables.set(
-      key,
-      !isNaN(value) || value === "true" || value === "false" ? eval(value) : value
-    );
+    this.runner.variables.set(key, JSON.parse(value));
   }
 };
 
@@ -711,8 +708,8 @@ gdjs.dialogueTree.loadState = function(inputVariable) {
       gdjs.evtTools.network.variableStructureToJSON(inputVariable)
     );
     gdjs.dialogueTree.runner.visited = loadedState.visited;
-    Object.entries(gdjs.dialogueTree.runner.variables).forEach(function([key, value]) {
-      gdjs.dialogueTree.runner.variables.set(key, value);
+    Object.entries(gdjs.dialogueTree.runner.variables).forEach(function(pair) {
+      gdjs.dialogueTree.runner.variables.set(pair[0], pair[1]);
     });
   } catch (e) {
     console.error(e);

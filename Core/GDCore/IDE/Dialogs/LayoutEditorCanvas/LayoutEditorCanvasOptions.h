@@ -49,9 +49,9 @@ class GD_CORE_API LayoutEditorCanvasOptions {
   int gridB;         ///< Grid blue color in editor
   float zoomFactor;  ///< Stores the zoom factor
   bool windowMask;   ///< True if window mask displayed in editor
-  int viewXPosition;
-  int viewYPosition;
-  bool viewPositionValid;
+  int viewXPosition;  ///< X coordinate value of editor
+  int viewYPosition;  ///< Y coordinate value of editor
+  bool viewPositionValid;   ///< True if editor does not has default X and Y coordinate value
 };
 
 }  // namespace gd

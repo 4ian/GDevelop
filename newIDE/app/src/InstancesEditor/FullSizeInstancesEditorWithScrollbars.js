@@ -90,6 +90,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
     if (this.props.options.viewXPosition !== xValue) {
       this.props.onChangeOptions({
         viewXPosition: this.state.xValue,
+        viewYPosition: this.state.yValue,
         viewPositionValid: true,
       });
     }
@@ -114,6 +115,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
     //Prevent reduntant calls to onChangeOptions
     if (this.props.options.viewYPosition !== yValue) {
       this.props.onChangeOptions({
+        viewXPosition: this.state.xValue,
         viewYPosition: this.state.yValue,
         viewPositionValid: true,
       });
@@ -131,6 +133,12 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
       yMin: -yMax,
       xValue,
       yValue,
+    });
+
+    this.props.onChangeOptions({
+      viewXPosition: this.state.xValue,
+      viewYPosition: this.state.yValue,
+      viewPositionValid: true,
     });
   };
 

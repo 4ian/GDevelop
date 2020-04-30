@@ -14,14 +14,20 @@ namespace gdjs {
      * \brief Extension for Cordova games
      * 
      * This is an Extension type for games compiled to the Cordova Platform.
-     * The difference with a normal extension is that 
-     * 1. It only gets exported on Cordova builds
-     * 2. It let you add Cordova plugins in the exported game.
+     * The difference with a normal extension is that it let you add
+     * Cordova plugins in the exported game.
      */
     class GD_API CordovaExtension : public gd::PlatformExtension {
         public:
             // New methods
+            /**
+             * \brief Adds a cordova plugin include to the extension.
+             */
             CordovaExtension& AddCordovaPlugin(const gd::String);
+
+            /**
+             * \brief Get all cordova plugins to export.
+             */
             std::vector<gd::String> GetCordovaPluginList() { return cordovaPlugins; };
             
             // Override the return type of inherited methods
@@ -36,7 +42,7 @@ namespace gdjs {
             CordovaExtension& SetExtensionHelpPath(const gd::String& helpPath) { gd::PlatformExtension::SetExtensionHelpPath(helpPath); return *this; };
 
         private:
-            std::vector<gd::String> cordovaPlugins;
+            std::vector<gd::String> cordovaPlugins; ///< Vector of all cordova plugins to include
     };
 } // namespace gdjs
 #endif // CORDOVAEXTENSION_H

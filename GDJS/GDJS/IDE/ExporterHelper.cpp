@@ -20,6 +20,9 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDJS/Extensions/CordovaExtension.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
@@ -286,6 +289,22 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
             "\" />\n"
             "\t</plugin>");
   }
+
+  gd::String pluginsList = "";
+
+  for(gd::String const extensionName : project.GetUsedExtensions()) {
+    std::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(extensionName);
+    if (std::shared_ptr<gdjs::CordovaExtension> cordovaExtension = std::dynamic_pointer_cast<gdjs::CordovaExtension>(extension)) { // If a downcast to CordovaExtension is possible...
+      for(gd::String const cordovaPluginName : cordovaExtension->GetCordovaPluginList()) {
+        str += "<plugin name=\"" + cordovaPluginName + "\">\n"; 
+      }
+    }
+  }
+
+  str.FindAndReplace(
+        "<!-- GDJS_CORDOVA_PLUGINS -->",
+        pluginsList
+  );
 
   if (!fs.WriteToFile(exportDir + "/config.xml", str)) {
     lastError = "Unable to write Cordova config.xml file.";

@@ -31,4 +31,5 @@
     <preference name="phonegap-version" value="cli-8.0.0" />
 
     <!-- GDJS_ADMOB_PLUGIN_AND_APPLICATION_ID -->
+    <!-- GDJS_CORDOVA_PLUGINS -->
 </widget>

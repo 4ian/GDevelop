@@ -60,6 +60,8 @@
 #include <GDCore/Events/Builtin/StandardEvent.h>
 #include <GDCore/Events/Builtin/WhileEvent.h>
 
+#include <GDJS/Extensions/CordovaExtension.h>
+
 #include <GDCore/Extensions/Builtin/SpriteExtension/Animation.h>
 #include <GDCore/Extensions/Builtin/SpriteExtension/Direction.h>
 #include <GDCore/Extensions/Builtin/SpriteExtension/Sprite.h>

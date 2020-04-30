@@ -2399,3 +2399,100 @@ interface JsCodeEvent {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+
+[Prefix="gdjs::"]
+interface CordovaExtension : PlatformExtension {
+    void CordovaExtension();
+
+    // New Exposed Methods
+    [Ref] CordovaExtension AddCordovaPlugin([Const] DOMString pluginName);
+
+    // Inherited Methods from PlatformExtension with return type override
+    [Ref] CordovaExtension SetExtensionInformation([Const] DOMString name,
+                                [Const] DOMString fullname,
+                                [Const] DOMString description,
+                                [Const] DOMString author,
+                                [Const] DOMString license);
+    [Ref] CordovaExtension SetExtensionHelpPath([Const] DOMString helpPath);
+
+    // Inherited Methods from PlatformExtension
+    void MarkAsDeprecated();
+
+    [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentence,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon,
+                                        [Const] DOMString smallicon);
+
+    [Const, Ref] InstructionMetadata AddAction([Const] DOMString name,
+                                     [Const] DOMString fullname,
+                                     [Const] DOMString description,
+                                     [Const] DOMString sentence,
+                                     [Const] DOMString group,
+                                     [Const] DOMString icon,
+                                     [Const] DOMString smallicon);
+
+    [Const, Ref] ExpressionMetadata AddExpression([Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString group,
+                                        [Const] DOMString smallicon);
+
+    [Const, Ref] ExpressionMetadata AddStrExpression([Const] DOMString name,
+                                           [Const] DOMString fullname,
+                                           [Const] DOMString description,
+                                           [Const] DOMString group,
+                                           [Const] DOMString smallicon);
+
+    [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString defaultName,
+        [Const] DOMString description,
+        [Const] DOMString group,
+        [Const] DOMString icon24x24,
+        [Const] DOMString className,
+        Behavior instance,
+        BehaviorsSharedData sharedDatasInstance);
+
+    [Ref] ObjectMetadata WRAPPED_AddObject([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString icon24x24,
+        gdObject instance);
+
+    [Ref] EffectMetadata AddEffect([Const] DOMString name);
+
+    [Const, Ref] DOMString GetFullName();
+    [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetDescription();
+    [Const, Ref] DOMString GetAuthor();
+    [Const, Ref] DOMString GetLicense();
+    [Const, Ref] DOMString GetHelpPath();
+    boolean IsBuiltin();
+    [Const, Ref] DOMString GetNameSpace();
+
+    [Value] VectorString GetExtensionObjectsTypes();
+    [Value] VectorString GetBehaviorsTypes();
+    [Value] VectorString GetExtensionEffectTypes();
+    [Ref] ObjectMetadata GetObjectMetadata([Const] DOMString type);
+    [Ref] BehaviorMetadata GetBehaviorMetadata([Const] DOMString type);
+    [Ref] EffectMetadata GetEffectMetadata([Const] DOMString type);
+    [Ref] MapStringEventMetadata GetAllEvents();
+    [Ref] MapStringInstructionMetadata GetAllActions();
+    [Ref] MapStringInstructionMetadata GetAllConditions();
+    [Ref] MapStringExpressionMetadata GetAllExpressions();
+    [Ref] MapStringExpressionMetadata GetAllStrExpressions();
+    [Ref] MapStringInstructionMetadata GetAllActionsForObject([Const] DOMString objectType);
+    [Ref] MapStringInstructionMetadata GetAllConditionsForObject([Const] DOMString objectType);
+    [Ref] MapStringExpressionMetadata GetAllExpressionsForObject([Const] DOMString objectType);
+    [Ref] MapStringExpressionMetadata GetAllStrExpressionsForObject([Const] DOMString objectType);
+    [Ref] MapStringInstructionMetadata GetAllActionsForBehavior([Const] DOMString autoType);
+    [Ref] MapStringInstructionMetadata GetAllConditionsForBehavior([Const] DOMString autoType);
+    [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
+    [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
+
+    [Const, Value] DOMString STATIC_GetNamespaceSeparator();
+    // End of inherited functions
+};

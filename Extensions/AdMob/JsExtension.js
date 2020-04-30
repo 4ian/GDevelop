@@ -12,16 +12,17 @@
  */
 module.exports = {
   createExtension: function(_, gd) {
-    const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'AdMob',
-      _('AdMob'),
-      _(
-        'Allow the game to display AdMob banner, interstitial and reward video ads'
-      ),
-      'Franco Maciel',
-      'MIT'
-    );
+    const extension = new gd.CordovaExtension();
+    extension
+      .setExtensionInformation(
+        'AdMob',
+        _('AdMob'),
+        _(
+          'Allow the game to display AdMob banner, interstitial and reward video ads'
+        ),
+        'Franco Maciel',
+        'MIT'
+      ).addCordovaPlugin("cordova-plugin-admob-free");
 
     // Banner
     extension

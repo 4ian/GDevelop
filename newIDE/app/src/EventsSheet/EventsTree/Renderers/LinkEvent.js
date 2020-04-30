@@ -34,7 +34,7 @@ const styles = {
 };
 
 export default class LinkEvent extends React.Component<EventRendererProps, *> {
-  _externalEventsField = null;
+  _externalEventsField: ?ExternalEventsField = null;
 
   state = {
     editing: false,
@@ -42,22 +42,26 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
   };
 
   edit = (domEvent: any) => {
-    // We should not need to stop the event propagation, but
+    // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
-    // Caveat: we can open multiple InlinePopover.
-    // Search the rest of the codebase for onlinepopover-event-hack
-    domEvent.preventDefault();
-    domEvent.stopPropagation();
-
-    this.setState(
-      {
-        editing: true,
-        anchorEl: domEvent.currentTarget,
-      },
-      () => {
-        if (this._externalEventsField) this._externalEventsField.focus();
-      }
+    // Search the rest of the codebase for inlinepopover-event-hack
+    const anchorEl = domEvent.currentTarget;
+    setTimeout(
+      () =>
+        this.setState(
+          {
+            editing: true,
+            anchorEl,
+          },
+          () => {
+            // Give a bit of time for the popover to mount itself
+            setTimeout(() => {
+              if (this._externalEventsField) this._externalEventsField.focus();
+            }, 10);
+          }
+        ),
+      10
     );
   };
 

@@ -6,11 +6,13 @@ This project is released under the MIT License.
 */
 
 #include "PlatformerObjectBehavior.h"
+
 #include <SFML/Window.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <memory>
+
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Layout.h"
@@ -22,6 +24,7 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include <iostream>
 #include <map>
+
 #include "GDCore/Project/PropertyDescriptor.h"
 #endif
 
@@ -34,6 +37,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("deceleration", 1500);
   behaviorContent.SetAttribute("maxSpeed", 250);
   behaviorContent.SetAttribute("jumpSpeed", 600);
+  behaviorContent.SetAttribute("jumpSustainTime", 0.2);
   behaviorContent.SetAttribute("ignoreDefaultControls", false);
   behaviorContent.SetAttribute("slopeMaxAngle", 60);
   behaviorContent.SetAttribute("canGrabPlatforms", false);
@@ -51,6 +55,14 @@ PlatformerObjectBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
   properties[_("Jump speed")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
+  properties[_("jumpSustainTime")]
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("jumpSustainTime", 0)))
+      .SetLabel(_("Jump sustain time"))
+      .SetDescription(
+          _("Maximum time (in seconds) during which the jump strength is "
+            "sustained if the jump key is held - allowing variable height "
+            "jumps."));
   properties[_("Max. falling speed")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
   properties[_("Acceleration")].SetValue(
@@ -91,7 +103,7 @@ bool PlatformerObjectBehavior::UpdateProperty(
     gd::Project& project) {
   if (name == _("Default controls"))
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
-  if (name == _("Round coordinates"))
+  else if (name == _("Round coordinates"))
     behaviorContent.SetAttribute("roundCoordinates", (value == "1"));
   else if (name == _("Can grab platform ledges"))
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
@@ -112,6 +124,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
       behaviorContent.SetAttribute("maxSpeed", value.To<double>());
     else if (name == _("Jump speed"))
       behaviorContent.SetAttribute("jumpSpeed", value.To<double>());
+    else if (name == _("jumpSustainTime"))
+      behaviorContent.SetAttribute("jumpSustainTime", value.To<double>());
     else if (name == _("Slope max. angle")) {
       double newMaxAngle = value.To<double>();
       if (newMaxAngle < 0 || newMaxAngle >= 90) return false;

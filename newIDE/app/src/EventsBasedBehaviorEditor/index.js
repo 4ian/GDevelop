@@ -99,7 +99,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                 eventsBasedBehavior.setDescription(text);
                 this.forceUpdate();
               }}
-              multiLine
+              multiline
               fullWidth
               rows={3}
             />

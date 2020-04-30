@@ -1,8 +1,6 @@
-import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
-import { Column, Line } from '../UI/Grid';
-import Text from '../UI/Text';
+import { Column } from '../UI/Grid';
 import ExamplesList from './ExamplesList';
 import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
 import ExamplesInformation from './ExamplesInformation';
@@ -18,24 +16,15 @@ export default class BrowserExamples extends Component {
   render() {
     return (
       <Column noMargin>
-        <Line>
-          <Column>
-            <Text>
-              <Trans>Choose or search for an example to open:</Trans>
-            </Text>
-          </Column>
-        </Line>
-        <Line>
-          <ExamplesList
-            exampleNames={exampleNames}
-            onCreateFromExample={exampleName => {
-              sendNewGameCreated(exampleName);
-              this.props.onOpen(InternalFileStorageProvider, {
-                fileIdentifier: `example://${exampleName}`,
-              });
-            }}
-          />
-        </Line>
+        <ExamplesList
+          exampleNames={exampleNames}
+          onCreateFromExample={exampleName => {
+            sendNewGameCreated(exampleName);
+            this.props.onOpen(InternalFileStorageProvider, {
+              fileIdentifier: `example://${exampleName}`,
+            });
+          }}
+        />
       </Column>
     );
   }

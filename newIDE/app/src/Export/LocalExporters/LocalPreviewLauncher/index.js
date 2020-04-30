@@ -87,6 +87,9 @@ export default class LocalPreviewLauncher extends React.Component<
           useContentSize: true,
           title: `Preview of ${project.getName()}`,
           backgroundColor: '#000000',
+          webPreferences: {
+            nodeIntegration: true,
+          },
         },
         previewGamePath: gamePath,
       },

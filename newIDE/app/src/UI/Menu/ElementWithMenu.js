@@ -45,9 +45,8 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     return (
       <React.Fragment>
         {React.cloneElement(element, {
-          ...(openMenuWithSecondaryClick
-            ? { onContextMenu: this.open }
-            : { onClick: this.open }),
+          onContextMenu: this.open,
+          ...(openMenuWithSecondaryClick ? {} : { onClick: this.open }),
           ref: wrappedElement => (this._wrappedElement = wrappedElement),
         })}
         <ContextMenu

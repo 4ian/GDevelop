@@ -168,6 +168,24 @@ export default class Window {
     });
   }
 
+  static showConfirmDialog(
+    message: string,
+    type?: 'none' | 'info' | 'error' | 'question' | 'warning'
+  ) {
+    if (!dialog || !electron) {
+      // eslint-disable-next-line
+      return confirm(message);
+    }
+
+    const browserWindow = electron.remote.getCurrentWindow();
+    const answer = dialog.showMessageBoxSync(browserWindow, {
+      message,
+      type,
+      buttons: ['OK', 'Cancel'],
+    });
+    return answer === 0;
+  }
+
   static setUpContextMenu() {
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
 

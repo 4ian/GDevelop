@@ -9,7 +9,7 @@ export default {
     try {
       fs.mkdirsSync(path);
     } catch (e) {
-      console.log('mkDir(' + path + ') failed: ' + e);
+      console.error('mkDir(' + path + ') failed: ' + e);
       return false;
     }
     return true;
@@ -20,18 +20,26 @@ export default {
   clearDir: function(path) {
     var files = [];
     var that = this;
-    if (fs.existsSync(path)) {
-      files = fs.readdirSync(path);
-      files.forEach(function(file) {
-        var curPath = path + '/' + file;
-        if (fs.lstatSync(curPath).isDirectory()) {
-          // recurse
-          that.clearDir(curPath);
-        } else {
-          // delete file
-          fs.unlinkSync(curPath);
-        }
-      });
+    try {
+      if (fs.existsSync(path)) {
+        files = fs.readdirSync(path);
+        files.forEach(function(file) {
+          var curPath = path + '/' + file;
+          if (fs.lstatSync(curPath).isDirectory()) {
+            // recurse
+            that.clearDir(curPath);
+          } else {
+            // delete file
+            try {
+              fs.unlinkSync(curPath);
+            } catch (e) {
+              console.error('fs.unlinkSync(' + curPath + ') failed: ' + e);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.error('clearDir(' + path + ') failed: ' + e);
     }
   },
   getTempDir: function() {
@@ -82,7 +90,7 @@ export default {
     try {
       if (source !== dest) fs.copySync(source, dest);
     } catch (e) {
-      console.log('copyFile(' + source + ', ' + dest + ') failed: ' + e);
+      console.error('copyFile(' + source + ', ' + dest + ') failed: ' + e);
       return false;
     }
     return true;
@@ -91,7 +99,7 @@ export default {
     try {
       fs.outputFileSync(file, contents);
     } catch (e) {
-      console.log('writeToFile(' + file + ', ...) failed: ' + e);
+      console.error('writeToFile(' + file + ', ...) failed: ' + e);
       return false;
     }
     return true;
@@ -101,7 +109,7 @@ export default {
       var contents = fs.readFileSync(file);
       return contents.toString();
     } catch (e) {
-      console.log('readFile(' + file + ') failed: ' + e);
+      console.error('readFile(' + file + ') failed: ' + e);
       return '';
     }
   },
@@ -122,7 +130,7 @@ export default {
         });
       }
     } catch (e) {
-      console.log('readDir(' + path + ',' + ext + ') failed: ' + e);
+      console.error('readDir(' + path + ',' + ext + ') failed: ' + e);
     }
 
     return output;

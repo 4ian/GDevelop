@@ -3,7 +3,7 @@ import gesture from 'pixi-simple-gesture';
 import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import InstancesSelection from '../SceneEditor/InstancesSelection';
+import InstancesSelection from './InstancesSelection';
 
 type Props = {|
   instancesSelection: InstancesSelection,
@@ -35,6 +35,9 @@ const getButtonSizes = (screenType: ScreenType) => {
 const RECTANGLE_BUTTON_SHAPE = 0;
 const CIRCLE_BUTTON_SHAPE = 1;
 
+/**
+ * Render selection rectangle for selected instances.
+ */
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: Object; // To be typed in InstancesRenderer

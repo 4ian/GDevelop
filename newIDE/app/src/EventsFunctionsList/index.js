@@ -13,6 +13,7 @@ import {
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
 import Clipboard from '../Utils/Clipboard';
+import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -89,8 +90,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     const { eventsFunctionsContainer } = this.props;
 
     if (askForConfirmation) {
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         "Are you sure you want to remove this function? This can't be undone."
       );
       if (!answer) return;

@@ -29,7 +29,6 @@ exports[`HelpButton renders the button linking to a help page 1`] = `
       aria-hidden="true"
       className="MuiSvgIcon-root"
       focusable="false"
-      role="presentation"
       viewBox="0 0 24 24"
     >
       <path

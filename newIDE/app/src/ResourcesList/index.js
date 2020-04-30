@@ -7,6 +7,7 @@ import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import Window from '../Utils/Window';
 import {
   createOrUpdateResource,
   getLocalResourceFullPath,
@@ -185,8 +186,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       return;
     }
 
-    // eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
     );
     if (!answer) return;

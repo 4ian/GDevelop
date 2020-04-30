@@ -387,6 +387,19 @@ module.exports = {
 
     extension
       .addStrExpression(
+        'UserHomePath',
+        _('User\'s Home folder'),
+        _('Get the path to the user home folder.'),
+        _('Filesystem/Windows, Linux, MacOS'),
+        'JsPlatform/Extensions/filesystem_folder24.png',
+        'JsPlatform/Extensions/filesystem_folder32.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
+      .setFunctionName('gdjs.fileSystem.getUserHomePath');
+
+    extension
+      .addStrExpression(
         'TempPath',
         _('Temp folder'),
         _('Get the path to temp folder.'),

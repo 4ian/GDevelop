@@ -4,6 +4,7 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import Text from '../UI/Text';
 import enumerateLayers from './EnumerateLayers';
 
 export default class VariablesEditorDialog extends Component {
@@ -63,9 +64,9 @@ export default class VariablesEditorDialog extends Component {
         open={this.props.open}
         onRequestClose={this.props.onCancel}
       >
-        <div>
+        <Text>
           <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>
-        </div>
+        </Text>
         <SelectField
           value={this.state.selectedLayer}
           onChange={(event, index, newValue) => {

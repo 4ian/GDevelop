@@ -92,6 +92,12 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
           .SetFunctionName("setJumpSpeed")
           .SetGetter("getJumpSpeed");
       autExpressions["JumpSpeed"].SetFunctionName("getJumpSpeed");
+      autConditions["PlatformBehavior::JumpSustainTime"].SetFunctionName(
+          "getJumpSustainTime");
+      autActions["PlatformBehavior::JumpSustainTime"]
+          .SetFunctionName("setJumpSustainTime")
+          .SetGetter("getJumpSustainTime");
+      autExpressions["JumpSustainTime"].SetFunctionName("getJumpSustainTime");
 
       autActions["PlatformBehavior::SetCanJump"].SetFunctionName("setCanJump");
       autActions["PlatformBehavior::SimulateLeftKey"].SetFunctionName(

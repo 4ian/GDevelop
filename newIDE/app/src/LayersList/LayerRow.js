@@ -1,18 +1,20 @@
 // @flow
+import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
-
 import React from 'react';
-import { TableRow, TableRowColumn } from '../UI/Table';
+import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import FlareIcon from '@material-ui/icons/Flare';
 import IconButton from '../UI/IconButton';
 import Delete from '@material-ui/icons/Delete';
 import TextField from '../UI/TextField';
-import FlatButton from '../UI/FlatButton';
 import DragHandle from '../UI/DragHandle';
-import styles from './styles';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import MoreVert from '@material-ui/icons/MoreVert';
+import Badge from '../UI/Badge';
 
 type Props = {|
   layerName: string,
@@ -23,7 +25,7 @@ type Props = {|
   onChangeVisibility: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
-  style?: ?Object,
+  width: number,
 |};
 
 export default ({
@@ -35,53 +37,78 @@ export default ({
   effectsCount,
   onEditEffects,
   onChangeVisibility,
+  width,
 }: Props) => (
-  <ThemeConsumer>
-    {muiTheme => (
-      <TableRow
-        style={{
-          backgroundColor: muiTheme.list.itemsBackgroundColor,
-        }}
-      >
-        <TableRowColumn style={styles.handleColumn}>
+  <I18n>
+    {({ i18n }) => (
+      <TreeTableRow>
+        <TreeTableCell>
           <DragHandle />
-        </TableRowColumn>
-        <TableRowColumn>
+        </TreeTableCell>
+        <TreeTableCell expand>
           <TextField
             margin="none"
-            defaultValue={layerName || 'Base layer'}
+            defaultValue={layerName || i18n._(t`Base layer`)}
             id={layerName}
             errorText={
               nameError ? <Trans>This name is already taken</Trans> : undefined
             }
             disabled={!layerName}
             onBlur={onBlur}
+            fullWidth
           />
-        </TableRowColumn>
-        <TableRowColumn style={styles.effectsColumn}>
-          <FlatButton
-            label={
-              effectsCount === 0 ? (
-                <Trans>Add effect</Trans>
-              ) : (
-                <Trans>{effectsCount} effect(s)</Trans>
-              )
-            }
-            onClick={onEditEffects}
-          />
-        </TableRowColumn>
-        <TableRowColumn style={styles.toolColumn}>
-          <InlineCheckbox
-            checked={isVisible}
-            checkedIcon={<Visibility />}
-            uncheckedIcon={<VisibilityOff />}
-            onCheck={(e, value) => onChangeVisibility(value)}
-          />
-          <IconButton onClick={onRemove} disabled={!layerName}>
-            <Delete />
-          </IconButton>
-        </TableRowColumn>
-      </TableRow>
+        </TreeTableCell>
+        <TreeTableCell>
+          {width < 350 ? (
+            <ElementWithMenu
+              element={
+                <IconButton>
+                  <MoreVert />
+                </IconButton>
+              }
+              buildMenuTemplate={() => [
+                {
+                  label: i18n._(t`Edit effects (${effectsCount})`),
+                  click: onEditEffects,
+                },
+                {
+                  type: 'checkbox',
+                  label: i18n._(t`Visible`),
+                  checked: isVisible,
+                  click: () => onChangeVisibility(!isVisible),
+                },
+                { type: 'separator' },
+                {
+                  label: i18n._(t`Delete`),
+                  enabled: !!layerName,
+                  click: onRemove,
+                },
+              ]}
+            />
+          ) : (
+            <React.Fragment>
+              <IconButton onClick={onEditEffects} tooltip={t`Edit effects`}>
+                <Badge badgeContent={effectsCount} color="primary">
+                  <FlareIcon />
+                </Badge>
+              </IconButton>
+              <InlineCheckbox
+                checked={isVisible}
+                checkedIcon={<Visibility />}
+                uncheckedIcon={<VisibilityOff />}
+                onCheck={(e, value) => onChangeVisibility(value)}
+              />
+              <IconButton
+                onClick={onRemove}
+                disabled={!layerName}
+                tooltip={t`Delete the layer`}
+              >
+                <Delete />
+              </IconButton>
+            </React.Fragment>
+          )}
+        </TreeTableCell>
+      </TreeTableRow>
     )}
-  </ThemeConsumer>
+  </I18n>
 );

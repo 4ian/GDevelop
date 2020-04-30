@@ -1,53 +1,30 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import Measure from 'react-measure';
 
 const styles = {
   flexContainer: { display: 'flex', flex: 1, position: 'relative' },
-  absoluteContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    overflowY: 'hidden',
-  },
 };
+
+type Props = {|
+  children: ({| width: number, height: number |}) => React.Node,
+|};
 
 /**
  * Take a component and pass the maximum size that the component can take
  * as width and height props.
- * @param {*} WrappedComponent
- * @param {*} options
  */
-export const passFullSize = (WrappedComponent, { useFlex }) => {
-  return class FullSizeMeasurer extends Component {
-    state = {
-      width: undefined,
-      height: undefined,
-    };
-
-    render() {
-      const { wrappedComponentRef, ...otherProps } = this.props;
-
-      return (
-        <Measure
-          onMeasure={({ width, height }) => this.setState({ width, height })}
-        >
-          <div
-            style={useFlex ? styles.flexContainer : styles.absoluteContainer}
-          >
-            {this.state.width !== undefined &&
-              this.state.height !== undefined && (
-                <WrappedComponent
-                  width={this.state.width}
-                  height={this.state.height}
-                  ref={ref => wrappedComponentRef && wrappedComponentRef(ref)}
-                  {...otherProps}
-                />
-              )}
-          </div>
-        </Measure>
-      );
-    }
-  };
-};
+export const FullSizeMeasurer = ({ children }: Props) => (
+  <Measure bounds>
+    {({ contentRect, measureRef }) => (
+      <div style={styles.flexContainer} ref={measureRef}>
+        {!!contentRect &&
+          !!contentRect.bounds &&
+          children({
+            width: contentRect.bounds.width,
+            height: contentRect.bounds.height,
+          })}
+      </div>
+    )}
+  </Measure>
+);

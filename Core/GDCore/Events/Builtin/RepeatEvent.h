@@ -45,11 +45,14 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent {
 
   virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors();
   virtual std::vector<gd::InstructionsList*> GetAllActionsVectors();
-  virtual std::vector<gd::Expression*> GetAllExpressions();
+  virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata();
+
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
   virtual std::vector<const gd::InstructionsList*> GetAllActionsVectors() const;
-  virtual std::vector<const gd::Expression*> GetAllExpressions() const;
+  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata() const;
 
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,

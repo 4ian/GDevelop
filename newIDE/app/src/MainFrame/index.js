@@ -385,8 +385,7 @@ class MainFrame extends React.Component<Props, State> {
       return hasAutoSave(fileMetadata, true).then(canOpenAutosave => {
         if (!canOpenAutosave) return fileMetadata;
 
-        //eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`
           )
@@ -405,8 +404,7 @@ class MainFrame extends React.Component<Props, State> {
       return hasAutoSave(fileMetadata, false).then(canOpenAutosave => {
         if (!canOpenAutosave) return null;
 
-        //eslint-disable-next-line
-        const answer = confirm(
+        const answer = Window.showConfirmDialog(
           i18n._(
             t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`
           )
@@ -608,8 +606,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this scene? This can't be undone.`
       )
@@ -632,8 +629,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this external layout? This can't be undone.`
       )
@@ -659,8 +655,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove these external events? This can't be undone.`
       )
@@ -688,8 +683,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n, eventsFunctionsExtensionsState } = this.props;
     if (!currentProject) return;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to remove this extension? This can't be undone.`
       )
@@ -1536,8 +1530,7 @@ class MainFrame extends React.Component<Props, State> {
       if (!this.state.currentProject) return Promise.resolve();
       const { i18n } = this.props;
 
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         i18n._(
           t`Close the project? Any changes that have not been saved will be lost.`
         )
@@ -1826,6 +1819,9 @@ class MainFrame extends React.Component<Props, State> {
           PaperProps={{
             style: styles.drawerContent,
           }}
+          ModalProps={{
+            keepMounted: true,
+          }}
           onClose={this.toggleProjectManager}
         >
           <EditorBar
@@ -2104,7 +2100,15 @@ class MainFrame extends React.Component<Props, State> {
             }}
           />
         )}
-        <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
+        <CloseConfirmDialog
+          shouldPrompt={!!this.state.currentProject}
+          i18n={this.props.i18n}
+          language={this.props.i18n.language}
+          hasUnsavedChanges={
+            !!this.props.unsavedChanges &&
+            this.props.unsavedChanges.hasUnsavedChanges
+          }
+        />
         <ChangelogDialogContainer />
         {this.state.gdjsDevelopmentWatcherEnabled &&
           renderGDJSDevelopmentWatcher &&

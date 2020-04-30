@@ -378,7 +378,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 parameter.setLongDescription(text);
                                 this.forceUpdate();
                               }}
-                              multiLine
+                              multiline
                               fullWidth
                               disabled={
                                 false /* Long description, if shown, can always be changed */
@@ -402,7 +402,6 @@ export default class EventsFunctionParametersEditor extends React.Component<
                         primary
                         label={<Trans>Add a parameter</Trans>}
                         onClick={this._addParameter}
-                        labelPosition="before"
                         icon={<Add />}
                       />
                     )}

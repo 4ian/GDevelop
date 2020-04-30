@@ -1,6 +1,4 @@
 // @flow
-import { isMacLike } from '../../Utils/Platform';
-
 const LEFT_KEY = 37;
 const UP_KEY = 38;
 const RIGHT_KEY = 39;
@@ -10,13 +8,14 @@ const DELETE_KEY = 46;
 const EQUAL_KEY = 187;
 const MINUS_KEY = 189;
 const NUMPAD_ADD = 107;
-const NUMPAD_SUBSTRACT = 109;
+const NUMPAD_SUBTRACT = 109;
 const C_KEY = 67;
 const F_KEY = 70;
 const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
 const Z_KEY = 90;
+const ESC_KEY = 27;
 
 type ShortcutCallbacks = {|
   onDelete?: () => void,
@@ -29,6 +28,7 @@ type ShortcutCallbacks = {|
   onSearch?: () => void,
   onZoomOut?: () => void,
   onZoomIn?: () => void,
+  onEscape?: () => void,
 |};
 
 type ConstructorArgs = {|
@@ -110,6 +110,7 @@ export default class KeyboardShortcuts {
       onSearch,
       onZoomOut,
       onZoomIn,
+      onEscape,
     } = this._shortcutCallbacks;
 
     if (onMove) {
@@ -152,29 +153,22 @@ export default class KeyboardShortcuts {
     if (onSearch && this._isControlOrCmdPressed() && evt.which === F_KEY) {
       onSearch();
     }
+    if (onEscape && evt.which === ESC_KEY) {
+      onEscape();
+    }
 
-    if (isMacLike()) {
-      //Mac specific shortcuts -- zooming done differently on windows and linux
-      if (
-        onZoomOut &&
-        this._isControlOrCmdPressed() &&
-        evt.which === MINUS_KEY
-      ) {
-        onZoomOut();
-      }
-      if (
-        onZoomIn &&
-        this._isControlOrCmdPressed() &&
-        evt.which === EQUAL_KEY
-      ) {
-        onZoomIn();
-      }
-      if (onZoomOut && evt.which === NUMPAD_SUBSTRACT) {
-        onZoomOut();
-      }
-      if (onZoomIn && evt.which === NUMPAD_ADD) {
-        onZoomIn();
-      }
+    if (onZoomOut && this._isControlOrCmdPressed() && evt.which === MINUS_KEY) {
+      onZoomOut();
+    }
+    if (onZoomOut && evt.which === NUMPAD_SUBTRACT) {
+      onZoomOut();
+    }
+
+    if (onZoomIn && this._isControlOrCmdPressed() && evt.which === EQUAL_KEY) {
+      onZoomIn();
+    }
+    if (onZoomIn && evt.which === NUMPAD_ADD) {
+      onZoomIn();
     }
   };
 }

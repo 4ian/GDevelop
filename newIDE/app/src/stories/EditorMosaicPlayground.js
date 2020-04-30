@@ -9,7 +9,8 @@ import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 type OpenEditorFunction = (
   editorName: string,
   position: 'start' | 'end',
-  slipPercentage: number
+  slipPercentage: number,
+  direction: 'column' | 'row'
 ) => void;
 
 type Props = {|
@@ -26,10 +27,16 @@ export default ({ renderButtons, renderEditorMosaic }: Props) => {
   const openEditor = (
     editorName: string,
     position: 'start' | 'end',
-    slipPercentage: number
+    slipPercentage: number,
+    direction: 'column' | 'row'
   ) => {
     if (editorRef.current)
-      editorRef.current.openEditor(editorName, position, slipPercentage);
+      editorRef.current.openEditor(
+        editorName,
+        position,
+        slipPercentage,
+        direction
+      );
   };
 
   return (

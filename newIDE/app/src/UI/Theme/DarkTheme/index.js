@@ -30,6 +30,12 @@ const backgroundColor = '#252525';
  */
 const canvasColor = '#303030';
 
+/**
+ * The alternate background color, for some lists or search box,
+ * to distinguish them from other content.
+ */
+const alternateCanvasColor = '#494949';
+
 // GDevelop specific variables:
 const gdevelopTheme = {
   palette: {
@@ -41,7 +47,7 @@ const gdevelopTheme = {
   },
   toolbar: {
     backgroundColor: backgroundColor,
-    separatorColor: '#303030',
+    separatorColor: '#4d4d4d',
   },
   closableTabs: {
     fontFamily,
@@ -57,13 +63,16 @@ const gdevelopTheme = {
     selectedBorderColor: systemSelectionColor,
   },
   list: {
-    itemsBackgroundColor: '#494949',
+    itemsBackgroundColor: alternateCanvasColor,
+  },
+  searchBar: {
+    backgroundColor: alternateCanvasColor,
   },
   listItem: {
     groupBackgroundColor: backgroundColor,
     groupTextColor: '#AAA',
     deprecatedGroupTextColor: '#888',
-    separatorColor: '#303030',
+    separatorColor: '#4d4d4d',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: almostWhite,
     errorTextColor: '#ff2e16',

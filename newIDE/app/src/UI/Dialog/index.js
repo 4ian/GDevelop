@@ -80,7 +80,6 @@ export default (props: Props) => {
     flexRowBody,
     flexBody,
     noTitleMargin,
-    cannotBeDismissed,
   } = props;
   const dialogActions = secondaryActions ? (
     <React.Fragment>
@@ -105,8 +104,8 @@ export default (props: Props) => {
           fullWidth
           fullScreen={size === 'small'}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick={!!cannotBeDismissed}
-          disableEscapeKeyDown={!!cannotBeDismissed}
+          disableBackdropClick={false}
+          disableEscapeKeyDown={false}
         >
           {title && (
             <DialogTitle

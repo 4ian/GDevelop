@@ -303,6 +303,31 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetGetter("GetJumpSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddCondition(
+           "JumpSustainTime",
+           _("Jump sustain time"),
+           _("Compare the jump sustain time of the object (in seconds)."),
+           _("the jump sustain time"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced();
+
+    aut.AddAction(
+           "JumpSustainTime",
+           _("Jump sustain time"),
+           _("Change the jump sustain time of an object (in seconds)."),
+           _("the jump sustain time"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number");
+
     aut.AddAction(
            "SetCanJump",
            _("Allow again jumping"),
@@ -502,6 +527,14 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetJumpSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddExpression("JumpSustainTime",
+                      _("Jump sustain time"),
+                      _("The time during which keeping the jump button held allow the initial jump speed to be maintained."),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior");
 #endif
   }
   {

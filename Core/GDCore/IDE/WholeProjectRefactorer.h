@@ -181,7 +181,7 @@ class GD_CORE_API WholeProjectRefactorer {
       bool isObjectGroup);
 
   /**
-   * \brief Refactor the events function after an object or group is renamed
+   * \brief Refactor the events function after an object or group is removed
    *
    * This will update the events of the function and groups.
    */

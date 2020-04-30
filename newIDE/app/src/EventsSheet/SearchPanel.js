@@ -33,6 +33,7 @@ type State = {|
   searchInConditions: boolean,
   searchInEventStrings: boolean,
   searchInSelection: boolean,
+  searchResultsDirty: boolean,
 |};
 
 export default class SearchPanel extends PureComponent<Props, State> {
@@ -45,12 +46,17 @@ export default class SearchPanel extends PureComponent<Props, State> {
     searchInConditions: true,
     searchInEventStrings: true,
     searchInSelection: false,
+    searchResultsDirty: false,
   };
 
   focus = () => {
     if (this.searchTextField) {
       this.searchTextField.focus();
     }
+  };
+
+  markSearchResultsDirty = () => {
+    this.setState({ searchResultsDirty: true });
   };
 
   launchSearch = () => {
@@ -96,6 +102,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
     });
   };
 
+  launchSearchIfResultsDirty = () => {
+    if (this.state.searchResultsDirty) {
+      this.launchSearch();
+      this.setState({ searchResultsDirty: false });
+    }
+  };
+
   render() {
     const {
       resultsCount,
@@ -115,7 +128,17 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 (this.searchTextField = _searchTextField)
               }
               hintText={t`Text to search in parameters`}
-              onChange={(e, searchText) => this.setState({ searchText })}
+              onChange={(e, searchText) => {
+                this.setState({
+                  searchText,
+                  searchResultsDirty: true,
+                });
+              }}
+              onKeyPress={event => {
+                if (event.key === 'Enter') {
+                  this.launchSearchIfResultsDirty();
+                }
+              }}
               value={searchText}
               fullWidth
             />
@@ -124,7 +147,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
               disabled={!searchText}
               primary
               label={<Trans>Search</Trans>}
-              onClick={this.launchSearch}
+              onClick={() => {
+                if (!this.state.searchResultsDirty) {
+                  onGoToNextSearchResult();
+                } else {
+                  this.launchSearchIfResultsDirty();
+                }
+              }}
             />
           </Line>
           <Line alignItems="baseline" noMargin>

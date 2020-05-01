@@ -429,7 +429,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             floatingLabelText={<Trans>Firebase Configuration string</Trans>}
             fullWidth
             rows={8}
-            multiLine
+            multiline
             type="text"
             value={firebaseConfig}
             onChange={value => this.setState({ firebaseConfig: value })}

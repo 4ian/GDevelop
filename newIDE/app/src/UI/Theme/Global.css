@@ -4,20 +4,21 @@
   height: 8px;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb {
   border: 1px solid transparent;
   background-clip: padding-box;
-  border-radius: 3px;
+  border-radius: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
   background-color: rgba(0,0,0,.07);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  border: 1px solid transparent;
-  background-clip: padding-box;
-  border-radius: 3px;
-  background: #8d8d8dCC;
+  background-color: #8d8d8dCC;
 }
 
 /* Handle on hover */

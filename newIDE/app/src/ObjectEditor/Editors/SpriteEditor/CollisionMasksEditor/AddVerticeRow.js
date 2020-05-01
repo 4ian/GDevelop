@@ -11,7 +11,7 @@ const AddVerticeRow = ({ onAdd }) => (
     <TableRowColumn style={styles.coordinateColumn} />
     <TableRowColumn style={styles.coordinateColumn} />
     <TableRowColumn style={styles.toolColumn}>
-      <IconButton onClick={onAdd}>
+      <IconButton size="small" onClick={onAdd}>
         <AddCircle />
       </IconButton>
     </TableRowColumn>

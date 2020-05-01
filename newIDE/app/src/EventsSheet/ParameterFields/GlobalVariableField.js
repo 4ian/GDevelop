@@ -42,6 +42,7 @@ export default class GlobalVariableField extends React.Component<
         />
         {this.state.editorOpen && project && (
           <VariablesEditorDialog
+            title={<Trans>Global Variables</Trans>}
             open={this.state.editorOpen}
             variablesContainer={project.getVariables()}
             onCancel={() => this.setState({ editorOpen: false })}

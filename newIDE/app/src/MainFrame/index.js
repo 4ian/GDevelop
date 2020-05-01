@@ -275,7 +275,11 @@ const MainFrame = (props: Props) => {
     }
 
     openFromFileMetadata(initialFileMetadataToOpen).then(state => {
-      if (state) openSceneOrProjectManager(state);
+      if (state)
+        openSceneOrProjectManager({
+          currentProject: state.currentProject,
+          editorTabs: state.editorTabs,
+        });
     });
   };
 
@@ -356,16 +360,22 @@ const MainFrame = (props: Props) => {
   const loadFromSerializedProject = (
     serializedProject: gdSerializerElement,
     fileMetadata: ?FileMetadata,
-    newState: State = state,
-    newProps: Props = props
+    newState = {
+      currentProject: state.currentProject,
+      editorTabs: state.editorTabs,
+    },
+    eventsFunctionsExtensionsState = props.eventsFunctionsExtensionsState
   ): Promise<State> => {
     return timePromise(
       () => {
         const newProject = gd.ProjectHelper.createNewGDJSProject();
         newProject.unserializeFrom(serializedProject);
-        return loadFromProject(newProject, fileMetadata, newState, newProps).then(state =>
-          Promise.resolve(state)
-        );
+        return loadFromProject(
+          newProject,
+          fileMetadata,
+          newState,
+          eventsFunctionsExtensionsState
+        ).then(state => Promise.resolve(state));
       },
       time => console.info(`Unserialization took ${time} ms`)
     );
@@ -374,11 +384,12 @@ const MainFrame = (props: Props) => {
   const loadFromProject = (
     project: gdProject,
     fileMetadata: ?FileMetadata,
-    newState: State = state,
-    newProps: Props = props
+    newState = {
+      currentProject: state.currentProject,
+      editorTabs: state.editorTabs,
+    },
+    eventsFunctionsExtensionsState = props.eventsFunctionsExtensionsState
   ): Promise<State> => {
-    const { eventsFunctionsExtensionsState } = newProps;
-
     return closeProject(newState).then(state => {
       // Make sure that the ResourcesLoader cache is emptied, so that
       // the URL to a resource with a name in the old project is not re-used
@@ -395,6 +406,7 @@ const MainFrame = (props: Props) => {
         ...state,
         currentProject: project,
         currentFileMetadata: fileMetadata,
+        createDialogOpen: false,
       }).then(state => {
         if (
           state.editorTabs.editors.length > 1 ||
@@ -417,9 +429,17 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = (
     fileMetadata: FileMetadata,
     newState: State = state,
-    newProps: Props = props
+    newProps = {
+      i18n: props.i18n,
+      storageProviderOperations: props.storageProviderOperations,
+      eventsFunctionsExtensionsState: props.eventsFunctionsExtensionsState,
+    }
   ): Promise<?State> => {
-    const { i18n, storageProviderOperations } = newProps;
+    const {
+      i18n,
+      storageProviderOperations,
+      eventsFunctionsExtensionsState,
+    } = newProps;
     const {
       hasAutoSave,
       onGetAutoSave,
@@ -474,7 +494,7 @@ const MainFrame = (props: Props) => {
       });
     };
 
-    return setState(state => ({ ...state, loadingProject: true })).then(state => {
+    return setState({ ...newState, loadingProject: true }).then(state => {
       // Try to find an autosave (and ask user if found)
       return checkForAutosave()
         .then(fileMetadata => onOpen(fileMetadata))
@@ -501,8 +521,11 @@ const MainFrame = (props: Props) => {
             // an autosave. If we're for some reason loading an autosave, we still consider
             // that we're opening the file that was originally requested by the user.
             fileMetadata,
-            state,
-            newProps
+            {
+              currentProject: state.currentProject,
+              editorTabs: state.editorTabs,
+            },
+            eventsFunctionsExtensionsState
           ).then(
             state => {
               serializedProject.delete();
@@ -532,10 +555,16 @@ const MainFrame = (props: Props) => {
     return Window.quit();
   };
 
-  const closeProject = (newState: State = state): Promise<State> => {
+  const closeProject = (
+    newState = {
+      currentProject: state.currentProject,
+      editorTabs: state.editorTabs,
+    }
+  ): Promise<State> => {
     const { eventsFunctionsExtensionsState } = props;
     const { currentProject, editorTabs } = newState;
-    if (!currentProject) return Promise.resolve(newState);
+    if (!currentProject)
+      return Promise.resolve({ ...state, currentProject, editorTabs });
 
     if (currentProject) {
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
@@ -964,7 +993,7 @@ const MainFrame = (props: Props) => {
       openEventsEditor = true,
       openSceneEditor = true,
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
-    newState: State = state
+    editorTabs = state.editorTabs
   ) => {
     const { i18n, storageProviderOperations } = props;
     const sceneEditorOptions = {
@@ -1090,8 +1119,8 @@ const MainFrame = (props: Props) => {
     };
 
     const tabsWithSceneEditor = openSceneEditor
-      ? openEditorTab(newState.editorTabs, sceneEditorOptions)
-      : newState.editorTabs;
+      ? openEditorTab(editorTabs, sceneEditorOptions)
+      : editorTabs;
     const tabsWithSceneAndEventsEditors = openEventsEditor
       ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
       : tabsWithSceneEditor;
@@ -1298,7 +1327,15 @@ const MainFrame = (props: Props) => {
             onOpen={() => chooseProject(newState, newProps)}
             onCreate={() => openCreateDialog()}
             onOpenProjectManager={() => openProjectManager()}
-            onCloseProject={() => askToCloseProject(newState, newProps)}
+            onCloseProject={() =>
+              askToCloseProject(
+                {
+                  currentProject: newState.currentProject,
+                  editorTabs: newState.editorTabs,
+                },
+                newProps
+              )
+            }
             onOpenAboutDialog={() => openAboutDialog()}
             onOpenHelpFinder={() => openHelpFinderDialog()}
             onOpenLanguageDialog={() => openLanguage()}
@@ -1432,7 +1469,11 @@ const MainFrame = (props: Props) => {
 
   const chooseProjectWithStorageProviderPicker = (
     newState: State = state,
-    newProps: Props = props
+    newProps = {
+      i18n: props.i18n,
+      eventsFunctionsExtensionsState: props.eventsFunctionsExtensionsState,
+      storageProviderOperations: props.storageProviderOperations,
+    }
   ) => {
     const { storageProviderOperations, i18n } = newProps;
     if (!storageProviderOperations.onOpenWithPicker) return;
@@ -1442,8 +1483,17 @@ const MainFrame = (props: Props) => {
       .then(fileMetadata => {
         if (!fileMetadata) return;
 
-        return openFromFileMetadata(fileMetadata, newState, newProps).then(state => {
-          if (state) openSceneOrProjectManager(state);
+        return openFromFileMetadata(fileMetadata, newState, {
+          i18n: newProps.i18n,
+          storageProviderOperations: newProps.storageProviderOperations,
+          eventsFunctionsExtensionsState:
+            newProps.eventsFunctionsExtensionsState,
+        }).then(state => {
+          if (state)
+            openSceneOrProjectManager({
+              currentProject: state.currentProject,
+              editorTabs: state.editorTabs,
+            });
           //addRecentFile(fileMetadata);
         });
       })
@@ -1549,25 +1599,35 @@ const MainFrame = (props: Props) => {
   };
 
   const askToCloseProject = (
-    newState: State = state,
+    newState = {
+      currentProject: state.currentProject,
+      editorTabs: state.editorTabs,
+    },
     newProps: Props = props
   ): Promise<State> => {
     const { unsavedChanges } = newProps;
+    const { currentProject, editorTabs } = newState;
     if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
-      if (!newState.currentProject) return Promise.resolve(newState);
+      if (!newState.currentProject)
+        return Promise.resolve({ ...state, ...newState });
 
       const answer = Window.showConfirmDialog(
         i18n._(
           t`Close the project? Any changes that have not been saved will be lost.`
         )
       );
-      if (!answer) return Promise.resolve(newState);
+      if (!answer) return Promise.resolve({ ...state, ...newState });
     }
     return closeProject(newState);
   };
 
-  const openSceneOrProjectManager = (newState: State = state) => {
-    const { currentProject } = newState;
+  const openSceneOrProjectManager = (
+    newState = {
+      currentProject: state.currentProject,
+      editorTabs: state.editorTabs,
+    }
+  ) => {
+    const { currentProject, editorTabs } = newState;
     if (!currentProject) return;
 
     if (currentProject.getLayoutsCount() === 1) {
@@ -1577,12 +1637,15 @@ const MainFrame = (props: Props) => {
           openSceneEditor: true,
           openEventsEditor: true,
         },
-        newState
+        editorTabs
       );
     } else {
-      setState({ ...newState, loadingProject: false }).then(state =>
-        openProjectManager()
-      );
+      setState(state => ({
+        ...state,
+        currentProject,
+        editorTabs,
+        loadingProject: false,
+      })).then(state => openProjectManager());
     }
   };
 
@@ -1936,9 +1999,21 @@ const MainFrame = (props: Props) => {
               state => {
                 // eslint-disable-next-line
                 useStorageProvider(storageProvider)
-                  .then(() => openFromFileMetadata(fileMetadata, state, props))
+                  .then(() =>
+                    openFromFileMetadata(fileMetadata, state, {
+                      i18n: props.i18n,
+                      storageProviderOperations:
+                        props.storageProviderOperations,
+                      eventsFunctionsExtensionsState:
+                        props.eventsFunctionsExtensionsState,
+                    })
+                  )
                   .then(state => {
-                    if (state) openSceneOrProjectManager(state);
+                    if (state)
+                      openSceneOrProjectManager({
+                        currentProject: state.currentProject,
+                        editorTabs: state.editorTabs,
+                      });
                   });
               }
             );
@@ -1948,8 +2023,18 @@ const MainFrame = (props: Props) => {
               state => {
                 // eslint-disable-next-line
                 useStorageProvider(storageProvider)
-                  .then(() => loadFromProject(project, fileMetadata, state))
-                  .then(state => openSceneOrProjectManager(state));
+                  .then(() =>
+                    loadFromProject(project, fileMetadata, {
+                      currentProject: state.currentProject,
+                      editorTabs: state.editorTabs,
+                    })
+                  )
+                  .then(state =>
+                    openSceneOrProjectManager({
+                      currentProject: state.currentProject,
+                      editorTabs: state.editorTabs,
+                    })
+                  );
               }
             );
           },

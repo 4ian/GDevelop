@@ -191,6 +191,7 @@ import {
   makeFakeExpressionAutocompletions,
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
+import LayersList from '../LayersList';
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -917,7 +918,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
       renderTextField={() => (
         <SemiControlledTextField
           floatingLabelText="Hello"
-          multiLine
+          multiline
           value={'123\n456\n789\nblablabla bla bla'}
           onChange={() => {}}
         />
@@ -2045,7 +2046,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   .addDecorator(muiDecorator)
   .add('autocompletions (first selected)', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
       // $FlowExpectedError
@@ -2057,7 +2058,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   ))
   .add('autocompletions (second selected)', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
       // $FlowExpectedError
@@ -2069,7 +2070,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   ))
   .add('autocompletion for an exact expression', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
       remainingCount={0}
       // $FlowExpectedError
@@ -2081,7 +2082,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   ))
   .add('empty autocompletions (nothing shown)', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={[]}
       remainingCount={0}
       // $FlowExpectedError
@@ -4097,6 +4098,47 @@ storiesOf('ExtensionsSearchDialog', module)
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('LayersList', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LayersList
+      project={testProject.project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      onRemoveLayer={(layerName, cb) => {
+        cb(true);
+      }}
+      onRenameLayer={(oldName, newName, cb) => {
+        cb(true);
+      }}
+      layersContainer={testProject.testLayout}
+    />
+  ))
+  .add('small width and height', () => (
+    <div style={{ width: 250, height: 200 }}>
+      <LayersList
+        project={testProject.project}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        onRemoveLayer={(layerName, cb) => {
+          cb(true);
+        }}
+        onRenameLayer={(oldName, newName, cb) => {
+          cb(true);
+        }}
+        layersContainer={testProject.testLayout}
+      />
+    </div>
   ));
 
 storiesOf('EffectsList', module)

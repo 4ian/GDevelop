@@ -135,7 +135,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                     eventsFunctionsExtension.setShortDescription(text);
                     this.forceUpdate();
                   }}
-                  multiLine
+                  multiline
                   fullWidth
                   rows={2}
                   rowsMax={2}
@@ -149,7 +149,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                     eventsFunctionsExtension.setDescription(text);
                     this.forceUpdate();
                   }}
-                  multiLine
+                  multiline
                   fullWidth
                   rows={5}
                   rowsMax={5}

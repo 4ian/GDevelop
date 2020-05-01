@@ -171,7 +171,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         />
         <Checkbox
           checked={this.state.shouldStopSoundsOnStartup}
-          label={<Trans>Stop musics and sounds on startup</Trans>}
+          label={<Trans>Stop music and sounds on startup</Trans>}
           onCheck={(e, check) =>
             this.setState({
               shouldStopSoundsOnStartup: check,

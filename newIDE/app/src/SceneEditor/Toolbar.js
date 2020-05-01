@@ -69,6 +69,16 @@ export class Toolbar extends PureComponent<Props> {
           src="res/ribbon_default/editprop32.png"
           tooltip={t`Open the properties panel`}
         />
+        <ToolbarIcon
+          onClick={this.props.toggleInstancesList}
+          src="res/ribbon_default/ObjectsPositionsList32.png"
+          tooltip={t`Open the list of instances`}
+        />
+        <ToolbarIcon
+          onClick={this.props.toggleLayersList}
+          src="res/ribbon_default/layers32.png"
+          tooltip={t`Open the layers editor`}
+        />
         <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.undo}
@@ -90,16 +100,6 @@ export class Toolbar extends PureComponent<Props> {
             !this.props.instancesSelection.getSelectedInstances().length
           }
           tooltip={t`Delete the selected instances from the scene`}
-        />
-        <ToolbarIcon
-          onClick={this.props.toggleInstancesList}
-          src="res/ribbon_default/ObjectsPositionsList32.png"
-          tooltip={t`Open the list of instances`}
-        />
-        <ToolbarIcon
-          onClick={this.props.toggleLayersList}
-          src="res/ribbon_default/layers32.png"
-          tooltip={t`Open the layers editor`}
         />
         <ToolbarSeparator />
         <ElementWithMenu

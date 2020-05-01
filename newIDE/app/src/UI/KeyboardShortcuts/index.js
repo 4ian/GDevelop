@@ -15,6 +15,7 @@ const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
 const Z_KEY = 90;
+const ESC_KEY = 27;
 
 type ShortcutCallbacks = {|
   onDelete?: () => void,
@@ -27,6 +28,7 @@ type ShortcutCallbacks = {|
   onSearch?: () => void,
   onZoomOut?: () => void,
   onZoomIn?: () => void,
+  onEscape?: () => void,
 |};
 
 type ConstructorArgs = {|
@@ -108,6 +110,7 @@ export default class KeyboardShortcuts {
       onSearch,
       onZoomOut,
       onZoomIn,
+      onEscape,
     } = this._shortcutCallbacks;
 
     if (onMove) {
@@ -149,6 +152,9 @@ export default class KeyboardShortcuts {
     }
     if (onSearch && this._isControlOrCmdPressed() && evt.which === F_KEY) {
       onSearch();
+    }
+    if (onEscape && evt.which === ESC_KEY) {
+      onEscape();
     }
 
     if (onZoomOut && this._isControlOrCmdPressed() && evt.which === MINUS_KEY) {

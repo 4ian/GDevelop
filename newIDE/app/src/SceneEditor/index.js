@@ -29,9 +29,7 @@ import Clipboard from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
-import Drawer from '@material-ui/core/Drawer';
 import EditorMosaic from '../UI/EditorMosaic';
-import EditorBar, { editorBarHeight } from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -69,6 +67,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 import SceneVariablesDialog from './SceneVariablesDialog';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -82,14 +81,7 @@ const styles = {
   },
 };
 
-const instancesDrawerPaperProps = {
-  style: {
-    width: 500,
-    overflow: 'hidden',
-  },
-};
-
-const initialEditors = {
+const initialMosaicEditorNodes = {
   direction: 'row',
   first: 'properties',
   splitPercentage: 23,
@@ -101,7 +93,7 @@ const initialEditors = {
   },
 };
 
-const initialEditorsSmallWindow = {
+const initialMosaicEditorNodesSmallWindow = {
   direction: 'row',
   first: 'instances-editor',
   second: 'objects-list',
@@ -129,8 +121,6 @@ type Props = {|
 |};
 
 type State = {|
-  objectsListOpen: boolean,
-  instancesListOpen: boolean,
   setupGridOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
@@ -152,6 +142,7 @@ type State = {|
   layoutVariablesDialogOpen: boolean,
   showPropertiesInfoBar: boolean,
   showLayersInfoBar: boolean,
+  showInstancesInfoBar: boolean,
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
@@ -177,8 +168,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.instancesSelection = new InstancesSelection();
     this.state = {
-      objectsListOpen: false,
-      instancesListOpen: false,
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,
       layersListOpen: false,
@@ -201,6 +190,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layoutVariablesDialogOpen: false,
       showPropertiesInfoBar: false,
       showLayersInfoBar: false,
+      showInstancesInfoBar: false,
 
       selectedObjectTags: [],
     };
@@ -294,12 +284,17 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   toggleInstancesList = () => {
-    this.setState({ instancesListOpen: !this.state.instancesListOpen });
+    if (!this.editorMosaic) return;
+    if (!this.editorMosaic.openEditor('instances-list', 'end', 75, 'row')) {
+      this.setState({
+        showInstancesInfoBar: true,
+      });
+    }
   };
 
   toggleLayersList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('layers', 'end', 75, 'row')) {
+    if (!this.editorMosaic.openEditor('layers-list', 'end', 75, 'row')) {
       this.setState({
         showLayersInfoBar: true,
       });
@@ -928,7 +923,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         ),
       },
-      layers: {
+      'layers-list': {
         type: 'secondary',
         title: t`Layers`,
         renderEditor: () => (
@@ -937,11 +932,21 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
-            freezeUpdate={false}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
             unsavedChanges={this.props.unsavedChanges}
+          />
+        ),
+      },
+      'instances-list': {
+        type: 'secondary',
+        title: t`Instances list`,
+        renderEditor: () => (
+          <InstancesList
+            instances={initialInstances}
+            selectedInstances={selectedInstances}
+            onSelectInstances={this._onSelectInstances}
           />
         ),
       },
@@ -1041,16 +1046,30 @@ export default class SceneEditor extends React.Component<Props, State> {
       <div style={styles.container}>
         <ResponsiveWindowMeasurer>
           {windowWidth => (
-            <EditorMosaic
-              editors={editors}
-              limitToOneSecondaryEditor={windowWidth === 'small'}
-              initialNodes={
-                windowWidth === 'small'
-                  ? initialEditorsSmallWindow
-                  : initialEditors
-              }
-              ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-            />
+            <PreferencesContext.Consumer>
+              {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
+                <EditorMosaic
+                  editors={editors}
+                  limitToOneSecondaryEditor={windowWidth === 'small'}
+                  initialNodes={
+                    windowWidth === 'small'
+                      ? getDefaultEditorMosaicNode('scene-editor-small') ||
+                        initialMosaicEditorNodesSmallWindow
+                      : getDefaultEditorMosaicNode('scene-editor') ||
+                        initialMosaicEditorNodes
+                  }
+                  onPersistNodes={node =>
+                    setDefaultEditorMosaicNode(
+                      windowWidth === 'small'
+                        ? 'scene-editor-small'
+                        : 'scene-editor',
+                      node
+                    )
+                  }
+                  ref={editorMosaic => (this.editorMosaic = editorMosaic)}
+                />
+              )}
+            </PreferencesContext.Consumer>
           )}
         </ResponsiveWindowMeasurer>
         {this.state.editedObjectWithContext && (
@@ -1099,27 +1118,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.editGroup(null)}
           />
         )}
-        <Drawer
-          open={this.state.instancesListOpen}
-          PaperProps={instancesDrawerPaperProps}
-          anchor="right"
-          onClose={this.toggleInstancesList}
-        >
-          <EditorBar
-            title={<Trans>Instances</Trans>}
-            displayLeftCloseButton
-            onClose={this.toggleInstancesList}
-          />
-          <InstancesList
-            freezeUpdate={!this.state.instancesListOpen}
-            instances={initialInstances}
-            selectedInstances={selectedInstances}
-            onSelectInstances={this._onSelectInstances}
-            style={{
-              height: `calc(100% - ${editorBarHeight}px)`,
-            }}
-          />
-        </Drawer>
         <InfoBar
           identifier="instance-drag-n-drop-explanation"
           message={
@@ -1164,6 +1162,16 @@ export default class SceneEditor extends React.Component<Props, State> {
             </Trans>
           }
           show={!!this.state.showLayersInfoBar}
+        />
+        <InfoBar
+          identifier="instances-panel-explanation"
+          message={
+            <Trans>
+              Instances panel is already opened. You can search instances in the
+              scene and click one to move the view to it.
+            </Trans>
+          }
+          show={!!this.state.showInstancesInfoBar}
         />
         {this.state.setupGridOpen && (
           <SetupGridDialog

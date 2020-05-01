@@ -1,12 +1,10 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Divider from '@material-ui/core/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import { findExamples } from './LocalExamplesFinder';
@@ -111,21 +109,12 @@ export default class LocalExamples extends Component<Props, State> {
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
-            <Line>
-              <Column>
-                <Text>
-                  <Trans>Choose or search for an example to open:</Trans>
-                </Text>
-              </Column>
-            </Line>
-            <Line>
-              <ExamplesList
-                exampleNames={this.state.exampleNames}
-                onCreateFromExample={exampleName =>
-                  this.createFromExample(i18n, exampleName)
-                }
-              />
-            </Line>
+            <ExamplesList
+              exampleNames={this.state.exampleNames}
+              onCreateFromExample={exampleName =>
+                this.createFromExample(i18n, exampleName)
+              }
+            />
             <Divider />
             <Line expand>
               <Column expand>

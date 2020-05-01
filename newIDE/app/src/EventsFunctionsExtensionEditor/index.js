@@ -43,6 +43,7 @@ import {
   emptyPreviewButtonSettings,
 } from '../MainFrame/Toolbar/PreviewButtons';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const gd = global.gd;
 
@@ -79,6 +80,23 @@ type State = {|
     parameters: ?EventsFunctionCreationParameters
   ) => void,
 |};
+
+const initialMosaicEditorNodes = {
+  direction: 'row',
+  first: {
+    direction: 'column',
+    first: 'free-functions-list',
+    second: 'behaviors-list',
+    splitPercentage: 50,
+  },
+  second: {
+    direction: 'column',
+    first: 'parameters',
+    second: 'events-sheet',
+    splitPercentage: 25,
+  },
+  splitPercentage: 25,
+};
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
@@ -512,6 +530,24 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this._editorNavigator.openEditor('behaviors-list');
   };
 
+  _onEditorNavigatorEditorChanged = (editorName: string) => {
+    // It's important that this method is the same across renders,
+    // to avoid confusing EditorNavigator into thinking it's changed
+    // and immediately calling it, which would trigger an infinite loop.
+    // Search for "callback-prevent-infinite-rerendering" in the codebase.
+
+    this.updateToolbar();
+
+    if (editorName === 'behaviors-list') {
+      this._selectEventsBasedBehavior(null);
+    } else if (
+      editorName === 'free-functions-list' ||
+      editorName === 'behavior-functions-list'
+    ) {
+      this._selectEventsFunction(null, this.state.selectedEventsBasedBehavior);
+    }
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -804,43 +840,37 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     nextEditor: 'events-sheet',
                   },
                 }}
-                onEditorChanged={editorName => {
-                  this.updateToolbar();
-
-                  if (editorName === 'behaviors-list') {
-                    this._selectEventsBasedBehavior(null);
-                  } else if (
-                    editorName === 'free-functions-list' ||
-                    editorName === 'behavior-functions-list'
-                  ) {
-                    this._selectEventsFunction(
-                      null,
-                      selectedEventsBasedBehavior
-                    );
-                  }
-                }}
+                onEditorChanged={
+                  // It's important that this callback is the same across renders,
+                  // to avoid confusing EditorNavigator into thinking it's changed
+                  // and immediately calling it, which would trigger an infinite loop.
+                  // Search for "callback-prevent-infinite-rerendering" in the codebase.
+                  this._onEditorNavigatorEditorChanged
+                }
               />
             ) : (
-              <EditorMosaic
-                ref={editorMosaic => (this._editorMosaic = editorMosaic)}
-                editors={editors}
-                initialNodes={{
-                  direction: 'row',
-                  first: {
-                    direction: 'column',
-                    first: 'free-functions-list',
-                    second: 'behaviors-list',
-                    splitPercentage: 50,
-                  },
-                  second: {
-                    direction: 'column',
-                    first: 'parameters',
-                    second: 'events-sheet',
-                    splitPercentage: 25,
-                  },
-                  splitPercentage: 25,
-                }}
-              />
+              <PreferencesContext.Consumer>
+                {({
+                  getDefaultEditorMosaicNode,
+                  setDefaultEditorMosaicNode,
+                }) => (
+                  <EditorMosaic
+                    ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                    editors={editors}
+                    onPersistNodes={node =>
+                      setDefaultEditorMosaicNode(
+                        'events-functions-extension-editor',
+                        node
+                      )
+                    }
+                    initialNodes={
+                      getDefaultEditorMosaicNode(
+                        'events-functions-extension-editor'
+                      ) || initialMosaicEditorNodes
+                    }
+                  />
+                )}
+              </PreferencesContext.Consumer>
             )
           }
         </ResponsiveWindowMeasurer>

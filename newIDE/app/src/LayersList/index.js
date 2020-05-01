@@ -17,6 +17,8 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
+import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
+import Background from '../UI/Background';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -36,7 +38,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
   };
 
   render() {
-    const { layersContainer, onEditEffects } = this.props;
+    const { layersContainer, onEditEffects, width } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
@@ -86,12 +88,13 @@ class LayersListBody extends Component<*, LayersListBodyState> {
             layer.setVisibility(visible);
             this._onLayerModified();
           }}
+          width={width}
         />
       );
     });
 
     return (
-      <Column noMargin>
+      <Column noMargin expand>
         {containerLayersList}
         <BackgroundColorRow
           layout={layersContainer}
@@ -109,7 +112,6 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  freezeUpdate: boolean,
   layersContainer: gdLayout,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
@@ -128,13 +130,6 @@ export default class LayersList extends Component<Props, State> {
   state = {
     effectsEditedLayer: null,
   };
-
-  shouldComponentUpdate(nextProps: Props) {
-    // Rendering the component can be costly as it iterates over
-    // every layers, so the prop freezeUpdate allow to ask the component to stop
-    // updating, for example when hidden.
-    return !nextProps.freezeUpdate;
-  }
 
   _editEffects = (effectsEditedLayer: ?gdLayer) => {
     this.setState({
@@ -167,26 +162,31 @@ export default class LayersList extends Component<Props, State> {
     const listKey = this.props.layersContainer.ptr;
 
     return (
-      <ScrollView>
-        <Column noMargin expand>
-          <SortableLayersListBody
-            key={listKey}
-            layersContainer={this.props.layersContainer}
-            onEditEffects={layer => this._editEffects(layer)}
-            onRemoveLayer={this.props.onRemoveLayer}
-            onRenameLayer={this.props.onRenameLayer}
-            onSortEnd={({ oldIndex, newIndex }) => {
-              const layersCount = this.props.layersContainer.getLayersCount();
-              this.props.layersContainer.moveLayer(
-                layersCount - 1 - oldIndex,
-                layersCount - 1 - newIndex
-              );
-              this._onLayerModified();
-            }}
-            helperClass="sortable-helper"
-            useDragHandle
-            unsavedChanges={this.props.unsavedChanges}
-          />
+      <Background>
+        <ScrollView autoHideScrollbar>
+          <FullSizeMeasurer>
+            {({ width }) => (
+              <SortableLayersListBody
+                key={listKey}
+                layersContainer={this.props.layersContainer}
+                onEditEffects={layer => this._editEffects(layer)}
+                onRemoveLayer={this.props.onRemoveLayer}
+                onRenameLayer={this.props.onRenameLayer}
+                onSortEnd={({ oldIndex, newIndex }) => {
+                  const layersCount = this.props.layersContainer.getLayersCount();
+                  this.props.layersContainer.moveLayer(
+                    layersCount - 1 - oldIndex,
+                    layersCount - 1 - newIndex
+                  );
+                  this._onLayerModified();
+                }}
+                helperClass="sortable-helper"
+                useDragHandle
+                unsavedChanges={this.props.unsavedChanges}
+                width={width}
+              />
+            )}
+          </FullSizeMeasurer>
           <Column>
             <Line justifyContent="flex-end" expand>
               <RaisedButton
@@ -211,8 +211,8 @@ export default class LayersList extends Component<Props, State> {
               }
             />
           )}
-        </Column>
-      </ScrollView>
+        </ScrollView>
+      </Background>
     );
   }
 }

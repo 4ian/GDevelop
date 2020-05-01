@@ -223,7 +223,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                                     <CheckCircle
                                       style={{
                                         ...styles.bulletIcon,
-                                        ...{ color: muiTheme.message.valid },
+                                        color: muiTheme.message.valid,
                                       }}
                                     />
                                   ) : (

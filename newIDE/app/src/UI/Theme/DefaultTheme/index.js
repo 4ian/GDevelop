@@ -40,7 +40,7 @@ const gdevelopTheme = {
   message: {
     warning: '#ffa500',
     error: '#f00',
-    valid: '#00db00',
+    valid: '#00aa00',
   },
   toolbar: {
     backgroundColor: backgroundColor,

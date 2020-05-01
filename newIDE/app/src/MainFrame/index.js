@@ -1429,7 +1429,7 @@ const MainFrame = (props: Props) => {
     if (!currentProject) return;
     const { eventsFunctionsExtensionsState } = props;
 
-    // Names are assumed to be alreaStartPagedy validated
+    // Names are assumed to be alreay validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
       extensionName
     );

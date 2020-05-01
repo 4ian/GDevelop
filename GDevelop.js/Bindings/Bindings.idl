@@ -1008,6 +1008,23 @@ interface ExpressionMetadata {
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
 
+enum DependencyTypes { "cordova", "npm" };
+
+interface DependencyMetadata {
+    void DependencyMetadata();
+
+    [Const, Ref] DOMString GetName();
+    [Ref] DependencyMetadata SetName([Const] DOMString name_);
+    [Const, Ref] DOMString GetExportName();
+    [Ref] DependencyMetadata SetExportName([Const] DOMString exportName_);
+    [Const, Ref] long GetVersion();
+    [Ref] DependencyMetadata SetVersion([Const] long name_);
+    [Const, Ref] DependencyTypes GetDependencyType();
+    [Ref] DependencyMetadata SetDependencyType([Const] DependencyTypes dependencyType_);
+    [Const, Ref] PropertyDescriptor GetExtraSetting();
+    [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const] PropertyDescriptor settingValue);
+};
+
 interface ParameterMetadata {
     void ParameterMetadata();
 

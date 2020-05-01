@@ -26,6 +26,7 @@
 #include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
 #include <GDCore/Extensions/Metadata/EffectMetadata.h>
 #include <GDCore/Extensions/Metadata/MetadataProvider.h>
+#include <GDCore/Extensions/Metadata/DependencyMetadata.h>
 #include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
 #include <GDCore/Project/EventsFunction.h>
 #include <GDCore/Project/EventsFunctionsExtension.h>

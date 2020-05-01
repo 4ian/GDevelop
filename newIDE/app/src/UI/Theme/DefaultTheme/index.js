@@ -5,7 +5,6 @@ import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 import './Markdown.css';
-import './Global.css';
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';

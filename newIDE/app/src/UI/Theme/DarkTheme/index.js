@@ -6,7 +6,6 @@ import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 import './Markdown.css';
-import './Global.css';
 
 const almostWhite = '#EEE';
 const lightWhite = '#DDD';

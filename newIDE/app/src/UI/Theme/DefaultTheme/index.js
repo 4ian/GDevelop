@@ -5,6 +5,7 @@ import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 import './Markdown.css';
+import './Global.css';
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';
@@ -40,6 +41,7 @@ const gdevelopTheme = {
   message: {
     warning: '#ffa500',
     error: '#f00',
+    valid: '#00db00',
   },
   toolbar: {
     backgroundColor: backgroundColor,

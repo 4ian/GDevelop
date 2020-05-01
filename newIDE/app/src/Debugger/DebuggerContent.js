@@ -24,6 +24,8 @@ import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
 import { type ProfilerOutput } from '.';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import MiniToolbar from '../UI/MiniToolbar';
+import ScrollView from '../UI/ScrollView';
 
 type Props = {|
   gameData: ?any,
@@ -127,7 +129,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
         noTitleBar: true,
         renderEditor: () => (
           <Background>
-            <Column expand noMargin>
+            <ScrollView>
+              <Column>
               {selectedInspector ? (
                 rawMode ? (
                   <RawContentInspector
@@ -169,24 +172,25 @@ export default class DebuggerContent extends React.Component<Props, State> {
                   )}
                 </EmptyMessage>
               )}
-              <Column>
-                <Line justifyContent="space-between" alignItems="center">
-                  <HelpButton helpPagePath="/interface/debugger" />
-                  <div>
-                    <Checkbox
-                      checkedIcon={<Flash />}
-                      uncheckedIcon={<FlashOff />}
-                      checked={rawMode}
-                      onCheck={(e, enabled) =>
-                        this.setState({
-                          rawMode: enabled,
-                        })
-                      }
-                    />
-                  </div>
-                </Line>
               </Column>
-            </Column>
+            </ScrollView>
+            <MiniToolbar>
+              <Line justifyContent="space-between" alignItems="center" noMargin>
+                <HelpButton helpPagePath="/interface/debugger" />
+                <div>
+                  <Checkbox
+                    checkedIcon={<Flash />}
+                    uncheckedIcon={<FlashOff />}
+                    checked={rawMode}
+                    onCheck={(e, enabled) =>
+                      this.setState({
+                        rawMode: enabled,
+                      })
+                    }
+                  />
+                </div>
+              </Line>
+            </MiniToolbar>
           </Background>
         ),
       },

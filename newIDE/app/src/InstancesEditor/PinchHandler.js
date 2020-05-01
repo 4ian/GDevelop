@@ -96,6 +96,7 @@ type Props = {|
   setZoomFactor: number => void,
   getZoomFactor: () => number,
   viewPosition: ViewPosition,
+  setViewPosition: ViewPosition => void,
 |};
 
 /**
@@ -108,12 +109,20 @@ export default class PinchHandler {
   _setZoomFactor: number => void;
   _getZoomFactor: () => number;
   _viewPosition: ViewPosition;
+  _setViewPosition: ViewPosition => void;
   _unregisterCanvasPinchDetector: () => void;
 
-  constructor({ canvas, setZoomFactor, getZoomFactor, viewPosition }: Props) {
+  constructor({
+    canvas,
+    setZoomFactor,
+    getZoomFactor,
+    viewPosition,
+    setViewPosition,
+  }: Props) {
     this._setZoomFactor = setZoomFactor;
     this._getZoomFactor = getZoomFactor;
     this._viewPosition = viewPosition;
+    this._setViewPosition = setViewPosition;
     this._unregisterCanvasPinchDetector = registerCanvasPinchDetector({
       canvas,
       onPinchStart: this._startPinch,
@@ -142,6 +151,7 @@ export default class PinchHandler {
     this._lastPinchCenterY = centerY;
 
     this._setZoomFactor(this._getZoomFactor() * scale);
+    this._setViewPosition(this._viewPosition);
   };
 
   _endPinch = () => {

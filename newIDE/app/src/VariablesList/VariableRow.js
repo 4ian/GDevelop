@@ -113,7 +113,7 @@ const VariableRow = ({
         key="value"
         style={limitEditing ? styles.fadedButton : undefined}
       >
-        <Text>(Structure)</Text>
+        <Text noMargin>(Structure)</Text>
       </TreeTableCell>
     );
   }
@@ -121,6 +121,7 @@ const VariableRow = ({
     <TreeTableCell key="tools" style={styles.toolColumn}>
       {origin === 'inherited' && depth === 0 && (
         <IconButton
+          size="small"
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
           tooltip={t`Reset`}
@@ -130,6 +131,7 @@ const VariableRow = ({
       )}
       {!(origin === 'inherited' && depth === 0) && origin !== 'parent' && (
         <IconButton
+          size="small"
           onClick={onAddChild}
           style={isStructure ? undefined : styles.fadedButton}
           tooltip={t`Add child variable`}

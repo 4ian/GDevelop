@@ -19,8 +19,14 @@ import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
 
 const useDenseLists = true;
-export const listItemWith32PxIconHeight = 40;
-export const listItemWithoutIconHeight = 37;
+export const listItemWith32PxIconHeight = 32;
+export const listItemWithoutIconHeight = 29;
+
+const styles = {
+  listItemText: {
+    margin: '1px 0',
+  },
+};
 
 type DoubleClickMouseEvent = {| button: 0 | 1 | 2 |};
 
@@ -103,7 +109,12 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
       return (
         <MUIListItemSecondaryAction>
           <Tooltip title={props.reloadButtonTooltip}>
-            <IconButton edge="end" aria-label="reload" onClick={props.onReload}>
+            <IconButton
+              size="small"
+              edge="end"
+              aria-label="reload"
+              onClick={props.onReload}
+            >
               <Refresh />
             </IconButton>
           </Tooltip>
@@ -116,7 +127,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
           <ElementWithMenu
             ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
             element={
-              <IconButton edge="end" aria-label="menu">
+              <IconButton size="small" edge="end" aria-label="menu">
                 <MoreVert />
               </IconButton>
             }
@@ -137,6 +148,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
       return (
         <MUIListItemSecondaryAction>
           <IconButton
+            size="small"
             edge="end"
             aria-label="open link"
             onClick={props.onOpenLink}
@@ -149,7 +161,12 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
     if (props.displayRemoveButton) {
       return (
         <MUIListItemSecondaryAction>
-          <IconButton edge="end" aria-label="remove" onClick={props.onRemove}>
+          <IconButton
+            size="small"
+            edge="end"
+            aria-label="remove"
+            onClick={props.onRemove}
+          >
             <Remove />
           </IconButton>
         </MUIListItemSecondaryAction>
@@ -192,6 +209,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
           )}
           <MUIListItemText
+            style={styles.listItemText}
             primary={props.primaryText}
             secondary={props.secondaryText}
           />
@@ -221,6 +239,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
               <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
             )}
             <MUIListItemText
+              style={styles.listItemText}
               primary={props.primaryText}
               secondary={props.secondaryText}
             />

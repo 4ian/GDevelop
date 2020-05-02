@@ -10,6 +10,7 @@
     Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
   font-size: 14px !important;
+  background-color: #2E3440;
 }
 
 /**
@@ -24,11 +25,11 @@
  * Draggable handle on the left of an event
  */
 .gd-events-sheet-nord-theme .rst__moveHandle {
-  background: #4ab0e4 !important;
+  background: #81A1C1 !important;
 }
 
 .gd-events-sheet-nord-theme .rst__moveHandle:hover {
-  background-color: #84d2ff !important;
+  background-color: #88C0D0 !important;
 }
 
 /**
@@ -38,7 +39,7 @@
 .rst__lineFullVertical::after,
 .rst__lineHalfVerticalTop::after,
 .rst__lineHalfVerticalBottom::after {
-  background-color: black;
+  background-color: #D8DEE9;
 }
 
 /**
@@ -58,14 +59,14 @@
 
 .gd-events-sheet-nord-theme .selectable.selected {
   background-color: rgba(0, 0, 0, 0.1);
-  border: 1px #4ab0e4 solid !important;
+  border: 1px #88C0D0 solid !important;
 }
 
 /**
  * Large selectable area (events)
  */
 .gd-events-sheet-nord-theme .large-selectable.large-selected {
-  border: 1px #4ab0e4 solid !important;
+  border: 1px #88C0D0 solid !important;
 }
 
 /**
@@ -80,7 +81,7 @@
  */
 .gd-events-sheet-nord-theme .conditions-container {
   background: #3B4252;
-  border-right: 1px solid #d3d3d3;
+  border-right: 1px solid D8DEE9;
   padding-left: 5px;
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
@@ -111,18 +112,18 @@
  * Instructions parameters color scheme
  */
 .gd-events-sheet-nord-theme .instruction-parameter {
-  color: rgb(78, 78, 78);
+  color: #8FBCBB;
 }
 
 .gd-events-sheet-nord-theme .instruction-parameter.expression {
-  color: rgb(27, 143, 1);
+  color: #A3BE8C;
 }
 
 .gd-events-sheet-nord-theme .instruction-parameter.object,
 .gd-events-sheet-nord-theme .instruction-parameter.objectPtr,
 .gd-events-sheet-nord-theme .instruction-parameter.objectList,
 .gd-events-sheet-nord-theme .instruction-parameter.objectListWithoutPicking {
-  color: #3c4698;
+  color: #5E81AC;
   font-weight: bold;
 }
 
@@ -131,26 +132,26 @@
 }
 
 .gd-events-sheet-nord-theme .instruction-parameter.operator {
-  color: rgb(55, 131, 211);
+  color: #B48EAD;
 }
 
 .gd-events-sheet-nord-theme .instruction-parameter.objectvar {
-  color: rgb(131, 55, 162);
+  color: #D08770;
 }
 
 .gd-events-sheet-nord-theme .instruction-parameter.scenevar {
-  color: rgb(131, 55, 162);
+  color: #D08770;
 }
 
 .gd-events-sheet-nord-theme .instruction-parameter.globalvar {
-  color: rgb(131, 55, 162);
+  color: #D08770;
 }
 
 .gd-events-sheet-nord-theme
   .instruction-parameter
   .instruction-invalid-parameter {
-  color: #bb0000;
-  text-decoration: #bb0000 underline wavy;
+  color: #BF616A;
+  text-decoration: #BF616A underline wavy;
 }
 
 .gd-events-sheet-nord-theme
@@ -158,7 +159,7 @@
   .instruction-missing-parameter {
   display: inline-flex;
   background-color: rgba(243, 0, 12, 0.15);
-  border-bottom: 1px dashed #bb0000;
+  border-bottom: 1px dashed #BF616A;
   min-width: 25px;
   min-height: 14px;
 }
@@ -173,19 +174,20 @@
 
 .gd-events-sheet-nord-theme .rst__rowSearchMatch {
   outline: none;
-  border-left: solid 3px #18dcf2;
+  border-left: solid 3px #88C0D0
+  ;
 }
 
 .gd-events-sheet-nord-theme .rst__rowSearchFocus {
   outline: none;
-  border-left: solid 5px #18dcf2;
+  border-left: solid 5px #88C0D0;
 }
 
 /**
 * Drag'n'drop indicator (events)
 */
 .gd-events-sheet-nord-theme .drop-indicator {
-  border-top: 2px solid black;
+  border-top: 2px solid #4C566A;
   height: 0;
   margin-top: -1px;
   margin-bottom: -1px;
@@ -194,7 +196,7 @@
 }
 
 .gd-events-sheet-nord-theme .cant-drop-indicator {
-  border-top: 2px solid #ff5c5c;
+  border-top: 2px solid #BF616A;
   height: 0;
   margin-top: -1px;
   margin-bottom: -1px;
@@ -206,10 +208,10 @@
 * Skinning the "Link" event
 */
 .gd-events-sheet-nord-theme .link-container {
-  background: #f1f2f2;
+  background: #2E3440;
 }
 .gd-events-sheet-nord-theme .link-container .selectable {
-  color: #3c4698;
+  color: #81A1C1;
 }
 
 /* Theming icons */

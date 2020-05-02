@@ -73,9 +73,9 @@ const gdevelopTheme = {
   },
   listItem: {
     groupBackgroundColor: backgroundColor,
-    groupTextColor: 'rgba(0,0,0,0.54)',
-    deprecatedGroupTextColor: 'rgba(0,0,0,0.30)',
-    separatorColor: '#e0e0e0',
+    groupTextColor: nord6,
+    deprecatedGroupTextColor: nord4,
+    separatorColor: nord4,
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',
     errorTextColor: '#ff2e16',
@@ -84,15 +84,15 @@ const gdevelopTheme = {
     selectedWarningBackgroundColor: '#ffb032',
   },
   emptyMessage: {
-    shadowColor: '#FFFFFF',
+    shadowColor: '#000',
   },
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-default-theme', // See Mosaic.css
+  mosaicRootClassName: 'mosaic-gd-nord-theme', // See Mosaic.css
   eventsSheetRootClassName: 'gd-events-sheet-nord-theme', // See EventsSheet.css
-  tableRootClassName: 'gd-table-default-theme', // See Table.css
-  markdownRootClassName: 'gd-markdown-default-theme', // See Markdown.css
+  tableRootClassName: 'gd-table-nord-theme', // See Table.css
+  markdownRootClassName: 'gd-markdown-nord-theme', // See Markdown.css
   gdevelopIconsCSSFilter: '',
 };
 
@@ -149,13 +149,13 @@ const muiTheme = createMuiTheme({
     MuiIconButton: {
       root: {
         // Fix color being grey if not set to (almost) black
-        color: '#111',
+        color: '#D8DEE9',
       },
     },
     MuiListItemIcon: {
       root: {
         // Fix color being grey if not set to (almost) black
-        color: '#111',
+        color: '#D8DEE9',
       },
     },
     // Use a more visible color scheme for tabs:
@@ -166,7 +166,7 @@ const muiTheme = createMuiTheme({
     },
     MuiTab: {
       textColorPrimary: {
-        color: '#fff !important',
+        color: '#ECEFF4 !important',
       },
     },
     MuiButtonBase: {

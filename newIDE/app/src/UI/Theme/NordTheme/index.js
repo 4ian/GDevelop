@@ -14,9 +14,8 @@ const nord8 = '#88C0D0';
 const nord9 = '#81A1C1';
 const nord11 = '#BF616A';
 const nord12 = '#D08770';
+const nord13 = '#EBCB8B';
 const nord14 = '#A3BE8C';
-
-const systemSelectionColor = '#4c92ff'; //OS X selection
 
 // Use the fonts provided by the operating system(s) as possible.
 // If you update this font list, be sure to do it in all the other places using fonts in the codebase.
@@ -51,7 +50,7 @@ const gdevelopTheme = {
   },
   toolbar: {
     backgroundColor: backgroundColor,
-    separatorColor: '#cecece',
+    separatorColor: nord4,
   },
   closableTabs: {
     fontFamily,
@@ -63,7 +62,7 @@ const gdevelopTheme = {
     closeButtonWidth: 24,
   },
   imageThumbnail: {
-    selectedBorderColor: systemSelectionColor,
+    selectedBorderColor: nord8,
   },
   list: {
     itemsBackgroundColor: alternateCanvasColor,
@@ -76,12 +75,12 @@ const gdevelopTheme = {
     groupTextColor: nord6,
     deprecatedGroupTextColor: nord4,
     separatorColor: nord4,
-    selectedBackgroundColor: systemSelectionColor,
-    selectedTextColor: '#ffffff',
-    errorTextColor: '#ff2e16',
-    warningTextColor: '#ffb032',
-    selectedErrorBackgroundColor: '#ff2e16',
-    selectedWarningBackgroundColor: '#ffb032',
+    selectedBackgroundColor: nord8,
+    selectedTextColor: backgroundColor,
+    errorTextColor: nord11,
+    warningTextColor: nord13,
+    selectedErrorBackgroundColor: nord11,
+    selectedWarningBackgroundColor: nord13,
   },
   emptyMessage: {
     shadowColor: '#000',

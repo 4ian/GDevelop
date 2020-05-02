@@ -54,11 +54,11 @@
  * Selectable area (instructions)
  */
 .gd-events-sheet-nord-theme .selectable:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .gd-events-sheet-nord-theme .selectable.selected {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.2);
   border: 1px #88C0D0 solid !important;
 }
 

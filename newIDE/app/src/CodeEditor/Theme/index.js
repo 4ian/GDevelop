@@ -6,6 +6,7 @@ import SolarizedDark from './SolarizedDark';
 import SolarizedLight from './SolarizedLight';
 import VibrantInk from './VibrantInk';
 import GitHub from './GitHub';
+import NordDark from './NordDark';
 
 type CodeEditorTheme = {|
   name: string,
@@ -35,6 +36,7 @@ const themes: Array<CodeEditorTheme> = [
   Tomorrow,
   TomorrowNight,
   VibrantInk,
+  NordDark
 ];
 
 export const getAllThemes = () => themes;

@@ -131,47 +131,47 @@ export default class DebuggerContent extends React.Component<Props, State> {
           <Background>
             <ScrollView>
               <Column>
-                {selectedInspector ? (
-                  rawMode ? (
-                    <RawContentInspector
-                      gameData={get(gameData, selectedInspectorFullPath, null)}
-                      onEdit={(path, newValue) =>
-                        onEdit(selectedInspectorFullPath.concat(path), newValue)
-                      }
-                    />
-                  ) : (
-                    selectedInspector.renderInspector(
-                      get(gameData, selectedInspectorFullPath, null),
-                      {
-                        onCall: (path, args) =>
-                          onCall(selectedInspectorFullPath.concat(path), args),
-                        onEdit: (path, newValue) =>
-                          onEdit(
-                            selectedInspectorFullPath.concat(path),
-                            newValue
-                          ),
-                      }
-                    ) || (
-                      <EmptyMessage>
-                        <Trans>
-                          No inspector, choose another element in the list or
-                          toggle the raw data view.
-                        </Trans>
-                      </EmptyMessage>
-                    )
-                  )
+              {selectedInspector ? (
+                rawMode ? (
+                  <RawContentInspector
+                    gameData={get(gameData, selectedInspectorFullPath, null)}
+                    onEdit={(path, newValue) =>
+                      onEdit(selectedInspectorFullPath.concat(path), newValue)
+                    }
+                  />
                 ) : (
-                  <EmptyMessage>
-                    {gameData ? (
-                      <Trans>Choose an element to inspect in the list</Trans>
-                    ) : (
+                  selectedInspector.renderInspector(
+                    get(gameData, selectedInspectorFullPath, null),
+                    {
+                      onCall: (path, args) =>
+                        onCall(selectedInspectorFullPath.concat(path), args),
+                      onEdit: (path, newValue) =>
+                        onEdit(
+                          selectedInspectorFullPath.concat(path),
+                          newValue
+                        ),
+                    }
+                  ) || (
+                    <EmptyMessage>
                       <Trans>
-                        Pause the game (from the toolbar) or hit refresh (on the
-                        left) to inspect the game
+                        No inspector, choose another element in the list or
+                        toggle the raw data view.
                       </Trans>
-                    )}
-                  </EmptyMessage>
-                )}
+                    </EmptyMessage>
+                  )
+                )
+              ) : (
+                <EmptyMessage>
+                  {gameData ? (
+                    <Trans>Choose an element to inspect in the list</Trans>
+                  ) : (
+                    <Trans>
+                      Pause the game (from the toolbar) or hit refresh (on the
+                      left) to inspect the game
+                    </Trans>
+                  )}
+                </EmptyMessage>
+              )}
               </Column>
             </ScrollView>
             <MiniToolbar>

@@ -180,7 +180,12 @@ export default class SearchPanel extends PureComponent<Props, State> {
               <InlineCheckbox
                 label={<Trans>Case insensitive</Trans>}
                 checked={!this.state.matchCase}
-                onCheck={(e, checked) => this.setState({ matchCase: !checked })}
+                onCheck={(e, checked) =>
+                  this.setState({
+                    matchCase: !checked,
+                    searchResultsDirty: true,
+                  })
+                }
               />
               <Text>
                 <Trans>Search in:</Trans>
@@ -190,21 +195,30 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 label={<Trans>Conditions</Trans>}
                 checked={this.state.searchInConditions}
                 onCheck={(e, checked) =>
-                  this.setState({ searchInConditions: checked })
+                  this.setState({
+                    searchInConditions: checked,
+                    searchResultsDirty: true,
+                  })
                 }
               />
               <InlineCheckbox
                 label={<Trans>Actions</Trans>}
                 checked={this.state.searchInActions}
                 onCheck={(e, checked) =>
-                  this.setState({ searchInActions: checked })
+                  this.setState({
+                    searchInActions: checked,
+                    searchResultsDirty: true,
+                  })
                 }
               />
               <InlineCheckbox
                 label={<Trans>Texts</Trans>}
                 checked={this.state.searchInEventStrings}
                 onCheck={(e, checked) =>
-                  this.setState({ searchInEventStrings: checked })
+                  this.setState({
+                    searchInEventStrings: checked,
+                    searchResultsDirty: true,
+                  })
                 }
               />
               {/* <InlineCheckbox //TODO: Implement search/replace in selection

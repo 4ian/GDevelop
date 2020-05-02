@@ -121,11 +121,11 @@ const muiTheme = createMuiTheme({
       contrastText: nord4,
     },
     text: {
-        primary: nord6,
-        secondary: nord5,
-        disabled: nord4,
-        hint: nord5,
-    }
+      primary: nord6,
+      secondary: nord5,
+      disabled: nord4,
+      hint: nord5,
+    },
   },
   overrides: {
     MuiTypography: {

@@ -81,13 +81,27 @@ export default [
           setLastUsedPath,
           'image'
         ).then(resources => {
+          const nativeImage = electron.nativeImage;
           return resources.map(resourcePath => {
-            const imageResource = new gd.ImageResource();
-            const projectPath = path.dirname(project.getProjectFile());
-            imageResource.setFile(path.relative(projectPath, resourcePath));
-            imageResource.setName(path.relative(projectPath, resourcePath));
+            let image = nativeImage.createFromPath(resourcePath);
 
-            return imageResource;
+            if (image.getSize().width > 2048 || image.getSize().height > 2048) {
+              const answer = Window.showConfirmDialog(
+                i18n._(
+                  t`The selected image is more than 2048 pixels wide. The image may not be displayed on some devices. Do you really want to import the image?`
+                )
+              );
+              if (answer) {
+                const imageResource = new gd.ImageResource();
+                const projectPath = path.dirname(project.getProjectFile());
+                imageResource.setFile(path.relative(projectPath, resourcePath));
+                imageResource.setName(path.relative(projectPath, resourcePath));
+
+                return imageResource;
+              }
+
+              return null;
+            }
           });
         });
       };

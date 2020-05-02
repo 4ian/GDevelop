@@ -81,7 +81,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
     if (!sources.length) return;
     onChooseResource(sources[0].name).then(resources => {
-      if (!resources.length) return; // No path was chosen by the user.
+      if (!resources[0]) return; // No path was chosen by the user.
       resource.setFile(resources[0].getFile());
 
       // Important, we are responsible for deleting the resources that were given to us.

@@ -3,7 +3,6 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { Column } from '../UI/Grid';
 import { type DebuggerId } from '.';
 
 type Props = {|

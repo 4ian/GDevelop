@@ -1026,15 +1026,13 @@ gd::String EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(
     const gd::String& referenceName,
     const gd::String& referencedBoolean,
     gd::EventsCodeGenerationContext& context) {
-  if (context.GetParentContext() == NULL) return "";
+  if (context.GetCurrentConditionDepth() <= 0)
+    return "/* Code generation error: the referenced boolean can't exist as "
+           "the context has a condition depth of 0. */";
 
-  // FIXME: Using context.GetParentContext() generates the wrong boolean name in
-  // case a condition with a custom code generator is used inside another
-  // condition (i.e: as a subinstructions).
   return GenerateBooleanFullName(referenceName, context) + " = " +
-         GenerateBooleanFullName(referencedBoolean,
-                                 *context.GetParentContext()) +
-         ";\n";
+         GetCodeNamespaceAccessor() + referencedBoolean + "_" +
+         gd::String::From(context.GetCurrentConditionDepth() - 1) + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateBooleanInitializationToFalse(

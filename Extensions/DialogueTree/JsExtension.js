@@ -254,7 +254,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State Variable Name'), '', false)
-      .addParameter('yesorno', _('Variable boolean value'), '', false)
+      .addParameter('trueorfalse', _('Variable boolean value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
             
@@ -683,7 +683,7 @@ module.exports = {
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State variable'), '', false)
-      .addParameter('yesorno', _('Equal to true'), '', false)
+      .addParameter('trueorfalse', _('Equal to'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.compareVariable');
 

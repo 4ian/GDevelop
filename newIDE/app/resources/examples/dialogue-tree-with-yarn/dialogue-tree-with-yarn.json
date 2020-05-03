@@ -6508,14 +6508,14 @@
                   },
                   "parameters": [
                     "\"debug\"",
-                    "yes"
+                    "True"
                   ],
                   "subInstructions": []
                 }
               ],
               "events": [
                 {
-                  "disabled": false,
+                  "disabled": true,
                   "folded": false,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
@@ -6527,7 +6527,7 @@
                       },
                       "parameters": [
                         "\"debugLinks\"",
-                        "yes"
+                        "True"
                       ],
                       "subInstructions": []
                     }
@@ -6783,7 +6783,7 @@
                       },
                       "parameters": [
                         "\"debug\"",
-                        "yes"
+                        "True"
                       ],
                       "subInstructions": []
                     }
@@ -7366,7 +7366,7 @@
                       },
                       "parameters": [
                         "\"debug\"",
-                        "yes"
+                        "True"
                       ],
                       "subInstructions": []
                     }

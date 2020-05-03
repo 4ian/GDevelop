@@ -661,11 +661,11 @@ gdjs.dialogueTree.getVariable = function(key) {
 /**
  * Check if a specific variable created by the Dialogue parses exists and is equal to a specific value.
  * @param {string} key The name of the variable you want to check the value of
- * @param {string} value The value you want to check against
+ * @param {string|boolean|number} value The value you want to check against
  */
 gdjs.dialogueTree.compareVariable = function(key, value) {
   if (this.dialogueIsRunning && key in this.runner.variables.data) {
-    return this.runner.variables.get(key).toString() === value;
+    return this.runner.variables.get(key) === value;
   }
   return false;
 };
@@ -673,11 +673,11 @@ gdjs.dialogueTree.compareVariable = function(key, value) {
 /**
  * Set a specific variable created by the Dialogue parser to a specific value.
  * @param {string} key The name of the variable you want to set the value of
- * @param {string} value The value you want to set
+ * @param {string|boolean|number} value The value you want to set
  */
 gdjs.dialogueTree.setVariable = function(key, value) {
   if (this.runner.variables) {
-    this.runner.variables.set(key, JSON.parse(value));
+    this.runner.variables.set(key, value);
   }
 };
 

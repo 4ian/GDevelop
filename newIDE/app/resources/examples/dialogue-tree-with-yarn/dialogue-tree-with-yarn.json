@@ -6504,18 +6504,18 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "DialogueTree::SetVariable"
+                    "value": "DialogueTree::SetBooleanVariable"
                   },
                   "parameters": [
                     "\"debug\"",
-                    "\"true\""
+                    "yes"
                   ],
                   "subInstructions": []
                 }
               ],
               "events": [
                 {
-                  "disabled": true,
+                  "disabled": false,
                   "folded": false,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
@@ -6523,11 +6523,11 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "DialogueTree::SetVariable"
+                        "value": "DialogueTree::SetBooleanVariable"
                       },
                       "parameters": [
                         "\"debugLinks\"",
-                        "\"true\""
+                        "yes"
                       ],
                       "subInstructions": []
                     }
@@ -6779,11 +6779,11 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "DialogueTree::CompareDialogueStateVariable"
+                        "value": "DialogueTree::CompareDialogueStateBooleanVariable"
                       },
                       "parameters": [
                         "\"debug\"",
-                        "\"true\""
+                        "yes"
                       ],
                       "subInstructions": []
                     }
@@ -7362,11 +7362,11 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "DialogueTree::CompareDialogueStateVariable"
+                        "value": "DialogueTree::CompareDialogueStateBooleanVariable"
                       },
                       "parameters": [
                         "\"debug\"",
-                        "\"true\""
+                        "yes"
                       ],
                       "subInstructions": []
                     }

@@ -64,7 +64,7 @@ type ListItemProps = {|
   open?: boolean,
   initiallyOpen?: boolean,
   disabled?: boolean,
-
+  rightIconColor?: string,
   nestedListStyle?: {|
     padding: 0,
   |},
@@ -117,7 +117,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
             element={
               <IconButton edge="end" aria-label="menu">
-                <MoreVert />
+                <MoreVert style={{ color: props.rightIconColor }} />
               </IconButton>
             }
             buildMenuTemplate={props.buildMenuTemplate}
@@ -141,7 +141,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             aria-label="open link"
             onClick={props.onOpenLink}
           >
-            <OpenInNew />
+            <OpenInNew style={{ color: props.rightIconColor }} />
           </IconButton>
         </MUIListItemSecondaryAction>
       );
@@ -150,7 +150,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
       return (
         <MUIListItemSecondaryAction>
           <IconButton edge="end" aria-label="remove" onClick={props.onRemove}>
-            <Remove />
+            <Remove style={{ color: props.rightIconColor }} />
           </IconButton>
         </MUIListItemSecondaryAction>
       );
@@ -196,8 +196,12 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             secondary={props.secondaryText}
           />
           {this._renderListItemSecondaryAction()}
-          {props.displayAddIcon && <Add />}
-          {props.displaySearchIcon && <Search />}
+          {props.displayAddIcon && (
+            <Add style={{ color: props.rightIconColor }} />
+          )}
+          {props.displaySearchIcon && (
+            <Search style={{ color: props.rightIconColor }} />
+          )}
         </MUIListItem>
       );
     } else {

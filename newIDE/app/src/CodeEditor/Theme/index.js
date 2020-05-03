@@ -36,7 +36,7 @@ const themes: Array<CodeEditorTheme> = [
   Tomorrow,
   TomorrowNight,
   VibrantInk,
-  NordDark
+  NordDark,
 ];
 
 export const getAllThemes = () => themes;

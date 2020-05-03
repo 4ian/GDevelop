@@ -71,6 +71,8 @@ const gdevelopTheme = {
     separatorColor: '#e0e0e0',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',
+    rightIconColor: '#111',
+    selectedRightIconColor: '#111',
     errorTextColor: '#ff2e16',
     warningTextColor: '#ffb032',
     selectedErrorBackgroundColor: '#ff2e16',

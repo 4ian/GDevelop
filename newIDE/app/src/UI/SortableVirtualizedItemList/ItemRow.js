@@ -125,6 +125,11 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                   : leftIcon
               }
               displayMenuButton={!hideMenuButton}
+              rightIconColor={
+                selected
+                  ? muiTheme.listItem.selectedRightIconColor
+                  : muiTheme.listItem.rightIconColor
+              }
               buildMenuTemplate={this.props.buildMenuTemplate}
               onClick={() => {
                 if (!onItemSelected) return;

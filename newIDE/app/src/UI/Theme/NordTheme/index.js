@@ -77,6 +77,8 @@ const gdevelopTheme = {
     separatorColor: nord4,
     selectedBackgroundColor: nord8,
     selectedTextColor: backgroundColor,
+    rightIconColor: nord4,
+    selectedRightIconColor: backgroundColor,
     errorTextColor: nord11,
     warningTextColor: nord13,
     selectedErrorBackgroundColor: nord11,
@@ -133,6 +135,11 @@ const muiTheme = createMuiTheme({
         fontWeight: 400,
       },
     },
+    MuiListItem: {
+      root: {
+        borderBottom: '1px solid #4C566A !important',
+      },
+    },
     MuiInput: {
       underline: {
         '&:before': {
@@ -147,7 +154,6 @@ const muiTheme = createMuiTheme({
     },
     MuiIconButton: {
       root: {
-        // Fix color being grey if not set to (almost) black
         color: '#D8DEE9',
       },
     },

@@ -25,7 +25,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
   /** @type {number} */
-  this._opacity = objectData.content.opacity;
+  this._opacity = parseInt(objectData.content.opacity);
   /** @type {boolean} */
   this._visible = objectData.content.visible;
   /** @type {string} */
@@ -34,8 +34,8 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   this._color = objectData.content.color;
   /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
-  /** @type {string} */
-  this._fontSize = objectData.content.fontSize;
+  /** @type {number} */
+  this._fontSize = parseInt(objectData.content.fontSize);
   /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
   /** @type {number} */
@@ -107,12 +107,12 @@ gdjs.BBTextRuntimeObject.prototype.getColor = function() {
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(fontSize) {
-  this._fontSize = fontSize.toString();
+  this._fontSize = fontSize;
   this._renderer.updateFontSize();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getFontSize = function() {
-  return parseInt(this._fontSize);
+  return this._fontSize;
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontFamily = function(fontFamily) {

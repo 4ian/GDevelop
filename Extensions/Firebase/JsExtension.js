@@ -36,8 +36,8 @@ module.exports = {
              ),
             _('Trigger Event _PARAM1_ with argument _PARAM2_'),
             _('Firebase/Analytics'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
           )
           .addCodeOnlyParameter('currentScene', '')
           .addParameter('string', _('Event Name'), '', false)
@@ -61,8 +61,8 @@ module.exports = {
              ),
             _('Set current user\'s ID to _PARAM1_'),
             _('Firebase/Analytics'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addCodeOnlyParameter('currentScene', '')
           .addParameter('string', _('New Unique ID'), '', false)
@@ -84,8 +84,8 @@ module.exports = {
              ),
             _('Set property _PARAM1_ of the current user to _PARAM2_'),
             _('Firebase/Analytics'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addCodeOnlyParameter('currentScene', '')
           .addParameter('string', _('Property Name'), '', false)
@@ -106,8 +106,8 @@ module.exports = {
             _('Get Remote setting as String'),
             _('Get a setting from Firebase Remote Config as String.'),
             _('Firebase/Remote Config'),
-            'JsPlatform/Extensions/filesystem_folder24.png',
-            'JsPlatform/Extensions/filesystem_folder32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addParameter('string', _('Setting Name'), '', false)
           .getCodeExtraInformation()
@@ -123,8 +123,8 @@ module.exports = {
             _('Get Remote setting as Number'),
             _('Get a setting from Firebase Remote Config as Number.'),
             _('Firebase/Remote Config'),
-            'JsPlatform/Extensions/filesystem_folder24.png',
-            'JsPlatform/Extensions/filesystem_folder32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addParameter('string', _('Setting Name'), '', false)
           .getCodeExtraInformation()
@@ -141,8 +141,8 @@ module.exports = {
             _('Sets Remote Config Auto Update Inteval.'),
             _('Set Remote Config Auto Update Inteval to _PARAM0_'),
             _('Firebase/Remote Config'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addParameter('number', _('Update Interval in ms'), '', false)
           .getCodeExtraInformation()
@@ -162,8 +162,8 @@ module.exports = {
             ),
             _('Set default config to _PARAM0_'),
             _('Firebase/Remote Config'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addParameter('scenevar', _('Structure with defaults'), '', false)
           .getCodeExtraInformation()
@@ -180,8 +180,8 @@ module.exports = {
             _('Use this to sync the Remote Config with the client at any time.'),
             _('Synchronize Remote Config'),
             _('Firebase/Remote Config'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
@@ -190,6 +190,7 @@ module.exports = {
 
 		
 		/* ====== AUTHENTIFICATION ====== */
+		// Auth Instructions
         extension
           .addAction(
             'CreateBasicAccount',
@@ -197,8 +198,8 @@ module.exports = {
             _('Create an account with e-mail and password as credentials.'),
             _('Create account with E-Mail _PARAM0_ and password _PARAM1_'),
             _('Firebase/Authentification'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addParameter('string', _('E-Mail'), '', false)
           .addParameter('string', _('Password'), '', false)
@@ -220,8 +221,8 @@ module.exports = {
 			),
             _('Connect to account with E-Mail _PARAM0_ and password _PARAM1_'),
             _('Firebase/Authentification'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .addParameter('string', _('E-Mail'), '', false)
 		  .addParameter('string', _('Password'), '', false)
@@ -246,8 +247,8 @@ module.exports = {
 			),
             _('Connect to account with Provider _PARAM0_'),
             _('Firebase/Authentification'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
           .getCodeExtraInformation()
@@ -264,8 +265,8 @@ module.exports = {
             _('Sign into a temporary anonymous account.'),
             _('Authenticate anonymously'),
             _('Firebase/Authentification'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
@@ -284,15 +285,82 @@ module.exports = {
 			),
             _('Check for authentification'),
             _('Firebase/Authentification'),
-            'JsPlatform/Extensions/filesystem_save_file24.png',
-            'JsPlatform/Extensions/filesystem_save_file32.png'
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
           )
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
           .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
-          .setFunctionName('gdjs.evtTools.firebase.auth.isAuthentified');
+		  .setFunctionName('gdjs.evtTools.firebase.auth.isAuthentified');
+		  
+		extension
+		  .addStrExpression(
+            'GetAuthToken',
+            _('Get the users authentififcation token'),
+            _('Get the users authentififcation token. The token is the proof of authentification.'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+          )
+          .addParameter('string', _('Setting Name'), '', false)
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.token');
+
+		//User management Instructions
+
+		extension
+		  .addStrExpression(
+            'GetUserEmail',
+            _('Get the users email address'),
+            _('Gets the users email address.'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+          )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getEmail');
+
+		extension
+		  .addStrExpression(
+			'GetAccountCreationTime',
+			_('Get the accounts creation time'),
+			_('Gets the accounts creation time.'),
+			_('Firebase/Authentification'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+     	  )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getCreationTime');
+
+		extension
+		  .addStrExpression(
+            'GetLastLoginTime',
+            _('Get the users last login time'),
+            _('Gets the users last login time.'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+      	  )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getLastLoginTime');
 
         return extension;
     },

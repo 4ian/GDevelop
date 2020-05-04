@@ -15,7 +15,7 @@ module.exports = {
       const extension = new gd.PlatformExtension();
       extension.setExtensionInformation(
         'Physics3',
-        'Physics Engine 3.0',
+        'Physics Engine 3.0(Experimental)',
         'Simulate physics',
         'Florian Rival, Franco Maciel',
         'MIT'
@@ -386,10 +386,10 @@ module.exports = {
         // extension
         .addBehavior(
           'Physics3Behavior',
-          _('Physics Engine 3.0'),
+          _('Physics Engine 3.0(Experimental)'),
           'Physics3',
           _(
-            'Simulate realistic object physics, with gravity, forces, joints, etc.'
+            'Complex RayCast Support, iOS Simulator improved, bug fixes etc.'
           ),
           '',
           'res/physics32.png',

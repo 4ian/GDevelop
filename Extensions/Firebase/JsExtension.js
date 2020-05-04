@@ -24,6 +24,8 @@ module.exports = {
           )
           .setExtensionHelpPath('/all-features/firebase');
 
+		
+		/* ====== ANALYTICS ====== */
         extension
           .addAction(
             'AnalyticsLog',
@@ -96,6 +98,8 @@ module.exports = {
           .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.setProperty');
 
+
+		/* ====== REMOTE CONFIGURATION ====== */
         extension
           .addStrExpression(
             'GetRCString',
@@ -132,7 +136,7 @@ module.exports = {
 
         extension
           .addAction(
-            'SetAutoUpdateInterval',
+            'SetRCAutoUpdateInterval',
             _('Set Remote Config Auto Update Inteval'),
             _('Sets Remote Config Auto Update Inteval.'),
             _('Set Remote Config Auto Update Inteval to _PARAM0_'),
@@ -150,7 +154,7 @@ module.exports = {
         
         extension
           .addAction(
-            'SetDefaultConfig',
+            'SetRCDefaultConfig',
             _('Set the default configuration'),
             _(
               'As the Remote Config is online, you need to set a default ' + 
@@ -171,7 +175,7 @@ module.exports = {
 
         extension
           .addAction(
-            'ForceReload',
+            'ForceReloadRC',
             _('Force sync the configuration'),
             _('Use this to sync the Remote Config with the client at any time.'),
             _('Synchronize Remote Config'),
@@ -184,6 +188,8 @@ module.exports = {
           .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
           .setFunctionName('firebase.remoteConfig().fetchAndActivate');
 
+		
+		/* ====== AUTHENTIFICATION ====== */
         extension
           .addAction(
             'CreateBasicAccount',
@@ -205,23 +211,52 @@ module.exports = {
 
         extension
           .addAction(
-            'LogInBasicAccount',
-            _('Log into account with basic auth'),
-            _('Sign into an account with e-mail and password as credentials.'),
+            'BasicAccountSignIn',
+            _('Sign into an account with basic auth'),
+			_(
+			  'Sign into an account with e-mail and password as credentials. ' +
+			  'The Authetification state variable will be set to "ok" if the authentification ' +
+			  'is succcessful, else it will contain the error message.'
+			),
             _('Connect to account with E-Mail _PARAM0_ and password _PARAM1_'),
             _('Firebase/Authentification'),
             'JsPlatform/Extensions/filesystem_save_file24.png',
             'JsPlatform/Extensions/filesystem_save_file32.png'
           )
           .addParameter('string', _('E-Mail'), '', false)
-          .addParameter('string', _('Password'), '', false)
+		  .addParameter('string', _('Password'), '', false)
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
           .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
-          .setFunctionName('firebase.auth().signInWithEmailAndPassword');
-        
+          .setFunctionName('gdjs.evtTools.firebase.auth.signInWithEmail');
+		
+		extension
+          .addAction(
+            'ProviderAccountSignIn',
+            _('Sign into an account with auth from provider'),
+			_(
+			  'Sign into an account via an external provider. ' +
+			  'The Authetification state variable will be set to "ok" if the authentification ' +
+			  'is succcessful, else it will contain the error message. \n' +
+			  'The availablke providers are: "google", "facebook", "github" and "twitter".\n' + 
+			  'Provider Authentification only works in the browser.'
+			),
+            _('Connect to account with Provider _PARAM0_'),
+            _('Firebase/Authentification'),
+            'JsPlatform/Extensions/filesystem_save_file24.png',
+            'JsPlatform/Extensions/filesystem_save_file32.png'
+          )
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setFunctionName('gdjs.evtTools.firebase.auth.signInWithProvider');
+
         extension
           .addAction(
             'AnonymSignIn',
@@ -243,7 +278,10 @@ module.exports = {
           .addCondition(
             'IsSignedIn',
             _('Is the user signed in?'),
-            _('Checks if the user is signed in.'),
+			_(
+			  'Checks if the user is signed in. \nYou should always use ' +
+			  'this before actions requiring authentifications.'
+			),
             _('Check for authentification'),
             _('Firebase/Authentification'),
             'JsPlatform/Extensions/filesystem_save_file24.png',

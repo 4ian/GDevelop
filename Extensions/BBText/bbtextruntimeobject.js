@@ -24,9 +24,9 @@
 gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
   /** @type {number} */
   this._opacity = parseFloat(objectData.content.opacity);
+  // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
   /** @type {boolean} */
   this._visible = objectData.content.visible;
   /** @type {string} */
@@ -35,9 +35,9 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   this._color = objectData.content.color;
   /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
-  // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
   /** @type {number} */
   this._fontSize = parseFloat(objectData.content.fontSize);
+  // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
   /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
   /** @type {number} */

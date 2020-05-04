@@ -34,7 +34,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   this._color = objectData.content.color;
   /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
-  /** @type {number} */
+  /** @type {string} */
   this._fontSize = objectData.content.fontSize;
   /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
@@ -107,12 +107,12 @@ gdjs.BBTextRuntimeObject.prototype.getColor = function() {
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(fontSize) {
-  this._fontSize = fontSize;
+  this._fontSize = fontSize.toString();
   this._renderer.updateFontSize();
 };
 
 gdjs.BBTextRuntimeObject.prototype.getFontSize = function() {
-  return this._fontSize;
+  return parseInt(this._fontSize);
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontFamily = function(fontFamily) {

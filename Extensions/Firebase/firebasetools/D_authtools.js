@@ -159,7 +159,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
      * @returns {string} - The users Email address.
      */
     getEmail() {
-        return gdjs.evtTools.firebase.auth.currentUser.email;
+        return gdjs.evtTools.firebase.auth.currentUser.email || "none";
     },
 
     /**
@@ -183,7 +183,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
      * @returns {string} - The current user's username.
      */
     getDisplayName() {
-        return gdjs.evtTools.firebase.auth.currentUser.displayName;
+        return gdjs.evtTools.firebase.auth.currentUser.displayName || "none";
     },
 
     /**
@@ -191,7 +191,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
      * @returns {string}
      */
     getPhoneNumber() {
-        return gdjs.evtTools.firebase.auth.currentUser.phoneNumber;
+        return gdjs.evtTools.firebase.auth.currentUser.phoneNumber || "none";
     },
 
     /**
@@ -225,7 +225,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
      * @returns {string}
      */
     getPhotoURL() {
-        return gdjs.evtTools.firebase.auth.currentUser.photoURL;
+        return gdjs.evtTools.firebase.auth.currentUser.photoURL || "none"
     },
 
     /**

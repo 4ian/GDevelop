@@ -112,7 +112,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
           };
 
           const leftIcon = getThumbnail ? (
-            <ListIcon iconSize={32} src={getThumbnail()} />
+            <ListIcon iconSize={24} src={getThumbnail()} />
           ) : null;
 
           return (

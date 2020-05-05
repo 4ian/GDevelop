@@ -17,7 +17,7 @@ import {
 
 const styles = {
   propertiesContainer: {
-    padding: 10,
+    padding: 8,
     overflowY: 'scroll',
     overflowX: 'hidden',
     flex: 2,

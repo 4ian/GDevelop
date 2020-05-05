@@ -3,10 +3,9 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import { Line, Column } from '../../UI/Grid';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { type EditorProps } from './EditorProps.flow';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 export default class TiledSpriteEditor extends React.Component<
@@ -24,23 +23,21 @@ export default class TiledSpriteEditor extends React.Component<
     const tiledSpriteObject = gd.asTiledSpriteObject(object);
 
     return (
-      <Column>
-        <Line>
-          <ResourceSelectorWithThumbnail
-            project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceKind="image"
-            resourceName={tiledSpriteObject.getTexture()}
-            resourceExternalEditors={resourceExternalEditors}
-            onChange={resourceName => {
-              tiledSpriteObject.setTexture(resourceName);
-              this.forceUpdate();
-            }}
-            floatingLabelText={<Trans>Select an image</Trans>}
-          />
-        </Line>
-        <ResponsiveLineStackLayout>
+      <ColumnStackLayout>
+        <ResourceSelectorWithThumbnail
+          project={project}
+          resourceSources={resourceSources}
+          onChooseResource={onChooseResource}
+          resourceKind="image"
+          resourceName={tiledSpriteObject.getTexture()}
+          resourceExternalEditors={resourceExternalEditors}
+          onChange={resourceName => {
+            tiledSpriteObject.setTexture(resourceName);
+            this.forceUpdate();
+          }}
+          floatingLabelText={<Trans>Select an image</Trans>}
+        />
+        <ResponsiveLineStackLayout noMargin>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}
@@ -64,7 +61,7 @@ export default class TiledSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-      </Column>
+      </ColumnStackLayout>
     );
   }
 }

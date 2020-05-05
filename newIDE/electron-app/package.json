@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
-    "electron": "8.2.1",
+    "electron": "8.2.5",
     "electron-builder": "21.2.0",
     "electron-notarize": "^0.2.1",
     "minimist": "^1.2.3",

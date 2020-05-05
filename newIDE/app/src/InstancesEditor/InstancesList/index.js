@@ -138,7 +138,7 @@ export default class InstancesList extends Component<Props, State> {
                     headerClassName={'tableHeaderColumn'}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}
-                    rowHeight={35}
+                    rowHeight={32}
                     onRowClick={this._onRowClick}
                     rowClassName={this._rowClassName}
                     width={width}

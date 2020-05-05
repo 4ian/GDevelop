@@ -246,7 +246,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
 
     /**
      * Send an email to the user's email adress to verify it.
-     * @note placeholder: will be called directly when declared
+     * @note Even though this function is redundant, we keep it for consitency.
      */
     sendVerificationEmail() {
         gdjs.evtTools.firebase.auth.currentUser.sendEmailVerification();

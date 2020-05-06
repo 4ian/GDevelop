@@ -54,6 +54,7 @@ const gdevelopTheme = {
   },
   closableTabs: {
     fontFamily,
+    containerBackgroundColor: backgroundColor,
     backgroundColor: backgroundColor,
     textColor: nord6,
     selectedBackgroundColor: nord8,
@@ -94,7 +95,7 @@ const gdevelopTheme = {
   eventsSheetRootClassName: 'gd-events-sheet-nord-theme', // See EventsSheet.css
   tableRootClassName: 'gd-table-nord-theme', // See Table.css
   markdownRootClassName: 'gd-markdown-nord-theme', // See Markdown.css
-  gdevelopIconsCSSFilter: '',
+  gdevelopIconsCSSFilter: 'brightness(110%) hue-rotate(5deg) contrast(90%)',
 };
 
 // Theme for Material-UI components
@@ -139,6 +140,17 @@ const muiTheme = createMuiTheme({
       root: {
         borderBottom: '1px solid #4C566A !important',
       },
+      secondaryAction: {
+        paddingRight: 40,
+      },
+      gutters: {
+        paddingRight: 8,
+      },
+    },
+    MuiListItemSecondaryAction: {
+      root: {
+        right: 8,
+      },
     },
     MuiInput: {
       underline: {
@@ -167,17 +179,56 @@ const muiTheme = createMuiTheme({
     MuiTabs: {
       root: {
         backgroundColor: nord9,
+        minHeight: 32, // Reduce the height of tabs to 32px
       },
     },
     MuiTab: {
       textColorPrimary: {
         color: '#ECEFF4 !important',
       },
+      root: {
+        // Reduce the height of tabs to 32px
+        paddingTop: 0,
+        paddingBottom: 0,
+        minHeight: 32,
+      },
     },
     MuiButtonBase: {
       // Remove the web-ish "pointer" (hand) cursor from buttons
       root: {
         cursor: 'default',
+      },
+    },
+    // Reduce default margins on tables:
+    MuiTableCell: {
+      sizeSmall: {
+        paddingTop: 0,
+        paddingBottom: 0,
+      },
+    },
+    // Reduce default margins on Dialogs:
+    MuiDialogTitle: {
+      root: {
+        padding: 8,
+      },
+    },
+    MuiDialogContent: {
+      root: {
+        padding: 8,
+      },
+    },
+    // Remove default margins on form controls (we already use a Grid)
+    MuiFormControl: {
+      marginDense: {
+        marginTop: 0,
+        marginBottom: 0,
+      },
+    },
+    MuiCheckbox: {
+      root: {
+        // Cancel padding around Checkbox
+        marginTop: -9,
+        marginBottom: -9,
       },
     },
     // Use non rounded buttons

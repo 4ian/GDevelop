@@ -38,7 +38,6 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
-  firebaseConfig: string,
   scaleMode: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
@@ -66,7 +65,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
       adMobAppId: project.getAdMobAppId(),
-      firebaseConfig: project.getFirebaseConfig(),
       scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
@@ -98,7 +96,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
-      firebaseConfig,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -114,7 +111,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setPackageName(packageName);
     project.setOrientation(orientation);
     project.setAdMobAppId(adMobAppId);
-    project.setFirebaseConfig(firebaseConfig);
     project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.setMinimumFPS(minFPS);
@@ -138,7 +134,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
-      firebaseConfig,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -447,7 +442,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               onChange={(e, i, value: string) =>
                 this.setState({ isFolderProject: value === 'folder-project' })
               }
-            />
+            >
               <SelectOption
                 value={'single-file'}
                 primaryText={t`Single file (default)`}

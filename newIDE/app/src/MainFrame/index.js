@@ -274,7 +274,11 @@ const MainFrame = (props: Props) => {
       return;
     }
 
-    openFromFileMetadata(initialFileMetadataToOpen).then(state => {
+    openFromFileMetadata(initialFileMetadataToOpen, state, {
+      i18n: props.i18n,
+      storageProviderOperations: props.storageProviderOperations,
+      eventsFunctionsExtensionsState: props.eventsFunctionsExtensionsState,
+    }).then(state => {
       if (state)
         openSceneOrProjectManager({
           currentProject: state.currentProject,
@@ -360,9 +364,9 @@ const MainFrame = (props: Props) => {
   const loadFromSerializedProject = (
     serializedProject: gdSerializerElement,
     fileMetadata: ?FileMetadata,
-    newState = {
-      currentProject: state.currentProject,
-      editorTabs: state.editorTabs,
+    newState: {
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
     },
     eventsFunctionsExtensionsState = props.eventsFunctionsExtensionsState
   ): Promise<State> => {
@@ -384,55 +388,57 @@ const MainFrame = (props: Props) => {
   const loadFromProject = (
     project: gdProject,
     fileMetadata: ?FileMetadata,
-    newState = {
-      currentProject: state.currentProject,
-      editorTabs: state.editorTabs,
+    newState: {
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
     },
     eventsFunctionsExtensionsState = props.eventsFunctionsExtensionsState
   ): Promise<State> => {
-    return closeProject(newState).then(state => {
-      // Make sure that the ResourcesLoader cache is emptied, so that
-      // the URL to a resource with a name in the old project is not re-used
-      // for another resource with the same name in the new project.
-      ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
-      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-        project
-      );
-      if (fileMetadata) {
-        project.setProjectFile(fileMetadata.fileIdentifier);
+    return closeProject(newState, eventsFunctionsExtensionsState).then(
+      state => {
+        // Make sure that the ResourcesLoader cache is emptied, so that
+        // the URL to a resource with a name in the old project is not re-used
+        // for another resource with the same name in the new project.
+        ResourcesLoader.burstAllUrlsCache();
+        // TODO: Pixi cache should also be burst
+        eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+          project
+        );
+        if (fileMetadata) {
+          project.setProjectFile(fileMetadata.fileIdentifier);
+        }
+        return setState({
+          ...state,
+          currentProject: project,
+          currentFileMetadata: fileMetadata,
+          createDialogOpen: false,
+        }).then(state => {
+          if (
+            state.editorTabs.editors.length > 1 ||
+            state.isPreviewFirstSceneOverriden
+          )
+            return setState({
+              ...state,
+              editorTabs: closeProjectTabs(
+                state.editorTabs,
+                state.currentProject
+              ),
+              isPreviewFirstSceneOverriden: false,
+              previewFirstSceneName: '',
+            });
+          return Promise.resolve(state);
+        });
       }
-      return setState({
-        ...state,
-        currentProject: project,
-        currentFileMetadata: fileMetadata,
-        createDialogOpen: false,
-      }).then(state => {
-        if (
-          state.editorTabs.editors.length > 1 ||
-          state.isPreviewFirstSceneOverriden
-        )
-          return setState({
-            ...state,
-            editorTabs: closeProjectTabs(
-              state.editorTabs,
-              state.currentProject
-            ),
-            isPreviewFirstSceneOverriden: false,
-            previewFirstSceneName: '',
-          });
-        return Promise.resolve(state);
-      });
-    });
+    );
   };
 
   const openFromFileMetadata = (
     fileMetadata: FileMetadata,
     newState: State = state,
-    newProps = {
-      i18n: props.i18n,
-      storageProviderOperations: props.storageProviderOperations,
-      eventsFunctionsExtensionsState: props.eventsFunctionsExtensionsState,
+    newProps: {
+      i18n: I18n,
+      storageProviderOperations: StorageProviderOperations,
+      eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
     }
   ): Promise<?State> => {
     const {
@@ -556,12 +562,12 @@ const MainFrame = (props: Props) => {
   };
 
   const closeProject = (
-    newState = {
-      currentProject: state.currentProject,
-      editorTabs: state.editorTabs,
-    }
+    newState: {
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
+    },
+    eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
   ): Promise<State> => {
-    const { eventsFunctionsExtensionsState } = props;
     const { currentProject, editorTabs } = newState;
     if (!currentProject)
       return Promise.resolve({ ...state, currentProject, editorTabs });
@@ -1038,7 +1044,11 @@ const MainFrame = (props: Props) => {
               onEditObject={newProps.onEditObject}
               resourceSources={newProps.resourceSources}
               onChooseResource={(sourceName, multiSelection) =>
-                _onChooseResource(sourceName, multiSelection, newState)
+                _onChooseResource(
+                  sourceName,
+                  multiSelection,
+                  newState.currentProject
+                )
               }
               resourceExternalEditors={newProps.resourceExternalEditors}
               isActive={isActive}
@@ -1098,14 +1108,26 @@ const MainFrame = (props: Props) => {
               }
               resourceSources={newProps.resourceSources}
               onChooseResource={(sourceName, multiSelection) =>
-                _onChooseResource(sourceName, multiSelection, newState)
+                _onChooseResource(
+                  sourceName,
+                  multiSelection,
+                  newState.currentProject
+                )
               }
               resourceExternalEditors={newProps.resourceExternalEditors}
               openInstructionOrExpression={(extension, type) =>
-                _openInstructionOrExpression(extension, type, newState)
+                _openInstructionOrExpression(extension, type, {
+                  currentProject: newState.currentProject,
+                  editorTabs: newState.editorTabs,
+                })
               }
               onCreateEventsFunction={(extensionName, eventsFunction) =>
-                _onCreateEventsFunction(extensionName, eventsFunction, newState)
+                _onCreateEventsFunction(
+                  extensionName,
+                  eventsFunction,
+                  newState.currentProject,
+                  newProps.eventsFunctionsExtensionsState
+                )
               }
               isActive={isActive}
               ref={editorRef}
@@ -1152,14 +1174,26 @@ const MainFrame = (props: Props) => {
             }
             resourceSources={newProps.resourceSources}
             onChooseResource={(sourceName, multiSelection) =>
-              _onChooseResource(sourceName, multiSelection, newState)
+              _onChooseResource(
+                sourceName,
+                multiSelection,
+                newState.currentProject
+              )
             }
             resourceExternalEditors={newProps.resourceExternalEditors}
             openInstructionOrExpression={(extension, type) =>
-              _openInstructionOrExpression(extension, type, newState)
+              _openInstructionOrExpression(extension, type, {
+                currentProject: newState.currentProject,
+                editorTabs: newState.editorTabs,
+              })
             }
             onCreateEventsFunction={(extensionName, eventsFunction) =>
-              _onCreateEventsFunction(extensionName, eventsFunction, newState)
+              _onCreateEventsFunction(
+                extensionName,
+                eventsFunction,
+                newState.currentProject,
+                newProps.eventsFunctionsExtensionsState
+              )
             }
             previewButtonSettings={emptyPreviewButtonSettings}
             isActive={isActive}
@@ -1215,7 +1249,11 @@ const MainFrame = (props: Props) => {
                 onEditObject={newProps.onEditObject}
                 resourceSources={newProps.resourceSources}
                 onChooseResource={(sourceName, multiSelection) =>
-                  _onChooseResource(sourceName, multiSelection, newState)
+                  _onChooseResource(
+                    sourceName,
+                    multiSelection,
+                    newState.currentProject
+                  )
                 }
                 resourceExternalEditors={newProps.resourceExternalEditors}
                 isActive={isActive}
@@ -1247,17 +1285,29 @@ const MainFrame = (props: Props) => {
             setToolbar={setEditorToolbar}
             resourceSources={newProps.resourceSources}
             onChooseResource={(sourceName, multiSelection) =>
-              _onChooseResource(sourceName, multiSelection, newState)
+              _onChooseResource(
+                sourceName,
+                multiSelection,
+                newState.currentProject
+              )
             }
             resourceExternalEditors={newProps.resourceExternalEditors}
             isActive={isActive}
             initiallyFocusedFunctionName={initiallyFocusedFunctionName}
             initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
             openInstructionOrExpression={(extension, type) =>
-              _openInstructionOrExpression(extension, type, newState)
+              _openInstructionOrExpression(extension, type, {
+                currentProject: newState.currentProject,
+                editorTabs: newState.editorTabs,
+              })
             }
             onCreateEventsFunction={(extensionName, eventsFunction) =>
-              _onCreateEventsFunction(extensionName, eventsFunction, newState)
+              _onCreateEventsFunction(
+                extensionName,
+                eventsFunction,
+                newState.currentProject,
+                newProps.eventsFunctionsExtensionsState
+              )
             }
             ref={editorRef}
             onLoadEventsFunctionsExtensions={() => {
@@ -1299,7 +1349,11 @@ const MainFrame = (props: Props) => {
             isActive={isActive}
             ref={editorRef}
             onChooseResource={(sourceName, multiSelection) =>
-              _onChooseResource(sourceName, multiSelection, newState)
+              _onChooseResource(
+                sourceName,
+                multiSelection,
+                newState.currentProject
+              )
             }
             resourceSources={newProps.resourceSources}
           />
@@ -1333,7 +1387,11 @@ const MainFrame = (props: Props) => {
                   currentProject: newState.currentProject,
                   editorTabs: newState.editorTabs,
                 },
-                newProps
+                {
+                  unsavedChanges: newProps.unsavedChanges,
+                  eventsFunctionsExtensionsState:
+                    newProps.eventsFunctionsExtensionsState,
+                }
               )
             }
             onOpenAboutDialog={() => openAboutDialog()}
@@ -1372,9 +1430,12 @@ const MainFrame = (props: Props) => {
   const _openInstructionOrExpression = (
     extension: gdPlatformExtension,
     type: string,
-    newState: State = state
+    newState: {
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
+    }
   ) => {
-    const { currentProject } = newState;
+    const { currentProject, editorTabs } = newState;
     if (!currentProject) return;
 
     const extensionName = extension.getName();
@@ -1386,7 +1447,7 @@ const MainFrame = (props: Props) => {
       const functionName = getFunctionNameFromType(type);
 
       const foundTab = getEventsFunctionsExtensionEditor(
-        newState.editorTabs,
+        editorTabs,
         eventsFunctionsExtension
       );
       if (foundTab) {
@@ -1397,7 +1458,7 @@ const MainFrame = (props: Props) => {
         );
         setState(state => ({
           ...state,
-          editorTabs: changeCurrentTab(newState.editorTabs, foundTab.tabIndex),
+          editorTabs: changeCurrentTab(editorTabs, foundTab.tabIndex),
         }));
       } else {
         // Open a new editor for the extension and the given function
@@ -1423,11 +1484,10 @@ const MainFrame = (props: Props) => {
   const _onCreateEventsFunction = (
     extensionName: string,
     eventsFunction: gdEventsFunction,
-    newState: State = state
+    currentProject: ?gdProject,
+    eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
   ) => {
-    const { currentProject } = newState;
     if (!currentProject) return;
-    const { eventsFunctionsExtensionsState } = props;
 
     // Names are assumed to be alreay validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
@@ -1599,26 +1659,30 @@ const MainFrame = (props: Props) => {
   };
 
   const askToCloseProject = (
-    newState = {
-      currentProject: state.currentProject,
-      editorTabs: state.editorTabs,
+    newState: {
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
     },
-    newProps: Props = props
+    newProps: {
+      unsavedChanges: ?UnsavedChanges,
+      eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+    }
   ): Promise<State> => {
-    const { unsavedChanges } = newProps;
+    const { unsavedChanges, eventsFunctionsExtensionsState } = newProps;
     const { currentProject, editorTabs } = newState;
     if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
       if (!newState.currentProject)
-        return Promise.resolve({ ...state, ...newState });
+        return Promise.resolve({ ...state, currentProject, editorTabs });
 
       const answer = Window.showConfirmDialog(
         i18n._(
           t`Close the project? Any changes that have not been saved will be lost.`
         )
       );
-      if (!answer) return Promise.resolve({ ...state, ...newState });
+      if (!answer)
+        return Promise.resolve({ ...state, currentProject, editorTabs });
     }
-    return closeProject(newState);
+    return closeProject(newState, eventsFunctionsExtensionsState);
   };
 
   const openSceneOrProjectManager = (
@@ -1737,9 +1801,8 @@ const MainFrame = (props: Props) => {
   const _onChooseResource = (
     sourceName: string,
     multiSelection: boolean = true,
-    newState: State = state
+    currentProject: ?gdProject
   ): Promise<Array<any>> => {
-    const { currentProject } = newState;
     const resourceSourceDialog = _resourceSourceDialogs.current[sourceName];
     if (!resourceSourceDialog) return Promise.resolve([]);
 
@@ -1849,7 +1912,18 @@ const MainFrame = (props: Props) => {
           onChooseProject: chooseProject,
           onSaveProject: saveProject,
           onSaveProjectAs: saveProjectAs,
-          onCloseProject: askToCloseProject,
+          onCloseProject: () =>
+            askToCloseProject(
+              {
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              },
+              {
+                unsavedChanges: props.unsavedChanges,
+                eventsFunctionsExtensionsState:
+                  props.eventsFunctionsExtensionsState,
+              }
+            ),
           onCloseApp: closeApp,
           onExportProject: openExportDialog,
           onCreateProject: openCreateDialog,
@@ -1899,7 +1973,17 @@ const MainFrame = (props: Props) => {
             onSaveProject={saveProject}
             onSaveProjectAs={saveProjectAs}
             onCloseProject={() => {
-              askToCloseProject();
+              askToCloseProject(
+                {
+                  currentProject: state.currentProject,
+                  editorTabs: state.editorTabs,
+                },
+                {
+                  unsavedChanges: props.unsavedChanges,
+                  eventsFunctionsExtensionsState:
+                    props.eventsFunctionsExtensionsState,
+                }
+              );
             }}
             onExportProject={openExportDialog}
             onOpenPreferences={() => openPreferences(true)}
@@ -2051,7 +2135,9 @@ const MainFrame = (props: Props) => {
           onApply={() => openPlatformSpecificAssets(false)}
           onClose={() => openPlatformSpecificAssets(false)}
           resourceSources={resourceSources}
-          onChooseResource={_onChooseResource}
+          onChooseResource={(sourceName, multiSelection) =>
+            _onChooseResource(sourceName, multiSelection, currentProject)
+          }
           resourceExternalEditors={resourceExternalEditors}
         />
       )}

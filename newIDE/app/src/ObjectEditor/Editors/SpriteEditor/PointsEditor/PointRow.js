@@ -54,7 +54,7 @@ const PointRow = ({
               }
             />
           ) : (
-            <Text>
+            <Text noMargin>
               <Trans>(auto)</Trans>
             </Text>
           )}
@@ -71,19 +71,19 @@ const PointRow = ({
               }
             />
           ) : (
-            <Text>
+            <Text noMargin>
               <Trans>(auto)</Trans>
             </Text>
           )}
         </TableRowColumn>
         <TableRowColumn style={styles.toolColumn}>
           {!!onRemove && (
-            <IconButton onClick={onRemove}>
+            <IconButton size="small" onClick={onRemove}>
               <Delete />
             </IconButton>
           )}
           {!!onEdit && (
-            <IconButton onClick={onEdit}>
+            <IconButton size="small" onClick={onEdit}>
               <Edit />
             </IconButton>
           )}

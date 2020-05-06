@@ -111,7 +111,7 @@ export default class LanguageDialog extends Component<Props, State> {
                   open={open}
                   title={<Trans>Language</Trans>}
                 >
-                  <Column>
+                  <Column noMargin>
                     <Line>
                       <AlertMessage kind="info">
                         <Trans>

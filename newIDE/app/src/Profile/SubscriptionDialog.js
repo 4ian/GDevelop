@@ -37,8 +37,6 @@ const styles = {
   descriptionText: {
     marginLeft: 16,
     marginRight: 16,
-    marginTop: 8,
-    marginBottom: 8,
   },
   card: {
     margin: 16,

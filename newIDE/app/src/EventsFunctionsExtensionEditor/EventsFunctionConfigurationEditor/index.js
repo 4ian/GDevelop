@@ -7,7 +7,7 @@ import { Tabs, Tab } from '../../UI/Tabs';
 import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -164,26 +164,30 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         </Tabs>
         {this.state.currentTab === 'config' ? (
           <ScrollView>
-            <EventsFunctionPropertiesEditor
-              eventsFunction={eventsFunction}
-              eventsBasedBehavior={eventsBasedBehavior}
-              helpPagePath={helpPagePath}
-              onConfigurationUpdated={onConfigurationUpdated}
-              renderConfigurationHeader={renderConfigurationHeader}
-              freezeEventsFunctionType={freezeEventsFunctionType}
-            />
+            <Line>
+              <EventsFunctionPropertiesEditor
+                eventsFunction={eventsFunction}
+                eventsBasedBehavior={eventsBasedBehavior}
+                helpPagePath={helpPagePath}
+                onConfigurationUpdated={onConfigurationUpdated}
+                renderConfigurationHeader={renderConfigurationHeader}
+                freezeEventsFunctionType={freezeEventsFunctionType}
+              />
+            </Line>
           </ScrollView>
         ) : null}
         {this.state.currentTab === 'parameters' ? (
           <ScrollView>
-            <EventsFunctionParametersEditor
-              project={project}
-              eventsFunction={eventsFunction}
-              eventsBasedBehavior={eventsBasedBehavior}
-              onParametersUpdated={onParametersOrGroupsUpdated}
-              helpPagePath={helpPagePath}
-              freezeParameters={freezeParameters}
-            />
+            <Line>
+              <EventsFunctionParametersEditor
+                project={project}
+                eventsFunction={eventsFunction}
+                eventsBasedBehavior={eventsBasedBehavior}
+                onParametersUpdated={onParametersOrGroupsUpdated}
+                helpPagePath={helpPagePath}
+                freezeParameters={freezeParameters}
+              />
+            </Line>
           </ScrollView>
         ) : null}
         {this.state.currentTab === 'groups' ? (

@@ -44,6 +44,7 @@ export default class SceneVariableField extends React.Component<
         />
         {this.state.editorOpen && layout && (
           <VariablesEditorDialog
+            title={<Trans>Scene Variables</Trans>}
             open
             variablesContainer={layout.getVariables()}
             onCancel={() => this.setState({ editorOpen: false })}

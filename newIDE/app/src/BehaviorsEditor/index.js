@@ -189,14 +189,16 @@ export default class BehaviorsEditor extends Component {
                   </IconButton>
                   <HelpIcon helpPagePath={getBehaviorHelpPagePath(behavior)} />
                 </MiniToolbar>
-                <BehaviorComponent
-                  behavior={behavior}
-                  behaviorContent={behaviorContent}
-                  project={project}
-                  resourceSources={this.props.resourceSources}
-                  onChooseResource={this.props.onChooseResource}
-                  resourceExternalEditors={this.props.resourceExternalEditors}
-                />
+                <Line>
+                  <BehaviorComponent
+                    behavior={behavior}
+                    behaviorContent={behaviorContent}
+                    project={project}
+                    resourceSources={this.props.resourceSources}
+                    onChooseResource={this.props.onChooseResource}
+                    resourceExternalEditors={this.props.resourceExternalEditors}
+                  />
+                </Line>
               </div>
             );
           })

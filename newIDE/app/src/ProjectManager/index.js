@@ -713,7 +713,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>Game settings</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/projectManager32.png"
               />
@@ -758,7 +758,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>Scenes</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/sceneadd32.png"
               />
@@ -823,7 +823,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>External events</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/externalevents32.png"
               />
@@ -888,7 +888,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>External layouts</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/externallayout32.png"
               />
@@ -955,7 +955,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/function32.png"
               />
@@ -1060,6 +1060,7 @@ export default class ProjectManager extends React.Component<Props, State> {
         />
         {this.state.projectVariablesEditorOpen && (
           <VariablesEditorDialog
+            title={<Trans>Global Variables</Trans>}
             open
             variablesContainer={project.getVariables()}
             onCancel={() =>

@@ -108,7 +108,7 @@ class Animation extends React.Component<AnimationProps, void> {
     const animationName = animation.getName();
     return (
       <div>
-        <MiniToolbar smallest>
+        <MiniToolbar>
           <DragHandle />
           <MiniToolbarText>Animation #{id} </MiniToolbarText>
           <Column expand margin>

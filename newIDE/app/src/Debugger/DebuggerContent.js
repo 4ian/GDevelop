@@ -24,6 +24,8 @@ import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
 import { type ProfilerOutput } from '.';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import MiniToolbar from '../UI/MiniToolbar';
+import ScrollView from '../UI/ScrollView';
 
 type Props = {|
   gameData: ?any,
@@ -127,66 +129,68 @@ export default class DebuggerContent extends React.Component<Props, State> {
         noTitleBar: true,
         renderEditor: () => (
           <Background>
-            <Column expand noMargin>
-              {selectedInspector ? (
-                rawMode ? (
-                  <RawContentInspector
-                    gameData={get(gameData, selectedInspectorFullPath, null)}
-                    onEdit={(path, newValue) =>
-                      onEdit(selectedInspectorFullPath.concat(path), newValue)
-                    }
-                  />
-                ) : (
-                  selectedInspector.renderInspector(
-                    get(gameData, selectedInspectorFullPath, null),
-                    {
-                      onCall: (path, args) =>
-                        onCall(selectedInspectorFullPath.concat(path), args),
-                      onEdit: (path, newValue) =>
-                        onEdit(
-                          selectedInspectorFullPath.concat(path),
-                          newValue
-                        ),
-                    }
-                  ) || (
-                    <EmptyMessage>
-                      <Trans>
-                        No inspector, choose another element in the list or
-                        toggle the raw data view.
-                      </Trans>
-                    </EmptyMessage>
-                  )
-                )
-              ) : (
-                <EmptyMessage>
-                  {gameData ? (
-                    <Trans>Choose an element to inspect in the list</Trans>
-                  ) : (
-                    <Trans>
-                      Pause the game (from the toolbar) or hit refresh (on the
-                      left) to inspect the game
-                    </Trans>
-                  )}
-                </EmptyMessage>
-              )}
+            <ScrollView>
               <Column>
-                <Line justifyContent="space-between" alignItems="center">
-                  <HelpButton helpPagePath="/interface/debugger" />
-                  <div>
-                    <Checkbox
-                      checkedIcon={<Flash />}
-                      uncheckedIcon={<FlashOff />}
-                      checked={rawMode}
-                      onCheck={(e, enabled) =>
-                        this.setState({
-                          rawMode: enabled,
-                        })
+                {selectedInspector ? (
+                  rawMode ? (
+                    <RawContentInspector
+                      gameData={get(gameData, selectedInspectorFullPath, null)}
+                      onEdit={(path, newValue) =>
+                        onEdit(selectedInspectorFullPath.concat(path), newValue)
                       }
                     />
-                  </div>
-                </Line>
+                  ) : (
+                    selectedInspector.renderInspector(
+                      get(gameData, selectedInspectorFullPath, null),
+                      {
+                        onCall: (path, args) =>
+                          onCall(selectedInspectorFullPath.concat(path), args),
+                        onEdit: (path, newValue) =>
+                          onEdit(
+                            selectedInspectorFullPath.concat(path),
+                            newValue
+                          ),
+                      }
+                    ) || (
+                      <EmptyMessage>
+                        <Trans>
+                          No inspector, choose another element in the list or
+                          toggle the raw data view.
+                        </Trans>
+                      </EmptyMessage>
+                    )
+                  )
+                ) : (
+                  <EmptyMessage>
+                    {gameData ? (
+                      <Trans>Choose an element to inspect in the list</Trans>
+                    ) : (
+                      <Trans>
+                        Pause the game (from the toolbar) or hit refresh (on the
+                        left) to inspect the game
+                      </Trans>
+                    )}
+                  </EmptyMessage>
+                )}
               </Column>
-            </Column>
+            </ScrollView>
+            <MiniToolbar>
+              <Line justifyContent="space-between" alignItems="center" noMargin>
+                <HelpButton helpPagePath="/interface/debugger" />
+                <div>
+                  <Checkbox
+                    checkedIcon={<Flash />}
+                    uncheckedIcon={<FlashOff />}
+                    checked={rawMode}
+                    onCheck={(e, enabled) =>
+                      this.setState({
+                        rawMode: enabled,
+                      })
+                    }
+                  />
+                </div>
+              </Line>
+            </MiniToolbar>
           </Background>
         ),
       },

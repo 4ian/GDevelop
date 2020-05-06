@@ -1,5 +1,5 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
@@ -7,6 +7,7 @@ import Divider from '@material-ui/core/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
+import Text from '../UI/Text';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { findEmptyPath } from './LocalPathFinder';
@@ -109,13 +110,6 @@ export default class LocalExamples extends Component<Props, State> {
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
-            <ExamplesList
-              exampleNames={this.state.exampleNames}
-              onCreateFromExample={exampleName =>
-                this.createFromExample(i18n, exampleName)
-              }
-            />
-            <Divider />
             <Line expand>
               <Column expand>
                 <LocalFolderPicker
@@ -125,6 +119,22 @@ export default class LocalExamples extends Component<Props, State> {
                   type="create-game"
                 />
               </Column>
+            </Line>
+            <Divider />
+            <Line>
+              <Column>
+                <Text>
+                  <Trans>Choose or search for an example to open:</Trans>
+                </Text>
+              </Column>
+            </Line>
+            <Line>
+              <ExamplesList
+                exampleNames={this.state.exampleNames}
+                onCreateFromExample={exampleName =>
+                  this.createFromExample(i18n, exampleName)
+                }
+              />
             </Line>
           </Column>
         )}

@@ -11,7 +11,7 @@ const style = {
 
 class MiniToolbar extends Component {
   render() {
-    const { justifyContent, smallest } = this.props;
+    const { justifyContent } = this.props;
 
     return (
       <ThemeConsumer>
@@ -19,7 +19,7 @@ class MiniToolbar extends Component {
           <div
             style={{
               ...style,
-              height: smallest ? 34 : 48,
+              height: 32,
               backgroundColor: muiTheme.toolbar.backgroundColor,
               justifyContent,
             }}

@@ -62,7 +62,7 @@ export default ({
           {width < 350 ? (
             <ElementWithMenu
               element={
-                <IconButton>
+                <IconButton size="small">
                   <MoreVert />
                 </IconButton>
               }
@@ -87,7 +87,11 @@ export default ({
             />
           ) : (
             <React.Fragment>
-              <IconButton onClick={onEditEffects} tooltip={t`Edit effects`}>
+              <IconButton
+                size="small"
+                onClick={onEditEffects}
+                tooltip={t`Edit effects`}
+              >
                 <Badge badgeContent={effectsCount} color="primary">
                   <FlareIcon />
                 </Badge>
@@ -99,6 +103,7 @@ export default ({
                 onCheck={(e, value) => onChangeVisibility(value)}
               />
               <IconButton
+                size="small"
                 onClick={onRemove}
                 disabled={!layerName}
                 tooltip={t`Delete the layer`}

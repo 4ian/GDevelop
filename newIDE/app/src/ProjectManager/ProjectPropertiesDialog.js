@@ -14,6 +14,7 @@ import {
   getErrors,
   displayProjectErrorsBox,
   validatePackageName,
+  validateJSON,
 } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
@@ -38,6 +39,7 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
+  firebaseConfig: string,
   scaleMode: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
@@ -65,6 +67,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
       adMobAppId: project.getAdMobAppId(),
+      firebaseConfig: project.getFirebaseConfig(),
       scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
@@ -96,6 +99,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      firebaseConfig,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -111,6 +115,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setPackageName(packageName);
     project.setOrientation(orientation);
     project.setAdMobAppId(adMobAppId);
+    project.setFirebaseConfig(firebaseConfig);
     project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.setMinimumFPS(minFPS);
@@ -134,6 +139,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      firebaseConfig,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -428,9 +434,34 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               fullWidth
               rows={8}
               multiline
+              hintText={`{
+  apiKey: "AIzaSyBwPHVLhvlHVLh0wqgp4m9qxxxxxxxx",
+  authDomain: "xxxxxx-e11a5.firebaseapp.com",
+  databaseURL: "https://xxxxx-e11a5.firebaseio.com",
+  projectId: "xxxxx-e11xx",
+  storageBucket: "xxxxxxx-e11a5.appspot.com",
+  messagingSenderId: "254035xxxxxx",
+  appId: "1:2345678910:web:2ddd6b830iad9ae3xxxxxxxx",
+  measurementId: "G-4REMLXXXXX"
+}`}
               type="text"
               value={firebaseConfig}
               onChange={value => this.setState({ firebaseConfig: value })}
+              errorText={
+                validateJSON(firebaseConfig) ? (
+                  undefined
+                ) : (
+                  <Trans>
+                    {`
+                    The Firebase Configuration is not valid JSON. Make sure that
+                    you only include what is between the {} and include the {}.
+                    Make sure the text before the : is also wrapped in "". Make
+                    sure that tere is a , after every configuration string
+                    except the latest.
+                    `}
+                  </Trans>
+                )
+              }
             />
             <Text size="title">
               <Trans>Project files</Trans>

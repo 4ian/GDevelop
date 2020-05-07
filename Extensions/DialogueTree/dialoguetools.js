@@ -136,7 +136,7 @@ gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
   if (!this.dialogueIsRunning || this.dialogueDataType  === '') return false;
   
   if (this.dialogueData && this.dialogueText.length > 0 && this.clipTextEnd >= this.dialogueText.length) {
-    if (gdjs.dialogueTree.getVariable("debug")) console.warn("Scroll completed:", this.clipTextEnd,"/", this.dialogueText.length);
+    if (gdjs.dialogueTree.getVariable('debug')) console.warn('Scroll completed:', this.clipTextEnd,'/', this.dialogueText.length);
     return true;
   }
   return false;
@@ -209,12 +209,13 @@ gdjs.dialogueTree.isCommandCalled = function(command) {
       setTimeout(function() {
         gdjs.dialogueTree.pauseScrolling = false;
         commandCalls.splice(index, 1);
+        if (gdjs.dialogueTree.getVariable('debug')) console.info('CMD:', call);
       }, parseInt(call.params[1], 10));
     }
     if (call.cmd === command) {
       gdjs.dialogueTree.commandParameters = call.params;
       commandCalls.splice(index, 1);
-      if (gdjs.dialogueTree.getVariable("debug")) console.info("CMD:", call);
+      if (gdjs.dialogueTree.getVariable('debug')) console.info('CMD:', call);
 
       return true;
     }
@@ -401,20 +402,21 @@ gdjs.dialogueTree.hasSelectedOptionChanged = function() {
  * @param {string} type The type you want to check for ( one of the three above )
  */
 gdjs.dialogueTree.isDialogueLineType = function(type) {
-  if (this.commandCalls) {
+  if (!this.dialogueIsRunning) return false;
+  if (this.commandCalls && type === 'command') {
     if (
       this.commandCalls.some(function(call) {
         return gdjs.dialogueTree.clipTextEnd > call.time && call.cmd === 'wait';
       })
     ) {
       return !this.pauseScrolling;
-    } 
-    if (this.commandCalls.length > 0 && this.commandParameters.length > 0 && type === 'command') {
+    }
+    if (this.commandCalls.length > 0 && this.commandParameters.length > 0) {
       return true;
     }
   }
 
-  return this.dialogueIsRunning ? this.dialogueDataType === type : false;
+  return this.dialogueDataType === type;
 };
 
 /**
@@ -491,7 +493,11 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   this.selectedOption = -1;
   this.selectedOptionUpdated = false;
 
-  if (gdjs.dialogueTree._isLineTypeText()) {
+  if (gdjs.dialogueTree.getVariable('debug')) console.info('parsing:', this.dialogueData);
+
+  if (!this.dialogueData) {
+    gdjs.dialogueTree.stopRunningDialogue();
+  } else if (gdjs.dialogueTree._isLineTypeText()) {
     if (this.lineNum === this.dialogueData.lineNum && this.dialogueBranchTitle === this.dialogueData.data.title){
       this.clipTextEnd = this.dialogueText.length - 1;
       this.dialogueText +=
@@ -499,7 +505,6 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
     } else {
       this.clipTextEnd = 0;
       this.dialogueText = this.dialogueData.text;
-      this.commandCalls = [];
     }
 
     this.dialogueBranchTags = this.dialogueData.data.tags;

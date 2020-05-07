@@ -5542,21 +5542,6 @@
           ]
         },
         {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Trigger sign text on collision",
-          "comment2": ""
-        },
-        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
@@ -5740,7 +5725,7 @@
             },
             {
               "disabled": false,
-              "folded": false,
+              "folded": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -6547,7 +6532,7 @@
             },
             {
               "disabled": true,
-              "folded": false,
+              "folded": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -6596,6 +6581,21 @@
                   "events": []
                 }
               ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Innitiate your dialogue data by loading it from a yarn json file",
+              "comment2": ""
             },
             {
               "disabled": false,

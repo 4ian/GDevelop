@@ -309,4 +309,4 @@ gdjs.evtTools.firebase.onAppCreated.push(function() {
             gdjs.evtTools.firebase.auth.authentified = false;
         }
     });
-})
+});

@@ -756,6 +756,8 @@ interface InitialInstance {
     void SetCustomHeight(float height);
     float GetCustomHeight();
 
+    [Ref] InitialInstance ResetPersistentUuid();
+
     void UpdateCustomProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout layout);
     [Value] MapStringPropertyDescriptor GetCustomProperties([Ref] Project project, [Ref] Layout layout);
     float GetRawFloatProperty([Const] DOMString name);

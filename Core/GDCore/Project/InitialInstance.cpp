@@ -5,10 +5,12 @@
  */
 
 #include "GDCore/Project/InitialInstance.h"
+
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/UUID/UUID.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Project/PropertyDescriptor.h"
 #endif
@@ -41,6 +43,9 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   SetZOrder(element.GetIntAttribute("zOrder", 0, "plan"));
   SetLayer(element.GetStringAttribute("layer"));
   SetLocked(element.GetBoolAttribute("locked", false));
+
+  persistentUuid = element.GetStringAttribute("persistentUuid");
+  if (persistentUuid.empty()) ResetPersistentUuid();
 
   floatInfos.clear();
   const SerializerElement& floatPropElement =
@@ -78,6 +83,9 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("width", GetCustomWidth());
   element.SetAttribute("height", GetCustomHeight());
   element.SetAttribute("locked", IsLocked());
+
+  if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
+  element.SetStringAttribute("persistentUuid", persistentUuid);
 
   SerializerElement& floatPropElement = element.AddChild("numberProperties");
   floatPropElement.ConsiderAsArrayOf("property");
@@ -146,14 +154,18 @@ const gd::String& InitialInstance::GetRawStringProperty(
   return it != stringInfos.end() ? it->second : *badStringProperyValue;
 }
 
-void InitialInstance::SetRawFloatProperty(const gd::String& name, float value)
-{
+void InitialInstance::SetRawFloatProperty(const gd::String& name, float value) {
   floatInfos[name] = value;
 }
 
-void InitialInstance::SetRawStringProperty(const gd::String& name, const gd::String& value)
-{
+void InitialInstance::SetRawStringProperty(const gd::String& name,
+                                           const gd::String& value) {
   stringInfos[name] = value;
+}
+
+InitialInstance& InitialInstance::ResetPersistentUuid() {
+  persistentUuid = UUID::MakeUuid4();
+  return *this;
 }
 #endif
 

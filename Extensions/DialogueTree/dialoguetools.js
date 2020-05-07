@@ -693,7 +693,7 @@ gdjs.dialogueTree.setVariable = function(key, value) {
  * @param {gdjs.Variable} outputVariable The variable where to store the State
  */
 gdjs.dialogueTree.saveState = function(outputVariable) {
-  const dialogueState = {
+  var dialogueState = {
     variables: gdjs.dialogueTree.runner.variables.data,
     visited: gdjs.dialogueTree.runner.visited,
   };
@@ -704,19 +704,24 @@ gdjs.dialogueTree.saveState = function(outputVariable) {
  * Load the current State of the Dialogue Parser from a specified variable.
  * Can be used to implement persistence in dialogue through your game's Load/Save function.
  * That way you can later load all the dialogue choices the player has made.
- * @param {gdjs.Variable} inputVariable The variable where to load the State from.
+ * @param {gdjs.Variable} inputVariable The structured variable where to load the State from.
  */
 gdjs.dialogueTree.loadState = function(inputVariable) {
-  const jsonData = gdjs.evtTools.network.variableStructureToJSON(inputVariable);
+  var loadedState = JSON.parse(
+    gdjs.evtTools.network.variableStructureToJSON(inputVariable)
+  );
+  if (!loadedState) {
+    console.error('Load state variable is empty:', inputVariable);
+    return
+  }
   try {
-    const loadedState = JSON.parse(
-      gdjs.evtTools.network.variableStructureToJSON(inputVariable)
-    );
     gdjs.dialogueTree.runner.visited = loadedState.visited;
-    Object.entries(gdjs.dialogueTree.runner.variables).forEach(function(pair) {
-      gdjs.dialogueTree.runner.variables.set(pair[0], pair[1]);
+    gdjs.dialogueTree.runner.variables.data = {};
+    Object.keys(loadedState.variables).forEach(function(key) {
+      var value = loadedState.variables[key];
+      gdjs.dialogueTree.runner.variables.set(key, value);
     });
   } catch (e) {
-    console.error(e);
+    console.error('Failed to load state from variable:', inputVariable, e);
   }
 };

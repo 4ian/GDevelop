@@ -1,6 +1,7 @@
 import React from 'react';
 import Checkbox from '../../UI/Checkbox';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import Warning from '@material-ui/icons/Warning';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -35,6 +36,13 @@ const styles = {
     bottom: 0,
     right: 0,
   },
+  spriteWarning: {
+    position: 'absolute',
+    display: 'flex',
+    top: 0,
+    right: 0,
+  },
+  icon: { width: 28, height: 28 },
 };
 
 const ImageThumbnail = ({
@@ -48,6 +56,15 @@ const ImageThumbnail = ({
   onContextMenu,
   muiTheme,
 }) => {
+  let warningSize = false;
+
+  const img = new Image();
+  img.src = resourcesLoader.getResourceFullUrl(project, resourceName);
+
+  if (img.width > 2048 || img.height > 2048) {
+    warningSize = true;
+  }
+
   return (
     <ThemeConsumer>
       {muiTheme => (
@@ -76,6 +93,16 @@ const ImageThumbnail = ({
               <Checkbox
                 checked={selected}
                 onCheck={(e, check) => onSelect(check)}
+              />
+            </div>
+          )}
+          {warningSize && (
+            <div style={styles.spriteWarning}>
+              <Warning
+                style={{
+                  ...styles.icon,
+                  color: muiTheme.message.error,
+                }}
               />
             </div>
           )}

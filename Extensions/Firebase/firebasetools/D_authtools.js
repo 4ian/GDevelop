@@ -96,8 +96,9 @@ gdjs.evtTools.firebase.auth.userManagement = {
          * Use this when using basic auth.
          * @param {string} email - Old Email for reauthentification.
          * @param {string} password - Old password for reauthentification.
+         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
          */
-        deleteUser(email, password) {
+        deleteUser(email, password, callbackStateVariable) {
             let credential = firebase.auth.EmailAuthProvider.credential(email, password);
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithCredential(credential)
               .then(() => gdjs.evtTools.firebase.auth.currentUser.delete())
@@ -137,8 +138,9 @@ gdjs.evtTools.firebase.auth.userManagement = {
         /**
          * Deletes the Current User.
          * Use this when using an external provider.
+         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
          */
-        deleteUserProvider() {
+        deleteUserProvider(callbackStateVariable) {
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
               .then(() => gdjs.evtTools.firebase.auth.currentUser.delete())
               .then(() => callbackStateVariable.setString("ok"))

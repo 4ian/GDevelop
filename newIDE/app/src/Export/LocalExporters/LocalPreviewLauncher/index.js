@@ -151,7 +151,7 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  _markAsPreview = (fs, outputDir) => {
+  _markAsPreview = ({ fs, outputDir }) => {
     let outputFile = path.join(outputDir, 'gd.js');
     fs.writeToFile(
       outputFile,
@@ -168,17 +168,19 @@ export default class LocalPreviewLauncher extends React.Component<
   ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
-    return this._prepareExporter().then(({ outputDir, exporter, fileSystem }) => {
-      timeFunction(
-        () => {
-          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
-          exporter.delete();
-          this._markAsPreview(fileSystem, outputDir);
-          this._openPreviewWindow(project, outputDir, options);
-        },
-        time => console.info(`Preview took ${time}ms`)
-      );
-    });
+    return this._prepareExporter().then(
+      ({ outputDir, exporter, fileSystem }) => {
+        timeFunction(
+          () => {
+            exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+            exporter.delete();
+            this._markAsPreview({ fileSystem, outputDir });
+            this._openPreviewWindow(project, outputDir, options);
+          },
+          time => console.info(`Preview took ${time}ms`)
+        );
+      }
+    );
   };
 
   launchExternalLayoutPreview = (
@@ -189,22 +191,24 @@ export default class LocalPreviewLauncher extends React.Component<
   ): Promise<any> => {
     if (!project || !externalLayout) return Promise.reject();
 
-    return this._prepareExporter().then(({ outputDir, exporter, fileSystem }) => {
-      timeFunction(
-        () => {
-          exporter.exportExternalLayoutForPixiPreview(
-            project,
-            layout,
-            externalLayout,
-            outputDir
-          );
-          exporter.delete();
-          this._markAsPreview(fileSystem, outputDir);
-          this._openPreviewWindow(project, outputDir, options);
-        },
-        time => console.info(`Preview took ${time}ms`)
-      );
-    });
+    return this._prepareExporter().then(
+      ({ outputDir, exporter, fileSystem }) => {
+        timeFunction(
+          () => {
+            exporter.exportExternalLayoutForPixiPreview(
+              project,
+              layout,
+              externalLayout,
+              outputDir
+            );
+            exporter.delete();
+            this._markAsPreview({ fileSystem, outputDir });
+            this._openPreviewWindow(project, outputDir, options);
+          },
+          time => console.info(`Preview took ${time}ms`)
+        );
+      }
+    );
   };
 
   _checkSubscription = () => {

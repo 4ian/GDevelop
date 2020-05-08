@@ -221,13 +221,14 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
           )
           .addParameter('string', _('E-Mail'), '', false)
-          .addParameter('string', _('Password'), '', false)
+		  .addParameter('string', _('Password'), '', false)
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
           .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
           .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
-          .setFunctionName('firebase.auth().createUserWithEmailAndPassword');
+          .setFunctionName('gdjs.evtTools.firebase.auth.createAccountWithEmail');
 
         extension
           .addAction(
@@ -286,13 +287,14 @@ module.exports = {
             _('Firebase/Authentification'),
             'JsPlatform/Extensions/firebase.png',
             'JsPlatform/Extensions/firebase.png'
-          )
-          .getCodeExtraInformation()
+		  )
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+		  .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
           .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
-          .setFunctionName('firebase.auth().signInAnonymously');
+          .setFunctionName('gdjs.evtTools.firebase.auth.anonymSignIn');
 
         extension
           .addCondition(

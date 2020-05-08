@@ -283,6 +283,28 @@ gdjs.evtTools.firebase.auth.signInWithEmail = function(email, password, callback
 }
 
 /**
+ * Creates an account with basic email-password authentification.
+ * @param {string} email - The user's email.
+ * @param {string} password - The user's password.
+ * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+ */
+gdjs.evtTools.firebase.auth.createAccountWithEmail = function(email, password, callbackStateVariable) {
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(result => callbackStateVariable.setString("ok"))
+      .catch(error => callbackStateVariable.setString(error.message));
+}
+
+/**
+ * Creates an account with basic email-password authentification.
+ * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+ */
+gdjs.evtTools.firebase.auth.anonymSignIn = function(callbackStateVariable) {
+    firebase.auth().signInAnonymously()
+      .then(result => callbackStateVariable.setString("ok"))
+      .catch(error => callbackStateVariable.setString(error.message));
+}
+
+/**
  * Signs you in with an external provider.
  * Only works on the web, NOT on elctron and probably not on Cordova.
  * @param {"google" | "facebook" | "github" | "twitter"} providerName - The external provider to use.

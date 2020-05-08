@@ -127,7 +127,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
           <ElementWithMenu
             ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
             element={
-              <IconButton edge="end" aria-label="menu">
+              <IconButton size="small" edge="end" aria-label="menu">
                 <MoreVert style={{ color: props.rightIconColor }} />
               </IconButton>
             }

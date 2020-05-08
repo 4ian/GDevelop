@@ -103,7 +103,6 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
           <ScreenTypeMeasurer>
             {screenType => (
               <List
-                style={{overflowX: 'hidden'}}
                 ref={list => (this._list = list)}
                 height={height}
                 rowCount={fullList.length + (onAddNewItem ? 1 : 0)}

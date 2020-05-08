@@ -95,7 +95,7 @@ const gdevelopTheme = {
   eventsSheetRootClassName: 'gd-events-sheet-nord-theme', // See EventsSheet.css
   tableRootClassName: 'gd-table-nord-theme', // See Table.css
   markdownRootClassName: 'gd-markdown-nord-theme', // See Markdown.css
-  gdevelopIconsCSSFilter: 'brightness(110%) hue-rotate(5deg) contrast(90%)',
+  gdevelopIconsCSSFilter: 'hue-rotate(-15deg) saturate(57%) brightness(120%)',
 };
 
 // Theme for Material-UI components

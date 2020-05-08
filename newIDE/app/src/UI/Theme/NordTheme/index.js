@@ -55,7 +55,7 @@ const gdevelopTheme = {
   closableTabs: {
     fontFamily,
     containerBackgroundColor: backgroundColor,
-    backgroundColor: backgroundColor,
+    backgroundColor: canvasColor,
     textColor: nord6,
     selectedBackgroundColor: nord8,
     selectedTextColor: backgroundColor,

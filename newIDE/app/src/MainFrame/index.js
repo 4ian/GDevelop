@@ -1942,6 +1942,9 @@ const MainFrame = (props: Props) => {
         PaperProps={{
           style: styles.drawerContent,
         }}
+        ModalProps={{
+          keepMounted: true,
+        }}
         onClose={toggleProjectManager}
       >
         <EditorBar

@@ -359,7 +359,7 @@ gdjs.objectsListsToArray = function(objectsLists) {
 };
 
 /**
- * Tells the extensions if you are in a preview or not.
+ * Is true on previews.
  */
 gdjs.isPreview = false;
 

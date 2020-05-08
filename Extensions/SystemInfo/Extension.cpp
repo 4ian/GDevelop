@@ -42,6 +42,22 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .SetFunctionName("SystemInfo::IsWebGLSupported")
       .SetIncludeFile("SystemInfo/SystemInfoTools.h");
+
+  extension
+      .AddCondition(
+          "IsPreview",
+          _("Is the game running in a preview"),
+          _(
+            "Check if the game is currently being previewed. " +
+            "Can be used to nabel a 'Debug mode'"
+          ),
+          _("The game is a preview"),
+          _("System information"),
+          "CppPlatform/Extensions/systeminfoicon24.png",
+          "CppPlatform/Extensions/systeminfoicon16.png")
+
+      .SetFunctionName("SystemInfo::IsMobile")
+      .SetIncludeFile("SystemInfo/SystemInfoTools.h");
 #endif
 }
 

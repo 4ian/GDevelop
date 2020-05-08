@@ -37,3 +37,11 @@ gdjs.evtTools.systemInfo.isMobile = function() {
 gdjs.evtTools.systemInfo.isWebGLSupported = function(runtimeScene) {
 	return runtimeScene.getGame().getRenderer().isWebGLSupported();
 };
+
+/**
+ * Checks gdjs.isPreview.
+ * @returns {boolean} Is the game a preview?
+ */
+gdjs.evtTools.systemInfo.isPreview = function() {
+	return gdjs.isPreview;
+};

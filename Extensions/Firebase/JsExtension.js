@@ -336,6 +336,23 @@ module.exports = {
 		//User management Instructions
 
 		extension
+          .addCondition(
+            'IsEmailVerified',
+            _('Is the users Email address verified'),
+            _('Checks if the email address of the user got verified.'),
+            _('The Email of the user is verified'),
+            _('Firebase/Authentification/User Management'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.isEmailVerified');
+
+		extension
 		  .addStrExpression(
             'GetUserEmail',
             _('Get the users email address'),
@@ -397,7 +414,7 @@ module.exports = {
           .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
           .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
-		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getEmail');
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getDisplayName');
 
 		extension
 		  .addStrExpression(
@@ -481,6 +498,239 @@ module.exports = {
       	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getPhotoURL');
+
+		extension
+          .addAction(
+            'SendEmailVerification',
+            _('Send a verification Email'),
+            _(
+              'Send a link per email to verify the users email.'
+             ),
+            _('Send Verification Email'),
+            _('Firebase/Authentification/User Management'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+          )
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.sendVerificationEmail');
+
+		extension
+          .addAction(
+            'SetDisplayName',
+            _('Set Display Name'),
+            _(
+              'Sets the users display name.'
+             ),
+            _('Set the user\'s display name to _PARAM0_'),
+            _('Firebase/Authentification/User Management'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('New display name'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.setDisplayName');
+
+		extension
+          .addAction(
+            'SetPhotoURL',
+            _('Set the users profile picture'),
+            _(
+              'Sets the users profile picture URL to a new one.'
+             ),
+            _('Set the user\'s display name to _PARAM0_'),
+            _('Firebase/Authentification/User Management'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('New photo\'s URL'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.setPhotoURL');
+
+		extension
+          .addAction(
+            'SetPhotoURL',
+            _('Set the users profile picture'),
+            _(
+              'Sets the users profile picture URL to a new one.'
+             ),
+            _('Set the user\'s display name to _PARAM0_'),
+            _('Firebase/Authentification/User Management'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('New photo\'s URL'), '', false)
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.setPhotoURL');
+
+		// Dangerous Authentification Instructions
+		extension
+          .addAction(
+            'ChangeEmail',
+            _('Change the users email'),
+            _(
+			  'This Action is dangerous so it requires reauthentification.\n' +
+			  'Changes the user\'s email address.'
+             ),
+            _('Change the user\'s email to _PARAM0_ and store result in _PARAM4_ (Send verification email: _PARAM3_)'),
+            _('Firebase/Authentification/User Management/Dangerous'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('Old Email'), '', false)
+		  .addParameter('string', _('Password'), '', false)
+		  .addParameter('string', _('New Email'), '', false)
+		  .addParameter('yesorno', _('Send verification Email before change?'), '', false)
+		  .setDefaultValue('true')
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changeEmail');
+
+		extension
+          .addAction(
+            'ChangeEmailProvider',
+            _('Change the users email (Provider)'),
+            _(
+			  'This Action is dangerous so it requires reauthentification.\n' +
+			  'Changes the user\'s email address.\n' +
+			  'This is the same as Change the users email but reauthenticates via an external provider.'
+             ),
+            _('Change the user\'s email to _PARAM0_ and store result in _PARAM2_ (Send verification email: _PARAM1_)'),
+            _('Firebase/Authentification/User Management/Dangerous'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('New Email'), '', false)
+		  .addParameter('yesorno', _('Send verification Email before change?'), '', false)
+		  .setDefaultValue('true')
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changeEmailProvider');
+
+		extension
+          .addAction(
+            'ChangePassword',
+            _('Change the users password'),
+            _(
+			  'This Action is dangerous so it requires reauthentification.\n' +
+			  'Changes the user\'s password.'
+             ),
+			_(
+			  'Change the user\'s password to _PARAM2_ and store result in ' +
+			  '_PARAM4_ (Send verification email: _PARAM3_)'
+			),
+            _('Firebase/Authentification/User Management/Dangerous'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('Email'), '', false)
+		  .addParameter('string', _('Old Password'), '', false)
+		  .addParameter('string', _('New Password'), '', false)
+		  .addParameter('yesorno', _('Send verification Email before change?'), '', false)
+		  .setDefaultValue('true')
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changePassword');
+
+		extension
+          .addAction(
+            'ChangePasswordProvider',
+            _('Change the users password (Provider)'),
+            _(
+			  'This Action is dangerous so it requires reauthentification.\n' +
+			  'Changes the user\'s password.\n' +
+			  'This is the same as Change the users password but reauthenticates via an external provider.'
+             ),
+			_(
+				'Change the user\'s password to _PARAM0_ and store result in ' +
+				'_PARAM2_ (Send verification email: _PARAM1_)'
+			),
+            _('Firebase/Authentification/User Management/Dangerous'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('New Password'), '', false)
+		  .addParameter('yesorno', _('Send verification Email before change?'), '', false)
+		  .setDefaultValue('true')
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changePasswordProvider');
+
+		  extension
+          .addAction(
+            'DeleteUser',
+            _('Delete the users account'),
+            _(
+			  'This Action is dangerous so it requires reauthentification.\n' +
+			  'Deletes the users account.'
+             ),
+            _('Delete the users account and store result in _PARAM2_'),
+            _('Firebase/Authentification/User Management/Dangerous'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('string', _('Email'), '', false)
+		  .addParameter('string', _('Password'), '', false)
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.deleteUser');
+
+		extension
+          .addAction(
+            'DeleteUserProvider',
+            _('Change the users password (Provider)'),
+            _(
+			  'This Action is dangerous so it requires reauthentification.\n' +
+			  'Deletes the users account.\n' +
+			  'This is the same as Delete the users account but reauthenticates via an external provider.'
+             ),
+            _('Delete the users account and store result in _PARAM0_'),
+            _('Firebase/Authentification/User Management/Dangerous'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.deleteUserProvider');
 
         return extension;
     },

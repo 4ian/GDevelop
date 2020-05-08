@@ -26,6 +26,25 @@ module.exports = {
 
 		
 		/* ====== ANALYTICS ====== */
+		extension
+          .addAction(
+            'AnalyticsEnable',
+            _('Enable analytics'),
+            _(
+              'Enables Analytics for that project.'
+             ),
+            _('Enable analytics'),
+            _('Firebase/Analytics'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+          )
+          .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
+		  .setFunctionName('firebase.analytics');
+
         extension
           .addAction(
             'AnalyticsLog',
@@ -319,7 +338,7 @@ module.exports = {
             'GetUserEmail',
             _('Get the users email address'),
             _('Gets the users email address.'),
-            _('Firebase/Authentification'),
+            _('Firebase/Authentification/User Management'),
             'JsPlatform/Extensions/firebase.png',
             'JsPlatform/Extensions/firebase.png'
           )
@@ -335,7 +354,7 @@ module.exports = {
 			'GetAccountCreationTime',
 			_('Get the accounts creation time'),
 			_('Gets the accounts creation time.'),
-			_('Firebase/Authentification'),
+			_('Firebase/Authentification/User Management'),
 			'JsPlatform/Extensions/firebase.png',
 			'JsPlatform/Extensions/firebase.png'
      	  )
@@ -351,7 +370,7 @@ module.exports = {
             'GetLastLoginTime',
             _('Get the users last login time'),
             _('Gets the users last login time.'),
-            _('Firebase/Authentification'),
+            _('Firebase/Authentification/User Management'),
             'JsPlatform/Extensions/firebase.png',
             'JsPlatform/Extensions/firebase.png'
       	  )
@@ -361,6 +380,105 @@ module.exports = {
       	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getLastLoginTime');
+
+		extension
+		  .addStrExpression(
+            'GetUserDisplayName',
+            _('Get the users display name'),
+            _('Gets the users display name.'),
+            _('Firebase/Authentification/User Management'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+          )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getEmail');
+
+		extension
+		  .addStrExpression(
+            'GetPhoneNumber',
+            _('Get the users phone number'),
+            _('Gets the users phone number.'),
+            _('Firebase/Authentification/User Management'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+          )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getPhoneNumber');
+
+		extension
+		  .addStrExpression(
+            'GetUserUID',
+            _('Get the users ID'),
+            _(
+				'Gets the users Unique Identifier. Use that to link data to an ' +
+				'user instead of the name or email.'
+			),
+            _('Firebase/Authentification/User Management'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+          )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getUID');
+
+		extension
+		  .addStrExpression(
+            'GetTenantID',
+            _('Get the users Tenant ID'),
+            _('Gets the users Tenant ID. Only use that if you know what you are doing.'),
+            _('Firebase/Authentification/User Management'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+      	  )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getTenantID');
+
+		extension
+		  .addStrExpression(
+            'GetRefreshToken',
+            _('Get the users refresh token'),
+            _('Gets the users Refresh Token. Only use that if you know what you are doing.'),
+            _('Firebase/Authentification/User Management'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+      	  )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getRefreshToken');
+
+		extension
+		  .addStrExpression(
+            'GetPhotoURL',
+            _('Get the users Profile Picture URL'),
+            _('Gets an URL to the users profile picture.'),
+            _('Firebase/Authentification/User Management'),
+            'JsPlatform/Extensions/firebase.png',
+            'JsPlatform/Extensions/firebase.png'
+      	  )
+		  .getCodeExtraInformation()
+		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getPhotoURL');
 
         return extension;
     },

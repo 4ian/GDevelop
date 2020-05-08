@@ -49,7 +49,7 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
           _("Is the game running in a preview"),
           _(
             "Check if the game is currently being previewed. " +
-            "Can be used to nabel a 'Debug mode'"
+            "Can be used to enable a Debug mode"
           ),
           _("The game is a preview"),
           _("System information"),

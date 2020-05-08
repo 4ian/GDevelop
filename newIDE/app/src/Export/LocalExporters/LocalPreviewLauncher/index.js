@@ -151,7 +151,7 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  _markAsPreview = ({ fs, outputDir }) => {
+  _markAsPreview = (fs: gdAbstractFileSystem, outputDir: string): void => {
     let outputFile = path.join(outputDir, 'gd.js');
     fs.writeToFile(
       outputFile,
@@ -174,7 +174,7 @@ export default class LocalPreviewLauncher extends React.Component<
           () => {
             exporter.exportLayoutForPixiPreview(project, layout, outputDir);
             exporter.delete();
-            this._markAsPreview({ fileSystem, outputDir });
+            this._markAsPreview(fileSystem, outputDir);
             this._openPreviewWindow(project, outputDir, options);
           },
           time => console.info(`Preview took ${time}ms`)
@@ -202,7 +202,7 @@ export default class LocalPreviewLauncher extends React.Component<
               outputDir
             );
             exporter.delete();
-            this._markAsPreview({ fileSystem, outputDir });
+            this._markAsPreview(fileSystem, outputDir);
             this._openPreviewWindow(project, outputDir, options);
           },
           time => console.info(`Preview took ${time}ms`)

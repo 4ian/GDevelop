@@ -41,7 +41,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     };
   };
 
-  _markAsPreview = ({ fs, outputDir }) => {
+  _markAsPreview = (fs: gdAbstractFileSystem, outputDir: string): void => {
     let outputFile = outputDir + '/gd.js';
     fs.writeToFile(
       outputFile,
@@ -91,7 +91,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       .then(({ exporter, outputDir, browserS3FileSystem }) => {
         exporter.exportLayoutForPixiPreview(project, layout, outputDir);
         exporter.delete();
-        this._markAsPreview({ browserS3FileSystem, outputDir });
+        this._markAsPreview(browserS3FileSystem, outputDir);
         return browserS3FileSystem
           .uploadPendingObjects()
           .then(() => {
@@ -133,7 +133,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           outputDir
         );
         exporter.delete();
-        this._markAsPreview({ browserS3FileSystem, outputDir });
+        this._markAsPreview(browserS3FileSystem, outputDir);
         return browserS3FileSystem
           .uploadPendingObjects()
           .then(() => {

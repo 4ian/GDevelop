@@ -146,8 +146,19 @@ export default class LocalPreviewLauncher extends React.Component<
       return {
         outputDir,
         exporter,
+        fileSystem,
       };
     });
+  };
+
+  _markAsPreview = (fs, outputDir) => {
+    let outputFile = path.join(outputDir, 'gd.js');
+    fs.writeToFile(
+      outputFile,
+      fs
+        .readFile(outputFile)
+        .replace('gdjs.isPreview = false;', 'gdjs.isPreview = true;')
+    );
   };
 
   launchLayoutPreview = (
@@ -157,11 +168,12 @@ export default class LocalPreviewLauncher extends React.Component<
   ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
-    return this._prepareExporter().then(({ outputDir, exporter }) => {
+    return this._prepareExporter().then(({ outputDir, exporter, fileSystem }) => {
       timeFunction(
         () => {
           exporter.exportLayoutForPixiPreview(project, layout, outputDir);
           exporter.delete();
+          this._markAsPreview(fileSystem, outputDir);
           this._openPreviewWindow(project, outputDir, options);
         },
         time => console.info(`Preview took ${time}ms`)
@@ -177,7 +189,7 @@ export default class LocalPreviewLauncher extends React.Component<
   ): Promise<any> => {
     if (!project || !externalLayout) return Promise.reject();
 
-    return this._prepareExporter().then(({ outputDir, exporter }) => {
+    return this._prepareExporter().then(({ outputDir, exporter, fileSystem }) => {
       timeFunction(
         () => {
           exporter.exportExternalLayoutForPixiPreview(
@@ -187,6 +199,7 @@ export default class LocalPreviewLauncher extends React.Component<
             outputDir
           );
           exporter.delete();
+          this._markAsPreview(fileSystem, outputDir);
           this._openPreviewWindow(project, outputDir, options);
         },
         time => console.info(`Preview took ${time}ms`)

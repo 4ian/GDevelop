@@ -358,6 +358,11 @@ gdjs.objectsListsToArray = function(objectsLists) {
   return result;
 };
 
+/**
+ * Tells the extensions if you are in a preview or not.
+ */
+gdjs.isPreview = false;
+
 Array.prototype.remove = function(from) {
   //Adapted from the nice article available at
   //https://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript

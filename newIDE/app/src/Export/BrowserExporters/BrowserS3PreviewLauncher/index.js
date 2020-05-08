@@ -41,6 +41,16 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     };
   };
 
+  _markAsPreview = (fs, outputDir) => {
+    let outputFile = outputDir+'/gd.js';
+    fs.writeToFile(
+      outputFile,
+      fs
+        .readFile(outputFile)
+        .replace('gdjs.isPreview = false;', 'gdjs.isPreview = true;')
+    );
+  };
+
   _prepareExporter = (): Promise<any> => {
     return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
@@ -58,7 +68,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         browserS3FileSystem
       );
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-      exporter.setCodeOutputDirectory(getBaseUrl() + prefix);
+      exporter.setCodeOutputDirectory(outputDir);
 
       return {
         exporter,
@@ -81,6 +91,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       .then(({ exporter, outputDir, browserS3FileSystem }) => {
         exporter.exportLayoutForPixiPreview(project, layout, outputDir);
         exporter.delete();
+        this._markAsPreview(browserS3FileSystem, outputDir);
         return browserS3FileSystem
           .uploadPendingObjects()
           .then(() => {
@@ -122,6 +133,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           outputDir
         );
         exporter.delete();
+        this._markAsPreview(browserS3FileSystem, outputDir);
         return browserS3FileSystem
           .uploadPendingObjects()
           .then(() => {

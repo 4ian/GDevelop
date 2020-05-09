@@ -110,11 +110,14 @@ export default class ResourcePropertiesEditor extends React.Component<
         style={styles.propertiesContainer}
         key={resources.map(resource => '' + resource.ptr).join(';')}
       >
-        { warningSizeSprite &&(<AlertMessage kind="error">
-          <Trans>
-            This resource are taller than 2048px wide, this reduce the performance and can be not correctly display on mobile devices.
-          </Trans>
-        </AlertMessage>)}
+        {warningSizeSprite && (
+          <AlertMessage kind="error">
+            <Trans>
+              This resource are taller than 2048px wide, this reduce the
+              performance and can be not correctly display on mobile devices.
+            </Trans>
+          </AlertMessage>
+        )}
         <PropertiesEditor
           schema={this.schema.concat(resourceSchema)}
           instances={resources}

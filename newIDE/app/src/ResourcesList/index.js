@@ -173,24 +173,20 @@ export default class ResourcesList extends React.Component<Props, State> {
     );
   };
 
-  _getResourceThumbnail = (resource: gdResource) =>{
-    
-   switch (resource.getKind()) {
-    case 'image':
-      return getLocalResourceFullPath(
-          this.props.project,
-          resource.getName()
-        );
-    case 'audio':
-      return 'res/actions/music24.png';
-    case 'json':
-      return 'res/actions/fichier24.png';
-    case 'video':
-      return 'JsPlatform/Extensions/videoicon24.png';
-    case 'font':
-      return 'res/actions/font24.png';
-    default:
-      return 'res/unknown32.png'; //Icon type inconnu
+  _getResourceThumbnail = (resource: gdResource) => {
+    switch (resource.getKind()) {
+      case 'image':
+        return getLocalResourceFullPath(this.props.project, resource.getName());
+      case 'audio':
+        return 'res/actions/music24.png';
+      case 'json':
+        return 'res/actions/fichier24.png';
+      case 'video':
+        return 'JsPlatform/Extensions/videoicon24.png';
+      case 'font':
+        return 'res/actions/font24.png';
+      default:
+        return 'res/unknown32.png'; //Icon type inconnu
     }
   };
 

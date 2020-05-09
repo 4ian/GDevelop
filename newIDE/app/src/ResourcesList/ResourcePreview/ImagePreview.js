@@ -149,9 +149,9 @@ export default class ImagePreview extends React.Component<Props, State> {
           const imagePositionTop = 0;
           const imagePositionLeft = Math.max(
             0,
-            (containerWidth / 2 -
+            containerWidth / 2 -
               ((imageWidth || 0) * imageZoomFactor) / 2 -
-              MARGIN) || 0
+              MARGIN || 0
           );
 
           const imageStyle = {

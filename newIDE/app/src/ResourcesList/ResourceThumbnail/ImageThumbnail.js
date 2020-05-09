@@ -97,7 +97,7 @@ const ImageThumbnail = ({
             </div>
           )}
           {warningSize && (
-            <div style={styles.spriteWarning}>
+            <div style={styles.spriteError}>
               <Warning
                 style={{
                   ...styles.icon,

@@ -94,7 +94,7 @@ class Bootstrapper extends Component<{}, State> {
     }, this.handleEditorLoadError);
   }
 
-  handleEditorLoadError(err) {
+  handleEditorLoadError = (err) => {
     const message = !electron
       ? 'Please check your internet connectivity, close the tab and reopen it.'
       : 'Please restart the application or reinstall the latest version if the problem persists.';

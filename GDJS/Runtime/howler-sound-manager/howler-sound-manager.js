@@ -175,6 +175,15 @@ gdjs.HowlerSoundManager = function(resources) {
 gdjs.SoundManager = gdjs.HowlerSoundManager; //Register the class to let the engine use it.
 
 /**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.HowlerSoundManager.prototype.setResources = function(resources) {
+  this._resources = resources;
+};
+
+/**
  * Ensure rate is in a range valid for Howler.js
  * @return The clamped rate
  * @private

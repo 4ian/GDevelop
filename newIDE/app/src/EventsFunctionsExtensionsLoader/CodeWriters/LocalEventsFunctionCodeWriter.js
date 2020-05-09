@@ -9,7 +9,9 @@ const fs = optionalRequire('fs');
  * Create the EventsFunctionCodeWriter that writes generated code for events functions
  * to local files.
  */
-export const makeLocalEventsFunctionCodeWriter = (): EventsFunctionCodeWriter => {
+export const makeLocalEventsFunctionCodeWriter = ({
+  onWriteFile,
+}): EventsFunctionCodeWriter => {
   const outputDir = os.tmpdir() + '/GDGeneratedEventsFunctions';
   fs.mkdir(outputDir, err => {
     if (err && err.code !== 'EEXIST') {
@@ -33,6 +35,7 @@ export const makeLocalEventsFunctionCodeWriter = (): EventsFunctionCodeWriter =>
     ): Promise<void> => {
       return new Promise((resolve, reject) => {
         const filepath = getPathFor(functionCodeNamespace);
+        onWriteFile({ includeFile: filepath, content: code });
         fs.writeFile(filepath, code, err => {
           if (err) return reject(err);
 
@@ -46,6 +49,7 @@ export const makeLocalEventsFunctionCodeWriter = (): EventsFunctionCodeWriter =>
     ): Promise<void> => {
       return new Promise((resolve, reject) => {
         const filepath = getPathFor(behaviorCodeNamespace);
+        onWriteFile({ includeFile: filepath, content: code });
         fs.writeFile(filepath, code, err => {
           if (err) return reject(err);
 

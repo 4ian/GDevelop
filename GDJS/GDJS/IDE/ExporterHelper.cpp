@@ -41,22 +41,20 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
                                gd::String codeOutputDir_)
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_){};
 
-bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
-                                                gd::Layout &layout,
-                                                gd::String exportDir,
-                                                gd::String additionalSpec) {
-  fs.MkDir(exportDir);
-  fs.ClearDir(exportDir);
+bool ExporterHelper::ExportProjectForPixiPreview(
+    const PreviewExportOptions &options) {
+  fs.MkDir(options.exportPath);
+  fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
 
-  gd::Project exportedProject = project;
+  gd::Project exportedProject = options.project;
 
   // Always disable the splash for preview
   exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
 
   // Export resources (*before* generating events as some resources filenames
   // may be updated)
-  ExportResources(fs, exportedProject, exportDir);
+  ExportResources(fs, exportedProject, options.exportPath);
 
   // Compatibility with GD <= 5.0-beta56
   // Stay compatible with text objects declaring their font as just a filename
@@ -87,41 +85,65 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
   // Strip the project (*after* generating events as the events may use stripped
   // things (objects groups...))
   gd::ProjectStripper::StripProjectForExport(exportedProject);
-  exportedProject.SetFirstLayout(layout.GetName());
+  exportedProject.SetFirstLayout(options.layoutName);
+
+  // Strip the includes to only have Pixi.js files (*before* creating runtimeGameOptions,
+  // since otherwise Cocos files will be passed to the hot-reloader).
+  RemoveIncludes(false, true, includesFiles);
+
+  // Create the setup options passed to the gdjs.RuntimeGame
+  gd::SerializerElement runtimeGameOptions;
+  runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
+  if (!options.externalLayoutName.empty()) {
+    runtimeGameOptions.AddChild("injectExternalLayout")
+        .SetValue(options.externalLayoutName);
+  }
+
+  // Pass in the options the list of scripts files - useful for hot-reloading.
+  auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
+  scriptFilesElement.ConsiderAsArrayOf("scriptFile");
+  for (const auto &includeFile : includesFiles) {
+    auto hashIt = options.includeFileHashes.find(includeFile);
+    scriptFilesElement.AddChild("scriptFile")
+        .SetStringAttribute("path", includeFile)
+        .SetIntAttribute(
+            "hash",
+            hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
+  }
 
   // Export the project
-  ExportToJSON(
-      fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+  ExportProjectData(
+      fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all the dependencies
-  RemoveIncludes(false, true, includesFiles);
-  ExportIncludesAndLibs(includesFiles, exportDir, false);
+  ExportIncludesAndLibs(includesFiles, options.exportPath, false);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
                            gdjsRoot + "/Runtime/index.html",
-                           exportDir,
+                           options.exportPath,
                            includesFiles,
-                           additionalSpec))
+                           "gdjs.runtimeGameOptions"))
     return false;
 
   return true;
 }
 
-gd::String ExporterHelper::ExportToJSON(gd::AbstractFileSystem &fs,
-                                        const gd::Project &project,
-                                        gd::String filename,
-                                        gd::String wrapIntoVariable) {
+gd::String ExporterHelper::ExportProjectData(
+    gd::AbstractFileSystem &fs,
+    const gd::Project &project,
+    gd::String filename,
+    const gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
-
-  gd::String output = gd::Serializer::ToJSON(rootElement);
-  if (!wrapIntoVariable.empty())
-    output = wrapIntoVariable + " = " + output + ";";
+  gd::String output =
+      "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
+      "gdjs.runtimeGameOptions = " +
+      gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
 
   if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
 
@@ -500,6 +522,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/networktools.js");
 
   if (websocketDebuggerClient) {
+    InsertUnique(includesFiles, "websocket-debugger-client/hot-reloader.js");
     InsertUnique(includesFiles,
                  "websocket-debugger-client/websocket-debugger-client.js");
   }

@@ -44,6 +44,7 @@ module.exports = function(config) {
       '../Runtime/events-tools/storagetools.js',
       '../Runtime/events-tools/stringtools.js',
       '../Runtime/events-tools/windowtools.js',
+      '../Runtime/websocket-debugger-client/hot-reloader.js',
 
       //Extensions:
       '../../Extensions/DraggableBehavior/draggableruntimebehavior.js',

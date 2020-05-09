@@ -2641,8 +2641,12 @@ describe('libGD.js', function() {
         done();
       };
 
-      var exporter = new gd.Exporter(fs);
-      exporter.exportLayoutForPixiPreview(project, layout, '/path/for/export/');
+      const exporter = new gd.Exporter(fs);
+      const previewExportOptions =
+        new gd.PreviewExportOptions(project, '/path/for/export/');
+      previewExportOptions.setLayoutName('Scene');
+      exporter.exportProjectForPixiPreview(previewExportOptions);
+      previewExportOptions.delete();
       exporter.delete();
     });
   });

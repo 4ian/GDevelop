@@ -822,7 +822,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       .forEach(instance => {
         instance.setX(instance.getX() - x + position[0]);
         instance.setY(instance.getY() - y + position[1]);
-        this.props.initialInstances.insertInitialInstance(instance);
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
         instance.delete();
       });
   };

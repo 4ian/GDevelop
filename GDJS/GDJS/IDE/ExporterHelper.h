@@ -5,20 +5,69 @@
  */
 #ifndef EXPORTER_HELPER_H
 #define EXPORTER_HELPER_H
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
+
 #include "GDCore/String.h"
 namespace gd {
 class Project;
 class Layout;
 class ExternalLayout;
+class SerializerElement;
 class AbstractFileSystem;
 class ResourcesManager;
 }  // namespace gd
 class wxProgressDialog;
 
 namespace gdjs {
+
+/**
+ * \brief The options used to export a project for a preview.
+ */
+struct PreviewExportOptions {
+  /**
+   * \param project_ The project to export
+   * \param exportPath_ The path in the filesystem where to export the files
+   */
+  PreviewExportOptions(gd::Project &project_, const gd::String &exportPath_)
+      : project(project_), exportPath(exportPath_){};
+
+  /**
+   * \brief Set the layout to be run first in the previewed game
+   */
+  PreviewExportOptions &SetLayoutName(const gd::String &layoutName_) {
+    layoutName = layoutName_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the (optional) external layout to be instanciated in the scene
+   * at the beginning of the previewed game.
+   */
+  PreviewExportOptions &SetExternalLayoutName(
+      const gd::String &externalLayoutName_) {
+    externalLayoutName = externalLayoutName_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the hash associated to an include file. Useful for the preview
+   * hot-reload, to know if a file changed.
+   */
+  PreviewExportOptions &SetIncludeFileHash(const gd::String &includeFile,
+                                           int hash) {
+    includeFileHashes[includeFile] = hash;
+    return *this;
+  }
+
+  gd::Project &project;
+  gd::String exportPath;
+  gd::String layoutName;
+  gd::String externalLayoutName;
+  std::map<gd::String, int> includeFileHashes;
+};
 
 /**
  * \brief Export a project or a layout to a playable HTML5/Javascript based
@@ -42,15 +91,15 @@ class ExporterHelper {
    * \param fs The abstract file system to use to write the file
    * \param project The project to be exported.
    * \param filename The filename where export the project
-   * \param wrapIntoVariable If not empty, the resulting json will be wrapped in
-   * this javascript variable allowing to use it as a classical javascript
-   * object. \return Empty string if everthing is ok, description of the error
-   * otherwise.
+   * \param runtimeGameOptions The content of the extra configuration to store
+   * in gdjs.runtimeGameOptions \return Empty string if everthing is ok,
+   * description of the error otherwise.
    */
-  static gd::String ExportToJSON(gd::AbstractFileSystem &fs,
-                                 const gd::Project &project,
-                                 gd::String filename,
-                                 gd::String wrapIntoVariable);
+  static gd::String ExportProjectData(
+      gd::AbstractFileSystem &fs,
+      const gd::Project &project,
+      gd::String filename,
+      const gd::SerializerElement &runtimeGameOptions);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -208,18 +257,13 @@ class ExporterHelper {
                                        gd::String exportDir);
 
   /**
-   * \brief Launch all export methods to generate a complete, stand-alone game
-   * for previewing.
+   * \brief Create a preview for the specified options.
+   * \note The preview is not launched, it is the caller responsibility to open
+   * a browser pointing to the preview.
    *
-   * \param layout The layout to be previewed.
-   * \param exportDir The directory where the preview must be created.
-   * \param additionalSpec Any additional parameters to be passed to the
-   * gdjs.RuntimeGame. \return true if export was successful.
+   * \param options The options to generate the preview.
    */
-  bool ExportLayoutForPixiPreview(gd::Project &project,
-                                  gd::Layout &layout,
-                                  gd::String exportDir,
-                                  gd::String additionalSpec);
+  bool ExportProjectForPixiPreview(const PreviewExportOptions &options);
 
   /**
    * \brief Change the directory where code files are generated.

@@ -180,6 +180,7 @@ declare class libGDevelop {
   LayoutCodeGenerator: Class<gdLayoutCodeGenerator>;
   BehaviorCodeGenerator: Class<gdBehaviorCodeGenerator>;
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
+  PreviewExportOptions: Class<gdPreviewExportOptions>;
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
 };

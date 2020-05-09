@@ -27,6 +27,20 @@ gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)
     this._activated = true;
     this.owner = owner;
 };
+
+/**
+ * Called when the behavior must be updated using the specified behaviorData. This is the
+ * case during hot-reload, and is only called if the behavior was modified.
+ *
+ * @param {BehaviorData} oldBehaviorData The previous data for the behavior.
+ * @param {BehaviorData} newBehaviorData The new data for the behavior.
+ * @returns {boolean} true if the behavior was updated, false if it could not (i.e: hot-reload is not supported).
+ */
+gdjs.RuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    // If not redefined, mark by default the hot-reload as failed.
+    return false;
+}
+
 /**
  * Get the name of the behavior.
  * @return {string} The behavior's name.

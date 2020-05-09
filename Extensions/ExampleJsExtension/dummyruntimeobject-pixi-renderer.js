@@ -1,6 +1,6 @@
 /**
  * The PIXI.js renderer for the DummyRuntimeObject.
- * 
+ *
  * @class DummyRuntimeObjectPixiRenderer
  * @constructor
  * @param {gdjs.DummyRuntimeObject} runtimeObject The object to render
@@ -9,7 +9,7 @@
 gdjs.DummyRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
 {
     this._object = runtimeObject; // Keep a reference to the object to read from it later.
-    
+
     // Here we're going to create a dummy text as an example.
     if ( this._text === undefined ) {
         this._text = new PIXI.Text(runtimeObject.getText(), {align:"left"});
@@ -36,6 +36,10 @@ gdjs.DummyRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 
 gdjs.DummyRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
     this.updatePosition();
+};
+
+gdjs.DummyRuntimeObjectPixiRenderer.prototype.updateText = function() {
+    this._text.text = this._object.getText();
 };
 
 gdjs.DummyRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

@@ -10,6 +10,7 @@ export type PreviewButtonsProps = {|
   onPreview: () => void,
   onOpenDebugger: () => void,
   onNetworkPreview: () => void,
+  onHotReloadPreview: () => void,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -24,6 +25,7 @@ export default function PreviewButtons({
   onPreview,
   onNetworkPreview,
   onOpenDebugger,
+  onHotReloadPreview,
   showNetworkPreviewButton,
   isPreviewEnabled,
   previewState,
@@ -104,6 +106,12 @@ export default function PreviewButtons({
                     previewState.overridenPreviewExternalLayoutName,
               },
             ]}
+          />
+          <ToolbarIcon
+            onClick={onHotReloadPreview}
+            disabled={!isPreviewEnabled}
+            src="res/ribbon_default/preview32.png"
+            tooltip={t`Apply changes to the running preview(s)`}
           />
           {showNetworkPreviewButton && (
             <ElementWithMenu

@@ -91,6 +91,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
             onPreview={this.props.onPreview}
             onOpenDebugger={this.props.onOpenDebugger}
             onNetworkPreview={this.props.onNetworkPreview}
+            onHotReloadPreview={this.props.onHotReloadPreview}
             setPreviewOverride={this.props.setPreviewOverride}
             showNetworkPreviewButton={this.props.showNetworkPreviewButton}
             isPreviewEnabled={this.props.isPreviewEnabled}

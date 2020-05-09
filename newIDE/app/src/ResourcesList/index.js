@@ -173,6 +173,27 @@ export default class ResourcesList extends React.Component<Props, State> {
     );
   };
 
+  _getResourceThumbnail = (resource: gdResource) =>{
+    
+   switch (resource.getKind()) {
+    case 'image':
+      return getLocalResourceFullPath(
+          this.props.project,
+          resource.getName()
+        );
+    case 'audio':
+      return 'res/actions/music24.png';
+    case 'json':
+      return 'res/actions/fichier24.png';
+    case 'video':
+      return 'JsPlatform/Extensions/videoicon24.png';
+    case 'font':
+      return 'res/actions/font24.png';
+    default:
+      return 'res/unknown32.png'; //Icon type inconnu
+    }
+  };
+
   _rename = (resource: gdResource, newName: string) => {
     const { project } = this.props;
     this.setState({
@@ -358,6 +379,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 width={width}
                 height={height}
                 getItemName={getResourceName}
+                getItemThumbnail={this._getResourceThumbnail}
                 selectedItems={selectedResource ? [selectedResource] : []}
                 onItemSelected={onSelectResource}
                 renamedItem={this.state.renamedResource}

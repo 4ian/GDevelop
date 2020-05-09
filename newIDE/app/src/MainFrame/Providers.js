@@ -26,7 +26,7 @@ import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
 type Props = {|
   authentification: Authentification,
   disableCheckForUpdates: boolean,
-  eventsFunctionCodeWriter: ?EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: () => EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
   children: ({
@@ -45,7 +45,7 @@ export default class Providers extends React.Component<Props, {||}> {
       disableCheckForUpdates,
       authentification,
       children,
-      eventsFunctionCodeWriter,
+      makeEventsFunctionCodeWriter,
       eventsFunctionsExtensionWriter,
       eventsFunctionsExtensionOpener,
     } = this.props;
@@ -67,8 +67,8 @@ export default class Providers extends React.Component<Props, {||}> {
                             {({ i18n }) => (
                               <EventsFunctionsExtensionsProvider
                                 i18n={i18n}
-                                eventsFunctionCodeWriter={
-                                  eventsFunctionCodeWriter
+                                makeEventsFunctionCodeWriter={
+                                  makeEventsFunctionCodeWriter
                                 }
                                 eventsFunctionsExtensionWriter={
                                   eventsFunctionsExtensionWriter

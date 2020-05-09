@@ -99,6 +99,12 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
      * @type {gdjs.RuntimeScene}
      */
     this._runtimeScene = runtimeScene;
+    /**
+     * An optional UUID associated to the object to be used
+     * for hot reload. Don't modify or use otherwise.
+     * @type {?string}
+     */
+    this.persistentUuid = null;
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
@@ -269,6 +275,18 @@ gdjs.RuntimeObject.prototype.update = function(runtimeScene) {
 gdjs.RuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
     //Nothing to do.
 };
+
+/**
+ * Called when the object must be updated using the specified objectData. This is the
+ * case during hot-reload, and is only called if the object was modified.
+ *
+ * @param {ObjectData} objectData The data for the object.
+ * @returns {boolean} true if the object was updated, false if it could not (i.e: hot-reload is not supported).
+ */
+gdjs.RuntimeObject.prototype.updateFromObjectData = function(objectData) {
+    // If not redefined, mark by default the hot-reload as failed.
+    return false;
+}
 
 /**
  * Remove an object from a scene.
@@ -1044,11 +1062,13 @@ gdjs.RuntimeObject.prototype.stepBehaviorsPostEvents = function(runtimeScene) {
 
 /**
  * Get a behavior from its name.
+ * If the behavior does not exists, `undefined` is returned.
  *
- * Be careful, the behavior must exists, no check is made on the name.
+ * **Never keep a reference** to a behavior, as they can be hot-reloaded. Instead,
+ * always call getBehavior on the object.
  *
  * @param name {String} The behavior name.
- * @return {gdjs.RuntimeBehavior} The behavior with the given name, or undefined.
+ * @return {gdjs.RuntimeBehavior?} The behavior with the given name, or undefined.
  */
 gdjs.RuntimeObject.prototype.getBehavior = function(name) {
     return this._behaviorsTable.get(name);
@@ -1078,7 +1098,7 @@ gdjs.RuntimeObject.prototype.activateBehavior = function(name, enable) {
 /**
  * Check if a behavior is activated
  *
- * @param name {String} The behavior name.
+ * @param {string} name The behavior name.
  * @return true if the behavior is activated.
  */
 gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
@@ -1087,6 +1107,39 @@ gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
     }
 
     return false;
+};
+
+/**
+ * Remove the behavior with the given name.
+ *
+ * @param {string} name The name of the behavior to remove.
+ * @returns {boolean} true if the behavior was properly removed, false otherwise.
+ */
+gdjs.RuntimeObject.prototype.removeBehavior = function(name) {
+    var behavior = this._behaviorsTable.get(name);
+    if (!behavior) return false;
+
+    var behaviorIndex = this._behaviors.indexOf(behavior);
+    if (behaviorIndex !== -1) this._behaviors.splice(behaviorIndex, 1);
+    this._behaviorsTable.remove(name);
+
+    return true;
+};
+
+/**
+ * Create the behavior decribed by the given BehaviorData
+ *
+ * @param {BehaviorData} behaviorData The data to be used to construct the behavior.
+ * @returns {boolean} true if the behavior was properly created, false otherwise.
+ */
+gdjs.RuntimeObject.prototype.addNewBehavior = function(behaviorData) {
+    var Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
+    if (!Ctor) return false;
+
+    var newRuntimeBehavior = new Ctor(this._runtimeScene, behaviorData, this);
+    this._behaviors.push(newRuntimeBehavior);
+    this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
+    return true;
 };
 
 //Timers:

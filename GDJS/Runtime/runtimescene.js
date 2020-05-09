@@ -85,10 +85,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
     //Load layers
     for(var i = 0, len = sceneData.layers.length;i<len;++i) {
-        var layerData = sceneData.layers[i];
-
-        this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
-        //console.log("Created layer : \""+name+"\".");
+        this.addLayer(sceneData.layers[i]);
     }
 
     //Load variables
@@ -114,7 +111,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     }
 
     //Create initial instances of objects
-    this.createObjectsFrom(sceneData.instances, 0, 0);
+    this.createObjectsFrom(sceneData.instances, 0, 0, /*trackByPersistentUuid=*/ true);
 
     //Set up the function to be executed at each tick
     var module = gdjs[sceneData.mangledName+"Code"];
@@ -269,14 +266,22 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
  * @param {InstanceData[]} data The instances data
  * @param {number} xPos The offset on X axis
  * @param {number} yPos The offset on Y axis
+ * @param {boolean} trackByPersistentUuid If true, objects are tracked by setting their persistentUuid
+ * to the same as the associated instance. Useful for hot-reloading when instances are changed.
  */
-gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
+gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos, trackByPersistentUuid) {
     for(var i = 0, len = data.length;i<len;++i) {
         var instanceData = data[i];
         var objectName = instanceData.name;
         var newObject = this.createObject(objectName);
 
         if ( newObject !== null ) {
+            if (trackByPersistentUuid) {
+                // Give the object the same persistentUuid as the instance, so that
+                // it can be hot-reloaded.
+                newObject.persistentUuid = instanceData.persistentUuid || null;
+            }
+
             newObject.setPosition(parseFloat(instanceData.x) + xPos, parseFloat(instanceData.y) + yPos);
             newObject.setZOrder(parseFloat(instanceData.zOrder));
             newObject.setAngle(parseFloat(instanceData.angle));
@@ -740,6 +745,19 @@ gdjs.RuntimeScene.prototype.hasLayer = function(name) {
     return this._layers.containsKey(name);
 };
 
+/**
+ * Add a layer.
+ * @param {string} name The name of the layer
+ * @param {LayerData} layerData The data to construct the layer
+ */
+gdjs.RuntimeScene.prototype.addLayer = function(layerData) {
+    this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
+};
+
+/**
+ * Fill the array passed as argument with the names of all layers
+ * @param {string[]} result The array where to put the layer names
+ */
 gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
     this._layers.keys(result);
 };

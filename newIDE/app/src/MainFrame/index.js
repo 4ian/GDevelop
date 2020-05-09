@@ -68,7 +68,9 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
-import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import EventsFunctionsExtensionsContext, {
+  type EventsFunctionsExtensionsState,
+} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   getUpdateNotificationTitle,
   getUpdateNotificationBody,
@@ -229,6 +231,9 @@ const MainFrame = (props: Props) => {
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const [commandPaletteOpen, openCommandPalette] = React.useState<boolean>(
     false
+  );
+  const eventsFunctionsExtensionsContext = React.useContext(
+    EventsFunctionsExtensionsContext
   );
 
   // This is just for testing, to check if we're getting the right state
@@ -1033,12 +1038,14 @@ const MainFrame = (props: Props) => {
   );
 
   const launchPreview = React.useCallback(
-    (networkPreview: boolean) => {
+    (networkPreview: boolean, hotReload: boolean) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
-      setPreviewLoading(true);
+      const previewLauncher = _previewLauncher.current;
+      if (!previewLauncher) return;
 
+      setPreviewLoading(true);
       notifyPreviewWillStart(state.editorTabs);
 
       const layoutName = previewState.isPreviewOverriden
@@ -1060,28 +1067,26 @@ const MainFrame = (props: Props) => {
 
       autosaveProjectIfNeeded();
 
-      const previewLauncher = _previewLauncher.current;
-      if (previewLauncher) {
-        return eventsFunctionsExtensionsState
-          .ensureLoadFinished()
-          .then(() =>
-            previewLauncher.launchPreview({
-              project: currentProject,
-              layout,
-              externalLayout,
-              networkPreview,
-            })
-          )
-          .catch(error => {
-            console.error(
-              'Error caught while launching preview, this should never happen.',
-              error
-            );
+      eventsFunctionsExtensionsState
+        .ensureLoadFinished()
+        .then(() =>
+          previewLauncher.launchPreview({
+            project: currentProject,
+            layout,
+            externalLayout,
+            networkPreview,
+            hotReload,
           })
-          .then(() => {
-            setPreviewLoading(false);
-          });
-      }
+        )
+        .catch(error => {
+          console.error(
+            'Error caught while launching preview, this should never happen.',
+            error
+          );
+        })
+        .then(() => {
+          setPreviewLoading(false);
+        });
     },
     [
       autosaveProjectIfNeeded,
@@ -1865,13 +1870,16 @@ const MainFrame = (props: Props) => {
         simulateUpdateAvailable={simulateUpdateAvailable}
         onOpenDebugger={() => {
           openDebugger();
-          launchPreview(/*networkPreview=*/ false);
+          launchPreview(/*networkPreview=*/ false, /*hotReload=*/ false);
         }}
         onPreview={() => {
-          launchPreview(/*networkPreview=*/ false);
+          launchPreview(/*networkPreview=*/ false, /*hotReload=*/ false);
         }}
         onNetworkPreview={() => {
-          launchPreview(/*networkPreview=*/ true);
+          launchPreview(/*networkPreview=*/ true, /*hotReload=*/ false);
+        }}
+        onHotReloadPreview={() => {
+          launchPreview(/*networkPreview=*/ false, /*hotReload=*/ true);
         }}
         showNetworkPreviewButton={
           !!_previewLauncher.current &&
@@ -2052,6 +2060,8 @@ const MainFrame = (props: Props) => {
       {!!renderPreviewLauncher &&
         renderPreviewLauncher(
           {
+            getIncludeFileHashs:
+              eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => openExportDialog(true),
             onChangeSubscription: () => openSubscriptionDialog(true),
           },

@@ -29,7 +29,8 @@ InitialInstance::InitialInstance()
       personalizedSize(false),
       width(0),
       height(0),
-      locked(false) {}
+      locked(false),
+      persistentUuid(UUID::MakeUuid4()) {}
 
 void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   SetObjectName(element.GetStringAttribute("name", "", "nom"));

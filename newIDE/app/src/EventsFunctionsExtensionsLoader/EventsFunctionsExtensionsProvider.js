@@ -17,11 +17,12 @@ import {
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
+import xxhashjs from 'xxhashjs';
 
 type Props = {|
   children: React.Node,
   i18n: I18nType,
-  eventsFunctionCodeWriter: ?EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: () => EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
 |};
@@ -38,6 +39,12 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   Props,
   State
 > {
+  _eventsFunctionCodeWriter: EventsFunctionCodeWriter = this.props.makeEventsFunctionCodeWriter(
+    {
+      onWriteFile: this._onWriteFile.bind(this),
+    }
+  );
+  _includeFileHashs: { [string]: string } = {};
   _lastLoadPromise: ?Promise<void> = null;
   state = {
     eventsFunctionsExtensionsError: null,
@@ -58,7 +65,14 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       this.props.eventsFunctionsExtensionWriter,
     getEventsFunctionsExtensionOpener: () =>
       this.props.eventsFunctionsExtensionOpener,
+    getIncludeFileHashs: () => this._includeFileHashs,
   };
+
+  _onWriteFile({ includeFile, content }) {
+    this._includeFileHashs[includeFile] = xxhashjs
+      .h32(content, 0xabcd)
+      .toNumber();
+  }
 
   _ensureLoadFinished(): Promise<void> {
     if (this._lastLoadPromise) {
@@ -77,8 +91,8 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   }
 
   _loadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
-    const { i18n, eventsFunctionCodeWriter } = this.props;
-    if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
+    const { i18n } = this.props;
+    if (!project) return Promise.resolve();
 
     const lastLoadPromise = this._lastLoadPromise || Promise.resolve();
 
@@ -86,7 +100,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       .then(() =>
         loadProjectEventsFunctionsExtensions(
           project,
-          eventsFunctionCodeWriter,
+          this._eventsFunctionCodeWriter,
           i18n
         )
       )

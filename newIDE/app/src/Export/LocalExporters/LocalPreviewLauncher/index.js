@@ -19,6 +19,7 @@ const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd: libGDevelop = global.gd;
 
 type Props = {|
+  getIncludeFileHashs: () => {| [string]: string |},
   onExport?: () => void,
   onChangeSubscription?: () => void,
 |};
@@ -44,6 +45,7 @@ export default class LocalPreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = () => true;
+  canDoHotReload = () => true;
 
   state = {
     networkPreviewDialogOpen: false,
@@ -153,23 +155,49 @@ export default class LocalPreviewLauncher extends React.Component<
 
   launchPreview = (previewOptions: PreviewOptions): Promise<any> => {
     const { project, layout, externalLayout } = previewOptions;
-    if (!project || !layout) return Promise.reject();
+
+    // Start the debugger server for previews. Even if not used,
+    // useful if the user opens the Debugger editor later, or want to
+    // hot reload.
+    this.getPreviewDebuggerServer().startServer();
 
     return this._prepareExporter().then(({ outputDir, exporter }) => {
       timeFunction(
         () => {
+          const previewExportOptions = new gd.PreviewExportOptions(
+            project,
+            outputDir
+          );
+          previewExportOptions.setLayoutName(layout.getName());
           if (externalLayout) {
-            exporter.exportExternalLayoutForPixiPreview(
-              project,
-              layout,
-              externalLayout,
-              outputDir
+            previewExportOptions.setExternalLayoutName(
+              externalLayout.getName()
             );
-          } else {
-            exporter.exportLayoutForPixiPreview(project, layout, outputDir);
           }
+
+          const includeFileHashs = this.props.getIncludeFileHashs();
+          for (const includeFile in includeFileHashs) {
+            const hash = includeFileHashs[includeFile];
+            previewExportOptions.setIncludeFileHash(includeFile, hash);
+          }
+
+          exporter.exportProjectForPixiPreview(previewExportOptions);
+          previewExportOptions.delete();
           exporter.delete();
-          this._openPreviewWindow(project, outputDir, previewOptions);
+
+          const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+          const shouldHotReload =
+            previewOptions.hotReload && !!debuggerIds.length;
+
+          if (shouldHotReload) {
+            debuggerIds.forEach(debuggerId => {
+              this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+                command: 'hotReload',
+              });
+            });
+          } else {
+            this._openPreviewWindow(project, outputDir, previewOptions);
+          }
         },
         time => console.info(`Preview took ${time}ms`)
       );

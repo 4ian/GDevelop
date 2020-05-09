@@ -2367,12 +2367,19 @@ interface EventsFunctionsExtensionCodeGenerator {
 };
 
 [Prefix="gdjs::"]
+interface PreviewExportOptions {
+    void PreviewExportOptions([Ref] Project project, [Const] DOMString outputPath);
+    [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
+    [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
+    [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
+};
+
+[Prefix="gdjs::"]
 interface Exporter {
     void Exporter([Ref] AbstractFileSystem fs, [Const] DOMString gdjsRoot);
     void SetCodeOutputDirectory([Const] DOMString path);
 
-    boolean ExportLayoutForPixiPreview([Ref] Project project, [Ref] Layout layout, [Const] DOMString exportDir);
-    boolean ExportExternalLayoutForPixiPreview([Ref] Project project, [Ref] Layout layout, [Ref] ExternalLayout externalLayout, [Const] DOMString exportDir);
+    boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions);
 
     boolean ExportWholeCocos2dProject([Ref] Project project, boolean debugMode, [Const] DOMString exportDir);

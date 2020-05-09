@@ -24,6 +24,15 @@ gdjs.JsonManager = function(resources) {
 };
 
 /**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.JsonManager.prototype.setResources = function(resources) {
+    this._resources = resources;
+};
+
+/**
  * The callback called when a json is preloaded
  * @callback JsonManagerOnProgressCallback
  * @param {number} loaded The number of json files loaded so far

@@ -6,17 +6,20 @@ export type PreviewOptions = {|
   layout: gdLayout,
   externalLayout: ?gdExternalLayout,
   networkPreview: boolean,
+  hotReload: boolean,
 |};
 
 /** The functions that PreviewLauncher must expose on their class */
 export type PreviewLauncherInterface = {
-  launchPreview: (options: PreviewOptions) => Promise<any>,
+  launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
+  canDoHotReload: () => boolean,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
+  getIncludeFileHashs: () => {| [string]: string |},
   onExport: () => void,
   onChangeSubscription: () => void,
 |};

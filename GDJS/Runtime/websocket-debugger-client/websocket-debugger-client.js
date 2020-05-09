@@ -54,6 +54,7 @@ gdjs.IDebuggerClient.prototype.sendProfilerOutput = function(framesAverageMeasur
  */
 gdjs.WebsocketDebuggerClient = function(runtimeGame) {
   this._runtimegame = runtimeGame;
+  this._hotReloader = new gdjs.HotReloader(runtimeGame);
 
   if (typeof WebSocket === 'undefined') {
     console.log("WebSocket is not defined, debugger won't work");
@@ -114,6 +115,8 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
         that.sendProfilerStarted();
       } else if (data.command === 'profiler.stop') {
         runtimeGame.stopCurrentSceneProfiler();
+      } else if (data.command === 'hotReload') {
+        that._hotReloader.hotReload();
       } else {
         console.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -325,7 +328,7 @@ gdjs.WebsocketDebuggerClient.prototype.sendProfilerOutput = function(
  * @returns {any} The new value.
  */
 
-/** 
+/**
  * This is an alternative to JSON.stringify that ensure that circular references
  * are replaced by a placeholder.
  * @param {any} obj - The object to serialize.
@@ -349,7 +352,7 @@ gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
   );
 };
 
-/** 
+/**
  * Generates a JSON serializer that prevent circular references and stop if maxDepth is reached.
  * @param {Function} [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
  * @param {DebuggerClientCycleReplacer} [cycleReplacer] - Function used to replace circular references with a new value.

@@ -252,6 +252,75 @@ gdjs.Physics2RuntimeBehavior.prototype.b2Vec2Sec = function(x, y) {
   return this._tempb2Vec2Sec;
 };
 
+gdjs.Physics2RuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+  if (oldBehaviorData.bullet !== newBehaviorData.bullet) {
+    this.setBullet(newBehaviorData.bullet);
+  }
+  if (oldBehaviorData.fixedRotation !== newBehaviorData.fixedRotation) {
+    this.setFixedRotation(newBehaviorData.fixedRotation);
+  }
+  if (oldBehaviorData.canSleep !== newBehaviorData.canSleep) {
+    this.setSleepingAllowed(newBehaviorData.canSleep);
+  }
+  if (oldBehaviorData.shapeDimensionA !== newBehaviorData.shapeDimensionA) {
+    this.shapeDimensionA = newBehaviorData.shapeDimensionA;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.shapeDimensionB !== newBehaviorData.shapeDimensionB) {
+    this.shapeDimensionB = newBehaviorData.shapeDimensionB;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.shapeOffsetX !== newBehaviorData.shapeOffsetX) {
+    this.shapeOffsetX = newBehaviorData.shapeOffsetX;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.shapeOffsetY !== newBehaviorData.shapeOffsetY) {
+    this.shapeOffsetY = newBehaviorData.shapeOffsetY;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.polygonOrigin !== newBehaviorData.polygonOrigin) {
+    this.polygonOrigin = newBehaviorData.polygonOrigin;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.density !== newBehaviorData.density) {
+    this.setDensity(newBehaviorData.density);
+  }
+  if (oldBehaviorData.friction !== newBehaviorData.friction) {
+    this.setFriction(newBehaviorData.friction);
+  }
+  if (oldBehaviorData.restitution !== newBehaviorData.restitution) {
+    this.setRestitution(newBehaviorData.restitution);
+  }
+  if (oldBehaviorData.linearDamping !== newBehaviorData.linearDamping) {
+    this.setLinearDamping(newBehaviorData.linearDamping);
+  }
+  if (oldBehaviorData.angularDamping !== newBehaviorData.angularDamping) {
+    this.setAngularDamping(newBehaviorData.angularDamping);
+  }
+  if (oldBehaviorData.gravityScale !== newBehaviorData.gravityScale) {
+    this.setGravityScale(newBehaviorData.gravityScale);
+  }
+
+  // TODO: make these properties updatable.
+  if (oldBehaviorData.layers !== newBehaviorData.layers) {
+    return false;
+  }
+  if (oldBehaviorData.masks !== newBehaviorData.masks) {
+    return false;
+  }
+  if (oldBehaviorData.vertices !== newBehaviorData.vertices) {
+    return false;
+  }
+  if (oldBehaviorData.bodyType !== newBehaviorData.bodyType) {
+    return false;
+  }
+  if (oldBehaviorData.shape !== newBehaviorData.shape) {
+    return false;
+  }
+
+  return true;
+};
+
 gdjs.Physics2RuntimeBehavior.prototype.onDeActivate = function() {
   if (this._body !== null) {
     // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list

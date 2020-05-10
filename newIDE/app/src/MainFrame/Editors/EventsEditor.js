@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import EventsSheet from '../../EventsSheet';
-import { serializeToJSObject } from '../../Utils/Serializer';
 import BaseEditor from './BaseEditor';
 
 export default class EventsEditor extends BaseEditor {
@@ -13,16 +12,6 @@ export default class EventsEditor extends BaseEditor {
 
   forceUpdateEditor() {
     // No updates to be done.
-  }
-
-  getSerializedElements() {
-    const layout = this.getLayout();
-    if (!layout) return {};
-
-    return {
-      ...BaseEditor.getLayoutSerializedElements(layout),
-      events: serializeToJSObject(layout.getEvents()),
-    };
   }
 
   getLayout(): ?gdLayout {

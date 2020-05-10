@@ -47,18 +47,6 @@ export default class ExternalLayoutEditor extends BaseEditor {
     // No updates to be done.
   }
 
-  getSerializedElements() {
-    const externalLayout = this.getExternalLayout();
-    const layout = this.getLayout();
-    if (!externalLayout || !layout) return {};
-
-    return {
-      ...BaseEditor.getLayoutSerializedElements(layout),
-      instances: serializeToJSObject(externalLayout.getInitialInstances()),
-      uiSettings: this.editor ? this.editor.getUiSettings() : {},
-    };
-  }
-
   getExternalLayout(): ?gdExternalLayout {
     const { project, externalLayoutName } = this.props;
     if (!project.hasExternalLayoutNamed(externalLayoutName)) {

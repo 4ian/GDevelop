@@ -399,12 +399,12 @@ const MainFrame = (props: Props) => {
         if (fileMetadata) {
           project.setProjectFile(fileMetadata.fileIdentifier);
         }
-        return setState({
+        return setState(state => ({
           ...state,
           currentProject: project,
           currentFileMetadata: fileMetadata,
           createDialogOpen: false,
-        }).then(state => {
+        })).then(state => {
           if (
             state.editorTabs.editors.length > 1 ||
             state.isPreviewFirstSceneOverriden

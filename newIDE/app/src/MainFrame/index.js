@@ -161,38 +161,55 @@ const MainFrame = (props: Props) => {
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,
-  ] = useStateWithCallback(({
-    createDialogOpen: false,
-    exportDialogOpen: false,
-    openConfirmDialogOpen: false,
-    loadingProject: false,
-    previewLoading: false,
-    currentProject: null,
-    currentFileMetadata: null,
-    editorTabs: getEditorTabsInitialState(),
-    snackMessage: '',
-    snackMessageOpen: false,
-    updateStatus: { message: '', status: 'unknown' },
-    openFromStorageProviderDialogOpen: false,
-    saveToStorageProviderDialogOpen: false,
-    eventsFunctionsExtensionsError: null,
-    gdjsDevelopmentWatcherEnabled: false,
-    isPreviewFirstSceneOverriden: false,
-    previewFirstSceneName: '',
-  }: State));
+  ] = useStateWithCallback(
+    ({
+      createDialogOpen: false,
+      exportDialogOpen: false,
+      openConfirmDialogOpen: false,
+      loadingProject: false,
+      previewLoading: false,
+      currentProject: null,
+      currentFileMetadata: null,
+      editorTabs: getEditorTabsInitialState(),
+      snackMessage: '',
+      snackMessageOpen: false,
+      updateStatus: { message: '', status: 'unknown' },
+      openFromStorageProviderDialogOpen: false,
+      saveToStorageProviderDialogOpen: false,
+      eventsFunctionsExtensionsError: null,
+      gdjsDevelopmentWatcherEnabled: false,
+      isPreviewFirstSceneOverriden: false,
+      previewFirstSceneName: '',
+    }: State)
+  );
   const toolbar = React.useRef(null);
   const _resourceSourceDialogs = React.useRef({});
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
-  const [projectManagerOpen, openProjectManager] = React.useState<boolean>(false);
+  const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
+    false
+  );
   const [introDialogOpen, openIntroDialog] = React.useState<boolean>(false);
-  const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(false);
-  const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(false);
-  const [platformSpecificAssetsDialogOpen, openPlatformSpecificAssetsDialog] = React.useState<boolean>(false);
+  const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
+    false
+  );
+  const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(
+    false
+  );
+  const [
+    platformSpecificAssetsDialogOpen,
+    openPlatformSpecificAssetsDialog,
+  ] = React.useState<boolean>(false);
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
   const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
-  const [preferencesDialogOpen, openPreferencesDialog] = React.useState<boolean>(false);
-  const [subscriptionDialogOpen, openSubscriptionDialog] = React.useState<boolean>(false);
+  const [
+    preferencesDialogOpen,
+    openPreferencesDialog,
+  ] = React.useState<boolean>(false);
+  const [
+    subscriptionDialogOpen,
+    openSubscriptionDialog,
+  ] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     // This is just for testing, to check if we're getting the right state
@@ -204,10 +221,7 @@ const MainFrame = (props: Props) => {
   React.useEffect(
     () => {
       if (!integratedEditor) openStartPage();
-      GD_STARTUP_TIMES.push([
-        'MainFrameComponentDidMount',
-        performance.now(),
-      ]);
+      GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
       _loadExtensions()
         .then(() =>
           // Enable the GDJS development watcher *after* the extensions are loaded,
@@ -567,7 +581,7 @@ const MainFrame = (props: Props) => {
 
   const toggleProjectManager = () => {
     if (toolbar.current)
-      openProjectManager(projectManagerOpen => !projectManagerOpen)
+      openProjectManager(projectManagerOpen => !projectManagerOpen);
   };
 
   const setEditorToolbar = (editorToolbar: any) => {
@@ -1920,7 +1934,9 @@ const MainFrame = (props: Props) => {
               openResources();
               openProjectManager(false);
             }}
-            onOpenPlatformSpecificAssets={() => openPlatformSpecificAssetsDialog(true)}
+            onOpenPlatformSpecificAssets={() =>
+              openPlatformSpecificAssetsDialog(true)
+            }
             onChangeSubscription={() => openSubscriptionDialog(true)}
             eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
             onReloadEventsFunctionsExtensions={() => {
@@ -2051,7 +2067,8 @@ const MainFrame = (props: Props) => {
             );
           },
         })}
-      {!!introDialog && introDialogOpen &&
+      {!!introDialog &&
+        introDialogOpen &&
         React.cloneElement(introDialog, {
           open: true,
           onClose: () => openIntroDialog(false),

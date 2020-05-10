@@ -115,7 +115,6 @@ export type State = {|
   createDialogOpen: boolean,
   exportDialogOpen: boolean,
   openConfirmDialogOpen: boolean,
-  loadingProject: boolean,
   previewLoading: boolean,
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
@@ -166,7 +165,6 @@ const MainFrame = (props: Props) => {
       createDialogOpen: false,
       exportDialogOpen: false,
       openConfirmDialogOpen: false,
-      loadingProject: false,
       previewLoading: false,
       currentProject: null,
       currentFileMetadata: null,
@@ -186,6 +184,9 @@ const MainFrame = (props: Props) => {
   const _resourceSourceDialogs = React.useRef({});
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
+  const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
+    false
+  );
   const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
     false
   );
@@ -491,61 +492,61 @@ const MainFrame = (props: Props) => {
       });
     };
 
-    return setState({ ...newState, loadingProject: true }).then(state => {
-      // Try to find an autosave (and ask user if found)
-      return checkForAutosave()
-        .then(fileMetadata => onOpen(fileMetadata))
-        .catch(err => {
-          // onOpen failed, tried to find again an autosave
-          return checkForAutosaveAfterFailure().then(fileMetadata => {
-            if (fileMetadata) {
-              return onOpen(fileMetadata);
-            }
+    setIsLoadingProject(true);
 
-            throw err;
-          });
-        })
-        .then(({ content }) => {
-          if (!verifyProjectContent(i18n, content)) {
-            // The content is not recognized and the user was warned. Abort the opening.
-            return;
+    // Try to find an autosave (and ask user if found)
+    return checkForAutosave()
+      .then(fileMetadata => onOpen(fileMetadata))
+      .catch(err => {
+        // onOpen failed, tried to find again an autosave
+        return checkForAutosaveAfterFailure().then(fileMetadata => {
+          if (fileMetadata) {
+            return onOpen(fileMetadata);
           }
 
-          const serializedProject = gd.Serializer.fromJSObject(content);
-          return loadFromSerializedProject(
-            serializedProject,
-            // Note that fileMetadata is the original, unchanged one, even if we're loading
-            // an autosave. If we're for some reason loading an autosave, we still consider
-            // that we're opening the file that was originally requested by the user.
-            fileMetadata,
-            {
-              currentProject: state.currentProject,
-              editorTabs: state.editorTabs,
-            },
-            eventsFunctionsExtensionsState
-          ).then(
-            state => {
-              serializedProject.delete();
-              return Promise.resolve(state);
-            },
-            err => {
-              serializedProject.delete();
-              throw err;
-            }
-          );
-        })
-        .catch(error => {
-          const errorMessage = getOpenErrorMessage
-            ? getOpenErrorMessage(error)
-            : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
-          showErrorBox(
-            [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
-              '\n'
-            ),
-            error
-          );
+          throw err;
         });
-    });
+      })
+      .then(({ content }) => {
+        if (!verifyProjectContent(i18n, content)) {
+          // The content is not recognized and the user was warned. Abort the opening.
+          return;
+        }
+
+        const serializedProject = gd.Serializer.fromJSObject(content);
+        return loadFromSerializedProject(
+          serializedProject,
+          // Note that fileMetadata is the original, unchanged one, even if we're loading
+          // an autosave. If we're for some reason loading an autosave, we still consider
+          // that we're opening the file that was originally requested by the user.
+          fileMetadata,
+          {
+            currentProject: newState.currentProject,
+            editorTabs: newState.editorTabs,
+          },
+          eventsFunctionsExtensionsState
+        ).then(
+          state => {
+            serializedProject.delete();
+            return Promise.resolve(state);
+          },
+          err => {
+            serializedProject.delete();
+            throw err;
+          }
+        );
+      })
+      .catch(error => {
+        const errorMessage = getOpenErrorMessage
+          ? getOpenErrorMessage(error)
+          : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
+        showErrorBox(
+          [i18n._(t`Unable to open the project.`), i18n._(errorMessage)].join(
+            '\n'
+          ),
+          error
+        );
+      });
   };
 
   const closeApp = (): void => {
@@ -1131,8 +1132,8 @@ const MainFrame = (props: Props) => {
     setState(state => ({
       ...state,
       editorTabs: tabsWithSceneAndEventsEditors,
-      loadingProject: false,
     }));
+    setIsLoadingProject(false);
     openProjectManager(false);
   };
 
@@ -1689,8 +1690,10 @@ const MainFrame = (props: Props) => {
         ...state,
         currentProject,
         editorTabs,
-        loadingProject: false,
-      })).then(state => openProjectManager(true));
+      })).then(() => {
+        setIsLoadingProject(false);
+        openProjectManager(true);
+      });
     }
   };
 
@@ -1839,8 +1842,7 @@ const MainFrame = (props: Props) => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
   } = props;
-  const showLoader =
-    state.loadingProject || state.previewLoading || props.loading;
+  const showLoader = isLoadingProject || state.previewLoading || props.loading;
 
   return (
     <div className="main-frame">

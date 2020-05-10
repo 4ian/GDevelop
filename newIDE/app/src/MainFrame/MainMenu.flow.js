@@ -8,7 +8,7 @@ export type MainMenuProps = {|
   project: ?gdProject,
   onChooseProject: () => void,
   onSaveProject: () => void,
-  onSaveProjectAs: (newState: State, newProps: Props) => void,
+  onSaveProjectAs: () => void,
   onCloseProject: () => Promise<State>,
   onCloseApp: () => void,
   onExportProject: (open?: boolean) => void,

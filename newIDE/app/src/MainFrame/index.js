@@ -113,7 +113,6 @@ const styles = {
 
 export type State = {|
   createDialogOpen: boolean,
-  exportDialogOpen: boolean,
   openConfirmDialogOpen: boolean,
   previewLoading: boolean,
   currentProject: ?gdProject,
@@ -163,7 +162,6 @@ const MainFrame = (props: Props) => {
   ] = useStateWithCallback(
     ({
       createDialogOpen: false,
-      exportDialogOpen: false,
       openConfirmDialogOpen: false,
       previewLoading: false,
       currentProject: null,
@@ -211,6 +209,7 @@ const MainFrame = (props: Props) => {
     subscriptionDialogOpen,
     openSubscriptionDialog,
   ] = React.useState<boolean>(false);
+  const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     // This is just for testing, to check if we're getting the right state
@@ -1697,10 +1696,6 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const openExportDialog = (open: boolean = true) => {
-    setState(state => ({ ...state, exportDialogOpen: open }));
-  };
-
   const _openOpenConfirmDialog = (open: boolean = true) => {
     setState(state => ({ ...state, openConfirmDialogOpen: open }));
   };
@@ -1866,7 +1861,7 @@ const MainFrame = (props: Props) => {
               }
             ),
           onCloseApp: closeApp,
-          onExportProject: openExportDialog,
+          onExportProject: () => openExportDialog(true),
           onCreateProject: openCreateDialog,
           onOpenProjectManager: () => openProjectManager(true),
           onOpenStartPage: openStartPage,
@@ -1929,7 +1924,7 @@ const MainFrame = (props: Props) => {
                 }
               );
             }}
-            onExportProject={openExportDialog}
+            onExportProject={() => openExportDialog(true)}
             onOpenPreferences={() => openPreferencesDialog(true)}
             onOpenProfile={() => openProfileDialog(true)}
             onOpenResources={() => {
@@ -2010,7 +2005,7 @@ const MainFrame = (props: Props) => {
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
       {!!renderExportDialog &&
-        state.exportDialogOpen &&
+        exportDialogOpen &&
         renderExportDialog({
           onClose: () => openExportDialog(false),
           onChangeSubscription: () => {

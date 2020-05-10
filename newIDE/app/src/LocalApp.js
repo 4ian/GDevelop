@@ -50,8 +50,7 @@ export const create = (authentification: Authentification) => {
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({
-            currentStorageProviderOperations,
-            useStorageProvider,
+            getStorageProviderOperations,
             storageProviders,
             initialFileMetadataToOpen,
           }) => (
@@ -80,8 +79,7 @@ export const create = (authentification: Authentification) => {
                     isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
                   }
                   storageProviders={storageProviders}
-                  useStorageProvider={useStorageProvider}
-                  storageProviderOperations={currentStorageProviderOperations}
+                  getStorageProviderOperations={getStorageProviderOperations}
                   resourceSources={localResourceSources}
                   resourceExternalEditors={localResourceExternalEditors}
                   extensionsLoader={makeExtensionsLoader({

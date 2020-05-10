@@ -1,5 +1,10 @@
 import React from 'react';
 
+/**
+ * A useState hook that returns a promise when the state is set.
+ * *Don't use it* excepted for MainFrame. This is used while transitioning
+ * MainFrame to hooks - and it's not typed properly.
+ */
 export default function useStateWithCallback(initialValue) {
   const [state, setState] = React.useState(initialValue);
   const callback = React.useRef(null);

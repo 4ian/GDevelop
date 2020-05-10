@@ -7,6 +7,7 @@ import ExternalEventsEditor from './Editors/ExternalEventsEditor';
 import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
 import ResourcesEditor from './Editors/ResourcesEditor';
 import SceneEditor from './Editors/SceneEditor';
+import { type State, type Props } from './index';
 
 // Supported editors
 type EditorRef =
@@ -19,7 +20,11 @@ type EditorRef =
   | SceneEditor;
 
 export type EditorTab = {|
-  render: (isCurrentTab: boolean) => React$Element<*>,
+  render: (
+    isCurrentTab: boolean,
+    newState: State,
+    newProps: Props
+  ) => React$Element<*>,
   editorRef: ?EditorRef,
   label: string,
   key: string,
@@ -41,6 +46,8 @@ export const getEditorTabsInitialState = (): EditorTabsState => {
 type renderEditorProps = {|
   isActive: boolean,
   editorRef: Function,
+  newState: State,
+  newProps: Props,
 |};
 
 export const openEditorTab = (
@@ -71,10 +78,12 @@ export const openEditorTab = (
   }
 
   const editorTab: EditorTab = {
-    render: (isCurrentTab: boolean) =>
+    render: (isCurrentTab: boolean, newState: State, newProps: Props) =>
       renderEditor({
         isActive: isCurrentTab,
         editorRef: editorRef => (editorTab.editorRef = editorRef),
+        newState,
+        newProps,
       }),
     editorRef: null,
     label,

@@ -1,3 +1,13 @@
+/**
+ * This is a simple script getting the commits since the last tag (which
+ * corresponds to a GitHub release). Each commit is filtered to:
+ * - hide trivial stuff
+ * - hide those containing "Don't mention in changelog"/"Don't show in changelog".
+ * - categorize as fix or improvement
+ *
+ * Authors nickname are fetched from GitHub.
+ */
+
 const shell = require('shelljs');
 const child = require('child_process');
 const axios = require('axios');
@@ -38,6 +48,9 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.includes('fix formatting') ||
           lowerCaseMessage.includes('fix warning') ||
           lowerCaseMessage.includes('package-lock.json');
+        const forceHide =
+          lowerCaseMessage.includes("don't mention in changelog") ||
+          lowerCaseMessage.includes("don't show in changelog");
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
 
         return {
@@ -46,7 +59,8 @@ const extractCommitsFromGit = () => {
           authorNickname: '',
           isFix,
           hidden:
-            commit.authorEmail === 'Florian.Rival@gmail.com' && shouldHide,
+            forceHide ||
+            (commit.authorEmail === 'Florian.Rival@gmail.com' && shouldHide),
         };
       })
   );
@@ -77,7 +91,7 @@ const findAuthorNicknameInCommits = async commits => {
     try {
       await delayGithubCall();
       console.log(
-        `Calling https://api.github.com/search/users?q=${authorEmail}+in:email`
+        `ℹ️ Calling https://api.github.com/search/users?q=${authorEmail}+in:email`
       );
       const response = await axios.get(
         `https://api.github.com/search/users?q=${authorEmail}+in:email`
@@ -143,6 +157,16 @@ const formatCommitMessage = commit => {
   return indentedMessage;
 };
 
+const formatHiddenCommitMessage = commit => {
+  const trimmedMessage = commit.message.replace(/\n/g, ' ').trim();
+  return (
+    '* ' +
+    (trimmedMessage.length > 50
+      ? trimmedMessage.substr(0, 50) + ' [...]'
+      : trimmedMessage)
+  );
+};
+
 (async () => {
   const commits = extractCommitsFromGit();
   const commitsWithAuthors = await findAuthorNicknameInCommits(commits);
@@ -154,9 +178,11 @@ const formatCommitMessage = commit => {
 
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
-      .map(commit => '* ' + commit.message)
+      .map(formatHiddenCommitMessage)
       .join('\n')}`
   );
+
+  shell.echo(`\n✅ The generated changelog is:\n`);
 
   shell.echo(`\n## 💝 Improvements\n`);
   shell.echo(improvementsCommits.map(formatCommitMessage).join('\n'));

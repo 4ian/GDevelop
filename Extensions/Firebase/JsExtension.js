@@ -713,7 +713,7 @@ module.exports = {
 		extension
           .addAction(
             'DeleteUserProvider',
-            _('Change the users password (Provider)'),
+            _('Delete the users account (Provider)'),
             _(
 			  'This Action is dangerous so it requires reauthentification.\n' +
 			  'Deletes the users account.\n' +
@@ -731,6 +731,8 @@ module.exports = {
       	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.deleteUserProvider');
+
+		/* ====== PERFORMANCE ====== */
 
         return extension;
     },

@@ -1,6 +1,7 @@
 import React from 'react';
 import Checkbox from '../../UI/Checkbox';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import Tooltip from '@material-ui/core/Tooltip';
 import Warning from '@material-ui/icons/Warning';
 
 const SPRITE_SIZE = 100;
@@ -56,14 +57,17 @@ const ImageThumbnail = ({
   onContextMenu,
   muiTheme,
 }) => {
-  let warningSize = false;
+  const [hasSizeWarning, setHasWarningSize] = React.useState(false);
 
-  const img = new Image();
-  img.src = resourcesLoader.getResourceFullUrl(project, resourceName);
+  const _callbackImageThumbnailLoaded = (imageElement: HTMLImageElement) => {
+    const image = imageElement.target;
 
-  if (img.width > 2048 || img.height > 2048) {
-    warningSize = true;
-  }
+    image.src = resourcesLoader.getResourceFullUrl(project, resourceName);
+
+    if (image.naturalWidth > 2048 || image.naturalHeight > 2048) {
+      setHasWarningSize(true);
+    }
+  };
 
   return (
     <ThemeConsumer>
@@ -87,6 +91,7 @@ const ImageThumbnail = ({
             alt={resourceName}
             src={resourcesLoader.getResourceFullUrl(project, resourceName)}
             crossOrigin="anonymous"
+            onLoad={_callbackImageThumbnailLoaded}
           />
           {selectable && (
             <div style={styles.checkboxContainer}>
@@ -96,14 +101,16 @@ const ImageThumbnail = ({
               />
             </div>
           )}
-          {warningSize && (
-            <div style={styles.spriteError}>
-              <Warning
-                style={{
-                  ...styles.icon,
-                  color: muiTheme.message.error,
-                }}
-              />
+          {hasSizeWarning && (
+            <div style={styles.spriteWarning}>
+              <Tooltip title="Sprite is taller than 2048px wide, this have consequence on performance.">
+                <Warning
+                  style={{
+                    ...styles.icon,
+                    color: muiTheme.message.error,
+                  }}
+                />
+              </Tooltip>
             </div>
           )}
         </div>

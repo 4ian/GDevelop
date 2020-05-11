@@ -19,7 +19,7 @@ gdjs.evtTools.firebase.performance = {
  * @param {string} tracerName - The name of the tracer.
  * @returns {firebase.performance.Trace} The tracer instance.
  */
-gdjs.evtTools.firebase.performance.getTracer(tracerName) {
+gdjs.evtTools.firebase.performance.getTracer = function(tracerName) {
     if(!gdjs.evtTools.firebase.performance.tracers.containsKey(tracerName)) {
         gdjs.evtTools.firebase.performance.tracers.put(
             tracerName, 
@@ -33,15 +33,14 @@ gdjs.evtTools.firebase.performance.getTracer(tracerName) {
  * Start measuring performance for a custom event (tracer).
  * @param {string} tracerName - The name of the tracer.
  */
-gdjs.evtTools.firebase.performance.startTracer(tracerName) {
+gdjs.evtTools.firebase.performance.startTracer = function(tracerName) {
     gdjs.evtTools.firebase.performance.getTracer(tracerName).start();
-}
+};
 
 /**
  * Stop measuring performance for a custom event (tracer).
  * @param {string} tracerName - The name of the tracer.
  */
-gdjs.evtTools.firebase.performance.stopTracer(tracerName) {
+gdjs.evtTools.firebase.performance.stopTracer = function(tracerName) {
     gdjs.evtTools.firebase.performance.getTracer(tracerName).stop();
-}
-
+};

@@ -9,7 +9,10 @@ import {
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
-import BaseEditor from './BaseEditor';
+import {
+  type RenderEditorContainerProps,
+  type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
 import LayoutChooserDialog from './LayoutChooserDialog';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
@@ -21,14 +24,25 @@ const styles = {
   },
 };
 
-export default class ExternalLayoutEditor extends BaseEditor {
+type State = {|
+  layoutChooserOpen: boolean,
+|};
+
+export class ExternalLayoutEditorContainer extends React.Component<
+  RenderEditorContainerProps,
+  State
+> {
   editor: ?SceneEditor;
   state = {
     layoutChooserOpen: false,
   };
 
-  shouldComponentUpdate(nextProps: *) {
-    // This optimization is a bit more cautious than the one is BaseEditor, to still allow
+  getProject(): ?gdProject {
+    return this.props.project;
+  }
+
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    // This optimization is a bit more cautious than the traditional one, to still allow
     // children, and in particular SceneEditor and InstancesEditor, to be notified when isActive
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
     // and remains false, it's safe to stop update here (PIXI rendering is already halted).
@@ -48,15 +62,18 @@ export default class ExternalLayoutEditor extends BaseEditor {
   }
 
   getExternalLayout(): ?gdExternalLayout {
-    const { project, externalLayoutName } = this.props;
-    if (!project.hasExternalLayoutNamed(externalLayoutName)) {
+    const { project, projectItemName } = this.props;
+    if (!project) return null;
+
+    if (!project.hasExternalLayoutNamed(projectItemName)) {
       return null;
     }
-    return project.getExternalLayout(externalLayoutName);
+    return project.getExternalLayout(projectItemName);
   }
 
   getLayout(): ?gdLayout {
     const { project } = this.props;
+    if (!project) return null;
 
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) return null;
@@ -100,20 +117,26 @@ export default class ExternalLayoutEditor extends BaseEditor {
   };
 
   render() {
-    const { project, externalLayoutName, isActive } = this.props;
+    const { project, projectItemName, isActive } = this.props;
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
 
-    if (!externalLayout) {
+    if (!externalLayout || !project) {
       //TODO: Error component
-      return <div>No external layout called {externalLayoutName} found!</div>;
+      return <div>No external layout called {projectItemName} found!</div>;
     }
 
     return (
       <div style={styles.container}>
         {layout && (
           <SceneEditor
-            {...this.props}
+            setToolbar={this.props.setToolbar}
+            showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+            showPreviewButton={this.props.showPreviewButton}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            unsavedChanges={this.props.unsavedChanges}
             ref={editor => (this.editor = editor)}
             project={project}
             layout={layout}
@@ -122,7 +145,12 @@ export default class ExternalLayoutEditor extends BaseEditor {
               externalLayout.getAssociatedSettings()
             )}
             onPreview={options =>
-              this.props.onPreview(project, layout, externalLayout, options)
+              this.props.onExternalLayoutPreview(
+                project,
+                layout,
+                externalLayout,
+                options
+              )
             }
             previewButtonSettings={this.props.previewButtonSettings}
             onOpenDebugger={this.props.onOpenDebugger}
@@ -158,3 +186,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
     );
   }
 }
+
+export const renderExternalLayoutEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+) => <ExternalLayoutEditorContainer {...props} />;

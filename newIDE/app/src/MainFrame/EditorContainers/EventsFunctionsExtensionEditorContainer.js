@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor';
-import BaseEditor from './BaseEditor';
+import {
+  type RenderEditorContainerProps,
+  type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
 import { emptyPreviewButtonSettings } from '../Toolbar/PreviewButtons';
 
 const styles = {
@@ -11,8 +14,16 @@ const styles = {
   },
 };
 
-export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
+export class EventsFunctionsExtensionEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsFunctionsExtensionEditor;
+
+  getProject(): ?gdProject {
+    return this.props.project;
+  }
+
+  getLayout(): ?gdLayout {
+    return null;
+  }
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
@@ -22,8 +33,8 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
     // No updates to be done.
   }
 
-  shouldComponentUpdate(nextProps: *) {
-    // This optimization is a bit more cautious than the one is BaseEditor,
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    // This optimization is a bit more cautious than the traditional one,
     // to still be notified when isActive goes from true to false.
     if (!this.props.isActive && !nextProps.isActive) {
       return false;
@@ -46,13 +57,13 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
   };
 
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
-    const { project, eventsFunctionsExtensionName } = this.props;
-    if (
-      !project.hasEventsFunctionsExtensionNamed(eventsFunctionsExtensionName)
-    ) {
+    const { project, projectItemName } = this.props;
+    if (!project) return null;
+
+    if (!project.hasEventsFunctionsExtensionNamed(projectItemName)) {
       return null;
     }
-    return project.getEventsFunctionsExtension(eventsFunctionsExtensionName);
+    return project.getEventsFunctionsExtension(projectItemName);
   }
 
   selectEventsFunctionByName(
@@ -64,15 +75,16 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
   }
 
   render() {
-    const { project, eventsFunctionsExtensionName } = this.props;
+    const { project, projectItemName } = this.props;
     const eventsFunctionsExtension = this.getEventsFunctionsExtension();
 
-    if (!eventsFunctionsExtension) {
+    if (!eventsFunctionsExtension || !project) {
       //TODO: Error component
-      return (
-        <div>No extension called {eventsFunctionsExtensionName} found!</div>
-      );
+      return <div>No extension called {projectItemName} found!</div>;
     }
+
+    const { initiallyFocusedFunctionName, initiallyFocusedBehaviorName } =
+      this.props.extraEditorProps || {};
 
     return (
       <div style={styles.container}>
@@ -86,8 +98,8 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           resourceExternalEditors={this.props.resourceExternalEditors}
           openInstructionOrExpression={this.props.openInstructionOrExpression}
           onCreateEventsFunction={this.props.onCreateEventsFunction}
-          initiallyFocusedFunctionName={this.props.initiallyFocusedFunctionName}
-          initiallyFocusedBehaviorName={this.props.initiallyFocusedBehaviorName}
+          initiallyFocusedFunctionName={initiallyFocusedFunctionName}
+          initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
@@ -97,3 +109,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
     );
   }
 }
+
+export const renderEventsFunctionsExtensionEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+) => <EventsFunctionsExtensionEditorContainer {...props} />;

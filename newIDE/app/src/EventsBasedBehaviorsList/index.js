@@ -57,7 +57,7 @@ type Props = {|
     eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default class EventsBasedBehaviorsList extends React.Component<

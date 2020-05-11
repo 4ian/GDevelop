@@ -4,7 +4,10 @@ import React from 'react';
 import EventsSheet from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
-import BaseEditor from './BaseEditor';
+import {
+  type RenderEditorContainerProps,
+  type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
 import LayoutChooserDialog from './LayoutChooserDialog';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
@@ -16,12 +19,29 @@ const styles = {
   },
 };
 
-export default class ExternalEventsEditor extends BaseEditor {
+type State = {|
+  layoutChooserOpen: boolean,
+|};
+
+export class ExternalEventsEditorContainer extends React.Component<
+  RenderEditorContainerProps,
+  State
+> {
   editor: ?EventsSheet;
 
   state = {
     layoutChooserOpen: false,
   };
+
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    // Prevent any update to the editor if the editor is not active,
+    // and so not visible to the user.
+    return nextProps.isActive;
+  }
+
+  getProject(): ?gdProject {
+    return this.props.project;
+  }
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
@@ -32,15 +52,18 @@ export default class ExternalEventsEditor extends BaseEditor {
   }
 
   getExternalEvents(): ?gdExternalEvents {
-    const { project, externalEventsName } = this.props;
-    if (!project.hasExternalEventsNamed(externalEventsName)) {
+    const { project, projectItemName } = this.props;
+    if (!project) return null;
+
+    if (!project.hasExternalEventsNamed(projectItemName)) {
       return null;
     }
-    return project.getExternalEvents(externalEventsName);
+    return project.getExternalEvents(projectItemName);
   }
 
   getLayout() {
     const { project } = this.props;
+    if (!project) return null;
 
     const externalEvents = this.getExternalEvents();
     if (!externalEvents) return null;
@@ -72,21 +95,32 @@ export default class ExternalEventsEditor extends BaseEditor {
   };
 
   render() {
-    const { project, externalEventsName } = this.props;
+    const { project, projectItemName } = this.props;
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
 
-    if (!externalEvents) {
+    if (!externalEvents || !project) {
       //TODO: Error component
-      return <div>No external events called {externalEventsName} found!</div>;
+      return <div>No external events called {projectItemName} found!</div>;
     }
 
     return (
       <div style={styles.container}>
         {layout && (
           <EventsSheet
-            {...this.props}
             ref={editor => (this.editor = editor)}
+            setToolbar={this.props.setToolbar}
+            showPreviewButton={this.props.showPreviewButton}
+            showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+            previewButtonSettings={this.props.previewButtonSettings}
+            onOpenDebugger={this.props.onOpenDebugger}
+            onOpenLayout={this.props.onOpenLayout}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            openInstructionOrExpression={this.props.openInstructionOrExpression}
+            onCreateEventsFunction={this.props.onCreateEventsFunction}
+            unsavedChanges={this.props.unsavedChanges}
             project={project}
             scope={{
               layout,
@@ -94,14 +128,11 @@ export default class ExternalEventsEditor extends BaseEditor {
             globalObjectsContainer={project}
             objectsContainer={layout}
             events={externalEvents.getEvents()}
-            onPreview={() => this.props.onPreview(project, layout)}
+            onPreview={options =>
+              this.props.onLayoutPreview(project, layout, options)
+            }
             onOpenSettings={this.openLayoutChooser}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
-            openInstructionOrExpression={this.props.openInstructionOrExpression}
-            unsavedChanges={this.props.unsavedChanges}
           />
         )}
         {!layout && (
@@ -133,3 +164,7 @@ export default class ExternalEventsEditor extends BaseEditor {
     );
   }
 }
+
+export const renderExternalEventsEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+) => <ExternalEventsEditorContainer {...props} />;

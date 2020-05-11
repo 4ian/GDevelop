@@ -27,7 +27,7 @@ type Props = {|
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';

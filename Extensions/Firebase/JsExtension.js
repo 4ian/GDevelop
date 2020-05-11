@@ -750,6 +750,63 @@ module.exports = {
       	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .setFunctionName('firebase.performance');
 
+		extension
+          .addAction(
+            'AddTracer',
+            _('Create a custom performance tracker'),
+			_(
+				'Creates a new custom performance tracker (If it doesn\'t already exists). ' + 
+				'They are used to measure performance of custom events.'
+			),
+            _('Create performance tracker: _PARAM0_'),
+            _('Firebase/Performance Measuring'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Tracker Name"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.performance.getTracer');
+
+		extension
+          .addAction(
+            'StartTracer',
+            _('Start a tracer'),
+			_('Start measuring performance for that tracer'),
+            _('Start Performance Measuring on tracer _PARAM0_'),
+            _('Firebase/Performance Measuring'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Tracker Name"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.performance.startTracer');
+
+		extension
+          .addAction(
+            'StopTracer',
+            _('Stop a tracer'),
+			_('Stop measuring performance for that tracer'),
+            _('Stop Performance Measuring on tracer _PARAM0_'),
+            _('Firebase/Performance Measuring'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Tracker Name"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.performance.stopTracer');
+
         return extension;
     },
     runExtensionSanityTests: function(gd, extension) {

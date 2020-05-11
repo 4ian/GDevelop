@@ -734,6 +734,22 @@ module.exports = {
 
 		/* ====== PERFORMANCE ====== */
 
+		extension
+          .addAction(
+            'EnablePerformance',
+            _('Enable Performance Measuring'),
+            _('Enables Performance Measuring.'),
+            _('Enable Performance Measuring'),
+            _('Firebase/Performance Measuring'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .setFunctionName('firebase.performance');
+
         return extension;
     },
     runExtensionSanityTests: function(gd, extension) {

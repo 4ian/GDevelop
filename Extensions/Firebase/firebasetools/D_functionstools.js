@@ -27,8 +27,14 @@ gdjs.evtTools.firebase.functions = {
 
         firebase.functions().httpsCallable(httpFunctionName).__call(param)
           .then(response => response.data)
-          .then(data => if(callbackValueVariable) gdjs.evtTools.network._objectToVariable(data, callbackValueVariable))
-          .then(() => if(callbackStateVariable) callbackStateVariable.setString("ok"))
+          .then(data => {
+              if(callbackValueVariable) 
+                gdjs.evtTools.network._objectToVariable(data, callbackValueVariable);
+          })
+          .then(() => {
+              if(callbackStateVariable) 
+                callbackStateVariable.setString("ok");
+          })
           .catch(error => {
             if(callbackValueVariable) 
               gdjs.evtTools.network._objectToVariable(error, callbackValueVariable);

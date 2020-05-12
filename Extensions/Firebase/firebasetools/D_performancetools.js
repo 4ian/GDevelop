@@ -44,3 +44,14 @@ gdjs.evtTools.firebase.performance.startTracer = function(tracerName) {
 gdjs.evtTools.firebase.performance.stopTracer = function(tracerName) {
     gdjs.evtTools.firebase.performance.getTracer(tracerName).stop();
 };
+
+/**
+ * Record performance for a specific time.
+ * @param {string} tracerName - The name of the tracer.
+ * @param {number} delay - The delay before starting measuring.
+ * @param {number} duration - The duration of the measuring.
+ */
+gdjs.evtTools.firebase.performance.recordPerformance = function(tracerName, delay, duration) {
+    let currentTimeSinceEpoch = Date.now();
+    gdjs.evtTools.firebase.performance.getTracer(tracerName).record(currentTimeSinceEpoch + delay, duration);
+};

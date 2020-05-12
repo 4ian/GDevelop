@@ -807,6 +807,29 @@ module.exports = {
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.performance.stopTracer');
 
+		extension
+          .addAction(
+            'RecordTracer',
+            _('Record performance'),
+			_(
+				'Record performance from a fixed start to end time. ' + 
+				'Use this if you know how much fixed time you want the performance measuring to happen.'
+			),
+            _('Record performance for _PARAM1_ms with a delay of _PARAM2_ms (Store in tracker _PARAM0_)'),
+            _('Firebase/Performance Measuring'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Tracker Name"), "", false)
+		  .addParameter("number", _("Delay before measuring start (in ms)"), "", false)
+		  .addParameter("number", _("Measuring duration (in ms)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.performance.recordPerformance');
+
         return extension;
     },
     runExtensionSanityTests: function(gd, extension) {

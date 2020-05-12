@@ -829,6 +829,33 @@ module.exports = {
       	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.performance.recordPerformance');
+		
+		/* ====== FUNCTIONS ====== */
+		
+		extension
+          .addAction(
+            'CallHttpFunction',
+            _('Call a HTTP function'),
+			_('Calls a HTTP function by name, and put the result in .'),
+			_(
+				'Call HTTP Function _PARAM0_ with parameter(s) _PARAM1_ ' +
+				'(Callback variables: Value: _PARAM2_ State: _PARAM3_)'
+			),
+            _('Firebase/Functions'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("HTTP Function Name"), "", false)
+		  .addParameter("string", _("Parameter(s) as JSON or string."), "", false)
+		  .addParameter("scenevar", _("Callback Variable with returned value"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .markAsAdvanced()
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-functions.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_functionstools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.performance.recordPerformance');
 
         return extension;
     },

@@ -5,7 +5,7 @@
  */
 
 /**
- * Firebase Authentification Tools.
+ * Firebase Authentification Event Tools.
  * @namespace
  */
 gdjs.evtTools.firebase.auth = {

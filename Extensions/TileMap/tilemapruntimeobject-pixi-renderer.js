@@ -9,7 +9,7 @@
 gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._object = runtimeObject;
 
-  // Load (or reset) the text
+  // Load (or reset)
   if (this._pixiObject === undefined) {
     this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(
       0,
@@ -22,7 +22,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   }
 
   runtimeScene
-    .getLayer("")
+    .getLayer('')
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
@@ -34,10 +34,8 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
-  this.updateVisible();
-
-  console.log(this._pixiObject, this._render, this._layerIndex);
   this.updateTileMap();
+  this.updateVisible();
 };
 
 gdjs.TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
@@ -61,7 +59,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
         );
       }
     }
-  );
+  //update the external object here
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTiledFile = function() {

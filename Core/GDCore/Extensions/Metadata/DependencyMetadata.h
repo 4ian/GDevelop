@@ -41,7 +41,7 @@ namespace gd {
              *  gd::DependencyMetadata dependencyMetadata = gd::DependencyMetadata();
              *  dependencyMetadata.setExporterName("is-thirteen");
              */
-            DependencyMetadata& SetExporterName(const gd::String& exportName_) {
+            DependencyMetadata& SetExportName(const gd::String& exportName_) {
                 exportName = exportName_;
                 return *this;
             };
@@ -57,7 +57,7 @@ namespace gd {
             /**
              * \brief Sets the type of dependecy (What will be used to install it)
              */
-            DependencyMetadata& SetDependencyType(const gd::String& dependencyType_) {
+            DependencyMetadata& SetDependencyType(DependencyTypes dependencyType_) {
                 dependencyType = dependencyType_;
                 return *this;
             };
@@ -65,8 +65,8 @@ namespace gd {
             /**
              * \brief Sets a dependency type specific setting.
              */
-            DependencyMetadata& SetExtraSetting(const gd::String& settingName, const gd::PropertyDescriptor settingValue) {
-                extraData[settingName] = std::shared_ptr<gd::PropertyDescriptor>(settingValue);
+            DependencyMetadata& SetExtraSetting(const gd::String& settingName, const gd::PropertyDescriptor& settingValue) {
+                extraData[settingName] = settingValue;
                 return *this;
             };
 
@@ -74,14 +74,14 @@ namespace gd {
             const gd::String& GetExportName() const { return exportName; };
             int GetVersion() const { return version; };
             DependencyTypes GetDependencyType() const { return dependencyType; };
-            std::shared_ptr<gd::PropertyDescriptor> GetExtraSetting(const gd::String& settingName) const { return extraData[settingName]; };
+            gd::PropertyDescriptor& GetExtraSetting(const gd::String& settingName) { return extraData[settingName]; };
 
         private:
             gd::String name = ""; ///< The name of the dependency.
             gd::String exportName = ""; ///< The name used to install the package (example: npm package name for npm dependency type).
             int version = -1; ///< The version of the dependency
             DependencyTypes dependencyType = DependencyTypes::invalid; ///< The tool used to install the dependency.
-            std::map<gd::String, std::shared_ptr<gd::PropertyDescriptor>> extraData = new std::map<gd::String, std::shared_ptr<gd::PropertyDescriptor>>(); ///< Contains dependency type specific additional parameters for the dependency.
+            std::map<gd::String, gd::PropertyDescriptor> extraData = std::map<gd::String, gd::PropertyDescriptor>(); ///< Contains dependency type specific additional parameters for the dependency.
     };
 } // namespace gd
 #endif  // DEPENDENCYMETADATA_H

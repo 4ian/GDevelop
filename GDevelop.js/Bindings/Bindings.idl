@@ -1017,12 +1017,12 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata SetName([Const] DOMString name_);
     [Const, Ref] DOMString GetExportName();
     [Ref] DependencyMetadata SetExportName([Const] DOMString exportName_);
-    [Const, Ref] long GetVersion();
+    [Const] long GetVersion();
     [Ref] DependencyMetadata SetVersion([Const] long name_);
-    [Const, Ref] DependencyTypes GetDependencyType();
+    DependencyTypes GetDependencyType();
     [Ref] DependencyMetadata SetDependencyType([Const] DependencyTypes dependencyType_);
-    [Const, Ref] PropertyDescriptor GetExtraSetting();
-    [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const] PropertyDescriptor settingValue);
+    [Ref] PropertyDescriptor GetExtraSetting([Const] DOMString settingName);
+    [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
 };
 
 interface ParameterMetadata {

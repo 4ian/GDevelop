@@ -58,7 +58,6 @@ module.exports = {
 			'JsPlatform/Extensions/firebase.png',
 			'JsPlatform/Extensions/firebase.png'
           )
-          .addCodeOnlyParameter('currentScene', '')
           .addParameter('string', _('Event Name'), '', false)
           .addParameter('string', _('Additional Data'), '', false)
           .getCodeExtraInformation()
@@ -83,7 +82,6 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png',
             'JsPlatform/Extensions/firebase.png'
           )
-          .addCodeOnlyParameter('currentScene', '')
           .addParameter('string', _('New Unique ID'), '', false)
           .markAsComplex()
           .getCodeExtraInformation()
@@ -106,7 +104,6 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png',
             'JsPlatform/Extensions/firebase.png'
           )
-          .addCodeOnlyParameter('currentScene', '')
           .addParameter('string', _('Property Name'), '', false)
           .addParameter('string', _('Property Data'), '', false)
           .markAsAdvanced()

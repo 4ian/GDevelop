@@ -732,5 +732,4 @@ gdjs.dialogueTree.loadState = function(inputVariable) {
 gdjs.dialogueTree.clearState = function() {
   gdjs.dialogueTree.runner.visited = {};
   gdjs.dialogueTree.runner.variables.data = {};
-  }
 };

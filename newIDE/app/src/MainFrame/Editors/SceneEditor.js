@@ -31,17 +31,6 @@ export default class SceneEditorContainer extends BaseEditor {
     if (this.editor) this.editor.forceUpdateObjectsList();
   }
 
-  getSerializedElements() {
-    const layout = this.getLayout();
-    if (!layout) return {};
-
-    return {
-      ...BaseEditor.getLayoutSerializedElements(layout),
-      instances: serializeToJSObject(layout.getInitialInstances()),
-      uiSettings: this.editor ? this.editor.getUiSettings() : {},
-    };
-  }
-
   getLayout(): ?gdLayout {
     const { project, layoutName } = this.props;
     if (!project || !project.hasLayoutNamed(layoutName)) return null;

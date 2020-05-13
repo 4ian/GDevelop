@@ -23,6 +23,12 @@ module.exports = {
       'MIT'
     );
 
+    extension.addDependency()
+      .setName("AdMob Cordova Extension")
+      .setDependencyType(gd.DependencyTypes.cordova)
+      .setExportName("cordova-plugin-admob-free")
+      .setVersion(1)
+
     // Banner
     extension
       .addCondition(

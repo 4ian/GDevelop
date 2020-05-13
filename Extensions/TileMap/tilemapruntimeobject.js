@@ -22,7 +22,6 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   /** @type boolean */
   this._visible = objectData.content.visible;
 
-  console.log(_tiledFile);
   if (this._renderer)
     gdjs.TileMapRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else
@@ -35,7 +34,7 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
 gdjs.TileMapRuntimeObject.prototype = Object.create(
   gdjs.RuntimeObject.prototype
 );
-gdjs.TileMapRuntimeObject.thisIsARuntimeObjectConstructor = "TileMap::TileMap";
+gdjs.TileMapRuntimeObject.thisIsARuntimeObjectConstructor = 'TileMap::TileMap';
 
 gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

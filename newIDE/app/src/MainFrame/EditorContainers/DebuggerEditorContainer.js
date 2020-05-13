@@ -3,15 +3,39 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Debugger from '../../Debugger';
-import BaseEditor from './BaseEditor';
+import {
+  type RenderEditorContainerProps,
+  type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
 import SubscriptionChecker from '../../Profile/SubscriptionChecker';
 
-export default class DebuggerEditor extends BaseEditor {
+type State = {|
+  subscriptionChecked: boolean,
+|};
+
+export class DebuggerEditorContainer extends React.Component<
+  RenderEditorContainerProps,
+  State
+> {
   editor: ?Debugger;
   _subscriptionChecker: ?SubscriptionChecker;
   state = {
     subscriptionChecked: false,
   };
+
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    // Prevent any update to the editor if the editor is not active,
+    // and so not visible to the user.
+    return nextProps.isActive;
+  }
+
+  getProject(): ?gdProject {
+    return this.props.project;
+  }
+
+  getLayout(): ?gdLayout {
+    return null;
+  }
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
@@ -43,9 +67,17 @@ export default class DebuggerEditor extends BaseEditor {
   }
 
   render() {
+    const { project } = this.props;
+    if (!project) return null;
+
     return (
       <React.Fragment>
-        <Debugger {...this.props} ref={editor => (this.editor = editor)} />
+        <Debugger
+          project={project}
+          setToolbar={this.props.setToolbar}
+          isActive={this.props.isActive}
+          ref={editor => (this.editor = editor)}
+        />
         <SubscriptionChecker
           ref={subscriptionChecker =>
             (this._subscriptionChecker = subscriptionChecker)
@@ -62,3 +94,7 @@ export default class DebuggerEditor extends BaseEditor {
     );
   }
 }
+
+export const renderDebuggerEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+) => <DebuggerEditorContainer {...props} />;

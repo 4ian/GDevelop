@@ -5,14 +5,21 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
-import BaseEditor from './BaseEditor';
+import {
+  type RenderEditorContainerProps,
+  type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
 import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 
-export default class SceneEditorContainer extends BaseEditor {
+export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
 
-  shouldComponentUpdate(nextProps: *) {
-    // This optimization is a bit more cautious than the one is BaseEditor, to still allow
+  getProject(): ?gdProject {
+    return this.props.project;
+  }
+
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    // This optimization is a bit more cautious than the traditional one, to still allow
     // children, and in particular SceneEditor and InstancesEditor, to be notified when isActive
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
     // and remains false, it's safe to stop update here (PIXI rendering is already halted).
@@ -31,22 +38,11 @@ export default class SceneEditorContainer extends BaseEditor {
     if (this.editor) this.editor.forceUpdateObjectsList();
   }
 
-  getSerializedElements() {
-    const layout = this.getLayout();
-    if (!layout) return {};
-
-    return {
-      ...BaseEditor.getLayoutSerializedElements(layout),
-      instances: serializeToJSObject(layout.getInitialInstances()),
-      uiSettings: this.editor ? this.editor.getUiSettings() : {},
-    };
-  }
-
   getLayout(): ?gdLayout {
-    const { project, layoutName } = this.props;
-    if (!project || !project.hasLayoutNamed(layoutName)) return null;
+    const { project, projectItemName } = this.props;
+    if (!project || !project.hasLayoutNamed(projectItemName)) return null;
 
-    return project.getLayout(layoutName);
+    return project.getLayout(projectItemName);
   }
 
   saveUiSettings = () => {
@@ -62,23 +58,29 @@ export default class SceneEditorContainer extends BaseEditor {
   };
 
   render() {
-    const { project, layoutName, isActive } = this.props;
+    const { project, projectItemName, isActive } = this.props;
     const layout = this.getLayout();
-    if (!layout) {
+    if (!layout || !project) {
       //TODO: Error component
-      return <div>No layout called {layoutName} found!</div>;
+      return <div>No layout called {projectItemName} found!</div>;
     }
 
     return (
       <SceneEditor
-        {...this.props}
+        setToolbar={this.props.setToolbar}
+        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        showPreviewButton={this.props.showPreviewButton}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
+        resourceExternalEditors={this.props.resourceExternalEditors}
+        unsavedChanges={this.props.unsavedChanges}
         ref={editor => (this.editor = editor)}
         project={project}
         layout={layout}
         initialInstances={layout.getInitialInstances()}
         initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
         onPreview={(options: PreviewOptions) =>
-          this.props.onPreview(project, layout, options)
+          this.props.onLayoutPreview(project, layout, options)
         }
         previewButtonSettings={this.props.previewButtonSettings}
         onOpenDebugger={this.props.onOpenDebugger}
@@ -87,3 +89,7 @@ export default class SceneEditorContainer extends BaseEditor {
     );
   }
 }
+
+export const renderSceneEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+) => <SceneEditorContainer {...props} />;

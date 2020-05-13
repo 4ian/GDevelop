@@ -508,12 +508,22 @@ gdjs.RuntimeScene.prototype._updateObjectsPostEvents = function() {
 };
 
 /**
- * Change the background color
+ * Change the background color, by setting the RGB components.
+ * Internally, the color is stored as an hexadecimal number.
+ *
+ * @param {number} r The color red component (0-255).
+ * @param {number} g The color green component (0-255).
+ * @param {number} b The color blue component (0-255).
  */
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
     this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
 
+
+/**
+ * Get the background color, as an hexadecimal number.
+ * @returns {number} The current background color.
+ */
 gdjs.RuntimeScene.prototype.getBackgroundColor = function() {
     return this._backgroundColor;
 }

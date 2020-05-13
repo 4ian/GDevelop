@@ -1,28 +1,42 @@
 // @flow
+import * as React from 'react';
 import findIndex from 'lodash/findIndex';
-import EventsEditor from './Editors/EventsEditor';
-import DebuggerEditor from './Editors/DebuggerEditor';
-import EventsFunctionsExtensionEditorWrapper from './Editors/EventsFunctionsExtensionEditor';
-import ExternalEventsEditor from './Editors/ExternalEventsEditor';
-import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
-import ResourcesEditor from './Editors/ResourcesEditor';
-import SceneEditor from './Editors/SceneEditor';
+import { EventsEditorContainer } from './EditorContainers/EventsEditorContainer';
+import { DebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
+import { EventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
+import { ExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
+import { ExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
+import { ResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
+import { SceneEditorContainer } from './EditorContainers/SceneEditorContainer';
+import {
+  type RenderEditorContainerPropsWithRef,
+  type EditorContainerExtraProps,
+} from './EditorContainers/BaseEditor';
 
 // Supported editors
 type EditorRef =
-  | DebuggerEditor
-  | EventsEditor
-  | EventsFunctionsExtensionEditorWrapper
-  | ExternalEventsEditor
-  | ExternalLayoutEditor
-  | ResourcesEditor
-  | SceneEditor;
+  | DebuggerEditorContainer
+  | EventsEditorContainer
+  | EventsFunctionsExtensionEditorContainer
+  | ExternalEventsEditorContainer
+  | ExternalLayoutEditorContainer
+  | ResourcesEditorContainer
+  | SceneEditorContainer;
 
 export type EditorTab = {|
-  render: (isCurrentTab: boolean) => React$Element<*>,
+  // The function to render the tab editor.
+  renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
+  // A reference to the editor.
   editorRef: ?EditorRef,
+  // The label shown on the tab.
   label: string,
+  // The name of the layout/external layout/external events/extension.
+  projectItemName: ?string,
+  // A unique key for the tab.
   key: string,
+  // Extra props to pass to editors
+  extraEditorProps: ?EditorContainerExtraProps,
+  // If set to false, the tab can't be closed.
   closable: boolean,
 |};
 
@@ -38,26 +52,27 @@ export const getEditorTabsInitialState = (): EditorTabsState => {
   };
 };
 
-type renderEditorProps = {|
-  isActive: boolean,
-  editorRef: Function,
-|};
-
 export const openEditorTab = (
   state: EditorTabsState,
   {
     label,
-    renderEditor,
+    projectItemName,
+    renderEditorContainer,
     key,
+    extraEditorProps,
     dontFocusTab,
     closable,
-  }: {
+  }: {|
     label: string,
-    renderEditor: (props: renderEditorProps) => React$Element<*>,
+    projectItemName: ?string,
+    renderEditorContainer: (
+      props: RenderEditorContainerPropsWithRef
+    ) => React.Node,
     key: string,
+    extraEditorProps?: EditorContainerExtraProps,
     dontFocusTab?: boolean,
     closable?: boolean,
-  }
+  |}
 ): EditorTabsState => {
   const existingEditorId = findIndex(
     state.editors,
@@ -71,14 +86,12 @@ export const openEditorTab = (
   }
 
   const editorTab: EditorTab = {
-    render: (isCurrentTab: boolean) =>
-      renderEditor({
-        isActive: isCurrentTab,
-        editorRef: editorRef => (editorTab.editorRef = editorRef),
-      }),
-    editorRef: null,
     label,
+    projectItemName,
+    renderEditorContainer,
     key,
+    extraEditorProps,
+    editorRef: null,
     closable: typeof closable === 'undefined' ? true : !!closable,
   };
 
@@ -175,7 +188,11 @@ export const closeProjectTabs = (
  */
 export const saveUiSettings = (state: EditorTabsState) => {
   state.editors.forEach(editorTab => {
-    if (editorTab.editorRef && editorTab.editorRef.saveUiSettings) {
+    if (
+      editorTab.editorRef &&
+      (editorTab.editorRef instanceof SceneEditorContainer ||
+        editorTab.editorRef instanceof ExternalLayoutEditorContainer)
+    ) {
       editorTab.editorRef.saveUiSettings();
     }
   });
@@ -205,7 +222,7 @@ export const closeExternalLayoutTabs = (
       editors: state.editors.filter(editorTab => {
         const editor = editorTab.editorRef;
 
-        if (editor instanceof ExternalLayoutEditor) {
+        if (editor instanceof ExternalLayoutEditorContainer) {
           return (
             !editor.getExternalLayout() ||
             editor.getExternalLayout() !== externalLayout
@@ -228,7 +245,7 @@ export const closeExternalEventsTabs = (
       ...state,
       editors: state.editors.filter(editorTab => {
         const editor = editorTab.editorRef;
-        if (editor instanceof ExternalEventsEditor) {
+        if (editor instanceof ExternalEventsEditorContainer) {
           return (
             !editor.getExternalEvents() ||
             editor.getExternalEvents() !== externalEvents
@@ -251,7 +268,7 @@ export const closeEventsFunctionsExtensionTabs = (
       ...state,
       editors: state.editors.filter(editorTab => {
         const editor = editorTab.editorRef;
-        if (editor instanceof EventsFunctionsExtensionEditorWrapper) {
+        if (editor instanceof EventsFunctionsExtensionEditorContainer) {
           return (
             !editor.getEventsFunctionsExtension() ||
             editor.getEventsFunctionsExtension() !== eventsFunctionsExtension
@@ -268,11 +285,11 @@ export const closeEventsFunctionsExtensionTabs = (
 export const getEventsFunctionsExtensionEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
-): ?{| editor: EventsFunctionsExtensionEditorWrapper, tabIndex: number |} => {
+): ?{| editor: EventsFunctionsExtensionEditorContainer, tabIndex: number |} => {
   for (let tabIndex = 0; tabIndex < state.editors.length; ++tabIndex) {
     const editor = state.editors[tabIndex].editorRef;
     if (
-      editor instanceof EventsFunctionsExtensionEditorWrapper &&
+      editor instanceof EventsFunctionsExtensionEditorContainer &&
       editor.getEventsFunctionsExtension() === eventsFunctionsExtension
     ) {
       return { editor, tabIndex };

@@ -105,9 +105,9 @@ type Props = {|
   initialInstances: gdInitialInstancesContainer,
   initialUiSettings: Object,
   layout: gdLayout,
-  onEditObject: (object: gdObject) => void,
+  onEditObject?: ?(object: gdObject) => void,
   onOpenDebugger: () => void,
-  onOpenMoreSettings: () => void,
+  onOpenMoreSettings?: ?() => void,
   onPreview: (options: PreviewOptions) => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
@@ -117,7 +117,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|

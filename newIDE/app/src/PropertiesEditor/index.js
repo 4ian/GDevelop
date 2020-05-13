@@ -115,7 +115,7 @@ type MandatoryProps = {|
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
   renderExtraDescriptionText?: (extraDescription: string) => string,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type Props =

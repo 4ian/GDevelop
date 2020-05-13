@@ -34,6 +34,11 @@ interface VectorPlatformExtension {
     [Const] PlatformExtension WRAPPED_at(unsigned long index);
 };
 
+interface VectorDependencyMetadata {
+    unsigned long size();
+    [Const, Ref] DependencyMetadata at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -1008,7 +1013,7 @@ interface ExpressionMetadata {
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
 
-enum DependencyTypes { "cordova", "npm" };
+enum DependencyTypes { "invalid", "cordova", "npm" };
 
 interface DependencyMetadata {
     void DependencyMetadata();
@@ -1234,6 +1239,8 @@ interface PlatformExtension {
                                            [Const] DOMString group,
                                            [Const] DOMString smallicon);
 
+    [Const, Ref] DependencyMetadata AddDependency();
+
     [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString defaultName,
@@ -1280,6 +1287,7 @@ interface PlatformExtension {
     [Ref] MapStringInstructionMetadata GetAllConditionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
+    [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
 };

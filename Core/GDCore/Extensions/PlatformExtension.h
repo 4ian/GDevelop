@@ -15,6 +15,7 @@
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/VersionPriv.h"
 
@@ -25,6 +26,7 @@ class ExpressionMetadata;
 class ObjectMetadata;
 class BehaviorMetadata;
 class EffectMetadata;
+class DependencyMetadata;
 class BaseEvent;
 class EventMetadata;
 class EventCodeGenerator;
@@ -147,6 +149,8 @@ class GD_CORE_API PlatformExtension {
                                            const gd::String& description_,
                                            const gd::String& group_,
                                            const gd::String& smallicon_);
+
+  gd::DependencyMetadata& AddDependency();
 
   /**
    * \brief Declare a new object as being part of the extension.
@@ -366,6 +370,11 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions();
 
   /**
+   * \brief Return a reference to a vector containing all the Dependencies of the extension.
+   */
+  std::vector<gd::DependencyMetadata>& GetAllDependencies();
+
+  /**
    * \brief Return a reference to a map containing the names of the actions,
    * related to the object type, and the metadata associated with.
    */
@@ -480,6 +489,7 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::vector<gd::DependencyMetadata> extensionDependencies;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
 #endif
 

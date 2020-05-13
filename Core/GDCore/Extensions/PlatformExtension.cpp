@@ -11,6 +11,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
@@ -114,6 +115,13 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
                                                               smallicon)
                                                .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[nameWithNamespace];
+#endif
+}
+
+gd::DependencyMetadata& PlatformExtension::AddDependency() {
+#if defined(GD_IDE_ONLY)
+  extensionDependencies.push_back(DependencyMetadata());
+  return extensionDependencies.back();
 #endif
 }
 
@@ -281,6 +289,11 @@ PlatformExtension::GetAllExpressions() {
 std::map<gd::String, gd::ExpressionMetadata>&
 PlatformExtension::GetAllStrExpressions() {
   return strExpressionsInfos;
+}
+
+std::vector<gd::DependencyMetadata>&
+PlatformExtension::GetAllDependencies() {
+  return extensionDependencies;
 }
 
 std::map<gd::String, gd::EventMetadata>& PlatformExtension::GetAllEvents() {

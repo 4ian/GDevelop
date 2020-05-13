@@ -62,17 +62,25 @@ gdjs.evtTools.firebase.auth.userManagement = {
          * @param {string} oldEmail - Old Email for reauthentification.
          * @param {string} password - Old password for reauthentification.
          * @param {string} newEmail - New Email for the user.
-         * @param {boolean} sendVerificationEmail - Send a verification email to the old address before changing the email?
-         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+         * @param {boolean} [sendVerificationEmail] - Send a verification email to the old address before changing the email?
+         * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
          */
         changeEmail(oldEmail, password, newEmail, sendVerificationEmail, callbackStateVariable) {
+            sendVerificationEmail = sendVerificationEmail || true;
+
             let credential = firebase.auth.EmailAuthProvider.credential(oldEmail, password);
             let updater = sendVerificationEmail ? gdjs.evtTools.firebase.auth.currentUser.updateEmail : gdjs.evtTools.firebase.auth.currentUser.verifyBeforeUpdateEmail;
 
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithCredential(credential)
               .then(() => updater(newEmail))
-              .then(() => callbackStateVariable.setString("ok"))
-              .catch(error => callbackStateVariable.setString(error.message));
+              .then(() => {
+                if (callbackStateVariable)
+                callbackStateVariable.setString("ok");
+              })
+              .catch(error => {
+                if (callbackStateVariable)
+                callbackStateVariable.setString(error.message);
+              });
         },
 
         /**
@@ -81,14 +89,20 @@ gdjs.evtTools.firebase.auth.userManagement = {
          * @param {string} email - Old Email for reauthentification.
          * @param {string} oldPassword - Old password for reauthentification.
          * @param {string} newPassword - New Password for the user.
-         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+         * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
          */
         changePassword(email, oldPassword, newPassword, callbackStateVariable) {
             let credential = firebase.auth.EmailAuthProvider.credential(email, oldPassword);
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithCredential(credential)
               .then(() => gdjs.evtTools.firebase.auth.currentUser.updatePassword(newPassword))
-              .then(() => callbackStateVariable.setString("ok"))
-              .catch(error => callbackStateVariable.setString(error.message));
+              .then(() => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString("ok");
+              })
+              .catch(error => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString(error.message);
+              });
         },
 
         /**
@@ -96,14 +110,20 @@ gdjs.evtTools.firebase.auth.userManagement = {
          * Use this when using basic auth.
          * @param {string} email - Old Email for reauthentification.
          * @param {string} password - Old password for reauthentification.
-         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+         * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
          */
         deleteUser(email, password, callbackStateVariable) {
             let credential = firebase.auth.EmailAuthProvider.credential(email, password);
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithCredential(credential)
               .then(() => gdjs.evtTools.firebase.auth.currentUser.delete())
-              .then(() => callbackStateVariable.setString("ok"))
-              .catch(error => callbackStateVariable.setString(error.message));
+              .then(() => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString("ok");
+              })
+              .catch(error => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString(error.message);
+              });
         },
 
         /**
@@ -111,40 +131,58 @@ gdjs.evtTools.firebase.auth.userManagement = {
          * Use this when using an external provider.
          * @param {string} newEmail - New Email for the user.
          * @param {boolean} sendVerificationEmail - Send a verification email to the old address before changing the email?
-         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+         * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
          */
         changeEmailProvider(newEmail, sendVerificationEmail, callbackStateVariable) {
             let updater = sendVerificationEmail ? gdjs.evtTools.firebase.auth.currentUser.updateEmail : gdjs.evtTools.firebase.auth.currentUser.verifyBeforeUpdateEmail;
 
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
               .then(() => updater(newEmail))
-              .then(() => callbackStateVariable.setString("ok"))
-              .catch(error => callbackStateVariable.setString(error.message));
+              .then(() => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString("ok");
+              })
+              .catch(error => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString(error.message);
+              });
         },
 
         /**
          * Changes the user's password.
          * Use this when using an external provider.
          * @param {string} newPassword - New Password for the user.
-         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+         * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
          */
         changePasswordProvider(newPassword, callbackStateVariable) {
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
               .then(() => gdjs.evtTools.firebase.auth.currentUser.updatePassword(newPassword))
-              .then(() => callbackStateVariable.setString("ok"))
-              .catch(error => callbackStateVariable.setString(error.message));
+              .then(() => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString("ok");
+              })
+              .catch(error => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString(error.message);
+              });
         },
 
         /**
          * Deletes the Current User.
          * Use this when using an external provider.
-         * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+         * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
          */
         deleteUserProvider(callbackStateVariable) {
             gdjs.evtTools.firebase.auth.currentUser.reauthenticateWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
               .then(() => gdjs.evtTools.firebase.auth.currentUser.delete())
-              .then(() => callbackStateVariable.setString("ok"))
-              .catch(error => callbackStateVariable.setString(error.message));
+              .then(() => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString("ok");
+              })
+              .catch(error => {
+                if (callbackStateVariable)
+                  callbackStateVariable.setString(error.message);
+              });
         }
     },
 
@@ -276,49 +314,73 @@ gdjs.evtTools.firebase.auth.isAuthentified = function() {return gdjs.evtTools.fi
  * Signs you in with basic email-password authentification.
  * @param {string} email - The user's email.
  * @param {string} password - The user's password.
- * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
  */
 gdjs.evtTools.firebase.auth.signInWithEmail = function(email, password, callbackStateVariable) {
     firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(result => callbackStateVariable.setString("ok"))
-      .catch(error => callbackStateVariable.setString(error.message));
+      .then(() => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString("ok");
+      })
+      .catch(error => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString(error.message);
+      });
 }
 
 /**
  * Creates an account with basic email-password authentification.
  * @param {string} email - The user's email.
  * @param {string} password - The user's password.
- * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
  */
 gdjs.evtTools.firebase.auth.createAccountWithEmail = function(email, password, callbackStateVariable) {
     firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(result => callbackStateVariable.setString("ok"))
-      .catch(error => callbackStateVariable.setString(error.message));
+      .then(() => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString("ok");
+      })
+      .catch(error => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString(error.message);
+      });
 }
 
 /**
  * Creates an account with basic email-password authentification.
- * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
  */
 gdjs.evtTools.firebase.auth.anonymSignIn = function(callbackStateVariable) {
     firebase.auth().signInAnonymously()
-      .then(result => callbackStateVariable.setString("ok"))
-      .catch(error => callbackStateVariable.setString(error.message));
+      .then(() => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString("ok");
+      })
+      .catch(error => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString(error.message);
+      });
 }
 
 /**
  * Signs you in with an external provider.
  * Only works on the web, NOT on elctron and probably not on Cordova.
  * @param {"google" | "facebook" | "github" | "twitter"} providerName - The external provider to use.
- * @param {gdjs.Variable} callbackStateVariable - The variable where to store the result.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
  */
 gdjs.evtTools.firebase.auth.signInWithProvider = function(providerName, callbackStateVariable) {
     let providerCtor = gdjs.evtTools.firebase.auth.providersList[providerName];
     gdjs.evtTools.firebase.auth._currentProvider = new providerCtor();
 
     firebase.auth().signInWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
-      .then(result => callbackStateVariable.setString("ok"))
-      .catch(error => callbackStateVariable.setString(error.message));
+      .then(() => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString("ok");
+      })
+      .catch(error => {
+        if (callbackStateVariable)
+          callbackStateVariable.setString(error.message);
+      });
 }
 
 /** Register callback for after firebase initialization. */

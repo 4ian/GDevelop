@@ -7701,56 +7701,6 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "DialogueTree::IsDialogueLineType"
-                  },
-                  "parameters": [
-                    "\"command\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Visible"
-                  },
-                  "parameters": [
-                    "commandsDebug"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "commandsDebug",
-                    "+",
-                    "\"<<\"+DialogueTree::CommandParameter(-1)+\">>\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
                     "value": "DialogueTree::IsCommandCalled"
                   },
                   "parameters": [
@@ -7904,6 +7854,56 @@
                     "value": "DialogueTree::ClearState"
                   },
                   "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsDialogueLineType"
+                  },
+                  "parameters": [
+                    "\"command\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Visible"
+                  },
+                  "parameters": [
+                    "commandsDebug"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "commandsDebug",
+                    "+",
+                    "\"<<\"+DialogueTree::CommandParameter(-1)+\">>\""
+                  ],
                   "subInstructions": []
                 }
               ],

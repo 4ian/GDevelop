@@ -49,7 +49,7 @@ namespace gd {
             /**
              * \brief Set the version of the dependency to install. Use -1 for latest.
              */
-            DependencyMetadata& SetVersion(const int version_) {
+            DependencyMetadata& SetVersion(const gd::String& version_) {
                 version = version_;
                 return *this;
             };
@@ -72,14 +72,14 @@ namespace gd {
 
             const gd::String& GetName() const { return name; };
             const gd::String& GetExportName() const { return exportName; };
-            int GetVersion() const { return version; };
+            const gd::String& GetVersion() const { return version; };
             DependencyTypes GetDependencyType() const { return dependencyType; };
             gd::PropertyDescriptor& GetExtraSetting(const gd::String& settingName) { return extraData[settingName]; };
 
         private:
             gd::String name = ""; ///< The name of the dependency.
             gd::String exportName = ""; ///< The name used to install the package (example: npm package name for npm dependency type).
-            int version = -1; ///< The version of the dependency
+            gd::String version = "-1"; ///< The version of the dependency
             DependencyTypes dependencyType = DependencyTypes::invalid; ///< The tool used to install the dependency.
             std::map<gd::String, gd::PropertyDescriptor> extraData = std::map<gd::String, gd::PropertyDescriptor>(); ///< Contains dependency type specific additional parameters for the dependency.
     };

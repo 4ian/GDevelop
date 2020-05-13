@@ -27,7 +27,7 @@ module.exports = {
       .setName("AdMob Cordova Extension")
       .setDependencyType(gd.DependencyTypes.cordova)
       .setExportName("cordova-plugin-admob-free")
-      .setVersion(1)
+      .setVersion("~0.21.0");
 
     // Banner
     extension

@@ -295,7 +295,7 @@ module.exports = {
         'ClearState',
         _('Clear dialogue state'),
         _(
-          'Clear dialogue state. This resets all dialogue state accumulated by the player choices. Use for when the player is starting a new game.'
+          'Clear dialogue state. This resets all dialogue state accumulated by the player choices. Useful when the player is starting a new game.'
         ),
         _('Clear dialogue state'),
         _('Dialogue Tree (experimental)'),

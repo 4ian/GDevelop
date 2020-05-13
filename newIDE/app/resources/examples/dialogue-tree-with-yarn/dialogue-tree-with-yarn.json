@@ -821,7 +821,7 @@
         "kind": "json",
         "metadata": "",
         "name": "dialogueData/npcs.json",
-        "userAdded": false
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -840,6 +840,10 @@
     {
       "name": "yarnState",
       "value": ""
+    },
+    {
+      "name": "textScrollSpdMultiplier",
+      "value": "1"
     }
   ],
   "layouts": [
@@ -7239,6 +7243,18 @@
                     "\"walking\""
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "textScrollSpdMultiplier",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
                 }
               ],
               "events": []
@@ -7301,7 +7317,7 @@
                       },
                       "parameters": [
                         "",
-                        "GlobalVariable(textScrollSpd)",
+                        "GlobalVariable(textScrollSpd) / GlobalVariable(textScrollSpdMultiplier) ",
                         "\"textScroll\""
                       ],
                       "subInstructions": []
@@ -7752,6 +7768,38 @@
                   "parameters": [
                     "avatars",
                     "DialogueTree::CommandParameter(0)"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsCommandCalled"
+                  },
+                  "parameters": [
+                    "\"speed\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "textScrollSpdMultiplier",
+                    "=",
+                    "ToNumber(DialogueTree::CommandParameter(0))"
                   ],
                   "subInstructions": []
                 }

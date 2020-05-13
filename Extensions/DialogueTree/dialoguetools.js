@@ -725,3 +725,16 @@ gdjs.dialogueTree.loadState = function(inputVariable) {
     console.error('Failed to load state from variable:', inputVariable, e);
   }
 };
+
+/**
+ * Clear the current State of the Dialogue Parser.
+ */
+gdjs.dialogueTree.clearState = function() {
+  try {
+    gdjs.dialogueTree.runner.visited = {};
+    gdjs.dialogueTree.runner.variables.data = {};
+    });
+  } catch (e) {
+    console.error('Failed to clear yarn state:', e);
+  }
+};

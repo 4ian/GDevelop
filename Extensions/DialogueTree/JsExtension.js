@@ -291,6 +291,21 @@ module.exports = {
       .setFunctionName('gdjs.dialogueTree.loadState');
 
     extension
+      .addAction(
+        'ClearState',
+        _('Clear dialogue state'),
+        _(
+          'Clear dialogue state. This resets all dialogue state accumulated by the player choices. Use for when the player is starting a new game.'
+        ),
+        _('Clear dialogue state'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.clearState');
+
+    extension
       .addStrExpression(
         'LineText',
         _('Get the current dialogue line text'),

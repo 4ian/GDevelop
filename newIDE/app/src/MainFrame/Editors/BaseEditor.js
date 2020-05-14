@@ -38,26 +38,4 @@ export default class BaseEditor extends React.Component<*, *> {
 
     if (this.props.setToolbar) this.props.setToolbar(null);
   }
-
-  getSerializedElements() {
-    throw new Error(
-      'The editor has not implemented getSerializedElements to return what should be serialized'
-    );
-  }
-
-  static getLayoutSerializedElements(layout: ?gdLayout) {
-    if (!layout) return {};
-
-    return {
-      windowTitle: layout.getWindowDefaultTitle(),
-      layers: serializeToJSObject(layout, 'serializeLayersTo'),
-      backgroundColor:
-        '' +
-        rgbToHexNumber(
-          layout.getBackgroundColorRed(),
-          layout.getBackgroundColorGreen(),
-          layout.getBackgroundColorBlue()
-        ),
-    };
-  }
 }

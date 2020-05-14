@@ -22,6 +22,17 @@
         background-position: center center;
         overscroll-behavior: none;
       }
+
+      @keyframes text-focus-in {
+        0% {
+          -webkit-filter: blur(12px); filter: blur(12px);
+          opacity: 0;
+        }
+        100% {
+          -webkit-filter: blur(0px); filter: blur(0px);
+          opacity: 1;
+        }
+      }
     </style>
 
     <!-- Progressive Web App support -->
@@ -34,14 +45,6 @@
 
     <script>
       window["GD_STARTUP_TIMES"] = [["indexHtmlFirstScriptStarted", performance.now()]];
-    </script>
-
-    <!-- GDevelop.js core -->
-    <script src="%PUBLIC_URL%/libGD.js"></script>
-
-    <script>
-      window["GD_STARTUP_TIMES"] = window["GD_STARTUP_TIMES"] || [];
-      window["GD_STARTUP_TIMES"].push(["libGDLoadedTime", performance.now()]);
     </script>
 
     <!-- Monaco Editor support -->

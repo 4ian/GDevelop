@@ -3,7 +3,6 @@ import { Trans } from '@lingui/macro';
 import React from 'react';
 import EventsSheet from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
-import { serializeToJSObject } from '../../Utils/Serializer';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';
 import LayoutChooserDialog from './LayoutChooserDialog';
@@ -30,17 +29,6 @@ export default class ExternalEventsEditor extends BaseEditor {
 
   forceUpdateEditor() {
     // No updates to be done.
-  }
-
-  getSerializedElements() {
-    const externalEvents = this.getExternalEvents();
-    const layout = this.getLayout();
-    if (!externalEvents) return {};
-
-    return {
-      ...BaseEditor.getLayoutSerializedElements(layout),
-      events: serializeToJSObject(externalEvents),
-    };
   }
 
   getExternalEvents(): ?gdExternalEvents {

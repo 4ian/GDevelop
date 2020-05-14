@@ -175,7 +175,7 @@ export const initialPreferences = {
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
-    useNewInstructionEditorDialog: false,
+    useNewInstructionEditorDialog: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,

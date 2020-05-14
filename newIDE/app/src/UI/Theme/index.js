@@ -2,6 +2,7 @@
 import DarkTheme from './DarkTheme';
 import DefaultTheme from './DefaultTheme';
 import { type Theme } from './DefaultTheme';
+import './Global.css';
 
 // To add a new theme:
 // * copy the folder of an existing one (DarkTheme for example),

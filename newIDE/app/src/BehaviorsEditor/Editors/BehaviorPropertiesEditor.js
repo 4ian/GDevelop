@@ -32,7 +32,7 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
     );
 
     return (
-      <Column>
+      <Column expand>
         {propertiesSchema.length ? (
           <PropertiesEditor
             schema={propertiesSchema}

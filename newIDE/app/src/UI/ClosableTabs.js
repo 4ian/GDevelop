@@ -91,7 +91,7 @@ export class ClosableTabs extends Component<ClosableTabsProps> {
             display: hideLabels ? 'none' : 'flex',
             flexWrap: 'nowrap', // Single line of tab...
             overflowX: 'auto', // ...scroll horizontally if needed
-            backgroundColor: muiTheme.closableTabs.backgroundColor,
+            backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
           };
 
           return <div style={tabItemContainerStyle}>{children}</div>;
@@ -153,6 +153,7 @@ export function ClosableTab({
                 flexShrink: 0, // Tabs are never resized to fit in flex container
                 position: 'relative',
                 display: 'inline-block',
+                marginRight: 1,
                 backgroundColor: !active
                   ? muiTheme.closableTabs.backgroundColor
                   : muiTheme.closableTabs.selectedBackgroundColor,

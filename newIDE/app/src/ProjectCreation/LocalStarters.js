@@ -99,6 +99,17 @@ export default class LocalStarters extends Component<Props, State> {
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
+            <Line expand>
+              <Column expand>
+                <LocalFolderPicker
+                  fullWidth
+                  value={this.state.outputPath}
+                  onChange={this._handleChangePath}
+                  type="create-game"
+                />
+              </Column>
+            </Line>
+            <Divider />
             <Line>
               <Column>
                 <Text>
@@ -237,17 +248,6 @@ export default class LocalStarters extends Component<Props, State> {
                     onClick={() => this.props.onShowExamples()}
                   />
                 </Line>
-              </Column>
-            </Line>
-            <Divider />
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={this.state.outputPath}
-                  onChange={this._handleChangePath}
-                  type="create-game"
-                />
               </Column>
             </Line>
           </Column>

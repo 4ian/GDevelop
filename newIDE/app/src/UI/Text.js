@@ -7,12 +7,13 @@ type Props = {|
   size?: 'body' | 'body2' | 'title',
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   noShrink?: boolean,
+  noMargin?: boolean,
   style?: {|
     // Margins
     marginLeft?: number,
     marginRight?: number,
-    marginTop?: number,
-    marginBottom?: number,
+    // marginTop?: number,
+    // marginBottom?: number,
 
     // Allow to specify that the text should break words
     overflow?: 'hidden',
@@ -29,14 +30,21 @@ type Props = {|
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help to maintain
 // consistency of text in the whole app.
-export default ({ children, style, size, align, noShrink }: Props) => (
+export default ({
+  children,
+  style,
+  size,
+  align,
+  noShrink,
+  noMargin,
+}: Props) => (
   <Typography
     variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
     style={{
       ...style,
       flexShrink: noShrink ? 0 : undefined,
-      marginTop: 6 + ((style && style.marginTop) || 0),
-      marginBottom: 6 + ((style && style.marginBottom) || 0),
+      marginTop: noMargin ? 0 : 6,
+      marginBottom: noMargin ? 0 : 6,
     }}
     align={align || 'inherit'}
   >

@@ -14,6 +14,7 @@ import EventsFunctionsExtensionsContext, {
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 import Text from '../UI/Text';
+import { ColumnStackLayout } from '../UI/Layout';
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -112,7 +113,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
               title={<Trans>Edit Extension Options</Trans>}
               onRequestClose={this.props.onClose}
             >
-              <Column>
+              <ColumnStackLayout noMargin>
                 <TextField
                   floatingLabelText={<Trans>Name</Trans>}
                   value={eventsFunctionsExtension.getName()}
@@ -183,7 +184,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                   }}
                   fullWidth
                 />
-              </Column>
+              </ColumnStackLayout>
               {exportDialogOpen && (
                 <Dialog
                   secondaryActions={[

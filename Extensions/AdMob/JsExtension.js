@@ -30,7 +30,7 @@ module.exports = {
       .setVersion("~0.21.0")
       .setExtraSetting(
         "ADMOB_APP_ID", 
-        gd.PropertyDesriptor()
+        new gd.PropertyDescriptor()
          .setType("ProjectProperty")
          .setValue("AdMobAppId")
       );

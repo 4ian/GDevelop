@@ -28,10 +28,11 @@ module.exports = {
       .setDependencyType(gd.DependencyTypes.cordova)
       .setExportName("cordova-plugin-admob-free")
       .setVersion("~0.21.0")
-      .setExtraSetting("ADMOB_APP_ID", 
-       gd.PropertyDesriptor()
-        .setType("ProjectProperty")
-        .setValue("AdMobAppId")
+      .setExtraSetting(
+        "ADMOB_APP_ID", 
+        gd.PropertyDesriptor()
+         .setType("ProjectProperty")
+         .setValue("AdMobAppId")
       );
 
     // Banner

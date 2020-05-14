@@ -1,6 +1,9 @@
 import React from 'react';
+import { t } from '@lingui/macro';
+import { i18n } from '@lingui/core';
 import Checkbox from '../../UI/Checkbox';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import Window from '../../Utils/Window';
 import Tooltip from '@material-ui/core/Tooltip';
 import Warning from '@material-ui/icons/Warning';
 
@@ -54,10 +57,12 @@ const ImageThumbnail = ({
   selectable,
   selected,
   onSelect,
+  deleteSprite,
   onContextMenu,
   muiTheme,
 }) => {
   const [hasSizeWarning, setHasWarningSize] = React.useState(false);
+  const [hasThumbnailMissing, setThumbnailMissing] = React.useState(false);
 
   const _callbackImageThumbnailLoaded = (imageElement: HTMLImageElement) => {
     const image = imageElement.target;
@@ -65,8 +70,21 @@ const ImageThumbnail = ({
     image.src = resourcesLoader.getResourceFullUrl(project, resourceName);
 
     if (image.naturalWidth > 2048 || image.naturalHeight > 2048) {
+      onSelect(selected);
       setHasWarningSize(true);
+      var answer = Window.showConfirmDialog(
+        i18n._(
+          t`The selected image is more than 2048 pixels wide. The image may not be displayed on some devices. Do you really want to import the image?`
+        )
+      );
+
+      if (!answer) {
+        deleteSprite(true);
+      }
+    } else {
+      setHasWarningSize(false);
     }
+    setThumbnailMissing(false);
   };
 
   return (
@@ -78,6 +96,8 @@ const ImageThumbnail = ({
             ...styles.spriteThumbnail,
             borderColor: selected
               ? muiTheme.imageThumbnail.selectedBorderColor
+              : hasThumbnailMissing
+              ? muiTheme.message.error
               : undefined,
             ...style,
           }}
@@ -88,10 +108,13 @@ const ImageThumbnail = ({
         >
           <img
             style={styles.spriteThumbnailImage}
-            alt={resourceName}
+            alt={hasThumbnailMissing ? '' : resourceName}
             src={resourcesLoader.getResourceFullUrl(project, resourceName)}
             crossOrigin="anonymous"
             onLoad={_callbackImageThumbnailLoaded}
+            onError={() => {
+              setThumbnailMissing(true);
+            }}
           />
           {selectable && (
             <div style={styles.checkboxContainer}>
@@ -103,7 +126,25 @@ const ImageThumbnail = ({
           )}
           {hasSizeWarning && (
             <div style={styles.spriteWarning}>
-              <Tooltip title="Sprite is taller than 2048px wide, this have consequence on performance.">
+              <Tooltip
+                title={`Sprite is taller than 2048px wide, this have consequence on performance.`}
+                placement="top"
+              >
+                <Warning
+                  style={{
+                    ...styles.icon,
+                    color: muiTheme.message.warning,
+                  }}
+                />
+              </Tooltip>
+            </div>
+          )}
+          {hasThumbnailMissing && (
+            <div style={styles.spriteWarning}>
+              <Tooltip
+                title={`Image ${resourceName} is missing in resource panel.`}
+                placement="top"
+              >
                 <Warning
                   style={{
                     ...styles.icon,

@@ -67,12 +67,21 @@ const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
 });
 
 const SortableSpriteThumbnail = SortableElement(
-  ({ sprite, project, resourcesLoader, selected, onSelect, onContextMenu }) => {
+  ({
+    sprite,
+    project,
+    resourcesLoader,
+    selected,
+    onDelete,
+    onSelect,
+    onContextMenu,
+  }) => {
     return (
       <ImageThumbnail
         selectable
         selected={selected}
         onSelect={onSelect}
+        deleteSprite={onDelete}
         onContextMenu={onContextMenu}
         resourceName={sprite.getImageName()}
         resourcesLoader={resourcesLoader}
@@ -89,6 +98,7 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
+    onDeleteSprite,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -107,6 +117,7 @@ const SortableList = SortableContainer(
                 selected={!!selectedSprites[sprite.ptr]}
                 onContextMenu={(x, y) => onSpriteContextMenu(x, y, sprite)}
                 onSelect={selected => onSelectSprite(sprite, selected)}
+                onDelete={selected => onDeleteSprite(i)}
                 resourcesLoader={resourcesLoader}
                 project={project}
               />
@@ -176,6 +187,12 @@ export default class SpritesList extends Component<Props, void> {
   }) => {
     this.props.direction.moveSprite(oldIndex, newIndex);
     this.forceUpdate();
+  };
+
+  onDeleteSprite = (spriteIndex: number) => {
+    const { direction } = this.props;
+
+    direction.removeSprite(spriteIndex);
   };
 
   onAddSprite = () => {
@@ -324,6 +341,7 @@ export default class SpritesList extends Component<Props, void> {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
+          onDeleteSprite={this.onDeleteSprite}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

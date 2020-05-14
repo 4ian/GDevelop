@@ -62,9 +62,7 @@ export default (props: Props) => (
   <ReactJsonView
     collapsed={false}
     name={false}
-    src={
-      props.variablesContainer ? transform(props.variablesContainer) : null
-    }
+    src={props.variablesContainer ? transform(props.variablesContainer) : null}
     enableClipboard={false}
     displayDataTypes={false}
     displayObjectSize={false}

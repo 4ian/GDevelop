@@ -47,6 +47,7 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.includes('run code formatting') ||
           lowerCaseMessage.includes('fix formatting') ||
           lowerCaseMessage.includes('fix warning') ||
+          lowerCaseMessage.includes('fix typo') ||
           lowerCaseMessage.includes('package-lock.json');
         const forceHide =
           lowerCaseMessage.includes("don't mention in changelog") ||

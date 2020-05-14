@@ -75,7 +75,7 @@ const gdevelopTheme = {
     groupBackgroundColor: backgroundColor,
     groupTextColor: nord6,
     deprecatedGroupTextColor: nord4,
-    separatorColor: nord4,
+    separatorColor: alternateCanvasColor,
     selectedBackgroundColor: nord8,
     selectedTextColor: backgroundColor,
     rightIconColor: nord4,
@@ -137,9 +137,6 @@ const muiTheme = createMuiTheme({
       },
     },
     MuiListItem: {
-      root: {
-        borderBottom: '1px solid #4C566A !important',
-      },
       secondaryAction: {
         paddingRight: 40,
       },
@@ -155,7 +152,7 @@ const muiTheme = createMuiTheme({
     MuiInput: {
       underline: {
         '&:before': {
-          borderBottom: `1px solid #BBBBBB`,
+          borderBottom: `1px solid ##D8DEE9`,
         },
       },
     },

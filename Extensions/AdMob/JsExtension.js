@@ -29,7 +29,7 @@ module.exports = {
       .setExportName("cordova-plugin-admob-free")
       .setVersion("~0.21.0")
       .setExtraSetting("ADMOB_APP_ID", 
-       gd::PropertyDesriptor()
+       gd.PropertyDesriptor()
         .setType("ProjectProperty")
         .setValue("AdMobAppId")
       );

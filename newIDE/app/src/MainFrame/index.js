@@ -215,11 +215,11 @@ const MainFrame = (props: Props) => {
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
   const preferences = React.useContext(PreferencesContext);
 
-  React.useEffect(() => {
-    // This is just for testing, to check if we're getting the right state
-    // and gives us an idea about the number of re-renders.
-    console.log(state);
-  });
+  // This is just for testing, to check if we're getting the right state
+  // and gives us an idea about the number of re-renders.
+  // React.useEffect(() => {
+  //   console.log(state);
+  // });
 
   const { integratedEditor, initialFileMetadataToOpen, introDialog } = props;
   React.useEffect(

@@ -1028,6 +1028,7 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata SetDependencyType([Const] DependencyTypes dependencyType_);
     [Ref] PropertyDescriptor GetExtraSetting([Const] DOMString settingName);
     [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
+    [Ref] MapStringPropertyDescriptor GetAllExtraSettings();
 };
 
 interface ParameterMetadata {

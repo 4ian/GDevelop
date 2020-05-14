@@ -75,6 +75,7 @@ namespace gd {
             const gd::String& GetVersion() const { return version; };
             DependencyTypes GetDependencyType() const { return dependencyType; };
             gd::PropertyDescriptor& GetExtraSetting(const gd::String& settingName) { return extraData[settingName]; };
+            std::map<gd::String, gd::PropertyDescriptor>& GetAllExtraSettings() { return extraData; }
 
         private:
             gd::String name = ""; ///< The name of the dependency.

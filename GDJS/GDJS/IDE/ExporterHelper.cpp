@@ -20,6 +20,10 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
+#include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
@@ -277,15 +281,38 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
 
-  if (!project.GetAdMobAppId().empty()) {
-    str = str.FindAndReplace(
-        "<!-- GDJS_ADMOB_PLUGIN_AND_APPLICATION_ID -->",
-        "<plugin name=\"cordova-plugin-admob-free\" spec=\"~0.21.0\">\n"
-        "\t\t<variable name=\"ADMOB_APP_ID\" value=\"" +
-            project.GetAdMobAppId() +
-            "\" />\n"
-            "\t</plugin>");
+  gd::String plugins = "";
+
+  for(gd::String const extensionName : project.GetUsedExtensions()) {
+    std::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(extensionName);
+
+    for (gd::DependencyMetadata dependency: extension->GetAllDependencies()) {
+      //if (dependency.GetDependencyType() == gd::DependencyTypes::cordova) {
+
+        plugins += "<plugin name=\"" + dependency.GetExportName();
+        if(dependency.GetVersion() != "-1") {
+          plugins += "\" spec=\"" + dependency.GetVersion();
+        }
+        plugins += "\">\n"; 
+
+        // In cordova all settings are considered a plugin variable
+        for (std::pair<gd::String, gd::PropertyDescriptor>& variable : dependency.GetAllExtraSettings()) {
+          if(variable.second.GetType() == "ProjectProperty") {
+            plugins += "\t\t<variable name=\"" + variable.first + "\" value=\"" + project["Get" + variable.second.GetValue()]() + "\" />\n";
+          } else {
+            plugins += "\t\t<variable name=\"" + variable.first + "\" value=\"" + variable.second.GetValue() + "\" />\n";
+          }
+        }
+
+        plugins += "\t</plugin>";
+      //}
+    }
   }
+
+  str = str.FindAndReplace(
+    "<!-- GDJS_PLUGINS -->",
+    plugins
+  );
 
   if (!fs.WriteToFile(exportDir + "/config.xml", str)) {
     lastError = "Unable to write Cordova config.xml file.";

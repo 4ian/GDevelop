@@ -85,43 +85,10 @@ export default [
             const imageResource = new gd.ImageResource();
             const projectPath = path.dirname(project.getProjectFile());
 
-            var onLoadPromise = function(obj) {
-              return new Promise((resolve, reject) => {
-                obj.onload = () => resolve(obj);
-                obj.onerror = reject;
-              });
-            };
+            imageResource.setFile(path.relative(projectPath, resourcePath));
+            imageResource.setName(path.relative(projectPath, resourcePath));
 
-            async function loadImage(src) {
-              let img = new Image();
-              let imgPromise = onLoadPromise(img);
-              img.src = src;
-              return await imgPromise;
-            }
-
-            let answer = true;
-            return  loadImage(resourcePath).then(img => {
-              if (img.width > 2048) {
-                console.warn('Img too big');
-
-                answer = Window.showConfirmDialog(
-                  i18n._(
-                    t`The selected image is more than 2048 pixels wide. The image may not be displayed on some devices. Do you really want to import the image?`
-                  )
-                );
-              } else {
-                console.log('Img correct');
-              }
-
-              if (answer) {
-                imageResource.setFile(path.relative(projectPath, img.src));
-                imageResource.setName(path.relative(projectPath, img.src));
-                return imageResource;
-              }else{
-
-                return null;
-              }
-            });
+            return imageResource;
           });
         });
       };

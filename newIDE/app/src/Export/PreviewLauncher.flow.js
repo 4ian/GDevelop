@@ -12,6 +12,7 @@ export type PreviewOptions = {|
 export type PreviewLauncherInterface = {
   launchPreview: (options: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
+  +getPreviewDebuggerServer: () => PreviewDebuggerServer,
 };
 
 /** The props that PreviewLauncher must support */
@@ -28,3 +29,30 @@ export type PreviewLauncherComponent = React.AbstractComponent<
   PreviewLauncherProps,
   PreviewLauncherInterface
 >;
+
+/** Each game connected to the debugger server is identified by a unique number. */
+export type DebuggerId = number;
+
+/** The callbacks for a debugger server used for previews. */
+export type PreviewDebuggerServerCallbacks = {|
+  onErrorReceived: (err: Error) => void,
+  onServerStateChanged: () => void,
+  onConnectionClosed: ({|
+    id: DebuggerId,
+    debuggerIds: Array<DebuggerId>,
+  |}) => void,
+  onConnectionOpened: ({|
+    id: DebuggerId,
+    debuggerIds: Array<DebuggerId>,
+  |}) => void,
+  onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
+|};
+
+/** Interface to run a debugger server for previews. */
+export type PreviewDebuggerServer = {|
+  startServer: () => void,
+  getServerState: () => 'started' | 'stopped',
+  getExistingDebuggerIds: () => Array<DebuggerId>,
+  sendMessage: (id: DebuggerId, message: Object) => void,
+  registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => () => void,
+|};

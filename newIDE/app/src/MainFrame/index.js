@@ -1655,6 +1655,9 @@ const MainFrame = (props: Props) => {
                 setPreviewedLayout,
                 onOpenDebugger: openDebugger,
                 onOpenExternalEvents: openExternalEvents,
+                previewDebuggerServer:
+                  _previewLauncher.current &&
+                  _previewLauncher.current.getPreviewDebuggerServer(),
                 onOpenLayout: name =>
                   openLayout(name, {
                     openEventsEditor: true,

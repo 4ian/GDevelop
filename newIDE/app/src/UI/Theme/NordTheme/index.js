@@ -120,7 +120,7 @@ const muiTheme = createMuiTheme({
       light: lighten(nord6, 0.05),
       main: nord6,
       dark: darken(nord6, 0.05),
-      contrastText: nord4,
+      contrastText: canvasColor,
     },
     text: {
       primary: nord6,

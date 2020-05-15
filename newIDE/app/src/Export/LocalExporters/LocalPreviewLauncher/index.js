@@ -11,6 +11,7 @@ import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import { findLocalIp } from './LocalIpFinder';
 import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
+import { LocalPreviewDebuggerServer } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -174,6 +175,8 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     });
   };
+
+  getPreviewDebuggerServer() { return LocalPreviewDebuggerServer; }
 
   _checkSubscription = () => {
     if (!this._subscriptionChecker) return true;

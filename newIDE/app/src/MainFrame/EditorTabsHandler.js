@@ -203,9 +203,17 @@ export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
     {
       ...state,
       editors: state.editors.filter(editorTab => {
-        const editorLayout =
-          editorTab.editorRef && editorTab.editorRef.getLayout();
-        return !editorLayout || editorLayout !== layout;
+        const editor = editorTab.editorRef;
+
+        if (editor instanceof EventsEditorContainer ||
+            editor instanceof ExternalEventsEditorContainer ||
+            editor instanceof ExternalLayoutEditorContainer ||
+            editor instanceof SceneEditorContainer ) {
+          const editorLayout = editor.getLayout();
+          return !editorLayout || editorLayout !== layout;
+        }
+
+        return true;
       }),
     },
     state.currentTab

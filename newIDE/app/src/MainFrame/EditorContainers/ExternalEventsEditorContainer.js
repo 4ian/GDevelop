@@ -61,7 +61,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     return project.getExternalEvents(projectItemName);
   }
 
-  getLayout() {
+  getLayout(): ?gdLayout {
     const { project } = this.props;
     if (!project) return null;
 

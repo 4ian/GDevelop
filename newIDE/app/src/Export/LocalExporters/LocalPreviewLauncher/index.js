@@ -150,44 +150,25 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  launchLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
+  launchPreview = (previewOptions: PreviewOptions): Promise<any> => {
+    const { project, layout, externalLayout } = previewOptions;
     if (!project || !layout) return Promise.reject();
 
     return this._prepareExporter().then(({ outputDir, exporter }) => {
       timeFunction(
         () => {
-          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+          if (externalLayout) {
+            exporter.exportExternalLayoutForPixiPreview(
+              project,
+              layout,
+              externalLayout,
+              outputDir
+            );
+          } else {
+            exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+          }
           exporter.delete();
-          this._openPreviewWindow(project, outputDir, options);
-        },
-        time => console.info(`Preview took ${time}ms`)
-      );
-    });
-  };
-
-  launchExternalLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
-    if (!project || !externalLayout) return Promise.reject();
-
-    return this._prepareExporter().then(({ outputDir, exporter }) => {
-      timeFunction(
-        () => {
-          exporter.exportExternalLayoutForPixiPreview(
-            project,
-            layout,
-            externalLayout,
-            outputDir
-          );
-          exporter.delete();
-          this._openPreviewWindow(project, outputDir, options);
+          this._openPreviewWindow(project, outputDir, previewOptions);
         },
         time => console.info(`Preview took ${time}ms`)
       );

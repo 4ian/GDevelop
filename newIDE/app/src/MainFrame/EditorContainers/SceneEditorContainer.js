@@ -9,7 +9,6 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -28,6 +27,20 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
 
     return true;
+  }
+
+  componentDidMount() {
+    if (this.props.isActive) {
+      const { projectItemName } = this.props;
+      this.props.setPreviewedLayout(projectItemName);
+    }
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps) {
+    if (!prevProps.isActive && this.props.isActive) {
+      const { projectItemName } = this.props;
+      this.props.setPreviewedLayout(projectItemName);
+    }
   }
 
   updateToolbar() {
@@ -68,8 +81,6 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return (
       <SceneEditor
         setToolbar={this.props.setToolbar}
-        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-        showPreviewButton={this.props.showPreviewButton}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}
         resourceExternalEditors={this.props.resourceExternalEditors}
@@ -79,11 +90,6 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         layout={layout}
         initialInstances={layout.getInitialInstances()}
         initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
-        onPreview={(options: PreviewOptions) =>
-          this.props.onLayoutPreview(project, layout, options)
-        }
-        previewButtonSettings={this.props.previewButtonSettings}
-        onOpenDebugger={this.props.onOpenDebugger}
         isActive={isActive}
       />
     );

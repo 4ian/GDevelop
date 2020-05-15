@@ -53,6 +53,28 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return true;
   }
 
+  componentDidMount() {
+    if (this.props.isActive) {
+      const { projectItemName } = this.props;
+      const layout = this.getLayout();
+      this.props.setPreviewedLayout(
+        layout ? layout.getName() : null,
+        projectItemName
+      );
+    }
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps) {
+    if (!prevProps.isActive && this.props.isActive) {
+      const { projectItemName } = this.props;
+      const layout = this.getLayout();
+      this.props.setPreviewedLayout(
+        layout ? layout.getName() : null,
+        projectItemName
+      );
+    }
+  }
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }
@@ -131,8 +153,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
         {layout && (
           <SceneEditor
             setToolbar={this.props.setToolbar}
-            showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-            showPreviewButton={this.props.showPreviewButton}
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
@@ -144,16 +164,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
             initialUiSettings={serializeToJSObject(
               externalLayout.getAssociatedSettings()
             )}
-            onPreview={options =>
-              this.props.onExternalLayoutPreview(
-                project,
-                layout,
-                externalLayout,
-                options
-              )
-            }
-            previewButtonSettings={this.props.previewButtonSettings}
-            onOpenDebugger={this.props.onOpenDebugger}
             onOpenMoreSettings={this.openLayoutChooser}
             isActive={isActive}
           />

@@ -5,7 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
-import Toolbar, { MainFrameToolbar } from './Toolbar';
+import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -60,7 +60,6 @@ import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
   type PreviewLauncherComponent,
-  type PreviewOptions,
 } from '../Export/PreviewLauncher.flow';
 import {
   type ResourceSource,
@@ -99,6 +98,7 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
+import { type PreviewState } from './PreviewState.flow';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -116,7 +116,6 @@ const styles = {
 export type State = {|
   createDialogOpen: boolean,
   openConfirmDialogOpen: boolean,
-  previewLoading: boolean,
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
   editorTabs: EditorTabsState,
@@ -127,9 +126,15 @@ export type State = {|
   saveToStorageProviderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
-  isPreviewFirstSceneOverriden: boolean,
-  previewFirstSceneName: string,
 |};
+
+const initialPreviewState: PreviewState = {
+  previewLayoutName: null,
+  previewExternalLayoutName: null,
+  isPreviewOverriden: false,
+  overridenPreviewLayoutName: null,
+  overridenPreviewExternalLayoutName: null,
+};
 
 export type Props = {
   integratedEditor?: boolean,
@@ -166,7 +171,6 @@ const MainFrame = (props: Props) => {
     ({
       createDialogOpen: false,
       openConfirmDialogOpen: false,
-      previewLoading: false,
       currentProject: null,
       currentFileMetadata: null,
       editorTabs: getEditorTabsInitialState(),
@@ -177,11 +181,9 @@ const MainFrame = (props: Props) => {
       saveToStorageProviderDialogOpen: false,
       eventsFunctionsExtensionsError: null,
       gdjsDevelopmentWatcherEnabled: false,
-      isPreviewFirstSceneOverriden: false,
-      previewFirstSceneName: '',
     }: State)
   );
-  const toolbar = React.useRef<?MainFrameToolbar>(null);
+  const toolbar = React.useRef<?Toolbar>(null);
   const _resourceSourceDialogs = React.useRef({});
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
@@ -214,6 +216,8 @@ const MainFrame = (props: Props) => {
   ] = React.useState<boolean>(false);
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
   const preferences = React.useContext(PreferencesContext);
+  const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
+  const [previewState, setPreviewState] = React.useState(initialPreviewState);
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -521,6 +525,7 @@ const MainFrame = (props: Props) => {
   const closeProject = (): Promise<void> => {
     const { eventsFunctionsExtensionsState } = props;
 
+    setPreviewState(initialPreviewState);
     return setState(state => {
       const { currentProject, editorTabs } = state;
 
@@ -536,13 +541,12 @@ const MainFrame = (props: Props) => {
         );
         currentProject.delete();
       }
+
       return {
         ...state,
         currentProject: null,
         currentFileMetadata: null,
         editorTabs: closeProjectTabs(editorTabs, currentProject),
-        isPreviewFirstSceneOverriden: false,
-        previewFirstSceneName: '',
       };
     }).then(() => {});
   };
@@ -556,13 +560,6 @@ const MainFrame = (props: Props) => {
     if (!toolbar.current) return;
 
     toolbar.current.setEditorToolbar(editorToolbar);
-  };
-
-  const togglePreviewFirstSceneOverride = () => {
-    setState(state => ({
-      ...state,
-      isPreviewFirstSceneOverriden: !state.isPreviewFirstSceneOverriden,
-    }));
   };
 
   const addLayout = () => {
@@ -872,75 +869,73 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const launchLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
+  const setPreviewedLayout = (
+    previewLayoutName: ?string,
+    previewExternalLayoutName?: ?string
   ) => {
-    if (!_previewLauncher.current) return;
-
-    setState(state => ({
-      ...state,
-      previewLoading: true,
-    }))
-      .then(state => {
-        let previewedLayout = layout;
-        const { previewFirstSceneName, isPreviewFirstSceneOverriden } = state;
-        if (previewFirstSceneName && isPreviewFirstSceneOverriden) {
-          if (project.hasLayoutNamed(previewFirstSceneName)) {
-            previewedLayout = project.getLayout(previewFirstSceneName);
-          }
-        }
-        if (_previewLauncher.current)
-          return _previewLauncher.current.launchLayoutPreview(
-            project,
-            previewedLayout,
-            options
-          );
-      })
-      .catch(error => {
-        console.error(
-          'Error caught while launching preview, this should never happen.',
-          error
-        );
-      })
-      .then(() => {
-        setState(state => ({
-          ...state,
-          previewLoading: false,
-        }));
-      });
-    autosaveProjectIfNeeded();
+    setPreviewState(
+      previewState =>
+        ({
+          ...previewState,
+          previewLayoutName,
+          previewExternalLayoutName,
+        }: PreviewState)
+    );
   };
 
-  const launchExternalLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
-  ) => {
-    if (!_previewLauncher.current) return;
+  const setPreviewOverride = ({
+    isPreviewOverriden,
+    overridenPreviewLayoutName,
+    overridenPreviewExternalLayoutName,
+  }) => {
+    setPreviewState(previewState => ({
+      ...previewState,
+      isPreviewOverriden,
+      overridenPreviewLayoutName,
+      overridenPreviewExternalLayoutName,
+    }));
+  };
 
-    setState(state => ({
-      ...state,
-      previewLoading: true,
-    })).then(state => {
-      if (_previewLauncher.current)
-        _previewLauncher.current
-          .launchExternalLayoutPreview(project, layout, externalLayout, options)
-          .catch(error => {
-            console.error(
-              'Error caught while launching preview, this should never happen.',
-              error
-            );
-          })
-          .then(() => {
-            setState(state => ({
-              ...state,
-              previewLoading: false,
-            }));
-          });
-    });
+  const launchPreview = (networkPreview: boolean) => {
+    if (!currentProject) return;
+    if (currentProject.getLayoutsCount() === 0) return;
+
+    setPreviewLoading(true);
+    const layoutName = previewState.isPreviewOverriden
+      ? previewState.overridenPreviewLayoutName
+      : previewState.previewLayoutName;
+    const externalLayoutName = previewState.isPreviewOverriden
+      ? previewState.overridenPreviewExternalLayoutName
+      : previewState.previewExternalLayoutName;
+
+    const layout =
+      layoutName && currentProject.hasLayoutNamed(layoutName)
+        ? currentProject.getLayout(layoutName)
+        : currentProject.getLayoutAt(0);
+    const externalLayout =
+      externalLayoutName &&
+      currentProject.hasExternalLayoutNamed(externalLayoutName)
+        ? currentProject.getExternalLayout(externalLayoutName)
+        : null;
+
+    if (_previewLauncher.current) {
+      return _previewLauncher.current
+        .launchPreview({
+          project: currentProject,
+          layout,
+          externalLayout,
+          networkPreview,
+        })
+        .catch(error => {
+          console.error(
+            'Error caught while launching preview, this should never happen.',
+            error
+          );
+        })
+        .then(() => {
+          setPreviewLoading(false);
+        });
+    }
     autosaveProjectIfNeeded();
   };
 
@@ -1364,14 +1359,6 @@ const MainFrame = (props: Props) => {
     setState(state => ({ ...state, openConfirmDialogOpen: open }));
   };
 
-  const _setPreviewFirstScene = (name: string) => {
-    setState(state => ({
-      ...state,
-      previewFirstSceneName: name,
-      isPreviewFirstSceneOverriden: true,
-    }));
-  };
-
   const _onChangeEditorTab = (value: number) => {
     setState(state => ({
       ...state,
@@ -1501,7 +1488,7 @@ const MainFrame = (props: Props) => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
   } = props;
-  const showLoader = isLoadingProject || state.previewLoading || props.loading;
+  const showLoader = isLoadingProject || previewLoading || props.loading;
 
   return (
     <div className="main-frame">
@@ -1604,6 +1591,25 @@ const MainFrame = (props: Props) => {
         requestUpdate={props.requestUpdate}
         simulateUpdateDownloaded={simulateUpdateDownloaded}
         simulateUpdateAvailable={simulateUpdateAvailable}
+        onOpenDebugger={() => {
+          openDebugger();
+          launchPreview(/*networkPreview=*/ false);
+        }}
+        onPreview={() => {
+          launchPreview(/*networkPreview=*/ false);
+        }}
+        onNetworkPreview={() => {
+          launchPreview(/*networkPreview=*/ true);
+        }}
+        showNetworkPreviewButton={
+          !!_previewLauncher.current &&
+          _previewLauncher.current.canDoNetworkPreview()
+        }
+        setPreviewOverride={setPreviewOverride}
+        isPreviewEnabled={
+          !!currentProject && currentProject.getLayoutsCount() > 0
+        }
+        previewState={previewState}
       />
       <ClosableTabs hideLabels={!!props.integratedEditor}>
         {getEditors(state.editorTabs).map((editorTab, id) => {
@@ -1636,22 +1642,7 @@ const MainFrame = (props: Props) => {
                 setToolbar: setEditorToolbar,
                 onChangeSubscription: () => openSubscriptionDialog(true),
                 projectItemName: editorTab.projectItemName,
-                previewButtonSettings: {
-                  isPreviewFirstSceneOverriden:
-                    state.isPreviewFirstSceneOverriden,
-                  togglePreviewFirstSceneOverride,
-                  previewFirstSceneName: state.previewFirstSceneName,
-                  useSceneAsPreviewFirstScene: () => {
-                    if (editorTab.projectItemName)
-                      _setPreviewFirstScene(editorTab.projectItemName);
-                  },
-                },
-                onLayoutPreview: launchLayoutPreview,
-                onExternalLayoutPreview: launchExternalLayoutPreview,
-                showPreviewButton: !!props.renderPreviewLauncher,
-                showNetworkPreviewButton:
-                  !!_previewLauncher.current &&
-                  _previewLauncher.current.canDoNetworkPreview(),
+                setPreviewedLayout,
                 onOpenDebugger: openDebugger,
                 onOpenExternalEvents: openExternalEvents,
                 onOpenLayout: name =>

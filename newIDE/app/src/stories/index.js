@@ -183,7 +183,6 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { emptyPreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 import TextField from '../UI/TextField';
 import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
 import {
@@ -2696,13 +2695,9 @@ storiesOf('EventsSheet', module)
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
           setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2725,13 +2720,9 @@ storiesOf('EventsSheet', module)
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
           setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -3888,7 +3879,6 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

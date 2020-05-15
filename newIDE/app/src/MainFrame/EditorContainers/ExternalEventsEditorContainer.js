@@ -110,9 +110,6 @@ export class ExternalEventsEditorContainer extends React.Component<
           <EventsSheet
             ref={editor => (this.editor = editor)}
             setToolbar={this.props.setToolbar}
-            showPreviewButton={this.props.showPreviewButton}
-            showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-            previewButtonSettings={this.props.previewButtonSettings}
             onOpenDebugger={this.props.onOpenDebugger}
             onOpenLayout={this.props.onOpenLayout}
             resourceSources={this.props.resourceSources}
@@ -128,9 +125,6 @@ export class ExternalEventsEditorContainer extends React.Component<
             globalObjectsContainer={project}
             objectsContainer={layout}
             events={externalEvents.getEvents()}
-            onPreview={options =>
-              this.props.onLayoutPreview(project, layout, options)
-            }
             onOpenSettings={this.openLayoutChooser}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
           />

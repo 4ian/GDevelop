@@ -205,10 +205,12 @@ export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
       editors: state.editors.filter(editorTab => {
         const editor = editorTab.editorRef;
 
-        if (editor instanceof EventsEditorContainer ||
-            editor instanceof ExternalEventsEditorContainer ||
-            editor instanceof ExternalLayoutEditorContainer ||
-            editor instanceof SceneEditorContainer ) {
+        if (
+          editor instanceof EventsEditorContainer ||
+          editor instanceof ExternalEventsEditorContainer ||
+          editor instanceof ExternalLayoutEditorContainer ||
+          editor instanceof SceneEditorContainer
+        ) {
           const editorLayout = editor.getLayout();
           return !editorLayout || editorLayout !== layout;
         }

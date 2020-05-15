@@ -1,27 +1,16 @@
 // @flow
 import * as React from 'react';
 
-export type PreviewOptions =
-  | {|
-      networkPreview?: boolean,
-    |}
-  | {||};
+export type PreviewOptions = {|
+  project: gdProject,
+  layout: gdLayout,
+  externalLayout: ?gdExternalLayout,
+  networkPreview: boolean,
+|};
 
 /** The functions that PreviewLauncher must expose on their class */
 export type PreviewLauncherInterface = {
-  launchLayoutPreview: (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
-  ) => Promise<any>,
-
-  launchExternalLayoutPreview: (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
-  ) => Promise<any>,
-
+  launchPreview: (options: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
 };
 

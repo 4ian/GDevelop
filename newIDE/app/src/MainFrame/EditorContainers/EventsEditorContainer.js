@@ -15,6 +15,20 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     return nextProps.isActive;
   }
 
+  componentDidMount() {
+    if (this.props.isActive) {
+      const layout = this.getLayout();
+      this.props.setPreviewedLayout(layout ? layout.getName() : null);
+    }
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps) {
+    if (!prevProps.isActive && this.props.isActive) {
+      const layout = this.getLayout();
+      this.props.setPreviewedLayout(layout ? layout.getName() : null);
+    }
+  }
+
   getProject(): ?gdProject {
     return this.props.project;
   }
@@ -46,9 +60,6 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       <EventsSheet
         ref={editor => (this.editor = editor)}
         setToolbar={this.props.setToolbar}
-        showPreviewButton={this.props.showPreviewButton}
-        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-        previewButtonSettings={this.props.previewButtonSettings}
         onOpenDebugger={this.props.onOpenDebugger}
         onOpenLayout={this.props.onOpenLayout}
         resourceSources={this.props.resourceSources}
@@ -64,9 +75,6 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         globalObjectsContainer={project}
         objectsContainer={layout}
         events={layout.getEvents()}
-        onPreview={options =>
-          this.props.onLayoutPreview(project, layout, options)
-        }
         onOpenExternalEvents={this.props.onOpenExternalEvents}
       />
     );

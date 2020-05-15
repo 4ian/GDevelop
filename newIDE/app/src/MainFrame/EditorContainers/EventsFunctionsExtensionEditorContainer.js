@@ -5,7 +5,6 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import { emptyPreviewButtonSettings } from '../Toolbar/PreviewButtons';
 
 const styles = {
   container: {
@@ -103,7 +102,6 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onBehaviorEdited={this._onBehaviorEdited}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </div>
     );

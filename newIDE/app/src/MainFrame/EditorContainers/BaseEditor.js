@@ -6,7 +6,6 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
-import { type PreviewButtonSettings } from '../Toolbar/PreviewButtons';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 
 export type RenderEditorContainerProps = {|
@@ -26,19 +25,9 @@ export type RenderEditorContainerProps = {|
   unsavedChanges: ?UnsavedChanges,
 
   // Preview:
-  showNetworkPreviewButton: boolean,
-  showPreviewButton: boolean,
-  previewButtonSettings: PreviewButtonSettings,
-  onLayoutPreview: (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
-  ) => void,
-  onExternalLayoutPreview: (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
+  setPreviewedLayout: (
+    layoutName: ?string,
+    externalLayoutName?: ?string
   ) => void,
 
   // Opening other editors:

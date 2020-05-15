@@ -12,7 +12,6 @@ import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu from '../UI/Menu/ContextMenu';
-import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type HistoryState,
@@ -81,7 +80,6 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 const gd = global.gd;
 
 type Props = {|
@@ -91,10 +89,6 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
-  showPreviewButton: boolean,
-  showNetworkPreviewButton: boolean,
-  previewButtonSettings: PreviewButtonSettings,
-  onPreview: (options: PreviewOptions) => void,
   onOpenDebugger: () => void,
   onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
@@ -112,6 +106,7 @@ type Props = {|
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
+
 type State = {|
   history: HistoryState,
 
@@ -251,15 +246,6 @@ export default class EventsSheet extends React.Component<Props, State> {
         }}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
-        showPreviewButton={this.props.showPreviewButton}
-        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-        onPreview={() => this.props.onPreview({})}
-        previewButtonSettings={this.props.previewButtonSettings}
-        onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
-        onOpenDebugger={() => {
-          this.props.onOpenDebugger();
-          this.props.onPreview({});
-        }}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}

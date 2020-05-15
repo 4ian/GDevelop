@@ -68,59 +68,24 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     });
   };
 
-  launchLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
+  launchPreview = (previewOptions: PreviewOptions): Promise<any> => {
+    const { project, layout, externalLayout } = previewOptions;
     this.setState({
       error: null,
     });
 
     return this._prepareExporter()
       .then(({ exporter, outputDir, browserS3FileSystem }) => {
-        exporter.exportLayoutForPixiPreview(project, layout, outputDir);
-        exporter.delete();
-        return browserS3FileSystem
-          .uploadPendingObjects()
-          .then(() => {
-            const finalUrl = outputDir + '/index.html';
-            return this._openPreviewWindow(project, finalUrl);
-          })
-          .then(({ url, windowObjectReference }) => {
-            if (!windowObjectReference) {
-              this.setState({
-                showPreviewLinkDialog: true,
-                url,
-              });
-            }
-          });
-      })
-      .catch((error: Error) => {
-        this.setState({
-          error,
-        });
-      });
-  };
-
-  launchExternalLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
-    this.setState({
-      error: null,
-    });
-
-    return this._prepareExporter()
-      .then(({ exporter, outputDir, browserS3FileSystem }) => {
-        exporter.exportExternalLayoutForPixiPreview(
-          project,
-          layout,
-          externalLayout,
-          outputDir
-        );
+        if (externalLayout) {
+          exporter.exportExternalLayoutForPixiPreview(
+            project,
+            layout,
+            externalLayout,
+            outputDir
+          );
+        } else {
+          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+        }
         exporter.delete();
         return browserS3FileSystem
           .uploadPendingObjects()

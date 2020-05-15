@@ -23,6 +23,14 @@ module.exports = {
       'MIT'
     );
 
+    extension.registerProperty(
+      _("AdMob App ID"),
+      _("The AdMob App ID"),
+      "string",
+      "ca-app-pub-",
+      "ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY"
+    );
+
     extension.addDependency()
       .setName("AdMob Cordova Extension")
       .setDependencyType(gd.DependencyTypes.cordova)

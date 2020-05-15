@@ -1242,6 +1242,8 @@ interface PlatformExtension {
 
     [Const, Ref] DependencyMetadata AddDependency();
 
+
+
     [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString defaultName,
@@ -1259,6 +1261,12 @@ interface PlatformExtension {
         gdObject instance);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
+
+    [Ref] PropertyDescriptor RegisterProperty([Const] DOMString name,
+                                           [Const] DOMString description,
+                                           [Const] DOMString type,
+                                           [Const] DOMString value,
+                                           [Const] DOMString hint);
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
@@ -1288,6 +1296,10 @@ interface PlatformExtension {
     [Ref] MapStringInstructionMetadata GetAllConditionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
+    
+    [Ref] PropertyDescriptor GetProperty([Const] DOMString propertyName);
+    [Ref] MapStringPropertyDescriptor GetAllProperties();
+
     [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();

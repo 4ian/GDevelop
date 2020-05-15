@@ -615,6 +615,15 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetStringAttribute("macExecutableFilename");
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
+  
+  SerializerElement& extensionProperties = propElement.GetChild("extensionProperties");
+  for(std::shared_ptr<gd::PlatformExtension> extension : GetCurrentPlatform().GetAllPlatformExtensions()) {
+    SerializerElement& extensionPropElement = extensionProperties.GetChild(extension->GetFullName());
+    for(std::pair<gd::String, std::shared_ptr<gd::SerializerElement>> property : extensionPropElement.GetAllChildren()) {
+      extension->GetProperty(property.first).UnserializeFrom(*property.second);
+    }
+  }
+
 #endif
 
   const SerializerElement& extensionsElement =
@@ -878,6 +887,15 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
   propElement.SetAttribute("macExecutableFilename", macExecutableFilename);
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
+
+  SerializerElement& extensionProperties = propElement.AddChild("extensionProperties");
+
+  for(std::shared_ptr<gd::PlatformExtension> extension : GetCurrentPlatform().GetAllPlatformExtensions()) {
+    SerializerElement& extensionPropElement = extensionProperties.AddChild(extension->GetFullName());
+    for(std::pair<gd::String, gd::PropertyDescriptor> property : extension->GetAllProperties()) {
+      property.second.SerializeTo(extensionPropElement.AddChild(property.first));
+    }
+  }
 
   SerializerElement& extensionsElement = propElement.AddChild("extensions");
   extensionsElement.ConsiderAsArrayOf("extension");

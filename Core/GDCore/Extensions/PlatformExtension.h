@@ -230,6 +230,28 @@ class GD_CORE_API PlatformExtension {
                               std::shared_ptr<gd::BaseEvent> instance);
 
   /**
+   * \brief Adds a property to the Extension.
+   * \param name The internal name of the property (to get it later).
+   * \param description The description of the property.
+   * \param type The type of the property. Supported ones are "string", "number" and "boolean".
+   * \param value The default Value.
+   * \param hint The hint (example value) shown to the user.
+   */
+  gd::PropertyDescriptor& RegisterProperty(const gd::String& name,
+                                           const gd::String& description,
+                                           const gd::String& type,
+                                           const gd::String& value,
+                                           const gd::String& hint
+  ) {
+    extensionProperties[name] = gd::PropertyDescriptor()
+      .SetType(type)
+      .SetValue(value)
+      .SetDescription(description)
+      .SetLabel(hint);
+    return extensionProperties[name];
+  };
+
+  /**
    * \brief Return the name extension user friendly name.
    */
   const gd::String& GetFullName() const { return fullname; }
@@ -446,6 +468,21 @@ class GD_CORE_API PlatformExtension {
    * generator.
    */
   void StripUnimplementedInstructionsAndExpressions();
+
+  /**
+   * \brief Get an extension property
+   * \param propertyName The name of the property
+   */
+  gd::PropertyDescriptor& GetProperty(const gd::String& propertyName) {
+    return extensionProperties[propertyName];
+  };
+
+  /**
+   * \brief Get all extension's property
+   */
+  std::map<gd::String, gd::PropertyDescriptor>& GetAllProperties() {
+    return extensionProperties;
+  }
 #endif
 
   /**
@@ -491,6 +528,7 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
   std::vector<gd::DependencyMetadata> extensionDependencies;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
+  std::map<gd::String, gd::PropertyDescriptor> extensionProperties;
 #endif
 
   ObjectMetadata badObjectMetadata;

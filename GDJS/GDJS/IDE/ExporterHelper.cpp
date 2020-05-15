@@ -283,29 +283,27 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
   gd::String plugins = "";
 
-  for(gd::String const extensionName : project.GetUsedExtensions()) {
-    std::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(extensionName);
+  for(std::shared_ptr<gd::PlatformExtension> extension : project.GetCurrentPlatform().GetAllPlatformExtensions()) { //TODO Add a way to select only used Extensions
+    for (gd::DependencyMetadata dependencies: extension->GetAllDependencies()) {
+      if (dependencies.GetDependencyType() == gd::DependencyTypes::cordova) {
 
-    for (gd::DependencyMetadata dependency: extension->GetAllDependencies()) {
-      //if (dependency.GetDependencyType() == gd::DependencyTypes::cordova) {
-
-        plugins += "<plugin name=\"" + dependency.GetExportName();
-        if(dependency.GetVersion() != "-1") {
-          plugins += "\" spec=\"" + dependency.GetVersion();
+        plugins += "<plugin name=\"" + dependencies.GetExportName();
+        if(dependencies.GetVersion() != "-1") {
+          plugins += "\" spec=\"" + dependencies.GetVersion();
         }
         plugins += "\">\n"; 
 
         // In cordova all settings are considered a plugin variable
-        for (std::pair<gd::String, gd::PropertyDescriptor>& variable : dependency.GetAllExtraSettings()) {
-          if(variable.second.GetType() == "ProjectProperty") {
-            plugins += "\t\t<variable name=\"" + variable.first + "\" value=\"" + project["Get" + variable.second.GetValue()]() + "\" />\n";
-          } else {
+        for (std::pair<const gd::String, gd::PropertyDescriptor>& dependency : dependencies.GetAllExtraSettings()) {
+          if (dependency.second.GetType() == "ExtensionProperty") {
             plugins += "\t\t<variable name=\"" + variable.first + "\" value=\"" + variable.second.GetValue() + "\" />\n";
+          } else {
+            plugins += "\t\t<variable name=\"" + variable.first + "\" value=\"" + extension.GetProperty(variable.second.GetValue()) + "\" />\n";
           }
         }
 
         plugins += "\t</plugin>";
-      //}
+      }
     }
   }
 

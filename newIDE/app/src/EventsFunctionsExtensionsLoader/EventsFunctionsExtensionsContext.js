@@ -26,7 +26,7 @@ const defaultState = {
     Promise.reject(new Error('Use a provider')),
   getEventsFunctionsExtensionWriter: () => null,
   getEventsFunctionsExtensionOpener: () => null,
-  ensureLoadFinished: () => Promise.reject(new Error('Use a provider'))
+  ensureLoadFinished: () => Promise.reject(new Error('Use a provider')),
 };
 
 const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(

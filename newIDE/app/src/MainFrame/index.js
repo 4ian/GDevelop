@@ -897,6 +897,8 @@ const MainFrame = (props: Props) => {
   };
 
   const launchPreview = (networkPreview: boolean) => {
+    const { eventsFunctionsExtensionsState } = props;
+
     if (!currentProject) return;
     if (currentProject.getLayoutsCount() === 0) return;
 
@@ -918,14 +920,18 @@ const MainFrame = (props: Props) => {
         ? currentProject.getExternalLayout(externalLayoutName)
         : null;
 
-    if (_previewLauncher.current) {
-      return _previewLauncher.current
-        .launchPreview({
-          project: currentProject,
-          layout,
-          externalLayout,
-          networkPreview,
-        })
+    const previewLauncher = _previewLauncher.current;
+    if (previewLauncher) {
+      return eventsFunctionsExtensionsState
+        .ensureLoadFinished()
+        .then(() =>
+          previewLauncher.launchPreview({
+            project: currentProject,
+            layout,
+            externalLayout,
+            networkPreview,
+          })
+        )
         .catch(error => {
           console.error(
             'Error caught while launching preview, this should never happen.',

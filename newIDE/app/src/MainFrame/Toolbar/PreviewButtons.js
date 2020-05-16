@@ -1,4 +1,5 @@
 // @flow
+import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import ToolbarIcon from '../../UI/ToolbarIcon';
@@ -47,76 +48,91 @@ export default function PreviewButtons({
     />
   );
 
-  // TOOD: i18n
   return (
-    <React.Fragment>
-      <ElementWithMenu
-        element={previewIcon}
-        openMenuWithSecondaryClick
-        buildMenuTemplate={() => [
-          ...(previewState.overridenPreviewLayoutName
-            ? [
+    <I18n>
+      {({ i18n }) => (
+        <React.Fragment>
+          <ElementWithMenu
+            element={previewIcon}
+            openMenuWithSecondaryClick
+            buildMenuTemplate={() => [
+              ...(previewState.overridenPreviewLayoutName
+                ? [
+                    {
+                      type: 'checkbox',
+                      label: previewState.overridenPreviewExternalLayoutName
+                        ? i18n._(
+                            t`Start all previews from external layout ${
+                              previewState.overridenPreviewExternalLayoutName
+                            }`
+                          )
+                        : i18n._(
+                            t`Start all previews from scene ${
+                              previewState.overridenPreviewLayoutName
+                            }`
+                          ),
+                      checked: previewState.isPreviewOverriden,
+                      click: () =>
+                        setPreviewOverride({
+                          isPreviewOverriden: !previewState.isPreviewOverriden,
+                          overridenPreviewLayoutName:
+                            previewState.overridenPreviewLayoutName,
+                          overridenPreviewExternalLayoutName:
+                            previewState.overridenPreviewExternalLayoutName,
+                        }),
+                    },
+                    { type: 'separator' },
+                  ]
+                : []),
+              {
+                label: previewState.previewExternalLayoutName
+                  ? i18n._(
+                      t`Use this external layout inside this scene to start all previews`
+                    )
+                  : i18n._(t`Use this scene to start all previews`),
+                click: () =>
+                  setPreviewOverride({
+                    isPreviewOverriden: true,
+                    overridenPreviewLayoutName: previewState.previewLayoutName,
+                    overridenPreviewExternalLayoutName:
+                      previewState.previewExternalLayoutName,
+                  }),
+                enabled:
+                  previewState.previewLayoutName !==
+                    previewState.overridenPreviewLayoutName ||
+                  previewState.previewExternalLayoutName !==
+                    previewState.overridenPreviewExternalLayoutName,
+              },
+            ]}
+          />
+          {showNetworkPreviewButton && (
+            <ElementWithMenu
+              element={
+                <ToolbarIcon
+                  disabled={!isPreviewEnabled}
+                  src="res/ribbon_default/bug32.png"
+                  tooltip={t`Advanced preview options (debugger, network preview...)`}
+                />
+              }
+              buildMenuTemplate={() => [
                 {
-                  type: 'checkbox',
-                  label: previewState.overridenPreviewExternalLayoutName
-                    ? 'Start all previews from external layout ' +
-                      previewState.overridenPreviewExternalLayoutName
-                    : 'Start all previews from scene ' +
-                      previewState.overridenPreviewLayoutName,
-                  checked: previewState.isPreviewOverriden,
-                  click: () =>
-                    setPreviewOverride({
-                      isPreviewOverriden: !previewState.isPreviewOverriden,
-                      overridenPreviewLayoutName:
-                        previewState.overridenPreviewLayoutName,
-                      overridenPreviewExternalLayoutName:
-                        previewState.overridenPreviewExternalLayoutName,
-                    }),
+                  label: i18n._(
+                    t`Start Network Preview (Preview over WiFi/LAN)`
+                  ),
+                  click: () => onNetworkPreview(),
                 },
                 { type: 'separator' },
-              ]
-            : []),
-          {
-            label: previewState.previewExternalLayoutName
-              ? 'Use this external layout inside this scene to start all previews'
-              : 'Use this scene to start all previews',
-            click: () =>
-              setPreviewOverride({
-                isPreviewOverriden: true,
-                overridenPreviewLayoutName: previewState.previewLayoutName,
-                overridenPreviewExternalLayoutName:
-                  previewState.previewExternalLayoutName,
-              }),
-            enabled:
-              previewState.previewLayoutName !==
-                previewState.overridenPreviewLayoutName ||
-              previewState.previewExternalLayoutName !==
-                previewState.overridenPreviewExternalLayoutName,
-          },
-        ]}
-      />
-      {showNetworkPreviewButton && (
-        <ElementWithMenu
-          element={
-            <ToolbarIcon
-              disabled={!isPreviewEnabled}
-              src="res/ribbon_default/bug32.png"
-              tooltip={t`Advanced preview options (debugger, network preview...)`}
+                {
+                  label: i18n._(
+                    t`Start Preview with Debugger and Performance Profiler`
+                  ),
+                  click: () => onOpenDebugger(),
+                },
+              ]}
             />
-          }
-          buildMenuTemplate={() => [
-            {
-              label: 'Network preview (Preview over WiFi/LAN)',
-              click: () => onNetworkPreview(),
-            },
-            { type: 'separator' },
-            {
-              label: 'Preview with debugger and performance profiler',
-              click: () => onOpenDebugger(),
-            },
-          ]}
-        />
+          )}
+        </React.Fragment>
       )}
-    </React.Fragment>
+    </I18n>
   );
 }

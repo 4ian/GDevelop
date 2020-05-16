@@ -41,6 +41,7 @@ import {
   type EditorTabsState,
   type EditorTab,
   getEventsFunctionsExtensionEditor,
+  notifyPreviewWillStart,
 } from './EditorTabsHandler';
 import { timePromise } from '../Utils/TimeFunction';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -903,6 +904,9 @@ const MainFrame = (props: Props) => {
     if (currentProject.getLayoutsCount() === 0) return;
 
     setPreviewLoading(true);
+
+    notifyPreviewWillStart(state.editorTabs);
+
     const layoutName = previewState.isPreviewOverriden
       ? previewState.overridenPreviewLayoutName
       : previewState.previewLayoutName;

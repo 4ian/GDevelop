@@ -112,44 +112,41 @@ export const changeCurrentTab = (
   };
 };
 
-export const closeAllEditorTabs = (state: EditorTabsState): EditorTabsState => {
+export const closeTabsExceptIf = (
+  state: EditorTabsState,
+  keepPredicate: (editorTab: EditorTab) => boolean
+) => {
+  const currentEditorTab = getCurrentTab(state);
+  const remainingEditors = state.editors.filter(keepPredicate);
   return changeCurrentTab(
     {
       ...state,
-      editors: state.editors.filter(editorTab => !editorTab.closable),
+      editors: remainingEditors,
     },
-    0
+    // Keep the focus on the current editor tab, or if it was closed
+    // go back to the first tab.
+    remainingEditors.indexOf(currentEditorTab) || 0
   );
+};
+
+export const closeAllEditorTabs = (state: EditorTabsState): EditorTabsState => {
+  return closeTabsExceptIf(state, editorTab => !editorTab.closable);
 };
 
 export const closeEditorTab = (
   state: EditorTabsState,
   chosenEditorTab: EditorTab
 ): EditorTabsState => {
-  const chosenEditorTabId = state.editors.indexOf(chosenEditorTab);
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(editorTab => editorTab !== chosenEditorTab),
-    },
-    chosenEditorTabId >= state.currentTab
-      ? state.currentTab
-      : state.currentTab - 1
-  );
+  return closeTabsExceptIf(state, editorTab => editorTab !== chosenEditorTab);
 };
 
 export const closeOtherEditorTabs = (
   state: EditorTabsState,
   chosenEditorTab: EditorTab
 ): EditorTabsState => {
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(
-        editorTab => !editorTab.closable || editorTab === chosenEditorTab
-      ),
-    },
-    state.currentTab
+  return closeTabsExceptIf(
+    state,
+    editorTab => !editorTab.closable || editorTab === chosenEditorTab
   );
 };
 
@@ -169,20 +166,14 @@ export const closeProjectTabs = (
   state: EditorTabsState,
   project: ?gdProject
 ) => {
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(editorTab => {
-        const editorProject =
-          editorTab.editorRef && editorTab.editorRef.getProject();
-        return !editorProject || editorProject !== project;
-      }),
-    },
-    state.currentTab
-  );
+  return closeTabsExceptIf(state, editorTab => {
+    const editorProject =
+      editorTab.editorRef && editorTab.editorRef.getProject();
+    return !editorProject || editorProject !== project;
+  });
 };
 
-/*
+/**
  * Ask the editors to persist their UI settings
  * to the project.
  */
@@ -198,98 +189,88 @@ export const saveUiSettings = (state: EditorTabsState) => {
   });
 };
 
+/**
+ * Notify the editors that the preview will start. This gives a chance
+ * to editors with changes to commit them (like modified extensions).
+ */
+export const notifyPreviewWillStart = (state: EditorTabsState) => {
+  state.editors.forEach(editorTab => {
+    const editor = editorTab.editorRef;
+
+    if (editor instanceof EventsFunctionsExtensionEditorContainer) {
+      editor.previewWillStart();
+    }
+  });
+};
+
 export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(editorTab => {
-        const editor = editorTab.editorRef;
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
 
-        if (
-          editor instanceof EventsEditorContainer ||
-          editor instanceof ExternalEventsEditorContainer ||
-          editor instanceof ExternalLayoutEditorContainer ||
-          editor instanceof SceneEditorContainer
-        ) {
-          const editorLayout = editor.getLayout();
-          return !editorLayout || editorLayout !== layout;
-        }
+    if (
+      editor instanceof EventsEditorContainer ||
+      editor instanceof ExternalEventsEditorContainer ||
+      editor instanceof ExternalLayoutEditorContainer ||
+      editor instanceof SceneEditorContainer
+    ) {
+      const editorLayout = editor.getLayout();
+      return !editorLayout || editorLayout !== layout;
+    }
 
-        return true;
-      }),
-    },
-    state.currentTab
-  );
+    return true;
+  });
 };
 
 export const closeExternalLayoutTabs = (
   state: EditorTabsState,
   externalLayout: gdExternalLayout
 ) => {
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(editorTab => {
-        const editor = editorTab.editorRef;
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
 
-        if (editor instanceof ExternalLayoutEditorContainer) {
-          return (
-            !editor.getExternalLayout() ||
-            editor.getExternalLayout() !== externalLayout
-          );
-        }
+    if (editor instanceof ExternalLayoutEditorContainer) {
+      return (
+        !editor.getExternalLayout() ||
+        editor.getExternalLayout() !== externalLayout
+      );
+    }
 
-        return true;
-      }),
-    },
-    state.currentTab
-  );
+    return true;
+  });
 };
 
 export const closeExternalEventsTabs = (
   state: EditorTabsState,
   externalEvents: gdExternalEvents
 ) => {
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(editorTab => {
-        const editor = editorTab.editorRef;
-        if (editor instanceof ExternalEventsEditorContainer) {
-          return (
-            !editor.getExternalEvents() ||
-            editor.getExternalEvents() !== externalEvents
-          );
-        }
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof ExternalEventsEditorContainer) {
+      return (
+        !editor.getExternalEvents() ||
+        editor.getExternalEvents() !== externalEvents
+      );
+    }
 
-        return true;
-      }),
-    },
-    state.currentTab
-  );
+    return true;
+  });
 };
 
 export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(editorTab => {
-        const editor = editorTab.editorRef;
-        if (editor instanceof EventsFunctionsExtensionEditorContainer) {
-          return (
-            !editor.getEventsFunctionsExtension() ||
-            editor.getEventsFunctionsExtension() !== eventsFunctionsExtension
-          );
-        }
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof EventsFunctionsExtensionEditorContainer) {
+      return (
+        !editor.getEventsFunctionsExtension() ||
+        editor.getEventsFunctionsExtension() !== eventsFunctionsExtension
+      );
+    }
 
-        return true;
-      }),
-    },
-    state.currentTab
-  );
+    return true;
+  });
 };
 
 export const getEventsFunctionsExtensionEditor = (

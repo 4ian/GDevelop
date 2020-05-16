@@ -43,7 +43,19 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   componentDidUpdate(prevProps: *) {
+    // Ensure that the editor will trigger the
+    // reload/regeneration of extensions when the user
+    // is focusing another editor
     if (prevProps.isActive && !this.props.isActive) {
+      this.props.onLoadEventsFunctionsExtensions();
+    }
+  }
+
+  componentWillUnmount() {
+    // Ensure that a closed editor will still trigger the
+    // reload/regeneration of extensions, as changes can have
+    // been made inside before it's closed.
+    if (this.props.isActive) {
       this.props.onLoadEventsFunctionsExtensions();
     }
   }
@@ -53,6 +65,16 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // as a change in the properties of a behavior can create changes
     // in actions/conditions/expressions to manipulate these properties.
     this.props.onLoadEventsFunctionsExtensions();
+  };
+
+  previewWillStart = () => {
+    // Immediately trigger the reload/regeneration of extensions
+    // if a preview is about to start, as changes chan have been made
+    // inside. The preview is responsible for waiting for extensions
+    // to be loaded before starting.
+    if (this.props.isActive) {
+      this.props.onLoadEventsFunctionsExtensions();
+    }
   };
 
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {

@@ -1,6 +1,9 @@
 const makeTestRuntimeScene = () => {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
+    resources: {
+      resources: [],
+    },
     properties: { windowWidth: 800, windowHeight: 600 },
   });
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);

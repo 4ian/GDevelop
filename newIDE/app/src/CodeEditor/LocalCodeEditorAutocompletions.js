@@ -19,7 +19,7 @@ export const setupAutocompletions = (monaco: any) => {
       }
 
       filenames.forEach(filename => {
-        if (filename.endsWith('.js')) {
+        if (filename.endsWith('.js') || filename.endsWith('.ts')) {
           const fullPath = path.join(folderPath, filename);
           fs.readFile(fullPath, 'utf8', (fileError, content) => {
             if (fileError) {
@@ -41,10 +41,44 @@ export const setupAutocompletions = (monaco: any) => {
 
   findGDJS().then(({ gdjsRoot }) => {
     const runtimePath = path.join(gdjsRoot, 'Runtime');
+    const runtimeTypesPath = path.join(gdjsRoot, 'Runtime', 'types');
+    const runtimeLibsPath = path.join(gdjsRoot, 'Runtime', 'libs');
+    const runtimePixiRenderersPath = path.join(
+      gdjsRoot,
+      'Runtime',
+      'pixi-renderers'
+    );
+    const runtimeCocosRenderersPath = path.join(
+      gdjsRoot,
+      'Runtime',
+      'cocos-renderers'
+    );
+    const runtimeHowlerSoundManagerPath = path.join(
+      gdjsRoot,
+      'Runtime',
+      'howler-sound-manager'
+    );
+    const runtimeCocosSoundManagerPath = path.join(
+      gdjsRoot,
+      'Runtime',
+      'cocos-sound-manager'
+    );
+    const runtimeFontfaceobserverFontManagerPath = path.join(
+      gdjsRoot,
+      'Runtime',
+      'fontfaceobserver-font-manager'
+    );
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');
 
     importAllJsFilesFromFolder(runtimePath);
+    importAllJsFilesFromFolder(runtimeTypesPath);
+    importAllJsFilesFromFolder(runtimeLibsPath);
+    importAllJsFilesFromFolder(runtimePixiRenderersPath);
+    importAllJsFilesFromFolder(runtimeCocosRenderersPath);
+    importAllJsFilesFromFolder(runtimeHowlerSoundManagerPath);
+    importAllJsFilesFromFolder(runtimeCocosSoundManagerPath);
+    importAllJsFilesFromFolder(runtimeFontfaceobserverFontManagerPath);
     importAllJsFilesFromFolder(eventToolsPath);
     fs.readdir(extensionsPath, (error: ?Error, folderNames: Array<string>) => {
       if (error) {

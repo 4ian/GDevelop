@@ -1,6 +1,7 @@
-var shell = require('shelljs');
-var https = require('follow-redirects').https;
-var fs = require('fs');
+const shell = require('shelljs');
+const https = require('follow-redirects').https;
+const fs = require('fs');
+const path = require('path');
 
 const downloadFile = (url, filePath) =>
   new Promise((resolve, reject) => {
@@ -26,10 +27,9 @@ const downloadFile = (url, filePath) =>
     });
   });
 
-var sourceJsFile = '../../../Binaries/embuild/GDevelop.js/libGD.js';
-var sourceJsMemFile = '../../../Binaries/embuild/GDevelop.js/libGD.js.mem';
-var destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
-var alreadyHasLibGdJs =
+const sourceDirectory = '../../../Binaries/embuild/GDevelop.js';
+const destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
+const alreadyHasLibGdJs =
   shell.test('-f', '../public/libGD.js') &&
   shell.test('-f', '../public/libGD.js.mem') &&
   shell.test('-f', destinationTestDirectory + '/index.js') &&
@@ -39,21 +39,55 @@ if (shell.mkdir('-p', destinationTestDirectory).stderr) {
   shell.echo('❌ Error while creating node_modules folder for libGD.js');
 }
 
-if (shell.test('-f', sourceJsFile) && shell.test('-f', sourceJsMemFile)) {
-  // Copy the file built locally
+if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
+  // Copy the files built locally
+  const sourceJsFile = path.join(sourceDirectory, 'libGD.js');
+  const sourceWasmFile = path.join(sourceDirectory, 'libGD.wasm');
+  const sourceJsMemFile = path.join(sourceDirectory, 'libGD.js.mem');
+
+  // Clean any artifact already present
+  shell.rm('-f', '../public/libGD.js.mem');
+  shell.rm('-f', '../public/libGD.wasm');
+  shell.rm('-f', destinationTestDirectory + '/libGD.js.mem');
+  shell.rm('-f', destinationTestDirectory + '/libGD.wasm');
+
+  const copyLibGdJsFile = filename => {
+    if (
+      !shell.cp(filename, '../public').stderr &&
+      !shell.cp(filename, destinationTestDirectory + '/index.js').stderr
+    ) {
+      shell.echo(
+        `✅ Copied ${filename} from Binaries/embuild/GDevelop.js to public and node_modules folder`
+      );
+    } else {
+      shell.echo(
+        `❌ Error while copying ${filename} from Binaries/embuild/GDevelop.js`
+      );
+    }
+  };
+
+  // Copy the wasm or memory file.
+  if (shell.test('-f', sourceWasmFile)) {
+    copyLibGdJsFile(sourceWasmFile);
+  } else if (shell.test('-f', sourceJsMemFile)) {
+    copyLibGdJsFile(sourceJsMemFile);
+  } else {
+    shell.echo(
+      `❌ At least libGD.js.mem or libGD.wasm should exist in ${sourceDirectory}.`
+    );
+  }
+
+  // Copy the JS file.
   if (
     !shell.cp(sourceJsFile, '../public').stderr &&
-    !shell.cp(sourceJsFile, destinationTestDirectory + '/index.js').stderr &&
-    !shell.cp(sourceJsMemFile, '../public').stderr &&
-    !shell.cp(sourceJsMemFile, destinationTestDirectory + '/libGD.js.mem')
-      .stderr
+    !shell.cp(sourceJsFile, destinationTestDirectory + '/index.js').stderr
   ) {
     shell.echo(
-      '✅ Copied libGD.js (and libGD.js.mem) from Binaries/embuild/GDevelop.js to public and node_modules folder'
+      '✅ Copied libGD.js from Binaries/embuild/GDevelop.js to public and node_modules folder'
     );
   } else {
     shell.echo(
-      '❌ Error while copying libGD.js (and libGD.js.mem) from Binaries/embuild/GDevelop.js'
+      '❌ Error while copying libGD.js from Binaries/embuild/GDevelop.js'
     );
   }
 } else {

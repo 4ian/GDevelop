@@ -24,7 +24,7 @@ module.exports = {
     );
 
     extension.registerProperty(
-      _("AdMobAppID"),
+      "AdMobAppID",
       _("AdMob App ID"),
       "string",
       "ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY"

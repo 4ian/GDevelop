@@ -634,7 +634,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this.props.openInstructionOrExpression
                 }
                 setToolbar={this.props.setToolbar}
-                onOpenDebugger={() => {}}
                 onCreateEventsFunction={this.props.onCreateEventsFunction}
                 onOpenSettings={this._editOptions}
                 unsavedChanges={this.props.unsavedChanges}

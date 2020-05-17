@@ -67,8 +67,8 @@ export class DebuggerEditorContainer extends React.Component<
   }
 
   render() {
-    const { project } = this.props;
-    if (!project) return null;
+    const { project, previewDebuggerServer } = this.props;
+    if (!project || !previewDebuggerServer) return null;
 
     return (
       <React.Fragment>
@@ -76,7 +76,7 @@ export class DebuggerEditorContainer extends React.Component<
           project={project}
           setToolbar={this.props.setToolbar}
           isActive={this.props.isActive}
-          previewDebuggerServer={this.props.previewDebuggerServer}
+          previewDebuggerServer={previewDebuggerServer}
           ref={editor => (this.editor = editor)}
         />
         <SubscriptionChecker

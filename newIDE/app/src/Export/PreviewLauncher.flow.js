@@ -12,7 +12,7 @@ export type PreviewOptions = {|
 export type PreviewLauncherInterface = {
   launchPreview: (options: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
-  +getPreviewDebuggerServer: () => PreviewDebuggerServer,
+  +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 
 /** The props that PreviewLauncher must support */

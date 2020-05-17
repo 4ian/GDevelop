@@ -6,9 +6,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
-import {
-  type PreviewDebuggerServer,
-} from '../../Export/PreviewLauncher.flow';
+import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 
 export type RenderEditorContainerProps = {|
@@ -32,10 +30,9 @@ export type RenderEditorContainerProps = {|
     layoutName: ?string,
     externalLayoutName?: ?string
   ) => void,
-  previewDebuggerServer: PreviewDebuggerServer,
+  previewDebuggerServer: ?PreviewDebuggerServer,
 
   // Opening other editors:
-  onOpenDebugger: () => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   openInstructionOrExpression: (

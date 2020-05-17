@@ -176,7 +176,9 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  getPreviewDebuggerServer() { return LocalPreviewDebuggerServer; }
+  getPreviewDebuggerServer() {
+    return LocalPreviewDebuggerServer;
+  }
 
   _checkSubscription = () => {
     if (!this._subscriptionChecker) return true;

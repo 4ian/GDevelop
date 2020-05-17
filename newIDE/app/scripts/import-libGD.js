@@ -54,7 +54,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
   const copyLibGdJsFile = filename => {
     if (
       !shell.cp(filename, '../public').stderr &&
-      !shell.cp(filename, destinationTestDirectory + '/index.js').stderr
+      !shell.cp(filename, destinationTestDirectory).stderr
     ) {
       shell.echo(
         `✅ Copied ${filename} from Binaries/embuild/GDevelop.js to public and node_modules folder`

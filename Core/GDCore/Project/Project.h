@@ -14,6 +14,7 @@
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/String.h"
 namespace gd {
 class Platform;
@@ -302,6 +303,34 @@ class GD_CORE_API Project : public ObjectsContainer {
    * the project.
    */
   std::vector<gd::String>& GetUsedExtensions() { return extensionsUsed; };
+
+  /**
+   * \brief Get the properties for an extension.
+   */
+  std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(const gd::String& extensionName) {
+    return extensionProperties[extensionName];
+  }
+
+  /**
+   * \brief Get the properties for an extension.
+   */
+  const std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(const gd::String& extensionName) const {
+    return extensionProperties.at(extensionName);
+  }
+
+  /**
+   * \brief Get the properties for an extension.
+   */
+  std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(gd::PlatformExtension& extension) {
+    return extensionProperties[extension.GetName()];
+  }
+
+  /**
+   * \brief Get the properties for an extension.
+   */
+  const std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(gd::PlatformExtension& extension) const {
+    return extensionProperties.at(extension.GetName());
+  }
 
 #if defined(GD_IDE_ONLY)
   /**
@@ -968,6 +997,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::LoadingScreen loadingScreen;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;                   ///< List of all externals events
+  std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>> extensionProperties; ///< The properties of the extensions. Use it like extensionProperties[extensionName][extensionProperty].
   mutable unsigned int gdMajorVersion;  ///< The GD major version used the last
                                         ///< time the project was saved.
   mutable unsigned int gdMinorVersion;  ///< The GD minor version used the last

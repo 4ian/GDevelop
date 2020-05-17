@@ -317,6 +317,7 @@ interface Project {
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
     [Const, Ref] VectorString GetUsedExtensions();
+    [Ref] MapStringPropertyDescriptor GetExtensionProperties([Const] DOMString extensionName);
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
 
@@ -631,6 +632,8 @@ interface Layer {
 interface PropertyDescriptor {
     void PropertyDescriptor([Const] DOMString propValue);
 
+    PropertyDescriptor Clone();
+
     [Ref] PropertyDescriptor SetValue([Const] DOMString value);
     [Const, Ref] DOMString GetValue();
     [Ref] PropertyDescriptor SetType([Const] DOMString type);
@@ -646,6 +649,8 @@ interface PropertyDescriptor {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+    void SerializeValuesTo([Ref] SerializerElement element);
+    void UnserializeValuesFrom([Const, Ref] SerializerElement element);
 };
 
 interface NamedPropertyDescriptor {
@@ -1263,9 +1268,8 @@ interface PlatformExtension {
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
     [Ref] PropertyDescriptor RegisterProperty([Const] DOMString name,
-                                           [Const] DOMString description,
+                                           [Const] DOMString fullname,
                                            [Const] DOMString type,
-                                           [Const] DOMString value,
                                            [Const] DOMString hint);
 
     [Const, Ref] DOMString GetFullName();

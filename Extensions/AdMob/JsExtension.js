@@ -24,10 +24,9 @@ module.exports = {
     );
 
     extension.registerProperty(
+      _("AdMobAppID"),
       _("AdMob App ID"),
-      _("The AdMob App ID"),
       "string",
-      "ca-app-pub-",
       "ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY"
     );
 
@@ -39,8 +38,8 @@ module.exports = {
       .setExtraSetting(
         "ADMOB_APP_ID", 
         new gd.PropertyDescriptor()
-         .setType("ProjectProperty")
-         .setValue("AdMobAppId")
+         .setType("ExtensionProperty")
+         .setValue("AdMobAppID")
       );
 
     // Banner

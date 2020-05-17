@@ -35,6 +35,13 @@ class GD_CORE_API PropertyDescriptor {
   PropertyDescriptor() : hidden(false){};
 
   /**
+   * \brief Returns a new PropertyDescriptor with the same data as the current one.
+   */
+  virtual PropertyDescriptor* Clone() const {
+    return new PropertyDescriptor(*this);
+  };
+
+  /**
    * \brief Destructor
    */
   virtual ~PropertyDescriptor();
@@ -120,6 +127,16 @@ class GD_CORE_API PropertyDescriptor {
    * \brief Unserialize the PropertyDescriptor.
    */
   virtual void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Serilaize only the Value and Extra Informations.
+   */
+  virtual void SerializeValuesTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserilaize only the Value and Extra Informations.
+   */
+  virtual void UnserializeValuesFrom(const SerializerElement& element);
   ///@}
 
  private:

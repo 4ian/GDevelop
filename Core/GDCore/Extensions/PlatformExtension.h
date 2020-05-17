@@ -238,15 +238,13 @@ class GD_CORE_API PlatformExtension {
    * \param hint The hint (example value) shown to the user.
    */
   gd::PropertyDescriptor& RegisterProperty(const gd::String& name,
-                                           const gd::String& description,
+                                           const gd::String& fullname,
                                            const gd::String& type,
-                                           const gd::String& value,
                                            const gd::String& hint
   ) {
     extensionProperties[name] = gd::PropertyDescriptor()
+      .SetDescription(fullname)
       .SetType(type)
-      .SetValue(value)
-      .SetDescription(description)
       .SetLabel(hint);
     return extensionProperties[name];
   };

@@ -1653,7 +1653,6 @@ const MainFrame = (props: Props) => {
                 onChangeSubscription: () => openSubscriptionDialog(true),
                 projectItemName: editorTab.projectItemName,
                 setPreviewedLayout,
-                onOpenDebugger: openDebugger,
                 onOpenExternalEvents: openExternalEvents,
                 previewDebuggerServer:
                   _previewLauncher.current &&

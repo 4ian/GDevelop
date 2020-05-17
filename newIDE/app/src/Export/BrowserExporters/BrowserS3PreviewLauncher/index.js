@@ -109,6 +109,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       });
   };
 
+  getPreviewDebuggerServer() {
+    // Debugger server is not supported in the web-app.
+    return null;
+  }
+
   render() {
     const { showPreviewLinkDialog, url, error } = this.state;
 

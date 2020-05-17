@@ -60,7 +60,6 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       <EventsSheet
         ref={editor => (this.editor = editor)}
         setToolbar={this.props.setToolbar}
-        onOpenDebugger={this.props.onOpenDebugger}
         onOpenLayout={this.props.onOpenLayout}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}

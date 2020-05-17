@@ -2692,7 +2692,6 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
           setToolbar={() => {}}
@@ -2717,7 +2716,6 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
           setToolbar={() => {}}

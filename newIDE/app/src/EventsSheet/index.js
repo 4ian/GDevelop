@@ -89,7 +89,6 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
-  onOpenDebugger: () => void,
   onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,

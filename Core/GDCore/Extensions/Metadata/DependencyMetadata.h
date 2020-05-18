@@ -37,9 +37,11 @@ namespace gd {
             /**
              * \brief Sets the name used by the dependency manager to find the dependency.
              * \example 
+             * \code
              *  // For depending upon the NPM package is-thirteen
              *  gd::DependencyMetadata dependencyMetadata = gd::DependencyMetadata();
              *  dependencyMetadata.setExporterName("is-thirteen");
+             * \endcode
              */
             DependencyMetadata& SetExportName(const gd::String& exportName_) {
                 exportName = exportName_;

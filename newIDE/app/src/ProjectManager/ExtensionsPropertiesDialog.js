@@ -68,10 +68,7 @@ class ExtensionsPropertiesDialog extends React.Component<Props, State> {
     const { properties } = this.state;
 
     const items = [];
-    for (let [
-      extensionName: string,
-      propertyMap: Map<string, gdPropertyDescriptor>,
-    ] of properties) {
+    for (let [extensionName, propertyMap] of properties.entries()) {
       const extensionFullName = this.props.project
         .getCurrentPlatform()
         .getAllPlatformExtensions()
@@ -83,51 +80,92 @@ class ExtensionsPropertiesDialog extends React.Component<Props, State> {
           <Trans>{extensionFullName}</Trans>
         </Text>
       );
-      for (let [
-        propertyName: string,
-        propertyDescriptor: gdPropertyDescriptor,
-      ] of propertyMap) {
+      for (let [propertyName, propertyDescriptor] of propertyMap.entries()) {
         if (propertyDescriptor.getType() === 'string') {
           extensionContent.push(
             <SemiControlledTextField
               floatingLabelText={
-                <Trans>{propertyDescriptor.getDescription()}</Trans>
+                <Trans>
+                  {this.state.properties
+                    .get(extensionName)
+                    .get(propertyName)
+                    .getDescription()}
+                </Trans>
               }
               fullWidth
-              hintText={<Trans>{propertyDescriptor.getLabel()}</Trans>}
+              hintText={
+                <Trans>
+                  {this.state.properties
+                    .get(extensionName)
+                    .get(propertyName)
+                    .getLabel()}
+                </Trans>
+              }
               type="text"
-              value={propertyDescriptor.getValue()}
-              onChange={value =>
+              value={this.state.properties
+                .get(extensionName)
+                .get(propertyName)
+                .getValue()}
+              onBlur={() => this.forceUpdate()}
+              onChange={value => {
                 this.state.properties
                   .get(extensionName)
                   .get(propertyName)
-                  .setValue(value)
-              }
+                  .setValue(value);
+              }}
             />
           );
         } else if (propertyDescriptor.getType() === 'number') {
           extensionContent.push(
             <SemiControlledTextField
               floatingLabelText={
-                <Trans>{propertyDescriptor.getDescription()}</Trans>
+                <Trans>
+                  {this.state.properties
+                    .get(extensionName)
+                    .get(propertyName)
+                    .getDescription()}
+                </Trans>
               }
               fullWidth
-              hintText={<Trans>{propertyDescriptor.getLabel()}</Trans>}
+              hintText={
+                <Trans>
+                  {this.state.properties
+                    .get(extensionName)
+                    .get(propertyName)
+                    .getLabel()}
+                </Trans>
+              }
               type="number"
-              value={propertyDescriptor.getValue()}
-              onChange={value =>
+              value={this.state.properties
+                .get(extensionName)
+                .get(propertyName)
+                .getValue()}
+              onBlur={() => this.forceUpdate()}
+              onChange={value => {
                 this.state.properties
                   .get(extensionName)
                   .get(propertyName)
-                  .setValue(value)
-              }
+                  .setValue(value);
+              }}
             />
           );
         } else if (propertyDescriptor.getType() === 'yesorno') {
           extensionContent.push(
             <Checkbox
-              label={<Trans>{propertyDescriptor.getDescription()}</Trans>}
-              checked={propertyDescriptor.getValue() === 'true'}
+              label={
+                <Trans>
+                  {this.state.properties
+                    .get(extensionName)
+                    .get(propertyName)
+                    .getDescription()}
+                </Trans>
+              }
+              checked={
+                this.state.properties
+                  .get(extensionName)
+                  .get(propertyName)
+                  .getValue() === 'true'
+              }
               onCheck={(e, checked) => {
                 const currentProperty = this.state.properties
                   .get(extensionName)
@@ -137,6 +175,7 @@ class ExtensionsPropertiesDialog extends React.Component<Props, State> {
                 } else {
                   currentProperty.setValue('false');
                 }
+                this.forceUpdate();
               }}
             />
           );
@@ -151,7 +190,8 @@ class ExtensionsPropertiesDialog extends React.Component<Props, State> {
           );
         }
       }
-      items.push(<ColumnStackLayout>{extensionContent}</ColumnStackLayout>);
+      // items.push(<ColumnStackLayout>{extensionContent}</ColumnStackLayout>);
+      items.push(extensionContent);
     }
     return items;
   }

@@ -34,7 +34,7 @@ module.exports = {
     
       extension.registerProperty("DummyPropertyBoolean")
       .setDescription(_("A boolean property"))
-      .setType("yesorno")
+      .setType("yesorno");
 
     // Register Cordova/NPM dependencies
     extension

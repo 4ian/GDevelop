@@ -1275,10 +1275,7 @@ interface PlatformExtension {
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
-    [Ref] PropertyDescriptor RegisterProperty([Const] DOMString name,
-                                           [Const] DOMString fullname,
-                                           [Const] DOMString type,
-                                           [Const] DOMString hint);
+    [Ref] PropertyDescriptor RegisterProperty([Const] DOMString name);
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();

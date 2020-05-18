@@ -22,19 +22,15 @@ module.exports = {
     );
 
     // Register Properties
-    extension.registerProperty(
-      "DummyPropertyID",
-      _("Dummy Property Name"),
-      "string",
-      "Type in anything :)"
-    );
+    extension.registerProperty("DummyPropertyString")
+      .setValue(_("Dummy Property Name"))
+      .setType("string")
+      .setLabel("Type in anything :)");
 
-    extension.registerProperty(
-      "DummyPropertyNum",
-      _("Dummy Numeric Property Name"),
-      "number",
-      "Type in a number :)"
-    );
+    extension.registerProperty("DummyPropertyNumber")
+      .setValue(_("Dummy Numeric Property Name"))
+      .setType("number")
+      .setLabel("Only numbers here ;)");
 
     // Register Cordova/NPM dependencies
     extension

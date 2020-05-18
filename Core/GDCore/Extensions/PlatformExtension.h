@@ -242,10 +242,17 @@ class GD_CORE_API PlatformExtension {
                                            const gd::String& type,
                                            const gd::String& hint
   ) {
-    extensionProperties[name] = gd::PropertyDescriptor()
+    extensionProperties[name]
       .SetDescription(fullname)
       .SetType(type)
       .SetLabel(hint);
+    return extensionProperties[name];
+  };
+
+  /**
+   * \brief Adds a property to the Extension.
+   */
+  gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
     return extensionProperties[name];
   };
 

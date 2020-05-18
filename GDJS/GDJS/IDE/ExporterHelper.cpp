@@ -463,6 +463,25 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
             .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
 
+    gd::String packages = "";
+
+    for(std::shared_ptr<gd::PlatformExtension> extension : project.GetCurrentPlatform().GetAllPlatformExtensions()) { //TODO Add a way to select only used Extensions
+      for (gd::DependencyMetadata dependency: extension->GetAllDependencies()) {
+        if (dependency.GetDependencyType() == gd::DependencyTypes::npm) {
+          if(dependency.GetVersion() == "-1") {
+            gd::LogError("Latest Version (-1) not available for NPM dependencies, dependency " + dependency.GetName() + " is not exported.");
+            continue;
+          }
+          packages += "     \"" + dependency.GetExportName() + "\": \"" + dependency.GetVersion() + "\",\n";
+          // In npm extra settings are ignored
+        }
+      }
+    }
+
+    packages = packages.substr(0, str.size()-2); // Remove the ,\n at the end as last item cannot have , in JSON.
+
+    str.FindAndReplace("\"GDJS_DEPENDENCY\": \"0\"", packages);
+
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
       lastError = "Unable to write Electron package.json file.";
       return false;

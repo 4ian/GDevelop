@@ -32,6 +32,7 @@ type MenuItemTemplate =
       accelerator?: string,
       enabled?: boolean,
       label?: string,
+      eventArgs?: any,
     |}
   | {|
       submenu: Array<MenuItemTemplate>,
@@ -63,9 +64,8 @@ const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
   React.useEffect(
     () => {
       if (!ipcRenderer) return;
-      const handler = (event, ...eventArgs) => func(...eventArgs);
-      ipcRenderer.on(ipcEvent, handler);
-      return () => ipcRenderer.removeListener(ipcEvent, handler);
+      ipcRenderer.on(ipcEvent, func);
+      return () => ipcRenderer.removeListener(ipcEvent, func);
     },
     [ipcEvent, func]
   );
@@ -91,6 +91,7 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
         submenu: recentProjectFiles.map(item => ({
           label: item.fileIdentifier,
           onClickSendEvent: 'main-menu-open-recent',
+          eventArgs: item,
         })),
       },
       { type: 'separator' },
@@ -306,30 +307,42 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   const { i18n, project, recentProjectFiles } = props;
   const language = i18n.language;
 
-  useIPCEventListener('main-menu-open', props.onChooseProject);
-  useIPCEventListener('main-menu-save', props.onSaveProject);
-  useIPCEventListener('main-menu-save-as', props.onSaveProjectAs);
-  useIPCEventListener('main-menu-close', props.onCloseProject);
-  useIPCEventListener('main-menu-close-app', props.onCloseApp);
-  useIPCEventListener('main-menu-export', props.onExportProject);
-  useIPCEventListener('main-menu-create', props.onCreateProject);
-  useIPCEventListener(
-    'main-menu-open-project-manager',
-    props.onOpenProjectManager
+  useIPCEventListener('main-menu-open', event => props.onChooseProject());
+  useIPCEventListener('main-menu-open-recent', (event, fileMetadata) =>
+    props.onOpenRecentFile(fileMetadata)
   );
-  useIPCEventListener('main-menu-open-start-page', props.onOpenStartPage);
-  useIPCEventListener('main-menu-open-debugger', props.onOpenDebugger);
-  useIPCEventListener('main-menu-open-about', props.onOpenAbout);
-  useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);
-  useIPCEventListener('main-menu-open-language', props.onOpenLanguage);
-  useIPCEventListener('main-menu-open-profile', props.onOpenProfile);
-  useIPCEventListener('update-status', props.setUpdateStatus);
+  useIPCEventListener('main-menu-save', event => props.onSaveProject());
+  useIPCEventListener('main-menu-save-as', event => props.onSaveProjectAs());
+  useIPCEventListener('main-menu-close', event => props.onCloseProject());
+  useIPCEventListener('main-menu-close-app', event => props.onCloseApp());
+  useIPCEventListener('main-menu-export', event => props.onExportProject());
+  useIPCEventListener('main-menu-create', event => props.onCreateProject());
+  useIPCEventListener('main-menu-open-project-manager', event =>
+    props.onOpenProjectManager()
+  );
+  useIPCEventListener('main-menu-open-start-page', event =>
+    props.onOpenStartPage()
+  );
+  useIPCEventListener('main-menu-open-debugger', event =>
+    props.onOpenDebugger()
+  );
+  useIPCEventListener('main-menu-open-about', event => props.onOpenAbout());
+  useIPCEventListener('main-menu-open-preferences', event =>
+    props.onOpenPreferences()
+  );
+  useIPCEventListener('main-menu-open-language', event =>
+    props.onOpenLanguage()
+  );
+  useIPCEventListener('main-menu-open-profile', event => props.onOpenProfile());
+  useIPCEventListener('update-status', (event, updateStatus) =>
+    props.setUpdateStatus(updateStatus)
+  );
 
   React.useEffect(
     () => {
       buildAndSendMenuTemplate(project, i18n, recentProjectFiles);
     },
-    [i18n, language, project]
+    [i18n, language, project, recentProjectFiles]
   );
 
   return null;

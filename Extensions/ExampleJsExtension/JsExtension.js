@@ -21,6 +21,29 @@ module.exports = {
       'MIT'
     );
 
+    // Register Properties
+    extension.registerProperty(
+      "DummyPropertyID",
+      _("Dummy Property Name"),
+      "string",
+      "Type in anything :)"
+    );
+
+    extension.registerProperty(
+      "DummyPropertyNum",
+      _("Dummy Numeric Property Name"),
+      "number",
+      "Type in a number :)"
+    );
+
+    // Register Cordova/NPM dependencies
+    extension
+      .addDependency()
+      .setName("Thirteen Checker")
+      .setDependencyType(gd.DependencyTypes.npm)
+      .setExportName("is-thirteen")
+      .setVersion("2.0.0");
+
     // Declare effects:
     const dumyEffect = extension
       .addEffect('DummyEffect')

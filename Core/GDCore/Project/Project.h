@@ -309,28 +309,38 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(const gd::String& extensionName) {
     return extensionProperties[extensionName];
-  }
+  };
 
   /**
    * \brief Get the properties for an extension.
    */
   const std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(const gd::String& extensionName) const {
     return extensionProperties.at(extensionName);
-  }
+  };
 
   /**
    * \brief Get the properties for an extension.
    */
   std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(gd::PlatformExtension& extension) {
     return extensionProperties[extension.GetName()];
-  }
+  };
 
   /**
    * \brief Get the properties for an extension.
    */
   const std::map<gd::String, gd::PropertyDescriptor>& GetExtensionProperties(gd::PlatformExtension& extension) const {
     return extensionProperties.at(extension.GetName());
-  }
+  };
+
+  /**
+   * \brief Get all extension properties
+   */
+  std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>& GetAllExtensionProperties() { return extensionProperties; };
+
+  /**
+   * \brief Get all extension properties
+   */
+  const std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>& GetAllExtensionProperties() const { return extensionProperties; };
 
 #if defined(GD_IDE_ONLY)
   /**

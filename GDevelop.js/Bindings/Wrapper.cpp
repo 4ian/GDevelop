@@ -390,6 +390,7 @@ typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehavio
 typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor> NamedPropertyDescriptorsList;
 typedef ExpressionCompletionDescription::CompletionKind ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription> VectorExpressionCompletionDescription;
+typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>> MapExtensionProperties;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;

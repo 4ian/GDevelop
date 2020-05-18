@@ -94,6 +94,13 @@ interface MapStringEventMetadata {
     [Value] VectorString MAP_keys();
 };
 
+interface MapExtensionProperties {
+    [Ref] MapStringPropertyDescriptor MAP_get([Const] DOMString name);
+    void MAP_set([Const] DOMString name, [Const, Ref] MapStringPropertyDescriptor prop);
+    boolean MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
 interface SetString {
     void SetString();
     [Value] VectorString FREE_toNewVectorString();
@@ -318,6 +325,7 @@ interface Project {
 
     [Const, Ref] VectorString GetUsedExtensions();
     [Ref] MapStringPropertyDescriptor GetExtensionProperties([Const] DOMString extensionName);
+    [Ref] MapExtensionProperties GetAllExtensionProperties();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
 

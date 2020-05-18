@@ -40,56 +40,19 @@ if (shell.mkdir('-p', destinationTestDirectory).stderr) {
 }
 
 if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
-  // Copy the files built locally
-  const sourceJsFile = path.join(sourceDirectory, 'libGD.js');
-  const sourceWasmFile = path.join(sourceDirectory, 'libGD.wasm');
-  const sourceJsMemFile = path.join(sourceDirectory, 'libGD.js.mem');
-
-  // Clean any artifact already present
-  shell.rm('-f', '../public/libGD.js.mem');
-  shell.rm('-f', '../public/libGD.wasm');
-  shell.rm('-f', destinationTestDirectory + '/libGD.js.mem');
-  shell.rm('-f', destinationTestDirectory + '/libGD.wasm');
-
-  const copyLibGdJsFile = filename => {
-    if (
-      !shell.cp(filename, '../public').stderr &&
-      !shell.cp(filename, destinationTestDirectory).stderr
-    ) {
-      shell.echo(
-        `✅ Copied ${filename} from Binaries/embuild/GDevelop.js to public and node_modules folder`
-      );
-    } else {
-      shell.echo(
-        `❌ Error while copying ${filename} from Binaries/embuild/GDevelop.js`
-      );
-    }
-  };
-
-  // Copy the wasm or memory file.
-  if (shell.test('-f', sourceWasmFile)) {
-    copyLibGdJsFile(sourceWasmFile);
-  } else if (shell.test('-f', sourceJsMemFile)) {
-    copyLibGdJsFile(sourceJsMemFile);
-  } else {
-    shell.echo(
-      `❌ At least libGD.js.mem or libGD.wasm should exist in ${sourceDirectory}.`
-    );
-  }
-
-  // Copy the JS file.
-  if (
-    !shell.cp(sourceJsFile, '../public').stderr &&
-    !shell.cp(sourceJsFile, destinationTestDirectory + '/index.js').stderr
-  ) {
-    shell.echo(
-      '✅ Copied libGD.js from Binaries/embuild/GDevelop.js to public and node_modules folder'
-    );
-  } else {
-    shell.echo(
-      '❌ Error while copying libGD.js from Binaries/embuild/GDevelop.js'
-    );
-  }
+  shell.echo(
+    'ℹ️  Copying libGD.js and associated files built locally to newIDE...'
+  );
+  const copyToNewIDEScriptPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'GDevelop.js',
+    'scripts',
+    'copy-to-newIDE.js'
+  );
+  shell.exec(`node ${copyToNewIDEScriptPath}`);
 } else {
   // Download a pre-built version otherwise
   shell.echo(

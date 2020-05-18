@@ -87,7 +87,9 @@ module.exports = function (grunt) {
             // Use wasm for faster builds in development.
             isDev ? '-DUSE_WASM=TRUE' : '-DUSE_WASM=FALSE',
             // Disable link time optimizations for slightly faster build time.
-            isDev ? '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=TRUE' : '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=FALSE',
+            isDev
+              ? '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=TRUE'
+              : '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=FALSE',
           ].join(' '),
         options: {
           execOptions: {
@@ -114,13 +116,13 @@ module.exports = function (grunt) {
       },
       // Copy the library to newIDE
       copyToNewIDE: {
-        command: 'node import-libGD.js',
+        command: 'node scripts/copy-to-newIDE.js',
         options: {
           execOptions: {
-            cwd: path.join(__dirname, '..', 'newIDE', 'app', 'scripts'),
+            cwd: __dirname,
           },
         },
-      }
+      },
     },
     clean: {
       options: { force: true },

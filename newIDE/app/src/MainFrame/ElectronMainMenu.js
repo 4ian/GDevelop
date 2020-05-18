@@ -9,6 +9,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 type MainMenuEvent =
   | 'main-menu-open'
+  | 'main-menu-open-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
   | 'main-menu-close'
@@ -70,7 +71,7 @@ const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
   );
 };
 
-const buildAndSendMenuTemplate = (project, i18n) => {
+const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
   const fileTemplate = {
     label: i18n._(t`File`),
     submenu: [
@@ -84,6 +85,13 @@ const buildAndSendMenuTemplate = (project, i18n) => {
         label: i18n._(t`Open...`),
         accelerator: 'CommandOrControl+O',
         onClickSendEvent: 'main-menu-open',
+      },
+      {
+        label: i18n._(t`Open Recent`),
+        submenu: recentProjectFiles.map(item => ({
+          label: item.fileIdentifier,
+          onClickSendEvent: 'main-menu-open-recent',
+        }))
       },
       { type: 'separator' },
       {
@@ -295,7 +303,7 @@ const buildAndSendMenuTemplate = (project, i18n) => {
  * Create and update the editor main menu using Electron APIs.
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
-  const { i18n, project } = props;
+  const { i18n, project, recentProjectFiles } = props;
   const language = i18n.language;
 
   useIPCEventListener('main-menu-open', props.onChooseProject);
@@ -319,7 +327,7 @@ const ElectronMainMenu = (props: MainMenuProps) => {
 
   React.useEffect(
     () => {
-      buildAndSendMenuTemplate(project, i18n);
+      buildAndSendMenuTemplate(project, i18n, recentProjectFiles);
     },
     [i18n, language, project]
   );

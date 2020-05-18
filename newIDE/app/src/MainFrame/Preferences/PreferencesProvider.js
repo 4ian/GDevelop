@@ -14,6 +14,7 @@ import {
 } from './PreferencesContext';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadata } from '../../ProjectsStorage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -53,6 +54,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setLastUsedPath: this._setLastUsedPath.bind(this),
     getDefaultEditorMosaicNode: this._getDefaultEditorMosaicNode.bind(this),
     setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this),
+    getRecentProjectFiles: this._getRecentProjectFiles.bind(this),
+    insertRecentProjectFile: this._insertRecentProjectFile.bind(this),
   };
 
   componentDidMount() {
@@ -341,6 +344,46 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
+  }
+
+  _getRecentProjectFiles() {
+    return this.state.values.recentProjectFiles;
+  }
+
+  _setRecentProjectFiles(recents: Array<FileMetadata>) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          recentProjectFiles: recents,
+        }
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _insertRecentProjectFile(fileMetadata: FileMetadata) {
+    let recentProjectFiles = this._getRecentProjectFiles();
+    let index = -1;
+    recentProjectFiles.forEach((item, _index) => {
+      if(JSON.stringify(item) === JSON.stringify(fileMetadata)) {
+        index = _index;
+        return;
+      }
+    });
+    if(index === 0) {
+      this._setRecentProjectFiles(recentProjectFiles);
+      return;
+    }
+    if(index === -1 && recentProjectFiles.length === 5) 
+      recentProjectFiles.shift();
+    if(index > 0) {
+      const len = recentProjectFiles.length > 5 ? 5 : recentProjectFiles.length;
+      recentProjectFiles = [...recentProjectFiles.slice(0, index), ...recentProjectFiles.slice(index + 1, len)];
+    }
+      
+    recentProjectFiles = [fileMetadata, ...recentProjectFiles];
+    this._setRecentProjectFiles(recentProjectFiles);
   }
 
   render() {

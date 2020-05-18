@@ -378,6 +378,7 @@ const MainFrame = (props: Props) => {
     fileMetadata: ?FileMetadata
   ): Promise<State> => {
     const { eventsFunctionsExtensionsState } = props;
+    if(fileMetadata) preferences.insertRecentProjectFile(fileMetadata);
 
     return closeProject().then(() => {
       // Make sure that the ResourcesLoader cache is emptied, so that
@@ -1507,6 +1508,15 @@ const MainFrame = (props: Props) => {
           i18n: i18n,
           project: state.currentProject,
           onChooseProject: chooseProject,
+          onOpenRecentFile: (fileMetadata: FileMetadata) => {
+            openFromFileMetadata(fileMetadata).then(state => {
+              if(state)
+                openSceneOrProjectManager({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+                });
+            })
+          }, 
           onSaveProject: saveProject,
           onSaveProjectAs: saveProjectAs,
           onCloseProject: askToCloseProject,
@@ -1521,6 +1531,7 @@ const MainFrame = (props: Props) => {
           onOpenLanguage: () => openLanguageDialog(true),
           onOpenProfile: () => openProfileDialog(true),
           setUpdateStatus: setUpdateStatus,
+          recentProjectFiles: preferences.getRecentProjectFiles(),
         })}
       <ProjectTitlebar fileMetadata={currentFileMetadata} />
       <Drawer

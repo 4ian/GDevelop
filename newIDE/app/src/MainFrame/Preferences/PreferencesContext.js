@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadata } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -130,6 +131,7 @@ export type PreferencesValues = {|
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
+  recentProjectFiles: Array<FileMetadata>,
 |};
 
 /**
@@ -162,6 +164,8 @@ export type Preferences = {|
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => void,
+  getRecentProjectFiles: () => Array<FileMetadata>,
+  insertRecentProjectFile: (fileMetadata: FileMetadata) => void,
 |};
 
 export const initialPreferences = {
@@ -181,6 +185,7 @@ export const initialPreferences = {
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
+    recentProjectFiles: [],
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -203,6 +208,8 @@ export const initialPreferences = {
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
+  getRecentProjectFiles: () => [],
+  insertRecentProjectFile: (fileMetadata: FileMetadata) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

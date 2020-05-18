@@ -356,7 +356,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           recentProjectFiles: recents,
-        }
+        },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
@@ -366,22 +366,25 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     let recentProjectFiles = this._getRecentProjectFiles();
     let index = -1;
     recentProjectFiles.forEach((item, _index) => {
-      if(JSON.stringify(item) === JSON.stringify(fileMetadata)) {
+      if (JSON.stringify(item) === JSON.stringify(fileMetadata)) {
         index = _index;
         return;
       }
     });
-    if(index === 0) {
+    if (index === 0) {
       this._setRecentProjectFiles(recentProjectFiles);
       return;
     }
-    if(index === -1 && recentProjectFiles.length === 5) 
+    if (index === -1 && recentProjectFiles.length === 5)
       recentProjectFiles.shift();
-    if(index > 0) {
+    if (index > 0) {
       const len = recentProjectFiles.length > 5 ? 5 : recentProjectFiles.length;
-      recentProjectFiles = [...recentProjectFiles.slice(0, index), ...recentProjectFiles.slice(index + 1, len)];
+      recentProjectFiles = [
+        ...recentProjectFiles.slice(0, index),
+        ...recentProjectFiles.slice(index + 1, len),
+      ];
     }
-      
+
     recentProjectFiles = [fileMetadata, ...recentProjectFiles];
     this._setRecentProjectFiles(recentProjectFiles);
   }

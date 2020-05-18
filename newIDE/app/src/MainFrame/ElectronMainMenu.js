@@ -91,7 +91,7 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
         submenu: recentProjectFiles.map(item => ({
           label: item.fileIdentifier,
           onClickSendEvent: 'main-menu-open-recent',
-        }))
+        })),
       },
       { type: 'separator' },
       {

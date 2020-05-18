@@ -14,7 +14,7 @@ import {
 } from './PreferencesContext';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
-import { type FileMetadata } from '../../ProjectsStorage';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -350,7 +350,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return this.state.values.recentProjectFiles;
   }
 
-  _setRecentProjectFiles(recents: Array<FileMetadata>) {
+  _setRecentProjectFiles(recents: Array<FileMetadataAndStorageProviderName>) {
     this.setState(
       state => ({
         values: {
@@ -362,31 +362,16 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _insertRecentProjectFile(fileMetadata: FileMetadata) {
+  _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
     let recentProjectFiles = this._getRecentProjectFiles();
-    let index = -1;
-    recentProjectFiles.forEach((item, _index) => {
-      if (JSON.stringify(item) === JSON.stringify(fileMetadata)) {
-        index = _index;
-        return;
-      }
-    });
-    if (index === 0) {
-      this._setRecentProjectFiles(recentProjectFiles);
-      return;
-    }
-    if (index === -1 && recentProjectFiles.length === 5)
-      recentProjectFiles.shift();
-    if (index > 0) {
-      const len = recentProjectFiles.length > 5 ? 5 : recentProjectFiles.length;
-      recentProjectFiles = [
-        ...recentProjectFiles.slice(0, index),
-        ...recentProjectFiles.slice(index + 1, len),
-      ];
-    }
-
-    recentProjectFiles = [fileMetadata, ...recentProjectFiles];
-    this._setRecentProjectFiles(recentProjectFiles);
+    const isNotNewRecentFile = recentFile =>
+      JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);
+    this._setRecentProjectFiles(
+      [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
+        0,
+        5
+      )
+    );
   }
 
   render() {

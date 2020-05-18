@@ -90,6 +90,7 @@ import {
   type StorageProvider,
   type StorageProviderOperations,
   type FileMetadata,
+  type FileMetadataAndStorageProviderName,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
@@ -150,6 +151,7 @@ export type Props = {
   getStorageProviderOperations: (
     ?StorageProvider
   ) => Promise<StorageProviderOperations>,
+  getStorageProvider: () => StorageProvider,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   loading?: boolean,
@@ -377,8 +379,13 @@ const MainFrame = (props: Props) => {
     project: gdProject,
     fileMetadata: ?FileMetadata
   ): Promise<State> => {
-    const { eventsFunctionsExtensionsState } = props;
-    if (fileMetadata) preferences.insertRecentProjectFile(fileMetadata);
+    const { eventsFunctionsExtensionsState, getStorageProvider } = props;
+
+    if (fileMetadata)
+      preferences.insertRecentProjectFile({
+        fileMetadata,
+        storageProviderName: getStorageProvider().internalName,
+      });
 
     return closeProject().then(() => {
       // Make sure that the ResourcesLoader cache is emptied, so that
@@ -1205,6 +1212,32 @@ const MainFrame = (props: Props) => {
     });
   };
 
+  const openFromFileMetadataWithStorageProvider = (
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
+  ) => {
+    const {
+      fileMetadata,
+      storageProviderName,
+    } = fileMetadataAndStorageProviderName;
+    const { storageProviders, getStorageProviderOperations } = props;
+
+    const storageProvider = storageProviders.filter(
+      storageProvider => storageProvider.internalName === storageProviderName
+    )[0];
+
+    if (storageProvider) {
+      getStorageProviderOperations(storageProvider).then(() => {
+        openFromFileMetadata(fileMetadata).then(state => {
+          if (state)
+            openSceneOrProjectManager({
+              currentProject: state.currentProject,
+              editorTabs: state.editorTabs,
+            });
+        });
+      });
+    }
+  };
+
   const saveProject = () => {
     const { currentProject, currentFileMetadata } = state;
     const { i18n, getStorageProviderOperations } = props;
@@ -1508,15 +1541,12 @@ const MainFrame = (props: Props) => {
           i18n: i18n,
           project: state.currentProject,
           onChooseProject: chooseProject,
-          onOpenRecentFile: (fileMetadata: FileMetadata) => {
-            openFromFileMetadata(fileMetadata).then(state => {
-              if (state)
-                openSceneOrProjectManager({
-                  currentProject: state.currentProject,
-                  editorTabs: state.editorTabs,
-                });
-            });
-          },
+          onOpenRecentFile: (
+            fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
+          ) =>
+            openFromFileMetadataWithStorageProvider(
+              fileMetadataAndStorageProviderName
+            ),
           onSaveProject: saveProject,
           onSaveProjectAs: saveProjectAs,
           onCloseProject: askToCloseProject,

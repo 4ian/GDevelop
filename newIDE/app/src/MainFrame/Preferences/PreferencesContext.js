@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
-import { type FileMetadata } from '../../ProjectsStorage';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -131,7 +131,7 @@ export type PreferencesValues = {|
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
-  recentProjectFiles: Array<FileMetadata>,
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
 |};
 
 /**
@@ -164,8 +164,10 @@ export type Preferences = {|
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => void,
-  getRecentProjectFiles: () => Array<FileMetadata>,
-  insertRecentProjectFile: (fileMetadata: FileMetadata) => void,
+  getRecentProjectFiles: () => Array<FileMetadataAndStorageProviderName>,
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -209,7 +211,9 @@ export const initialPreferences = {
     node: ?EditorMosaicNode
   ) => {},
   getRecentProjectFiles: () => [],
-  insertRecentProjectFile: (fileMetadata: FileMetadata) => {},
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

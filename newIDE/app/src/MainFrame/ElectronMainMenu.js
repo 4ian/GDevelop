@@ -90,7 +90,7 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
       {
         label: i18n._(t`Open Recent`),
         submenu: recentProjectFiles.map(item => ({
-          label: item.fileIdentifier,
+          label: item.fileMetadata.fileIdentifier,
           onClickSendEvent: 'main-menu-open-recent',
           eventArgs: item,
         })),

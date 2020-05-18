@@ -65,6 +65,7 @@ declare type gdEventsFunctionsExtension = gdEventsFunctionsContainer & gdEmscrip
 
 declare type gdVectorEventsSearchResult = gdEmscriptenObject;
 declare type gdMapStringPropertyDescriptor = gdEmscriptenObject;
+declare type gdMapExtensionProperties = gdEmscriptenObject;
 declare type gdPropertyDescriptor = gdEmscriptenObject;
 declare type gdNamedPropertyDescriptor = gdEmscriptenObject;
 declare type gdNamedPropertyDescriptorsList = gdEmscriptenObject;

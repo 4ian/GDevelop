@@ -13,6 +13,7 @@ import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
+import ExtensionsPropertiesDialog from './ExtensionsPropertiesDialog';
 import {
   enumerateLayouts,
   enumerateExternalEvents,
@@ -286,6 +287,7 @@ type State = {|
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
+  extensionsPropertiesDialogOpen: boolean,
   projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
   layoutPropertiesDialogOpen: boolean,
@@ -302,6 +304,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     renamedItemName: '',
     searchText: '',
     projectPropertiesDialogOpen: false,
+    extensionsPropertiesDialogOpen: false,
     projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
     layoutPropertiesDialogOpen: false,
@@ -752,6 +755,14 @@ export default class ProjectManager extends React.Component<Props, State> {
                   this.props.onOpenResources();
                 }}
               />,
+              <ListItem
+                key="extension-properties"
+                primaryText={<Trans>Extensions Properties</Trans>}
+                leftIcon={<SettingsApplications />}
+                onClick={() =>
+                  this.setState({ extensionsPropertiesDialogOpen: true })
+                }
+              />,
             ]}
           />
           <ProjectStructureItem
@@ -1098,6 +1109,15 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {this.state.extensionsPropertiesDialogOpen && (
+          <ExtensionsPropertiesDialog
+            open={this.state.extensionsPropertiesDialogOpen}
+            project={project}
+            onApply={() => {
+              this.setState({ extensionsPropertiesDialogOpen: false });
+            }}
           />
         )}
         {!!this.state.editedPropertiesLayout && (

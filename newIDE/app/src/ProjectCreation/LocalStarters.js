@@ -34,6 +34,7 @@ type Props = {|
     fileMetadata: ?FileMetadata
   ) => void,
   onShowExamples: () => void,
+  pathProvider: Object,
 |};
 
 type State = {|
@@ -42,17 +43,19 @@ type State = {|
 
 export default class LocalStarters extends Component<Props, State> {
   state = {
-    outputPath: findEmptyPath(
+    outputPath: this.props.pathProvider.getState() === "" ? findEmptyPath(
       path && app
         ? path.join(app.getPath('documents'), 'GDevelop projects')
         : ''
-    ),
+    ) : this.props.pathProvider.getState(),
   };
 
-  _handleChangePath = (outputPath: string) =>
+  _handleChangePath = (outputPath: string) => {
     this.setState({
       outputPath,
     });
+    this.props.pathProvider.setState(outputPath);
+  }
 
   createFromExample(i18n: I18nType, exampleName: string) {
     const { outputPath } = this.state;

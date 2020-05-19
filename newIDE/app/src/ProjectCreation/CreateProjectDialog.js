@@ -8,9 +8,26 @@ import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { string } from 'prop-types';
+
+class StringStore {
+  state: string;
+  constructor(initialState: string = "") {
+    this.state = initialState;
+  }
+
+  setState(newState: string): void {
+    this.state = newState;
+  }
+
+  getState(): string {
+    return this.state;
+  }
+}
 
 type State = {|
   currentTab: 'starters' | 'examples' | 'tutorials',
+  outputPath: StringStore,
 |};
 
 export type CreateProjectDialogWithComponentsProps = {|
@@ -36,6 +53,7 @@ type Props = {|
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
     currentTab: 'starters',
+    outputPath: new StringStore(),
   };
 
   _onChangeTab = (newTab: 'starters' | 'examples' | 'tutorials') => {
@@ -85,6 +103,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
               onOpen={onOpen}
               onCreate={onCreate}
               onShowExamples={this._showExamples}
+              pathProvider={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'examples' && (
@@ -92,6 +111,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
               onOpen={onOpen}
               onCreate={onCreate}
               onExamplesLoaded={this._onExamplesLoaded}
+              pathProvider={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'tutorials' && <Tutorials />}

@@ -32,6 +32,7 @@ type Props = {|
     fileMetadata: FileMetadata
   ) => void,
   onExamplesLoaded: () => void,
+  pathProvider: Object,
 |};
 
 type State = {|
@@ -54,11 +55,11 @@ export const showGameFileCreationError = (
 
 export default class LocalExamples extends Component<Props, State> {
   state = {
-    outputPath: findEmptyPath(
+    outputPath: this.props.pathProvider.getState() === "" ? findEmptyPath(
       path && app
         ? path.join(app.getPath('documents'), 'GDevelop projects')
         : ''
-    ),
+    ) : this.props.pathProvider.getState(),
     exampleNames: null,
   };
 
@@ -80,10 +81,12 @@ export default class LocalExamples extends Component<Props, State> {
     });
   }
 
-  _handleChangePath = (outputPath: string) =>
+  _handleChangePath = (outputPath: string) => {
     this.setState({
       outputPath,
     });
+    this.props.pathProvider.setState(outputPath);
+  }
 
   createFromExample = (i18n: I18nType, exampleName: string) => {
     const { outputPath } = this.state;

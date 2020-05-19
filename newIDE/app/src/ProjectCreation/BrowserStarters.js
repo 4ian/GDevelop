@@ -9,6 +9,7 @@ import ListIcon from '../UI/ListIcon';
 import Text from '../UI/Text';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
+import { object } from 'prop-types';
 const gd = global.gd;
 
 type Props = {|

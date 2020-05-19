@@ -120,11 +120,11 @@ export default class ProjectStorageProviders extends React.Component<
       }
     }
 
-    const storageProviderOperations = (
+    const newStorageProvider: StorageProvider =
       storageProvider ||
       this.state.currentStorageProvider ||
-      emptyStorageProvider
-    ).createOperations({
+      emptyStorageProvider;
+    const storageProviderOperations = newStorageProvider.createOperations({
       setDialog: this._setDialog,
       closeDialog: this._closeDialog,
     });
@@ -132,7 +132,7 @@ export default class ProjectStorageProviders extends React.Component<
     return new Promise(resolve => {
       this.setState(
         {
-          currentStorageProvider: storageProvider,
+          currentStorageProvider: newStorageProvider,
           storageProviderOperations,
         },
         () => {

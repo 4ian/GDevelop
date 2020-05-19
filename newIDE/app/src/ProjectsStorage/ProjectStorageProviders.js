@@ -35,6 +35,7 @@ type Props = {|
       newStorageProvider: ?StorageProvider
     ) => Promise<StorageProviderOperations>,
     initialFileMetadataToOpen: ?FileMetadata,
+    getStorageProvider: () => StorageProvider,
   }) => React.Node,
 |};
 
@@ -142,6 +143,10 @@ export default class ProjectStorageProviders extends React.Component<
     });
   };
 
+  _getStorageProvider = () => {
+    return this.state.currentStorageProvider || emptyStorageProvider;
+  };
+
   render() {
     const { children, storageProviders } = this.props;
     const { renderDialog, initialFileMetadataToOpen } = this.state;
@@ -152,6 +157,7 @@ export default class ProjectStorageProviders extends React.Component<
           storageProviders,
           getStorageProviderOperations: this._getStorageProviderOperations,
           initialFileMetadataToOpen,
+          getStorageProvider: this._getStorageProvider,
         })}
         {renderDialog && renderDialog()}
       </React.Fragment>

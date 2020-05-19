@@ -8,7 +8,6 @@ import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { string } from 'prop-types';
 
 class StringStore {
   state: string;

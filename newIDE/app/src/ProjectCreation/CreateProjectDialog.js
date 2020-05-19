@@ -11,7 +11,7 @@ import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 class StringStore {
   state: string;
-  constructor(initialState: string = "") {
+  constructor(initialState: string = '') {
     this.state = initialState;
   }
 

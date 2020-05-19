@@ -43,11 +43,14 @@ type State = {|
 
 export default class LocalStarters extends Component<Props, State> {
   state = {
-    outputPath: this.props.pathProvider.getState() === "" ? findEmptyPath(
-      path && app
-        ? path.join(app.getPath('documents'), 'GDevelop projects')
-        : ''
-    ) : this.props.pathProvider.getState(),
+    outputPath:
+      this.props.pathProvider.getState() === ''
+        ? findEmptyPath(
+            path && app
+              ? path.join(app.getPath('documents'), 'GDevelop projects')
+              : ''
+          )
+        : this.props.pathProvider.getState(),
   };
 
   _handleChangePath = (outputPath: string) => {
@@ -55,7 +58,7 @@ export default class LocalStarters extends Component<Props, State> {
       outputPath,
     });
     this.props.pathProvider.setState(outputPath);
-  }
+  };
 
   createFromExample(i18n: I18nType, exampleName: string) {
     const { outputPath } = this.state;

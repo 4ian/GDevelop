@@ -55,11 +55,14 @@ export const showGameFileCreationError = (
 
 export default class LocalExamples extends Component<Props, State> {
   state = {
-    outputPath: this.props.pathProvider.getState() === "" ? findEmptyPath(
-      path && app
-        ? path.join(app.getPath('documents'), 'GDevelop projects')
-        : ''
-    ) : this.props.pathProvider.getState(),
+    outputPath:
+      this.props.pathProvider.getState() === ''
+        ? findEmptyPath(
+            path && app
+              ? path.join(app.getPath('documents'), 'GDevelop projects')
+              : ''
+          )
+        : this.props.pathProvider.getState(),
     exampleNames: null,
   };
 
@@ -86,7 +89,7 @@ export default class LocalExamples extends Component<Props, State> {
       outputPath,
     });
     this.props.pathProvider.setState(outputPath);
-  }
+  };
 
   createFromExample = (i18n: I18nType, exampleName: string) => {
     const { outputPath } = this.state;

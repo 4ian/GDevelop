@@ -1541,12 +1541,7 @@ const MainFrame = (props: Props) => {
           i18n: i18n,
           project: state.currentProject,
           onChooseProject: chooseProject,
-          onOpenRecentFile: (
-            fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
-          ) =>
-            openFromFileMetadataWithStorageProvider(
-              fileMetadataAndStorageProviderName
-            ),
+          onOpenRecentFile: openFromFileMetadataWithStorageProvider,
           onSaveProject: saveProject,
           onSaveProjectAs: saveProjectAs,
           onCloseProject: askToCloseProject,

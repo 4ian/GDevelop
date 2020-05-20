@@ -8,25 +8,15 @@ import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-
-class StringStore {
-  state: string;
-  constructor(initialState: string = '') {
-    this.state = initialState;
-  }
-
-  setState(newState: string): void {
-    this.state = newState;
-  }
-
-  getState(): string {
-    return this.state;
-  }
-}
+import { findEmptyPath } from './LocalPathFinder';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const path = optionalRequire('path');
+const electron = optionalRequire('electron');
+const app = electron ? electron.remote.app : null;
 
 type State = {|
   currentTab: 'starters' | 'examples' | 'tutorials',
-  outputPath: StringStore,
+  outputPath: string,
 |};
 
 export type CreateProjectDialogWithComponentsProps = {|
@@ -52,7 +42,7 @@ type Props = {|
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
     currentTab: 'starters',
-    outputPath: new StringStore(),
+    outputPath: '',
   };
 
   _onChangeTab = (newTab: 'starters' | 'examples' | 'tutorials') => {
@@ -67,6 +57,15 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
     // Force an update to ensure dialog is properly positioned.
     this.forceUpdate();
   };
+
+  componentDidMount() {
+    if (path && app)
+      this.setState({
+        outputPath: findEmptyPath(
+          path.join(app.getPath('documents'), 'GDevelop projects')
+        ),
+      });
+  }
 
   render() {
     const { open, onClose, onOpen, onCreate } = this.props;
@@ -101,16 +100,18 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             <StartersComponent
               onOpen={onOpen}
               onCreate={onCreate}
+              onChangeOutputPath={outputPath => this.setState({ outputPath })}
               onShowExamples={this._showExamples}
-              pathProvider={this.state.outputPath}
+              outputPath={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'examples' && (
             <ExamplesComponent
               onOpen={onOpen}
               onCreate={onCreate}
+              onChangeOutputPath={outputPath => this.setState({ outputPath })}
               onExamplesLoaded={this._onExamplesLoaded}
-              pathProvider={this.state.outputPath}
+              outputPath={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'tutorials' && <Tutorials />}

@@ -12,14 +12,11 @@ import { Column, Line } from '../UI/Grid';
 import { List, ListItem } from '../UI/List';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { findEmptyPath } from './LocalPathFinder';
 import ListIcon from '../UI/ListIcon';
 import { showGameFileCreationError } from './LocalExamples';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 const gd = global.gd;
 
@@ -33,35 +30,16 @@ type Props = {|
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata
   ) => void,
+  onChangeOutputPath: (outputPath: string) => void,
   onShowExamples: () => void,
-  pathProvider: Object,
-|};
-
-type State = {|
   outputPath: string,
 |};
 
+type State = {||};
+
 export default class LocalStarters extends Component<Props, State> {
-  state = {
-    outputPath:
-      this.props.pathProvider.getState() === ''
-        ? findEmptyPath(
-            path && app
-              ? path.join(app.getPath('documents'), 'GDevelop projects')
-              : ''
-          )
-        : this.props.pathProvider.getState(),
-  };
-
-  _handleChangePath = (outputPath: string) => {
-    this.setState({
-      outputPath,
-    });
-    this.props.pathProvider.setState(outputPath);
-  };
-
   createFromExample(i18n: I18nType, exampleName: string) {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     findExamples(examplesPath => {
@@ -81,7 +59,7 @@ export default class LocalStarters extends Component<Props, State> {
   }
 
   createEmptyGame(i18n: I18nType) {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     try {
@@ -91,7 +69,7 @@ export default class LocalStarters extends Component<Props, State> {
       return;
     }
 
-    const project = gd.ProjectHelper.createNewGDJSProject();
+    const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
     const filePath = path.join(outputPath, 'game.json');
     project.setProjectFile(filePath);
     this.props.onCreate(project, LocalFileStorageProvider, {
@@ -109,8 +87,8 @@ export default class LocalStarters extends Component<Props, State> {
               <Column expand>
                 <LocalFolderPicker
                   fullWidth
-                  value={this.state.outputPath}
-                  onChange={this._handleChangePath}
+                  value={this.props.outputPath}
+                  onChange={this.props.onChangeOutputPath}
                   type="create-game"
                 />
               </Column>

@@ -28,12 +28,14 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
     project: gdProject
   ) {
     const keys = properties.keys().toJSArray();
+    const propertiesManager = project.getExtensionPropertiesManager();
     for (let key of keys) {
-      properties
-        .get(key)
-        .setValue(
-          project.getExtensionPropertiesManager().getValue(extensionName, key)
-        );
+      if(propertiesManager.hasProperty(extensionName, key)) // Leave default value if none has been set yet
+        properties
+          .get(key)
+          .setValue(
+            propertiesManager.getValue(extensionName, key)
+          );
     }
     return properties;
   }

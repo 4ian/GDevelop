@@ -24,6 +24,15 @@ namespace gd{
         properties[extension][property] = newValue;
       };
 
+      bool HasProperty(const gd::String& extension, const gd::String& property) {
+        for (std::pair<gd::String, gd::String> propertyPair : properties[extension]) {
+          if (propertyPair.first == property) {
+            return true;
+          }
+        }
+        return false;
+      }
+
       ///@{
       /**
        * \brief Serialize the Extension Properties.

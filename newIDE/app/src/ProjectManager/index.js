@@ -31,6 +31,7 @@ import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
+import Tune from '@material-ui/icons/Tune';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
 import Settings from '@material-ui/icons/Settings';
 import Save from '@material-ui/icons/Save';
@@ -758,7 +759,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ListItem
                 key="extension-properties"
                 primaryText={<Trans>Extensions Properties</Trans>}
-                leftIcon={<SettingsApplications />}
+                leftIcon={<Tune />}
                 onClick={() =>
                   this.setState({ extensionsPropertiesDialogOpen: true })
                 }

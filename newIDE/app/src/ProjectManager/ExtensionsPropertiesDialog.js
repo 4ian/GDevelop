@@ -3,200 +3,59 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import Checkbox from '../UI/Checkbox';
 import Dialog from '../UI/Dialog';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
-import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
+import { ColumnStackLayout } from '../UI/Layout';
+import EmptyMessage from '../UI/EmptyMessage';
+import PropertiesEditor from '../PropertiesEditor';
+import propertiesMapToSchema  from '../PropertiesEditor/PropertiesMapToSchema';
+import { List } from '@material-ui/core';
 
 type Props = {|
   project: gdProject,
   open: boolean,
-  onClose: Function,
   onApply: Function,
-  onChangeSubscription: () => void,
 |};
 
-type State = {|
-  properties: Map<string, Array<gdPropertyDescriptor>>,
-|};
-
-class ExtensionsPropertiesDialog extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = this._loadFrom(props.project);
-  }
-
-  _loadFrom(project: gdProject): State {
-    const allProps: gdMapExtensionProperties = project.getAllExtensionProperties();
-    const properties: Map<
-      string,
-      Map<string, gdPropertyDescriptor>
-    > = new Map();
-
-    // Convert to js map
-    for (let extensionName of allProps.keys().toJSArray()) {
-      let extensionProperties: gdMapStringPropertyDescriptor = allProps.get(
-        extensionName
-      );
-      for (let propertyName of extensionProperties.keys().toJSArray()) {
-        let property: Map<string, gdPropertyDescriptor> = new Map();
-        property.set(propertyName, extensionProperties.get(propertyName));
-        properties.set(extensionName, property);
-      }
-    }
-
-    return {
-      properties: properties,
-    };
-  }
-
-  componentWillReceiveProps(newProps: Props) {
-    if (
-      (!this.props.open && newProps.open) ||
-      (newProps.open && this.props.project !== newProps.project)
-    ) {
-      this.setState(this._loadFrom(newProps.project));
-    }
-  }
-
+class ExtensionsPropertiesDialog extends React.Component<Props> {
   _onApply = () => {
     this.props.onApply();
   };
 
-  _getAllProperties() {
-    const { properties } = this.state;
-
-    const items = [];
-    for (let [extensionName, propertyMap] of properties.entries()) {
-      const extensionFullName = this.props.project
-        .getCurrentPlatform()
-        .getAllPlatformExtensions()
-        .get(extensionName)
-        .getFullName();
-      const extensionContent = [];
-      extensionContent.push(
-        <Text size="body">
-          <Trans>{extensionFullName}</Trans>
-        </Text>
-      );
-      for (let [propertyName, propertyDescriptor] of propertyMap.entries()) {
-        if (propertyDescriptor.getType() === 'string') {
-          extensionContent.push(
-            <SemiControlledTextField
-              floatingLabelText={
-                <Trans>
-                  {this.state.properties
-                    .get(extensionName)
-                    .get(propertyName)
-                    .getDescription()}
-                </Trans>
-              }
-              fullWidth
-              hintText={
-                <Trans>
-                  {this.state.properties
-                    .get(extensionName)
-                    .get(propertyName)
-                    .getLabel()}
-                </Trans>
-              }
-              type="text"
-              value={this.state.properties
-                .get(extensionName)
-                .get(propertyName)
-                .getValue()}
-              onBlur={() => this.forceUpdate()}
-              onChange={value => {
-                this.state.properties
-                  .get(extensionName)
-                  .get(propertyName)
-                  .setValue(value);
-              }}
-            />
-          );
-        } else if (propertyDescriptor.getType() === 'number') {
-          extensionContent.push(
-            <SemiControlledTextField
-              floatingLabelText={
-                <Trans>
-                  {this.state.properties
-                    .get(extensionName)
-                    .get(propertyName)
-                    .getDescription()}
-                </Trans>
-              }
-              fullWidth
-              hintText={
-                <Trans>
-                  {this.state.properties
-                    .get(extensionName)
-                    .get(propertyName)
-                    .getLabel()}
-                </Trans>
-              }
-              type="number"
-              value={this.state.properties
-                .get(extensionName)
-                .get(propertyName)
-                .getValue()}
-              onBlur={() => this.forceUpdate()}
-              onChange={value => {
-                this.state.properties
-                  .get(extensionName)
-                  .get(propertyName)
-                  .setValue(value);
-              }}
-            />
-          );
-        } else if (propertyDescriptor.getType() === 'yesorno') {
-          extensionContent.push(
-            <Checkbox
-              label={
-                <Trans>
-                  {this.state.properties
-                    .get(extensionName)
-                    .get(propertyName)
-                    .getDescription()}
-                </Trans>
-              }
-              checked={
-                this.state.properties
-                  .get(extensionName)
-                  .get(propertyName)
-                  .getValue() === 'true'
-              }
-              onCheck={(e, checked) => {
-                const currentProperty = this.state.properties
-                  .get(extensionName)
-                  .get(propertyName);
-                if (checked) {
-                  currentProperty.setValue('true');
-                } else {
-                  currentProperty.setValue('false');
-                }
-                this.forceUpdate();
-              }}
-            />
-          );
-        } else {
-          console.error(
-            'Property with incorrect type cannot be displayed! ' +
-              'Extension: ' +
-              extensionName +
-              ', Property: ' +
-              propertyName +
-              '.'
-          );
-        }
-      }
-      // items.push(<ColumnStackLayout>{extensionContent}</ColumnStackLayout>);
-      items.push(extensionContent);
+  _mapExtensionValueToPropertyDescriptors(properties: gdMapStringPropertyDescriptor, extensionName: string, project: gdProject) {
+    const keys = properties.keys().toJSArray();
+    for(let key of keys) {
+      properties.get(key).setValue(project.getExtensionPropertiesManager().getValue(extensionName, key))
     }
-    return items;
+    return properties;
   }
 
   render() {
+    const { project } = this.props;
+    const allExtensions = project.getCurrentPlatform().getAllPlatformExtensions();
+    const properties = [];
+    for(let i = 0; i<allExtensions.size(); i++) {
+      const extension = allExtensions.at(i);
+      const propertiesSchema = propertiesMapToSchema(
+        extension.getAllProperties(),
+        instance => this._mapExtensionValueToPropertyDescriptors(extension.getAllProperties(), extension.getName(), project),
+        (instance, propertyName, newValue) => project.getExtensionPropertiesManager().setValue(extension.getName(), propertyName, newValue)
+      );
+      if(extension.getAllProperties().keys().size() !== 0)
+        properties.push(
+          <ColumnStackLayout key={extension.getName()}>
+            <Text size="title">
+              <Trans>{extension.getFullName()}</Trans>
+            </Text>
+            <PropertiesEditor 
+              schema={propertiesSchema}
+              instances={[extension.getAllProperties()]}
+            />
+          </ColumnStackLayout>
+        );
+    }
+    
+
     return (
       <React.Fragment>
         <Dialog
@@ -211,11 +70,19 @@ class ExtensionsPropertiesDialog extends React.Component<Props, State> {
           title={<Trans>Extension properties</Trans>}
           cannotBeDismissed={true}
           open={this.props.open}
-          onRequestClose={this.props.onClose}
+          onRequestClose={this.props.onApply}
         >
-          <ColumnStackLayout noMargin>
-            {this._getAllProperties()}
-          </ColumnStackLayout>
+            {properties.length ? (
+              <List>
+                {properties}
+              </List>
+            ) : (
+              <EmptyMessage>
+                <Trans>
+                  No Extension Properties Available.
+                </Trans>
+              </EmptyMessage>
+            )}
         </Dialog>
       </React.Fragment>
     );

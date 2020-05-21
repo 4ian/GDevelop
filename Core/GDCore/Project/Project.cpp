@@ -616,29 +616,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
   
-  /*
-  SerializerElement& extensionPropertiesElement = propElement.GetChild("extensionProperties");
-  for(std::pair<gd::String, std::shared_ptr<gd::SerializerElement>> extension : extensionPropertiesElement.GetAllChildren()) {
-    std::shared_ptr<PlatformExtension> platformExtension = GetCurrentPlatform().GetExtension(extension.first);
-    for(std::pair<gd::String, std::shared_ptr<gd::SerializerElement>> property : extension.second->GetAllChildren()) {
-      gd::PropertyDescriptor propertyInstance = *platformExtension->GetProperty(property.first).Clone(); // Take the extension's property as "template" to keep the metadata.
-      propertyInstance.UnserializeValuesFrom(*property.second); // Apply the saved value
-      extensionProperties[extension.first][property.first] = propertyInstance; // Put it in the project.
-    }
-  }
-  */
-  
-  SerializerElement& allExtensionsPropertiesElement = propElement.GetChild("extensionProperties");
-  for(std::shared_ptr<PlatformExtension> extension : GetCurrentPlatform().GetAllPlatformExtensions()) { // We do not iterate over serialized object to include also new properties and remove old removed ones.
-    gd::String extensionName = extension->GetName(); // Cache the name to not call the function again...
-    SerializerElement& extensionElement = allExtensionsPropertiesElement.GetChild(extensionName); // ... and the serializer element too
-    for(std::pair<const gd::String, gd::PropertyDescriptor>& property : extension->GetAllProperties()) {
-      gd::PropertyDescriptor propertyInstance = *property.second.Clone(); // Take the extension's property as "template" to keep the metadata.
-      if(extensionElement.HasChild(property.first)) // In case we have a serialized value...
-        propertyInstance.UnserializeValuesFrom(extensionElement.GetChild(property.first)); // ... apply the saved value
-      extensionProperties[extensionName][property.first] = propertyInstance; // And finally put the property in the project!
-    }
-  }
+  extensionProperties.UnserializeFrom(propElement.GetChild("extensionProperties"));
 
 #endif
 
@@ -904,14 +882,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("macExecutableFilename", macExecutableFilename);
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
-  SerializerElement& extensionsPropertiesElement = propElement.AddChild("extensionProperties");
-
-  for(std::pair<gd::String, std::map<gd::String, gd::PropertyDescriptor>> extension : extensionProperties) {
-    SerializerElement& extensionPropElement = extensionsPropertiesElement.AddChild(extension.first);
-    for(std::pair<gd::String, gd::PropertyDescriptor> property : extension.second) {
-      property.second.SerializeValuesTo(extensionPropElement.AddChild(property.first));
-    }
-  }
+  extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
 
   SerializerElement& extensionsElement = propElement.AddChild("extensions");
   extensionsElement.ConsiderAsArrayOf("extension");

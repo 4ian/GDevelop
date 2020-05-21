@@ -296,7 +296,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
         // In cordova all settings are considered a plugin variable
         for (std::pair<const gd::String, gd::PropertyDescriptor>& dependency : dependencies.GetAllExtraSettings()) {
           if (dependency.second.GetType() == "ExtensionProperty") {
-            plugins += "\t\t<variable name=\"" + dependency.first + "\" value=\"" + project.GetExtensionProperties(*extension).at(dependency.second.GetValue()).GetValue() + "\" />\n";
+            plugins += "\t\t<variable name=\"" + dependency.first + "\" value=\"" + project.GetExtensionPropertiesManager().GetValue(extension->GetName(), dependency.second.GetValue()) + "\" />\n";
           } else {
             plugins += "\t\t<variable name=\"" + dependency.first + "\" value=\"" + dependency.second.GetValue() + "\" />\n";
           }

@@ -324,8 +324,7 @@ interface Project {
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
     [Const, Ref] VectorString GetUsedExtensions();
-    [Ref] MapStringPropertyDescriptor GetExtensionProperties([Const] DOMString extensionName);
-    [Ref] MapExtensionProperties GetAllExtensionProperties();
+    [Ref] ExtensionPropertiesManager GetExtensionPropertiesManager();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
 
@@ -396,6 +395,11 @@ interface Project {
     unsigned long GetObjectsCount();
 
     [Ref] ObjectGroupsContainer GetObjectGroups();
+};
+
+interface ExtensionPropertiesManager {
+    [Const, Ref] DOMString GetValue([Const] DOMString extension, [Const] DOMString property);
+    void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
 };
 
 interface Behavior {

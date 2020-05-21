@@ -82,7 +82,7 @@ export default class LocalStarters extends Component<Props, State> {
   }
 
   componentDidMount() {
-    if ((this.props.outputPath === ''))
+    if (this.props.outputPath === '')
       if (path && app)
         this.props.onChangeOutputPath(
           findEmptyPath(

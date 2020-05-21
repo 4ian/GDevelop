@@ -56,6 +56,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this),
     getRecentProjectFiles: this._getRecentProjectFiles.bind(this),
     insertRecentProjectFile: this._insertRecentProjectFile.bind(this),
+    getAutoOpenMostRecent: this._getAutoOpenMostRecent.bind(this),
+    setAutoOpenMostRecent: this._setAutoOpenMostRecent.bind(this),
+    getProjectHasOpened: this._getProjectHasOpened.bind(this),
+    setProjectHasOpened: this._setProjectHasOpened.bind(this),
   };
 
   componentDidMount() {
@@ -371,6 +375,38 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         0,
         5
       )
+    );
+  }
+
+  _getAutoOpenMostRecent() {
+    return this.state.values.autoOpenMostRecent;
+  }
+
+  _setAutoOpenMostRecent(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          autoOpenMostRecent: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getProjectHasOpened() {
+    return this.state.values.projectHasOpened;
+  }
+
+  _setProjectHasOpened(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          projectHasOpened: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
     );
   }
 

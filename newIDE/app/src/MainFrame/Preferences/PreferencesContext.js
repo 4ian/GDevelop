@@ -132,6 +132,8 @@ export type PreferencesValues = {|
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
+  autoOpenMostRecent: boolean,
+  projectHasOpened: boolean,
 |};
 
 /**
@@ -168,6 +170,10 @@ export type Preferences = {|
   insertRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => void,
+  getAutoOpenMostRecent: () => boolean,
+  setAutoOpenMostRecent: (enabled: boolean) => void,
+  getProjectHasOpened: () => boolean,
+  setProjectHasOpened: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -188,6 +194,8 @@ export const initialPreferences = {
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
     recentProjectFiles: [],
+    autoOpenMostRecent: true,
+    projectHasOpened: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -214,6 +222,10 @@ export const initialPreferences = {
   insertRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => {},
+  getAutoOpenMostRecent: () => true,
+  setAutoOpenMostRecent: () => {},
+  getProjectHasOpened: () => false,
+  setProjectHasOpened: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

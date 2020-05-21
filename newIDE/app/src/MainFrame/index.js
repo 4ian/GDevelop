@@ -254,6 +254,19 @@ const MainFrame = (props: Props) => {
             performance.now(),
           ]);
           console.info('Startup times:', getStartupTimesSummary());
+
+          const {
+            getAutoOpenMostRecent,
+            getRecentProjectFiles,
+            getProjectHasOpened,
+          } = preferences;
+
+          if (
+            getAutoOpenMostRecent() &&
+            getProjectHasOpened() &&
+            getRecentProjectFiles()[0]
+          )
+            openFromFileMetadataWithStorageProvider(getRecentProjectFiles()[0]);
         })
         .catch(() => {
           /* Ignore errors */
@@ -393,6 +406,7 @@ const MainFrame = (props: Props) => {
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
       // TODO: Pixi cache should also be burst
+      preferences.setProjectHasOpened(true);
 
       return setState(state => ({
         ...state,
@@ -534,6 +548,7 @@ const MainFrame = (props: Props) => {
   const closeProject = (): Promise<void> => {
     const { eventsFunctionsExtensionsState } = props;
 
+    preferences.setProjectHasOpened(false);
     setPreviewState(initialPreviewState);
     return setState(state => {
       const { currentProject, editorTabs } = state;

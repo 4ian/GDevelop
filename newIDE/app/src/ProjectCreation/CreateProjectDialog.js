@@ -8,11 +8,6 @@ import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { findEmptyPath } from './LocalPathFinder';
-import optionalRequire from '../Utils/OptionalRequire.js';
-const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
 
 type State = {|
   currentTab: 'starters' | 'examples' | 'tutorials',
@@ -57,15 +52,6 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
     // Force an update to ensure dialog is properly positioned.
     this.forceUpdate();
   };
-
-  componentDidMount() {
-    if (path && app)
-      this.setState({
-        outputPath: findEmptyPath(
-          path.join(app.getPath('documents'), 'GDevelop projects')
-        ),
-      });
-  }
 
   render() {
     const { open, onClose, onOpen, onCreate } = this.props;

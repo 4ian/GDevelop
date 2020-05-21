@@ -84,7 +84,7 @@ namespace gd {
             gd::String exportName = ""; ///< The name used to install the package (example: npm package name for npm dependency type).
             gd::String version = "-1"; ///< The version of the dependency
             DependencyTypes dependencyType = DependencyTypes::invalid; ///< The tool used to install the dependency.
-            std::map<gd::String, gd::PropertyDescriptor> extraData = std::map<gd::String, gd::PropertyDescriptor>(); ///< Contains dependency type specific additional parameters for the dependency.
+            std::map<gd::String, gd::PropertyDescriptor> extraData; ///< Contains dependency type specific additional parameters for the dependency.
     };
 } // namespace gd
 #endif  // DEPENDENCYMETADATA_H

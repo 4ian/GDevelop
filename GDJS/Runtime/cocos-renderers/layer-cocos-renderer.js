@@ -16,7 +16,7 @@ gdjs.LayerCocosRenderer = function(layer, runtimeSceneRenderer)
     this._layer = layer;
     this.convertYPosition = runtimeSceneRenderer.convertYPosition;
 
-    var effects = this._layer.getEffects();
+    var effects = this._layer.getEffectsData();
     if (effects.length === 0) {
         this._cocosLayer = new CocosLayer();
         runtimeSceneRenderer.getCocosScene().addChild(this._cocosLayer);
@@ -60,7 +60,7 @@ gdjs.LayerCocosRenderer.prototype._makeShaders = function() {
         return;
     }
 
-    var effects = this._layer.getEffects();
+    var effects = this._layer.getEffectsData();
     if (effects.length === 0) {
         return;
     } else if (effects.length > 1) {
@@ -164,4 +164,29 @@ gdjs.LayerCocosRenderer.prototype.setEffectStringParameter = function (name, par
 
 gdjs.LayerCocosRenderer.prototype.setEffectBooleanParameter = function (name, parameterName, value) {
     // Unimplemented
+};
+
+gdjs.LayerCocosRenderer.prototype.hasEffect = function(name) {
+    for (var i = 0;i < this._shaders.length; ++i) {
+        if (this._shaders[i].name === name) {
+            return true;
+        }
+    }
+    return false;
+};
+
+gdjs.LayerCocosRenderer.prototype.enableEffect = function(name, value) {
+    // Unimplemented
+};
+
+gdjs.LayerCocosRenderer.prototype.addEffect = function(effectData) {
+    // Unimplemented
+};
+
+gdjs.LayerCocosRenderer.prototype.removeEffect = function(effect) {
+    // Unimplemented
+};
+
+gdjs.LayerCocosRenderer.prototype.isEffectEnabled = function(name) {
+    return this.hasEffect(name);
 };

@@ -37,6 +37,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   Props,
   State
 > {
+  _lastLoadPromise: ?Promise<void> = null;
   state = {
     eventsFunctionsExtensionsError: null,
     loadProjectEventsFunctionsExtensions: this._loadProjectEventsFunctionsExtensions.bind(
@@ -48,21 +49,43 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
     reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
       this
     ),
+    ensureLoadFinished: this._ensureLoadFinished.bind(this),
     getEventsFunctionsExtensionWriter: () =>
       this.props.eventsFunctionsExtensionWriter,
     getEventsFunctionsExtensionOpener: () =>
       this.props.eventsFunctionsExtensionOpener,
   };
 
+  _ensureLoadFinished(): Promise<void> {
+    if (this._lastLoadPromise) {
+      console.info(
+        'Waiting on the events functions extensions to finish loading...'
+      );
+    } else {
+      console.info('Events functions extensions are ready.');
+    }
+
+    return this._lastLoadPromise
+      ? this._lastLoadPromise.then(() => {
+          console.info('Events functions extensions finished loading.');
+        })
+      : Promise.resolve();
+  }
+
   _loadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
     const { i18n, eventsFunctionCodeWriter } = this.props;
     if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
-    return loadProjectEventsFunctionsExtensions(
-      project,
-      eventsFunctionCodeWriter,
-      i18n
-    )
+    const lastLoadPromise = this._lastLoadPromise || Promise.resolve();
+
+    this._lastLoadPromise = lastLoadPromise
+      .then(() =>
+        loadProjectEventsFunctionsExtensions(
+          project,
+          eventsFunctionCodeWriter,
+          i18n
+        )
+      )
       .then(() =>
         this.setState({
           eventsFunctionsExtensionsError: null,
@@ -78,7 +101,12 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
           ),
           eventsFunctionsExtensionsError
         );
+      })
+      .then(() => {
+        this._lastLoadPromise = null;
       });
+
+    return this._lastLoadPromise;
   }
 
   _unloadProjectEventsFunctionsExtensions(project: gdProject) {

@@ -16,6 +16,7 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/VersionPriv.h"
 

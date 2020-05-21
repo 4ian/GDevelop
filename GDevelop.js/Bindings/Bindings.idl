@@ -1259,8 +1259,6 @@ interface PlatformExtension {
 
     [Const, Ref] DependencyMetadata AddDependency();
 
-
-
     [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString defaultName,

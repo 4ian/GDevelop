@@ -14,7 +14,6 @@
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
-#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/ExtensionPropertiesManager.h"
 #include "GDCore/String.h"
 namespace gd {

@@ -127,6 +127,66 @@ Add an object using [`addObject`](https://docs.gdevelop-app.com/GDCore%20Documen
 
 > ℹ️ After doing this, you can actually see your object in GDevelop! Read the next sections to see how to add an editor and a renderer for instances on the scene editor.
 
+#### Declare a Property
+
+A property is a global configuration value for your extension. An example would be the App ID for AdMob.
+
+To declare one, just use `registerProperty`: 
+```js
+// From ExampleJsExtension/JsExtension.js:
+extension.registerProperty("DummyPropertyString")
+  .setDescription(_("Dummy Property Name"))
+  .setType("string")
+  .setLabel("Type in anything :)");
+```
+
+#### Declare a Dependency on an external package
+
+You can declare a dependency on an npm package or cordova plugin with `addDependency`. Example:
+```js
+// From ExampleJsExtension/JsExtension.js:
+extension
+  .addDependency()
+  .setName("Thirteen Checker")
+  .setDependencyType(gd.DependencyTypes.npm)
+  .setExportName("is-thirteen")
+  .setVersion("2.0.0");
+```
+
+On cordova you can add plugin variables as extra properties:
+```js
+extension.addDependency()
+  .setName("Some Cordova Extension")
+  .setDependencyType(gd.DependencyTypes.cordova)
+  .setExportName("cordova-some-plugin")
+  .setVersion("1.0.0")
+  .setExtraSetting(
+    "VARIABLE_NAME",
+    new gd.PropertyDescriptor().setValue("42")
+  );
+```
+
+You can also use an extension property to determine the value of the plugin variable:
+```js
+// From AdMob/JsExtension.js:
+extension.registerProperty("AdMobAppID") // Remember Property Name
+      .setDescription("AdMob App ID")
+      .setType("string")
+      .setLabel("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY");
+
+extension.addDependency()
+  .setName("AdMob Cordova Extension")
+  .setDependencyType(gd.DependencyTypes.cordova)
+  .setExportName("cordova-plugin-admob-free")
+  .setVersion("~0.21.0")
+  .setExtraSetting(
+    "ADMOB_APP_ID", 
+    new gd.PropertyDescriptor()
+      .setType("ExtensionProperty") // Tell the exporte this is an extension property...
+      .setValue("AdMobAppID") // ... and what property it is (name of the property).
+  );
+```
+
 #### Declare an object editor
 
 To add an editor to your object, implement the function `registerEditorConfigurations` in your extension module. For now, only a default editor, displaying the object properties, is supported:

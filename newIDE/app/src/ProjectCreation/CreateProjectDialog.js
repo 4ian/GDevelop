@@ -11,6 +11,7 @@ import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type State = {|
   currentTab: 'starters' | 'examples' | 'tutorials',
+  outputPath: string,
 |};
 
 export type CreateProjectDialogWithComponentsProps = {|
@@ -36,6 +37,7 @@ type Props = {|
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
     currentTab: 'starters',
+    outputPath: '',
   };
 
   _onChangeTab = (newTab: 'starters' | 'examples' | 'tutorials') => {
@@ -84,14 +86,18 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             <StartersComponent
               onOpen={onOpen}
               onCreate={onCreate}
+              onChangeOutputPath={outputPath => this.setState({ outputPath })}
               onShowExamples={this._showExamples}
+              outputPath={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'examples' && (
             <ExamplesComponent
               onOpen={onOpen}
               onCreate={onCreate}
+              onChangeOutputPath={outputPath => this.setState({ outputPath })}
               onExamplesLoaded={this._onExamplesLoaded}
+              outputPath={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'tutorials' && <Tutorials />}

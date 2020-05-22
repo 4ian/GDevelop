@@ -56,10 +56,13 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this),
     getRecentProjectFiles: this._getRecentProjectFiles.bind(this),
     insertRecentProjectFile: this._insertRecentProjectFile.bind(this),
-    getAutoOpenMostRecent: this._getAutoOpenMostRecent.bind(this),
-    setAutoOpenMostRecent: this._setAutoOpenMostRecent.bind(this),
-    getProjectHasOpened: this._getProjectHasOpened.bind(this),
-    setProjectHasOpened: this._setProjectHasOpened.bind(this),
+    removeRecentProjectFile: this._removeRecentProjectFile.bind(this),
+    getAutoOpenMostRecentProject: this._getAutoOpenMostRecentProject.bind(this),
+    setAutoOpenMostRecentProject: this._setAutoOpenMostRecentProject.bind(this),
+    hadProjectOpenedDuringLastSession: this._hadProjectOpenedDuringLastSession.bind(
+      this
+    ),
+    setHasProjectOpened: this._setHasProjectOpened.bind(this),
   };
 
   componentDidMount() {
@@ -378,32 +381,43 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getAutoOpenMostRecent() {
-    return this.state.values.autoOpenMostRecent;
+  _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
+    const isNotSadPathRecentFile = recentFileItem =>
+      JSON.stringify(recentFileItem) !== JSON.stringify(recentFile);
+    this._setRecentProjectFiles(
+      [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
+        0,
+        5
+      )
+    );
   }
 
-  _setAutoOpenMostRecent(enabled: boolean) {
+  _getAutoOpenMostRecentProject() {
+    return this.state.values.autoOpenMostRecentProject;
+  }
+
+  _setAutoOpenMostRecentProject(enabled: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          autoOpenMostRecent: enabled,
+          autoOpenMostRecentProject: enabled,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
   }
 
-  _getProjectHasOpened() {
-    return this.state.values.projectHasOpened;
+  _hadProjectOpenedDuringLastSession() {
+    return this.state.values.hasProjectOpened;
   }
 
-  _setProjectHasOpened(enabled: boolean) {
+  _setHasProjectOpened(enabled: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          projectHasOpened: enabled,
+          hasProjectOpened: enabled,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

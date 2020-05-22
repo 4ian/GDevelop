@@ -90,6 +90,7 @@ export default class InstructionEditor extends React.Component<Props, State> {
             ref={instructionParametersEditor =>
               (this._instructionParametersEditor = instructionParametersEditor)
             }
+            //$FlowFixMe
             focusOnMount={instruction.getType()}
           />
         </Paper>

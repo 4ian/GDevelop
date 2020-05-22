@@ -11,7 +11,7 @@ const gd = global.gd;
  * @param {*} methodName The name of the serialization method. "unserializeFrom" by default
  */
 export function serializeToJSObject(
-  serializable: gdSerializable,
+  serializable: gdSerializableObject,
   methodName: string = 'serializeTo'
 ) {
   const serializedElement = new gd.SerializerElement();
@@ -31,7 +31,7 @@ export function serializeToJSObject(
  * @param {*} methodName The name of the serialization method. "unserializeFrom" by default
  */
 export function serializeToJSON(
-  serializable: gdSerializable,
+  serializable: gdSerializableObject,
   methodName: string = 'serializeTo'
 ): string {
   const serializedElement = new gd.SerializerElement();
@@ -50,7 +50,7 @@ export function serializeToJSON(
  * @param {*} optionalProject The project to pass as argument for unserialization
  */
 export function unserializeFromJSObject(
-  serializable: gdSerializable,
+  serializable: gdSerializableObject,
   object: Object,
   methodName: string = 'unserializeFrom',
   optionalProject: ?gdProject = undefined

@@ -62,7 +62,7 @@ const runExtensionSanityTests = (
 const loadExtension = (
   _ /*: TranslationFunction */,
   gd /*: any */,
-  platform /*: gdPlatform*/,
+  platform /*: gdJsPlatform*/,
   jsExtensionModule /*: JsExtensionModule*/
 ) /*: ExtensionLoadingResult*/ => {
   if (!jsExtensionModule.createExtension) {

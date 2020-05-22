@@ -522,6 +522,7 @@ export default class ExpressionField extends React.Component<Props, State> {
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
+            //$FlowFixMe Union types should be used in a manner that handles all types
             expressionMetadata={this.state.selectedExpressionInfo.metadata}
             onDone={parameterValues => {
               if (!this.state.selectedExpressionInfo) return;

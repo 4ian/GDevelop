@@ -16,7 +16,7 @@ export type HistoryState = {|
  * @param {*} serializableObject
  */
 export const getHistoryInitialState = (
-  serializableObject: gdSerializable,
+  serializableObject: gdSerializableObject,
   { historyMaxSize }: { historyMaxSize: number }
 ): HistoryState => {
   return {
@@ -50,7 +50,7 @@ export const canUndo = (history: HistoryState): boolean => {
  */
 export const saveToHistory = (
   history: HistoryState,
-  serializableObject: gdSerializable
+  serializableObject: gdSerializableObject
 ): HistoryState => {
   const newUndoHistory = [...history.undoHistory, history.current];
   if (newUndoHistory.length > history.maxSize) {
@@ -75,7 +75,7 @@ export const saveToHistory = (
  */
 export const undo = (
   history: HistoryState,
-  serializableObject: gdSerializable,
+  serializableObject: gdSerializableObject,
   project: ?gdProject = undefined
 ): HistoryState => {
   if (!history.undoHistory.length) {
@@ -108,7 +108,7 @@ export const undo = (
  */
 export const redo = (
   history: HistoryState,
-  serializableObject: gdSerializable,
+  serializableObject: gdSerializableObject,
   project: ?gdProject = undefined
 ): HistoryState => {
   if (!history.redoHistory.length) {

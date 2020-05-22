@@ -463,11 +463,12 @@ export default class EventsSheet extends React.Component<Props, State> {
     indexInList: ?number = undefined
   ) => {
     const selectedInstructions = getSelectedInstructions(this.state.selection);
-    const destinationIndex =
-      indexInList === undefined
-        ? destinationContext.instrsList.size()
-        : indexInList;
 
+    let destinationIndex: number = 0;
+    if(indexInList != null) 
+       destinationIndex = indexInList;
+    else destinationIndex = destinationContext.instrsList.size();;
+      
     const isTryingToDragAnInstructionIntoItsOwnNestedInstructions = !!selectedInstructions.filter(
       instruction =>
         containsSubInstructions(instruction, destinationContext.instrsList)
@@ -925,7 +926,7 @@ export default class EventsSheet extends React.Component<Props, State> {
           } = this.state.editedInstruction;
           if (!instrsList) return;
 
-          if (indexInList !== undefined) {
+          if (indexInList != null) {
             // Replace an existing instruction
             instrsList.set(indexInList, instruction);
           } else {

@@ -138,6 +138,7 @@ export const useNewInstructionEditor = ({
           enumeratedInstructionMetadata.scope.behaviorMetadata)
       ) {
         const objectParameterIndex = getObjectParameterIndex(
+          //$FlowFixMe Union types should be used in a manner that handles all types
           enumeratedInstructionMetadata.metadata
         );
         if (objectParameterIndex !== -1) {

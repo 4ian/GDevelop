@@ -79,26 +79,31 @@ describe('EnumerateInstructions', () => {
       ({ type }) => type === 'Create'
     )[0];
     expect(createInstruction).not.toBeUndefined();
+    //$FlowFixMe Union types should be used in a manner that handles all types
     expect(getObjectParameterIndex(createInstruction.metadata)).toBe(1);
 
     const pickRandom = actions.filter(({ type }) => type === 'AjoutHasard')[0];
     expect(pickRandom).not.toBeUndefined();
+    //$FlowFixMe Union types should be used in a manner that handles all types
     expect(getObjectParameterIndex(pickRandom.metadata)).toBe(1);
 
     const pickAll = actions.filter(({ type }) => type === 'AjoutObjConcern')[0];
     expect(pickAll).not.toBeUndefined();
+    //$FlowFixMe Union types should be used in a manner that handles all types
     expect(getObjectParameterIndex(pickAll.metadata)).toBe(1);
 
     const triggerOnce = conditions.filter(
       ({ type }) => type === 'BuiltinCommonInstructions::Once'
     )[0];
     expect(triggerOnce).not.toBeUndefined();
+    //$FlowFixMe Union types should be used in a manner that handles all types
     expect(getObjectParameterIndex(triggerOnce.metadata)).toBe(-1);
 
     const spriteAnimatedEnded = conditions.filter(
       ({ type }) => type === 'AnimationEnded'
     )[0];
     expect(spriteAnimatedEnded).not.toBeUndefined();
+    //$FlowFixMe Union types should be used in a manner that handles all types
     expect(getObjectParameterIndex(spriteAnimatedEnded.metadata)).toBe(0);
   });
 });

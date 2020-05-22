@@ -217,7 +217,7 @@ export default class VariablesList extends React.Component<Props, State> {
         depth={depth}
         origin={origin}
         errorText={
-          this.state.nameErrors[variable.ptr]
+          this.state.nameErrors[variable.ptr.toString()]
             ? 'This name is already taken'
             : undefined
         }

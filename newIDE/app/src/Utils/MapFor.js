@@ -25,15 +25,8 @@ const mapReverseFor = /*:: <T>*/ (
   return result;
 };
 
-/*flow-include
-type CppVector<T> = {
-  size: () => number,
-  at: (number) => T,
-}
-*/
-
 const mapVector = /*:: <T, U>*/ (
-  cppVector /*: CppVector<T> */,
+  cppVector /*: gdVector<T> */,
   func /*: (T, number) => U */
 ) /*:Array<U> */ => {
   return mapFor(0, cppVector.size(), i => func(cppVector.at(i), i));

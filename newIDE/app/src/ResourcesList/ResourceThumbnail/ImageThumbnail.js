@@ -64,28 +64,37 @@ const ImageThumbnail = ({
   const [hasSizeWarning, setHasWarningSize] = React.useState(false);
   const [hasThumbnailMissing, setThumbnailMissing] = React.useState(false);
 
-  const _callbackImageThumbnailLoaded = (imageElement: HTMLImageElement) => {
-    const image = imageElement.target;
+  const _callbackImageThumbnailLoaded = React.useCallback(
+    (imageElement: HTMLImageElement) => {
+      if (!imageElement || hasSizeWarning) return;
+      const image = imageElement.target;
 
-    image.src = resourcesLoader.getResourceFullUrl(project, resourceName);
+      if (image.naturalWidth > 2048 || image.naturalHeight > 2048) {
+        onSelect(selected);
+        setHasWarningSize(true);
+        var answer = Window.showConfirmDialog(
+          i18n._(
+            t`The selected image is more than 2048 pixels wide. The image may not be displayed on some devices. Do you really want to import the image?`
+          )
+        );
 
-    if (image.naturalWidth > 2048 || image.naturalHeight > 2048) {
-      onSelect(selected);
-      setHasWarningSize(true);
-      var answer = Window.showConfirmDialog(
-        i18n._(
-          t`The selected image is more than 2048 pixels wide. The image may not be displayed on some devices. Do you really want to import the image?`
-        )
-      );
+        if (!answer) {
+          deleteSprite(true);
+          // TODO Supprimer la resource
+          //deleteResource(PATH);
 
-      if (!answer) {
-        deleteSprite(true);
+          /*
+          FIXED avec le useCallback - l'image du sprite semble être chargé une nouvelle fois après l'importation d'un nouveau sprite,
+          FIXME lorsque les sprite sont déplacé dans le sortable container la confirmation de l'import d'une resource trop grande est de nouveau déclenché.
+          */
+        }
+      } else {
+        setHasWarningSize(false);
       }
-    } else {
-      setHasWarningSize(false);
-    }
-    setThumbnailMissing(false);
-  };
+      setThumbnailMissing(false);
+    },
+    [!hasThumbnailMissing]
+  );
 
   return (
     <ThemeConsumer>

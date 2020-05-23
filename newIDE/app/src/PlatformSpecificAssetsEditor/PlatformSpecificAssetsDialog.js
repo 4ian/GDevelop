@@ -17,6 +17,7 @@ import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import optionalRequire from '../Utils/OptionalRequire';
 import Text from '../UI/Text';
+import { ColumnStackLayout } from '../UI/Layout';
 const path = optionalRequire('path');
 const gd = global.gd;
 
@@ -247,88 +248,90 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         cannotBeDismissed={true}
         onRequestClose={this.props.onClose}
       >
-        <Line justifyContent="center">
-          {isResizeSupported() ? (
-            <RaisedButton
-              primary
-              label={<Trans>Generate icons from a file</Trans>}
-              onClick={this._generateFromFile}
+        <ColumnStackLayout noMargin>
+          <Line justifyContent="center">
+            {isResizeSupported() ? (
+              <RaisedButton
+                primary
+                label={<Trans>Generate icons from a file</Trans>}
+                onClick={this._generateFromFile}
+              />
+            ) : (
+              <Text>
+                <Trans>
+                  Download GDevelop desktop version to generate the Android and
+                  iOS icons of your game.
+                </Trans>
+              </Text>
+            )}
+          </Line>
+          <Text>
+            <Trans>Desktop (Windows, macOS and Linux) icon:</Trans>
+          </Text>
+          {desktopSizes.map((size, index) => (
+            <ResourceSelectorWithThumbnail
+              key={size}
+              floatingLabelText={`Desktop icon (${size}x${size} px)`}
+              project={project}
+              resourceSources={resourceSources}
+              onChooseResource={onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
+              resourceKind="image"
+              resourceName={desktopIconResourceNames[index]}
+              onChange={resourceName => {
+                const newIcons = [...desktopIconResourceNames];
+                newIcons[index] = resourceName;
+                this.setState({
+                  desktopIconResourceNames: newIcons,
+                });
+              }}
             />
-          ) : (
-            <Text>
-              <Trans>
-                Download GDevelop desktop version to generate the Android and
-                iOS icons of your game.
-              </Trans>
-            </Text>
-          )}
-        </Line>
-        <Text>
-          <Trans>Desktop (Windows, macOS and Linux) icon:</Trans>
-        </Text>
-        {desktopSizes.map((size, index) => (
-          <ResourceSelectorWithThumbnail
-            key={size}
-            floatingLabelText={`Desktop icon (${size}x${size} px)`}
-            project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
-            resourceKind="image"
-            resourceName={desktopIconResourceNames[index]}
-            onChange={resourceName => {
-              const newIcons = [...desktopIconResourceNames];
-              newIcons[index] = resourceName;
-              this.setState({
-                desktopIconResourceNames: newIcons,
-              });
-            }}
-          />
-        ))}
-        <Text>
-          <Trans>Android icons:</Trans>
-        </Text>
-        {androidSizes.map((size, index) => (
-          <ResourceSelectorWithThumbnail
-            key={size}
-            floatingLabelText={`Android icon (${size}x${size} px)`}
-            project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
-            resourceKind="image"
-            resourceName={androidIconResourceNames[index]}
-            onChange={resourceName => {
-              const newIcons = [...androidIconResourceNames];
-              newIcons[index] = resourceName;
-              this.setState({
-                androidIconResourceNames: newIcons,
-              });
-            }}
-          />
-        ))}
-        <Text>
-          <Trans>iOS (iPhone and iPad) icons:</Trans>
-        </Text>
-        {iosSizes.map((size, index) => (
-          <ResourceSelectorWithThumbnail
-            key={size}
-            floatingLabelText={`iOS icon (${size}x${size} px)`}
-            project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceKind="image"
-            resourceName={iosIconResourceNames[index]}
-            resourceExternalEditors={resourceExternalEditors}
-            onChange={resourceName => {
-              const newIcons = [...iosIconResourceNames];
-              newIcons[index] = resourceName;
-              this.setState({
-                iosIconResourceNames: newIcons,
-              });
-            }}
-          />
-        ))}
+          ))}
+          <Text>
+            <Trans>Android icons:</Trans>
+          </Text>
+          {androidSizes.map((size, index) => (
+            <ResourceSelectorWithThumbnail
+              key={size}
+              floatingLabelText={`Android icon (${size}x${size} px)`}
+              project={project}
+              resourceSources={resourceSources}
+              onChooseResource={onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
+              resourceKind="image"
+              resourceName={androidIconResourceNames[index]}
+              onChange={resourceName => {
+                const newIcons = [...androidIconResourceNames];
+                newIcons[index] = resourceName;
+                this.setState({
+                  androidIconResourceNames: newIcons,
+                });
+              }}
+            />
+          ))}
+          <Text>
+            <Trans>iOS (iPhone and iPad) icons:</Trans>
+          </Text>
+          {iosSizes.map((size, index) => (
+            <ResourceSelectorWithThumbnail
+              key={size}
+              floatingLabelText={`iOS icon (${size}x${size} px)`}
+              project={project}
+              resourceSources={resourceSources}
+              onChooseResource={onChooseResource}
+              resourceKind="image"
+              resourceName={iosIconResourceNames[index]}
+              resourceExternalEditors={resourceExternalEditors}
+              onChange={resourceName => {
+                const newIcons = [...iosIconResourceNames];
+                newIcons[index] = resourceName;
+                this.setState({
+                  iosIconResourceNames: newIcons,
+                });
+              }}
+            />
+          ))}
+        </ColumnStackLayout>
       </Dialog>
     );
   }

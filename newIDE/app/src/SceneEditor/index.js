@@ -28,7 +28,6 @@ import {
 import Clipboard from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
-import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import EditorMosaic from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
@@ -65,7 +64,6 @@ import {
 } from '../Utils/TagsHelper';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 const gd = global.gd;
@@ -101,23 +99,18 @@ const initialMosaicEditorNodesSmallWindow = {
 };
 
 type Props = {|
-  previewButtonSettings: PreviewButtonSettings,
   initialInstances: gdInitialInstancesContainer,
   initialUiSettings: Object,
   layout: gdLayout,
-  onEditObject: (object: gdObject) => void,
-  onOpenDebugger: () => void,
-  onOpenMoreSettings: () => void,
-  onPreview: (options: PreviewOptions) => void,
+  onEditObject?: ?(object: gdObject) => void,
+  onOpenMoreSettings?: ?() => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
-  showNetworkPreviewButton: boolean,
-  showPreviewButton: boolean,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -213,15 +206,6 @@ export default class SceneEditor extends React.Component<Props, State> {
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
-        previewButtonSettings={this.props.previewButtonSettings}
-        showPreviewButton={this.props.showPreviewButton}
-        onPreview={() => this.props.onPreview({})}
-        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-        onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
-        onOpenDebugger={() => {
-          this.props.onOpenDebugger();
-          this.props.onPreview({});
-        }}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
         openObjectGroupsList={this.openObjectGroupsList}

@@ -3,11 +3,10 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
-import { Line, Column } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -19,23 +18,21 @@ export default class PanelSpriteEditor extends React.Component<
     const shapePainterObject = gd.asShapePainterObject(object);
 
     return (
-      <Column>
-        <Line>
-          <Checkbox
-            label={
-              <Trans>
-                Draw the shapes relative to the object position on the scene
-              </Trans>
-            }
-            checked={!shapePainterObject.areCoordinatesAbsolute()}
-            onCheck={(e, checked) => {
-              if (!checked) shapePainterObject.setCoordinatesAbsolute();
-              else shapePainterObject.setCoordinatesRelative();
-              this.forceUpdate();
-            }}
-          />
-        </Line>
-        <ResponsiveLineStackLayout>
+      <ColumnStackLayout>
+        <Checkbox
+          label={
+            <Trans>
+              Draw the shapes relative to the object position on the scene
+            </Trans>
+          }
+          checked={!shapePainterObject.areCoordinatesAbsolute()}
+          onCheck={(e, checked) => {
+            if (!checked) shapePainterObject.setCoordinatesAbsolute();
+            else shapePainterObject.setCoordinatesRelative();
+            this.forceUpdate();
+          }}
+        />
+        <ResponsiveLineStackLayout noMargin>
           <ColorField
             floatingLabelText={<Trans>Outline color</Trans>}
             disableAlpha
@@ -78,7 +75,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin>
           <ColorField
             floatingLabelText={<Trans>Fill color</Trans>}
             disableAlpha
@@ -110,7 +107,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-      </Column>
+      </ColumnStackLayout>
     );
   }
 }

@@ -23,7 +23,7 @@ type Props = {|
   ) => void,
   onGroupsUpdated?: () => void,
   canSetAsGlobalGroup?: boolean,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|

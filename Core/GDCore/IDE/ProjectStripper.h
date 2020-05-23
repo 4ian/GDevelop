@@ -28,23 +28,6 @@ class GD_CORE_API ProjectStripper {
    */
   static void StripProjectForExport(gd::Project& project);
 
-  /**
-   * \brief Strip project to keep only the full content of the specified
-   * layout. The content of other layouts, external events and external layouts
-   * is removed.
-   */
-  static void StripProjectForLayoutEdition(gd::Project& project,
-                                           const gd::String& layoutName);
-
-  /**
-   * \brief Strip project to keep only the full content of the specified
-   * external layout and the associated layout.
-   * The content of other layouts, external events and external layouts is
-   * removed.
-   */
-  static void StripProjectForExternalLayoutEdition(
-      gd::Project& project, const gd::String& externalLayoutName);
-
  private:
   ProjectStripper(){};
   virtual ~ProjectStripper(){};

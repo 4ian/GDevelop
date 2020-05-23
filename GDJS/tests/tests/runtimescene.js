@@ -5,7 +5,7 @@
 describe('gdjs.RuntimeScene integration tests', function() {
   describe('Object and behavior lifecycles (using TestObject and TestBehavior)', function () {
     it('should properly create and destroy object, including the behaviors', function() {
-	    const runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
+	    const runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}, resources: {resources: []}});
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers:[{name:"", visibility: true}],

@@ -2,12 +2,12 @@
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
-import React from 'react';
+import * as React from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '../../../UI/IconButton';
 import Language from '@material-ui/icons/Language';
-import BaseEditor from '../BaseEditor';
+import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import Window from '../../../Utils/Window';
 import { Line, Spacer } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
@@ -36,13 +36,40 @@ const styles = {
   },
 };
 
-class StartPage extends BaseEditor {
-  constructor() {
-    super();
+type Props = {|
+  project: ?gdProject,
 
-    this.state = {
-      aboutDialogOpen: false,
-    };
+  isActive: boolean,
+  projectItemName: ?string,
+  project: ?gdProject,
+  setToolbar: (?React.Node) => void,
+
+  // Project opening
+  canOpen: boolean,
+  onOpen: () => void,
+  onCreate: () => void,
+  onOpenProjectManager: () => void,
+  onCloseProject: () => Promise<void>,
+
+  // Other dialogs opening:
+  onOpenAboutDialog: () => void,
+  onOpenHelpFinder: () => void,
+  onOpenLanguageDialog: () => void,
+|};
+
+type State = {|
+  aboutDialogOpen: boolean,
+|};
+
+export class StartPage extends React.Component<Props, State> {
+  state = {
+    aboutDialogOpen: false,
+  };
+
+  shouldComponentUpdate(nextProps: Props) {
+    // Prevent any update to the editor if the editor is not active,
+    // and so not visible to the user.
+    return nextProps.isActive;
   }
 
   getProject() {
@@ -129,7 +156,9 @@ class StartPage extends BaseEditor {
                       <FlatButton
                         label={<Trans>Close project</Trans>}
                         fullWidth
-                        onClick={onCloseProject}
+                        onClick={() => {
+                          onCloseProject();
+                        }}
                       />
                       <Spacer />
                     </React.Fragment>
@@ -200,4 +229,22 @@ class StartPage extends BaseEditor {
   }
 }
 
-export default StartPage;
+export const renderStartPageContainer = (
+  props: RenderEditorContainerPropsWithRef
+) => (
+  <StartPage
+    ref={props.ref}
+    project={props.project}
+    isActive={props.isActive}
+    projectItemName={props.projectItemName}
+    setToolbar={props.setToolbar}
+    canOpen={props.canOpen}
+    onOpen={props.onOpen}
+    onCreate={props.onCreate}
+    onOpenProjectManager={props.onOpenProjectManager}
+    onCloseProject={props.onCloseProject}
+    onOpenAboutDialog={props.onOpenAboutDialog}
+    onOpenHelpFinder={props.onOpenHelpFinder}
+    onOpenLanguageDialog={props.onOpenLanguageDialog}
+  />
+);

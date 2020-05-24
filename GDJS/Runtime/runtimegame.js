@@ -65,8 +65,9 @@ gdjs.RuntimeGame = function(data, spec) {
   /**
    * Property passed by the IDE when the current export is a preview.
    * @type {boolean}
+   * @private
    */
-  this.isPreview = spec.isPreview | false;
+  this._isPreview = spec.isPreview || false;
 };
 
 gdjs.RuntimeGame.prototype.getRenderer = function() {
@@ -531,4 +532,12 @@ gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
  */
 gdjs.RuntimeGame.prototype.wasFirstSceneLoaded = function() {
   return this._sceneStack.wasFirstSceneLoaded();
+}
+
+/**
+ * Checks if the IDE marked the current build as preview.
+ * @returns {boolean} true if the current game is a preview.
+ */
+gdjs.RuntimeGame.prototype.isPreview() {
+  return this._isPreview;
 }

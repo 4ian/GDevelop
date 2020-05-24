@@ -358,11 +358,6 @@ gdjs.objectsListsToArray = function(objectsLists) {
   return result;
 };
 
-/**
- * Is true on previews.
- */
-gdjs.isPreview = false;
-
 Array.prototype.remove = function(from) {
   //Adapted from the nice article available at
   //https://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript

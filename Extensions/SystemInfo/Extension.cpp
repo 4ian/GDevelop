@@ -48,16 +48,15 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
           "IsPreview",
           _("Is the game running in a preview"),
           _(
-            "Check if the game is currently being previewed. " +
-            "Can be used to nabel a 'Debug mode'"
+            "Check if the game is currently being previewed. "
+            "Can be used to enable a 'Debug mode'"
           ),
           _("The game is a preview"),
           _("System information"),
           "CppPlatform/Extensions/systeminfoicon24.png",
           "CppPlatform/Extensions/systeminfoicon16.png")
 
-      .SetFunctionName("SystemInfo::IsMobile")
-      .SetIncludeFile("SystemInfo/SystemInfoTools.h");
+      .AddCodeOnlyParameter("currentScene", "");
 #endif
 }
 

@@ -61,6 +61,12 @@ gdjs.RuntimeGame = function(data, spec) {
   this._debuggerClient = gdjs.DebuggerClient
     ? new gdjs.DebuggerClient(this)
     : null;
+
+  /**
+   * Property passed by the IDE when the current export is a preview.
+   * @type {boolean}
+   */
+  this.isPreview = spec.isPreview | false;
 };
 
 gdjs.RuntimeGame.prototype.getRenderer = function() {

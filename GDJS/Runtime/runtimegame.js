@@ -560,6 +560,6 @@ gdjs.RuntimeGame.prototype.getSceneStack = function() {
  * Checks if the IDE marked the current build as preview.
  * @returns {boolean} true if the current game is a preview.
  */
-gdjs.RuntimeGame.prototype.isPreview() {
+gdjs.RuntimeGame.prototype.isPreview = function() {
   return this._isPreview;
 }

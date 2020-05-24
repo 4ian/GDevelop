@@ -39,9 +39,9 @@ gdjs.evtTools.systemInfo.isWebGLSupported = function(runtimeScene) {
 };
 
 /**
- * Checks in runtimeGame for the additional isPreview spec.
+ * Check if the game is running as a preview, launched from an editor.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene.
- * @returns {boolean} true if the game is a Preview.
+ * @returns {boolean} true if the game is running as a preview.
  */
 gdjs.evtTools.systemInfo.isPreview = function(runtimeScene) {
 	return runtimeScene.getGame().isPreview;

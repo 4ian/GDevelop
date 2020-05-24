@@ -9,6 +9,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 type MainMenuEvent =
   | 'main-menu-open'
+  | 'main-menu-open-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
   | 'main-menu-close'
@@ -31,6 +32,7 @@ type MenuItemTemplate =
       accelerator?: string,
       enabled?: boolean,
       label?: string,
+      eventArgs?: any,
     |}
   | {|
       submenu: Array<MenuItemTemplate>,
@@ -70,7 +72,7 @@ const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
   );
 };
 
-const buildAndSendMenuTemplate = (project, i18n) => {
+const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
   const fileTemplate = {
     label: i18n._(t`File`),
     submenu: [
@@ -84,6 +86,14 @@ const buildAndSendMenuTemplate = (project, i18n) => {
         label: i18n._(t`Open...`),
         accelerator: 'CommandOrControl+O',
         onClickSendEvent: 'main-menu-open',
+      },
+      {
+        label: i18n._(t`Open Recent`),
+        submenu: recentProjectFiles.map(item => ({
+          label: item.fileMetadata.fileIdentifier,
+          onClickSendEvent: 'main-menu-open-recent',
+          eventArgs: item,
+        })),
       },
       { type: 'separator' },
       {
@@ -295,10 +305,11 @@ const buildAndSendMenuTemplate = (project, i18n) => {
  * Create and update the editor main menu using Electron APIs.
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
-  const { i18n, project } = props;
+  const { i18n, project, recentProjectFiles } = props;
   const language = i18n.language;
 
   useIPCEventListener('main-menu-open', props.onChooseProject);
+  useIPCEventListener('main-menu-open-recent', props.onOpenRecentFile);
   useIPCEventListener('main-menu-save', props.onSaveProject);
   useIPCEventListener('main-menu-save-as', props.onSaveProjectAs);
   useIPCEventListener('main-menu-close', props.onCloseProject);
@@ -319,9 +330,9 @@ const ElectronMainMenu = (props: MainMenuProps) => {
 
   React.useEffect(
     () => {
-      buildAndSendMenuTemplate(project, i18n);
+      buildAndSendMenuTemplate(project, i18n, recentProjectFiles);
     },
-    [i18n, language, project]
+    [i18n, language, project, recentProjectFiles]
   );
 
   return null;

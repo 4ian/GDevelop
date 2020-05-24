@@ -26,12 +26,12 @@ This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Co
 ```shell
     cd GDevelop.js
     npm install
-    npm run build
+    npm run build -- --dev
 ```
 
 > ℹ️ Output is created in _/path/to/GD/Binaries/embuild/GDevelop.js/_ and also copied to GDevelop 5 IDE (`newIDE` folder).
 
-> ⏱ As the linking (last step) of the build can be very long, you can run `npm run build -- --dev` to disable temporary optimizations and get a (slightly) faster build.
+> ⏱ The linking (last step) of the build can be very long when `-- --dev` is not specified, so be sure to include it. Only remove it if you are about to deploy a new version.
 
 - You can then launch GDevelop 5 that will use your build of GDevelop.js:
 

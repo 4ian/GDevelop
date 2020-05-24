@@ -69,7 +69,7 @@ gdjs.RuntimeGame = function(data, options) {
    * @type {boolean}
    * @private
    */
-  this._isPreview = spec.isPreview || false;
+  this._isPreview = options.isPreview || false;
 };
 
 /**

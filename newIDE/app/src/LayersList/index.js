@@ -119,7 +119,7 @@ type Props = {|
     newName: string,
     cb: (done: boolean) => void
   ) => void,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|

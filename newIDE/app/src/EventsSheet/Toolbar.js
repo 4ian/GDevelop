@@ -6,17 +6,8 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import { type EventMetadata } from './EnumerateEventsMetadata';
-import PreviewButtons, {
-  type PreviewButtonSettings,
-} from '../MainFrame/Toolbar/PreviewButtons.js';
 
 type Props = {|
-  showPreviewButton: boolean,
-  onPreview: () => void,
-  previewButtonSettings: PreviewButtonSettings,
-  showNetworkPreviewButton: boolean,
-  onNetworkPreview: () => void,
-  onOpenDebugger: () => void,
   onAddStandardEvent: () => void,
   onAddSubEvent: () => void,
   canAddSubEvent: boolean,
@@ -37,15 +28,6 @@ export class Toolbar extends PureComponent<Props> {
   render() {
     return (
       <ToolbarGroup lastChild>
-        <PreviewButtons
-          showPreviewButton={this.props.showPreviewButton}
-          onPreview={this.props.onPreview}
-          previewButtonSettings={this.props.previewButtonSettings}
-          onNetworkPreview={this.props.onNetworkPreview}
-          onOpenDebugger={this.props.onOpenDebugger}
-          showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-        />
-        {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.onAddStandardEvent}
           src="res/ribbon_default/eventadd32.png"

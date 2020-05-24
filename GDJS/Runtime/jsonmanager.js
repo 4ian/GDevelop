@@ -14,7 +14,7 @@
  *
  * @class JsonManager
  * @memberof gdjs
- * @param {Object[]} resources The resources data of the game.
+ * @param {ResourceData[]} resources The resources data of the game.
  */
 gdjs.JsonManager = function(resources) {
   this._resources = resources;
@@ -28,14 +28,14 @@ gdjs.JsonManager = function(resources) {
  * @callback JsonManagerOnProgressCallback
  * @param {number} loaded The number of json files loaded so far
  * @param {number} total The total number to be loaded
- * @returns {undefined} Nothing
+ * @returns {void} Nothing
  */
 
 /**
  * The callback called when all jsons are preloaded
  * @callback JsonManagerOnCompleteCallback
  * @param {number} total The total number to be loaded
- * @returns {undefined} Nothing
+ * @returns {void} Nothing
  */
 
 /**

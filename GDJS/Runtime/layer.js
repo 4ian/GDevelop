@@ -11,7 +11,7 @@
  * Viewports and multiple cameras are not supported.
  *
  * @class Layer
- * @param {Object} layerData The data used to initialize the layer
+ * @param {LayerData} layerData The data used to initialize the layer
  * @param {gdjs.RuntimeScene} runtimeScene The scene in which the layer is used
  * @memberof gdjs
  */
@@ -21,7 +21,7 @@ gdjs.Layer = function(layerData, runtimeScene) {
   this._zoomFactor = 1;
   this._timeScale = 1;
   this._hidden = !layerData.visibility;
-  this._effects = layerData.effects || [];
+  this._effectsData = layerData.effects || [];
   this._cameraX = runtimeScene.getGame().getGameResolutionWidth() / 2;
   this._cameraY = runtimeScene.getGame().getGameResolutionHeight() / 2;
   this._cachedGameResolutionWidth = runtimeScene
@@ -275,9 +275,25 @@ gdjs.Layer.prototype.getHeight = function() {
   return this._cachedGameResolutionHeight;
 };
 
-gdjs.Layer.prototype.getEffects = function() {
-  return this._effects;
+gdjs.Layer.prototype.getEffectsData = function() {
+  return this._effectsData;
 };
+
+/**
+ * Add a new effect, or replace the one with the same name.
+ * @param {EffectData} effectData The data of the effect to add.
+ */
+gdjs.Layer.prototype.addEffect = function(effectData) {
+  this._renderer.addEffect(effectData);
+}
+
+/**
+ * Remove the effect with the specified name
+ * @param {string} effectName The name of the effect.
+ */
+gdjs.Layer.prototype.removeEffect = function(effectName) {
+  this._renderer.removeEffect(effectName);
+}
 
 /**
  * Change an effect parameter value (for parameters that are numbers).
@@ -339,28 +355,37 @@ gdjs.Layer.prototype.isEffectEnabled = function(name) {
   return this._renderer.isEffectEnabled(name);
 };
 
+/**
+ * Check if an effect exists on this layer
+ * @param {string} name The name of the effect
+ * @return {boolean} true if the effect exists, false otherwise.
+ */
+gdjs.Layer.prototype.hasEffect = function(name) {
+  return this._renderer.hasEffect(name);
+};
+
 gdjs.Layer.prototype._setEffectsDefaultParameters = function() {
-  for (var i = 0; i < this._effects.length; ++i) {
-    var effect = this._effects[i];
-    for (var name in effect.doubleParameters) {
+  for (var i = 0; i < this._effectsData.length; ++i) {
+    var effectData = this._effectsData[i];
+    for (var name in effectData.doubleParameters) {
       this.setEffectDoubleParameter(
-        effect.name,
+        effectData.name,
         name,
-        effect.doubleParameters[name]
+        effectData.doubleParameters[name]
       );
     }
-    for (var name in effect.stringParameters) {
+    for (var name in effectData.stringParameters) {
       this.setEffectStringParameter(
-        effect.name,
+        effectData.name,
         name,
-        effect.stringParameters[name]
+        effectData.stringParameters[name]
       );
     }
-    for (var name in effect.booleanParameters) {
+    for (var name in effectData.booleanParameters) {
       this.setEffectBooleanParameter(
-        effect.name,
+        effectData.name,
         name,
-        effect.booleanParameters[name]
+        effectData.booleanParameters[name]
       );
     }
   }

@@ -22,7 +22,7 @@ type Props = {|
   project: gdProject,
   onApply: () => void,
   onClose: () => void,
-  onOpenMoreSettings?: () => void,
+  onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
 |};
 

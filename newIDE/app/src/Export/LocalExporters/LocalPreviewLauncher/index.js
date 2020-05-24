@@ -11,6 +11,7 @@ import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import { findLocalIp } from './LocalIpFinder';
 import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
+import { LocalPreviewDebuggerServer } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -150,53 +151,34 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  launchLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
+  launchPreview = (previewOptions: PreviewOptions): Promise<any> => {
+    const { project, layout, externalLayout } = previewOptions;
     if (!project || !layout) return Promise.reject();
 
-    return this._prepareExporter().then(
-      ({ outputDir, exporter }) => {
-        timeFunction(
-          () => {
-            exporter.exportLayoutForPixiPreview(project, layout, outputDir);
-            exporter.delete();
-            this._openPreviewWindow(project, outputDir, options);
-          },
-          time => console.info(`Preview took ${time}ms`)
-        );
-      }
-    );
-  };
-
-  launchExternalLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
-    if (!project || !externalLayout) return Promise.reject();
-
-    return this._prepareExporter().then(
-      ({ outputDir, exporter }) => {
-        timeFunction(
-          () => {
+    return this._prepareExporter().then(({ outputDir, exporter }) => {
+      timeFunction(
+        () => {
+          if (externalLayout) {
             exporter.exportExternalLayoutForPixiPreview(
               project,
               layout,
               externalLayout,
               outputDir
             );
-            exporter.delete();
-            this._openPreviewWindow(project, outputDir, options);
-          },
-          time => console.info(`Preview took ${time}ms`)
-        );
-      }
-    );
+          } else {
+            exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+          }
+          exporter.delete();
+          this._openPreviewWindow(project, outputDir, previewOptions);
+        },
+        time => console.info(`Preview took ${time}ms`)
+      );
+    });
   };
+
+  getPreviewDebuggerServer() {
+    return LocalPreviewDebuggerServer;
+  }
 
   _checkSubscription = () => {
     if (!this._subscriptionChecker) return true;

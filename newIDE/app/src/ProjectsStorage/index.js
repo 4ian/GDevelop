@@ -12,6 +12,11 @@ export type FileMetadata = {|
   fileIdentifier: string,
 |};
 
+export type FileMetadataAndStorageProviderName = {
+  fileMetadata: FileMetadata,
+  storageProviderName: string,
+};
+
 /**
  * Interface returned by a storage provider to manipulate files.
  */

@@ -32,6 +32,7 @@ declare type gdResource = gdEmscriptenObject;
 declare type gdResourcesManager = gdEmscriptenObject;
 declare type gdEventsList = gdEmscriptenObject;
 declare type gdEventsFunction = gdEmscriptenObject;
+declare type gdAbstractFileSystem = gdEmscriptenObject;
 
 declare type gdInstruction = gdEmscriptenObject;
 declare type gdInstructionMetadata = gdEmscriptenObject;

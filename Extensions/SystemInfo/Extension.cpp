@@ -46,12 +46,12 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
   extension
       .AddCondition(
           "IsPreview",
-          _("Is the game running in a preview"),
+          _("Is the game running as a preview"),
           _(
-            "Check if the game is currently being previewed. "
-            "Can be used to enable a \"Debug mode\" or do some work only in previews."
+            "Check if the game is currently being previewed in the editor. "
+            "This can be used to enable a \"Debug mode\" or do some work only in previews."
           ),
-          _("The game is a preview"),
+          _("The game is being previewed in the editor"),
           _("System information"),
           "CppPlatform/Extensions/systeminfoicon24.png",
           "CppPlatform/Extensions/systeminfoicon16.png")

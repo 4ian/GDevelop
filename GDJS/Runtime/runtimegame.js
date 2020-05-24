@@ -64,11 +64,7 @@ gdjs.RuntimeGame = function(data, options) {
     ? new gdjs.DebuggerClient(this)
     : null;
 
-  /**
-   * Property passed by the IDE when the current export is a preview.
-   * @type {boolean}
-   * @private
-   */
+  /** @type {boolean} */
   this._isPreview = options.isPreview || false;
 };
 
@@ -557,7 +553,7 @@ gdjs.RuntimeGame.prototype.getSceneStack = function() {
 }
 
 /**
- * Checks if the IDE marked the current build as preview.
+ * Check if the game is running as a preview, launched from an editor.
  * @returns {boolean} true if the current game is a preview.
  */
 gdjs.RuntimeGame.prototype.isPreview = function() {

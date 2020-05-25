@@ -852,7 +852,7 @@ module.exports = {
 		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-functions.js')
       	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_functionstools.js')
-		  .setFunctionName('gdjs.evtTools.firebase.performance.recordPerformance');
+		  .setFunctionName('gdjs.evtTools.firebase.functions.call');
 
         return extension;
     },

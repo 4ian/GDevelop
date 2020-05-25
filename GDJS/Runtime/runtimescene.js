@@ -145,6 +145,19 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 };
 
 /**
+ * Check if an object is registered, meaning that instances of it can be created and lives in the scene.
+ * @see gdjs.RuntimeScene#registerObject
+ */
+gdjs.RuntimeScene.prototype.isObjectRegistered = function(objectName) {
+    return (
+        this._objects.containsKey(objectName) &&
+        this._instances.containsKey(objectName) &&
+        this._instancesCache.containsKey(objectName) &&
+        this._objectsCtor.containsKey(objectName)
+    );
+}
+
+/**
  * Register a {@link gdjs.RuntimeObject} so that instances of it can be used in the scene.
  * @param {ObjectData} objectData The data for the object to register.
  */
@@ -153,6 +166,23 @@ gdjs.RuntimeScene.prototype.registerObject = function(objectData) {
     this._instances.put(objectData.name, []); //Also reserve an array for the instances
     this._instancesCache.put(objectData.name, []); //and for cached instances
     this._objectsCtor.put(objectData.name, gdjs.getObjectConstructor(objectData.type)); //And cache the constructor for the performance sake
+}
+
+/**
+ * Update the data of a {@link gdjs.RuntimeObject} so that instances use this when constructed.
+ * @param {ObjectData} objectData The data for the object to register.
+ */
+gdjs.RuntimeScene.prototype.updateObject = function(objectData) {
+    if (!this.isObjectRegistered(objectData.name)) {
+        console.warn(
+            "Tried to call updateObject for an object that was not registered (" +
+            objectData.name +
+            "). Call registerObject first."
+        );
+    }
+
+    this._objects.put(objectData.name, objectData);
+    // Don't erase instances, nor instances cache, or objectsCtor cache.
 }
 
 /**
@@ -236,7 +266,7 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
  * Create objects from initial instances data ( for example, the initial instances
  * of the scene or from an external layout ).
  *
- * @param {Object} data The instances data
+ * @param {InstanceData[]} data The instances data
  * @param {number} xPos The offset on X axis
  * @param {number} yPos The offset on Y axis
  */

@@ -66,47 +66,62 @@ gdjs.LayerPixiRenderer.prototype.updateTime = function() {
 };
 
 gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
-  var effects = this._layer.getEffects();
-  if (effects.length === 0) {
+  var effectsData = this._layer.getEffectsData();
+  if (effectsData.length === 0) {
     return;
   }
 
-  this._filters = {};
+  this._pixiContainer.filters = [];
+  for (var i = 0; i < effectsData.length; ++i) {
+    this.addEffect(effectsData[i])
+  }
+};
 
-  // @ts-ignore
-  /** @type PIXI.Filter[] */
-  var pixiFilters = [];
-  for (var i = 0; i < effects.length; ++i) {
-    var effect = effects[i];
-    var filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
-      effect.effectType
+/**
+ * Add a new effect, or replace the one with the same name.
+ * @param {EffectData} effectData The data of the effect to add.
+ */
+gdjs.LayerPixiRenderer.prototype.addEffect = function(effectData) {
+  var filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
+    effectData.effectType
+  );
+  if (!filterCreator) {
+    console.log(
+      'Filter "' +
+        effectData.name +
+        '" has an unknown effect type: "' +
+        effectData.effectType +
+        '". Was it registered properly? Is the effect type correct?'
     );
-    if (!filterCreator) {
-      console.log(
-        'Filter "' +
-          effect.name +
-          '" has an unknown effect type: "' +
-          effect.effectType +
-          '". Was it registered properly? Is the effect type correct?'
-      );
-      continue;
-    }
-
-    /** @type gdjsPixiFiltersToolsFilter */
-    var filter = {
-      pixiFilter: filterCreator.makePIXIFilter(this._layer, effect),
-      updateDoubleParameter: filterCreator.updateDoubleParameter,
-      updateStringParameter: filterCreator.updateStringParameter,
-      updateBooleanParameter: filterCreator.updateBooleanParameter,
-      update: filterCreator.update,
-    };
-
-    pixiFilters.push(filter.pixiFilter);
-    this._filters[effect.name] = filter;
+    return;
   }
 
-  this._pixiContainer.filters = pixiFilters;
-};
+  /** @type gdjsPixiFiltersToolsFilter */
+  var filter = {
+    pixiFilter: filterCreator.makePIXIFilter(this._layer, effectData),
+    updateDoubleParameter: filterCreator.updateDoubleParameter,
+    updateStringParameter: filterCreator.updateStringParameter,
+    updateBooleanParameter: filterCreator.updateBooleanParameter,
+    update: filterCreator.update,
+  };
+
+  this._pixiContainer.filters = (this._pixiContainer.filters || [])
+    .concat(filter.pixiFilter);
+  this._filters[effectData.name] = filter;
+}
+
+/**
+ * Remove the effect with the specified name
+ * @param {string} effectName The name of the effect.
+ */
+gdjs.LayerPixiRenderer.prototype.removeEffect = function(effectName) {
+  var filter = this._filters[effectName];
+  if (!filter) return;
+
+  this._pixiContainer.filters = (this._pixiContainer.filters || [])
+    .filter(function(pixiFilter) { return pixiFilter !== filter.pixiFilter; });
+  delete this._filters[effectName];
+}
 
 /**
  * Add a child to the pixi container associated to the layer.
@@ -201,6 +216,15 @@ gdjs.LayerPixiRenderer.prototype.setEffectBooleanParameter = function(
   if (!filter) return;
 
   filter.updateBooleanParameter(filter.pixiFilter, parameterName, value);
+};
+
+/**
+ * Check if an effect exists.
+ * @param {string} name The effect name
+ * @returns {boolean} True if the effect exists, false otherwise
+ */
+gdjs.LayerPixiRenderer.prototype.hasEffect = function(name) {
+  return !!this._filters[name];
 };
 
 /**

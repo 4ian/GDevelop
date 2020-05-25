@@ -8,6 +8,7 @@
 #define GDCORE_PROJECT_H
 #include <memory>
 #include <vector>
+
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -472,22 +473,27 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetLayoutsCount() const;
 
   /**
-   * \brief \brief Adds a new empty layout called "name" at the specified
+   * \brief Add a new empty layout called "name" at the specified
    * position in the layout list.
    */
   gd::Layout& InsertNewLayout(const gd::String& name, std::size_t position);
 
   /**
-   * \brief \brief Adds a new layout constructed from the layout passed as
-   * parameter. \note No pointer or reference must be kept on the layout passed
-   * as parameter. \param layout The layout that must be copied and inserted
-   * into the project \param position Insertion position. Even if the position
+   * \brief Add a new layout constructed from the layout passed as
+   * parameter.
+   * \param layout The layout that must be copied and inserted
+   * into the project
+   * \param position Insertion position. Even if the position
    * is invalid, the layout must be inserted at the end of the layout list.
+   *
+   * \note No pointer or reference must be kept on the layout passed
+   * as parameter.
+   *
    */
   gd::Layout& InsertLayout(const Layout& layout, std::size_t position);
 
   /**
-   * Must delete layout named "name".
+   * \brief Delete layout named "name".
    */
   void RemoveLayout(const gd::String& name);
 
@@ -604,7 +610,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                                        std::size_t position);
 
   /**
-   * Must delete external events named "name".
+   * \brief Delete external events named "name".
    */
   void RemoveExternalEvents(const gd::String& name);
 #endif
@@ -685,7 +691,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            std::size_t position);
 
   /**
-   * Must delete external layout named "name".
+   * \brief Delete external layout named "name".
    */
   void RemoveExternalLayout(const gd::String& name);
 
@@ -706,37 +712,37 @@ class GD_CORE_API Project : public ObjectsContainer {
 ///@{
 #if defined(GD_IDE_ONLY)
   /**
-   * Return true if events functions extension called "name" exists.
+   * \brief  Check if events functions extension called "name" exists.
    */
   bool HasEventsFunctionsExtensionNamed(const gd::String& name) const;
 
   /**
-   * Return a reference to the events functions extension called "name".
+   * \brief Return a reference to the events functions extension called "name".
    */
   EventsFunctionsExtension& GetEventsFunctionsExtension(const gd::String& name);
 
   /**
-   * Return a reference to the events functions extension called "name".
+   * \brief Return a reference to the events functions extension called "name".
    */
   const EventsFunctionsExtension& GetEventsFunctionsExtension(
       const gd::String& name) const;
 
   /**
-   * Return a reference to the events functions extension at position "index" in
-   * the list
+   * \brief Return a reference to the events functions extension at position
+   * "index" in the list
    */
   EventsFunctionsExtension& GetEventsFunctionsExtension(std::size_t index);
 
   /**
-   * Return a reference to the events functions extension at position "index" in
-   * the list
+   * \brief Return a reference to the events functions extension at position
+   * "index" in the list
    */
   const EventsFunctionsExtension& GetEventsFunctionsExtension(
       std::size_t index) const;
 
   /**
-   * Return the position of the events functions extension called "name" in the
-   * list
+   * \brief Return the position of the events functions extension called "name"
+   * in the list.
    */
   std::size_t GetEventsFunctionsExtensionPosition(const gd::String& name) const;
 
@@ -748,7 +754,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SwapEventsFunctionsExtensions(std::size_t first, std::size_t second);
 
   /**
-   * Return the number of events functions extension.
+   * \brief Returns the number of events functions extension.
    */
   std::size_t GetEventsFunctionsExtensionsCount() const;
 
@@ -771,9 +777,14 @@ class GD_CORE_API Project : public ObjectsContainer {
       std::size_t position);
 
   /**
-   * Must delete the events functions extension named "name".
+   * \brief Delete the events functions extension named "name".
    */
   void RemoveEventsFunctionsExtension(const gd::String& name);
+
+  /**
+   * \brief Remove all the events functions extensions.
+   */
+  void ClearEventsFunctionsExtensions();
 #endif
   ///@}
 

@@ -1,15 +1,18 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { type UpdateStatus } from './UpdaterTools';
-import { type State, type Props } from './index';
+import { type FileMetadataAndStorageProviderName } from '../ProjectsStorage';
 
 export type MainMenuProps = {|
   i18n: I18nType,
   project: ?gdProject,
   onChooseProject: () => void,
+  onOpenRecentFile: (
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
+  ) => void,
   onSaveProject: () => void,
   onSaveProjectAs: () => void,
-  onCloseProject: () => Promise<State>,
+  onCloseProject: () => Promise<void>,
   onCloseApp: () => void,
   onExportProject: (open?: boolean) => void,
   onCreateProject: (open?: boolean) => void,
@@ -21,4 +24,5 @@ export type MainMenuProps = {|
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
   setUpdateStatus: UpdateStatus => void,
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
 |};

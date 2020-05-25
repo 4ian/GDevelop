@@ -522,6 +522,9 @@ void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
 
   eventsFunctionsExtensions.erase(eventsFunctionExtension);
 }
+void Project::ClearEventsFunctionsExtensions() {
+  eventsFunctionsExtensions.clear();
+}
 #endif
 
 void Project::UnserializeFrom(const SerializerElement& element) {

@@ -9,7 +9,7 @@
  *
  * @class PixiImageManager
  * @memberof gdjs
- * @param {Object} resources The resources data of the game.
+ * @param {ResourceData[]} resources The resources data of the game.
  */
 gdjs.PixiImageManager = function(resources)
 {
@@ -111,11 +111,9 @@ gdjs.PixiImageManager.prototype.getInvalidPIXITexture = function() {
  * used by calling `getPIXITexture`.
  * @param onProgress Callback called each time a new file is loaded.
  * @param onComplete Callback called when loading is done.
- * @param resources The resources to be loaded. If not specified, will load the resources
- * specified in the PixiImageManager constructor.
  */
-gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, resources) {
-	resources = resources || this._resources;
+gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete) {
+	var resources = this._resources;
 
 	//Construct the list of files to be loaded.
 	//For one loaded file, it can have one or more resources

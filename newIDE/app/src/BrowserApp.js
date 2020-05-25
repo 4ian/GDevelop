@@ -58,6 +58,7 @@ export const create = (authentification: Authentification) => {
             getStorageProviderOperations,
             storageProviders,
             initialFileMetadataToOpen,
+            getStorageProvider,
           }) => (
             <UnsavedChangesContext.Consumer>
               {unsavedChanges => (
@@ -86,6 +87,7 @@ export const create = (authentification: Authentification) => {
                   introDialog={<BrowserIntroDialog />}
                   storageProviders={storageProviders}
                   getStorageProviderOperations={getStorageProviderOperations}
+                  getStorageProvider={getStorageProvider}
                   resourceSources={browserResourceSources}
                   resourceExternalEditors={browserResourceExternalEditors}
                   extensionsLoader={makeExtensionsLoader({

@@ -330,7 +330,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction(
            "SetCanJump",
-           _("Allow again jumping"),
+           _("Allow jumping again"),
            _("When this action is executed, the object is able to jump again, "
              "even if it is in the air: this can be useful to allow a double "
              "jump for example. This is not a permanent effect: you must call "

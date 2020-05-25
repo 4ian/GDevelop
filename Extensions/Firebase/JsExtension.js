@@ -833,7 +833,7 @@ module.exports = {
           .addAction(
             'CallHttpFunction',
             _('Call a HTTP function'),
-			_('Calls a HTTP function by name, and put the result in .'),
+			_('Calls a HTTP function by name, and put the result in.'),
 			_(
 				'Call HTTP Function _PARAM0_ with parameter(s) _PARAM1_ ' +
 				'(Callback variables: Value: _PARAM2_ State: _PARAM3_)'
@@ -853,6 +853,28 @@ module.exports = {
       	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/firebasetools/D_functionstools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.functions.call');
+
+		/* ====== MESSAGING ====== */
+		
+		/* TODO: reported as needs a service worker, and auto generating one is not currently possible.
+		extension
+          .addAction(
+            'EnableMessaging',
+            _('Enable Messaging'),
+			_('Enables Firebase push messaging.'),
+			_('Enable Firebase Messaging with Public Key _PARAM0_.'),
+            _('Firebase/Messaging'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Public Key (VAPID)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-messaging.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/firebase-messaging-sw.js')
+		  .setFunctionName('firebase.messaging().usePublicVapidKey');
+
+		*/
 
         return extension;
     },

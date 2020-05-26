@@ -876,6 +876,222 @@ module.exports = {
 
 		*/
 
+		/* ====== CLOUD FIRESTORE ====== */
+
+		extension
+          .addAction(
+            'FirestoreWriteDocument',
+            _('Write a documnet to firestore'),
+			_('Writes a document (variable) to cloud firestore.'),
+			_('Write _PARAM2_ to firestore in document _PARAM1_ of collection _PARAM0_ (Store result state in _PARAM3_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("scenevar", _("Variable to write"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.writeDocument');
+
+		extension
+          .addAction(
+            'FirestoreWriteField',
+            _('Write a field in firestore'),
+			_('Writes a field of a firestore document.'),
+			_('Write _PARAM3_ to firestore in field _PARAM2_ of document _PARAM1_ in collection _PARAM0_ (Store result state in _PARAM4_, Merge: _PARAM5_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("string", _("Field to write"), "", false)
+		  .addParameter("string", _("Value to write"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .addParameter("yesorno", _("Merge Document?"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.writeField');
+
+		extension
+          .addAction(
+            'FirestoreUpdateDocument',
+            _('Update a document in firestore'),
+			_('Updates a firestore document (variable).'),
+			_('Update firestore document _PARAM1_ in collection _PARAM0_ with _PARAM2_ (Store result state in _PARAM3_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("scenevar", _("Variable to update with"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.updateDocument');
+
+		extension
+          .addAction(
+            'FirestoreUpdateField',
+            _('Update a field of a document'),
+			_('Updates a field of a firestore document.'),
+			_('Update field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with _PARAM3_ (Store result state in _PARAM4_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("string", _("Field to update"), "", false)
+		  .addParameter("string", _("Value to write"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.updateField');
+
+		extension
+          .addAction(
+            'FirestoreDeleteDocument',
+            _('Delete a document in firestore'),
+			_('Deletes a firestore document (variable).'),
+			_('Delete firestore document _PARAM1_ in collection _PARAM0_ (Store result state in _PARAM2_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.deleteDocument');
+
+		extension
+          .addAction(
+            'FirestoreDeleteField',
+            _('Delete a field of a document'),
+			_('Deletes a field of a firestore document.'),
+			_('Delete field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with (Store result state in _PARAM3_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("string", _("Field to delete"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.deleteField');
+
+		  extension
+          .addAction(
+            'FirestoreGetDocument',
+            _('Get a document from firestore'),
+			_('Gets a firestore document and store it in a variable.'),
+			_('Load firestore document _PARAM1_ in collection _PARAM0_ into _PARAM2_ (Store result state in _PARAM3_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("scenevar", _("Variable where to load the document"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.getDocument');
+
+		extension
+          .addAction(
+            'FirestoreGetField',
+            _('Get a field of a document'),
+			_('Gets the value of a field in a firestore document.'),
+			_('Load field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ into _PARAM3_ (Store result state in _PARAM4_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("string", _("Field to update"), "", false)
+		  .addParameter("scenevar", _("Variable where to store the field's value"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.getField');
+
+		  extension
+          .addAction(
+            'FirestoreHasDocument',
+            _('Check for a document\'s existence'),
+			_('Checks for the existence of a document. Sets the result variable to 1 if it exists else to 2.'),
+			_('Check for existence of _PARAM1_ in collection _PARAM0_ and store result in _PARAM3_ (Store result state in _PARAM3_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.hasDocument');
+
+		extension
+          .addAction(
+            'FirestoreHasField',
+            _('Check for existence of a document\'s field'),
+			_('Checks for the existence of a field in a document. Sets the result variable to 1 if it exists else to 2.'),
+			_('Check for existence of _PARAM2_ in document _PARAM1_ of collection _PARAM0_ and store result in _PARAM3_ (Store result state in _PARAM4_)'),
+            _('Firebase/Cloud Firestore'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Collection"), "", false)
+		  .addParameter("string", _("Document"), "", false)
+		  .addParameter("string", _("Field to check"), "", false)
+		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.firestore.hasField');
+
         return extension;
     },
     runExtensionSanityTests: function(gd, extension) {

@@ -21,7 +21,7 @@ gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
   this._layer = layer;
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
 
-  this._setupFilters();
+  this._pixiContainer.filters = [];
 };
 
 gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the engine use it.
@@ -62,18 +62,6 @@ gdjs.LayerPixiRenderer.prototype.updateTime = function() {
   for(var filterName in this._filters) {
     var filter = this._filters[filterName];
     filter.update(filter.pixiFilter, this._layer);
-  }
-};
-
-gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
-  var effectsData = this._layer.getEffectsData();
-  if (effectsData.length === 0) {
-    return;
-  }
-
-  this._pixiContainer.filters = [];
-  for (var i = 0; i < effectsData.length; ++i) {
-    this.addEffect(effectsData[i])
   }
 };
 

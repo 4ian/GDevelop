@@ -642,10 +642,21 @@ gdjs.Physics2RuntimeBehavior.prototype.doStepPreEvents = function(
 gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(
   runtimeScene
 ) {
+  this._updateBodyFromObject();
+
+  // Reset world step to update next frame
+  this._sharedData.stepped = false;
+};
+
+gdjs.Physics2RuntimeBehavior.prototype.onObjectHotReloaded = function() {
+  this._updateBodyFromObject();
+}
+
+gdjs.Physics2RuntimeBehavior.prototype._updateBodyFromObject = function() {
   // If there is no body, set a new one
   if (this._body === null) this.createBody();
 
-  // GD object size has changed, recreate shape
+  // The object size has changed, recreate the shape.
   // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
   // The height has changed, the shape is not an edge (edges doesn't have height),
   // it isn't a box with custom height or a circle with custom radius
@@ -660,7 +671,7 @@ gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(
     this.recreateShape();
   }
 
-  // GD object transform has changed, update body transform
+  // The object object transform has changed, update body transform:
   if (
     this._objectOldX !== this.owner.getX() ||
     this._objectOldY !== this.owner.getY() ||
@@ -675,10 +686,7 @@ gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(
     this._body.SetTransform(pos, gdjs.toRad(this.owner.getAngle()));
     this._body.SetAwake(true);
   }
-
-  // Reset world step to update next frame
-  this._sharedData.stepped = false;
-};
+}
 
 gdjs.Physics2RuntimeBehavior.prototype.getGravityX = function() {
   return this._sharedData.gravityX;

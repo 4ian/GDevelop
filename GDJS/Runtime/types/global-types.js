@@ -19,4 +19,5 @@
  * @typedef { import("./project-data").EffectData } EffectData
  * @typedef { import("./project-data").ResourceData } ResourceData
  * @typedef { import("./project-data").ResourcesData } ResourcesData
+ * @typedef { import("./project-data").BehaviorSharedData } BehaviorSharedData
  */

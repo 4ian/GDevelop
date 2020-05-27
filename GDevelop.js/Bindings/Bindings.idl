@@ -2372,6 +2372,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
     [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
+    [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
 };
 
 [Prefix="gdjs::"]

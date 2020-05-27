@@ -126,7 +126,7 @@ gdjs.TextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, 
         this.setCharacterSize(newObjectData.characterSize);
     }
     if (oldObjectData.font !== newObjectData.font) {
-        this.setFontName(font);
+        this.setFontName(newObjectData.font);
     }
     if (oldObjectData.bold !== newObjectData.bold) {
         this.setBold(newObjectData.bold);

@@ -7,8 +7,6 @@ import Dialog from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
-const gd: libGDevelop = global.gd;
-
 type Props = {|
   project: gdProject,
   group: gdObjectGroup,

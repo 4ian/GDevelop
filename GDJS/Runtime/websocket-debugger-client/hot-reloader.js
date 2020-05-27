@@ -1,4 +1,4 @@
-/// @ts-check
+// @ts-check
 
 /**
  * @typedef {Object} HotReloaderLog
@@ -7,7 +7,8 @@
  */
 
 /**
- *
+ * Reload scripts/data of an exported game and applies the changes
+ * to the running runtime game.
  *
  * @memberof gdjs
  * @class HotReloader
@@ -20,6 +21,9 @@ gdjs.HotReloader = function (runtimeGame) {
 
   /** @type {HotReloaderLog[]} */
   this._logs = [];
+
+  /** @type {Object.<string, boolean>} */
+  this._alreadyLoadedScriptFiles = {};
 };
 
 /**
@@ -37,9 +41,60 @@ gdjs.HotReloader.groupByPersistentUuid = function (objectsWithPersistentId) {
 
 /**
  * @param {string} srcFilename
+ * @returns {boolean}
+ */
+gdjs.HotReloader.prototype._canReloadScriptFile = function (srcFilename) {
+  function endsWith(str, suffix) {
+    return str.indexOf(suffix) === str.length - suffix.length;
+  }
+
+  // Never reload .h script files, as they are leaking by mistake from C++ extensions.
+  if (endsWith(srcFilename, '.h')) {
+    return false;
+  }
+
+  // Make sure some files are loaded only once.
+  if (this._alreadyLoadedScriptFiles[srcFilename]) {
+    if (
+      // Don't reload Box2d as it would confuse and crash the asm.js library.
+      endsWith(srcFilename, 'box2d.js') ||
+      // Don't reload shifty.js library.
+      endsWith(srcFilename, 'shifty.js') ||
+      // Don't reload shopify-buy library.
+      endsWith(srcFilename, 'shopify-buy.umd.polyfilled.min.js') ||
+      // Don't reload pixi-multistyle-text library.
+      endsWith(srcFilename, 'pixi-multistyle-text.umd.js') ||
+      // Don't reload bondage.js library.
+      endsWith(srcFilename, 'bondage.min.js') ||
+      // Don't reload pixi-particles library.
+      endsWith(srcFilename, 'pixi-particles-pixi-renderer.min.js')
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+/**
+ * @param {string} srcFilename
  * @returns {Promise<void>}
  */
 gdjs.HotReloader.prototype._reloadScript = function (srcFilename) {
+  function endsWith(str, suffix) {
+    return str.indexOf(suffix) === str.length - suffix.length;
+  }
+
+  if (!this._canReloadScriptFile(srcFilename)) {
+    this._logs.push({
+      kind: 'info',
+      message:
+        'Not reloading ' + srcFilename + ' as it is blocked for hot-reloading.',
+    });
+    // @ts-ignore - Promise not supported in ES5 mode.
+    return Promise.resolve();
+  }
+
   const head = document.getElementsByTagName('head')[0];
   if (!head) {
     // @ts-ignore - Promise not supported in ES5 mode.
@@ -52,6 +107,16 @@ gdjs.HotReloader.prototype._reloadScript = function (srcFilename) {
   return new Promise((resolve, reject) => {
     const existingScriptElement = this._reloadedScriptElement[srcFilename];
     if (existingScriptElement) head.removeChild(existingScriptElement);
+    else {
+      // Check if there is an existing scriptElement in head
+      const headScriptElements = head.getElementsByTagName('script');
+      for (var i = 0; i < headScriptElements.length; ++i) {
+        var scriptElement = headScriptElements[i];
+        if (endsWith(scriptElement.src, srcFilename)) {
+          head.removeChild(scriptElement);
+        }
+      }
+    }
 
     const reloadedScriptElement = document.createElement('script');
     reloadedScriptElement.src = srcFilename + '?timestamp=' + Date.now();
@@ -68,6 +133,8 @@ gdjs.HotReloader.prototype._reloadScript = function (srcFilename) {
 };
 
 gdjs.HotReloader.prototype.hotReload = function () {
+  console.info('Hot reload started');
+  this._runtimeGame.pause(true);
   this._logs = [];
 
   // Save old data of the project, to be used to compute
@@ -81,8 +148,13 @@ gdjs.HotReloader.prototype.hotReload = function () {
   // @ts-ignore
   const oldScriptFiles = gdjs.runtimeGameOptions.scriptFiles;
 
+  oldScriptFiles.forEach((scriptFile) => {
+    this._alreadyLoadedScriptFiles[scriptFile.path] = true;
+  });
+
   /** @type {Object.<string, Function>} */
   const oldBehaviorConstructors = {};
+
   // @ts-ignore - TODO: type gdjs.behaviorsType
   for (let behaviorTypeName in gdjs.behaviorsTypes.items) {
     oldBehaviorConstructors[behaviorTypeName] =
@@ -91,21 +163,31 @@ gdjs.HotReloader.prototype.hotReload = function () {
   }
 
   // Reload projectData and runtimeGameOptions stored by convention in data.js:
-  this._reloadScript('data.js').then(() => {
+  return this._reloadScript('data.js').then(() => {
     /** @type {ProjectData} */
     // @ts-ignore
     const newProjectData = gdjs.projectData;
 
+    /** @type {RuntimeGameOptions} */
+    // @ts-ignore
+    const newRuntimeGameOptions = gdjs.runtimeGameOptions;
+
     /** @type {RuntimeGameOptionsScriptFile[]} */
     // @ts-ignore
-    const newScriptFiles = gdjs.runtimeGameOptions.scriptFiles;
+    const newScriptFiles = newRuntimeGameOptions.scriptFiles;
+    const projectDataOnlyExport = !!newRuntimeGameOptions.projectDataOnlyExport;
 
     // Reload the changed scripts, which will have the side effects of re-running
     // the new scripts, potentially replacing the code of the free functions from
     // extensions (which is fine) and registering updated behaviors (which will
     // need to be re-instantiated in runtime objects).
     // @ts-ignore - Promise not supported in ES5 mode.
-    this.reloadScriptFiles(newProjectData, oldScriptFiles, newScriptFiles)
+    return this.reloadScriptFiles(
+      newProjectData,
+      oldScriptFiles,
+      newScriptFiles,
+      projectDataOnlyExport
+    )
       .then(() => {
         const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
           oldBehaviorConstructors,
@@ -113,15 +195,12 @@ gdjs.HotReloader.prototype.hotReload = function () {
           gdjs.behaviorsTypes.items
         );
 
-        this._hotReloadRuntimeGame(
+        return this._hotReloadRuntimeGame(
           oldProjectData,
           newProjectData,
           changedRuntimeBehaviors,
           this._runtimeGame
         );
-
-        // Scene events code are automatically updated when reloading the scripts
-        // (side effects of running the scripts).
       })
       .catch((error) => {
         const errorTarget = error.target;
@@ -139,7 +218,9 @@ gdjs.HotReloader.prototype.hotReload = function () {
         }
       })
       .then(() => {
-        console.log('Hot reload finished with logs:', this._logs);
+        console.info('Hot reload finished with logs:', this._logs);
+        this._runtimeGame.pause(false);
+        return this._logs;
       });
   });
 };
@@ -195,16 +276,18 @@ gdjs.HotReloader.prototype._computeChangedRuntimeBehaviors = function (
  * @param {ProjectData} newProjectData
  * @param {RuntimeGameOptionsScriptFile[]} oldScriptFiles
  * @param {RuntimeGameOptionsScriptFile[]} newScriptFiles
+ * @param {boolean} projectDataOnlyExport
  */
 gdjs.HotReloader.prototype.reloadScriptFiles = function (
   newProjectData,
   oldScriptFiles,
-  newScriptFiles
+  newScriptFiles,
+  projectDataOnlyExport
 ) {
-  const reloadSceneEventsCode = true;
   const reloadPromises = [];
 
-  if (reloadSceneEventsCode) {
+  // Reload events, only if they were exported.
+  if (!projectDataOnlyExport) {
     newProjectData.layouts.forEach((_layoutData, index) => {
       reloadPromises.push(this._reloadScript('code' + index + '.js'));
     });
@@ -222,7 +305,7 @@ gdjs.HotReloader.prototype.reloadScriptFiles = function (
         message:
           'Loading ' +
           newScriptFile.path +
-          ' has it was added to the list of scripts.',
+          ' as it was added to the list of scripts.',
       });
       reloadPromises.push(this._reloadScript(newScriptFile.path));
     } else {
@@ -243,13 +326,11 @@ gdjs.HotReloader.prototype.reloadScriptFiles = function (
     const newScriptFile = newScriptFiles.filter(
       (scriptFile) => scriptFile.path === oldScriptFile.path
     )[0];
-    if (!newScriptFile) {
+    // A file may be removed because of a partial preview.
+    if (!newScriptFile && !projectDataOnlyExport) {
       this._logs.push({
-        kind: 'error',
-        message:
-          'Script file ' +
-          oldScriptFile.path +
-          ' was removed. A fresh preview should be launched.',
+        kind: 'warning',
+        message: 'Script file ' + oldScriptFile.path + ' was removed.',
       });
     }
   }
@@ -270,69 +351,74 @@ gdjs.HotReloader.prototype._hotReloadRuntimeGame = function (
   changedRuntimeBehaviors,
   runtimeGame
 ) {
-  // Update project data and re-load assets (sound/image/font/json managers
-  // will take care of reloading only what is needed).
-  runtimeGame.setProjectData(newProjectData);
-  runtimeGame.loadAllAssets(() => {
-    this._hotReloadVariablesContainer(
-      oldProjectData.variables,
-      newProjectData.variables,
-      runtimeGame.getVariables()
-    );
+  // @ts-ignore - Promise not supported in ES5 mode.
+  return new Promise((resolve) => {
+    // Update project data and re-load assets (sound/image/font/json managers
+    // will take care of reloading only what is needed).
+    runtimeGame.setProjectData(newProjectData);
+    runtimeGame.loadAllAssets(() => {
+      this._hotReloadVariablesContainer(
+        oldProjectData.variables,
+        newProjectData.variables,
+        runtimeGame.getVariables()
+      );
 
-    // Reload runtime scenes
-    var sceneStack = runtimeGame.getSceneStack();
-    sceneStack._stack.forEach((runtimeScene) => {
-      const oldLayoutData = oldProjectData.layouts.filter(
-        (layoutData) => layoutData.name === runtimeScene.getName()
-      )[0];
-      const newLayoutData = newProjectData.layouts.filter(
-        (layoutData) => layoutData.name === runtimeScene.getName()
-      )[0];
+      // Reload runtime scenes
+      var sceneStack = runtimeGame.getSceneStack();
+      sceneStack._stack.forEach((runtimeScene) => {
+        const oldLayoutData = oldProjectData.layouts.filter(
+          (layoutData) => layoutData.name === runtimeScene.getName()
+        )[0];
+        const newLayoutData = newProjectData.layouts.filter(
+          (layoutData) => layoutData.name === runtimeScene.getName()
+        )[0];
 
-      if (oldLayoutData && newLayoutData) {
-        this._hotReloadRuntimeScene(
-          oldLayoutData,
-          newLayoutData,
-          changedRuntimeBehaviors,
-          runtimeScene
-        );
-      } else {
-        // A scene was removed. Not hot-reloading this.
-        this._logs.push({
-          kind: 'error',
-          message:
-            'Scene ' +
-            oldLayoutData.name +
-            ' was removed. A fresh preview should be launched.',
-        });
-      }
-    });
-
-    // Reload changes in external layouts
-    newProjectData.externalLayouts.forEach((newExternalLayoutData) => {
-      const oldExternalLayoutData = oldProjectData.externalLayouts.filter(
-        (externalLayoutData) =>
-          externalLayoutData.name === newExternalLayoutData.name
-      )[0];
-
-      if (
-        oldExternalLayoutData &&
-        // Check if there are actual changes, to avoid useless work trying to
-        // hot-reload all the scenes.
-        !gdjs.HotReloader.deepEqual(
-          oldExternalLayoutData,
-          newExternalLayoutData
-        )
-      ) {
-        sceneStack._stack.forEach((runtimeScene) => {
-          this._hotReloadRuntimeSceneInstances(
-            oldExternalLayoutData.instances,
-            newExternalLayoutData.instances,
+        if (oldLayoutData && newLayoutData) {
+          this._hotReloadRuntimeScene(
+            oldLayoutData,
+            newLayoutData,
+            changedRuntimeBehaviors,
             runtimeScene
           );
-        });
-      }
+        } else {
+          // A scene was removed. Not hot-reloading this.
+          this._logs.push({
+            kind: 'error',
+            message:
+              'Scene ' +
+              oldLayoutData.name +
+              ' was removed. A fresh preview should be launched.',
+          });
+        }
+      });
+
+      // Reload changes in external layouts
+      newProjectData.externalLayouts.forEach((newExternalLayoutData) => {
+        const oldExternalLayoutData = oldProjectData.externalLayouts.filter(
+          (externalLayoutData) =>
+            externalLayoutData.name === newExternalLayoutData.name
+        )[0];
+
+        if (
+          oldExternalLayoutData &&
+          // Check if there are actual changes, to avoid useless work trying to
+          // hot-reload all the scenes.
+          !gdjs.HotReloader.deepEqual(
+            oldExternalLayoutData,
+            newExternalLayoutData
+          )
+        ) {
+          sceneStack._stack.forEach((runtimeScene) => {
+            this._hotReloadRuntimeSceneInstances(
+              oldExternalLayoutData.instances,
+              newExternalLayoutData.instances,
+              runtimeScene
+            );
+          });
+        }
+      });
+
+      resolve();
     });
   });
 };
@@ -360,7 +446,7 @@ gdjs.HotReloader.prototype._hotReloadVariablesContainer = function (
     } else if (
       !newVariableData.children &&
       (oldVariableData.value !== newVariableData.value ||
-        !oldVariableData.children)
+        oldVariableData.children)
     ) {
       // Variable value was changed or was converted from
       // a structure to a variable with value.
@@ -466,13 +552,26 @@ gdjs.HotReloader.prototype._hotReloadRuntimeScene = function (
   changedRuntimeBehaviors,
   runtimeScene
 ) {
+  runtimeScene.setBackgroundColor(
+    newLayoutData.r,
+    newLayoutData.v,
+    newLayoutData.b
+  );
+  if (oldLayoutData.title !== newLayoutData.title) {
+    runtimeScene.getGame().getRenderer().setWindowTitle(newLayoutData.title);
+  }
+
   this._hotReloadVariablesContainer(
     oldLayoutData.variables,
     newLayoutData.variables,
     runtimeScene.getVariables()
   );
-
-  // First re-instantiate any gdjs.RuntimeBehavior that was changed.
+  this._hotReloadRuntimeSceneBehaviorsSharedData(
+    oldLayoutData.behaviorsSharedData,
+    newLayoutData.behaviorsSharedData,
+    runtimeScene
+  );
+  // Re-instantiate any gdjs.RuntimeBehavior that was changed.
   this._reinstantiateRuntimeSceneRuntimeBehaviors(
     changedRuntimeBehaviors,
     newLayoutData.objects,
@@ -493,6 +592,60 @@ gdjs.HotReloader.prototype._hotReloadRuntimeScene = function (
     newLayoutData.layers,
     runtimeScene
   );
+
+  // Update the events generated code launched at each frame. Events generated code
+  // script files were already reloaded at the beginning of the hot-reload. Note that
+  // if they have not changed, it's still fine to call this, it will be basically a
+  // no-op.
+  runtimeScene.setEventsGeneratedCodeFunction(newLayoutData);
+};
+
+/**
+ * @param {BehaviorSharedData[]} oldBehaviorsSharedData
+ * @param {BehaviorSharedData[]} newBehaviorsSharedData
+ * @param {gdjs.RuntimeScene} runtimeScene
+ */
+gdjs.HotReloader.prototype._hotReloadRuntimeSceneBehaviorsSharedData = function (
+  oldBehaviorsSharedData,
+  newBehaviorsSharedData,
+  runtimeScene
+) {
+  oldBehaviorsSharedData.forEach((oldBehaviorSharedData) => {
+    const name = oldBehaviorSharedData.name;
+    const newBehaviorSharedData = newBehaviorsSharedData.filter(
+      (behaviorSharedData) => behaviorSharedData.name === name
+    )[0];
+
+    if (!newBehaviorSharedData) {
+      // Behavior shared data was removed.
+      runtimeScene.setInitialSharedDataForBehavior(
+        oldBehaviorSharedData.name,
+        null
+      );
+    } else if (
+      !gdjs.HotReloader.deepEqual(oldBehaviorSharedData, newBehaviorSharedData)
+    ) {
+      // Behavior shared data was modified
+      runtimeScene.setInitialSharedDataForBehavior(
+        newBehaviorSharedData.name,
+        newBehaviorSharedData
+      );
+    }
+  });
+  newBehaviorsSharedData.forEach((newBehaviorSharedData) => {
+    const name = newBehaviorSharedData.name;
+    const oldBehaviorSharedData = oldBehaviorsSharedData.filter(
+      (behaviorSharedData) => behaviorSharedData.name === name
+    )[0];
+
+    if (!oldBehaviorSharedData) {
+      // Behavior shared data was added
+      runtimeScene.setInitialSharedDataForBehavior(
+        newBehaviorSharedData.name,
+        newBehaviorSharedData
+      );
+    }
+  });
 };
 
 /**
@@ -609,9 +762,14 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneObjects = function (
       (objectData) => objectData.name === name
     )[0];
 
-    if (!newObjectData) {
-      // Object was removed
-      // runtimeScene.unregisterObject(name); // TODO - unregister object
+    if (!newObjectData || oldObjectData.type !== newObjectData.type) {
+      // Object was removed or object type was changed (considered as a removal of the old object)
+      runtimeScene.unregisterObject(name);
+      // Note: if an object is renamed in the editor, it will be considered as removed,
+      // and the new object name as a new object to register.
+      // It's not ideal because living instances of the object will be destroyed,
+      // but it would be complex to iterate over instances of the object and change
+      // its name (it's not expected to change).
     } else if (runtimeScene.isObjectRegistered(name)) {
       this._hotReloadRuntimeSceneObject(
         oldObjectData,
@@ -626,8 +784,11 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneObjects = function (
       (layerData) => layerData.name === name
     )[0];
 
-    if (!oldObjectData && !runtimeScene.isObjectRegistered(name)) {
-      // Object was added
+    if (
+      (!oldObjectData || oldObjectData.type !== newObjectData.type) &&
+      !runtimeScene.isObjectRegistered(name)
+    ) {
+      // Object was added or object type was changed (considered as adding the new object)
       runtimeScene.registerObject(newObjectData);
     }
   });
@@ -815,7 +976,7 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneLayers = function (
 
     if (!newLayerData) {
       // Layer was removed
-      // runtimeScene.removeLayer(runtimeScene.getLayer(name)); // TODO - remove layer
+      runtimeScene.removeLayer(name);
     } else if (runtimeScene.hasLayer(name)) {
       const layer = runtimeScene.getLayer(name);
       this._hotReloadRuntimeLayer(oldLayerData, newLayerData, layer);
@@ -971,8 +1132,11 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneInstances = function (
     const newInstance = groupedNewInstances[persistentUuid];
     const runtimeObject = groupedRuntimeObjects[persistentUuid];
 
-    if (oldInstance && !newInstance) {
-      // Instance was deleted
+    if (
+      oldInstance &&
+      (!newInstance || oldInstance.name !== newInstance.name)
+    ) {
+      // Instance was deleted (or object name changed, in which case it will be re-created later)
       if (runtimeObject) {
         runtimeObject.deleteFromScene(runtimeScene);
       }
@@ -986,8 +1150,13 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneInstances = function (
     const newInstance = groupedNewInstances[persistentUuid];
     const runtimeObject = groupedRuntimeObjects[persistentUuid];
 
-    if (!oldInstance && newInstance && !runtimeObject) {
-      // Instance was created (and we verified that runtimeObject does not exist)
+    if (
+      newInstance &&
+      (!oldInstance || oldInstance.name !== newInstance.name) &&
+      !runtimeObject
+    ) {
+      // Instance was created (or object name changed, in which case it was destroyed previously)
+      // and we verified that runtimeObject does not exist.
       runtimeScene.createObjectsFrom(
         [newInstance],
         0,
@@ -1008,35 +1177,44 @@ gdjs.HotReloader.prototype._hotReloadRuntimeInstance = function (
   newInstance,
   runtimeObject
 ) {
+  var somethingChanged = false;
+
   // Check if default properties changed
   if (oldInstance.x !== newInstance.x) {
     runtimeObject.setX(newInstance.x);
+    somethingChanged = true;
   }
   if (oldInstance.y !== newInstance.y) {
     runtimeObject.setY(newInstance.y);
+    somethingChanged = true;
   }
   if (oldInstance.angle !== newInstance.angle) {
     runtimeObject.setAngle(newInstance.angle);
+    somethingChanged = true;
   }
   if (oldInstance.zOrder !== newInstance.zOrder) {
     runtimeObject.setZOrder(newInstance.zOrder);
+    somethingChanged = true;
   }
   if (oldInstance.layer !== newInstance.layer) {
     runtimeObject.setLayer(newInstance.layer);
+    somethingChanged = true;
   }
 
   // Check if size changed
   if (newInstance.customSize) {
-    // TODO: setWidth/setHeight on all runtimeobject
     if (!oldInstance.customSize) {
       runtimeObject.setWidth(newInstance.width);
       runtimeObject.setHeight(newInstance.height);
+      somethingChanged = true;
     } else {
       if (oldInstance.width !== newInstance.width) {
         runtimeObject.setWidth(newInstance.width);
+        somethingChanged = true;
       }
       if (oldInstance.height !== newInstance.height) {
         runtimeObject.setHeight(newInstance.height);
+        somethingChanged = true;
       }
     }
   }
@@ -1073,6 +1251,17 @@ gdjs.HotReloader.prototype._hotReloadRuntimeInstance = function (
   );
   if (numberPropertiesChanged || stringPropertiesChanged) {
     runtimeObject.extraInitializationFromInitialInstance(newInstance);
+    somethingChanged = true;
+  }
+
+  if (somethingChanged) {
+    // If we changed the runtime object position/size/angle or another property,
+    // notify behaviors that the runtime object was reloaded.
+    // This is useful for behaviors like the physics engine that are watching the
+    // object position/size and need to be notified when changed (otherwise, they
+    // would continue using the previous position, so the object would not be moved
+    // or updated according to the changes made in the project instance).
+    runtimeObject.notifyBehaviorsObjectHotReloaded();
   }
 };
 

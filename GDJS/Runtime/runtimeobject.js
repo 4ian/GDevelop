@@ -280,10 +280,11 @@ gdjs.RuntimeObject.prototype.extraInitializationFromInitialInstance = function(i
  * Called when the object must be updated using the specified objectData. This is the
  * case during hot-reload, and is only called if the object was modified.
  *
- * @param {ObjectData} objectData The data for the object.
+ * @param {ObjectData} oldObjectData The previous data for the object.
+ * @param {ObjectData} newObjectData The new data for the object.
  * @returns {boolean} true if the object was updated, false if it could not (i.e: hot-reload is not supported).
  */
-gdjs.RuntimeObject.prototype.updateFromObjectData = function(objectData) {
+gdjs.RuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
     // If not redefined, mark by default the hot-reload as failed.
     return false;
 }
@@ -683,7 +684,7 @@ gdjs.RuntimeObject.prototype.hide = function(enable) {
 /**
  * Return true if the object is not hidden.
  *
- * Note: This is unrelated to the actual visibility of the objec on the screen.
+ * Note: This is unrelated to the actual visibility of the object on the screen.
  * For this, see `getVisibilityAABB` to get the bounding boxes of the object as displayed
  * on the scene.
  *
@@ -1059,6 +1060,16 @@ gdjs.RuntimeObject.prototype.stepBehaviorsPostEvents = function(runtimeScene) {
         this._behaviors[i].stepPostEvents(runtimeScene);
     }
 };
+
+/**
+ * Called when the object was hot reloaded, to notify behaviors
+ * that the object was modified. Useful for behaviors that
+ */
+gdjs.RuntimeObject.prototype.notifyBehaviorsObjectHotReloaded = function() {
+    for(var i = 0, len = this._behaviors.length;i<len;++i) {
+        this._behaviors[i].onObjectHotReloaded();
+    }
+}
 
 /**
  * Get a behavior from its name.

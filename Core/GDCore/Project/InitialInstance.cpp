@@ -113,6 +113,11 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   GetVariables().SerializeTo(element.AddChild("initialVariables"));
 }
 
+InitialInstance& InitialInstance::ResetPersistentUuid() {
+  persistentUuid = UUID::MakeUuid4();
+  return *this;
+}
+
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor>
 InitialInstance::GetCustomProperties(gd::Project& project, gd::Layout& layout) {
@@ -162,11 +167,6 @@ void InitialInstance::SetRawFloatProperty(const gd::String& name, float value) {
 void InitialInstance::SetRawStringProperty(const gd::String& name,
                                            const gd::String& value) {
   stringInfos[name] = value;
-}
-
-InitialInstance& InitialInstance::ResetPersistentUuid() {
-  persistentUuid = UUID::MakeUuid4();
-  return *this;
 }
 #endif
 

@@ -88,7 +88,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
           )}
           <ToolbarSeparator />
           <PreviewButtons
-            onPreview={this.props.onPreview}
+            onPreviewWithoutHotReload={this.props.onPreviewWithoutHotReload}
             onOpenDebugger={this.props.onOpenDebugger}
             onNetworkPreview={this.props.onNetworkPreview}
             onHotReloadPreview={this.props.onHotReloadPreview}
@@ -96,6 +96,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
             showNetworkPreviewButton={this.props.showNetworkPreviewButton}
             isPreviewEnabled={this.props.isPreviewEnabled}
             previewState={this.props.previewState}
+            hasPreviewsRunning={this.props.hasPreviewsRunning}
           />
         </ToolbarGroup>
         {this.state.editorToolbar || <ToolbarGroup />}

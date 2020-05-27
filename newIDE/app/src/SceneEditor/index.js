@@ -68,6 +68,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -113,6 +114,9 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
+
+  // Preview:
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|
@@ -931,6 +935,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
             unsavedChanges={this.props.unsavedChanges}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         ),
       },
@@ -1018,6 +1023,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             getAllObjectTags={this._getAllObjectTags}
             ref={objectsList => (this._objectsList = objectsList)}
             unsavedChanges={this.props.unsavedChanges}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         ),
       },
@@ -1110,6 +1116,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               if (this.props.unsavedChanges)
                 this.props.unsavedChanges.triggerUnsavedChanges();
             }}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onUpdateBehaviorsSharedData={() => this.updateBehaviorsSharedData()}
           />
         )}
         {!!this.state.editedGroup && (
@@ -1221,6 +1229,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 this.editInstanceVariables(null);
               }
             }}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {!!this.state.variablesEditedObject && (
@@ -1240,6 +1249,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               </Trans>
             }
             title={<Trans>Object Variables</Trans>}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {!!this.state.layerRemoveDialogOpen && (
@@ -1262,6 +1272,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 effectsEditedLayer: null,
               })
             }
+            hotReloadPreviewButtonProps={
+              this.props.hotReloadPreviewButtonProps
+            }
           />
         )}
         {this.state.scenePropertiesDialogOpen && (
@@ -1281,6 +1294,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             layout={layout}
             onApply={() => this.editLayoutVariables(false)}
             onClose={() => this.editLayoutVariables(false)}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         <ContextMenu

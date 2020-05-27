@@ -6,6 +6,9 @@ import Dialog from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import VariablesList from './index';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
 
 type Props = {|
   onCancel: () => void,
@@ -16,6 +19,7 @@ type Props = {|
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
   variablesContainer: gdVariablesContainer,
+  hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 |};
 
 const VariablesEditorDialog = ({
@@ -27,6 +31,7 @@ const VariablesEditorDialog = ({
   emptyExplanationMessage,
   emptyExplanationSecondMessage,
   variablesContainer,
+  hotReloadPreviewButtonProps,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
@@ -54,15 +59,22 @@ const VariablesEditorDialog = ({
       open={open}
       cannotBeDismissed={true}
       onRequestClose={onCancelChanges}
-      secondaryActions={
+      secondaryActions={[
         onEditObjectVariables ? (
           <FlatButton
+            key="edit-object-variables"
             label={<Trans>Edit Object Variables</Trans>}
             primary={false}
             onClick={onEditObjectVariables}
           />
-        ) : null
-      }
+        ) : null,
+        hotReloadPreviewButtonProps ? (
+          <HotReloadPreviewButton
+            key="hot-reload-preview-button"
+            {...hotReloadPreviewButtonProps}
+          />
+        ) : null,
+      ]}
       title={title}
     >
       <VariablesList

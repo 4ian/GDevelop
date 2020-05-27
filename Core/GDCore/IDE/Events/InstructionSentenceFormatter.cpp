@@ -49,9 +49,15 @@ InstructionSentenceFormatter::GetAsFormattedText(
 
   gd::String sentence = metadata.GetSentence();
   std::replace(sentence.Raw().begin(), sentence.Raw().end(), '\n', ' ');
-  bool parse = true;
 
+  size_t loopCount = 0;
+  bool parse = true;
   while (parse) {
+    if (loopCount > 40) {
+      break;
+    }
+    loopCount++;
+
     // Search first parameter
     parse = false;
     size_t firstParamPosition = gd::String::npos;

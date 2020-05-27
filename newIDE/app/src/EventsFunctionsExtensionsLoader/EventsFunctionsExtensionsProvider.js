@@ -6,6 +6,8 @@ import EventsFunctionsExtensionsContext, {
 } from './EventsFunctionsExtensionsContext';
 import {
   loadProjectEventsFunctionsExtensions,
+  type IncludeFileContent,
+  type EventsFunctionCodeWriterCallbacks,
   type EventsFunctionCodeWriter,
   unloadProjectEventsFunctionsExtensions,
   unloadProjectEventsFunctionsExtension,
@@ -22,7 +24,7 @@ import xxhashjs from 'xxhashjs';
 type Props = {|
   children: React.Node,
   i18n: I18nType,
-  makeEventsFunctionCodeWriter: () => EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
 |};
@@ -39,12 +41,12 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   Props,
   State
 > {
-  _eventsFunctionCodeWriter: EventsFunctionCodeWriter = this.props.makeEventsFunctionCodeWriter(
+  _eventsFunctionCodeWriter: ?EventsFunctionCodeWriter = this.props.makeEventsFunctionCodeWriter(
     {
       onWriteFile: this._onWriteFile.bind(this),
     }
   );
-  _includeFileHashs: { [string]: string } = {};
+  _includeFileHashs: { [string]: number } = {};
   _lastLoadPromise: ?Promise<void> = null;
   state = {
     eventsFunctionsExtensionsError: null,
@@ -68,7 +70,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
     getIncludeFileHashs: () => this._includeFileHashs,
   };
 
-  _onWriteFile({ includeFile, content }) {
+  _onWriteFile({ includeFile, content }: IncludeFileContent) {
     this._includeFileHashs[includeFile] = xxhashjs
       .h32(content, 0xabcd)
       .toNumber();
@@ -92,7 +94,8 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
 
   _loadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
     const { i18n } = this.props;
-    if (!project) return Promise.resolve();
+    const eventsFunctionCodeWriter = this._eventsFunctionCodeWriter;
+    if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
     const lastLoadPromise = this._lastLoadPromise || Promise.resolve();
 
@@ -100,7 +103,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       .then(() =>
         loadProjectEventsFunctionsExtensions(
           project,
-          this._eventsFunctionCodeWriter,
+          eventsFunctionCodeWriter,
           i18n
         )
       )

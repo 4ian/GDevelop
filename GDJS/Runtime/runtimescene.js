@@ -93,10 +93,9 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
     //Cache the initial shared data of the behaviors
     for(var i = 0, len = sceneData.behaviorsSharedData.length;i<len;++i) {
-        var data = sceneData.behaviorsSharedData[i];
+        var behaviorSharedData = sceneData.behaviorsSharedData[i];
 
-        //console.log("Initializing shared data for "+data.name);
-        this._initialBehaviorSharedData.put(data.name, data);
+        this.setInitialSharedDataForBehavior(behaviorSharedData.name, behaviorSharedData);
     }
 
     //Registering objects: Global objects first...
@@ -114,13 +113,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     this.createObjectsFrom(sceneData.instances, 0, 0, /*trackByPersistentUuid=*/ true);
 
     //Set up the function to be executed at each tick
-    var module = gdjs[sceneData.mangledName+"Code"];
-    if ( module && module.func )
-        this._eventsFunction = module.func;
-    else {
-        console.log("Warning: no function found for running logic of scene " + this._name);
-        this._eventsFunction = (function() {});
-    }
+    this.setEventsGeneratedCodeFunction(sceneData);
 
     this._onceTriggers = new gdjs.OnceTriggers();
 
@@ -180,6 +173,29 @@ gdjs.RuntimeScene.prototype.updateObject = function(objectData) {
 
     this._objects.put(objectData.name, objectData);
     // Don't erase instances, nor instances cache, or objectsCtor cache.
+}
+
+/**
+ * Unregister a {@link gdjs.RuntimeObject}. Instances will be destroyed.
+ * @param {string} objectName The name of the object to unregister.
+ */
+gdjs.RuntimeScene.prototype.unregisterObject = function(objectName) {
+    var instances = this._instances.get(objectName);
+    if (instances) {
+        // This is sub-optimal: markObjectForDeletion will search the instance to
+        // remove in instances, so cost is O(n^2), n being the number of instances.
+        // As we're unregistering an object which only happen during a hot-reloading,
+        // this is fine.
+        var instancesToRemove = instances.slice();
+        for(var i = 0;i<instancesToRemove.length;i++) {
+            this.markObjectForDeletion(instancesToRemove[i]);
+        }
+        this._cacheOrClearRemovedInstances();
+    }
+    this._objects.remove(objectName);
+    this._instances.remove(objectName);
+    this._instancesCache.put(objectName);
+    this._objectsCtor.remove(objectName);
 }
 
 /**
@@ -291,6 +307,24 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos, track
         }
     }
 };
+
+
+/**
+ * Set the function called each time the scene is stepped to be the events generated code,
+ * which is by convention assumed to be a function in `gdjs` with a name based on the scene
+ * mangled name.
+ *
+ * @param {LayoutData} sceneData The scene data, used to find where the code was generated.
+ */
+gdjs.RuntimeScene.prototype.setEventsGeneratedCodeFunction = function(sceneData) {
+    var module = gdjs[sceneData.mangledName+"Code"];
+    if (module && module.func)
+        this._eventsFunction = module.func;
+    else {
+        console.log("Warning: no function found for running logic of scene " + this._name);
+        this._eventsFunction = (function() {});
+    }
+}
 
 /**
  * Set the function called each time the scene is stepped.
@@ -715,14 +749,25 @@ gdjs.RuntimeScene.prototype.getVariables = function() {
 /**
  * Get the data representing the initial shared data of the scene for the specified behavior.
  * @param {string} name The name of the behavior
+ * @returns {?BehaviorSharedData} The shared data for the behavior, if any.
  */
 gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
-    if ( this._initialBehaviorSharedData.containsKey(name) ) {
-        return this._initialBehaviorSharedData.get(name);
+    const behaviorSharedData = this._initialBehaviorSharedData.get(name);
+    if (behaviorSharedData) {
+        return behaviorSharedData;
     }
 
     console.error("Can't find shared data for behavior with name:", name);
     return null;
+};
+
+/**
+ * Set the data representing the initial shared data of the scene for the specified behavior.
+ * @param {string} name The name of the behavior
+ * @param {?BehaviorSharedData} behaviorSharedData The shared data for the behavior, or null to remove it.
+ */
+gdjs.RuntimeScene.prototype.setInitialSharedDataForBehavior = function(name, sharedData) {
+    this._initialBehaviorSharedData.put(name, sharedData);
 };
 
 /**
@@ -753,6 +798,23 @@ gdjs.RuntimeScene.prototype.hasLayer = function(name) {
 gdjs.RuntimeScene.prototype.addLayer = function(layerData) {
     this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
 };
+
+/**
+ * Remove a layer. All {@link gdjs.RuntimeObject} on this layer will
+ * be moved back to the base layer.
+ * @param {string} layerName The name of the layer to remove
+ */
+gdjs.RuntimeScene.prototype.removeLayer = function(layerName) {
+    var allInstances = this.getAdhocListOfAllInstances();
+    for(var i = 0;i < allInstances.length;++i) {
+        var runtimeObject = allInstances[i];
+        if (runtimeObject.getLayer() === layerName) {
+            runtimeObject.setLayer("");
+        }
+    }
+
+    this._layers.remove(layerName);
+}
 
 /**
  * Fill the array passed as argument with the names of all layers

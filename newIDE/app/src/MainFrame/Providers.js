@@ -14,7 +14,10 @@ import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoade
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { type EventsFunctionCodeWriter } from '../EventsFunctionsExtensionsLoader';
+import {
+  type EventsFunctionCodeWriter,
+  type EventsFunctionCodeWriterCallbacks,
+} from '../EventsFunctionsExtensionsLoader';
 import {
   type EventsFunctionsExtensionWriter,
   type EventsFunctionsExtensionOpener,
@@ -26,7 +29,7 @@ import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
 type Props = {|
   authentification: Authentification,
   disableCheckForUpdates: boolean,
-  makeEventsFunctionCodeWriter: () => EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
   children: ({

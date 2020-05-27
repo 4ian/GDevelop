@@ -185,6 +185,8 @@ export default class Debugger extends React.Component<Props, State> {
       this.setState(state => ({
         profilingInProgress: { ...state.profilingInProgress, [id]: false },
       }));
+    } else if (data.command === 'hotReloader.logs') {
+      // Nothing to do.
     } else {
       console.warn(
         'Unknown command received from debugger client:',

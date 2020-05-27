@@ -4,6 +4,7 @@ declare class gdPreviewExportOptions {
   setLayoutName(layoutName: string): gdPreviewExportOptions;
   setExternalLayoutName(externalLayoutName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
+  setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

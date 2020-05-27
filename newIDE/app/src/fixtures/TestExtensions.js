@@ -106,7 +106,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
 
-    const sepiaEffect = extension
+    extension
       .addBehavior(
         'FakeTextBehavior',
         'Fake behavior for text objects only',

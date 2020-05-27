@@ -63,8 +63,6 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
   gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
 
-  codeGenerator.AddAllObjectsIncludeFiles();
-
   // "Booleans" used by conditions
   gd::String globalConditionsBooleans =
       codeGenerator.GenerateAllConditionsBooleanDeclarations();
@@ -394,33 +392,6 @@ EventsCodeGenerator::GenerateAllObjectsDeclarationsAndResets(
     generateDeclarations(objectsAndGroups.GetObject(i));
 
   return std::make_pair(globalObjectLists, globalObjectListsReset);
-}
-
-void EventsCodeGenerator::AddAllObjectsIncludeFiles() {
-  auto addIncludeFiles = [this](const gd::Object& object) {
-    gd::String type = gd::GetTypeOfObject(
-        GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), object.GetName());
-
-    // Ensure needed files are included for the object type and its behaviors.
-    const gd::ObjectMetadata& metadata =
-        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
-    AddIncludeFiles(metadata.includeFiles);
-
-    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      const gd::BehaviorMetadata& metadata =
-          gd::MetadataProvider::GetBehaviorMetadata(
-              JsPlatform::Get(),
-              object.GetBehavior(behaviors[j]).GetTypeName());
-      AddIncludeFiles(metadata.includeFiles);
-    }
-  };
-
-  for (std::size_t i = 0; i < globalObjectsAndGroups.GetObjectsCount(); ++i)
-    addIncludeFiles(globalObjectsAndGroups.GetObject(i));
-
-  for (std::size_t i = 0; i < objectsAndGroups.GetObjectsCount(); ++i)
-    addIncludeFiles(objectsAndGroups.GetObject(i));
 }
 
 gd::String EventsCodeGenerator::GenerateAllConditionsBooleanDeclarations() {

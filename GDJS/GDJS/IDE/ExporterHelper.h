@@ -32,7 +32,7 @@ struct PreviewExportOptions {
    * \param exportPath_ The path in the filesystem where to export the files
    */
   PreviewExportOptions(gd::Project &project_, const gd::String &exportPath_)
-      : project(project_), exportPath(exportPath_){};
+      : project(project_), exportPath(exportPath_), projectDataOnlyExport(false) {};
 
   /**
    * \brief Set the layout to be run first in the previewed game
@@ -62,11 +62,21 @@ struct PreviewExportOptions {
     return *this;
   }
 
+  /**
+   * \brief Set if the export should only export the project data, not
+   * exporting events code.
+   */
+  PreviewExportOptions& SetProjectDataOnlyExport(bool enable) {
+    projectDataOnlyExport = enable;
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String layoutName;
   gd::String externalLayoutName;
   std::map<gd::String, int> includeFileHashes;
+  bool projectDataOnlyExport;
 };
 
 /**
@@ -167,6 +177,13 @@ class ExporterHelper {
    */
   bool ExportEffectIncludes(gd::Project &project,
                             std::vector<gd::String> &includesFiles);
+
+  /**
+   * \brief Add the include files for all the objects of the project
+   * and their behaviors.
+   */
+  void ExportObjectAndBehaviorsIncludes(
+    gd::Project &project, std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy the external source files used by the game into the export

@@ -66,15 +66,15 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
 };
 
 /**
- * @param {VideoObjectData} oldObjectData
- * @param {VideoObjectData} newObjectData
+ * @param {BBTextObjectDataType} oldObjectData
+ * @param {BBTextObjectDataType} newObjectData
  */
-gdjs.VideoRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
   if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
     this.setOpacity(newObjectData.content.opacity);
   }
   if (oldObjectData.content.visible !== newObjectData.content.visible) {
-    this.setVisible(newObjectData.content.visible);
+    this.hide(!newObjectData.content.visible);
   }
   if (oldObjectData.content.text !== newObjectData.content.text) {
     this.setBBText(newObjectData.content.text);
@@ -126,15 +126,6 @@ gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
  */
 gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
   return this._text;
-};
-
-gdjs.BBTextRuntimeObject.prototype.setVisible = function(enable) {
-  this._visible = enable;
-  this._renderer.updateVisible();
-};
-
-gdjs.BBTextRuntimeObject.prototype.isVisible = function() {
-  return this._visible;
 };
 
 gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {

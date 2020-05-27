@@ -47,28 +47,28 @@ gdjs.registerBehavior(
 );
 
 gdjs.TopDownMovementRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
-  if (newBehaviorData.allowDiagonals !== newBehaviorData.allowDiagonals) {
+  if (oldBehaviorData.allowDiagonals !== newBehaviorData.allowDiagonals) {
     this._allowDiagonals = newBehaviorData.allowDiagonals;
   }
-  if (newBehaviorData.acceleration !== newBehaviorData.acceleration) {
+  if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
     this._acceleration = newBehaviorData.acceleration;
   }
-  if (newBehaviorData.deceleration !== newBehaviorData.deceleration) {
+  if (oldBehaviorData.deceleration !== newBehaviorData.deceleration) {
     this._deceleration = newBehaviorData.deceleration;
   }
-  if (newBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
+  if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
     this._maxSpeed = newBehaviorData.maxSpeed;
   }
-  if (newBehaviorData.angularMaxSpeed !== newBehaviorData.angularMaxSpeed) {
+  if (oldBehaviorData.angularMaxSpeed !== newBehaviorData.angularMaxSpeed) {
     this._angularMaxSpeed = newBehaviorData.angularMaxSpeed;
   }
-  if (newBehaviorData.rotateObject !== newBehaviorData.rotateObject) {
+  if (oldBehaviorData.rotateObject !== newBehaviorData.rotateObject) {
     this._rotateObject = newBehaviorData.rotateObject;
   }
-  if (newBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
+  if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
     this._angleOffset = newBehaviorData.angleOffset;
   }
-  if (newBehaviorData.ignoreDefaultControls !== newBehaviorData.ignoreDefaultControls) {
+  if (oldBehaviorData.ignoreDefaultControls !== newBehaviorData.ignoreDefaultControls) {
     this._ignoreDefaultControls = newBehaviorData.ignoreDefaultControls;
   }
   return true;

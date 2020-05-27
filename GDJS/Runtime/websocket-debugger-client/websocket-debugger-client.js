@@ -1,4 +1,4 @@
-/// @ts-check
+// @ts-check
 /**
  * An client side implementation of the Debugger
  * @interface
@@ -116,7 +116,9 @@ gdjs.WebsocketDebuggerClient = function(runtimeGame) {
       } else if (data.command === 'profiler.stop') {
         runtimeGame.stopCurrentSceneProfiler();
       } else if (data.command === 'hotReload') {
-        that._hotReloader.hotReload();
+        that._hotReloader.hotReload().then((logs) => {
+          that.sendHotReloaderLogs(logs);
+        });
       } else {
         console.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -270,6 +272,20 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
   }
 
   this._ws.send(stringifiedMessage);
+};
+
+gdjs.WebsocketDebuggerClient.prototype.sendHotReloaderLogs = function(logs) {
+  if (!this._ws) {
+    console.warn('No connection to debugger opened');
+    return;
+  }
+
+  this._ws.send(
+    this._circularSafeStringify({
+      command: 'hotReloader.logs',
+      payload: logs,
+    })
+  );
 };
 
 gdjs.WebsocketDebuggerClient.prototype.sendProfilerStarted = function() {

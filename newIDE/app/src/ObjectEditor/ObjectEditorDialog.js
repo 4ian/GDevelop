@@ -19,6 +19,9 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
 
 type Props = {|
   open: boolean,
@@ -37,6 +40,10 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   unsavedChanges?: UnsavedChanges,
+  onUpdateBehaviorsSharedData: () => void,
+
+  // Preview:
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type InnerDialogProps = {|
@@ -62,7 +69,13 @@ const InnerDialog = (props: InnerDialogProps) => {
   return (
     <Dialog
       key={props.object && props.object.ptr}
-      secondaryActions={<HelpButton helpPagePath={props.helpPagePath} />}
+      secondaryActions={[
+        <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,
+        <HotReloadPreviewButton
+          key="hot-reload-preview-button"
+          {...props.hotReloadPreviewButtonProps}
+        />,
+      ]}
       actions={[
         <FlatButton
           key="cancel"
@@ -147,6 +160,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           onSizeUpdated={
             forceUpdate /*Force update to ensure dialog is properly positionned*/
           }
+          onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
         />
       )}
     </Dialog>

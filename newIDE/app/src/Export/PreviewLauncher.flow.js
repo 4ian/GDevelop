@@ -7,6 +7,7 @@ export type PreviewOptions = {|
   externalLayout: ?gdExternalLayout,
   networkPreview: boolean,
   hotReload: boolean,
+  projectDataOnlyExport: boolean,
 |};
 
 /** The functions that PreviewLauncher must expose on their class */
@@ -19,7 +20,7 @@ export type PreviewLauncherInterface = {
 
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
-  getIncludeFileHashs: () => {| [string]: string |},
+  getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
   onChangeSubscription: () => void,
 |};
@@ -58,4 +59,10 @@ export type PreviewDebuggerServer = {|
   getExistingDebuggerIds: () => Array<DebuggerId>,
   sendMessage: (id: DebuggerId, message: Object) => void,
   registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => () => void,
+|};
+
+/** The logs returned by the game hot-reloader. */
+export type HotReloaderLog = {|
+  kind: 'fatal' | 'error' | 'warning' | 'info',
+  message: string,
 |};

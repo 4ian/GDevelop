@@ -4,10 +4,10 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import ToolbarIcon from '../../UI/ToolbarIcon';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
-import { type PreviewState } from '../PreviewState.flow';
+import { type PreviewState } from '../PreviewState';
 
 export type PreviewButtonsProps = {|
-  onPreview: () => void,
+  onPreviewWithoutHotReload: () => void,
   onOpenDebugger: () => void,
   onNetworkPreview: () => void,
   onHotReloadPreview: () => void,
@@ -18,30 +18,36 @@ export type PreviewButtonsProps = {|
   |}) => void,
   showNetworkPreviewButton: boolean,
   isPreviewEnabled: boolean,
+  hasPreviewsRunning: boolean,
   previewState: PreviewState,
 |};
 
 export default function PreviewButtons({
-  onPreview,
+  onPreviewWithoutHotReload,
   onNetworkPreview,
   onOpenDebugger,
   onHotReloadPreview,
   showNetworkPreviewButton,
   isPreviewEnabled,
+  hasPreviewsRunning,
   previewState,
   setPreviewOverride,
 }: PreviewButtonsProps) {
   const previewIcon = (
     <ToolbarIcon
-      onClick={onPreview}
+      onClick={onHotReloadPreview}
       disabled={!isPreviewEnabled}
       src={
-        previewState.isPreviewOverriden
+        hasPreviewsRunning
+          ? 'res/ribbon_default/hotReload64.png'
+          : previewState.isPreviewOverriden
           ? 'res/ribbon_default/previewOverride32.png'
-          : 'res/ribbon_default/preview32.png'
+          : 'res/ribbon_default/preview64.png'
       }
       tooltip={
-        previewState.isPreviewOverriden
+        hasPreviewsRunning
+          ? t`Apply changes to the running preview, right click for more`
+          : previewState.isPreviewOverriden
           ? t`Preview is overridden, right click for more`
           : previewState.previewExternalLayoutName
           ? t`Launch a preview of the external layout inside the scene, right click for more`
@@ -58,6 +64,12 @@ export default function PreviewButtons({
             element={previewIcon}
             openMenuWithSecondaryClick
             buildMenuTemplate={() => [
+              {
+                label: i18n._(t`Launch another preview in a new window`),
+                click: onPreviewWithoutHotReload,
+                enabled: isPreviewEnabled && hasPreviewsRunning,
+              },
+              { type: 'separator' },
               ...(previewState.overridenPreviewLayoutName
                 ? [
                     {
@@ -106,12 +118,6 @@ export default function PreviewButtons({
                     previewState.overridenPreviewExternalLayoutName,
               },
             ]}
-          />
-          <ToolbarIcon
-            onClick={onHotReloadPreview}
-            disabled={!isPreviewEnabled}
-            src="res/ribbon_default/preview32.png"
-            tooltip={t`Apply changes to the running preview(s)`}
           />
           {showNetworkPreviewButton && (
             <ElementWithMenu

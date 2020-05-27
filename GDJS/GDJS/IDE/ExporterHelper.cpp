@@ -13,6 +13,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
@@ -27,6 +28,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
+#include "GDJS/Extensions/JsPlatform.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace gdjs {
@@ -60,26 +62,32 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // Stay compatible with text objects declaring their font as just a filename
   // without a font resource - by manually adding these resources.
   AddDeprecatedFontFilesToFontResources(
-      fs, exportedProject.GetResourcesManager(), exportDir);
+      fs, exportedProject.GetResourcesManager(), options.exportPath);
   // end of compatibility code
 
   // Export engine libraries
   AddLibsInclude(true, false, true, includesFiles);
 
+  // Export files for object and behaviors
+  ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
   ExportEffectIncludes(exportedProject, includesFiles);
 
-  // Generate events code
-  if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
-    return false;
+  if (!options.projectDataOnlyExport) {
+    // Generate events code
+    if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
+      return false;
 
-  // Export source files
-  if (!ExportExternalSourceFiles(
-          exportedProject, codeOutputDir, includesFiles)) {
-    gd::LogError(_("Error during exporting! Unable to export source files:\n") +
-                 lastError);
-    return false;
+    // Export source files
+    if (!ExportExternalSourceFiles(
+            exportedProject, codeOutputDir, includesFiles)) {
+      gd::LogError(
+          _("Error during exporting! Unable to export source files:\n") +
+          lastError);
+      return false;
+    }
   }
 
   // Strip the project (*after* generating events as the events may use stripped
@@ -87,8 +95,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   gd::ProjectStripper::StripProjectForExport(exportedProject);
   exportedProject.SetFirstLayout(options.layoutName);
 
-  // Strip the includes to only have Pixi.js files (*before* creating runtimeGameOptions,
-  // since otherwise Cocos files will be passed to the hot-reloader).
+  // Strip the includes to only have Pixi.js files (*before* creating
+  // runtimeGameOptions, since otherwise Cocos files will be passed to the
+  // hot-reloader).
   RemoveIncludes(false, true, includesFiles);
 
   // Create the setup options passed to the gdjs.RuntimeGame
@@ -98,6 +107,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     runtimeGameOptions.AddChild("injectExternalLayout")
         .SetValue(options.externalLayoutName);
   }
+  runtimeGameOptions.AddChild("projectDataOnlyExport")
+      .SetBoolValue(options.projectDataOnlyExport);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -695,6 +706,45 @@ bool ExporterHelper::ExportIncludesAndLibs(
   }
 
   return true;
+}
+
+void ExporterHelper::ExportObjectAndBehaviorsIncludes(
+    gd::Project &project, std::vector<gd::String> &includesFiles) {
+  auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
+    for (const auto &includeFile : newIncludeFiles) {
+      InsertUnique(includesFiles, includeFile);
+    }
+  };
+
+  auto addObjectIncludeFiles = [&](const gd::Object &object) {
+    // Ensure needed files are included for the object type and its behaviors.
+    const gd::ObjectMetadata &metadata =
+        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(),
+                                                object.GetType());
+    addIncludeFiles(metadata.includeFiles);
+
+    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+    for (std::size_t j = 0; j < behaviors.size(); ++j) {
+      const gd::BehaviorMetadata &metadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              JsPlatform::Get(),
+              object.GetBehavior(behaviors[j]).GetTypeName());
+      addIncludeFiles(metadata.includeFiles);
+    }
+  };
+
+  auto addObjectsIncludeFiles =
+      [&](const gd::ObjectsContainer &objectsContainer) {
+        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
+          addObjectIncludeFiles(objectsContainer.GetObject(i));
+        }
+      };
+
+  addObjectsIncludeFiles(project);
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout &layout = project.GetLayout(i);
+    addObjectsIncludeFiles(layout);
+  }
 }
 
 void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,

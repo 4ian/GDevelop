@@ -311,12 +311,6 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       unsigned int maxDepthLevelReached);
 
   /**
-   * \brief Add to include files all the files required by the object and their
-   * behaviors.
-   */
-  void AddAllObjectsIncludeFiles();
-
-  /**
    * \brief Generate the list of parameters of a function.
    *
    * \note runtimeScene is always added as the first parameter, and

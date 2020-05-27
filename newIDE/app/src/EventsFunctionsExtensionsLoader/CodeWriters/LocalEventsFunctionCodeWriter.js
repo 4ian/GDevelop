@@ -1,5 +1,8 @@
 // @flow
-import { type EventsFunctionCodeWriter } from '..';
+import {
+  type EventsFunctionCodeWriter,
+  type EventsFunctionCodeWriterCallbacks,
+} from '..';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import slugs from 'slugs';
 const os = optionalRequire('os');
@@ -11,7 +14,7 @@ const fs = optionalRequire('fs');
  */
 export const makeLocalEventsFunctionCodeWriter = ({
   onWriteFile,
-}): EventsFunctionCodeWriter => {
+}: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   const outputDir = os.tmpdir() + '/GDGeneratedEventsFunctions';
   fs.mkdir(outputDir, err => {
     if (err && err.code !== 'EEXIST') {

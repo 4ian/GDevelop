@@ -19,7 +19,7 @@ const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd: libGDevelop = global.gd;
 
 type Props = {|
-  getIncludeFileHashs: () => {| [string]: string |},
+  getIncludeFileHashs: () => { [string]: number },
   onExport?: () => void,
   onChangeSubscription?: () => void,
 |};
@@ -181,13 +181,18 @@ export default class LocalPreviewLauncher extends React.Component<
             previewExportOptions.setIncludeFileHash(includeFile, hash);
           }
 
-          exporter.exportProjectForPixiPreview(previewExportOptions);
-          previewExportOptions.delete();
-          exporter.delete();
-
           const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
           const shouldHotReload =
             previewOptions.hotReload && !!debuggerIds.length;
+
+          previewExportOptions.setProjectDataOnlyExport(
+            // Only export project data if asked and if a hot-reloading is being done.
+            shouldHotReload && previewOptions.projectDataOnlyExport
+          );
+
+          exporter.exportProjectForPixiPreview(previewExportOptions);
+          previewExportOptions.delete();
+          exporter.delete();
 
           if (shouldHotReload) {
             debuggerIds.forEach(debuggerId => {

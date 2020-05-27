@@ -32,6 +32,8 @@ gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)
  * Called when the behavior must be updated using the specified behaviorData. This is the
  * case during hot-reload, and is only called if the behavior was modified.
  *
+ * @see gdjs.RuntimeBehavior#onObjectHotReloaded
+ *
  * @param {BehaviorData} oldBehaviorData The previous data for the behavior.
  * @param {BehaviorData} newBehaviorData The new data for the behavior.
  * @returns {boolean} true if the behavior was updated, false if it could not (i.e: hot-reload is not supported).
@@ -157,6 +159,15 @@ gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
  * is being removed from the scene and is about to be destroyed/reused later,
  */
 gdjs.RuntimeBehavior.prototype.onDestroy = function() {
+
+};
+
+/**
+ * This method is called when the owner of the behavior
+ * was hot reloaded, so its position, angle, size can have been changed outside
+ * of events.
+ */
+gdjs.RuntimeBehavior.prototype.onObjectHotReloaded = function() {
 
 };
 

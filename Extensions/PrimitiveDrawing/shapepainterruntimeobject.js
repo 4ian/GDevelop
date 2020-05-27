@@ -111,6 +111,9 @@ gdjs.ShapePainterRuntimeObject.prototype.updateFromObjectData = function(oldObje
         this._renderer.updateXPosition();
         this._renderer.updateYPosition();
     }
+    if (oldObjectData.clearBetweenFrames !== newObjectData.clearBetweenFrames) {
+        this._clearBetweenFrames = newObjectData.clearBetweenFrames
+    }
 
     return true;
 };

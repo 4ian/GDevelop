@@ -1,3 +1,4 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import React, { Component } from 'react';
@@ -16,6 +17,11 @@ import { isNullPtr } from '../Utils/IsNullPtr';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 const gd: libGDevelop = global.gd;
 
 const AddBehaviorLine = ({ onAdd }) => (
@@ -31,25 +37,22 @@ const AddBehaviorLine = ({ onAdd }) => (
   </Column>
 );
 
-export default class BehaviorsEditor extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { newBehaviorDialogOpen: false };
-  }
+type Props = {|
+  project: gdProject,
+  object: gdObject,
+  onUpdateBehaviorsSharedData: () => void,
+  onSizeUpdated?: ?() => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+|};
 
-  componentWillMount() {
-    this._loadFrom(this.props.object);
-  }
+type State = {|
+  newBehaviorDialogOpen: boolean,
+|};
 
-  componentWillReceiveProps(newProps) {
-    if (this.props.object !== newProps.object) {
-      this._loadFrom(newProps.object);
-    }
-  }
-
-  _loadFrom(object) {
-    if (!object) return;
-  }
+export default class BehaviorsEditor extends Component<Props, State> {
+  state = { newBehaviorDialogOpen: false };
 
   chooseNewBehavior = () => {
     this.setState({
@@ -57,7 +60,7 @@ export default class BehaviorsEditor extends Component {
     });
   };
 
-  _hasBehaviorWithType = type => {
+  _hasBehaviorWithType = (type: string) => {
     const { object } = this.props;
     const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
 
@@ -67,7 +70,7 @@ export default class BehaviorsEditor extends Component {
       .filter(behaviorType => behaviorType === type).length;
   };
 
-  addBehavior = (type, defaultName) => {
+  addBehavior = (type: string, defaultName: string) => {
     const { object, project } = this.props;
 
     this.setState(
@@ -90,11 +93,15 @@ export default class BehaviorsEditor extends Component {
 
         this.forceUpdate();
         if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+        this.props.onUpdateBehaviorsSharedData();
       }
     );
   };
 
-  _onChangeBehaviorName = (behaviorContent, newName) => {
+  _onChangeBehaviorName = (
+    behaviorContent: gdBehaviorContent,
+    newName: string
+  ) => {
     // TODO: This is disabled for now as there is no proper refactoring
     // of events after a behavior renaming. Once refactoring is available,
     // the text field can be enabled again and refactoring calls added here
@@ -108,7 +115,7 @@ export default class BehaviorsEditor extends Component {
     this.forceUpdate();
   };
 
-  _onRemoveBehavior = behaviorName => {
+  _onRemoveBehavior = (behaviorName: string) => {
     const { object } = this.props;
     const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this behavior? This can't be undone."

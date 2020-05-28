@@ -36,9 +36,11 @@ declare class gdSetString {
 };
 
 // Vectors -->
-declare class gdVector<VectorObject> extends gdEmscriptenObject {
+declare class gdVector<VectorObject> extends gdEmscriptenClass {
     size(): number;
     at(index: number): VectorObject;
+    get(index: number): VectorObject;
+    toJSArray(): Array<VectorObject>;
 }
 declare class gdModifiableVector<VectorObject> extends gdVector<VectorObject> {
     push_back(value: VectorObject): void;
@@ -52,9 +54,11 @@ declare type gdVectorPolygon2d = gdModifiableVector<gdPolygon2d>;
 declare type gdVectorPlatformExtension = gdVector<gdPlatformExtension>;
 declare type gdVectorExpressionCompletionDescription = gdVector<gdExpressionCompletionDescription>;
 
-declare class gdVector2f extends gdEmscriptenObject {
+declare class gdVector2f extends gdEmscriptenClass {
     x: number;
     y: number;
+    set_x(newValue: number): void;
+    set_y(newValue: number): void;
 };
 // <-- Vectors
 
@@ -74,7 +78,7 @@ declare type gdMapStringPropertyDescriptor = gdMap<string, gdPropertyDescriptor>
 // <-- Base types
 
 // Platforms -->
-declare class gdPlatform extends gdEmscriptenObject {
+declare class gdPlatform extends gdEmscriptenClass {
     getName(): string;
     getFullName(): string;
     getSubtitle(): string;
@@ -95,7 +99,7 @@ declare class gdJsPlatform extends gdPlatform {
     getBehaviorSharedDatas(type: string): gdBehaviorsSharedData;
 }
 // Extension -->
-declare class gdPlatformExtension extends gdEmscriptenObject {
+declare class gdPlatformExtension extends gdEmscriptenClass {
     static getNamespaceSeparator(): string;
 
     setExtensionInformation(name: string,
@@ -181,7 +185,9 @@ declare class gdPlatformExtension extends gdEmscriptenObject {
     getAllExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
     getAllStrExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
 };
-declare class gdInstruction extends gdEmscriptenObject {
+declare class gdInstruction extends gdEmscriptenClass {
+    clone(): gdInstruction;
+
     setType(type: string): void;
     getType(): string;
     setInverted(inverted: boolean): void;
@@ -415,7 +421,7 @@ declare class gdNamedPropertyDescriptor extends gdPropertyDescriptor {
 
     toPropertyDescriptor(): gdPropertyDescriptor;
 };
-declare class gdNamedPropertyDescriptorsList extends gdVector<gdNamedPropertyDescriptor> {
+declare class gdNamedPropertyDescriptorsList {
     insertNew(name: string, position: number): gdNamedPropertyDescriptor;
     insert(item: gdPropertyDescriptor, position: number): gdNamedPropertyDescriptor;
     has(name: string): boolean;
@@ -434,7 +440,7 @@ declare type gdExpressionCompletionDescription = gdEmscriptenObject;
 // <-- Expressions
 
 // Exporter -->
-declare class gdjsExporter extends gdEmscriptenObject {
+declare class gdjsExporter extends gdEmscriptenClass {
     constructor(abstractFilesystem: object, gdjsRoot: string): void;
     setCodeOutputDirectory(path: string): void;
     exportLayoutForPixiPreview(project: gdProject, layout: gdLayout, exportDir: string): boolean;
@@ -443,7 +449,7 @@ declare class gdjsExporter extends gdEmscriptenObject {
     exportWholeCocos2dProject(project: gdProject, debugMode: boolean, exportDir: string): boolean;
     getLastError(): string;
 };
-declare class gdEventsContext extends gdEmscriptenObject {
+declare class gdEventsContext extends gdEmscriptenClass {
     getReferencedObjectOrGroupNames(): gdSetString;
     getObjectNames(): gdSetString;
     getBehaviorNamesOfObjectOrGroup(objectOrGroupName: string): gdSetString;
@@ -474,10 +480,10 @@ declare class gdResource extends gdSerializableClass {
     getProperties(project: gdProject): gdMapStringPropertyDescriptor;
     updateProperty(name: string, value: string, project: gdProject): boolean;
 };
-declare class gdResourcesManager extends gdEmscriptenObject {
+declare class gdResourcesManager extends gdEmscriptenClass {
     getAllResourceNames(): gdVectorString;
     hasResource(name: string): boolean;
-    GetResource(name: string): gdResource;
+    getResource(name: string): gdResource;
     addResource(res: gdResource): boolean;
     removeResource(name: string): void;
     renameResource(oldName: string, name: string): void;
@@ -545,7 +551,7 @@ declare class gdEventsFunction extends gdSerializableClass {
     getParameters(): gdVectorParameterMetadata;
     getObjectGroups(): gdObjectGroupsContainer;
 };
-declare class gdEventsSearchResult extends gdEmscriptenObject {
+declare class gdEventsSearchResult extends gdEmscriptenClass {
     isEventsListValid(): boolean;
     getEventsList(): gdEventsList;
     getPositionInList(): number;

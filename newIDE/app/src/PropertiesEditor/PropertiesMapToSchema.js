@@ -167,5 +167,6 @@ export default (
     }
   }).filter(Boolean);
 
+  //$FlowFixMe
   return propertyFields;
 };

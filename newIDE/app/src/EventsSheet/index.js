@@ -465,10 +465,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     const selectedInstructions = getSelectedInstructions(this.state.selection);
 
     let destinationIndex: number = 0;
-    if(indexInList != null) 
-       destinationIndex = indexInList;
-    else destinationIndex = destinationContext.instrsList.size();;
-      
+    if (indexInList != null) destinationIndex = indexInList;
+    else destinationIndex = destinationContext.instrsList.size();
+
     const isTryingToDragAnInstructionIntoItsOwnNestedInstructions = !!selectedInstructions.filter(
       instruction =>
         containsSubInstructions(instruction, destinationContext.instrsList)

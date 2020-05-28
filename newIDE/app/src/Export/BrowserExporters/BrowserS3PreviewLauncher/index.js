@@ -58,7 +58,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         browserS3FileSystem
       );
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-      exporter.setCodeOutputDirectory(getBaseUrl() + prefix);
+      exporter.setCodeOutputDirectory(outputDir);
 
       return {
         exporter,

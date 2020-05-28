@@ -1,4 +1,5 @@
 // @flow
+import { type Theme } from '../DefaultTheme';
 import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
 import './Mosaic.css';
 import './EventsSheet.css';
@@ -6,10 +7,15 @@ import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 import './Markdown.css';
 
-const gdevelopPurple = '#9100ce';
-const gdevelopLightBlue = '#4ab0e4';
-
-const systemSelectionColor = '#4c92ff'; //OS X selection
+const nord4 = '#D8DEE9';
+const nord5 = '#E5E9F0';
+const nord6 = '#ECEFF4';
+const nord8 = '#88C0D0';
+const nord9 = '#81A1C1';
+const nord11 = '#BF616A';
+const nord12 = '#D08770';
+const nord13 = '#EBCB8B';
+const nord14 = '#A3BE8C';
 
 // Use the fonts provided by the operating system(s) as possible.
 // If you update this font list, be sure to do it in all the other places using fonts in the codebase.
@@ -19,18 +25,18 @@ const fontFamily =
 /**
  * The background color of the main window
  */
-const backgroundColor = '#f7f7f7';
+const backgroundColor = '#2E3440';
 
 /**
  * The background color of the "papers", "dialogs", etc...
  */
-const canvasColor = '#f0f0f0';
+const canvasColor = '#3B4252';
 
 /**
  * The alternate background color, for some lists or search box,
  * to distinguish them from other content.
  */
-const alternateCanvasColor = '#ffffff';
+const alternateCanvasColor = '#4C566A';
 
 // GDevelop specific variables:
 const gdevelopTheme = {
@@ -38,26 +44,26 @@ const gdevelopTheme = {
     canvasColor,
   },
   message: {
-    warning: '#ffa500',
-    error: '#f00',
-    valid: '#00aa00',
+    warning: nord12,
+    error: nord11,
+    valid: nord14,
   },
   toolbar: {
     backgroundColor: backgroundColor,
-    separatorColor: '#cecece',
+    separatorColor: nord4,
   },
   closableTabs: {
     fontFamily,
     containerBackgroundColor: backgroundColor,
     backgroundColor: canvasColor,
-    textColor: '#878787',
-    selectedBackgroundColor: gdevelopLightBlue,
-    selectedTextColor: '#ffffff',
+    textColor: nord6,
+    selectedBackgroundColor: nord8,
+    selectedTextColor: backgroundColor,
     height: 32,
     closeButtonWidth: 24,
   },
   imageThumbnail: {
-    selectedBorderColor: systemSelectionColor,
+    selectedBorderColor: nord8,
   },
   list: {
     itemsBackgroundColor: alternateCanvasColor,
@@ -67,29 +73,29 @@ const gdevelopTheme = {
   },
   listItem: {
     groupBackgroundColor: backgroundColor,
-    groupTextColor: 'rgba(0,0,0,0.54)',
-    deprecatedGroupTextColor: 'rgba(0,0,0,0.30)',
-    separatorColor: '#e0e0e0',
-    selectedBackgroundColor: systemSelectionColor,
-    selectedTextColor: '#ffffff',
-    rightIconColor: '#111',
-    selectedRightIconColor: '#111',
-    errorTextColor: '#ff2e16',
-    warningTextColor: '#ffb032',
-    selectedErrorBackgroundColor: '#ff2e16',
-    selectedWarningBackgroundColor: '#ffb032',
+    groupTextColor: nord6,
+    deprecatedGroupTextColor: nord4,
+    separatorColor: alternateCanvasColor,
+    selectedBackgroundColor: nord8,
+    selectedTextColor: backgroundColor,
+    rightIconColor: nord4,
+    selectedRightIconColor: backgroundColor,
+    errorTextColor: nord11,
+    warningTextColor: nord13,
+    selectedErrorBackgroundColor: nord11,
+    selectedWarningBackgroundColor: nord13,
   },
   emptyMessage: {
-    shadowColor: '#FFFFFF',
+    shadowColor: '#000',
   },
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-default-theme', // See Mosaic.css
-  eventsSheetRootClassName: 'gd-events-sheet-default-theme', // See EventsSheet.css
-  tableRootClassName: 'gd-table-default-theme', // See Table.css
-  markdownRootClassName: 'gd-markdown-default-theme', // See Markdown.css
-  gdevelopIconsCSSFilter: '',
+  mosaicRootClassName: 'mosaic-gd-nord-theme', // See Mosaic.css
+  eventsSheetRootClassName: 'gd-events-sheet-nord-theme', // See EventsSheet.css
+  tableRootClassName: 'gd-table-nord-theme', // See Table.css
+  markdownRootClassName: 'gd-markdown-nord-theme', // See Markdown.css
+  gdevelopIconsCSSFilter: 'hue-rotate(-15deg) saturate(57%) brightness(120%)',
 };
 
 // Theme for Material-UI components
@@ -98,23 +104,29 @@ const muiTheme = createMuiTheme({
     fontFamily,
   },
   palette: {
-    type: 'light',
+    type: 'dark',
     common: { black: 'rgba(110, 42, 42, 1)', white: '#fff' },
     background: {
       paper: canvasColor,
       default: backgroundColor,
     },
     primary: {
-      light: lighten(gdevelopLightBlue, 0.05),
-      main: gdevelopLightBlue,
-      dark: darken(gdevelopLightBlue, 0.05),
-      contrastText: '#fff',
+      light: lighten(nord8, 0.05),
+      main: nord8,
+      dark: darken(nord8, 0.05),
+      contrastText: backgroundColor,
     },
     secondary: {
-      light: lighten(gdevelopPurple, 0.05),
-      main: gdevelopPurple,
-      dark: darken(gdevelopPurple, 0.05),
-      contrastText: '#fff',
+      light: lighten(nord6, 0.05),
+      main: nord6,
+      dark: darken(nord6, 0.05),
+      contrastText: canvasColor,
+    },
+    text: {
+      primary: nord6,
+      secondary: nord5,
+      disabled: nord4,
+      hint: nord5,
     },
   },
   overrides: {
@@ -124,31 +136,6 @@ const muiTheme = createMuiTheme({
         fontWeight: 400,
       },
     },
-    MuiInput: {
-      underline: {
-        '&:before': {
-          borderBottom: `1px solid #BBBBBB`,
-        },
-      },
-    },
-    MuiAppBar: {
-      colorPrimary: {
-        backgroundColor: gdevelopPurple,
-      },
-    },
-    MuiIconButton: {
-      root: {
-        // Fix color being grey if not set to (almost) black
-        color: '#111',
-      },
-    },
-    MuiListItemIcon: {
-      root: {
-        // Fix color being grey if not set to (almost) black
-        color: '#111',
-      },
-    },
-    // Reduce right margins from 16px to 8px in lists:
     MuiListItem: {
       secondaryAction: {
         paddingRight: 40,
@@ -162,16 +149,39 @@ const muiTheme = createMuiTheme({
         right: 8,
       },
     },
+    MuiInput: {
+      underline: {
+        '&:before': {
+          borderBottom: `1px solid ##D8DEE9`,
+        },
+      },
+    },
+    MuiAppBar: {
+      colorPrimary: {
+        backgroundColor: nord8,
+      },
+    },
+    MuiIconButton: {
+      root: {
+        color: '#D8DEE9',
+      },
+    },
+    MuiListItemIcon: {
+      root: {
+        // Fix color being grey if not set to (almost) black
+        color: '#D8DEE9',
+      },
+    },
     // Use a more visible color scheme for tabs:
     MuiTabs: {
       root: {
-        backgroundColor: gdevelopLightBlue,
+        backgroundColor: nord9,
         minHeight: 32, // Reduce the height of tabs to 32px
       },
     },
     MuiTab: {
       textColorPrimary: {
-        color: '#fff !important',
+        color: '#ECEFF4 !important',
       },
       root: {
         // Reduce the height of tabs to 32px
@@ -228,9 +238,9 @@ const muiTheme = createMuiTheme({
   },
 });
 
-const theme = {
+const theme: Theme = {
   gdevelopTheme,
   muiTheme,
 };
-export type Theme = $Exact<typeof theme>;
+
 export default theme;

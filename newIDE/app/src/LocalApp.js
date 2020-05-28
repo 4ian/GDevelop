@@ -53,6 +53,7 @@ export const create = (authentification: Authentification) => {
             getStorageProviderOperations,
             storageProviders,
             initialFileMetadataToOpen,
+            getStorageProvider,
           }) => (
             <UnsavedChangesContext.Consumer>
               {unsavedChanges => (
@@ -80,6 +81,7 @@ export const create = (authentification: Authentification) => {
                   }
                   storageProviders={storageProviders}
                   getStorageProviderOperations={getStorageProviderOperations}
+                  getStorageProvider={getStorageProvider}
                   resourceSources={localResourceSources}
                   resourceExternalEditors={localResourceExternalEditors}
                   extensionsLoader={makeExtensionsLoader({

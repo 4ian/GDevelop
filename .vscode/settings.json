@@ -99,11 +99,7 @@
         "newIDE/electron-app/dist": true,
         "newIDE/app/build": true,
         "newIDE/app/resources/GDJS": true,
-        "newIDE/electron-app/app/www": true,
-        "**/.classpath": true,
-        "**/.project": true,
-        "**/.settings": true,
-        "**/.factorypath": true
+        "newIDE/electron-app/app/www": true
     },
     // Support for Flowtype (for newIDE):
     "javascript.validate.enable": false,

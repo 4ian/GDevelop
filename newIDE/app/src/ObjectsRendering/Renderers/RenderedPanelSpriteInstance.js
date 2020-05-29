@@ -273,7 +273,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        this._borderSprites[1].width - panelSprite.getRightMargin(),
+        texture.width - panelSprite.getRightMargin(),
         0,
         panelSprite.getRightMargin(),
         panelSprite.getTopMargin()
@@ -330,7 +330,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     makeInsideTexture(
       new PIXI.Rectangle(
         0,
-        this._borderSprites[5].height - panelSprite.getBottomMargin(),
+        texture.height - panelSprite.getBottomMargin(),
         panelSprite.getLeftMargin(),
         panelSprite.getBottomMargin()
       )
@@ -357,8 +357,8 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        this._borderSprites[7].width - panelSprite.getRightMargin(),
-        this._borderSprites[7].height - panelSprite.getBottomMargin(),
+        texture.width - panelSprite.getRightMargin(),
+        texture.height - panelSprite.getBottomMargin(),
         panelSprite.getRightMargin(),
         panelSprite.getBottomMargin()
       )

@@ -58,12 +58,12 @@ const styles = {
     lineHeight: 1.4,
   },
   backgroundHighlightingWithFloatingLabel: {
-    marginTop: 29, //Properly align with the text field
+    marginTop: 22, //Properly align with the text field
     paddingLeft: 12,
     paddingRight: 12,
   },
   backgroundHighlightingInline: {
-    marginTop: 6, //Properly align with the text field
+    marginTop: 0, //Properly align with the text field
     paddingLeft: 0,
     paddingRight: 0,
   },

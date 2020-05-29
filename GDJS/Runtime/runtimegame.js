@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -9,28 +10,28 @@
  *
  * @memberof gdjs
  * @class RuntimeGame
- * @param {Object} data The object (usually stored in data.json) containing the full project data
- * @param {Object=} spec Optional object for specifiying additional options: {forceFullscreen: ...}
+ * @param {ProjectData} data The object (usually stored in data.json) containing the full project data
+ * @param {Object=} options Optional object for specifiying additional options: {forceFullscreen: ...}
  */
-gdjs.RuntimeGame = function(data, spec) {
-  spec = spec || {};
+gdjs.RuntimeGame = function(data, options) {
+  options = options || {};
 
   this._variables = new gdjs.VariablesContainer(data.variables);
   this._data = data;
   this._imageManager = new gdjs.ImageManager(
-    data.resources ? data.resources.resources : undefined
+    data.resources.resources
   );
   this._soundManager = new gdjs.SoundManager(
-    data.resources ? data.resources.resources : undefined
+    data.resources.resources
   );
   this._fontManager = new gdjs.FontManager(
-    data.resources ? data.resources.resources : undefined
+    data.resources.resources
   );
   this._jsonManager = new gdjs.JsonManager(
-    data.resources ? data.resources.resources : undefined
+    data.resources.resources
   );
-  this._maxFPS = data ? parseInt(data.properties.maxFPS, 10) : 60;
-  this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
+  this._maxFPS = data ? data.properties.maxFPS : 60;
+  this._minFPS = data ? data.properties.minFPS : 15;
 
   this._gameResolutionWidth = data.properties.windowWidth;
   this._gameResolutionHeight = data.properties.windowHeight;
@@ -43,7 +44,7 @@ gdjs.RuntimeGame = function(data, spec) {
   this._scaleMode = data.properties.scaleMode || 'linear';
   this._renderer = new gdjs.RuntimeGameRenderer(
     this,
-    spec.forceFullscreen || false
+    options.forceFullscreen || false
   );
 
   //Game loop management (see startGameLoop method)
@@ -55,12 +56,24 @@ gdjs.RuntimeGame = function(data, spec) {
   this._inputManager = new gdjs.InputManager();
 
   //Allow to specify an external layout to insert in the first scene:
-  this._injectExternalLayout = spec.injectExternalLayout || '';
+  this._injectExternalLayout = options.injectExternalLayout || '';
+  this._options = options;
 
   //Optional client to connect to a debugger:
   this._debuggerClient = gdjs.DebuggerClient
     ? new gdjs.DebuggerClient(this)
     : null;
+
+  /** @type {boolean} */
+  this._isPreview = options.isPreview || false;
+};
+
+/**
+ * Return the additional options passed to the RuntimeGame when created.
+ * @returns {?Object} The additional options, if any.
+ */
+gdjs.RuntimeGame.prototype.getAdditionalOptions = function() {
+  return this._options;
 };
 
 gdjs.RuntimeGame.prototype.getRenderer = function() {
@@ -77,25 +90,28 @@ gdjs.RuntimeGame.prototype.getVariables = function() {
 
 /**
  * Get the gdjs.SoundManager of the RuntimeGame.
- * @return {gdjs.SoundManager} The sound manager.
+ * @return {gdjs.HowlerSoundManager | gdjs.CocosSoundManager} The sound manager.
  */
 gdjs.RuntimeGame.prototype.getSoundManager = function() {
+  // @ts-ignore
   return this._soundManager;
 };
 
 /**
  * Get the gdjs.ImageManager of the RuntimeGame.
- * @return {gdjs.ImageManager} The image manager.
+ * @return {gdjs.PixiImageManager | gdjs.CocosImageManager} The image manager.
  */
 gdjs.RuntimeGame.prototype.getImageManager = function() {
+  // @ts-ignore
   return this._imageManager;
 };
 
 /**
  * Get the gdjs.FontManager of the RuntimeGame.
- * @return {gdjs.FontManager} The font manager.
+ * @return {gdjs.FontFaceObserverFontManager} The font manager.
  */
 gdjs.RuntimeGame.prototype.getFontManager = function() {
+  // @ts-ignore
   return this._fontManager;
 };
 
@@ -119,7 +135,7 @@ gdjs.RuntimeGame.prototype.getJsonManager = function() {
 
 /**
  * Get the object containing the game data
- * @return {Object} The object associated to the game.
+ * @return {ProjectData} The object associated to the game.
  */
 gdjs.RuntimeGame.prototype.getGameData = function() {
   return this._data;
@@ -128,11 +144,11 @@ gdjs.RuntimeGame.prototype.getGameData = function() {
 /**
  * Get the data associated to a scene.
  *
- * @param {string} sceneName The name of the scene. If not defined, the first scene will be returned.
- * @return {?Object} The data associated to the scene.
+ * @param {string=} sceneName The name of the scene. If not defined, the first scene will be returned.
+ * @return {?LayoutData} The data associated to the scene.
  */
 gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
-  var scene = undefined;
+  var scene = null;
   for (var i = 0, len = this._data.layouts.length; i < len; ++i) {
     var sceneData = this._data.layouts[i];
 
@@ -142,7 +158,7 @@ gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
     }
   }
 
-  if (scene === undefined)
+  if (scene === null)
     console.warn('The game has no scene called "' + sceneName + '"');
 
   return scene;
@@ -172,7 +188,7 @@ gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
  * Get the data associated to an external layout.
  *
  * @param {string} name The name of the external layout.
- * @return {?Object} The data associated to the external layout or null if not found.
+ * @return {?ExternalLayoutData} The data associated to the external layout or null if not found.
  */
 gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
   var externalLayout = null;
@@ -190,7 +206,7 @@ gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
 
 /**
  * Get the data representing all the global objects of the game.
- * @return {Object} The data associated to the global objects.
+ * @return {ObjectData[]} The data associated to the global objects.
  */
 gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
   return this._data.objects || [];
@@ -424,6 +440,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
   //Load the first scene
   var firstSceneName = this._data.firstLayout;
   this._sceneStack.push(
+    // @ts-ignore - no risk of null object.
     this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name,
     this._injectExternalLayout
   );
@@ -515,7 +532,7 @@ gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(
  */
 gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
   var currentScene = this._sceneStack.getCurrentScene();
-  if (!currentScene) return null;
+  if (!currentScene) return;
 
   currentScene.stopProfiler();
 };
@@ -525,4 +542,20 @@ gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
  */
 gdjs.RuntimeGame.prototype.wasFirstSceneLoaded = function() {
   return this._sceneStack.wasFirstSceneLoaded();
+}
+
+/**
+ * Return the stack of {@link gdjs.RuntimeScene} being played.
+ * @returns {gdjs.SceneStack}
+ */
+gdjs.RuntimeGame.prototype.getSceneStack = function() {
+  return this._sceneStack;
+}
+
+/**
+ * Check if the game is running as a preview, launched from an editor.
+ * @returns {boolean} true if the current game is a preview.
+ */
+gdjs.RuntimeGame.prototype.isPreview = function() {
+  return this._isPreview;
 }

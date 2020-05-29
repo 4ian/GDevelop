@@ -8,7 +8,8 @@
       "./Runtime/Cocos2d/",
       "./Runtime/Cordova/",
       "./Runtime/Electron/",
-      "./Runtime/FacebookInstantGames/"
+      "./Runtime/FacebookInstantGames/",
+      "./Runtime/types/"
     ],
     "includePattern": ".+\\.js(doc)?$",
     "excludePattern": "(^|\\/|\\\\)_"

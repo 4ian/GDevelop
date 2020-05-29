@@ -14,6 +14,7 @@ import { Line, Column } from '../../UI/Grid';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import ScrollView from '../../UI/ScrollView';
 
 type Props = {|
   project: gdProject,
@@ -22,7 +23,7 @@ type Props = {|
   onEditObjectByName: string => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
@@ -88,6 +89,13 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         instance.setLayer(newValue),
     },
     {
+      name: 'Custom size?',
+      valueType: 'boolean',
+      getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) =>
+        instance.setHasCustomSize(newValue),
+    },
+    {
       name: 'Custom size',
       type: 'row',
       children: [
@@ -106,13 +114,6 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
             instance.setCustomHeight(newValue),
         },
       ],
-    },
-    {
-      name: 'Custom size?',
-      valueType: 'boolean',
-      getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setHasCustomSize(newValue),
     },
   ];
 
@@ -142,41 +143,47 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
     );
 
     return (
-      <div
-        style={{ overflowY: 'scroll', overflowX: 'hidden' }}
+      <ScrollView
+        autoHideScrollbar
         key={instances
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}
       >
-        <Column>
-          <PropertiesEditor
-            unsavedChanges={this.props.unsavedChanges}
-            schema={this.schema.concat(instanceSchema)}
-            instances={instances}
-          />
-          <Line alignItems="center" justifyContent="space-between">
-            <Text>
-              <Trans>Instance Variables</Trans>
-            </Text>
-            <IconButton
-              onClick={() => {
-                this.props.editInstanceVariables(instance);
-              }}
-            >
-              <OpenInNew />
-            </IconButton>
-          </Line>
-        </Column>
-        <VariablesList
-          inheritedVariablesContainer={object ? object.getVariables() : null}
-          variablesContainer={instance.getVariables()}
-          onSizeUpdated={
-            () =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
-          }
-          ref={this._instanceVariablesList}
-        />
-      </div>
+        <Line>
+          <Column expand noMargin>
+            <Column>
+              <PropertiesEditor
+                unsavedChanges={this.props.unsavedChanges}
+                schema={this.schema.concat(instanceSchema)}
+                instances={instances}
+              />
+              <Line alignItems="center" justifyContent="space-between">
+                <Text>
+                  <Trans>Instance Variables</Trans>
+                </Text>
+                <IconButton
+                  onClick={() => {
+                    this.props.editInstanceVariables(instance);
+                  }}
+                >
+                  <OpenInNew />
+                </IconButton>
+              </Line>
+            </Column>
+            <VariablesList
+              inheritedVariablesContainer={
+                object ? object.getVariables() : null
+              }
+              variablesContainer={instance.getVariables()}
+              onSizeUpdated={
+                () =>
+                  this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+              }
+              ref={this._instanceVariablesList}
+            />
+          </Column>
+        </Line>
+      </ScrollView>
     );
   }
 

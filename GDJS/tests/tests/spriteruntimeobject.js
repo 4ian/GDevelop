@@ -1,10 +1,14 @@
+// @ts-check
+
 /**
  * Basic tests for gdjs.SpriteRuntimeObject
  */
 describe('gdjs.SpriteRuntimeObject', function() {
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
+    // @ts-ignore
     properties: { windowWidth: 800, windowHeight: 600 },
+    resources: { resources: [] }
   });
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
@@ -12,6 +16,8 @@ describe('gdjs.SpriteRuntimeObject', function() {
     var object = new gdjs.SpriteRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      updateIfNotVisible: false,
+      variables: [],
       behaviors: [],
       animations: [],
     });
@@ -31,18 +37,23 @@ describe('gdjs.SpriteRuntimeObject', function() {
     var object = new gdjs.SpriteRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      updateIfNotVisible: false,
       behaviors: [],
+      variables: [],
       animations: [
         {
           name: 'firstAnimation',
+          useMultipleDirections: false,
           directions: [],
         },
         {
           name: 'secondAnimation',
+          useMultipleDirections: false,
           directions: [],
         },
         {
           name: '',
+          useMultipleDirections: false,
           directions: [],
         },
       ],

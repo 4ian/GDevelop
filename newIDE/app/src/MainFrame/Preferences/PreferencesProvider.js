@@ -8,8 +8,13 @@ import PreferencesContext, {
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
-import type { PreferencesValues } from './PreferencesContext';
+import {
+  type PreferencesValues,
+  type EditorMosaicName,
+} from './PreferencesContext';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -47,6 +52,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
     getLastUsedPath: this._getLastUsedPath.bind(this),
     setLastUsedPath: this._setLastUsedPath.bind(this),
+    getDefaultEditorMosaicNode: this._getDefaultEditorMosaicNode.bind(this),
+    setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this),
+    getRecentProjectFiles: this._getRecentProjectFiles.bind(this),
+    insertRecentProjectFile: this._insertRecentProjectFile.bind(this),
   };
 
   componentDidMount() {
@@ -314,6 +323,54 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         },
       },
       () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getDefaultEditorMosaicNode(name: EditorMosaicName) {
+    return this.state.values.defaultEditorMosaicNodes[name] || null;
+  }
+
+  _setDefaultEditorMosaicNode(name: EditorMosaicName, node: ?EditorMosaicNode) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          defaultEditorMosaicNodes: {
+            ...state.values.defaultEditorMosaicNodes,
+            // $FlowFixMe - Flow errors on unions in computed properties
+            [name]: node,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getRecentProjectFiles() {
+    return this.state.values.recentProjectFiles;
+  }
+
+  _setRecentProjectFiles(recents: Array<FileMetadataAndStorageProviderName>) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          recentProjectFiles: recents,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
+    let recentProjectFiles = this._getRecentProjectFiles();
+    const isNotNewRecentFile = recentFile =>
+      JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);
+    this._setRecentProjectFiles(
+      [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
+        0,
+        5
+      )
     );
   }
 

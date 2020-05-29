@@ -11,6 +11,7 @@ import InfoBar from '../UI/Messages/InfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 import {
   type ResourceSource,
@@ -45,6 +46,13 @@ type Props = {
   ) => void,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+};
+
+const initialMosaicEditorNodes = {
+  direction: 'row',
+  first: 'properties',
+  second: 'resources-list',
+  splitPercentage: 66,
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
@@ -175,16 +183,21 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     return (
       <div style={styles.container}>
-        <EditorMosaic
-          editors={editors}
-          ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-          initialNodes={{
-            direction: 'row',
-            first: 'properties',
-            second: 'resources-list',
-            splitPercentage: 66,
-          }}
-        />
+        <PreferencesContext.Consumer>
+          {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
+            <EditorMosaic
+              editors={editors}
+              ref={editorMosaic => (this.editorMosaic = editorMosaic)}
+              initialNodes={
+                getDefaultEditorMosaicNode('resources-editor') ||
+                initialMosaicEditorNodes
+              }
+              onPersistNodes={node =>
+                setDefaultEditorMosaicNode('resources-editor', node)
+              }
+            />
+          )}
+        </PreferencesContext.Consumer>
         <InfoBar
           message={
             <Trans>

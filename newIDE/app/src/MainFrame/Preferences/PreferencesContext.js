@@ -2,6 +2,8 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -18,9 +20,17 @@ export type AlertMessageIdentifier =
   | 'objects-panel-explanation'
   | 'instance-properties-panel-explanation'
   | 'layers-panel-explanation'
+  | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used';
+
+export type EditorMosaicName =
+  | 'scene-editor'
+  | 'scene-editor-small'
+  | 'debugger'
+  | 'resources-editor'
+  | 'events-functions-extension-editor';
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -83,6 +93,10 @@ export const allAlertMessages: Array<{
     label: <Trans>Using the layers panel</Trans>,
   },
   {
+    key: 'instances-panel-explanation',
+    label: <Trans>Using the instances panel</Trans>,
+  },
+  {
     key: 'physics2-shape-collisions',
     label: <Trans>Collisions handling with the Physics engine</Trans>,
   },
@@ -116,6 +130,8 @@ export type PreferencesValues = {|
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
+  defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
 |};
 
 /**
@@ -143,6 +159,15 @@ export type Preferences = {|
     kind: ResourceKind,
     path: string
   ) => void,
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => ?EditorMosaicNode,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => void,
+  getRecentProjectFiles: () => Array<FileMetadataAndStorageProviderName>,
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -156,11 +181,13 @@ export const initialPreferences = {
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
-    useNewInstructionEditorDialog: false,
+    useNewInstructionEditorDialog: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
+    defaultEditorMosaicNodes: {},
+    recentProjectFiles: [],
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -178,6 +205,15 @@ export const initialPreferences = {
   setShowEffectParameterNames: (enabled: boolean) => {},
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => {},
+  getRecentProjectFiles: () => [],
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

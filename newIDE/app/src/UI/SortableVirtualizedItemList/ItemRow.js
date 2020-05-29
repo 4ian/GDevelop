@@ -112,7 +112,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
           };
 
           const leftIcon = getThumbnail ? (
-            <ListIcon iconSize={32} src={getThumbnail()} />
+            <ListIcon iconSize={24} src={getThumbnail()} />
           ) : null;
 
           return (
@@ -125,6 +125,11 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                   : leftIcon
               }
               displayMenuButton={!hideMenuButton}
+              rightIconColor={
+                selected
+                  ? muiTheme.listItem.selectedRightIconColor
+                  : muiTheme.listItem.rightIconColor
+              }
               buildMenuTemplate={this.props.buildMenuTemplate}
               onClick={() => {
                 if (!onItemSelected) return;

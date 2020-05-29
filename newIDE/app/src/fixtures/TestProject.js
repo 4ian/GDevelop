@@ -1,7 +1,7 @@
 // @flow
 
 /*::
-type TestProject = {|
+export type TestProject = {|
   project: gdProject,
   shapePainterObject: any,
   textObject: any,

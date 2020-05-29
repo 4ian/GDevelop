@@ -25,13 +25,6 @@ type State = {|
   newObjectName: string,
 |};
 
-const styles = {
-  container: {
-    flex: 1,
-    overflowY: 'scroll',
-  },
-};
-
 const transformLayer = layer => {
   if (!layer) return null;
   return {
@@ -113,7 +106,7 @@ export default class RuntimeSceneInspector extends React.Component<
     if (!runtimeScene) return null;
 
     return (
-      <div style={styles.container}>
+      <React.Fragment>
         <Text>
           <Trans>Layers:</Trans>
         </Text>
@@ -167,7 +160,7 @@ export default class RuntimeSceneInspector extends React.Component<
             )}
           />
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }

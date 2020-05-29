@@ -14,7 +14,7 @@ import { t } from '@lingui/macro';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
-import StartPage from '../MainFrame/Editors/StartPage';
+import { StartPage } from '../MainFrame/EditorContainers/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import {
@@ -57,7 +57,7 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
-import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
+import LayoutChooserDialog from '../MainFrame/EditorContainers/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
@@ -183,7 +183,6 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { emptyPreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
 import TextField from '../UI/TextField';
 import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
 import {
@@ -191,6 +190,7 @@ import {
   makeFakeExpressionAutocompletions,
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
+import LayersList from '../LayersList';
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -2045,7 +2045,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   .addDecorator(muiDecorator)
   .add('autocompletions (first selected)', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
       // $FlowExpectedError
@@ -2057,7 +2057,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   ))
   .add('autocompletions (second selected)', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
       // $FlowExpectedError
@@ -2069,7 +2069,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   ))
   .add('autocompletion for an exact expression', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
       remainingCount={0}
       // $FlowExpectedError
@@ -2081,7 +2081,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   ))
   .add('empty autocompletions (nothing shown)', () => (
     <ExpressionAutocompletionsDisplayer
-      project={testProject}
+      project={testProject.project}
       expressionAutocompletions={[]}
       remainingCount={0}
       // $FlowExpectedError
@@ -2363,7 +2363,36 @@ storiesOf('LocalFilePicker', module)
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <StartPage onOpenLanguageDialog={action('open language dialog')} />
+    <StartPage
+      project={null}
+      isActive={true}
+      projectItemName={null}
+      setToolbar={() => {}}
+      canOpen={true}
+      onOpen={() => action('onOpen')()}
+      onCreate={() => action('onCreate')()}
+      onOpenProjectManager={() => action('onOpenProjectManager')()}
+      onCloseProject={() => action('onCloseProject')()}
+      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
+      onOpenLanguageDialog={() => action('open language dialog')()}
+    />
+  ))
+  .add('project opened', () => (
+    <StartPage
+      project={testProject.project}
+      isActive={true}
+      projectItemName={null}
+      setToolbar={() => {}}
+      canOpen={true}
+      onOpen={() => action('onOpen')()}
+      onCreate={() => action('onCreate')()}
+      onOpenProjectManager={() => action('onOpenProjectManager')()}
+      onCloseProject={() => action('onCloseProject')()}
+      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
+      onOpenLanguageDialog={() => action('open language dialog')()}
+    />
   ));
 
 storiesOf('DebuggerContent', module)
@@ -2663,16 +2692,11 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
           setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2692,16 +2716,11 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
           setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -3858,7 +3877,6 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -4097,6 +4115,47 @@ storiesOf('ExtensionsSearchDialog', module)
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('LayersList', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LayersList
+      project={testProject.project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      onRemoveLayer={(layerName, cb) => {
+        cb(true);
+      }}
+      onRenameLayer={(oldName, newName, cb) => {
+        cb(true);
+      }}
+      layersContainer={testProject.testLayout}
+    />
+  ))
+  .add('small width and height', () => (
+    <div style={{ width: 250, height: 200 }}>
+      <LayersList
+        project={testProject.project}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        onRemoveLayer={(layerName, cb) => {
+          cb(true);
+        }}
+        onRenameLayer={(oldName, newName, cb) => {
+          cb(true);
+        }}
+        layersContainer={testProject.testLayout}
+      />
+    </div>
   ));
 
 storiesOf('EffectsList', module)

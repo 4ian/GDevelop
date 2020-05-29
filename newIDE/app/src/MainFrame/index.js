@@ -492,6 +492,7 @@ const MainFrame = (props: Props) => {
         .then(({ content }) => {
           if (!verifyProjectContent(i18n, content)) {
             // The content is not recognized and the user was warned. Abort the opening.
+            setIsLoadingProject(false);
             return;
           }
 
@@ -523,6 +524,7 @@ const MainFrame = (props: Props) => {
             ),
             error
           );
+          setIsLoadingProject(false);
         });
     });
   };

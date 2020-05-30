@@ -55,7 +55,7 @@ PlatformerObjectBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
   properties[_("Jump speed")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
-  properties[_("jumpSustainTime")]
+  properties["jumpSustainTime"]
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("jumpSustainTime", 0)))
       .SetLabel(_("Jump sustain time"))
@@ -124,7 +124,7 @@ bool PlatformerObjectBehavior::UpdateProperty(
       behaviorContent.SetAttribute("maxSpeed", value.To<double>());
     else if (name == _("Jump speed"))
       behaviorContent.SetAttribute("jumpSpeed", value.To<double>());
-    else if (name == _("jumpSustainTime"))
+    else if (name == "jumpSustainTime")
       behaviorContent.SetAttribute("jumpSustainTime", value.To<double>());
     else if (name == _("Slope max. angle")) {
       double newMaxAngle = value.To<double>();

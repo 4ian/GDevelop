@@ -614,21 +614,23 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
                                     bool cocosRenderers,
                                     std::vector<gd::String> &includesFiles) {
   if (pixiRenderers) {
-    for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("pixi-renderer") != gd::String::npos ||
-          it->find("pixi-filter") != gd::String::npos)
-        includesFiles.erase(it++);
+    for (size_t i = 0; i < includesFiles.size();) {
+      const gd::String &includeFile = includesFiles[i];
+      if (includeFile.find("pixi-renderer") != gd::String::npos ||
+          includeFile.find("pixi-filter") != gd::String::npos)
+        includesFiles.erase(includesFiles.begin() + i);
       else
-        ++it;
+        ++i;
     }
   }
   if (cocosRenderers) {
-    for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("cocos-renderer") != gd::String::npos ||
-          it->find("cocos-shader") != gd::String::npos)
-        includesFiles.erase(it++);
+    for (size_t i = 0; i < includesFiles.size();) {
+      const gd::String &includeFile = includesFiles[i];
+      if (includeFile.find("cocos-renderer") != gd::String::npos ||
+          includeFile.find("cocos-shader") != gd::String::npos)
+        includesFiles.erase(includesFiles.begin() + i);
       else
-        ++it;
+        ++i;
     }
   }
 }

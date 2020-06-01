@@ -245,28 +245,33 @@ const MainFrame = (props: Props) => {
           }))
         )
         .then(state => {
-          if (initialFileMetadataToOpen) {
-            _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
-          } else if (introDialog && !Window.isDev()) openIntroDialog(true);
-
           GD_STARTUP_TIMES.push([
             'MainFrameComponentDidMountFinished',
             performance.now(),
           ]);
           console.info('Startup times:', getStartupTimesSummary());
 
-          const {
-            getAutoOpenMostRecentProject,
-            getRecentProjectFiles,
-            hadProjectOpenedDuringLastSession,
-          } = preferences;
+          if (initialFileMetadataToOpen) {
+            _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
+          } else {
+            if (introDialog && !Window.isDev()) openIntroDialog(true);
 
-          if (
-            getAutoOpenMostRecentProject() &&
-            hadProjectOpenedDuringLastSession() &&
-            getRecentProjectFiles()[0]
-          )
-            openFromFileMetadataWithStorageProvider(getRecentProjectFiles()[0]);
+            // Re-open the last opened project, if any and if asked to.
+            const {
+              getAutoOpenMostRecentProject,
+              getRecentProjectFiles,
+              hadProjectOpenedDuringLastSession,
+            } = preferences;
+
+            if (
+              getAutoOpenMostRecentProject() &&
+              hadProjectOpenedDuringLastSession() &&
+              getRecentProjectFiles()[0]
+            )
+              openFromFileMetadataWithStorageProvider(
+                getRecentProjectFiles()[0]
+              );
+          }
         })
         .catch(() => {
           /* Ignore errors */

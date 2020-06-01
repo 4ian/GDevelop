@@ -171,7 +171,7 @@ export type Preferences = {|
     fileMetadata: FileMetadataAndStorageProviderName
   ) => void,
   removeRecentProjectFile: (
-    fileMetadat: FileMetadataAndStorageProviderName
+    fileMetadata: FileMetadataAndStorageProviderName
   ) => void,
   getAutoOpenMostRecentProject: () => boolean,
   setAutoOpenMostRecentProject: (enabled: boolean) => void,

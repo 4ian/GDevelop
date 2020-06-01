@@ -886,7 +886,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxFallingSpeed = function() {
 };
 
 /**
- * Get the speed of Climbing the ladder
+ * Get the speed of climbing the ladder.
  * @returns {number} The speed of climbing the ladder
  */
 gdjs.PlatformerObjectRuntimeBehavior.prototype.getLadderClimbingSpeed = function() {

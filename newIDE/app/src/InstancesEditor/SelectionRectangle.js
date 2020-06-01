@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import InstancesRotator from './InstancesRotator';
 const gd = global.gd;
 
 export default class SelectionRectangle {

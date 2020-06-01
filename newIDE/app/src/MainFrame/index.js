@@ -254,6 +254,19 @@ const MainFrame = (props: Props) => {
             performance.now(),
           ]);
           console.info('Startup times:', getStartupTimesSummary());
+
+          const {
+            getAutoOpenMostRecentProject,
+            getRecentProjectFiles,
+            hadProjectOpenedDuringLastSession,
+          } = preferences;
+
+          if (
+            getAutoOpenMostRecentProject() &&
+            hadProjectOpenedDuringLastSession() &&
+            getRecentProjectFiles()[0]
+          )
+            openFromFileMetadataWithStorageProvider(getRecentProjectFiles()[0]);
         })
         .catch(() => {
           /* Ignore errors */
@@ -393,6 +406,7 @@ const MainFrame = (props: Props) => {
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
       // TODO: Pixi cache should also be burst
+      preferences.setHasProjectOpened(true);
 
       return setState(state => ({
         ...state,
@@ -525,6 +539,7 @@ const MainFrame = (props: Props) => {
             error
           );
           setIsLoadingProject(false);
+          return Promise.reject(error);
         });
     });
   };
@@ -536,6 +551,7 @@ const MainFrame = (props: Props) => {
   const closeProject = (): Promise<void> => {
     const { eventsFunctionsExtensionsState } = props;
 
+    preferences.setHasProjectOpened(false);
     setPreviewState(initialPreviewState);
     return setState(state => {
       const { currentProject, editorTabs } = state;
@@ -1229,13 +1245,19 @@ const MainFrame = (props: Props) => {
 
     if (storageProvider) {
       getStorageProviderOperations(storageProvider).then(() => {
-        openFromFileMetadata(fileMetadata).then(state => {
-          if (state)
-            openSceneOrProjectManager({
-              currentProject: state.currentProject,
-              editorTabs: state.editorTabs,
-            });
-        });
+        openFromFileMetadata(fileMetadata)
+          .then(state => {
+            if (state)
+              openSceneOrProjectManager({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              });
+          })
+          .catch(error => {
+            preferences.removeRecentProjectFile(
+              fileMetadataAndStorageProviderName
+            );
+          });
       });
     }
   };

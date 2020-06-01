@@ -1,13 +1,11 @@
 // @flow
+import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
-
 import React from 'react';
-import { TableRow, TableRowColumn } from '../UI/Table';
 import TextField from '../UI/TextField';
-
-import styles from './styles';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ColorPicker from '../UI/ColorField/ColorPicker';
+import { TreeTableCell, TreeTableRow } from '../UI/TreeTable';
+import DragHandle from '../UI/DragHandle';
 
 type Props = {|
   layout: gdLayout,
@@ -15,18 +13,21 @@ type Props = {|
 |};
 
 export default ({ layout, onBackgroundColorChanged }: Props) => (
-  <ThemeConsumer>
-    {muiTheme => (
-      <TableRow
-        style={{
-          backgroundColor: muiTheme.list.itemsBackgroundColor,
-        }}
-      >
-        <TableRowColumn style={styles.handleColumn} />
-        <TableRowColumn>
-          <TextField hintText={t`Background color`} margin="none" disabled />
-        </TableRowColumn>
-        <TableRowColumn style={styles.effectsColumn}>
+  <I18n>
+    {({ i18n }) => (
+      <TreeTableRow>
+        <TreeTableCell>
+          <DragHandle disabled />
+        </TreeTableCell>
+        <TreeTableCell expand>
+          <TextField
+            fullWidth
+            value={i18n._(t`Background color`)}
+            margin="none"
+            disabled
+          />
+        </TreeTableCell>
+        <TreeTableCell>
           <ColorPicker
             disableAlpha
             color={{
@@ -40,9 +41,8 @@ export default ({ layout, onBackgroundColorChanged }: Props) => (
               onBackgroundColorChanged();
             }}
           />
-        </TableRowColumn>
-        <TableRowColumn style={styles.toolColumn} />
-      </TableRow>
+        </TreeTableCell>
+      </TreeTableRow>
     )}
-  </ThemeConsumer>
+  </I18n>
 );

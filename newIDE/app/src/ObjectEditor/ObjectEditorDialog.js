@@ -10,7 +10,7 @@ import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from '../UI/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
+import { Column, Line } from '../UI/Grid';
 
 type StateType = {|
   currentTab: string,
@@ -60,8 +60,8 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         secondaryActions={<HelpButton helpPagePath={this.props.helpPagePath} />}
         actions={actions}
         noMargin
-        modal
         onRequestClose={this.props.onCancel}
+        cannotBeDismissed={true}
         open={this.props.open}
         noTitleMargin
         title={
@@ -81,25 +81,25 @@ export class ObjectEditorDialog extends Component<*, StateType> {
           </div>
         }
       >
-        <MiniToolbar alignItems="baseline">
-          <MiniToolbarText>
-            <Trans>Object name:</Trans>
-          </MiniToolbarText>
-          <SemiControlledTextField
-            fullWidth
-            commitOnBlur
-            margin="none"
-            value={this.state.newObjectName}
-            hintText={t`Object Name`}
-            onChange={text => {
-              if (text === this.state.newObjectName) return;
+        <Line>
+          <Column expand>
+            <SemiControlledTextField
+              fullWidth
+              commitOnBlur
+              floatingLabelText={<Trans>Object name</Trans>}
+              floatingLabelFixed
+              value={this.state.newObjectName}
+              hintText={t`Object Name`}
+              onChange={text => {
+                if (text === this.state.newObjectName) return;
 
-              if (this.props.canRenameObject(text)) {
-                this.setState({ newObjectName: text });
-              }
-            }}
-          />
-        </MiniToolbar>
+                if (this.props.canRenameObject(text)) {
+                  this.setState({ newObjectName: text });
+                }
+              }}
+            />
+          </Column>
+        </Line>
         {currentTab === 'properties' && EditorComponent && (
           <EditorComponent
             object={this.props.object}

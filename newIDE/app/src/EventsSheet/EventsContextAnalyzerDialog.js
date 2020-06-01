@@ -69,7 +69,12 @@ export default class EventsContextAnalyzerDialog extends React.Component<
     ];
 
     return (
-      <Dialog actions={actions} open onRequestClose={onClose}>
+      <Dialog
+        actions={actions}
+        cannotBeDismissed={false}
+        open
+        onRequestClose={onClose}
+      >
         <Text>
           <Trans>
             Objects or groups being directly referenced in the events:{' '}

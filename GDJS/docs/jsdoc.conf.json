@@ -8,7 +8,8 @@
       "./Runtime/Cocos2d/",
       "./Runtime/Cordova/",
       "./Runtime/Electron/",
-      "./Runtime/FacebookInstantGames/"
+      "./Runtime/FacebookInstantGames/",
+      "./Runtime/types/"
     ],
     "includePattern": ".+\\.js(doc)?$",
     "excludePattern": "(^|\\/|\\\\)_"
@@ -50,6 +51,7 @@
     "recurse": true,
     "private": false,
     "lenient": true,
+    "template": "docs/jaguarjs-jsdoc",
     "destination": "../docs/GDJS Runtime Documentation"
   }
 }

@@ -19,6 +19,7 @@
 
 /**
  * @typedef {Object} SpriteCenterPointData Represents the center point in a frame.
+ * @property {string} name Name of the point.
  * @property {boolean} automatic Is the center automatically computed?
  * @property {number} x X position of the point.
  * @property {number} y Y position of the point.
@@ -28,7 +29,7 @@
  * @typedef {Object} SpriteFrameData Represents a {@link gdjs.SpriteAnimationFrame}.
  * @property {string} [image] The resource name of the image used in this frame.
  * @property {Array<SpriteCustomPointData>} [points] The points of the frame.
- * @property {SpritePoint} originPoint The origin point.
+ * @property {SpriteCustomPointData} originPoint The origin point.
  * @property {SpriteCenterPointData} centerPoint The center of the frame.
  * @property {boolean} hasCustomCollisionMask Is The collision mask custom?
  * @property {Array<Array<SpritePoint>>} [customCollisionMask] The collision mask if it is custom.
@@ -52,7 +53,7 @@
  * @typedef {Object} SpriteObjectDataType Represents the data of a {@link gdjs.SpriteRuntimeObject}.
  * @property {boolean} updateIfNotVisible Update the object even if he is not visible?.
  * @property {Array<SpriteAnimationData>} animations The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances.
- * 
+ *
  * @typedef {ObjectData & SpriteObjectDataType} SpriteObjectData
  */
 
@@ -264,7 +265,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
     this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
 
     //Animations:
-    
+
     if ( this._animations === undefined ) {
         /** @type {Array<gdjs.SpriteAnimation>} */
         this._animations = [];

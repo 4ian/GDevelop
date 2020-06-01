@@ -153,6 +153,7 @@ export default class EventTextDialog extends React.Component<Props, State> {
       <Dialog
         title={<Trans>Edit the event text</Trans>}
         onRequestClose={onClose}
+        cannotBeDismissed={true}
         open
         noMargin
         actions={[
@@ -211,7 +212,7 @@ export default class EventTextDialog extends React.Component<Props, State> {
                   commitOnBlur
                   hintText={t`Enter the text to be displayed`}
                   fullWidth
-                  multiLine
+                  multiline
                   rows={8}
                   rowsMax={30}
                   value={textValue}

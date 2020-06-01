@@ -1,0 +1,5 @@
+This extension is using bondage.js library to parse yarn syntax.
+https://github.com/hylyh/bondage.js
+
+The current build used is built from commit 3c63e21
+

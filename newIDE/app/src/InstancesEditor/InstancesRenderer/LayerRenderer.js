@@ -4,6 +4,7 @@ import getObjectByName from '../../Utils/GetObjectByName';
 
 import * as PIXI from 'pixi.js';
 import { shouldBeHandledByPinch } from '../PinchHandler';
+import { makeDoubleClickable } from './PixiDoubleClickEvent';
 const gd = global.gd;
 
 export default class LayerRenderer {
@@ -14,6 +15,7 @@ export default class LayerRenderer {
     viewPosition,
     instances,
     onInstanceClicked,
+    onInstanceDoubleClicked,
     onOverInstance,
     onOutInstance,
     onMoveInstance,
@@ -27,6 +29,7 @@ export default class LayerRenderer {
     // `layer` can be changed at any moment (see InstancesRenderer).
     this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
+    this.onInstanceDoubleClicked = onInstanceDoubleClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
     this.onMoveInstance = onMoveInstance;
@@ -124,8 +127,12 @@ export default class LayerRenderer {
 
       renderedInstance._pixiObject.interactive = true;
       gesture.panable(renderedInstance._pixiObject);
+      makeDoubleClickable(renderedInstance._pixiObject);
       renderedInstance._pixiObject.on('click', () => {
         this.onInstanceClicked(instance);
+      });
+      renderedInstance._pixiObject.on('doubleclick', () => {
+        this.onInstanceDoubleClicked(instance);
       });
       renderedInstance._pixiObject.on('mouseover', () => {
         this.onOverInstance(instance);

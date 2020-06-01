@@ -1,6 +1,11 @@
-
+// @ts-check
 describe('gdjs.DraggableRuntimeBehavior', function() {
-	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
+	var runtimeGame = new gdjs.RuntimeGame({
+		variables: [],
+		resources: {resources: []},
+		// @ts-ignore
+		properties: {windowWidth: 800, windowHeight: 600}
+	});
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 	runtimeScene.loadFromScene({
 		layers:[{name:"", visibility: true}],
@@ -10,8 +15,8 @@ describe('gdjs.DraggableRuntimeBehavior', function() {
 		instances: []
 	});
 
-	var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [{type: "DraggableBehavior::Draggable"}]});
-	var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [{type: "DraggableBehavior::Draggable"}]});
+	var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [{name: "Behavior1", type: "DraggableBehavior::Draggable"}], variables: []});
+	var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [{name: "Behavior1", type: "DraggableBehavior::Draggable"}], variables: []});
 	runtimeScene.addObject(object);
 	runtimeScene.addObject(object2);
 

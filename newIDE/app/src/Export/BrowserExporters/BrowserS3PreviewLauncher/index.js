@@ -58,7 +58,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         browserS3FileSystem
       );
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-      exporter.setCodeOutputDirectory(getBaseUrl() + prefix);
+      exporter.setCodeOutputDirectory(outputDir);
 
       return {
         exporter,
@@ -68,18 +68,24 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     });
   };
 
-  launchLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
+  launchPreview = (previewOptions: PreviewOptions): Promise<any> => {
+    const { project, layout, externalLayout } = previewOptions;
     this.setState({
       error: null,
     });
 
     return this._prepareExporter()
       .then(({ exporter, outputDir, browserS3FileSystem }) => {
-        exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+        if (externalLayout) {
+          exporter.exportExternalLayoutForPixiPreview(
+            project,
+            layout,
+            externalLayout,
+            outputDir
+          );
+        } else {
+          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+        }
         exporter.delete();
         return browserS3FileSystem
           .uploadPendingObjects()
@@ -103,46 +109,10 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       });
   };
 
-  launchExternalLayoutPreview = (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
-  ): Promise<any> => {
-    this.setState({
-      error: null,
-    });
-
-    return this._prepareExporter()
-      .then(({ exporter, outputDir, browserS3FileSystem }) => {
-        exporter.exportExternalLayoutForPixiPreview(
-          project,
-          layout,
-          externalLayout,
-          outputDir
-        );
-        exporter.delete();
-        return browserS3FileSystem
-          .uploadPendingObjects()
-          .then(() => {
-            const finalUrl = outputDir + '/index.html';
-            return this._openPreviewWindow(project, finalUrl);
-          })
-          .then(({ url, windowObjectReference }) => {
-            if (!windowObjectReference) {
-              this.setState({
-                showPreviewLinkDialog: true,
-                url,
-              });
-            }
-          });
-      })
-      .catch((error: Error) => {
-        this.setState({
-          error,
-        });
-      });
-  };
+  getPreviewDebuggerServer() {
+    // Debugger server is not supported in the web-app.
+    return null;
+  }
 
   render() {
     const { showPreviewLinkDialog, url, error } = this.state;

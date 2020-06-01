@@ -4,7 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
+
 #include <algorithm>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
@@ -898,24 +900,25 @@ gd::String EventsCodeGenerator::GenerateObject(
   //(references to) objects lists. We statically declare and construct them to
   // avoid re-creating them at runtime. Arrays are passed as reference in JS and
   // we always use the same static arrays, making this possible.
-  auto declareMapOfObjects = [this](
-      const std::vector<gd::String>& objects,
-      const gd::EventsCodeGenerationContext& context) {
-    gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
-    gd::String mapDeclaration;
-    for (auto& objectName : objects) {
-      // The map name must be unique for each set of objects lists.
-      objectsMapName += ManObjListName(GetObjectListName(objectName, context));
+  auto declareMapOfObjects =
+      [this](const std::vector<gd::String>& objects,
+             const gd::EventsCodeGenerationContext& context) {
+        gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
+        gd::String mapDeclaration;
+        for (auto& objectName : objects) {
+          // The map name must be unique for each set of objects lists.
+          objectsMapName +=
+              ManObjListName(GetObjectListName(objectName, context));
 
-      if (!mapDeclaration.empty()) mapDeclaration += ", ";
-      mapDeclaration += "\"" + ConvertToString(objectName) +
-                        "\": " + GetObjectListName(objectName, context);
-    }
+          if (!mapDeclaration.empty()) mapDeclaration += ", ";
+          mapDeclaration += "\"" + ConvertToString(objectName) +
+                            "\": " + GetObjectListName(objectName, context);
+        }
 
-    AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" +
-                             mapDeclaration + "});");
-    return objectsMapName;
-  };
+        AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" +
+                                 mapDeclaration + "});");
+        return objectsMapName;
+      };
 
   gd::String output;
   if (type == "objectList") {
@@ -1026,15 +1029,13 @@ gd::String EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(
     const gd::String& referenceName,
     const gd::String& referencedBoolean,
     gd::EventsCodeGenerationContext& context) {
-  if (context.GetParentContext() == NULL) return "";
+  if (context.GetCurrentConditionDepth() <= 0)
+    return "/* Code generation error: the referenced boolean can't exist as "
+           "the context has a condition depth of 0. */";
 
-  // FIXME: Using context.GetParentContext() generates the wrong boolean name in
-  // case a condition with a custom code generator is used inside another
-  // condition (i.e: as a subinstructions).
   return GenerateBooleanFullName(referenceName, context) + " = " +
-         GenerateBooleanFullName(referencedBoolean,
-                                 *context.GetParentContext()) +
-         ";\n";
+         GetCodeNamespaceAccessor() + referencedBoolean + "_" +
+         gd::String::From(context.GetCurrentConditionDepth() - 1) + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateBooleanInitializationToFalse(

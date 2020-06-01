@@ -1,3 +1,4 @@
+// TODO: this needs to be flow-typed
 import React from 'react';
 import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
@@ -11,6 +12,8 @@ class MaterialUIContextMenu extends React.Component {
     super(props);
     this.state = {
       open: false,
+      anchorX: 0,
+      anchorY: 0,
     };
     this.menuImplementation = new MaterialUIMenuImplementation({
       onClose: this._onClose,
@@ -38,7 +41,7 @@ class MaterialUIContextMenu extends React.Component {
   };
 
   render() {
-    return (
+    return this.state.open ? (
       <Menu
         open={this.state.open}
         anchorPosition={{ left: this.state.anchorX, top: this.state.anchorY }}
@@ -51,7 +54,10 @@ class MaterialUIContextMenu extends React.Component {
           this.props.buildMenuTemplate()
         )}
       </Menu>
-    );
+    ) : // Don't render the menu when it's not opened, as `buildMenuTemplate` could
+    // be running logic to compute some labels or `enabled` flag values - and might
+    // not be prepared to do that when the menu is not opened.
+    null;
   }
 }
 

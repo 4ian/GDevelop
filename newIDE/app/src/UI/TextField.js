@@ -44,12 +44,17 @@ type Props = {|
       value: string,
     },
   }) => void,
-  onKeyPress?: (event: {| charCode: number, key: string |}) => void,
-  onKeyUp?: (event: {| charCode: number, key: string |}) => void,
+
+  // Advanced DOM events, for exceptional usage:
+  onClick?: () => void,
+  onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
+  onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
+  onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
 
   // Error handling:
   errorText?: React.Node,
 
+  // Labels:
   disabled?: boolean,
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
@@ -68,7 +73,7 @@ type Props = {|
   step?: number,
 
   // Support for multiline:
-  multiLine?: boolean,
+  multiline?: boolean,
   rows?: number,
   rowsMax?: number,
 
@@ -211,7 +216,7 @@ export default class TextField extends React.Component<Props, {||}> {
             // Keyboard focus:
             autoFocus={props.autoFocus}
             // Multiline:
-            multiline={props.multiLine}
+            multiline={props.multiline}
             rows={props.rows}
             rowsMax={props.rowsMax}
             // Styling:
@@ -230,6 +235,8 @@ export default class TextField extends React.Component<Props, {||}> {
               inputProps: {
                 onKeyPress: props.onKeyPress,
                 onKeyUp: props.onKeyUp,
+                onKeyDown: props.onKeyDown,
+                onClick: props.onClick,
                 // Number field props:
                 max: props.max,
                 min: props.min,
@@ -257,4 +264,4 @@ export default class TextField extends React.Component<Props, {||}> {
 
 // The "top" offset to add to the position of the TextField when
 // it's used inside a ListItem "primaryText"
-export const noMarginTextFieldInListItemTopOffset = -7;
+export const noMarginTextFieldInListItemTopOffset = 0;

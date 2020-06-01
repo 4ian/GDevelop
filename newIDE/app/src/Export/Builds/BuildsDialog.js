@@ -40,6 +40,7 @@ export default class BuildsDialog extends Component<Props, State> {
         secondaryActions={[
           <HelpButton key="help" helpPagePath={'/publishing'} />,
         ]}
+        cannotBeDismissed={false}
         open={open}
         noMargin
       >

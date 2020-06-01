@@ -45,7 +45,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
-      .addIncludeFile('Extensions/DialogueTree/bondage.min.js')
+      .addIncludeFile('Extensions/DialogueTree/bondage.js/dist/bondage.min.js')
       .setFunctionName('gdjs.dialogueTree.loadFromSceneVariable');
 
     extension
@@ -69,7 +69,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
-      .addIncludeFile('Extensions/DialogueTree/bondage.min.js')
+      .addIncludeFile('Extensions/DialogueTree/bondage.js/dist/bondage.min.js')
       .setFunctionName('gdjs.dialogueTree.loadFromJsonFile');
 
     extension
@@ -168,15 +168,14 @@ module.exports = {
         _(
           'Select option by number. Use this when the dialogue line is of type "options" and the player has pressed a button to change selected option.'
         ),
-        _('Select option by number'),
+        _('Select option at index _PARAM0_'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('expression', _('Option index number'), '', false)
-      .setDefaultValue('0')
       .getCodeExtraInformation()
-      .setFunctionName('gdjs.dialogueTree.selectPreviousOption');
+      .setFunctionName('gdjs.dialogueTree.selectOption');
 
     extension
       .addAction(
@@ -210,21 +209,55 @@ module.exports = {
 
     extension
       .addAction(
-        'SetVariable',
-        _('Set dialogue state variable'),
+        'SetStringVariable',
+        _('Set dialogue state string variable'),
         _(
-          'Set dialogue state variable. Use this to set a variable that the dialogue data is using.'
+          'Set dialogue state string variable. Use this to set a variable that the dialogue data is using.'
         ),
-        _('Set dialogue state variable _PARAM0_ to _PARAM1_'),
+        _('Set dialogue state string variable _PARAM0_ to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State Variable Name'), '', false)
-      .addParameter('expression', _('Variable Value'), '', false)
+      .addParameter('string', _('Variable string value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
 
+    extension
+      .addAction(
+        'SetNumberVariable',
+        _('Set dialogue state number variable'),
+        _(
+          'Set dialogue state number variable. Use this to set a variable that the dialogue data is using.'
+        ),
+        _('Set dialogue state number variable _PARAM0_ to _PARAM1_'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('State Variable Name'), '', false)
+      .addParameter('expression', _('Variable number value'), '', true)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.setVariable');
+      
+    extension
+      .addAction(
+        'SetBooleanVariable',
+        _('Set dialogue state boolean variable'),
+        _(
+          'Set dialogue state boolean variable. Use this to set a variable that the dialogue data is using.'
+        ),
+        _('Set dialogue state boolean variable _PARAM0_ to _PARAM1_'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('State Variable Name'), '', false)
+      .addParameter('trueorfalse', _('Variable boolean value'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.setVariable');
+            
     extension
       .addAction(
         'SaveState',
@@ -256,6 +289,21 @@ module.exports = {
       .addParameter('globalvar', _('Global Variable'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.loadState');
+
+    extension
+      .addAction(
+        'ClearState',
+        _('Clear dialogue state'),
+        _(
+          'Clear dialogue state. This resets all dialogue state accumulated by the player choices. Useful when the player is starting a new game.'
+        ),
+        _('Clear dialogue state'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.clearState');
 
     extension
       .addStrExpression(
@@ -592,9 +640,9 @@ module.exports = {
     extension
       .addCondition(
         'WasBranchVisited',
-        _('Branch title has been visited before'),
-        _('Check if the current branch has been visited before'),
-        _('Branch title _PARAM0_ has been visited before'),
+        _('Branch title has been visited'),
+        _('Check if a branch has been visited'),
+        _('Branch title _PARAM0_ has been visited'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -605,18 +653,52 @@ module.exports = {
 
     extension
       .addCondition(
-        'CompareDialogueStateVariable',
-        _('Compare dialogue state variable'),
+        'CompareDialogueStateStringVariable',
+        _('Compare dialogue state string variable'),
         _(
-          'Compare dialogue state variable. Use this to trigger game events via dialogue variables.'
+          'Compare dialogue state string variable. Use this to trigger game events via dialogue variables.'
         ),
-        _('Dialogue state variable _PARAM0_ is equal to _PARAM1_'),
+        _('Dialogue state string variable _PARAM0_ is equal to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn24.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State variable'), '', false)
       .addParameter('string', _('Equal to'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.compareVariable');
+
+    extension
+      .addCondition(
+        'CompareDialogueStateNumberVariable',
+        _('Compare dialogue state number variable'),
+        _(
+          'Compare dialogue state number variable. Use this to trigger game events via dialogue variables.'
+        ),
+        _('Dialogue state number variable _PARAM0_ is equal to _PARAM1_'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('State variable'), '', false)
+      .addParameter('expression', _('Equal to'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.compareVariable');
+
+    extension
+      .addCondition(
+        'CompareDialogueStateBooleanVariable',
+        _('Compare dialogue state boolean variable'),
+        _(
+          'Compare dialogue state variable. Use this to trigger game events via dialogue variables.'
+        ),
+        _('Dialogue state boolean variable _PARAM0_ is equal to _PARAM1_'),
+        _('Dialogue Tree (experimental)'),
+        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('State variable'), '', false)
+      .addParameter('trueorfalse', _('Equal to'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.compareVariable');
 

@@ -7,9 +7,12 @@ import { Tabs, Tab } from '../../UI/Tabs';
 import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
+import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+
 const gd = global.gd;
 
 type Props = {|
@@ -24,6 +27,7 @@ type Props = {|
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
@@ -75,8 +79,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       objectsContainer,
     } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Do you want to remove all references to this group in events (actions and conditions using the group)?'
     );
 
@@ -161,26 +164,30 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         </Tabs>
         {this.state.currentTab === 'config' ? (
           <ScrollView>
-            <EventsFunctionPropertiesEditor
-              eventsFunction={eventsFunction}
-              eventsBasedBehavior={eventsBasedBehavior}
-              helpPagePath={helpPagePath}
-              onConfigurationUpdated={onConfigurationUpdated}
-              renderConfigurationHeader={renderConfigurationHeader}
-              freezeEventsFunctionType={freezeEventsFunctionType}
-            />
+            <Line>
+              <EventsFunctionPropertiesEditor
+                eventsFunction={eventsFunction}
+                eventsBasedBehavior={eventsBasedBehavior}
+                helpPagePath={helpPagePath}
+                onConfigurationUpdated={onConfigurationUpdated}
+                renderConfigurationHeader={renderConfigurationHeader}
+                freezeEventsFunctionType={freezeEventsFunctionType}
+              />
+            </Line>
           </ScrollView>
         ) : null}
         {this.state.currentTab === 'parameters' ? (
           <ScrollView>
-            <EventsFunctionParametersEditor
-              project={project}
-              eventsFunction={eventsFunction}
-              eventsBasedBehavior={eventsBasedBehavior}
-              onParametersUpdated={onParametersOrGroupsUpdated}
-              helpPagePath={helpPagePath}
-              freezeParameters={freezeParameters}
-            />
+            <Line>
+              <EventsFunctionParametersEditor
+                project={project}
+                eventsFunction={eventsFunction}
+                eventsBasedBehavior={eventsBasedBehavior}
+                onParametersUpdated={onParametersOrGroupsUpdated}
+                helpPagePath={helpPagePath}
+                freezeParameters={freezeParameters}
+              />
+            </Line>
           </ScrollView>
         ) : null}
         {this.state.currentTab === 'groups' ? (
@@ -195,6 +202,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             onDeleteGroup={this._onDeleteGroup}
             onGroupsUpdated={onParametersOrGroupsUpdated}
             canSetAsGlobalGroup={false}
+            unsavedChanges={this.props.unsavedChanges}
           />
         ) : null}
       </Column>

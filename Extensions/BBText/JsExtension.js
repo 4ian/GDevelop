@@ -35,6 +35,8 @@ module.exports = {
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';
+        else if (typeof objectContent[propertyName] === 'number')
+          objectContent[propertyName] = parseFloat(newValue);
         else objectContent[propertyName] = newValue;
         return true;
       }
@@ -67,7 +69,7 @@ module.exports = {
 
       objectProperties.set(
         'fontSize',
-        new gd.PropertyDescriptor(objectContent.fontSize)
+        new gd.PropertyDescriptor(objectContent.fontSize.toString())
           .setType('number')
           .setLabel(_('Base size'))
       );
@@ -111,7 +113,7 @@ module.exports = {
         text:
           '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
-        fontSize: '20',
+        fontSize: 20,
         visible: true,
         color: '#000000',
         fontFamily: 'Arial',
@@ -410,7 +412,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'BBText::BBText',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/bbtext_object',
+        helpPagePath: '/objects/bbtext',
       })
     );
   },

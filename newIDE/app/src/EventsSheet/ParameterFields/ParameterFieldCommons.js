@@ -4,7 +4,14 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+
+export type ParameterRenderingServiceType = {
+  components: any,
+  getParameterComponent: (type: string) => any,
+  getUserFriendlyTypeName: (rawType: string) => ?MessageDescriptor,
+};
 
 type CommonProps = {|
   // The parameter
@@ -24,10 +31,7 @@ type CommonProps = {|
   resourceExternalEditors?: Array<ResourceExternalEditor>,
 
   // Pass the ParameterRenderingService to allow to render nested parameters
-  parameterRenderingService?: {
-    components: any,
-    getParameterComponent: (type: string) => any,
-  },
+  parameterRenderingService?: ParameterRenderingServiceType,
 |};
 
 export type ExpressionParameters = {|

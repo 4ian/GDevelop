@@ -25,6 +25,10 @@ type Props = {|
   type?: 'text' | 'number',
 
   // Some TextField props that can be reused:
+  onClick?: () => void,
+  onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
+  onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
+  onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
   margin?: 'none' | 'dense',
   disabled?: boolean,
   errorText?: React.Node,
@@ -32,12 +36,12 @@ type Props = {|
   floatingLabelText?: React.Node,
   fullWidth?: boolean,
   hintText?: React.Node,
-  helperMarkdownText?: React.Node,
+  helperMarkdownText?: ?string,
   id?: string,
   inputStyle?: Object,
   max?: number,
   min?: number,
-  multiLine?: boolean,
+  multiline?: boolean,
   name?: string,
   step?: number,
   style?: Object,
@@ -62,6 +66,18 @@ export default class SemiControlledTextField extends React.Component<
   };
 
   _field: ?TextField = null;
+
+  forceSetValue(text: string) {
+    this.setState({ text });
+  }
+
+  forceSetSelection(selectionStart: number, selectionEnd: number) {
+    const input = this.getInputNode();
+    if (input) {
+      input.selectionStart = selectionStart;
+      input.selectionEnd = selectionEnd;
+    }
+  }
 
   focus() {
     if (this._field) this._field.focus();

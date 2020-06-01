@@ -2,7 +2,7 @@
 import * as React from 'react';
 import {
   enumerateObjectAndBehaviorsInstructions,
-  enumerateInstructions,
+  enumerateAllInstructions,
   getObjectParameterIndex,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
@@ -13,7 +13,7 @@ import {
   type EnumeratedInstructionOrExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 const gd = global.gd;
 
 /** Helper to get the gdInstructionMetadata of an instruction. */
@@ -126,7 +126,7 @@ export const useNewInstructionEditor = ({
     if (!isNewInstruction) {
       // Check if the instruction is an object/behavior instruction. If yes
       // select the object, which is the first parameter of the instruction.
-      const allInstructions = enumerateInstructions(isCondition);
+      const allInstructions = enumerateAllInstructions(isCondition);
       const instructionType: string = instruction.getType();
       const enumeratedInstructionMetadata = findInstruction(
         allInstructions,

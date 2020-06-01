@@ -1,24 +1,20 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import Divider from '@material-ui/core/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
+import Text from '../UI/Text';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { findEmptyPath } from './LocalPathFinder';
 import ExamplesList from './ExamplesList';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 
 // To add a new example, add it first in resources/examples (at which point you can see it
@@ -32,11 +28,12 @@ type Props = {|
     storageProvider: StorageProvider,
     fileMetadata: FileMetadata
   ) => void,
+  onChangeOutputPath: (outputPath: string) => void,
   onExamplesLoaded: () => void,
+  outputPath: string,
 |};
 
 type State = {|
-  outputPath: string,
   exampleNames: ?Array<string>,
 |};
 
@@ -55,11 +52,6 @@ export const showGameFileCreationError = (
 
 export default class LocalExamples extends Component<Props, State> {
   state = {
-    outputPath: findEmptyPath(
-      path && app
-        ? path.join(app.getPath('documents'), 'GDevelop projects')
-        : ''
-    ),
     exampleNames: null,
   };
 
@@ -81,13 +73,8 @@ export default class LocalExamples extends Component<Props, State> {
     });
   }
 
-  _handleChangePath = (outputPath: string) =>
-    this.setState({
-      outputPath,
-    });
-
   createFromExample = (i18n: I18nType, exampleName: string) => {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     findExamples(examplesPath => {
@@ -111,6 +98,17 @@ export default class LocalExamples extends Component<Props, State> {
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
+            <Line expand>
+              <Column expand>
+                <LocalFolderPicker
+                  fullWidth
+                  value={this.props.outputPath}
+                  onChange={this.props.onChangeOutputPath}
+                  type="create-game"
+                />
+              </Column>
+            </Line>
+            <Divider />
             <Line>
               <Column>
                 <Text>
@@ -125,17 +123,6 @@ export default class LocalExamples extends Component<Props, State> {
                   this.createFromExample(i18n, exampleName)
                 }
               />
-            </Line>
-            <Divider />
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={this.state.outputPath}
-                  onChange={this._handleChangePath}
-                  type="create-game"
-                />
-              </Column>
             </Line>
           </Column>
         )}

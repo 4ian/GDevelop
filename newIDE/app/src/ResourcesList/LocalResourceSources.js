@@ -9,6 +9,7 @@ import {
   copyAllToProjectFolder,
 } from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import Window from '../Utils/Window';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
 const path = optionalRequire('path');
@@ -235,49 +236,45 @@ const selectLocalResourcePath = (
   ) => void,
   kind: ResourceKind
 ): Promise<Array<string>> => {
-  return new Promise((resolve, reject) => {
-    if (!dialog) return reject('Not supported');
+  if (!dialog) return Promise.reject('Not supported');
 
-    const properties = ['openFile'];
-    if (options.multiSelections) properties.push('multiSelections');
-    const projectPath = path.dirname(project.getProjectFile());
+  const properties = ['openFile'];
+  if (options.multiSelections) properties.push('multiSelections');
+  const projectPath = path.dirname(project.getProjectFile());
 
-    const latestPath = getLastUsedPath(project, kind) || projectPath;
+  const latestPath = getLastUsedPath(project, kind) || projectPath;
 
-    const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showOpenDialog(
-      browserWindow,
-      {
-        title: options.title,
-        properties,
-        filters: [{ name: options.name, extensions: options.extensions }],
-        defaultPath: latestPath,
-      },
-      paths => {
-        if (!paths) return resolve([]);
+  const browserWindow = electron.remote.getCurrentWindow();
 
-        const lastUsedPath = path.parse(paths[0]).dir;
-        setLastUsedPath(project, kind, lastUsedPath);
+  return dialog
+    .showOpenDialog(browserWindow, {
+      title: options.title,
+      properties,
+      filters: [{ name: options.name, extensions: options.extensions }],
+      defaultPath: latestPath,
+    })
+    .then(({ filePaths }) => {
+      if (!filePaths || !filePaths.length) return [];
 
-        const outsideProjectFolderPaths = paths.filter(
-          path => !isPathInProjectFolder(project, path)
+      const lastUsedPath = path.parse(filePaths[0]).dir;
+      setLastUsedPath(project, kind, lastUsedPath);
+
+      const outsideProjectFolderPaths = filePaths.filter(
+        path => !isPathInProjectFolder(project, path)
+      );
+
+      if (outsideProjectFolderPaths.length) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
+          )
         );
 
-        if (outsideProjectFolderPaths.length) {
-          // eslint-disable-next-line
-          const answer = confirm(
-            i18n._(
-              t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-            )
-          );
-
-          if (answer) {
-            return resolve(copyAllToProjectFolder(project, paths));
-          }
+        if (answer) {
+          return copyAllToProjectFolder(project, filePaths);
         }
-
-        return resolve(paths);
       }
-    );
-  });
+
+      return filePaths;
+    });
 };

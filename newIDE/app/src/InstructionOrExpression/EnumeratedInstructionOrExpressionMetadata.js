@@ -1,5 +1,5 @@
 //@flow
-import { type EventsScope } from '../EventsSheet/EventsScope.flow';
+import { type EventsScope } from './EventsScope.flow';
 const gd = global.gd;
 
 export type InstructionOrExpressionScope = {|
@@ -21,7 +21,7 @@ export type EnumeratedInstructionOrExpressionMetadata = {|
   isPrivate: boolean,
 
   name?: string, // For expressions
-  parameters?: Array<any>, // For expressions
+  parameters?: Array<gdParameterMetadata>, // For expressions
 |};
 
 export const filterEnumeratedInstructionOrExpressionMetadataByScope = (

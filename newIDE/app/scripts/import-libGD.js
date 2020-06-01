@@ -1,6 +1,7 @@
-var shell = require('shelljs');
-var https = require('follow-redirects').https;
-var fs = require('fs');
+const shell = require('shelljs');
+const https = require('follow-redirects').https;
+const fs = require('fs');
+const path = require('path');
 
 const downloadFile = (url, filePath) =>
   new Promise((resolve, reject) => {
@@ -26,10 +27,9 @@ const downloadFile = (url, filePath) =>
     });
   });
 
-var sourceJsFile = '../../../Binaries/embuild/GDevelop.js/libGD.js';
-var sourceJsMemFile = '../../../Binaries/embuild/GDevelop.js/libGD.js.mem';
-var destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
-var alreadyHasLibGdJs =
+const sourceDirectory = '../../../Binaries/embuild/GDevelop.js';
+const destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
+const alreadyHasLibGdJs =
   shell.test('-f', '../public/libGD.js') &&
   shell.test('-f', '../public/libGD.js.mem') &&
   shell.test('-f', destinationTestDirectory + '/index.js') &&
@@ -39,23 +39,20 @@ if (shell.mkdir('-p', destinationTestDirectory).stderr) {
   shell.echo('❌ Error while creating node_modules folder for libGD.js');
 }
 
-if (shell.test('-f', sourceJsFile) && shell.test('-f', sourceJsMemFile)) {
-  // Copy the file built locally
-  if (
-    !shell.cp(sourceJsFile, '../public').stderr &&
-    !shell.cp(sourceJsFile, destinationTestDirectory + '/index.js').stderr &&
-    !shell.cp(sourceJsMemFile, '../public').stderr &&
-    !shell.cp(sourceJsMemFile, destinationTestDirectory + '/libGD.js.mem')
-      .stderr
-  ) {
-    shell.echo(
-      '✅ Copied libGD.js (and libGD.js.mem) from Binaries/embuild/GDevelop.js to public and node_modules folder'
-    );
-  } else {
-    shell.echo(
-      '❌ Error while copying libGD.js (and libGD.js.mem) from Binaries/embuild/GDevelop.js'
-    );
-  }
+if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
+  shell.echo(
+    'ℹ️  Copying libGD.js and associated files built locally to newIDE...'
+  );
+  const copyToNewIDEScriptPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'GDevelop.js',
+    'scripts',
+    'copy-to-newIDE.js'
+  );
+  shell.exec(`node ${copyToNewIDEScriptPath}`);
 } else {
   // Download a pre-built version otherwise
   shell.echo(

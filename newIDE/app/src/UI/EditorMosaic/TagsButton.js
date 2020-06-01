@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import IconButton from '../IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import ElementWithMenu from '../Menu/ElementWithMenu';
+import { type MenuItemTemplate } from '../Menu/Menu.flow';
 
 const styles = {
   container: {
@@ -16,9 +17,9 @@ const styles = {
   },
 };
 
-type Props = {
-  buildMenuTemplate: () => Array<any>,
-};
+type Props = {|
+  buildMenuTemplate: () => Array<MenuItemTemplate>,
+|};
 
 export default class TagsButton extends Component<Props, {||}> {
   render() {

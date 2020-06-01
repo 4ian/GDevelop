@@ -24,6 +24,7 @@ import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import EventsFunctionParametersEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 type Props = {|
@@ -122,6 +123,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             onClick={() => onCreate(extensionName, eventsFunction)}
           />,
         ]}
+        cannotBeDismissed={true}
         open
         onRequestClose={onClose}
         noMargin
@@ -137,79 +139,72 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               a new extension, and a function name, then configure the function
               and its parameters.
             </DismissableAlertMessage>
-            <Line noMargin>
-              <Column noMargin expand>
-                <SelectField
-                  floatingLabelText={
-                    <Trans>Extension (storing the function)</Trans>
+            <ResponsiveLineStackLayout noMargin expand>
+              <SelectField
+                floatingLabelText={
+                  <Trans>Extension (storing the function)</Trans>
+                }
+                value={
+                  createNewExtension
+                    ? CREATE_NEW_EXTENSION_PLACEHOLDER
+                    : extensionName
+                }
+                onChange={(e, i, extensionName) => {
+                  if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
+                    this.setState({
+                      createNewExtension: true,
+                      extensionName: '',
+                    });
+                  } else {
+                    this.setState({
+                      createNewExtension: false,
+                      extensionName,
+                    });
                   }
-                  value={
-                    createNewExtension
-                      ? CREATE_NEW_EXTENSION_PLACEHOLDER
-                      : extensionName
-                  }
-                  onChange={(e, i, extensionName) => {
-                    if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
-                      this.setState({
-                        createNewExtension: true,
-                        extensionName: '',
-                      });
-                    } else {
-                      this.setState({
-                        createNewExtension: false,
-                        extensionName,
-                      });
-                    }
-                  }}
-                  fullWidth
-                >
-                  {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
-                    <SelectOption
-                      key={eventsFunctionsExtension.getName()}
-                      value={eventsFunctionsExtension.getName()}
-                      primaryText={
-                        eventsFunctionsExtension.getFullName() ||
-                        eventsFunctionsExtension.getName()
-                      }
-                    />
-                  ))}
+                }}
+                fullWidth
+              >
+                {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
                   <SelectOption
-                    value={CREATE_NEW_EXTENSION_PLACEHOLDER}
-                    primaryText={t`<Create a New Extension>`}
+                    key={eventsFunctionsExtension.getName()}
+                    value={eventsFunctionsExtension.getName()}
+                    primaryText={
+                      eventsFunctionsExtension.getFullName() ||
+                      eventsFunctionsExtension.getName()
+                    }
                   />
-                </SelectField>
-              </Column>
+                ))}
+                <SelectOption
+                  value={CREATE_NEW_EXTENSION_PLACEHOLDER}
+                  primaryText={t`<Create a New Extension>`}
+                />
+              </SelectField>
               {createNewExtension ? (
-                <Column noMargin expand>
-                  <SemiControlledTextField
-                    commitOnBlur
-                    value={extensionName}
-                    floatingLabelText={<Trans>New extension name</Trans>}
-                    onChange={(extensionName: string) =>
-                      this.setState({ extensionName })
-                    }
-                    fullWidth
-                    errorText={
-                      !validateExtensionNameUniqueness(
-                        project,
-                        extensionName
-                      ) ? (
-                        <Trans>
-                          This name is already taken by another extension.
-                        </Trans>
-                      ) : !validateExtensionName(extensionName) ? (
-                        <Trans>
-                          This name is not valid. Only use alphanumeric
-                          characters (0-9, a-z) and underscores.
-                        </Trans>
-                      ) : (
-                        undefined
-                      )
-                    }
-                  />
-                </Column>
+                <SemiControlledTextField
+                  commitOnBlur
+                  value={extensionName}
+                  floatingLabelText={<Trans>New extension name</Trans>}
+                  onChange={(extensionName: string) =>
+                    this.setState({ extensionName })
+                  }
+                  fullWidth
+                  errorText={
+                    !validateExtensionNameUniqueness(project, extensionName) ? (
+                      <Trans>
+                        This name is already taken by another extension.
+                      </Trans>
+                    ) : !validateExtensionName(extensionName) ? (
+                      <Trans>
+                        This name is not valid. Only use alphanumeric characters
+                        (0-9, a-z) and underscores.
+                      </Trans>
+                    ) : (
+                      undefined
+                    )
+                  }
+                />
               ) : null}
-            </Line>
+            </ResponsiveLineStackLayout>
             <Line>
               <SemiControlledTextField
                 commitOnBlur

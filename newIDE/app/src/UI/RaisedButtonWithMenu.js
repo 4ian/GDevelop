@@ -4,12 +4,13 @@ import RaisedButton, {
   type RaisedButtonPropsWithoutOnClick,
 } from './RaisedButton';
 import ElementWithMenu from './Menu/ElementWithMenu';
+import { type MenuItemTemplate } from './Menu/Menu.flow';
 
 // We support a subset of the props supported by Material-UI v0.x RaisedButton
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
   ...RaisedButtonPropsWithoutOnClick,
-  buildMenuTemplate: () => Array<any>,
+  buildMenuTemplate: () => Array<MenuItemTemplate>,
 |};
 
 const shouldNeverBeCalled = () => {

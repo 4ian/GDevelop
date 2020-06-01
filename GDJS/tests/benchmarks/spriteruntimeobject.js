@@ -1,7 +1,14 @@
+// @ts-check
+
 describe('gdjs.SpriteRuntimeObject', function() {
-	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
+	var runtimeGame = new gdjs.RuntimeGame({
+		variables: [],
+		// @ts-ignore
+		properties: {windowWidth: 800, windowHeight: 600},
+		resources: {resources: []}
+	});
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-	
+
 	const makeSpriteRuntimeObjectWithCustomHitBox = (runtimeScene) => new gdjs.SpriteRuntimeObject(runtimeScene, {
 		"name": "obj1",
 		"type": "Sprite",
@@ -59,7 +66,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
 			}
 		]
 	});
-	
+
 
 	it('benchmark getAABB of rotated vs non rotated sprite, with custom hitboxes, origin and center', function(){
 		this.timeout(20000);
@@ -73,14 +80,16 @@ describe('gdjs.SpriteRuntimeObject', function() {
           .add('getAABB of a non rotated sprite, with custom hitboxes, origin and center', (i) => {
             object.setAngle(0);
 			object.setX(i);
+			// @ts-ignore - inheritance not properly understood by TypeScript
 			object.getAABB();
           })
           .add('getAABB of a rotated sprite, with custom hitboxes, origin and center', (i) => {
             object.setAngle(90);
-            object.setX(i);
+			object.setX(i);
+			// @ts-ignore - inheritance not properly understood by TypeScript
             object.getAABB();
           });
-    
+
 		console.log(benchmarkSuite.run());
 	});
 });

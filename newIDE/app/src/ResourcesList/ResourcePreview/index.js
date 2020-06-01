@@ -14,7 +14,6 @@ type Props = {|
   resourceName: string,
   resourcePath?: string,
   resourcesLoader: typeof ResourcesLoader,
-  style?: Object,
   onSize?: (number, number) => void,
 |};
 
@@ -60,7 +59,6 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
             project={this.props.project}
             resourceName={this.props.resourceName}
             resourcesLoader={this.props.resourcesLoader}
-            style={this.props.style}
             onSize={this.props.onSize}
             resourcePath={this.props.resourcePath}
           />

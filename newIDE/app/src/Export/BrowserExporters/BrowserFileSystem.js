@@ -29,6 +29,12 @@ const isURL = (filename: string) => {
   );
 };
 
+// For some reason, `path.posix` is undefined when packaged
+// with webpack, so we're using `path` directly. As it's for the web-app,
+// it should always be the posix version. In tests on Windows,
+// it's necessary to use path.posix.
+const pathPosix = path.posix || path;
+
 // TODO: Merge BrowserS3FileSystem into this?
 
 /**
@@ -106,21 +112,21 @@ export default class BrowserFileSystem {
     return '/browser-file-system-tmp-dir';
   };
   fileNameFrom = (fullpath: string) => {
-    return path.posix.basename(fullpath);
+    return pathPosix.basename(fullpath);
   };
   dirNameFrom = (fullpath: string) => {
-    return path.posix.dirname(fullpath);
+    return pathPosix.dirname(fullpath);
   };
   makeAbsolute = (filePathOrURL: string, baseDirectoryOrURL: string) => {
     // URLs are always absolute
     if (isURL(filePathOrURL)) return filePathOrURL;
 
     if (!this.isAbsolute(baseDirectoryOrURL))
-      baseDirectoryOrURL = path.posix.resolve(baseDirectoryOrURL);
+      baseDirectoryOrURL = pathPosix.resolve(baseDirectoryOrURL);
 
-    return path.posix.resolve(
+    return pathPosix.resolve(
       baseDirectoryOrURL,
-      path.posix.normalize(filePathOrURL)
+      pathPosix.normalize(filePathOrURL)
     );
   };
   makeRelative = (filePathOrURL: string, baseDirectoryOrURL: string) => {
@@ -138,9 +144,9 @@ export default class BrowserFileSystem {
     }
 
     // Paths are treated as usual paths.
-    return path.posix.relative(
+    return pathPosix.relative(
       baseDirectoryOrURL,
-      path.posix.normalize(filePathOrURL)
+      pathPosix.normalize(filePathOrURL)
     );
   };
   isAbsolute = (fullpath: string) => {
@@ -161,14 +167,14 @@ export default class BrowserFileSystem {
         return false;
       }
 
-      this._filesToDownload[path.posix.normalize(dest)] = source;
+      this._filesToDownload[pathPosix.normalize(dest)] = source;
       return true;
     }
 
     // If this is a file that we have already in memory,
     // copy its path.
     if (!!this._textFiles[source]) {
-      this._textFiles[path.posix.normalize(dest)] = this._textFiles[source];
+      this._textFiles[pathPosix.normalize(dest)] = this._textFiles[source];
       return true;
     }
 
@@ -177,7 +183,7 @@ export default class BrowserFileSystem {
   };
 
   writeToFile = (filePath: string, content: string) => {
-    this._textFiles[path.posix.normalize(filePath)] = content;
+    this._textFiles[pathPosix.normalize(filePath)] = content;
     return true;
   };
 
@@ -210,7 +216,7 @@ export default class BrowserFileSystem {
   fileExists = (filePath: string) => {
     if (isURL(filePath)) return true;
 
-    const normalizedFilePath = path.posix.normalize(filePath);
+    const normalizedFilePath = pathPosix.normalize(filePath);
     return (
       !!this._textFiles[normalizedFilePath] ||
       !!this._filesToDownload[normalizedFilePath]

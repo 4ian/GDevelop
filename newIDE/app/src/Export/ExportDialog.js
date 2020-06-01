@@ -21,7 +21,7 @@ import AlertMessage from '../UI/AlertMessage';
 const styles = {
   icon: { width: 40, height: 40 },
   disabledItem: { opacity: 0.6 },
-  content: { padding: 24 },
+  content: { padding: 8 },
 };
 
 export type Exporter = {|
@@ -128,6 +128,7 @@ export default class ExportDialog extends React.Component<Props, State> {
                 <Dialog
                   title={<Trans>Export project to a standalone game</Trans>}
                   onRequestClose={onClose}
+                  cannotBeDismissed={false}
                   actions={[
                     chosenExporterKey && (
                       <FlatButton

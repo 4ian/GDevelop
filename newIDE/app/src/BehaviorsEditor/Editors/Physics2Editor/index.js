@@ -103,7 +103,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
     const masksValues = parseInt(properties.get('masks').getValue(), 10);
 
     return (
-      <Column>
+      <Column expand>
         <Line>
           <SelectField
             key={'bodyType'}

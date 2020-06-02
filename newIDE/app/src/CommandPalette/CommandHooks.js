@@ -3,7 +3,7 @@ import * as React from 'react';
 import { type GlobalCommand } from './CommandManager';
 import CommandsContext from './CommandsContext';
 
-const useGlobalCommand = (cmdName: string, cmdOpts: GlobalCommand) => {
+export const useGlobalCommand = (cmdName: string, cmdOpts: GlobalCommand) => {
   const manager = React.useContext(CommandsContext);
   React.useEffect(
     () => {
@@ -12,6 +12,6 @@ const useGlobalCommand = (cmdName: string, cmdOpts: GlobalCommand) => {
         return () => manager.deregisterGlobal(cmdName);
       }
     },
-    [cmdName, cmdOpts.displayText, cmdOpts.enabled, cmdOpts.handler]
+    [manager, cmdName, cmdOpts.displayText, cmdOpts.enabled, cmdOpts.handler]
   );
 };

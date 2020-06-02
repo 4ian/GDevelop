@@ -1,11 +1,16 @@
 // @flow
 type CmdHandler = () => void | Promise<void>;
 
-export type GlobalCommand = {
+export type GlobalCommand = {|
   displayText: string,
   enabled: boolean,
-  handler: null | CmdHandler,
-};
+  handler: CmdHandler,
+|};
+
+export type UIGlobalCommand = {|
+  name: string,
+  ...GlobalCommand,
+|};
 
 export default class CommandManager {
   globalCommands: { [string]: GlobalCommand };
@@ -27,5 +32,12 @@ export default class CommandManager {
       return console.warn(`Command ${cmdName} is not registered.`);
     delete this.globalCommands[cmdName];
     console.warn(`Command ${cmdName} unregistered!`);
+  };
+
+  getGlobalCommands = () => {
+    return Object.keys(this.globalCommands).map<UIGlobalCommand>(cmdName => {
+      const cmd = this.globalCommands[cmdName];
+      return { ...cmd, name: cmdName };
+    });
   };
 }

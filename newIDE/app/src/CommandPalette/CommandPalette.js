@@ -36,6 +36,7 @@ const CommandPalette = (props: Props) => {
       aria-labelledby="command-palette"
       open={open}
       fullWidth
+      hideBackdrop
       maxWidth="sm"
     >
       <DialogTitle>

@@ -1,9 +1,11 @@
 import React from 'react';
-import { t } from '@lingui/macro';
-import { i18n } from '@lingui/core';
 import Checkbox from '../../UI/Checkbox';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
-import Window from '../../Utils/Window';
+import {
+  checkImageSize,
+  confirmationImportImage,
+  ResourcesManagerContext,
+} from '../../Utils/ImageSizeChecker';
 import Tooltip from '@material-ui/core/Tooltip';
 import Warning from '@material-ui/icons/Warning';
 
@@ -64,38 +66,25 @@ const ImageThumbnail = ({
   const [hasSizeWarning, setHasWarningSize] = React.useState(false);
   const [hasThumbnailMissing, setThumbnailMissing] = React.useState(false);
 
-  const _callbackImageThumbnailLoaded = React.useCallback(
-    (imageElement: HTMLImageElement) => {
-      if (!imageElement || hasSizeWarning) return;
-      const image = imageElement.target;
-
-      if (image.naturalWidth > 2048 || image.naturalHeight > 2048) {
+  const _callbackImageThumbnailLoaded = (imageElement: HTMLImageElement) => {
+    const existAlready = resourcesLoader.getStatusCode(project, resourceName);
+    if (existAlready === 'IMAGE_EXCEEDED_2048_PIXELS') {
+      setHasWarningSize(true);
+    } else {
+      if (checkImageSize(imageElement)) {
         onSelect(selected);
         setHasWarningSize(true);
-        var answer = Window.showConfirmDialog(
-          i18n._(
-            t`The selected image is more than 2048 pixels wide. The image may not be displayed on some devices. Do you really want to import the image?`
-          )
-        );
-
-        if (!answer) {
+        if (!confirmationImportImage()) {
           deleteSprite(true);
           // TODO Supprimer la resource
           //deleteResource(PATH);
-
-          /*
-          FIXED avec le useCallback - l'image du sprite semble être chargé une nouvelle fois après l'importation d'un nouveau sprite,
-          FIXME lorsque les sprite sont déplacé dans le sortable container la confirmation de l'import d'une resource trop grande est de nouveau déclenché.
-          */
         }
       } else {
         setHasWarningSize(false);
       }
-      setThumbnailMissing(false);
-    },
-    [!hasThumbnailMissing]
-  );
-
+    }
+    setThumbnailMissing(false);
+  };
   return (
     <ThemeConsumer>
       {muiTheme => (

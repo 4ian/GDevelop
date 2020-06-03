@@ -17,7 +17,8 @@ class UrlsCache {
 
   getCachedUrl(project: gdProject, filename: string) {
     const cache = this._getProjectCache(project);
-    return cache[filename];
+    if(!cache[filename]) return;
+    return cache[filename]["systemFilename"];
   }
 
   cacheUrl(project: gdProject, url: string) {
@@ -37,15 +38,27 @@ class UrlsCache {
     disableCacheBurst: boolean
   ) {
     const cache = this._getProjectCache(project);
-
+    cache[filename] = {};
     if (!disableCacheBurst) {
       // The URL is cached with an extra "cache-bursting" parameter.
       // If the cache is emptied or changed, local files will have another
       // value for this parameter, forcing the browser to reload the images.
-      return (cache[filename] = `${systemFilename}?cache=${Date.now()}`);
+      return (cache[filename]["systemFilename"] = `${systemFilename}?cache=${Date.now()}`);
     } else {
-      return (cache[filename] = systemFilename);
+      return (cache[filename]["systemFilename"] = systemFilename);
     }
+  }
+
+  getStatusCode(project: gdProject, filename: string) {
+    const cache = this._getProjectCache(project);
+    if(!cache) return {};
+    return cache[filename].statusCode || {};
+  }
+
+  setStatusCode(project: gdProject, filename: string, statusCode: string) {
+    const cache = this._getProjectCache(project);
+    if(!cache[filename]) return;
+    return (cache[filename]["statusCode"] = statusCode);
   }
 }
 
@@ -145,5 +158,17 @@ export default class ResourcesLoader {
     }
 
     return resourceName;
+  }
+
+  static getStatusCode(project: gdProject, resourceName: string) {
+    return this._cache.getStatusCode(project, resourceName);
+  }
+
+  static setStatusCode(
+    project: gdProject,
+    resourceName: string,
+    statusCode: string
+  ) {
+    this._cache.setStatusCode(project, resourceName, statusCode);
   }
 }

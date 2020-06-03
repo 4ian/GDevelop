@@ -95,7 +95,7 @@ export default class ResourcePropertiesEditor extends React.Component<
   };
 
   _renderResourcesProperties() {
-    const { resources, project } = this.props;
+    const { resources, project, resourcesLoader } = this.props;
     //TODO: Multiple resources support
     const properties = resources[0].getProperties(project);
     const resourceSchema = propertiesMapToSchema(
@@ -103,14 +103,17 @@ export default class ResourcePropertiesEditor extends React.Component<
       resource => resource.getProperties(project),
       (resource, name, value) => resource.updateProperty(name, value, project)
     );
-    const warningSizeSprite = true;
+    const warningSizeSprite = resourcesLoader.getStatusCode(
+      project,
+      resources[0].getName()
+    );
 
     return (
       <div
         style={styles.propertiesContainer}
         key={resources.map(resource => '' + resource.ptr).join(';')}
       >
-        {warningSizeSprite && (
+        {warningSizeSprite === 'IMAGE_EXCEEDED_2048_PIXELS' && (
           <AlertMessage kind="error">
             <Trans>
               This resource are taller than 2048px wide, this reduce the

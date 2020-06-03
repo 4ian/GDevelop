@@ -23,6 +23,14 @@ export default class PixiResourcesLoader {
     if (!imageResource.isSmooth()) {
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     }
+
+    if (
+      texture.baseTexture.realWidth > 2048 ||
+      texture.baseTexture.realHeight > 2048
+    ) {
+      console.log("IMAGE trop grande ...");
+      //statusCode = 'IMAGE_EXCEEDED_2048_PIXELS';
+    }
   }
 
   /**
@@ -63,11 +71,23 @@ export default class PixiResourcesLoader {
         if (loadedResources.hasOwnProperty(resourceName)) {
           const resource = resourcesManager.getResource(resourceName);
           if (resource.getKind() !== 'image') continue;
-
-          loadedTextures[resourceName] = loadedResources[resourceName].texture;
+          let statusCode = null;
+          if (
+            loadedResources[resourceName].texture.baseTexture.realWidth >
+              2048 ||
+            loadedResources[resourceName].texture.baseTexture.realHeight > 2048
+          ) {
+            statusCode = 'IMAGE_EXCEEDED_2048_PIXELS';
+          }
+          loadedTextures[resourceName] = {
+            pixi: loadedResources[resourceName].texture,
+            statusCode: statusCode,
+          };
+          console.debug(loadedTextures);
+          ResourcesLoader.setStatusCode(project, resourceName, statusCode);
           PixiResourcesLoader._initializeTexture(
             resource,
-            loadedTextures[resourceName]
+            loadedTextures[resourceName].pixi
           );
         }
       }
@@ -91,7 +111,7 @@ export default class PixiResourcesLoader {
    */
   static getPIXITexture(project: gdProject, resourceName: string) {
     if (loadedTextures[resourceName]) {
-      return loadedTextures[resourceName];
+      return loadedTextures[resourceName].pixi;
     }
 
     if (!project.getResourcesManager().hasResource(resourceName))
@@ -100,16 +120,18 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     if (resource.getKind() !== 'image') return invalidTexture;
 
-    loadedTextures[resourceName] = PIXI.Texture.fromImage(
-      ResourcesLoader.getResourceFullUrl(project, resourceName),
-      true /* Treats request as cross-origin */
-    );
+    loadedTextures[resourceName] = {
+      pixi: PIXI.Texture.fromImage(
+        ResourcesLoader.getResourceFullUrl(project, resourceName),
+        true /* Treats request as cross-origin */
+      ),
+    };
 
     PixiResourcesLoader._initializeTexture(
       resource,
-      loadedTextures[resourceName]
+      loadedTextures[resourceName].pixi
     );
-    return loadedTextures[resourceName];
+    return loadedTextures[resourceName].pixi;
   }
 
   /**
@@ -121,7 +143,7 @@ export default class PixiResourcesLoader {
    */
   static getPIXIVideoTexture(project: gdProject, resourceName: string) {
     if (loadedTextures[resourceName]) {
-      return loadedTextures[resourceName];
+      return loadedTextures[resourceName].pixi;
     }
 
     if (!project.getResourcesManager().hasResource(resourceName))
@@ -130,7 +152,7 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     if (resource.getKind() !== 'video') return invalidTexture;
 
-    loadedTextures[resourceName] = PIXI.Texture.fromVideo(
+    loadedTextures[resourceName].pixi = PIXI.Texture.fromVideo(
       ResourcesLoader.getResourceFullUrl(
         project,
         resourceName,
@@ -143,8 +165,8 @@ export default class PixiResourcesLoader {
 
     // Fix compatibility with Chrome 76+. Only useful for Pixi v4, fixed and can be removed with Pixi v5.
     // See https://github.com/pixijs/pixi.js/issues/5996
-    loadedTextures[resourceName].baseTexture.source.preload = 'auto';
-    return loadedTextures[resourceName];
+    loadedTextures[resourceName].pixi.baseTexture.source.preload = 'auto';
+    return loadedTextures[resourceName].pixi;
   }
 
   /**
@@ -209,5 +231,21 @@ export default class PixiResourcesLoader {
 
   static getInvalidPIXITexture() {
     return invalidTexture;
+  }
+
+  static setResourceStatusCode(project: gdProject, resourceName: string) {
+    let statusCode = '';
+    if (
+      loadedTextures[resourceName].pixi.texture.baseTexture.realWidth > 2048 ||
+      loadedTextures[resourceName].pixi.texture.baseTexture.realHeight > 2048
+    ) {
+      statusCode = 'IMAGE_EXCEEDED_2048_PIXELS';
+    }
+    return (loadedTextures[resourceName].statusCode = statusCode);
+  }
+
+  static getResourceStatusCode(project: gdProject, resourceName: string) {
+    if (!loadedTextures[resourceName].statusCode) return;
+    return loadedTextures[resourceName].statusCode;
   }
 }

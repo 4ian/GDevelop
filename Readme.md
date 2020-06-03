@@ -22,7 +22,7 @@ Overview of the architecture
 | Directory | ℹ️ Description |
 | --- | --- |
 | `Core` | GDevelop core library, containing common tools to implement the IDE and work with GDevelop games. |
-| `GDCpp` | GDevelop C++ game engine, used to **build native games**. |
+| `GDCpp` | GDevelop C++ game engine, used to **build native games**. ***(Deprecated since GDevelop 5)*** |
 | `GDJS` | GDevelop JS game engine, used to build **HTML5 games**. |
 | `GDevelop.js` | Bindings of Core/GDCpp/GDJS and Extensions to JavaScript (used by the IDE). |
 | `newIDE` | The game editor, written in JavaScript with React, Electron and Pixi.js. |

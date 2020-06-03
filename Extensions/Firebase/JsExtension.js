@@ -39,10 +39,10 @@ module.exports = {
 			'JsPlatform/Extensions/firebase.png'
           )
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_analyticstools.js')
 		  .setFunctionName('firebase.analytics');
 
         extension
@@ -61,10 +61,10 @@ module.exports = {
           .addParameter('string', _('Event Name'), '', false)
           .addParameter('string', _('Additional Data'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_analyticstools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.log');
 
         extension
@@ -85,10 +85,10 @@ module.exports = {
           .addParameter('string', _('New Unique ID'), '', false)
           .markAsComplex()
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_analyticstools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.setUserID');
         
         extension
@@ -108,10 +108,10 @@ module.exports = {
           .addParameter('string', _('Property Data'), '', false)
           .markAsAdvanced()
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-analytics.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_analyticstools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-analytics.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_analyticstools.js')
           .setFunctionName('gdjs.evtTools.firebase.analytics.setProperty');
 
 
@@ -127,10 +127,10 @@ module.exports = {
           )
           .addParameter('string', _('Setting Name'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_remoteconfigtools.js')
           .setFunctionName('firebase.remoteConfig().getString');
 
         extension
@@ -144,10 +144,10 @@ module.exports = {
           )
           .addParameter('string', _('Setting Name'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_remoteconfigtools.js')
           .setFunctionName('firebase.remoteConfig().getNumber');
 
         extension
@@ -162,10 +162,10 @@ module.exports = {
           )
           .addParameter('number', _('Update Interval in ms'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_remoteconfigtools.js')
           .setFunctionName('gdjs.evtTools.firebase.RC.setAutoUpdateInterval');
         
         extension
@@ -183,10 +183,10 @@ module.exports = {
           )
           .addParameter('scenevar', _('Structure with defaults'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_remoteconfigtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-remote-config.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_remoteconfigtools.js')
           .setFunctionName('gdjs.evtTools.firebase.RC.setDefaultConfig');
 
         extension
@@ -200,8 +200,8 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
           )
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-remote-config.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-remote-config.js')
           .setFunctionName('firebase.remoteConfig().fetchAndActivate');
 
 		
@@ -221,10 +221,10 @@ module.exports = {
 		  .addParameter('string', _('Password'), '', false)
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
           .setFunctionName('gdjs.evtTools.firebase.auth.createAccountWithEmail');
 
         extension
@@ -245,10 +245,10 @@ module.exports = {
 		  .addParameter('string', _('Password'), '', false)
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
           .setFunctionName('gdjs.evtTools.firebase.auth.signInWithEmail');
 		
 		extension
@@ -269,10 +269,10 @@ module.exports = {
           )
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
           .setFunctionName('gdjs.evtTools.firebase.auth.signInWithProvider');
 
         extension
@@ -287,10 +287,10 @@ module.exports = {
 		  )
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
           .setFunctionName('gdjs.evtTools.firebase.auth.anonymSignIn');
 
         extension
@@ -307,10 +307,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
           )
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.isAuthentified');
 		  
 		extension
@@ -324,10 +324,10 @@ module.exports = {
           )
           .addParameter('string', _('Setting Name'), '', false)
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.token');
 
 		//User management Instructions
@@ -343,10 +343,10 @@ module.exports = {
 			'JsPlatform/Extensions/firebase.png'
 		  )
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.isEmailVerified');
 
 		extension
@@ -359,10 +359,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
           )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getEmail');
 
 		extension
@@ -375,10 +375,10 @@ module.exports = {
 			'JsPlatform/Extensions/firebase.png'
      	  )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+      	  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getCreationTime');
 
 		extension
@@ -391,10 +391,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
       	  )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getLastLoginTime');
 
 		extension
@@ -407,10 +407,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
           )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getDisplayName');
 
 		extension
@@ -423,10 +423,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
           )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getPhoneNumber');
 
 		extension
@@ -442,10 +442,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
           )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-          .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-          .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+          .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+          .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getUID');
 
 		extension
@@ -458,10 +458,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
       	  )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getTenantID');
 
 		extension
@@ -474,10 +474,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
       	  )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getRefreshToken');
 
 		extension
@@ -490,10 +490,10 @@ module.exports = {
             'JsPlatform/Extensions/firebase.png'
       	  )
 		  .getCodeExtraInformation()
-		  .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.getPhotoURL');
 
 		extension
@@ -509,10 +509,10 @@ module.exports = {
 			'JsPlatform/Extensions/firebase.png'
           )
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.sendVerificationEmail');
 
 		extension
@@ -529,10 +529,10 @@ module.exports = {
 		  )
 		  .addParameter('string', _('New display name'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.setDisplayName');
 
 		extension
@@ -549,10 +549,10 @@ module.exports = {
 		  )
 		  .addParameter('string', _('New photo\'s URL'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.setPhotoURL');
 
 		extension
@@ -569,10 +569,10 @@ module.exports = {
 		  )
 		  .addParameter('string', _('New photo\'s URL'), '', false)
           .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.setPhotoURL');
 
 		// Dangerous Authentification Instructions
@@ -596,10 +596,10 @@ module.exports = {
 		  .setDefaultValue('true')
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changeEmail');
 
 		extension
@@ -621,10 +621,10 @@ module.exports = {
 		  .setDefaultValue('true')
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changeEmailProvider');
 
 		extension
@@ -650,10 +650,10 @@ module.exports = {
 		  .setDefaultValue('true')
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changePassword');
 
 		extension
@@ -678,10 +678,10 @@ module.exports = {
 		  .setDefaultValue('true')
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.changePasswordProvider');
 
 		  extension
@@ -701,10 +701,10 @@ module.exports = {
 		  .addParameter('string', _('Password'), '', false)
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.deleteUser');
 
 		extension
@@ -723,10 +723,10 @@ module.exports = {
 		  )
 		  .addParameter('scenevar', _('Authentification State Variable'), '', false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-auth.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_authtools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.auth.userManagement.dangerous.deleteUserProvider');
 
 		/* ====== PERFORMANCE ====== */
@@ -742,9 +742,9 @@ module.exports = {
 			'JsPlatform/Extensions/firebase.png'
 		  )
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
 		  .setFunctionName('firebase.performance');
 
 		extension
@@ -762,10 +762,10 @@ module.exports = {
 		  )
 		  .addParameter("string", _("Tracker Name"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_performancetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.performance.getTracer');
 
 		extension
@@ -780,10 +780,10 @@ module.exports = {
 		  )
 		  .addParameter("string", _("Tracker Name"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_performancetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.performance.startTracer');
 
 		extension
@@ -798,10 +798,10 @@ module.exports = {
 		  )
 		  .addParameter("string", _("Tracker Name"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_performancetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.performance.stopTracer');
 
 		extension
@@ -821,10 +821,10 @@ module.exports = {
 		  .addParameter("number", _("Delay before measuring start (in ms)"), "", false)
 		  .addParameter("number", _("Measuring duration (in ms)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-performance.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_performancetools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-performance.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_performancetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.performance.recordPerformance');
 		
 		/* ====== FUNCTIONS ====== */
@@ -848,10 +848,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .markAsAdvanced()
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-functions.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_functionstools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-functions.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_functionstools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.functions.call');
 
 		/* ====== MESSAGING ====== */
@@ -869,9 +869,9 @@ module.exports = {
 		  )
 		  .addParameter("string", _("Public Key (VAPID)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-messaging.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/firebase-messaging-sw.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-messaging.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/firebase-messaging-sw.js')
 		  .setFunctionName('firebase.messaging().usePublicVapidKey');
 
 		*/
@@ -893,10 +893,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Variable to write"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.writeDocument');
 
 		extension
@@ -916,10 +916,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .addParameter("yesorno", _("Merge Document?"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.writeField');
 
 		extension
@@ -937,10 +937,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Variable to update with"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.updateDocument');
 
 		extension
@@ -959,10 +959,10 @@ module.exports = {
 		  .addParameter("string", _("Value to write"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.updateField');
 
 		extension
@@ -979,10 +979,10 @@ module.exports = {
 		  .addParameter("string", _("Document"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.deleteDocument');
 
 		extension
@@ -1000,10 +1000,10 @@ module.exports = {
 		  .addParameter("string", _("Field to delete"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.deleteField');
 
 		  extension
@@ -1021,10 +1021,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Variable where to load the document"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.getDocument');
 
 		extension
@@ -1043,10 +1043,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Variable where to store the field's value"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.getField');
 
 		  extension
@@ -1064,10 +1064,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.hasDocument');
 
 		extension
@@ -1086,10 +1086,10 @@ module.exports = {
 		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/firebasejs/B_firebase-firestore.js')
-      	  .addIncludeFile('Extensions/Firebase/firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/firebasetools/D_cloudfirestoretools.js')
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.hasField');
 
         return extension;

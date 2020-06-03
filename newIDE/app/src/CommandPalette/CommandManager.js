@@ -22,24 +22,24 @@ export default class CommandManager {
     console.warn('Initialised command manager');
   }
 
-  registerCommand = (cmdName: string, cmdOpts: Command) => {
-    if (this.commands[cmdName])
-      return console.warn(`Command ${cmdName} is already registered.`);
-    this.commands[cmdName] = cmdOpts;
-    console.warn(`Command ${cmdName} registered!`);
+  registerCommand = (commandName: string, command: Command) => {
+    if (this.commands[commandName])
+      return console.warn(`Command ${commandName} is already registered.`);
+    this.commands[commandName] = command;
+    console.warn(`Command ${commandName} registered!`);
   };
 
-  deregisterCommand = (cmdName: string) => {
-    if (!this.commands[cmdName])
-      return console.warn(`Command ${cmdName} is not registered.`);
-    delete this.commands[cmdName];
-    console.warn(`Command ${cmdName} unregistered!`);
+  deregisterCommand = (commandName: string) => {
+    if (!this.commands[commandName])
+      return console.warn(`Command ${commandName} is not registered.`);
+    delete this.commands[commandName];
+    console.warn(`Command ${commandName} unregistered!`);
   };
 
   getAllNamedCommands = () => {
-    return Object.keys(this.commands).map<NamedCommand>(cmdName => {
-      const cmd = this.commands[cmdName];
-      return { ...cmd, name: cmdName };
+    return Object.keys(this.commands).map<NamedCommand>(commandName => {
+      const cmd = this.commands[commandName];
+      return { ...cmd, name: commandName };
     });
   };
 }

@@ -35,7 +35,7 @@ const CommandPalette = (props: Props) => {
       {({ i18n }) => (
         <Dialog
           onClose={handleClose}
-          aria-labelledby="command-palette"
+          aria-label="command-palette"
           open={open}
           fullWidth
           hideBackdrop

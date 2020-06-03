@@ -15,7 +15,7 @@ type Props = {|
   requestUpdate: ?() => void,
   simulateUpdateDownloaded: ?() => void,
   simulateUpdateAvailable: ?() => void,
-  openCmdPalette: () => void,
+  openCommandPalette: () => void,
   exportProject: () => void,
   ...PreviewButtonsProps,
 |};
@@ -87,9 +87,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
                 {
                   label: 'Open command palette',
                   disabled: false,
-                  click: () => {
-                    this.props.openCmdPalette();
-                  },
+                  click: this.props.openCommandPalette,
                 },
               ]}
             />

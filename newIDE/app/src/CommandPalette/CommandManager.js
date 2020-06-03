@@ -1,42 +1,44 @@
 // @flow
-type CmdHandler = () => void | Promise<void>;
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
-export type GlobalCommand = {|
-  displayText: string,
+type CommandHandler = () => void | Promise<void>;
+
+export type Command = {|
+  displayText: MessageDescriptor,
   enabled: boolean,
-  handler: CmdHandler,
+  handler: CommandHandler,
 |};
 
-export type UIGlobalCommand = {|
+export type NamedCommand = {|
   name: string,
-  ...GlobalCommand,
+  ...Command,
 |};
 
 export default class CommandManager {
-  globalCommands: { [string]: GlobalCommand };
+  commands: { [string]: Command };
 
   constructor() {
-    this.globalCommands = {};
+    this.commands = {};
     console.warn('Initialised command manager');
   }
 
-  registerGlobal = (cmdName: string, cmdOpts: GlobalCommand) => {
-    if (this.globalCommands[cmdName])
+  registerCommand = (cmdName: string, cmdOpts: Command) => {
+    if (this.commands[cmdName])
       return console.warn(`Command ${cmdName} is already registered.`);
-    this.globalCommands[cmdName] = cmdOpts;
+    this.commands[cmdName] = cmdOpts;
     console.warn(`Command ${cmdName} registered!`);
   };
 
-  deregisterGlobal = (cmdName: string) => {
-    if (!this.globalCommands[cmdName])
+  deregisterCommand = (cmdName: string) => {
+    if (!this.commands[cmdName])
       return console.warn(`Command ${cmdName} is not registered.`);
-    delete this.globalCommands[cmdName];
+    delete this.commands[cmdName];
     console.warn(`Command ${cmdName} unregistered!`);
   };
 
-  getGlobalCommands = () => {
-    return Object.keys(this.globalCommands).map<UIGlobalCommand>(cmdName => {
-      const cmd = this.globalCommands[cmdName];
+  getAllNamedCommands = () => {
+    return Object.keys(this.commands).map<NamedCommand>(cmdName => {
+      const cmd = this.commands[cmdName];
       return { ...cmd, name: cmdName };
     });
   };

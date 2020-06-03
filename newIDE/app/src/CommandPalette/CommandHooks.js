@@ -1,17 +1,22 @@
 // @flow
 import * as React from 'react';
-import { type GlobalCommand } from './CommandManager';
+import { type Command } from './CommandManager';
 import CommandsContext from './CommandsContext';
 
-export const useGlobalCommand = (cmdName: string, cmdOpts: GlobalCommand) => {
-  const manager = React.useContext(CommandsContext);
+export const useCommand = (commandName: string, command: Command) => {
+  const commandManager = React.useContext(CommandsContext);
   React.useEffect(
     () => {
-      if (cmdOpts.enabled) {
-        manager.registerGlobal(cmdName, cmdOpts);
-        return () => manager.deregisterGlobal(cmdName);
-      }
+      if (!command.enabled) return;
+      commandManager.registerCommand(commandName, command);
+      return () => commandManager.deregisterCommand(commandName);
     },
-    [manager, cmdName, cmdOpts.displayText, cmdOpts.enabled, cmdOpts.handler]
+    [
+      commandManager,
+      commandName,
+      command.displayText,
+      command.enabled,
+      command.handler,
+    ]
   );
 };

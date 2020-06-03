@@ -100,7 +100,7 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useGlobalCommand } from '../CommandPalette/CommandHooks';
+import { useCommand } from '../CommandPalette/CommandHooks';
 import CommandPalette from '../CommandPalette/CommandPalette';
 import { type PreviewState } from './PreviewState.flow';
 
@@ -223,7 +223,7 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
-  const [cmdPanelOpen, openCmdPanel] = React.useState<boolean>(false);
+  const [commandPanelOpen, openCommandPanel] = React.useState<boolean>(false);
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1773,7 +1773,7 @@ const MainFrame = (props: Props) => {
         requestUpdate={props.requestUpdate}
         simulateUpdateDownloaded={simulateUpdateDownloaded}
         simulateUpdateAvailable={simulateUpdateAvailable}
-        openCmdPalette={() => openCmdPanel(true)}
+        openCommandPalette={() => openCommandPanel(true)}
         onOpenDebugger={() => {
           openDebugger();
           launchPreview(/*networkPreview=*/ false);
@@ -1991,11 +1991,8 @@ const MainFrame = (props: Props) => {
           onChangeSubscription={() => openSubscriptionDialog(true)}
         />
       )}
-      {cmdPanelOpen && (
-        <CommandPalette
-          open={cmdPanelOpen}
-          onClose={() => openCmdPanel(false)}
-        />
+      {commandPanelOpen && (
+        <CommandPalette open onClose={() => openCommandPanel(false)} />
       )}
       {subscriptionDialogOpen && (
         <SubscriptionDialog

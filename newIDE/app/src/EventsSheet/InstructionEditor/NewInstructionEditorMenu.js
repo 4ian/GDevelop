@@ -7,7 +7,6 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { setupInstruction } from './InstructionParametersEditor';
 import {
   useNewInstructionEditor,
   getInstructionMetadata,
@@ -19,6 +18,7 @@ import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 
 const styles = {
   fullHeightSelector: {
@@ -111,13 +111,21 @@ export default function NewInstructionEditorMenu({
     instruction: gdInstruction,
     chosenObjectName: ?string,
   }) => {
+    // Before submitting the instruction, ensure that we set the default
+    // parameters, notably the object and behavior name.
     const instructionMetadata = getInstructionMetadata({
       instructionType: instruction.getType(),
       isCondition,
       project,
     });
     if (instructionMetadata) {
-      setupInstruction(instruction, instructionMetadata, chosenObjectName);
+      setupInstructionParameters(
+        globalObjectsContainer,
+        objectsContainer,
+        instruction,
+        instructionMetadata,
+        chosenObjectName
+      );
     }
     onSubmit();
   };

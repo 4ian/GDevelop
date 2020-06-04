@@ -27,6 +27,7 @@ import { getObjectParameterIndex } from '../../InstructionOrExpression/Enumerate
 import Text from '../../UI/Text';
 import { getInstructionMetadata } from './NewInstructionEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 const gd = global.gd;
 
 const styles = {
@@ -79,26 +80,6 @@ type Props = {|
 type State = {|
   isDirty: boolean,
 |};
-
-export const setupInstruction = (
-  instruction: gdInstruction,
-  instructionMetadata: gdInstructionMetadata,
-  objectName: ?string
-) => {
-  instruction.setParametersCount(instructionMetadata.getParametersCount());
-
-  if (objectName) {
-    const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
-    if (objectParameterIndex === -1) {
-      console.error(
-        `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
-      );
-      return;
-    }
-
-    instruction.setParameter(objectParameterIndex, objectName);
-  }
-};
 
 const isParameterVisible = (
   parameterMetadata: gdParameterMetadata,
@@ -236,7 +217,13 @@ export default class InstructionParametersEditor extends React.Component<
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
 
-    setupInstruction(instruction, instructionMetadata, objectName);
+    setupInstructionParameters(
+      globalObjectsContainer,
+      objectsContainer,
+      instruction,
+      instructionMetadata,
+      objectName
+    );
 
     let parameterFieldIndex = 0;
     return (

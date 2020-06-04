@@ -27,7 +27,7 @@ import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
 import UnsavedChangesContext from './MainFrame/UnsavedChangesContext';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();

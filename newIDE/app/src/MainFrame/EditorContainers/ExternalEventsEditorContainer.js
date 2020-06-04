@@ -53,7 +53,7 @@ export class ExternalEventsEditorContainer extends React.Component<
 
   getExternalEvents(): ?gdExternalEvents {
     const { project, projectItemName } = this.props;
-    if (!project) return null;
+    if (!project || !projectItemName) return null;
 
     if (!project.hasExternalEventsNamed(projectItemName)) {
       return null;

@@ -1,5 +1,6 @@
+// @flow
 import { containsSubInstructions } from './ContainsSubInstruction';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 describe('ContainsSubInstructions', () => {
   const insertInstruction = (list, type) => {

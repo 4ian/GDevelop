@@ -16,7 +16,7 @@ const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   onExport?: () => void,

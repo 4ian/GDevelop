@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Wrap the specified component so that it is able to modify a

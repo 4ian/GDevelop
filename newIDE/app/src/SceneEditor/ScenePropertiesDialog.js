@@ -14,7 +14,7 @@ import some from 'lodash/some';
 import Checkbox from '../UI/Checkbox';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { ColumnStackLayout } from '../UI/Layout';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   open: boolean,
@@ -123,13 +123,14 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
               sharedDataContent.getContent(),
               project
             ),
-          (sharedDataContent, name, value) =>
+          (sharedDataContent, name, value) => {
             behaviorSharedData.updateProperty(
               sharedDataContent.getContent(),
               name,
               value,
               project
-            )
+            );
+          }
         );
 
         return (

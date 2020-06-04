@@ -2,7 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type EnumeratedObjectMetadata = {|
   extension: gdPlatformExtension,
@@ -38,7 +38,7 @@ export const isSameObjectWithContext = (
 };
 
 export const enumerateObjects = (
-  project: gdProject,
+  project: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   type: ?string = undefined
 ) => {

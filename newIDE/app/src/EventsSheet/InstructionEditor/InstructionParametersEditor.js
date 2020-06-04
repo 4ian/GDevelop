@@ -28,7 +28,7 @@ import Text from '../../UI/Text';
 import { getInstructionMetadata } from './NewInstructionEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   // When displaying parameters, take all the height:

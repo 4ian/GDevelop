@@ -28,7 +28,7 @@ import Add from '@material-ui/icons/Add';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,

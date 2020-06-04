@@ -3,7 +3,7 @@ import { unserializeFromJSObject } from '../../Utils/Serializer';
 import { mapVector } from '../../Utils/MapFor';
 import { getFreeEventsFunctionType } from '../../EventsFunctionsExtensionsLoader';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Set up an events function with the given serialized events,
@@ -108,7 +108,8 @@ export const setupFunctionFromEvents = ({
         gd.getTypeOfBehavior(
           globalObjectsContainer,
           objectsContainer,
-          behaviorName
+          behaviorName,
+          false
         )
       );
       parameters.push_back(newParameter);

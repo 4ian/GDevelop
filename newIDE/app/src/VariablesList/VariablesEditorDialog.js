@@ -5,7 +5,7 @@ import Dialog from '../UI/Dialog';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 import VariablesList from './index';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export class VariablesEditorDialog extends Component {
   render() {

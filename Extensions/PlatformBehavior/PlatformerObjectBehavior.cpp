@@ -33,6 +33,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("roundCoordinates", true);
   behaviorContent.SetAttribute("gravity", 1000);
   behaviorContent.SetAttribute("maxFallingSpeed", 700);
+  behaviorContent.SetAttribute("ladderClimbingSpeed", 150);
   behaviorContent.SetAttribute("acceleration", 1500);
   behaviorContent.SetAttribute("deceleration", 1500);
   behaviorContent.SetAttribute("maxSpeed", 250);
@@ -66,7 +67,7 @@ PlatformerObjectBehavior::GetProperties(
   properties[_("Max. falling speed")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
   properties[_("Ladder Climbing speed")].SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("ladderClimbingSpeed")));      
+      gd::String::From(behaviorContent.GetDoubleAttribute("ladderClimbingSpeed")));
   properties[_("Acceleration")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
   properties[_("Deceleration")].SetValue(

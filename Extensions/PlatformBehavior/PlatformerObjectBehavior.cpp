@@ -119,7 +119,7 @@ bool PlatformerObjectBehavior::UpdateProperty(
     else if (name == _("Max. falling speed"))
       behaviorContent.SetAttribute("maxFallingSpeed", value.To<double>());
     else if (name == _("Ladder Climbing Speed"))
-      behaviorContent.SetAttribute("ladderCLimbingSpeed", value.To<double>());  
+      behaviorContent.SetAttribute("ladderClimbingSpeed", value.To<double>());
     else if (name == _("Acceleration"))
       behaviorContent.SetAttribute("acceleration", value.To<double>());
     else if (name == _("Deceleration"))

@@ -245,15 +245,33 @@ const MainFrame = (props: Props) => {
           }))
         )
         .then(state => {
-          if (initialFileMetadataToOpen) {
-            _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
-          } else if (introDialog && !Window.isDev()) openIntroDialog(true);
-
           GD_STARTUP_TIMES.push([
             'MainFrameComponentDidMountFinished',
             performance.now(),
           ]);
           console.info('Startup times:', getStartupTimesSummary());
+
+          if (initialFileMetadataToOpen) {
+            _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
+          } else {
+            if (introDialog && !Window.isDev()) openIntroDialog(true);
+
+            // Re-open the last opened project, if any and if asked to.
+            const {
+              getAutoOpenMostRecentProject,
+              getRecentProjectFiles,
+              hadProjectOpenedDuringLastSession,
+            } = preferences;
+
+            if (
+              getAutoOpenMostRecentProject() &&
+              hadProjectOpenedDuringLastSession() &&
+              getRecentProjectFiles()[0]
+            )
+              openFromFileMetadataWithStorageProvider(
+                getRecentProjectFiles()[0]
+              );
+          }
         })
         .catch(() => {
           /* Ignore errors */
@@ -393,6 +411,7 @@ const MainFrame = (props: Props) => {
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
       // TODO: Pixi cache should also be burst
+      preferences.setHasProjectOpened(true);
 
       return setState(state => ({
         ...state,
@@ -525,6 +544,7 @@ const MainFrame = (props: Props) => {
             error
           );
           setIsLoadingProject(false);
+          return Promise.reject(error);
         });
     });
   };
@@ -536,6 +556,7 @@ const MainFrame = (props: Props) => {
   const closeProject = (): Promise<void> => {
     const { eventsFunctionsExtensionsState } = props;
 
+    preferences.setHasProjectOpened(false);
     setPreviewState(initialPreviewState);
     return setState(state => {
       const { currentProject, editorTabs } = state;
@@ -1229,13 +1250,19 @@ const MainFrame = (props: Props) => {
 
     if (storageProvider) {
       getStorageProviderOperations(storageProvider).then(() => {
-        openFromFileMetadata(fileMetadata).then(state => {
-          if (state)
-            openSceneOrProjectManager({
-              currentProject: state.currentProject,
-              editorTabs: state.editorTabs,
-            });
-        });
+        openFromFileMetadata(fileMetadata)
+          .then(state => {
+            if (state)
+              openSceneOrProjectManager({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              });
+          })
+          .catch(error => {
+            preferences.removeRecentProjectFile(
+              fileMetadataAndStorageProviderName
+            );
+          });
       });
     }
   };

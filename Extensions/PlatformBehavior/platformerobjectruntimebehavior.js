@@ -955,7 +955,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxFallingSpeed = function(
 * Set the speed of climbing the ladder.
 * @param {number} ladderClimbingSpeed The speed of climbing the ladder
 */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.setladderClimbingSpeed = function (
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setLadderClimbingSpeed = function (
   ladderClimbingSpeed
 ) {
   this._ladderClimbingSpeed = ladderClimbingSpeed;

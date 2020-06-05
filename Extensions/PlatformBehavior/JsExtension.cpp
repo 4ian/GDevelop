@@ -70,6 +70,12 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
       autExpressions["MaxFallingSpeed"].SetFunctionName("getMaxFallingSpeed");
       autConditions["PlatformBehavior::Acceleration"].SetFunctionName(
           "getAcceleration");
+      autActions["PlatformBehavior::LadderClimbingSpeed"]
+          .SetFunctionName("setLadderClimbingSpeed")
+          .SetGetter("getLadderClimbingSpeed");
+      autExpressions["LadderClimbingSpeed"].SetFunctionName("getLadderClimbingSpeed");
+      autConditions["PlatformBehavior::LadderClimbingSpeed"].SetFunctionName(
+          "getLadderClimbingSpeed");
       autActions["PlatformBehavior::Acceleration"]
           .SetFunctionName("setAcceleration")
           .SetGetter("getAcceleration");

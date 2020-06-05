@@ -1083,7 +1083,7 @@ module.exports = {
 		  .addParameter("string", _("Collection"), "", false)
 		  .addParameter("string", _("Document"), "", false)
 		  .addParameter("string", _("Field to check"), "", false)
-		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable where to store the result"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
           .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1097,9 +1097,9 @@ module.exports = {
 		extension
           .addAction(
             'StorageUpload',
-            _('Upload'),
-			_('Upload.'),
-			_('Upload'),
+            _('Upload a file'),
+			_('Upload a file to firebase Storage.'),
+			_('Save _PARAM0_ in location _PARAM1_ to Firebase storage and store access URL in _PARAM3_ (Format: _PARAM2_, Store result state in _PARAM4_)'),
             _('Firebase/Storage'),
 			'JsPlatform/Extensions/firebase.png',
 			'JsPlatform/Extensions/firebase.png'
@@ -1108,21 +1108,24 @@ module.exports = {
 		  .addParameter("string", _("Storage path"), "", false)
 		  .addParameter("string", _("File content format"), "", false)
 		  .setDefaultValue('none')
-		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .addParameter("scenevar", _("Callback Variable where to store the upload ID"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/A_utils/A_UIDArray.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-storage.js')
       	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_storagetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.storage.upload');
 
 		extension
           .addAction(
             'StorageDownload',
-            _('Download'),
-			_('Download.'),
-			_('Download'),
+            _('Get Download URL'),
+			_('Get a unique download URL for a file.'),
+			_('Get a download url for _PARAM0_ and store it in _PARAM1_ (Store result state in _PARAM2_)'),
             _('Firebase/Storage'),
 			'JsPlatform/Extensions/firebase.png',
 			'JsPlatform/Extensions/firebase.png'
@@ -1131,10 +1134,11 @@ module.exports = {
 		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
-          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
-		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+		  .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/A_utils/A_UIDArray.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-storage.js')
       	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
-		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_storagetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.storage.getDownloadURL');
 
         return extension;

@@ -1092,6 +1092,51 @@ module.exports = {
 		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.firestore.hasField');
 
+		/* ====== STORAGE ====== */
+
+		extension
+          .addAction(
+            'StorageUpload',
+            _('Upload'),
+			_('Upload.'),
+			_('Upload'),
+            _('Firebase/Storage'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("File content"), "", false)
+		  .addParameter("string", _("Storage path"), "", false)
+		  .addParameter("string", _("File content format"), "", false)
+		  .setDefaultValue('none')
+		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.storage.upload');
+
+		extension
+          .addAction(
+            'StorageDownload',
+            _('Download'),
+			_('Download.'),
+			_('Download'),
+            _('Firebase/Storage'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Storage path to the file"), "", false)
+		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-firestore.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.storage.getDownloadURL');
+
         return extension;
     },
     runExtensionSanityTests: function(gd, extension) {

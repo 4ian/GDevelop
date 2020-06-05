@@ -11,12 +11,6 @@ export const useCommand = (commandName: string, command: Command) => {
       commandManager.registerCommand(commandName, command);
       return () => commandManager.deregisterCommand(commandName);
     },
-    [
-      commandManager,
-      commandName,
-      command.displayText,
-      command.enabled,
-      command.handler,
-    ]
+    [commandManager, commandName, command.enabled, command.handler]
   );
 };

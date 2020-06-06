@@ -1,6 +1,8 @@
 gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, lightObjectData);
 
+  this._radius = parseFloat(lightObjectData.content.radius);
+
   if (this._renderer)
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   /** @type {gdjs.TextRuntimeObjectRenderer} */ 
@@ -20,3 +22,7 @@ gdjs.LightRuntimeObject.prototype.getRendererObject = function () {
 gdjs.LightRuntimeObject.prototype.update = function () {
   //this._renderer.ensureUpToDate();
 };
+
+gdjs.LightRuntimeObject.prototype.getRadius = function () {
+  return this._radius;
+}

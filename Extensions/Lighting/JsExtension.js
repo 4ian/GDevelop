@@ -11,7 +11,7 @@ module.exports = {
 
     var lightObject = new gd.ObjectJsImplementation();
 
-     lightObject.updateProperty = function(
+    lightObject.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -21,16 +21,27 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'Color') {
+        objectContent.color = newValue;
+        return true;
+      }
+
       return false;
     };
 
-    lightObject.getProperties = function(objectContent) {
+    lightObject.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
         'Radius',
-        new gd.PropertyDescriptor(objectContent.radius.toString())
-        .setType('number')
+        new gd.PropertyDescriptor(objectContent.radius.toString()).setType(
+          'number'
+        )
+      );
+
+      objectProperties.set(
+        'Color',
+        new gd.PropertyDescriptor(objectContent.color)
       );
 
       return objectProperties;
@@ -38,10 +49,11 @@ module.exports = {
     lightObject.setRawJSONContent(
       JSON.stringify({
         radius: 50,
+        color: '180,180,180',
       })
     );
 
-    lightObject.updateInitialInstanceProperty = function(
+    lightObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -49,10 +61,9 @@ module.exports = {
       project,
       layout
     ) {
-
       return false;
     };
-    lightObject.getInitialInstanceProperties = function(
+    lightObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -83,7 +94,7 @@ module.exports = {
     return [];
   },
 
-  registerEditorConfigurations: function(objectsEditorService) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'Lighting::LightObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -96,7 +107,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(objectsRenderingService) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -124,12 +135,21 @@ module.exports = {
         pixiContainer,
         pixiResourcesLoader
       );
-      this._radius = parseFloat(this._associatedObject
+      this._radius = parseFloat(
+        this._associatedObject
+          .getProperties(this.project)
+          .get('Radius')
+          .getValue()
+      );
+      this._color = this._associatedObject
         .getProperties(this.project)
-        .get('Radius')
-        .getValue());
+        .get('Color')
+        .getValue()
+        .split(',')
+        .map((item) => parseFloat(item) / 255);
       this._geometry = new PIXI.Geometry();
-      this._shader = PIXI.Shader.from(`
+      this._shader = PIXI.Shader.from(
+        `
     precision mediump float;
     attribute vec2 aVertexPosition;
 
@@ -140,34 +160,46 @@ module.exports = {
     void main() {
         vPos = aVertexPosition;
         gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-    }`, `
+    }`,
+        `
     precision mediump float;
     uniform vec2 center;
     uniform float radius;
+    uniform vec3 color;
     uniform mat3 translationMatrix;
     uniform mat3 projectionMatrix;
 
     varying vec2 vPos;
 
     void main() {
-        float d = distance(center, vPos);
-        float intensity = log(radius/d);
-        gl_FragColor = vec4(vec3(0.35*intensity), 1.0);
+        float l = length(vPos - center);
+        float intensity = 0.0;
+        if(l < radius)
+          intensity = clamp((radius - l)*(radius - l)/(radius*radius), 0.0, 1.0);
+        gl_FragColor = vec4(color*intensity, 1.0);
     }
-    `, {
-      center: [this._instance.getX() + this._radius, this._instance.getY() + this._radius],
-      radius: this._radius,
-    });
-      this._geometry.addAttribute('aVertexPosition', [
-        50, 150,
-        150, 150,
-        150, 50,
-        50, 50,
-      ], 2).addIndex([0,1,2,2,3,0]);
+    `,
+        {
+          center: [
+            this._instance.getX() + this._radius,
+            this._instance.getY() + this._radius,
+          ],
+          radius: this._radius,
+          color: this._color,
+        }
+      );
+      this._geometry
+        .addAttribute(
+          'aVertexPosition',
+          [50, 150, 150, 150, 150, 50, 50, 50],
+          2
+        )
+        .addIndex([0, 1, 2, 2, 3, 0]);
       //Setup the PIXI object:
       this._pixiObject = new PIXI.Mesh(this._geometry, this._shader);
       this._pixiObject.blendMode = PIXI.BLEND_MODES.ADD;
       this._pixiContainer.addChild(this._pixiObject);
+      this._pixiObject.pivot.x = 0.5;
       this.update();
     }
     RenderedLightObjectInstance.prototype = Object.create(
@@ -177,7 +209,7 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-    RenderedLightObjectInstance.getThumbnail = function(
+    RenderedLightObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
       object
@@ -188,32 +220,38 @@ module.exports = {
     /**
      * This is called to update the PIXI object on the scene editor
      */
-    RenderedLightObjectInstance.prototype.update = function() {
+    RenderedLightObjectInstance.prototype.update = function () {
       this._pixiObject.shader.uniforms.center = new Float32Array([
-        this._instance.getX() + this._radius, 
+        this._instance.getX() + this._radius,
         this._instance.getY() + this._radius,
-      ])
-      this._pixiObject.geometry.getBuffer('aVertexPosition').update(
-        new Float32Array([
-          this._instance.getX() + (this._radius * 2), this._instance.getY(),
-          this._instance.getX() + (this._radius * 2), this._instance.getY() + (this._radius * 2),
-          this._instance.getX(), this._instance.getY() + (this._radius * 2),
-          this._instance.getX(), this._instance.getY(),
-        ])
-      );
+      ]);
+      this._pixiObject.geometry
+        .getBuffer('aVertexPosition')
+        .update(
+          new Float32Array([
+            this._instance.getX(),
+            this._instance.getY() + this._radius * 2,
+            this._instance.getX() + this._radius * 2,
+            this._instance.getY() + this._radius * 2,
+            this._instance.getX() + this._radius * 2,
+            this._instance.getY(),
+            this._instance.getX(),
+            this._instance.getY(),
+          ])
+        );
     };
 
     /**
      * Return the width of the instance, when it's not resized.
      */
-    RenderedLightObjectInstance.prototype.getDefaultWidth = function() {
+    RenderedLightObjectInstance.prototype.getDefaultWidth = function () {
       return this._pixiObject.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-    RenderedLightObjectInstance.prototype.getDefaultHeight = function() {
+    RenderedLightObjectInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height;
     };
 

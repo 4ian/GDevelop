@@ -2,11 +2,14 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, lightObjectData);
 
   this._radius = parseFloat(lightObjectData.content.radius);
+  this._color = lightObjectData.content.color
+    .split(',')
+    .map((item) => parseFloat(item));
 
   if (this._renderer)
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  /** @type {gdjs.TextRuntimeObjectRenderer} */ 
-  else this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
+  /** @type {gdjs.TextRuntimeObjectRenderer} */ else
+    this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();
@@ -20,9 +23,21 @@ gdjs.LightRuntimeObject.prototype.getRendererObject = function () {
 };
 
 gdjs.LightRuntimeObject.prototype.update = function () {
-  //this._renderer.ensureUpToDate();
+  this._renderer.ensureUpToDate();
 };
 
 gdjs.LightRuntimeObject.prototype.getRadius = function () {
   return this._radius;
-}
+};
+
+gdjs.LightRuntimeObject.prototype.getColor = function () {
+  return this._color;
+};
+
+gdjs.LightRuntimeObject.prototype.setX = function (x) {
+  gdjs.RuntimeObject.prototype.setX.call(this, x);
+};
+
+gdjs.LightRuntimeObject.prototype.setY = function (y) {
+  gdjs.RuntimeObject.prototype.setY.call(this, y);
+};

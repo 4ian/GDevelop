@@ -886,8 +886,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxFallingSpeed = function() {
 };
 
 /**
- * Get the speed of climbing the ladder.
- * @returns {number} The speed of climbing the ladder
+ * Get the speed used to move on Y axis when climbing a ladder.
+ * @returns {number} The speed of ladder climbing.
  */
 gdjs.PlatformerObjectRuntimeBehavior.prototype.getLadderClimbingSpeed = function() {
   return this._ladderClimbingSpeed;
@@ -952,8 +952,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxFallingSpeed = function(
 };
 
 /**
-* Set the speed of climbing the ladder.
-* @param {number} ladderClimbingSpeed The speed of climbing the ladder
+* Set the speed used to move on Y axis when climbing a ladder.
+* @param {number} ladderClimbingSpeed The speed of ladder climbing.
 */
 gdjs.PlatformerObjectRuntimeBehavior.prototype.setLadderClimbingSpeed = function (
   ladderClimbingSpeed

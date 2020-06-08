@@ -522,7 +522,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("LadderClimbingSpeed",
-                      _("Ladder Climbing speed"),
+                      _("Ladder climbing speed"),
                       _("Get the ladder climbing speed"),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")

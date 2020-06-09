@@ -7,10 +7,16 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import AutoComplete from '../UI/SemiControlledAutoComplete';
-import MUIAutocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { makeStyles } from '@material-ui/core/styles';
 import CommandsContext from '../CommandPalette/CommandsContext';
 import { type NamedCommand } from '../CommandPalette/CommandManager';
+
+const useStyles = makeStyles({
+  scrollPaper: {
+    alignItems: 'flex-start',
+  },
+});
 
 type Props = {|
   open: boolean,
@@ -18,22 +24,13 @@ type Props = {|
 |};
 
 const CommandPalette = (props: Props) => {
+  const classes = useStyles();
   const { onClose, open } = props;
   const commandManager = React.useContext(CommandsContext);
 
   const handleClose = () => {
     onClose();
   };
-
-  // const handleCommandChoose = commandText => {
-  //   const command = commandManager
-  //     .getAllNamedCommands()
-  //     .find(c => c.displayText.id === commandText);
-  //   if (!command) return;
-  //   console.warn(`Called ${command.name} from palette!`);
-  //   onClose();
-  //   command.handler();
-  // };
 
   const handleCommandChoose = (e, command: NamedCommand) => {
     console.warn(command);
@@ -51,22 +48,20 @@ const CommandPalette = (props: Props) => {
           fullWidth
           hideBackdrop
           maxWidth="sm"
-          style={{ marginTop: 10 }}
+          classes={classes}
         >
           <DialogTitle>
-            <MUIAutocomplete
+            <Autocomplete
               options={commandManager.getAllNamedCommands()}
               getOptionLabel={command => i18n._(command.displayText)}
               onChange={handleCommandChoose}
+              openOnFocus
               renderInput={params => (
                 <TextField
                   {...params}
-                  label="Command Palette"
+                  placeholder="Start typing a command..."
                   variant="outlined"
-                  ref={r => {
-                    console.warn('Ref:', r);
-                    r && r.focus();
-                  }}
+                  autoFocus
                 />
               )}
               renderOption={command => (
@@ -78,18 +73,6 @@ const CommandPalette = (props: Props) => {
                 </>
               )}
             />
-            {/* <AutoComplete
-              dataSource={commandManager.getAllNamedCommands().map(command => ({
-                text: i18n._(command.displayText),
-                value: i18n._(command.displayText),
-                renderIcon: () => <ChevronRightIcon />,
-              }))}
-              onChange={str => console.log(str)}
-              onChoose={handleCommandChoose}
-              value=""
-              fullWidth
-              ref={ref => ref && ref.focus()}
-            /> */}
           </DialogTitle>
         </Dialog>
       )}

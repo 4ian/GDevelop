@@ -3774,20 +3774,24 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
 storiesOf('ResourcesList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <div style={{ height: 200 }}>
-      <ValueStateHolder
-        initialValue={null}
-        render={(value, onChange) => (
-          <ResourcesList
-            onSelectResource={onChange}
-            selectedResource={value}
-            onDeleteResource={() => {}}
-            onRenameResource={() => {}}
-            project={testProject.project}
-          />
-        )}
-      />
-    </div>
+    <DragAndDropContextProvider>
+      <div style={{ height: 200 }}>
+        <ValueStateHolder
+          initialValue={null}
+          render={(value, onChange) => (
+            <ResourcesList
+              onSelectResource={onChange}
+              selectedResource={value}
+              onDeleteResource={() => {}}
+              onRenameResource={() => {}}
+              project={testProject.project}
+              onRemoveUnusedResources={() => {}}
+              onRemoveAllResourcesWithInvalidPath={() => {}}
+            />
+          )}
+        />
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsFunctionConfigurationEditor', module)

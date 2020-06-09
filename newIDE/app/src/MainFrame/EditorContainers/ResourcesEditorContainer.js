@@ -4,10 +4,10 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import ResourcesFullEditor from '../../ResourcesEditor';
+import ResourcesEditor from '../../ResourcesEditor';
 
 export class ResourcesEditorContainer extends React.Component<RenderEditorContainerProps> {
-  editor: ?ResourcesFullEditor;
+  editor: ?ResourcesEditor;
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // Prevent any update to the editor if the editor is not active,
@@ -36,8 +36,13 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     if (!project) return null;
 
     return (
-      <ResourcesFullEditor
-        {...this.props}
+      <ResourcesEditor
+        setToolbar={this.props.setToolbar}
+        project={this.props.project}
+        onDeleteResource={this.props.onDeleteResource}
+        onRenameResource={this.props.onRenameResource}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
         ref={editor => (this.editor = editor)}
         project={project}
       />

@@ -47,6 +47,8 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onRemoveUnusedResources: ResourceKind => void,
+  onRemoveAllResourcesWithInvalidPath: () => void,
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
@@ -132,34 +134,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       }
       this.forceUpdate();
     });
-  };
-
-  _removeUnusedResources = (resourceType: ResourceKind) => {
-    const { project } = this.props;
-    gd.ProjectResourcesAdder.getAllUseless(project, resourceType)
-      .toJSArray()
-      .forEach(resourceName => {
-        console.info(
-          `Removing unused` + resourceType + ` resource: ${resourceName}`
-        );
-      });
-    gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
-    this.forceUpdate();
-  };
-
-  _removeAllResourcesWithInvalidPath = () => {
-    const { project } = this.props;
-    const resourcesManager = project.getResourcesManager();
-    resourcesManager
-      .getAllResourceNames()
-      .toJSArray()
-      .forEach(resourceName => {
-        if (getResourceFilePathStatus(project, resourceName) === 'error') {
-          resourcesManager.removeResource(resourceName);
-          console.info('Removed due to invalid path: ' + resourceName);
-        }
-      });
-    this.forceUpdate();
   };
 
   _editName = (resource: ?gdResource) => {
@@ -286,25 +260,25 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Remove Unused Images',
         click: () => {
-          this._removeUnusedResources('image');
+          this.props.onRemoveUnusedResources('image');
         },
       },
       {
         label: 'Remove Unused Audio',
         click: () => {
-          this._removeUnusedResources('audio');
+          this.props.onRemoveUnusedResources('audio');
         },
       },
       {
         label: 'Remove Unused Fonts',
         click: () => {
-          this._removeUnusedResources('font');
+          this.props.onRemoveUnusedResources('font');
         },
       },
       {
         label: 'Remove Resources with Invalid Path',
         click: () => {
-          this._removeAllResourcesWithInvalidPath();
+          this.props.onRemoveAllResourcesWithInvalidPath();
         },
         enabled: hasElectron,
       },

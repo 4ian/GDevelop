@@ -2,7 +2,7 @@ import optionalRequire from '../../Utils/OptionalRequire.js';
 var fs = optionalRequire('fs-extra');
 var path = optionalRequire('path');
 var os = optionalRequire('os');
-const gd = global.gd;
+const gd /* TODO: add flow in this file */ = global.gd;
 
 export default {
   mkDir: function(path) {

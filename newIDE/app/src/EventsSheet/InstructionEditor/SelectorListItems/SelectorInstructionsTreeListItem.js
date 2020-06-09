@@ -8,9 +8,9 @@ import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
 import { getSubheaderListItemKey, getInstructionListItemValue } from './Keys';
 
-type Props = {|
+type Props<T> = {|
   instructionTreeNode: InstructionOrExpressionTreeNode,
-  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  onChoose: (type: string, T) => void,
   iconSize: number,
   useSubheaders?: boolean,
   selectedValue: ?string,
@@ -20,7 +20,9 @@ type Props = {|
   selectedItemRef?: { current: null | ListItem },
 |};
 
-export const renderInstructionTree = ({
+export const renderInstructionOrExpressionTree = <
+  T: EnumeratedInstructionOrExpressionMetadata
+>({
   instructionTreeNode,
   onChoose,
   iconSize,
@@ -28,7 +30,7 @@ export const renderInstructionTree = ({
   selectedValue,
   selectedItemRef,
   initiallyOpenedPath,
-}: Props): Array<React$Element<any> | null> => {
+}: Props<T>): Array<React$Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
 
@@ -38,12 +40,13 @@ export const renderInstructionTree = ({
       // between instruction (leaf nodes) and group (nodes). We use
       // the "type" properties, but this will fail if a group is called "type"
       // (hence the flow errors, which are valid warnings)
+      // $FlowFixMe
       const instructionOrGroup = instructionTreeNode[key];
       if (!instructionOrGroup) return null;
 
       if (typeof instructionOrGroup.type === 'string') {
         // $FlowFixMe - see above
-        const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
+        const instructionInformation: T = instructionOrGroup;
         const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
         return (
@@ -70,7 +73,7 @@ export const renderInstructionTree = ({
           return [
             <Subheader key={getSubheaderListItemKey(key)}>{key}</Subheader>,
           ].concat(
-            renderInstructionTree({
+            renderInstructionOrExpressionTree({
               instructionTreeNode: groupOfInstructionInformation,
               onChoose,
               iconSize,
@@ -89,7 +92,7 @@ export const renderInstructionTree = ({
               autoGenerateNestedIndicator={true}
               initiallyOpen={initiallyOpen}
               renderNestedItems={() =>
-                renderInstructionTree({
+                renderInstructionOrExpressionTree({
                   instructionTreeNode: groupOfInstructionInformation,
                   onChoose,
                   iconSize,

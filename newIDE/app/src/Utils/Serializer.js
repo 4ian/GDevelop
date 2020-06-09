@@ -1,6 +1,6 @@
 // @flow
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Tool function to save a serializable object to a JS object.

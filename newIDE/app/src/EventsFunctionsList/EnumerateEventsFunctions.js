@@ -2,7 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 
 export const enumerateEventsFunctions = (
-  eventsFunctionsContainer: gdEventsFunctionsExtension
+  eventsFunctionsContainer: gdEventsFunctionsContainer
 ): Array<gdEventsFunction> =>
   mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i =>
     eventsFunctionsContainer.getEventsFunctionAt(i)

@@ -22,6 +22,8 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
+    console.log(object);
+    // TODO: cast to gdObject?
     const properties = object.getProperties(project);
 
     const propertiesSchema = propertiesMapToSchema(

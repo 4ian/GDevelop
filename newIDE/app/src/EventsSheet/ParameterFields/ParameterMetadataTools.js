@@ -1,6 +1,6 @@
 // @flow
 import { type ExpressionParameters } from './ParameterFieldCommons';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Given an instruction or an expression and a parameter number,

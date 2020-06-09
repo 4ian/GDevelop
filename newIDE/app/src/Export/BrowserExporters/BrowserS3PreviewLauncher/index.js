@@ -8,7 +8,7 @@ import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import { getBaseUrl } from '../../../Utils/GDevelopServices/Preview';
 import { makeTimestampedId } from '../../../Utils/TimestampedId';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type State = {|
   showPreviewLinkDialog: boolean,

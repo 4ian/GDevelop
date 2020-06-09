@@ -22,7 +22,7 @@ import {
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(EditVariableRow);
@@ -217,7 +217,7 @@ export default class VariablesList extends React.Component<Props, State> {
         depth={depth}
         origin={origin}
         errorText={
-          this.state.nameErrors[variable.ptr]
+          this.state.nameErrors[variable.ptr.toString()]
             ? 'This name is already taken'
             : undefined
         }

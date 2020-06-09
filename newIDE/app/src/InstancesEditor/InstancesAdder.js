@@ -1,6 +1,6 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   instances: gdInitialInstancesContainer,

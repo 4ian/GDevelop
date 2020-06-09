@@ -14,7 +14,7 @@ import RenderedInstance from './Renderers/RenderedInstance';
 import * as PIXI from 'pixi.js';
 import optionalRequire from '../Utils/OptionalRequire';
 const path = optionalRequire('path');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const requirableModules = {};
 

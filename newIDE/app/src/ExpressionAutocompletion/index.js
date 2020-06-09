@@ -14,7 +14,7 @@ import {
   enumerateBehaviorExpressions,
 } from '../InstructionOrExpression/EnumerateExpressions';
 import {
-  type EnumeratedInstructionOrExpressionMetadata,
+  type EnumeratedExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
@@ -32,7 +32,7 @@ export type ExpressionAutocompletion =
   | {|
       ...BaseExpressionAutocompletion,
       kind: 'Expression',
-      enumeratedExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
+      enumeratedExpressionMetadata: EnumeratedExpressionMetadata,
     |}
   | {|
       ...BaseExpressionAutocompletion,
@@ -52,7 +52,7 @@ type ExpressionAutocompletionContext = {|
 |};
 
 const getAutocompletionsForExpressions = (
-  expressionMetadatas: Array<EnumeratedInstructionOrExpressionMetadata>,
+  expressionMetadatas: Array<EnumeratedExpressionMetadata>,
   prefix: string,
   isExact: boolean
 ): Array<ExpressionAutocompletion> => {

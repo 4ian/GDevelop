@@ -85,7 +85,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   getExternalLayout(): ?gdExternalLayout {
     const { project, projectItemName } = this.props;
-    if (!project) return null;
+    if (!project || !projectItemName) return null;
 
     if (!project.hasExternalLayoutNamed(projectItemName)) {
       return null;

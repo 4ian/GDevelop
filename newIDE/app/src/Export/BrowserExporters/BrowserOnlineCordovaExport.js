@@ -23,7 +23,7 @@ import {
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import { ExplanationHeader } from '../GenericExporters/OnlineCordovaExport';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type ExportState = null;
 

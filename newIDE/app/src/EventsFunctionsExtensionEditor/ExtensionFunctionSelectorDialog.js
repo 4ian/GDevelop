@@ -17,7 +17,7 @@ import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import { Line } from '../UI/Grid';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,

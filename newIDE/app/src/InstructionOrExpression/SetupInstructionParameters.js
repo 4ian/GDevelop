@@ -1,6 +1,6 @@
 // @flow
 import { getObjectParameterIndex } from './EnumerateInstructions';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * After selecting an instruction, this function allows to set up the proper
@@ -59,7 +59,8 @@ export const setupInstructionParameters = (
           gd.getTypeOfBehavior(
             globalObjectsContainer,
             objectsContainer,
-            behaviorName
+            behaviorName,
+            false
           ) === allowedBehaviorType
         );
       });

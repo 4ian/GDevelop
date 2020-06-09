@@ -7,6 +7,7 @@ import {
   enumerateAllExpressions,
 } from './EnumerateExpressions';
 import { createTree } from './CreateTree';
+import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
 
 describe('EnumerateExpressions', () => {
   it('can enumerate and filter free expressions', () => {
@@ -81,7 +82,9 @@ describe('EnumerateExpressions', () => {
   });
 
   it('can create the tree of all expressions', () => {
-    const allExpressions = enumerateAllExpressions('number');
+    const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
+      'number'
+    );
     const allExpressionsTree = createTree(allExpressions);
 
     // Check that some free expressions are there

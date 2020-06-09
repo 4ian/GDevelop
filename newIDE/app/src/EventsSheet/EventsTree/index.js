@@ -33,7 +33,7 @@ const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
 );
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const indentWidth = 22;
 

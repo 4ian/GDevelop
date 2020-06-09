@@ -21,7 +21,7 @@ const glob = optionalRequire('glob');
 const electron = optionalRequire('electron');
 const hasElectron = electron ? true : false;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {

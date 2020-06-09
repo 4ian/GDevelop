@@ -1,15 +1,16 @@
 // @flow
 import React from 'react';
 import { I18n } from '@lingui/react';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import AutoComplete from '../UI/SemiControlledAutoComplete';
+import MUIAutocomplete from '@material-ui/lab/Autocomplete';
 import CommandsContext from '../CommandPalette/CommandsContext';
+import { type NamedCommand } from '../CommandPalette/CommandManager';
 
 type Props = {|
   open: boolean,
@@ -24,10 +25,20 @@ const CommandPalette = (props: Props) => {
     onClose();
   };
 
-  const handleCommandClick = command => {
-    console.warn(`Called ${command.name} from palette!`);
-    onClose();
-    command.handler();
+  // const handleCommandChoose = commandText => {
+  //   const command = commandManager
+  //     .getAllNamedCommands()
+  //     .find(c => c.displayText.id === commandText);
+  //   if (!command) return;
+  //   console.warn(`Called ${command.name} from palette!`);
+  //   onClose();
+  //   command.handler();
+  // };
+
+  const handleCommandChoose = (e, command: NamedCommand) => {
+    console.warn(command);
+    command && command.handler();
+    props.onClose();
   };
 
   return (
@@ -40,30 +51,46 @@ const CommandPalette = (props: Props) => {
           fullWidth
           hideBackdrop
           maxWidth="sm"
+          style={{ marginTop: 10 }}
         >
           <DialogTitle>
-            <TextField
-              fullWidth
-              label="Command"
-              placeholder="Just a dummy searchbox for now"
-              variant="outlined"
+            <MUIAutocomplete
+              options={commandManager.getAllNamedCommands()}
+              getOptionLabel={command => i18n._(command.displayText)}
+              onChange={handleCommandChoose}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Command Palette"
+                  variant="outlined"
+                  ref={r => {
+                    console.warn('Ref:', r);
+                    r && r.focus();
+                  }}
+                />
+              )}
+              renderOption={command => (
+                <>
+                  <ListItemIcon>
+                    <ChevronRightIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={i18n._(command.displayText)} />
+                </>
+              )}
             />
+            {/* <AutoComplete
+              dataSource={commandManager.getAllNamedCommands().map(command => ({
+                text: i18n._(command.displayText),
+                value: i18n._(command.displayText),
+                renderIcon: () => <ChevronRightIcon />,
+              }))}
+              onChange={str => console.log(str)}
+              onChoose={handleCommandChoose}
+              value=""
+              fullWidth
+              ref={ref => ref && ref.focus()}
+            /> */}
           </DialogTitle>
-
-          <List>
-            {commandManager.getAllNamedCommands().map(command => (
-              <ListItem
-                button
-                onClick={() => handleCommandClick(command)}
-                key={command.name}
-              >
-                <ListItemAvatar>
-                  <ChevronRightIcon />
-                </ListItemAvatar>
-                <ListItemText primary={i18n._(command.displayText)} />
-              </ListItem>
-            ))}
-          </List>
         </Dialog>
       )}
     </I18n>

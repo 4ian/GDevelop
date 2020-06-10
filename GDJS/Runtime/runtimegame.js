@@ -60,6 +60,10 @@ gdjs.RuntimeGame = function(data, options) {
   this._options = options;
 
   //Optional client to connect to a debugger:
+  /** 
+   * @type {gdjs.IDebuggerClient} 
+   * @private
+   */
   this._debuggerClient = gdjs.DebuggerClient
     ? new gdjs.DebuggerClient(this)
     : null;
@@ -210,6 +214,14 @@ gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
  */
 gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
   return this._data.objects || [];
+};
+
+/**
+ * Get the Debugger Client.
+ * @return {?gdjs.IDebuggerClient} The Debugger (or null if not present).
+ */
+gdjs.RuntimeGame.prototype.getDebugger = function() {
+  return this._debuggerClient;
 };
 
 /**

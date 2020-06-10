@@ -1320,7 +1320,7 @@ const MainFrame = (props: Props) => {
         });
       }
     },
-    [openLayout, setState, state.currentProject, state.editorTabs]
+    [openLayout, setState]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(

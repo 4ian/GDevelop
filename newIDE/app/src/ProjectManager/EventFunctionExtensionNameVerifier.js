@@ -1,4 +1,5 @@
-export function isValidExtensionName(
+//@flow
+export function isExtensionNameTaken(
   name: string,
   project: gdProject
 ): boolean {

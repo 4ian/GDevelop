@@ -41,7 +41,7 @@ import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
-import { isValidExtensionName } from './EventFunctionExtensionNameVerifier';
+import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
@@ -418,7 +418,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const { project } = this.props;
 
     const newName = newNameGenerator('NewExtension', name =>
-      isValidExtensionName(name, project)
+      isExtensionNameTaken(name, project)
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
     this._onProjectItemModified();
@@ -590,7 +590,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const { project } = this.props;
 
     const newName = newNameGenerator(name, name =>
-      isValidExtensionName(name, project)
+      isExtensionNameTaken(name, project)
     );
 
     const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(

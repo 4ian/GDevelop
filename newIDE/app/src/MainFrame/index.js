@@ -1293,12 +1293,7 @@ const MainFrame = (props: Props) => {
   );
 
   const openSceneOrProjectManager = React.useCallback(
-    (
-      newState = {
-        currentProject: state.currentProject,
-        editorTabs: state.editorTabs,
-      }
-    ) => {
+    (newState: { currentProject: gdProject, editorTabs: EditorTabsState }) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 

@@ -32,6 +32,29 @@
         "to": "GDJS"
       }
     ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        }
+      ]
+    },
     "mac": {
       "category": "public.app-category.developer-tools",
       "hardenedRuntime": true,

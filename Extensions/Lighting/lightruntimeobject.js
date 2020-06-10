@@ -5,6 +5,8 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   this._color = lightObjectData.content.color
     .split(',')
     .map((item) => parseFloat(item));
+  
+  this._obstacleManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
   if (this._renderer)
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -41,3 +43,7 @@ gdjs.LightRuntimeObject.prototype.setX = function (x) {
 gdjs.LightRuntimeObject.prototype.setY = function (y) {
   gdjs.RuntimeObject.prototype.setY.call(this, y);
 };
+
+gdjs.LightRuntimeObject.prototype.getObstaclesManager = function () {
+  return this._obstacleManager;
+} 

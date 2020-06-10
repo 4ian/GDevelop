@@ -9,6 +9,38 @@ module.exports = {
       'MIT'
     );
 
+    var lightObstacleBehavior = new gd.BehaviorJsImplementation();
+    lightObstacleBehavior.updateProperty = function(
+      behaviorContent,
+      propertyName,
+      newValue
+    ) {
+
+      return false;
+    };
+    lightObstacleBehavior.getProperties = function(behaviorContent) {
+      var behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+      return behaviorProperties;
+    };
+    lightObstacleBehavior.initializeContent = function(behaviorContent) {
+      behaviorContent.setStringAttribute('property1', 'Initial value 1');
+      behaviorContent.setBoolAttribute('property2', true);
+    };
+    extension
+      .addBehavior(
+        'LightObstacleBehavior',
+        _('Light Obstacle Behavior'),
+        'DummyBehavior',
+        _('This behavior makes the object an obstacle to light'),
+        '',
+        'CppPlatform/Extensions/topdownmovementicon.png',
+        'LightObstacleBehavior',
+        lightObstacleBehavior,
+        new gd.BehaviorsSharedData()
+      )
+      .setIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
+
     var lightObject = new gd.ObjectJsImplementation();
 
     lightObject.updateProperty = function (
@@ -199,7 +231,6 @@ module.exports = {
       this._pixiObject = new PIXI.Mesh(this._geometry, this._shader);
       this._pixiObject.blendMode = PIXI.BLEND_MODES.ADD;
       this._pixiContainer.addChild(this._pixiObject);
-      this._pixiObject.pivot.x = 0.5;
       this.update();
     }
     RenderedLightObjectInstance.prototype = Object.create(

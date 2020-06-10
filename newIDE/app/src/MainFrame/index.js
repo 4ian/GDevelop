@@ -104,7 +104,7 @@ import { type PreviewState } from './PreviewState.flow';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   drawerContent: {

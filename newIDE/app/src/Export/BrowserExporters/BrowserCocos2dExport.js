@@ -24,7 +24,7 @@ import {
 import { openBlobDownloadUrl } from '.';
 import { Column, Line } from '../../UI/Grid';
 import Toggle from '../../UI/Toggle';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type ExportState = {
   debugMode: boolean,

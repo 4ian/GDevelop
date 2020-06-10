@@ -1,4 +1,5 @@
-const gd = global.gd;
+// @flow
+const gd: libGDevelop = global.gd;
 
 export const containsSubInstructions = (
   instruction: gdInstruction,

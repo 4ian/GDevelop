@@ -9,7 +9,7 @@ import {
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Open JFXR to create wav resources.

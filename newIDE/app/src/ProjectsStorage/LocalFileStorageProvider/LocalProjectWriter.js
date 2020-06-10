@@ -10,7 +10,7 @@ import {
 import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');

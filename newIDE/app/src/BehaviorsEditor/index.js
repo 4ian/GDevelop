@@ -16,7 +16,7 @@ import { isNullPtr } from '../Utils/IsNullPtr';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const AddBehaviorLine = ({ onAdd }) => (
   <Column>

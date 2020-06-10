@@ -41,7 +41,7 @@ import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
-import { isValidExtensionName } from "./EventFunctionExtensionNameVerifier";
+import { isValidExtensionName } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 

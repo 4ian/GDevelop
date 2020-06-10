@@ -38,7 +38,6 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     return (
       <ResourcesEditor
         setToolbar={this.props.setToolbar}
-        project={this.props.project}
         onDeleteResource={this.props.onDeleteResource}
         onRenameResource={this.props.onRenameResource}
         resourceSources={this.props.resourceSources}

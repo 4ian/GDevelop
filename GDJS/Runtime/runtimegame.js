@@ -61,7 +61,7 @@ gdjs.RuntimeGame = function(data, options) {
 
   //Optional client to connect to a debugger:
   /** 
-   * @type {gdjs.IDebuggerClient} 
+   * @type {?gdjs.IDebuggerClient} 
    * @private
    */
   this._debuggerClient = gdjs.DebuggerClient

@@ -66,8 +66,8 @@ PlatformerObjectBehavior::GetProperties(
             "jumps."));
   properties[_("Max. falling speed")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
-  properties[_("Ladder climbing speed")].SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("ladderClimbingSpeed")));
+  properties[_("Ladder climbing speed")].SetValue(gd::String::From(
+      behaviorContent.GetDoubleAttribute("ladderClimbingSpeed", 150)));
   properties[_("Acceleration")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
   properties[_("Deceleration")].SetValue(

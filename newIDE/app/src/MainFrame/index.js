@@ -100,6 +100,7 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
+import { isValidExtensionName } from "../ProjectManager/EventFunctionExtensionNameVerifier"
 import { type PreviewState } from './PreviewState.flow';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -859,9 +860,9 @@ const MainFrame = (props: Props) => {
       return;
     }
 
-    if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
+    if (isValidExtensionName(newName, currentProject)) {
       showWarningBox(
-        i18n._(t`Another extension with this name already exists.`)
+        i18n._(t`Another extension with this name already exists, or this name is the name of a Built-In extension.`)
       );
       return;
     }

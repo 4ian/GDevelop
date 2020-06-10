@@ -1,5 +1,6 @@
 gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._object = runtimeObject;
+  this._manager = runtimeObject.getObstaclesManager();
   this._geometry = new PIXI.Geometry();
   this._radius = runtimeObject.getRadius();
   this._color = runtimeObject.getColor().map((item) => item / 255);

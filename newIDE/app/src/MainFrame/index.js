@@ -990,14 +990,22 @@ const MainFrame = (props: Props) => {
           storageProviderOperations.onAutoSaveProject &&
           currentFileMetadata
         ) {
-          storageProviderOperations.onAutoSaveProject(
-            currentProject,
-            currentFileMetadata
-          );
+          storageProviderOperations
+            .onAutoSaveProject(currentProject, currentFileMetadata)
+            .catch(err => {
+              console.error('Error while auto-saving the project: ', err);
+              _showSnackMessage(
+                i18n._(
+                  t`There was an error while making an auto-save of the project. Verify that you have permissions to write in the project folder.`
+                )
+              );
+            });
         }
       });
     },
     [
+      i18n,
+      _showSnackMessage,
       currentProject,
       currentFileMetadata,
       getStorageProviderOperations,
@@ -1031,6 +1039,8 @@ const MainFrame = (props: Props) => {
           ? currentProject.getExternalLayout(externalLayoutName)
           : null;
 
+      autosaveProjectIfNeeded();
+
       const previewLauncher = _previewLauncher.current;
       if (previewLauncher) {
         return eventsFunctionsExtensionsState
@@ -1053,7 +1063,6 @@ const MainFrame = (props: Props) => {
             setPreviewLoading(false);
           });
       }
-      autosaveProjectIfNeeded();
     },
     [
       autosaveProjectIfNeeded,

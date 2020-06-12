@@ -142,7 +142,6 @@ export default class LanguageDialog extends Component<Props, State> {
                         {goodProgressLocales.map(localeMetadata =>
                           renderLanguageSelectOption(localeMetadata)
                         )}
-                        <Divider />
                         {startedLocales.map(localeMetadata =>
                           renderLanguageSelectOption(localeMetadata)
                         )}

@@ -23,14 +23,6 @@ export default class PixiResourcesLoader {
     if (!imageResource.isSmooth()) {
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     }
-
-    if (
-      texture.baseTexture.realWidth > 2048 ||
-      texture.baseTexture.realHeight > 2048
-    ) {
-      console.log("IMAGE trop grande ...");
-      //statusCode = 'IMAGE_EXCEEDED_2048_PIXELS';
-    }
   }
 
   /**

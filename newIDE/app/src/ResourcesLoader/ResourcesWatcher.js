@@ -4,23 +4,26 @@ import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import debounce from 'lodash/debounce';
 import { RESOURCE_EXTENSIONS } from '../ResourcesList/ResourceUtils.js';
+import resourcesLoader from './index';
 
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
 
-
-/**
- * Callback for fs.watch, so that  whenever a source file is changed,
- * it relaunchs automatically the script to import.
+/*
+  Detecte un type d'event si un fichier change.
+  eventName = change: lorsque le fichier est édité.
  */
 const onWatchEvent = debounce((event: ?string, filename: ?string) => {
   const eventName = event || 'unknown-event';
   const resolvedFilename = filename || 'unknown-file';
-  console.info(
+  console.warn(
     `Resources watchers found a "${eventName}" in ${resolvedFilename}, updating state Warning or Error for this resource...`
   );
-  //importGDJSRuntime().catch(() => {});
+  /*
+  un truc du style:
+  createOrUpdateResource(project, createResource(), resolvedFilename);
+   */
 }, 100 /* Avoid running the script too much in case multiple changes are fired at the same time. */);
 
 const genericWatcherErrorMessage =
@@ -60,6 +63,9 @@ export const ResourcesWatcher = (props: Props) => {
         return;
       }
 
+      let stopWatchers = false;
+      let watchers = [];
+
       //faire de getAllResourcesPaths une fonction externe au composant ?
       getAllResourcesPaths(projectPath, (err, res) => {
         if (err) {
@@ -67,9 +73,15 @@ export const ResourcesWatcher = (props: Props) => {
         } else {
           //mettre tout les path dans un array.
           // utilisé l'array et bouclé dessus dans le useEffect plus bas.
+
+          if (!fs) {
+            console.error(
+              "Unable to use 'fs' from Node.js to watch changes in resources."
+            );
+            return;
+          }
+
           res.forEach(pathResourceFound => {
-            //watchere ici
-            //const fileName = path.relative(projectPath, pathResourceFound);
             // if (!resourcesManager.hasResource(fileName)) {
             //createOrUpdateResource(project, createResource(), fileName);
             console.log(`${pathResourceFound}`);
@@ -92,6 +104,18 @@ export const ResourcesWatcher = (props: Props) => {
               });
               watcher.on('change', (eventType, filename) => {
                 console.log(`File Changed: ${filename}`);
+
+                //lance la verification de la taille de l'image
+                let warningSize = false;
+
+                const img = new Image();
+                img.src = resourcesLoader.getResourceFullUrl(project, filename);
+
+                if (img.width > 2048 || img.height > 2048) {
+                  warningSize = true;
+                  console.warn("watcher warning size");
+                  resourcesLoader.setStatusCode(project, filename, 'IMAGE_EXCEEDED_2048_PIXELS');
+                }
               });
 
               watchers.push(watcher);
@@ -102,13 +126,13 @@ export const ResourcesWatcher = (props: Props) => {
 
       // Close all the watchers when the React effect is unregistered
       return () => {
-        //stopWatchers = true;
+        stopWatchers = true;
         if (!watchers.length) return;
 
         watchers.forEach(watcher => {
           watcher.close();
         });
-        console.info('Watchers for GDJS Runtime closed.');
+        console.info('Watchers for resources closed.');
       };
     },
     [shouldWatch]

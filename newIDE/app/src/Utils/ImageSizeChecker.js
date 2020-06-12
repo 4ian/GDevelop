@@ -4,7 +4,7 @@ import Window from './Window';
 
 const RECOMMENDED_IMAGE_SIZE = 2048;
 
-export const checkImageSize = (imageElement: HTMLImageElement) => {
+export const checkImageElementSize = (imageElement: HTMLImageElement) => {
   if (!imageElement) return;
   const image = imageElement.target;
 

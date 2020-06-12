@@ -2,7 +2,7 @@ import React from 'react';
 import Checkbox from '../../UI/Checkbox';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import {
-  checkImageSize,
+  checkImageElementSize,
   confirmationImportImage,
 } from '../../Utils/ImageSizeChecker';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -70,7 +70,7 @@ const ImageThumbnail = ({
     if (existAlready === 'IMAGE_EXCEEDED_2048_PIXELS') {
       setHasWarningSize(true);
     } else {
-      if (checkImageSize(imageElement)) {
+      if (checkImageElementSize(imageElement)) {
         onSelect(selected);
         setHasWarningSize(true);
         if (!confirmationImportImage()) {

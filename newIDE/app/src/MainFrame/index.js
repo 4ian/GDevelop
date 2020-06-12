@@ -223,7 +223,9 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
-  const [commandPanelOpen, openCommandPanel] = React.useState<boolean>(false);
+  const [commandPaletteOpen, openCommandPalette] = React.useState<boolean>(
+    false
+  );
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1668,6 +1670,82 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
+  useCommand('QUIT_APP', {
+    displayText: t`Close GDevelop`,
+    enabled: true,
+    handler: closeApp,
+  });
+
+  useCommand('OPEN_PROJECT_MANAGER', {
+    displayText: t`Open project manager`,
+    enabled: !!state.currentProject,
+    handler: toggleProjectManager,
+  });
+
+  useCommand('LAUNCH_PREVIEW', {
+    displayText: t`Launch preview`,
+    enabled:
+      !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
+    handler: React.useCallback(() => launchPreview(/*networkPreview=*/ false), [
+      launchPreview,
+    ]),
+  });
+
+  useCommand('LAUNCH_DEBUG_PREVIEW', {
+    displayText: t`Launch preview with debugger and profiler`,
+    enabled:
+      !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
+    handler: React.useCallback(
+      () => {
+        openDebugger();
+        launchPreview(/*networkPreview=*/ false);
+      },
+      [openDebugger, launchPreview]
+    ),
+  });
+
+  useCommand('OPEN_START_PAGE', {
+    displayText: t`Open start page`,
+    enabled: true,
+    handler: openStartPage,
+  });
+
+  useCommand('CREATE_NEW_PROJECT', {
+    displayText: t`Create a new project`,
+    enabled: true,
+    handler: openCreateDialog,
+  });
+
+  useCommand('OPEN_PROJECT', {
+    displayText: t`Open a project`,
+    enabled: true,
+    handler: chooseProject,
+  });
+
+  useCommand('SAVE_PROJECT', {
+    displayText: t`Save project`,
+    enabled: !!state.currentProject,
+    handler: saveProject,
+  });
+
+  useCommand('SAVE_PROJECT_AS', {
+    displayText: t`Save project as...`,
+    enabled: !!state.currentProject,
+    handler: saveProjectAs,
+  });
+
+  useCommand('CLOSE_PROJECT', {
+    displayText: t`Close the current project`,
+    enabled: !!state.currentProject,
+    handler: askToCloseProject,
+  });
+
+  useCommand('EXPORT_GAME', {
+    displayText: t`Export game`,
+    enabled: !!state.currentProject,
+    handler: React.useCallback(() => openExportDialog(true), []),
+  });
+
   const showLoader = isLoadingProject || previewLoading || props.loading;
 
   return (
@@ -1773,7 +1851,7 @@ const MainFrame = (props: Props) => {
         requestUpdate={props.requestUpdate}
         simulateUpdateDownloaded={simulateUpdateDownloaded}
         simulateUpdateAvailable={simulateUpdateAvailable}
-        openCommandPalette={() => openCommandPanel(true)}
+        openCommandPalette={() => openCommandPalette(true)}
         onOpenDebugger={() => {
           openDebugger();
           launchPreview(/*networkPreview=*/ false);
@@ -1991,8 +2069,8 @@ const MainFrame = (props: Props) => {
           onChangeSubscription={() => openSubscriptionDialog(true)}
         />
       )}
-      {commandPanelOpen && (
-        <CommandPalette open onClose={() => openCommandPanel(false)} />
+      {commandPaletteOpen && (
+        <CommandPalette open onClose={() => openCommandPalette(false)} />
       )}
       {subscriptionDialogOpen && (
         <SubscriptionDialog

@@ -1670,6 +1670,22 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
+  // Very temporary keyboard shortcut for command palette
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const body = document.body;
+      const activeEl = document.activeElement;
+      const mainFrame = document.querySelector('div.main-frame');
+      const isBody = activeEl === body;
+      const isInMainframe = mainFrame && mainFrame.contains(activeEl);
+      if (!isBody && !isInMainframe) return;
+      if ((e.ctrlKey || e.metaKey) && e.code === 'KeyP')
+        openCommandPalette(true);
+    };
+    document.addEventListener('keyup', handler);
+    return () => document.removeEventListener('keyup', handler);
+  }, []);
+
   useCommand('QUIT_APP', {
     displayText: t`Close GDevelop`,
     enabled: true,

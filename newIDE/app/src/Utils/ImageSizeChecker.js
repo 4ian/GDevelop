@@ -1,4 +1,3 @@
-import React from 'react';
 import { t } from '@lingui/macro';
 import { i18n } from '@lingui/core';
 import Window from './Window';

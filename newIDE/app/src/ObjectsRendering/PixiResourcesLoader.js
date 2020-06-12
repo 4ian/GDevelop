@@ -71,7 +71,7 @@ export default class PixiResourcesLoader {
         if (loadedResources.hasOwnProperty(resourceName)) {
           const resource = resourcesManager.getResource(resourceName);
           if (resource.getKind() !== 'image') continue;
-          let statusCode = null;
+          let statusCode = '';
           if (
             loadedResources[resourceName].texture.baseTexture.realWidth >
               2048 ||

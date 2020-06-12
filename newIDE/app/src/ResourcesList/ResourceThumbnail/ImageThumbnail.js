@@ -4,7 +4,6 @@ import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import {
   checkImageSize,
   confirmationImportImage,
-  ResourcesManagerContext,
 } from '../../Utils/ImageSizeChecker';
 import Tooltip from '@material-ui/core/Tooltip';
 import Warning from '@material-ui/icons/Warning';

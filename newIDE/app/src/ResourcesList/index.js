@@ -134,6 +134,25 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
+  /*
+   Watcher on resources
+
+  Quand on detecte un changement dans projectPath
+  Si c'est une resource prise en charge par le logiciel
+  Actualisé le status de warning ou d'erreur.
+
+
+  Recupération de la dimension avec 
+  https://www.npmjs.com/package/image-size
+  - le module est asynchrone (promesse ?)
+  - Voir si c pas plus simple de faire une image avec le fichier et lire le bordel.
+
+   */
+
+
+
+   
+
   _removeUnusedResources = (resourceType: ResourceKind) => {
     const { project } = this.props;
     gd.ProjectResourcesAdder.getAllUseless(project, resourceType)

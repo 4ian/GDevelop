@@ -34,6 +34,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setAutosaveOnPreview,
     setUseNewInstructionEditorDialog,
     setUseGDJSDevelopmentWatcher,
+    setUseResourcesWatcher,
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
@@ -226,19 +227,34 @@ const PreferencesDialog = ({ onClose }: Props) => {
             />
           </Line>
           {Window.isDev() && (
-            <Line>
-              <Toggle
-                onToggle={(e, check) => setUseGDJSDevelopmentWatcher(check)}
-                toggled={values.useGDJSDevelopmentWatcher}
-                labelPosition="right"
-                label={
-                  <Trans>
-                    Watch changes in game engine (GDJS) sources and auto import
-                    them (dev only)
-                  </Trans>
-                }
-              />
-            </Line>
+            <div>
+              <Line>
+                <Toggle
+                  onToggle={(e, check) => setUseGDJSDevelopmentWatcher(check)}
+                  toggled={values.useGDJSDevelopmentWatcher}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Watch changes in game engine (GDJS) sources and auto
+                      import them (dev only)
+                    </Trans>
+                  }
+                />
+              </Line>
+              <Line>
+                <Toggle
+                  onToggle={(e, check) => setUseResourcesWatcher(check)}
+                  toggled={values.useResourcesWatcher}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Watch changes in resources and check the possible warning
+                      on them (dev only because WIP)
+                    </Trans>
+                  }
+                />
+              </Line>
+            </div>
           )}
         </Column>
       )}

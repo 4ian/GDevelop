@@ -101,6 +101,7 @@ import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { type PreviewState } from './PreviewState.flow';
+import { ResourcesWatcher } from '../ResourcesLoader/ResourcesWatcher.js';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1934,6 +1935,9 @@ const MainFrame = (props: Props) => {
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
         renderGDJSDevelopmentWatcher()}
+      {state.currentProject && (
+        <ResourcesWatcher project={state.currentProject} />
+      )}
     </div>
   );
 };

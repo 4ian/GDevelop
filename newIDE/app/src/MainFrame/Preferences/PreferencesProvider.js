@@ -46,6 +46,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
+    setUseResourcesWatcher: this._setUseResourcesWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
     ),
@@ -118,6 +119,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           useGDJSDevelopmentWatcher,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseResourcesWatcher(useResourcesWatcher: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          useResourcesWatcher,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

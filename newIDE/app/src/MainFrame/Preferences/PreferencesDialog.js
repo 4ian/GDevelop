@@ -38,6 +38,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
+    setAutoOpenMostRecentProject,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -224,6 +225,18 @@ const PreferencesDialog = ({ onClose }: Props) => {
               toggled={values.autosaveOnPreview}
               labelPosition="right"
               label={<Trans>Auto-save project on Preview</Trans>}
+            />
+          </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) => setAutoOpenMostRecentProject(check)}
+              toggled={values.autoOpenMostRecentProject}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Automatically re-open the project edited during last session
+                </Trans>
+              }
             />
           </Line>
           {Window.isDev() && (

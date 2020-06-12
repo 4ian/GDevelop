@@ -123,6 +123,15 @@ module.exports = function (grunt) {
           },
         },
       },
+      // Copy the library to newIDE
+      generateTypes: {
+        command: 'node scripts/generate-types.js',
+        options: {
+          execOptions: {
+            cwd: __dirname,
+          },
+        },
+      },
     },
     clean: {
       options: { force: true },
@@ -149,5 +158,9 @@ module.exports = function (grunt) {
     'newer:shell:updateGDBindings',
     'shell:make',
   ]);
-  grunt.registerTask('build', ['build:raw', 'shell:copyToNewIDE']);
+  grunt.registerTask('build', [
+    'build:raw',
+    'shell:copyToNewIDE',
+    'shell:generateTypes',
+  ]);
 };

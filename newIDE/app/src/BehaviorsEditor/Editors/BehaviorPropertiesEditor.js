@@ -22,13 +22,14 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
       properties,
       behaviorContent =>
         behavior.getProperties(behaviorContent.getContent(), project),
-      (behaviorContent, name, value) =>
+      (behaviorContent, name, value) => {
         behavior.updateProperty(
           behaviorContent.getContent(),
           name,
           value,
           project
-        )
+        );
+      }
     );
 
     return (

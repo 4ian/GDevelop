@@ -13,7 +13,7 @@ import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {

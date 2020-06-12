@@ -106,16 +106,17 @@ import exampleFile101 from '../../fixtures/space-invaders/space-invaders.json';
 import exampleFile102 from '../../fixtures/space-shooter/space-shooter.json';
 import exampleFile103 from '../../fixtures/splash-screen/splash-screen.json';
 import exampleFile104 from '../../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
-import exampleFile105 from '../../fixtures/take-screenshot/take-screenshot.json';
-import exampleFile106 from '../../fixtures/text-entry-object/text-entry-object.json';
-import exampleFile107 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
-import exampleFile108 from '../../fixtures/text-to-speech/text-to-speech.json';
-import exampleFile109 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
-import exampleFile110 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
-import exampleFile111 from '../../fixtures/unlock-items/unlock-items.json';
-import exampleFile112 from '../../fixtures/video-player/video-player.json';
-import exampleFile113 from '../../fixtures/z-depth/z-depth.json';
-import exampleFile114 from '../../fixtures/zombie-laser/zombie-laser.json';
+import exampleFile105 from '../../fixtures/tabbed-menu-with-layers/tabbed-menu-with-layers.json';
+import exampleFile106 from '../../fixtures/take-screenshot/take-screenshot.json';
+import exampleFile107 from '../../fixtures/text-entry-object/text-entry-object.json';
+import exampleFile108 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
+import exampleFile109 from '../../fixtures/text-to-speech/text-to-speech.json';
+import exampleFile110 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
+import exampleFile111 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
+import exampleFile112 from '../../fixtures/unlock-items/unlock-items.json';
+import exampleFile113 from '../../fixtures/video-player/video-player.json';
+import exampleFile114 from '../../fixtures/z-depth/z-depth.json';
+import exampleFile115 from '../../fixtures/zombie-laser/zombie-laser.json';
 
 // prettier-ignore
 export default {
@@ -224,14 +225,15 @@ export default {
   'example://space-shooter': exampleFile102,
   'example://splash-screen': exampleFile103,
   'example://sprite-fade-in-out': exampleFile104,
-  'example://take-screenshot': exampleFile105,
-  'example://text-entry-object': exampleFile106,
-  'example://text-fade-in-out': exampleFile107,
-  'example://text-to-speech': exampleFile108,
-  'example://toggle-music-play-sound': exampleFile109,
-  'example://type-on-text-effect': exampleFile110,
-  'example://unlock-items': exampleFile111,
-  'example://video-player': exampleFile112,
-  'example://z-depth': exampleFile113,
-  'example://zombie-laser': exampleFile114,
+  'example://tabbed-menu-with-layers': exampleFile105,
+  'example://take-screenshot': exampleFile106,
+  'example://text-entry-object': exampleFile107,
+  'example://text-fade-in-out': exampleFile108,
+  'example://text-to-speech': exampleFile109,
+  'example://toggle-music-play-sound': exampleFile110,
+  'example://type-on-text-effect': exampleFile111,
+  'example://unlock-items': exampleFile112,
+  'example://video-player': exampleFile113,
+  'example://z-depth': exampleFile114,
+  'example://zombie-laser': exampleFile115,
 };

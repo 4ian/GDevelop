@@ -1,6 +1,8 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
+
 #include <algorithm>
 #include <utility>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
@@ -539,6 +541,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   if (MetadataProvider::HasBehaviorAction(
           platform, behaviorType, action.GetType()) &&
       instrInfos.parameters.size() >= 2) {
+
     std::vector<gd::String> realObjects =
         ExpandObjectsName(objectName, context);
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
@@ -628,7 +631,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
     argOutput = "\"" + argOutput + "\"";
   } else if (ParameterMetadata::IsBehavior(metadata.type)) {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
+    argOutput = GenerateGetBehaviorNameCode(parameter);
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "password" || metadata.type == "musicfile" ||

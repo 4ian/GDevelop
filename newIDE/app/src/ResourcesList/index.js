@@ -21,7 +21,7 @@ const glob = optionalRequire('glob');
 const electron = optionalRequire('electron');
 const hasElectron = electron ? true : false;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
@@ -47,6 +47,8 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onRemoveUnusedResources: ResourceKind => void,
+  onRemoveAllResourcesWithInvalidPath: () => void,
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
@@ -134,6 +136,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
+
   /*
    Watcher on resources
 
@@ -147,11 +150,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   - le module est asynchrone (promesse ?)
   - Voir si c pas plus simple de faire une image avec le fichier et lire le bordel.
 
-   */
-
-
-
-   
+   */   
 
   _removeUnusedResources = (resourceType: ResourceKind) => {
     const { project } = this.props;
@@ -322,25 +321,25 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Remove Unused Images',
         click: () => {
-          this._removeUnusedResources('image');
+          this.props.onRemoveUnusedResources('image');
         },
       },
       {
         label: 'Remove Unused Audio',
         click: () => {
-          this._removeUnusedResources('audio');
+          this.props.onRemoveUnusedResources('audio');
         },
       },
       {
         label: 'Remove Unused Fonts',
         click: () => {
-          this._removeUnusedResources('font');
+          this.props.onRemoveUnusedResources('font');
         },
       },
       {
         label: 'Remove Resources with Invalid Path',
         click: () => {
-          this._removeAllResourcesWithInvalidPath();
+          this.props.onRemoveAllResourcesWithInvalidPath();
         },
         enabled: hasElectron,
       },

@@ -328,7 +328,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   gd::String GenerateEventsFunctionContext(
       const std::vector<gd::ParameterMetadata>& parameters,
-      const gd::String& thisObjectName = "");
+      const gd::String& thisObjectName = "",
+      const gd::String& thisBehaviorName = "");
 
   gd::String GenerateEventsFunctionReturn(
       const gd::EventsFunction& eventFunction);

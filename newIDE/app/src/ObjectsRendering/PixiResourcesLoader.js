@@ -3,7 +3,7 @@ import slugs from 'slugs';
 import * as PIXI from 'pixi.js';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const loadedFontFamilies = {};
 const loadedTextures = {};

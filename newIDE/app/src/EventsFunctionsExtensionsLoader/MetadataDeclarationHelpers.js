@@ -2,7 +2,7 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { mapVector } from '../Utils/MapFor';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 // This file contains the logic to declare extension metadata from
 // events functions or events based behaviors.
@@ -40,9 +40,11 @@ export const declareBehaviorMetadata = (
   // This should be safe as if eventsBasedBehavior is deleted (i.e: the behavior
   // is removed from its extension), then extension will be re-generated.
 
-  // Declare the properties of the behavior
+  // Declare the properties of the behavior:
+
+  // $FlowExpectedError - we're creating a behavior
   generatedBehavior.updateProperty = function(
-    behaviorContent: gdBehaviorContent,
+    behaviorContent: gdSerializerElement,
     propertyName: string,
     newValue: string
   ) {
@@ -66,6 +68,7 @@ export const declareBehaviorMetadata = (
     return propertyFound;
   };
 
+  // $FlowExpectedError - we're creating a behavior
   generatedBehavior.getProperties = function(behaviorContent) {
     var behaviorProperties = new gd.MapStringPropertyDescriptor();
     mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
@@ -99,6 +102,7 @@ export const declareBehaviorMetadata = (
     return behaviorProperties;
   };
 
+  // $FlowExpectedError - we're creating a behavior
   generatedBehavior.initializeContent = function(behaviorContent) {
     mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
       const element = behaviorContent.addChild(property.getName());
@@ -267,6 +271,10 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
   }
 };
 
+type gdInstructionOrExpressionMetadata =
+  | gdInstructionMetadata
+  | gdExpressionMetadata;
+
 /**
  * Declare the instructions (actions/conditions) and expressions for the
  * properties of the given events based behavior.
@@ -278,9 +286,9 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior
 ): void => {
-  const addObjectAndBehaviorParameters = (
-    instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
-  ) => {
+  const addObjectAndBehaviorParameters = <T: gdInstructionOrExpressionMetadata>(
+    instructionOrExpression: T
+  ): T => {
     // By convention, first parameter is always the object:
     instructionOrExpression.addParameter(
       'object',
@@ -343,6 +351,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Compare the content of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          'res/function32.png',
           'res/function.png'
         )
       )
@@ -357,6 +366,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Change the content of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          'res/function32.png',
           'res/function.png'
         )
       )
@@ -385,6 +395,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Compare the value of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          'res/function32.png',
           'res/function.png'
         )
       )
@@ -399,6 +410,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Change the value of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          'res/function32.png',
           'res/function.png'
         )
       )
@@ -414,8 +426,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Check the value of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png',
-          'res/function24.png'
+          'res/function32.png',
+          'res/function.png'
         )
       )
         .getCodeExtraInformation()
@@ -428,6 +440,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Update the value of ${propertyLabel}`),
           i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          'res/function32.png',
           'res/function.png'
         )
       )

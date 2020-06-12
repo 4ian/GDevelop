@@ -80,7 +80,7 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -464,7 +464,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   ) => {
     const selectedInstructions = getSelectedInstructions(this.state.selection);
     const destinationIndex =
-      indexInList === undefined
+      indexInList === undefined || indexInList === null
         ? destinationContext.instrsList.size()
         : indexInList;
 
@@ -923,9 +923,9 @@ export default class EventsSheet extends React.Component<Props, State> {
             instruction,
             indexInList,
           } = this.state.editedInstruction;
-          if (!instrsList) return;
+          if (!instrsList || !instruction) return;
 
-          if (indexInList !== undefined) {
+          if (indexInList !== undefined && indexInList !== null) {
             // Replace an existing instruction
             instrsList.set(indexInList, instruction);
           } else {

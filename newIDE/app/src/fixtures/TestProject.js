@@ -490,7 +490,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   effect2.setDoubleParameter('opacity', 0.2);
   effect3.setEffectType('FakeEffectWithVariousParameters');
   effect3.setDoubleParameter('intensity', 0.1);
-  effect3.setDoubleParameter('image', 'my-image');
+  effect3.setStringParameter('image', 'my-image');
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
   layerWithEffectWithoutEffectType.insertNewEffect(

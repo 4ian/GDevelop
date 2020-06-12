@@ -3,7 +3,7 @@ import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',

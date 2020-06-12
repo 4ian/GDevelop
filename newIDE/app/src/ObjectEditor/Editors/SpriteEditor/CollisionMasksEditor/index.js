@@ -15,7 +15,7 @@ import {
 import SpriteSelector from '../Utils/SpriteSelector';
 import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export default class CollisionMasksEditor extends Component {
   state = {

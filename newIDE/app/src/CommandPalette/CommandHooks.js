@@ -11,6 +11,7 @@ export const useCommand = (commandName: string, command: Command) => {
       commandManager.registerCommand(commandName, command);
       return () => commandManager.deregisterCommand(commandName);
     },
+    // eslint-disable-next-line
     [commandManager, commandName, command.enabled, command.handler]
   );
 };

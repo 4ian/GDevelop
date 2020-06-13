@@ -73,13 +73,6 @@
 }
 
 /**
- * Executable events (standard events, repeat, for each, while...) container
- */
-.gd-events-sheet-dark-theme .executable-event-container {
-  border-bottom: 1px solid black;
-}
-
-/**
  * Conditions and actions containers
  */
 

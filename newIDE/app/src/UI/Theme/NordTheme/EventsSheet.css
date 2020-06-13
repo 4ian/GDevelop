@@ -36,9 +36,9 @@
  * Scaffolding lines on the left
  */
 .gd-events-sheet-nord-theme .rst__lineHalfHorizontalRight::before,
-.rst__lineFullVertical::after,
-.rst__lineHalfVerticalTop::after,
-.rst__lineHalfVerticalBottom::after {
+.gd-events-sheet-nord-theme .rst__lineFullVertical::after,
+.gd-events-sheet-nord-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet-nord-theme .rst__lineHalfVerticalBottom::after {
   background-color: #D8DEE9;
 }
 

@@ -209,7 +209,7 @@ type EventsTreeProps = {|
 
 type SortableTreeNode = {
   eventsList: gdEventsList,
-  event: gdBaseEvent,
+  event: ?gdBaseEvent,
   depth: number,
   disabled: boolean,
   isCondition: boolean,
@@ -337,6 +337,10 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     path: Array<any>,
     node: SortableTreeNode,
   }) => {
+    // Get the moved event and its list from the moved node.
+    const { event, eventsList } = node;
+    if (!event) return;
+
     // Get the event list where the event should be moved to.
     const targetPath = path.slice(0, -1);
     const target = getNodeAtPath({
@@ -351,9 +355,6 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         : this.props.events;
     const targetPosition =
       targetNode && targetNode.children ? targetNode.children.indexOf(node) : 0;
-
-    // Get the moved event and its list from the moved node.
-    const { event, eventsList } = node;
 
     // Do the move
     // Note that moveEventToAnotherEventsList does not invalidate the
@@ -370,15 +371,33 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     this.props.onEventMoved();
   };
 
-  _canDrop = ({ nextParent }: { nextParent: ?SortableTreeNode }) => {
-    if (nextParent && nextParent.event)
-      return nextParent.event.canHaveSubEvents();
+  _canDrag = ({ node }: { node: ?SortableTreeNode }) => {
+    return !!node && !!node.event;
+  };
 
+  _canDrop = ({ nextParent }: { nextParent: ?SortableTreeNode }) => {
+    if (nextParent) {
+      if (nextParent.event) {
+        return nextParent.event.canHaveSubEvents();
+      }
+    }
+
+    // No "nextParent" means that we're trying to drop at the root
+    // of the events tree.
     return true;
+  };
+
+  _canNodeHaveChildren = (node: ?SortableTreeNode) => {
+    if (node && node.event) {
+      return node.event.canHaveSubEvents();
+    }
+
+    return false;
   };
 
   _onVisibilityToggle = ({ node }: { node: SortableTreeNode }) => {
     const { event } = node;
+    if (!event) return;
 
     event.setFolded(!event.isFolded());
     this.forceEventsUpdate();
@@ -405,6 +424,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
 
   _renderEvent = ({ node }: { node: SortableTreeNode }) => {
     const { event, depth, disabled } = node;
+    if (!event) return null;
 
     return (
       <EventContainer
@@ -427,7 +447,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         onEventClick={() =>
           this.props.onEventClick({
             eventsList: node.eventsList,
-            event: node.event,
+            event: event,
             indexInList: node.indexInList,
             isCondition: node.isCondition,
           })
@@ -435,7 +455,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         onEventContextMenu={(x, y) =>
           this.props.onEventContextMenu(x, y, {
             eventsList: node.eventsList,
-            event: node.event,
+            event: event,
             indexInList: node.indexInList,
             isCondition: node.isCondition,
           })
@@ -454,7 +474,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     );
   };
 
-  _treeSearchMethod = ({
+  _isNodeHighlighted = ({
     node,
     searchQuery,
   }: {
@@ -464,6 +484,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     const searchResults = searchQuery;
     if (!searchResults) return false;
     const { event } = node;
+    if (!event) return false;
 
     return searchResults.find(highlightedEvent =>
       gd.compare(highlightedEvent, event)
@@ -485,13 +506,15 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
           onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}
           onMoveNode={this._onMoveNode}
+          canDrag={this._canDrag}
           canDrop={this._canDrop}
+          canNodeHaveChildren={this._canNodeHaveChildren}
           rowHeight={({ node }: { node: SortableTreeNode }) => {
             if (!node.event) return 0;
 
             return this.eventsHeightsCache.getEventHeight(node.event);
           }}
-          searchMethod={this._treeSearchMethod}
+          searchMethod={this._isNodeHighlighted}
           searchQuery={this.props.searchResults}
           searchFocusOffset={this.props.searchFocusOffset}
           className={

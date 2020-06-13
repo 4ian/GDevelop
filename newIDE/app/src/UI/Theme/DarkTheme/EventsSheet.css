@@ -86,14 +86,15 @@
 .gd-events-sheet-dark-theme .conditions-container {
   background: #494949;
   color: rgb(209, 209, 209);
-  border-right: 1px solid black;
+  border: 1px solid #494949;
+  border-right-color: black;
   padding-left: 5px;
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
 }
 .gd-events-sheet-dark-theme .conditions-container.small-width-container {
-  border-right: none;
-  border-bottom: 1px solid black;
+  border-right-color: #494949;
+  border-bottom-color: black;
 }
 
 .gd-events-sheet-dark-theme .actions-container {
@@ -104,7 +105,7 @@
   min-width: 0; /* Prevent container to growing outside its parent */
 }
 .gd-events-sheet-dark-theme .actions-container.small-width-container {
-  padding-left: 15px;
+  padding-left: 20px;
 }
 
 .gd-events-sheet-dark-theme .sub-instructions-container {

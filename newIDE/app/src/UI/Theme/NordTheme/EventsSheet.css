@@ -65,6 +65,9 @@
 /**
  * Large selectable area (events)
  */
+.gd-events-sheet-nord-theme .large-selectable {
+  border: 1px #2E3440 solid !important;
+}
 .gd-events-sheet-nord-theme .large-selectable.large-selected {
   border: 1px #88C0D0 solid !important;
 }
@@ -81,14 +84,14 @@
  */
 .gd-events-sheet-nord-theme .conditions-container {
   background: #3B4252;
-  border-right: 1px solid D8DEE9;
+  border: 1px solid #3B4252;
   padding-left: 5px;
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
 }
 .gd-events-sheet-nord-theme .conditions-container.small-width-container {
-  border-right: none;
-  border-bottom: 1px solid #2E3440;
+  border-right-color: #3B4252;
+  border-bottom-color: #2E3440;
 }
 
 .gd-events-sheet-nord-theme .actions-container {
@@ -98,7 +101,7 @@
   min-width: 0; /* Prevent container to growing outside its parent */
 }
 .gd-events-sheet-nord-theme .actions-container.small-width-container {
-  padding-left: 15px;
+  padding-left: 20px;
 }
 
 .gd-events-sheet-nord-theme .sub-instructions-container {

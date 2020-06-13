@@ -65,6 +65,9 @@
 /**
  * Large selectable area (events)
  */
+.gd-events-sheet-default-theme .large-selectable {
+  border: 1px #f0f0f2 solid !important;
+}
 .gd-events-sheet-default-theme .large-selectable.large-selected {
   border: 1px #4ab0e4 solid !important;
 }
@@ -72,23 +75,24 @@
 /**
  * Executable events (standard events, repeat, for each, while...) container
  */
-.gd-events-sheet-default-theme .executable-event-container {
-  border-bottom: 1px solid #d3d3d3 !important;
-}
+/* .gd-events-sheet-default-theme .executable-event-container {
+  border-top: 1px solid white !important;
+  border-bottom: 1px solid white !important;
+} */
 
 /**
  * Conditions and actions containers
  */
 .gd-events-sheet-default-theme .conditions-container {
   background: #f1f2f2;
-  border-right: 1px solid #d3d3d3;
+  border: 1px solid #c5c5c5;
   padding-left: 5px;
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
 }
 .gd-events-sheet-default-theme .conditions-container.small-width-container {
-  border-right: none;
-  border-bottom: 1px solid #d3d3d3;
+  border-right-color: #c5c5c5;
+  border-bottom-color: #c5c5c5;
 }
 
 .gd-events-sheet-default-theme .actions-container {
@@ -98,7 +102,7 @@
   min-width: 0; /* Prevent container to growing outside its parent */
 }
 .gd-events-sheet-default-theme .actions-container.small-width-container {
-  padding-left: 15px;
+  padding-left: 20px;
 }
 
 .gd-events-sheet-default-theme .sub-instructions-container {

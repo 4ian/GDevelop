@@ -12,7 +12,6 @@ import PreferencesContext from './PreferencesContext';
 import AlertMessage from '../../UI/AlertMessage';
 import LocalesMetadata from '../../locales/LocalesMetadata';
 import { I18n } from '@lingui/react';
-import Divider from '@material-ui/core/Divider';
 
 type Props = {|
   open: boolean,

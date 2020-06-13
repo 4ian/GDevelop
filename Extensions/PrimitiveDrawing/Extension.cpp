@@ -217,7 +217,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Begin fill path"),
                 _("Begin to draw a simple one-color fill. Subsequent actions, such as \"Path line\" (in the Advanced category) can be used to draw. Be sure to use \"End fill path\" action when you're done drawing the shape."),
                 _("Begins drawing filling of an advanced path "
-                  "with _PARAM0_"),
+                  "with _PARAM0_ (start: _PARAM1_;_PARAM2_)"),
                 _("Advanced"),
                 "res/actions/beginFillPath24.png",
                 "res/actions/beginFillPath.png")

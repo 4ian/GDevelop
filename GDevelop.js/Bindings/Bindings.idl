@@ -2179,6 +2179,9 @@ interface ShapePainterObject {
     void SetCoordinatesRelative();
     boolean AreCoordinatesAbsolute();
 
+    void SetClearAtEachFrame(boolean value);
+    boolean AreClearAtEachFrame();
+
     void SetOutlineSize(float size);
     float GetOutlineSize();
 

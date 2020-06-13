@@ -18,6 +18,7 @@
  * @property {number} outlineOpacity The opacity of the outline of the painted shape
  * @property {number} outlineSize The size of the outline of the painted shape, in pixels.
  * @property {boolean} absoluteCoordinates Use absolute coordinates?
+ * @property {boolean} clearAtEachFrame Clear the previous render before the next draw?
  * 
  * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
  */
@@ -53,6 +54,9 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
     /** @type {boolean} */
     this._absoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
 
+    /** @type {boolean} */
+    this._clearAtEachFrame = shapePainterObjectData.clearAtEachFrame;
+
     if (this._renderer)
         gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
@@ -72,7 +76,9 @@ gdjs.ShapePainterRuntimeObject.prototype.getRendererObject = function() {
 
 gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
     //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
-    this._renderer.clear();
+    if(this._clearAtEachFrame){
+        this._renderer.clear();
+    }
 
     gdjs.RuntimeObject.prototype.stepBehaviorsPreEvents.call(this, runtimeScene);
 };

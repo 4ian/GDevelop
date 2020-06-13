@@ -32,6 +32,19 @@ export default class PanelSpriteEditor extends React.Component<
             this.forceUpdate();
           }}
         />
+        <Checkbox
+          label={
+            <Trans>
+              Clear the render before the next draw
+            </Trans>
+          }
+          checked={shapePainterObject.areClearAtEachFrame()}
+          onCheck={(e, checked) => {
+            if (!checked) shapePainterObject.setClearAtEachFrame(false);
+            else shapePainterObject.setClearAtEachFrame(true);
+            this.forceUpdate();
+          }}
+        />
         <ResponsiveLineStackLayout noMargin>
           <ColorField
             floatingLabelText={<Trans>Outline color</Trans>}

@@ -17,12 +17,7 @@ import {
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
-import {
-  createOrUpdateResource,
-  getLocalResourceFullPath,
-  getResourceFilePathStatus,
-  RESOURCE_EXTENSIONS,
-} from '../ResourcesList/ResourceUtils.js';
+import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils.js';
 
 const gd: libGDevelop = global.gd;
 

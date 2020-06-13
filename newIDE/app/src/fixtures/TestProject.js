@@ -17,6 +17,7 @@ export type TestProject = {|
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
   emptyLayout: gdLayout,
+  emptyEventsList: gdEventsList,
   testEventsFunction: gdEventsFunction,
   testEventsFunctionsExtension: gdEventsFunctionsExtension,
   testSerializedEvents: Object,
@@ -348,6 +349,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
 
+  // Empty events list
+  const emptyEventsList = new gd.EventsList();
+
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
     'TestExt',
@@ -516,6 +520,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testExternalEvents1,
     testExternalEvents2,
     emptyLayout,
+    emptyEventsList,
     testEventsFunction,
     testEventsFunctionsExtension,
     testSerializedEvents,

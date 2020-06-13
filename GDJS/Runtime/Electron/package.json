@@ -8,5 +8,10 @@
     "dependencies": {},
     "devDependencies": {
       "electron": "3.0.9"
+    },
+    "build": {
+        "directories": {
+            "buildResources": "buildResources"
+        }
     }
-  }
+}

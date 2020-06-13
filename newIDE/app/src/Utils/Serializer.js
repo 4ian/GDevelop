@@ -36,8 +36,10 @@ export function serializeToJSON(
 ): string {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
+  const json = gd.Serializer.toJSON(serializedElement);
+  serializedElement.delete();
 
-  return gd.Serializer.toJSON(serializedElement);
+  return json;
 }
 
 /**

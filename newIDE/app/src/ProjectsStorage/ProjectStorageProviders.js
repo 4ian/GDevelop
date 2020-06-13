@@ -21,7 +21,7 @@ const emptyStorageProvider: StorageProvider = {
       Promise.reject('No storage provider set up'),
     onSaveProjectAs: (project: gdProject) =>
       Promise.reject('No storage provider set up'),
-    onAutoSaveProject: (project: gdProject) => {},
+    onAutoSaveProject: (project: gdProject) => Promise.resolve(),
   }),
 };
 

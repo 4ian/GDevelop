@@ -35,13 +35,12 @@ export default class PanelSpriteEditor extends React.Component<
         <Checkbox
           label={
             <Trans>
-              Clear the render before the next draw
+              Clear the rendered image between each frame
             </Trans>
           }
-          checked={shapePainterObject.areClearAtEachFrame()}
+          checked={shapePainterObject.isClearedBetweenFrames()}
           onCheck={(e, checked) => {
-            if (!checked) shapePainterObject.setClearAtEachFrame(false);
-            else shapePainterObject.setClearAtEachFrame(true);
+            shapePainterObject.setClearBetweenFrames(checked);
             this.forceUpdate();
           }}
         />

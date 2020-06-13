@@ -106,6 +106,13 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
         .SetFunctionName("drawArcTo");*/
     GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClearBetweenFrames"]
+        .SetFunctionName("setClearBetweenFrames");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClearBetweenFrames"]
+        .SetFunctionName("setClearBetweenFrames")
+        .SetGetter("isClearedBetweenFrames");
+    GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
     GetAllActionsForObject(

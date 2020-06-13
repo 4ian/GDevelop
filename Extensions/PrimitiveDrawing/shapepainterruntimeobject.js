@@ -18,7 +18,7 @@
  * @property {number} outlineOpacity The opacity of the outline of the painted shape
  * @property {number} outlineSize The size of the outline of the painted shape, in pixels.
  * @property {boolean} absoluteCoordinates Use absolute coordinates?
- * @property {boolean} clearAtEachFrame Clear the previous render before the next draw?
+ * @property {boolean} clearBetweenFrames Clear the previous render before the next draw?
  * 
  * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
  */
@@ -55,7 +55,7 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
     this._absoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
 
     /** @type {boolean} */
-    this._clearAtEachFrame = shapePainterObjectData.clearAtEachFrame;
+    this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
 
     if (this._renderer)
         gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -76,7 +76,7 @@ gdjs.ShapePainterRuntimeObject.prototype.getRendererObject = function() {
 
 gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
     //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
-    if(this._clearAtEachFrame){
+    if(this._clearBetweenFrames){
         this._renderer.clear();
     }
 
@@ -158,6 +158,14 @@ gdjs.ShapePainterRuntimeObject.prototype.drawPathQuadraticCurveTo = function(cpX
 
 gdjs.ShapePainterRuntimeObject.prototype.closePath = function() {
     this._renderer.closePath();  
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.setClearBetweenFrames = function(value) {
+    this._clearBetweenFrames = value;
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.isClearedBetweenFrames = function() {
+    return this._clearBetweenFrames;
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setFillColor = function(rgbColor) {

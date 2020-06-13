@@ -339,6 +339,36 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("closePath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddAction("ClearBetweenFrames",
+                _("Clear between frames"),
+                _("Clear the renderer before the next draw"),
+                _("The shape painter _PARAM0_ is cleared before the next draw: _PARAM1_"),
+                _("Setup"),
+                "res/actions/visibilite24.png",
+                "res/actions/visibilite.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("yesorno", _("Clear the previous draw"), "", true)
+      .SetDefaultValue("yes")
+      .SetFunctionName("SetClearBetweenFrames")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddCondition(
+         "ClearBetweenFrames",
+         _("Clear between frames"),
+         _("Test if the renderer is cleared at each frames."),
+         _("The shape painter _PARAM0_ is clear before the next draw: _PARAM1_"),
+         _("Setup"),
+         "res/conditions/visibilite24.png",
+         "res/conditions/visibilite.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("yesorno", _("Clear the renderer at each frames is enabled (yes by default)"), "", true)
+      .SetDefaultValue("yes")
+      .SetFunctionName("IsClearedBetweenFrames")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+
   obj.AddAction("FillColor",
                 _("Fill color"),
                 _("Change the color used when filling"),

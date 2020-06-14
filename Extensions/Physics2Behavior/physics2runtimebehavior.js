@@ -586,7 +586,7 @@ gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(
     (this._objectOldHeight !== this.owner.getHeight() &&
       this.shape !== 'Edge' &&
       !(this.shape === 'Box' && this.shapeDimensionB > 0) &&
-      !(this.shape === 'Ciecle' && this.shapeDimensionA > 0))
+      !(this.shape === 'Circle' && this.shapeDimensionA > 0))
   ) {
     this.recreateShape();
   }

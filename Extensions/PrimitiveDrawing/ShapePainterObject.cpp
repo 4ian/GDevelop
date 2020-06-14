@@ -179,13 +179,6 @@ std::size_t RuntimeShapePainterObject::GetNumberOfProperties() const {
 #endif
 
 /**
- * Change if the last draw is clear
- */
-void ShapePainterObjectBase::SetClearBetweenFrames(bool value) {
-  clearBetweenFrames = value;
-}
-
-/**
  * Change the color filter of the sprite object
  */
 void ShapePainterObjectBase::SetFillColor(unsigned int r,

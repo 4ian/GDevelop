@@ -81,6 +81,9 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   inline void SetCoordinatesRelative() { absoluteCoordinates = false; }
   inline bool AreCoordinatesAbsolute() { return absoluteCoordinates; }
 
+  inline void SetClearBetweenFrames(bool value) { clearBetweenFrames = value; }
+  inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
+
  protected:
   virtual void DoUnserializeFrom(const gd::SerializerElement& element);
 #if defined(GD_IDE_ONLY)
@@ -102,6 +105,7 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   float outlineOpacity;
 
   bool absoluteCoordinates;
+  bool clearBetweenFrames;
 };
 
 /**

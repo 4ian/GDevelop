@@ -395,7 +395,7 @@ interface Behavior {
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
-[JSImplementation="Behavior"]
+[JSImplementation=Behavior]
 interface BehaviorJsImplementation {
     void BehaviorJsImplementation();
 
@@ -425,7 +425,7 @@ interface BehaviorsSharedData {
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
-[JSImplementation="BehaviorsSharedData"]
+[JSImplementation=BehaviorsSharedData]
 interface BehaviorSharedDataJsImplementation {
     void BehaviorSharedDataJsImplementation();
 
@@ -472,7 +472,7 @@ interface UniquePtrObject {
     gdObject release();
 };
 
-[JSImplementation="gdObject"]
+[JSImplementation=gdObject]
 interface ObjectJsImplementation {
     void ObjectJsImplementation();
     [Value] UniquePtrObject Clone();
@@ -801,7 +801,7 @@ interface HighestZOrderFinder {
 
 interface InitialInstanceFunctor {};
 interface InitialInstanceJSFunctorWrapper {};
-[JSImplementation="InitialInstanceJSFunctorWrapper"]
+[JSImplementation=InitialInstanceJSFunctorWrapper]
 interface InitialInstanceJSFunctor {
     void InitialInstanceJSFunctor();
 
@@ -1856,7 +1856,7 @@ interface EventsFunctionsExtension {
 interface AbstractFileSystem {
 };
 
-[JSImplementation="AbstractFileSystem"]
+[JSImplementation=AbstractFileSystem]
 interface AbstractFileSystemJS {
     void AbstractFileSystemJS();
 
@@ -1918,7 +1918,7 @@ interface EventsContext {
 };
 
 interface EventsContextAnalyzer {
-    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] Project project, [Ref] Layout layout);
+    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer);
     [Const, Ref] EventsContext GetEventsContext();
 
     //Inherited from ArbitraryEventsWorker
@@ -1927,7 +1927,7 @@ interface EventsContextAnalyzer {
 
 interface ArbitraryResourceWorker {
 };
-[JSImplementation="ArbitraryResourceWorker"]
+[JSImplementation=ArbitraryResourceWorker]
 interface ArbitraryResourceWorkerJS {
     void ArbitraryResourceWorkerJS();
 
@@ -2178,6 +2178,9 @@ interface ShapePainterObject {
     void SetCoordinatesAbsolute();
     void SetCoordinatesRelative();
     boolean AreCoordinatesAbsolute();
+
+    void SetClearBetweenFrames(boolean value);
+    boolean IsClearedBetweenFrames();
 
     void SetOutlineSize(float size);
     float GetOutlineSize();

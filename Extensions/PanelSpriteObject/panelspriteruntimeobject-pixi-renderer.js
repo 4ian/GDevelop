@@ -245,7 +245,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        this._borderSprites[1].width - obj._rBorder,
+        texture.width - obj._rBorder,
         0,
         obj._rBorder,
         obj._tBorder
@@ -261,7 +261,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(
     makeInsideTexture(
       new PIXI.Rectangle(
         0,
-        this._borderSprites[5].height - obj._bBorder,
+        texture.height - obj._bBorder,
         obj._lBorder,
         obj._bBorder
       )
@@ -271,8 +271,8 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        this._borderSprites[7].width - obj._rBorder,
-        this._borderSprites[7].height - obj._bBorder,
+        texture.width - obj._rBorder,
+        texture.height - obj._bBorder,
         obj._rBorder,
         obj._bBorder
       )

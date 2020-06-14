@@ -26,7 +26,9 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow
 import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
 import Text from '../../UI/Text';
 import { getInstructionMetadata } from './NewInstructionEditor';
-const gd = global.gd;
+import { ColumnStackLayout } from '../../UI/Layout';
+import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   // When displaying parameters, take all the height:
@@ -78,26 +80,6 @@ type Props = {|
 type State = {|
   isDirty: boolean,
 |};
-
-export const setupInstruction = (
-  instruction: gdInstruction,
-  instructionMetadata: gdInstructionMetadata,
-  objectName: ?string
-) => {
-  instruction.setParametersCount(instructionMetadata.getParametersCount());
-
-  if (objectName) {
-    const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
-    if (objectParameterIndex === -1) {
-      console.error(
-        `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
-      );
-      return;
-    }
-
-    instruction.setParameter(objectParameterIndex, objectName);
-  }
-};
 
 const isParameterVisible = (
   parameterMetadata: gdParameterMetadata,
@@ -235,7 +217,13 @@ export default class InstructionParametersEditor extends React.Component<
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
 
-    setupInstruction(instruction, instructionMetadata, objectName);
+    setupInstructionParameters(
+      globalObjectsContainer,
+      objectsContainer,
+      instruction,
+      instructionMetadata,
+      objectName
+    );
 
     let parameterFieldIndex = 0;
     return (
@@ -268,59 +256,64 @@ export default class InstructionParametersEditor extends React.Component<
             )}
             <Spacer />
             <div key={instructionType} style={styles.parametersContainer}>
-              {mapFor(0, instructionMetadata.getParametersCount(), i => {
-                const parameterMetadata = instructionMetadata.getParameter(i);
-                if (
-                  !isParameterVisible(
-                    parameterMetadata,
-                    i,
-                    objectParameterIndex
+              <ColumnStackLayout noMargin>
+                {mapFor(0, instructionMetadata.getParametersCount(), i => {
+                  const parameterMetadata = instructionMetadata.getParameter(i);
+                  if (
+                    !isParameterVisible(
+                      parameterMetadata,
+                      i,
+                      objectParameterIndex
+                    )
                   )
-                )
-                  return null;
+                    return null;
 
-                const parameterMetadataType = parameterMetadata.getType();
-                const ParameterComponent = ParameterRenderingService.getParameterComponent(
-                  parameterMetadataType
-                );
+                  const parameterMetadataType = parameterMetadata.getType();
+                  const ParameterComponent = ParameterRenderingService.getParameterComponent(
+                    parameterMetadataType
+                  );
 
-                // Track the field count on screen, to affect the ref to the
-                // first visible field.
-                const isFirstVisibleParameterField = parameterFieldIndex === 0;
-                parameterFieldIndex++;
+                  // Track the field count on screen, to affect the ref to the
+                  // first visible field.
+                  const isFirstVisibleParameterField =
+                    parameterFieldIndex === 0;
+                  parameterFieldIndex++;
 
-                return (
-                  <ParameterComponent
-                    instructionMetadata={instructionMetadata}
-                    instruction={instruction}
-                    parameterMetadata={parameterMetadata}
-                    parameterIndex={i}
-                    value={instruction.getParameter(i)}
-                    onChange={value => {
-                      if (instruction.getParameter(i) !== value) {
-                        instruction.setParameter(i, value);
-                        this.setState({
-                          isDirty: true,
-                        });
+                  return (
+                    <ParameterComponent
+                      instructionMetadata={instructionMetadata}
+                      instruction={instruction}
+                      parameterMetadata={parameterMetadata}
+                      parameterIndex={i}
+                      value={instruction.getParameter(i)}
+                      onChange={value => {
+                        if (instruction.getParameter(i) !== value) {
+                          instruction.setParameter(i, value);
+                          this.setState({
+                            isDirty: true,
+                          });
+                        }
+                      }}
+                      project={project}
+                      scope={scope}
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
+                      key={i}
+                      parameterRenderingService={ParameterRenderingService}
+                      resourceSources={this.props.resourceSources}
+                      onChooseResource={this.props.onChooseResource}
+                      resourceExternalEditors={
+                        this.props.resourceExternalEditors
                       }
-                    }}
-                    project={project}
-                    scope={scope}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    key={i}
-                    parameterRenderingService={ParameterRenderingService}
-                    resourceSources={this.props.resourceSources}
-                    onChooseResource={this.props.onChooseResource}
-                    resourceExternalEditors={this.props.resourceExternalEditors}
-                    ref={field => {
-                      if (isFirstVisibleParameterField) {
-                        this._firstVisibleField = field;
-                      }
-                    }}
-                  />
-                );
-              })}
+                      ref={field => {
+                        if (isFirstVisibleParameterField) {
+                          this._firstVisibleField = field;
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </ColumnStackLayout>
               {this._getVisibleParametersCount(
                 instructionMetadata,
                 objectName

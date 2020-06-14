@@ -136,7 +136,7 @@ export default class PolygonEditor extends React.Component<Props> {
                       />
                     </TableRowColumn>
                     <TableRowColumn>
-                      <IconButton onClick={() => onRemove(index)}>
+                      <IconButton size="small" onClick={() => onRemove(index)}>
                         <Delete />
                       </IconButton>
                     </TableRowColumn>

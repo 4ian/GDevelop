@@ -18,10 +18,10 @@ import {
 import EmptyMessage from '../../UI/EmptyMessage';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsFunction: gdEventsFunction,
@@ -36,7 +36,6 @@ type State = {||};
 
 const styles = {
   icon: {
-    width: 32,
     height: 32,
     marginRight: 8,
     flexSrink: 0,
@@ -139,7 +138,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       isExtensionLifecycleEventsFunction(eventsFunction.getName());
     if (isAnExtensionLifecycleEventsFunction) {
       return (
-        <React.Fragment>
+        <Column>
           <DismissableAlertMessage
             kind="info"
             identifier="lifecycle-events-function-included-only-if-extension-used"
@@ -159,16 +158,16 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               used as the events will be run for all scenes in your game.
             </Trans>
           </EmptyMessage>
-        </React.Fragment>
+        </Column>
       );
     }
 
     return (
       <I18n>
         {({ i18n }) => (
-          <Column>
+          <ColumnStackLayout expand>
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
-            <ResponsiveLineStackLayout alignItems="center">
+            <ResponsiveLineStackLayout alignItems="center" noMargin>
               <Line alignItems="center" noMargin>
                 <img src="res/function32.png" alt="" style={styles.icon} />
                 <SelectField
@@ -177,6 +176,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   fullWidth
                   disabled={!!freezeEventsFunctionType}
                   onChange={(e, i, value: string) => {
+                    // $FlowFixMe
                     eventsFunction.setFunctionType(value);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     this.forceUpdate();
@@ -230,7 +230,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 }}
               />
             </Line>
-            <Line>
+            <Line noMargin>
               {type === gd.EventsFunction.Action ||
               type === gd.EventsFunction.Condition ? (
                 <SemiControlledTextField
@@ -253,13 +253,13 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               ) : null}
             </Line>
             {helpPagePath ? (
-              <Line>
+              <Line noMargin>
                 <HelpButton helpPagePath={helpPagePath} />
               </Line>
             ) : (
               <Spacer />
             )}
-          </Column>
+          </ColumnStackLayout>
         )}
       </I18n>
     );

@@ -10,9 +10,10 @@ if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
 }
 
 // Sanity check libGD.js size
-const checkLibGDjsSize = () =>
-  new Promise(resolve => {
-    fs.stat(path.join(__dirname, '../../app/public/libGD.js'), (err, stats) => {
+const checkLibGDjsSize = () => {
+  const appPublicPath = path.join(__dirname, '../../app/public/');
+  return new Promise(resolve => {
+    fs.stat(path.join(appPublicPath, 'libGD.js'), (err, stats) => {
       if (err) {
         shell.echo(
           `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
@@ -31,9 +32,20 @@ const checkLibGDjsSize = () =>
       }
 
       shell.echo(`✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`);
+
+      if (
+        !fs.existsSync(path.join(appPublicPath, 'libGD.js.mem')) ||
+        fs.existsSync(path.join(appPublicPath, 'libGD.wasm'))
+      ) {
+        shell.echo(
+          `❌ Found libGD.wasm or missing libGD.js.mem - are you sure you're not trying to deploy the development version?`
+        );
+        shell.exit(1);
+      }
       resolve();
     });
   });
+};
 
 checkLibGDjsSize().then(() => {
   if (!args['skip-app-build']) {

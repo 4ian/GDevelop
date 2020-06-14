@@ -11,11 +11,15 @@ import InfoBar from '../UI/Messages/InfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
-
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
+  type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
+import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils.js';
+
+const gd: libGDevelop = global.gd;
 
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
@@ -29,12 +33,12 @@ const styles = {
   },
 };
 
-type State = {
+type State = {|
   showPropertiesInfoBar: boolean,
   selectedResource: ?gdResource,
-};
+|};
 
-type Props = {
+type Props = {|
   setToolbar: React.Node => void,
   project: gdProject,
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
@@ -45,6 +49,13 @@ type Props = {
   ) => void,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+|};
+
+const initialMosaicEditorNodes = {
+  direction: 'row',
+  first: 'properties',
+  second: 'resources-list',
+  splitPercentage: 66,
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
@@ -92,11 +103,77 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           selectedResource: null,
         },
         () => {
+          // Force update of the resources list as otherwise it could render
+          // resource that was just deleted.
           if (this._resourcesList) this._resourcesList.forceUpdateList();
           this.updateToolbar();
         }
       );
     });
+  };
+
+  _removeUnusedResources = (resourceKind: ResourceKind) => {
+    const { project } = this.props;
+    const selectedResourceName = this.state.selectedResource
+      ? this.state.selectedResource.getName()
+      : null;
+
+    const removedResourceNames = gd.ProjectResourcesAdder.getAllUseless(
+      project,
+      resourceKind
+    ).toJSArray();
+    console.info(
+      `Removing ${
+        removedResourceNames.length
+      } unused ${resourceKind} resource(s):`,
+      removedResourceNames
+    );
+
+    gd.ProjectResourcesAdder.removeAllUseless(project, resourceKind);
+
+    // The selectedResource might be *invalid* now if it was removed.
+    // Be sure to drop the reference to it if that's the case.
+    if (removedResourceNames.includes(selectedResourceName)) {
+      this._onResourceSelected(null);
+    }
+
+    // Force update of the resources list as otherwise it could render
+    // resources that were just deleted.
+    if (this._resourcesList) {
+      this._resourcesList.forceUpdateList();
+    }
+  };
+
+  _removeAllResourcesWithInvalidPath = () => {
+    const { project } = this.props;
+    const selectedResourceName = this.state.selectedResource
+      ? this.state.selectedResource.getName()
+      : null;
+
+    const resourcesManager = project.getResourcesManager();
+    const removedResourceNames = resourcesManager
+      .getAllResourceNames()
+      .toJSArray()
+      .filter(resourceName => {
+        return getResourceFilePathStatus(project, resourceName) === 'error';
+      });
+
+    removedResourceNames.forEach(resourceName => {
+      resourcesManager.removeResource(resourceName);
+      console.info('Removed due to invalid path: ' + resourceName);
+    });
+
+    // The selectedResource might be *invalid* now if it was removed.
+    // Be sure to drop the reference to it if that's the case.
+    if (removedResourceNames.includes(selectedResourceName)) {
+      this._onResourceSelected(null);
+    }
+
+    // Force update of the resources list as otherwise it could render
+    // resources that were just deleted.
+    if (this._resourcesList) {
+      this._resourcesList.forceUpdateList();
+    }
   };
 
   openProjectFolder = () => {
@@ -168,6 +245,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onSelectResource={this._onResourceSelected}
             selectedResource={selectedResource}
             ref={resourcesList => (this._resourcesList = resourcesList)}
+            onRemoveUnusedResources={this._removeUnusedResources}
+            onRemoveAllResourcesWithInvalidPath={
+              this._removeAllResourcesWithInvalidPath
+            }
           />
         ),
       },
@@ -175,16 +256,21 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     return (
       <div style={styles.container}>
-        <EditorMosaic
-          editors={editors}
-          ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-          initialNodes={{
-            direction: 'row',
-            first: 'properties',
-            second: 'resources-list',
-            splitPercentage: 66,
-          }}
-        />
+        <PreferencesContext.Consumer>
+          {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
+            <EditorMosaic
+              editors={editors}
+              ref={editorMosaic => (this.editorMosaic = editorMosaic)}
+              initialNodes={
+                getDefaultEditorMosaicNode('resources-editor') ||
+                initialMosaicEditorNodes
+              }
+              onPersistNodes={node =>
+                setDefaultEditorMosaicNode('resources-editor', node)
+              }
+            />
+          )}
+        </PreferencesContext.Consumer>
         <InfoBar
           message={
             <Trans>

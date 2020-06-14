@@ -5,7 +5,7 @@
 
 
 describe('gdjs.Layer', function() {
-	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
+	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}, resources: {resources: []}});
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
 	it('can convert coordinates', function(){

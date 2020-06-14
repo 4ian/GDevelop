@@ -5,7 +5,7 @@ import getObjectByName from '../../Utils/GetObjectByName';
 import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
-const gd = global.gd;
+const gd /* TODO: add flow in this file */ = global.gd;
 
 export default class LayerRenderer {
   constructor({

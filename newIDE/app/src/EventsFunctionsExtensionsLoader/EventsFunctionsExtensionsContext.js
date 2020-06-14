@@ -14,6 +14,7 @@ export type EventsFunctionsExtensionsState = {|
   ) => Promise<void>,
   getEventsFunctionsExtensionWriter: () => ?EventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => ?EventsFunctionsExtensionOpener,
+  ensureLoadFinished: () => Promise<void>,
 |};
 
 const defaultState = {
@@ -25,6 +26,7 @@ const defaultState = {
     Promise.reject(new Error('Use a provider')),
   getEventsFunctionsExtensionWriter: () => null,
   getEventsFunctionsExtensionOpener: () => null,
+  ensureLoadFinished: () => Promise.reject(new Error('Use a provider')),
 };
 
 const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(

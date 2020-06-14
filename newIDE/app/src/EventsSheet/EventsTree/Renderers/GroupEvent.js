@@ -11,7 +11,7 @@ import {
   disabledText,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {

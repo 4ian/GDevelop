@@ -41,6 +41,7 @@ import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
+import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
@@ -417,7 +418,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const { project } = this.props;
 
     const newName = newNameGenerator('NewExtension', name =>
-      project.hasEventsFunctionsExtensionNamed(name)
+      isExtensionNameTaken(name, project)
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
     this._onProjectItemModified();
@@ -589,7 +590,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const { project } = this.props;
 
     const newName = newNameGenerator(name, name =>
-      project.hasEventsFunctionsExtensionNamed(name)
+      isExtensionNameTaken(name, project)
     );
 
     const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
@@ -713,7 +714,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>Game settings</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/projectManager32.png"
               />
@@ -758,7 +759,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>Scenes</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/sceneadd32.png"
               />
@@ -823,7 +824,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>External events</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/externalevents32.png"
               />
@@ -888,7 +889,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>External layouts</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/externallayout32.png"
               />
@@ -955,7 +956,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/function32.png"
               />
@@ -1057,10 +1058,10 @@ export default class ProjectManager extends React.Component<Props, State> {
           value={searchText}
           onRequestSearch={this._onRequestSearch}
           onChange={this._onSearchChange}
-          elevation={3}
         />
         {this.state.projectVariablesEditorOpen && (
           <VariablesEditorDialog
+            title={<Trans>Global Variables</Trans>}
             open
             variablesContainer={project.getVariables()}
             onCancel={() =>

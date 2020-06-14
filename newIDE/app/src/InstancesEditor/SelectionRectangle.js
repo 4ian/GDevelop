@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js-legacy';
-const gd = global.gd;
+const gd /* TODO: add flow in this file */ = global.gd;
 
 export default class SelectionRectangle {
   constructor({

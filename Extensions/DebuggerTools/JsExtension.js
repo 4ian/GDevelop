@@ -33,8 +33,8 @@ module.exports = {
         ),
         _('Pause game execution'),
         _('Debugger Tools'),
-        'res/ribbon_default/bug32.png',
-        'res/ribbon_default/bug32.png'
+        'res/actions/bug32.png',
+        'res/actions/bug32.png'
       )
       .addCodeOnlyParameter("currentScene", "")
       .getCodeExtraInformation()

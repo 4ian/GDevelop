@@ -1,6 +1,6 @@
 /**
  * @file
- * Tools for interracting with the debugger.
+ * Tools for interacting with the debugger.
  */
 
 

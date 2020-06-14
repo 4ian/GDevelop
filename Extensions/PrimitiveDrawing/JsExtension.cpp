@@ -108,7 +108,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClearBetweenFrames"]
         .SetFunctionName("setClearBetweenFrames");
-    GetAllActionsForObject(
+    GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClearBetweenFrames"]
         .SetFunctionName("setClearBetweenFrames")
         .SetGetter("isClearedBetweenFrames");

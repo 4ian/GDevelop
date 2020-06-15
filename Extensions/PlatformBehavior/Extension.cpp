@@ -501,6 +501,22 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("IgnoreDefaultControls")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddCondition(
+           "CurrentFallSpeed",
+           _("Current falling speed"),
+           _("Compare the current falling speed of the object (in pixels per "
+             "second)."),
+           _("the current falling speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("GetCurrentFallSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddExpression("Gravity",
                       _("Gravity"),
                       _("Get the gravity applied on the object"),

@@ -578,6 +578,16 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior");
+    
+    aut.AddExpression("CurrentFallSpeed",
+                      _("Current fall speed"),
+                      _("Current fall speed"),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetFunctionName("GetCurrentFallSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 #endif
   }
   {

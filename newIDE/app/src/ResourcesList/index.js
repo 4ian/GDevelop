@@ -15,9 +15,10 @@ import {
   RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
+import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 
+const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
-const glob = optionalRequire('glob');
 const electron = optionalRequire('electron');
 const hasElectron = electron ? true : false;
 
@@ -113,6 +114,9 @@ export default class ResourcesList extends React.Component<Props, State> {
     extensions: string,
     createResource: () => gdResource
   ) => {
+    const glob = lazyRequireGlob();
+    if (!glob) return;
+
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());

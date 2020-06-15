@@ -102,7 +102,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import {
   useCommand,
-  useKeyboardShortcutForPalette,
+  useKeyboardShortcutForCommandPalette,
 } from '../CommandPalette/CommandHooks';
 import CommandPalette from '../CommandPalette/CommandPalette';
 import { type PreviewState } from './PreviewState.flow';
@@ -1674,7 +1674,7 @@ const MainFrame = (props: Props) => {
     });
 
   // Temporary keyboard shortcut for command palette
-  useKeyboardShortcutForPalette(
+  useKeyboardShortcutForCommandPalette(
     React.useCallback(() => openCommandPalette(true), [])
   );
 

@@ -16,7 +16,7 @@ export const useCommand = (commandName: string, command: Command) => {
   );
 };
 
-export const useKeyboardShortcutForPalette = (onOpen: () => void) => {
+export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
   React.useEffect(
     () => {
       const handler = (e: KeyboardEvent) => {

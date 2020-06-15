@@ -100,7 +100,10 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useCommand } from '../CommandPalette/CommandHooks';
+import {
+  useCommand,
+  useKeyboardShortcutForPalette,
+} from '../CommandPalette/CommandHooks';
 import CommandPalette from '../CommandPalette/CommandPalette';
 import { type PreviewState } from './PreviewState.flow';
 
@@ -1670,21 +1673,10 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
-  // Very temporary keyboard shortcut for command palette
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const body = document.body;
-      const activeEl = document.activeElement;
-      const mainFrame = document.querySelector('div.main-frame');
-      const isBody = activeEl === body;
-      const isInMainframe = mainFrame && mainFrame.contains(activeEl);
-      if (!isBody && !isInMainframe) return;
-      if ((e.ctrlKey || e.metaKey) && e.code === 'KeyP')
-        openCommandPalette(true);
-    };
-    document.addEventListener('keyup', handler);
-    return () => document.removeEventListener('keyup', handler);
-  }, []);
+  // Temporary keyboard shortcut for command palette
+  useKeyboardShortcutForPalette(
+    React.useCallback(() => openCommandPalette(true), [])
+  );
 
   useCommand('QUIT_APP', {
     displayText: t`Close GDevelop`,

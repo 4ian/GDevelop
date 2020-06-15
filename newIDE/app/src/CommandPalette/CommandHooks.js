@@ -15,3 +15,23 @@ export const useCommand = (commandName: string, command: Command) => {
     [commandManager, commandName, command.enabled, command.handler]
   );
 };
+
+export const useKeyboardShortcutForPalette = (onOpen: () => void) => {
+  React.useEffect(
+    () => {
+      const handler = (e: KeyboardEvent) => {
+        const body = document.body;
+        const activeEl = document.activeElement;
+        const mainFrame = document.querySelector('div.main-frame');
+        const isBody = activeEl === body;
+        const isInMainframe = mainFrame && mainFrame.contains(activeEl);
+        if (!isBody && !isInMainframe) return;
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.code === 'KeyP')
+          onOpen();
+      };
+      document.addEventListener('keyup', handler);
+      return () => document.removeEventListener('keyup', handler);
+    },
+    [onOpen]
+  );
+};

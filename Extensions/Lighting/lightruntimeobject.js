@@ -1,11 +1,14 @@
 gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, lightObjectData);
 
-  this._radius = parseFloat(lightObjectData.content.radius);
+  this._radius =
+    typeof lightObjectData.content.radius === 'string'
+      ? parseFloat(lightObjectData.content.radius)
+      : lightObjectData.content.radius;
   this._color = lightObjectData.content.color
     .split(',')
-    .map((item) => parseFloat(item));
-  
+    .map(function(item) { return parseFloat(item) });
+
   this._obstacleManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
   if (this._renderer)
@@ -32,6 +35,14 @@ gdjs.LightRuntimeObject.prototype.getRadius = function () {
   return this._radius;
 };
 
+gdjs.LightRuntimeObject.prototype.getHeight = function () {
+  return 2 * this.getRadius();
+};
+
+gdjs.LightRuntimeObject.prototype.getWidth = function () {
+  return 2 * this.getRadius();
+};
+
 gdjs.LightRuntimeObject.prototype.getColor = function () {
   return this._color;
 };
@@ -46,4 +57,4 @@ gdjs.LightRuntimeObject.prototype.setY = function (y) {
 
 gdjs.LightRuntimeObject.prototype.getObstaclesManager = function () {
   return this._obstacleManager;
-} 
+};

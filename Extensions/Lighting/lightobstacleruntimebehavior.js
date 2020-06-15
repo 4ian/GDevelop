@@ -18,33 +18,31 @@ gdjs.LightObstaclesManager.getManager = function (runtimeScene) {
   return runtimeScene.lightObstaclesManager;
 };
 
-gdjs.LightObstaclesManager.prototype.addObstacle = function (obstacle) {
+gdjs.LightObstaclesManager.prototype.addObstacle = function(obstacle) {
   this._obstacleRBush.insert(obstacle);
 };
 
-gdjs.LightObstaclesManager.prototype.removeObstacle = function (obstacle) {
+gdjs.LightObstaclesManager.prototype.removeObstacle = function(obstacle) {
   this._obstacleRBush.remove(obstacle);
 };
 
-gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function (
+gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function(
   object,
   radius,
   result
 ) {
   // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
   // is not necessarily in the middle of the object (for sprites for example).
-  var ow = object.getWidth();
-  var oh = object.getHeight();
-  var x = object.getDrawableX() + object.getCenterX();
-  var y = object.getDrawableY() + object.getCenterY();
+  var x = object.getX();
+  var y = object.getY();
 
   var searchArea = gdjs.staticObject(
-    gdjs.LightObstaclesManager.prototype.getAllPlatformsAround
+    gdjs.LightObstaclesManager.prototype.getAllObstaclesAround
   );
-  searchArea.minX = x - ow / 2 - radius;
-  searchArea.minY = y - oh / 2 - radius;
-  searchArea.maxX = x + ow / 2 + radius;
-  searchArea.maxY = y + oh / 2 + radius;
+  searchArea.minX = x;
+  searchArea.minY = y;
+  searchArea.maxX = x + 2 * radius;
+  searchArea.maxY = y + 2 * radius;
   var nearbyPlatforms = this._obstacleRBush.search(searchArea);
   result.length = 0;
   result.push.apply(result, nearbyPlatforms);
@@ -74,9 +72,9 @@ gdjs.registerBehavior(
   gdjs.LightObstacleRuntimeBehavior
 );
 
-gdjs.LightObstacleRuntimeBehavior.prototype.onDeActivate = function () {};
+gdjs.LightObstacleRuntimeBehavior.prototype.onDeActivate = function() {};
 
-gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function (
+gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function(
   runtimeScene
 ) {
   // This is run at every frame, before events are launched.
@@ -108,7 +106,7 @@ gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function (
   }
 };
 
-gdjs.LightObstacleRuntimeBehavior.prototype.doStepPostEvents = function (
+gdjs.LightObstacleRuntimeBehavior.prototype.doStepPostEvents = function(
   runtimeScene
 ) {
   // This is run at every frame, after events are launched.

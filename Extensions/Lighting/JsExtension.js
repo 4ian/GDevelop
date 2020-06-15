@@ -24,14 +24,13 @@ module.exports = {
       return behaviorProperties;
     };
     lightObstacleBehavior.initializeContent = function(behaviorContent) {
-      behaviorContent.setStringAttribute('property1', 'Initial value 1');
-      behaviorContent.setBoolAttribute('property2', true);
+      
     };
     extension
       .addBehavior(
         'LightObstacleBehavior',
         _('Light Obstacle Behavior'),
-        'DummyBehavior',
+        'LightObstacleBehavior',
         _('This behavior makes the object an obstacle to light'),
         '',
         'CppPlatform/Extensions/topdownmovementicon.png',

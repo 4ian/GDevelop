@@ -942,6 +942,14 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getCurrentFallSpeed = function() 
 };
 
 /**
+ * Get the current speed of the Platformer Object.
+ * @returns {number} The current speed.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getCurrentSpeed = function() {
+  return this._currentSpeed;
+};
+
+/**
  * Set the gravity of the Platformer Object.
  * @param {number} gravity The new gravity.
  */

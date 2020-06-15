@@ -517,6 +517,22 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCurrentFallSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddCondition(
+           "CurrentSpeed",
+           _("Current speed"),
+           _("Compare the current speed of the object (in pixels per "
+             "second)."),
+           _("the current speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("GetCurrentSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddExpression("Gravity",
                       _("Gravity"),
                       _("Get the gravity applied on the object"),
@@ -603,6 +619,16 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetCurrentFallSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+    
+    aut.AddExpression("CurrentSpeed",
+                      _("Current speed"),
+                      _("Current speed"),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetFunctionName("GetCurrentSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 #endif
   }

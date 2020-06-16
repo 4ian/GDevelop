@@ -52,6 +52,7 @@ export class VariablesEditorDialog extends Component {
         title={title}
       >
         <VariablesList
+          commitOnBlur={true}
           variablesContainer={variablesContainer}
           emptyExplanationMessage={emptyExplanationMessage}
           emptyExplanationSecondMessage={emptyExplanationSecondMessage}

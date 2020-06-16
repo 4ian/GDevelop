@@ -26,6 +26,7 @@ type Props = {|
   variable: gdVariable,
   depth: number,
   errorText?: ?string,
+  commitOnBlur: boolean,
   onBlur: () => void,
   onRemove: () => void,
   onAddChild: () => void,
@@ -45,6 +46,7 @@ const VariableRow = ({
   depth,
   errorText,
   onBlur,
+  commitOnBlur,
   onRemove,
   onAddChild,
   onChangeValue,
@@ -92,7 +94,7 @@ const VariableRow = ({
       <TreeTableCell key="value" expand>
         <SemiControlledTextField
           margin="none"
-          commitOnBlur
+          commitOnBlur={commitOnBlur}
           fullWidth
           name={key + 'value'}
           value={variable.getString()}

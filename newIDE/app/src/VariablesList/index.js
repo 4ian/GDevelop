@@ -44,6 +44,7 @@ type Props = {|
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
+  commitOnBlur?: Boolean,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -202,7 +203,7 @@ export default class VariablesList extends React.Component<Props, State> {
     parentVariable: ?gdVariable,
     parentOrigin: ?VariableOrigin = null
   ) {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, commitOnBlur } = this.props;
     const isStructure = variable.isStructure();
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
@@ -216,6 +217,7 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled={depth !== 0}
         depth={depth}
         origin={origin}
+        commitOnBlur={commitOnBlur}
         errorText={
           this.state.nameErrors[variable.ptr.toString()]
             ? 'This name is already taken'

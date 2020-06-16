@@ -4,6 +4,8 @@ declare class gdShapePainterObject extends gdObject {
   setCoordinatesAbsolute(): void;
   setCoordinatesRelative(): void;
   areCoordinatesAbsolute(): boolean;
+  setClearBetweenFrames(value: boolean): void;
+  isClearedBetweenFrames(): boolean;
   setOutlineSize(size: number): void;
   getOutlineSize(): number;
   setOutlineOpacity(val: number): void;

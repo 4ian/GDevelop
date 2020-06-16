@@ -105,6 +105,7 @@ import {
   useKeyboardShortcutForCommandPalette,
 } from '../CommandPalette/CommandHooks';
 import CommandPalette from '../CommandPalette/CommandPalette';
+import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import { type PreviewState } from './PreviewState.flow';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -919,9 +920,11 @@ const MainFrame = (props: Props) => {
       return;
     }
 
-    if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
+    if (isExtensionNameTaken(newName, currentProject)) {
       showWarningBox(
-        i18n._(t`Another extension with this name already exists.`)
+        i18n._(
+          t`Another extension with this name already exists (or you used a reserved extension name). Please choose another name.`
+        )
       );
       return;
     }

@@ -27,6 +27,7 @@ import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader'
 import Add from '@material-ui/icons/Add';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 
 const gd: libGDevelop = global.gd;
 
@@ -333,6 +334,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                             {parameter.getType() === 'behavior' && (
                               <BehaviorTypeSelector
                                 project={project}
+                                objectType={getLastObjectParameterObjectType(
+                                  parameters,
+                                  i
+                                )}
                                 value={parameter.getExtraInfo()}
                                 onChange={(value: string) => {
                                   parameter.setExtraInfo(value);

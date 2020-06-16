@@ -1859,7 +1859,6 @@ const MainFrame = (props: Props) => {
         requestUpdate={props.requestUpdate}
         simulateUpdateDownloaded={simulateUpdateDownloaded}
         simulateUpdateAvailable={simulateUpdateAvailable}
-        openCommandPalette={() => openCommandPalette(true)}
         onOpenDebugger={() => {
           openDebugger();
           launchPreview(/*networkPreview=*/ false);

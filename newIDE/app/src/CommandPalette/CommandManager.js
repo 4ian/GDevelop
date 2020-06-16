@@ -19,21 +19,22 @@ export default class CommandManager {
 
   constructor() {
     this.commands = {};
-    console.warn('Initialised command manager');
   }
 
   registerCommand = (commandName: string, command: Command) => {
     if (this.commands[commandName])
-      return console.warn(`Command ${commandName} is already registered.`);
+      return console.warn(
+        `Tried to register command ${commandName}, but it is already registered.`
+      );
     this.commands[commandName] = command;
-    console.warn(`Command ${commandName} registered!`);
   };
 
   deregisterCommand = (commandName: string) => {
     if (!this.commands[commandName])
-      return console.warn(`Command ${commandName} is not registered.`);
+      return console.warn(
+        `Tried to deregister command ${commandName}, but it is not registered.`
+      );
     delete this.commands[commandName];
-    console.warn(`Command ${commandName} unregistered!`);
   };
 
   getAllNamedCommands = () => {

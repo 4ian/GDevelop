@@ -966,6 +966,14 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getCanGrabPlatforms = function() 
 };
 
 /**
+ * Get if the Platformer Object can jump.
+ * @returns {boolean} Platformer Object can jump.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getCanJump = function() {
+  return this._canJump;
+};
+
+/**
  * Set the gravity of the Platformer Object.
  * @param {number} gravity The new gravity.
  */

@@ -379,6 +379,19 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetCanJump")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddCondition("CanJump",
+                     _("Can jump"),
+                     _("Check if the object can jump."),
+                     _("_PARAM0_ can jump"),
+                     "",
+                     "CppPlatform/Extensions/platformerobjecticon24.png",
+                     "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .MarkAsSimple()
+        .SetFunctionName("GetCanJump")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddAction("SimulateLeftKey",
                   _("Simulate left key press"),
                   _("Simulate a press of the left key."),

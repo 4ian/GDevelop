@@ -501,6 +501,33 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("IgnoreDefaultControls")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddAction("CanGrabPlatforms",
+                  _("Can Grab Platform"),
+                  _("De/activate when the platformer object can grab the platform."),
+                  _("_PARAM0_ can grab the platforms: _PARAM2_"),
+                  _("Controls"),
+                  "res/conditions/keyboard24.png",
+                  "res/conditions/keyboard.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .AddParameter("yesorno", _("Can grab the platfroms"))
+        .MarkAsAdvanced()
+        .SetFunctionName("SetCanGrabPlatforms")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddCondition("CanGrabPlatforms",
+                     _("Can grab platforms"),
+                     _("Check if the object can grab the platforms."),
+                     _("_PARAM0_ can grab the platforms"),
+                     "",
+                     "CppPlatform/Extensions/platformerobjecticon24.png",
+                     "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .MarkAsSimple()
+        .SetFunctionName("GetCanGrabPlatforms")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddCondition(
            "CurrentFallSpeed",
            _("Current falling speed"),

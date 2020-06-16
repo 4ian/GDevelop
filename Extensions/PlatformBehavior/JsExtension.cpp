@@ -110,11 +110,14 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
       autConditions["PlatformBehavior::CurrentSpeed"].SetFunctionName(
           "getCurrentSpeed");
       autExpressions["CurrentSpeed"].SetFunctionName("getCurrentSpeed");
-
+      autActions["PlatformBehavior::CanGrabPlatforms"]
+          .SetFunctionName("setCanGrabPlatforms")
+          .SetGetter("getCanGrabPlatforms");
+      autConditions["PlatformBehavior::CanGrabPlatforms"].SetFunctionName(
+          "getCanGrabPlatforms");    
       autConditions["PlatformBehavior::CurrentJumpSpeed"].SetFunctionName(
           "getCurrentJumpSpeed");
       autExpressions["CurrentJumpSpeed"].SetFunctionName("getCurrentJumpSpeed");
-
       autActions["PlatformBehavior::SetCanJump"].SetFunctionName("setCanJump");
       autActions["PlatformBehavior::SimulateLeftKey"].SetFunctionName(
           "simulateLeftKey");

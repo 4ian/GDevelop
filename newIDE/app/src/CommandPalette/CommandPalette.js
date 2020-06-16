@@ -49,37 +49,36 @@ const CommandPalette = (props: Props) => {
           hideBackdrop
           maxWidth="sm"
           classes={classes}
+          transitionDuration={0}
         >
-          <DialogTitle>
-            <Autocomplete
-              open={autocompleteOpen}
-              onClose={() => {
-                openAutocomplete(false);
-                handleClose();
-              }}
-              onOpen={() => openAutocomplete(true)}
-              options={commandManager.getAllNamedCommands()}
-              getOptionLabel={command => i18n._(command.displayText)}
-              onChange={handleCommandChoose}
-              openOnFocus
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  placeholder="Start typing a command..."
-                  variant="outlined"
-                  autoFocus
-                />
-              )}
-              renderOption={command => (
-                <>
-                  <ListItemIcon>
-                    <ChevronRightIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={i18n._(command.displayText)} />
-                </>
-              )}
-            />
-          </DialogTitle>
+          <Autocomplete
+            open={autocompleteOpen}
+            onClose={() => {
+              openAutocomplete(false);
+              handleClose();
+            }}
+            onOpen={() => openAutocomplete(true)}
+            options={commandManager.getAllNamedCommands()}
+            getOptionLabel={command => i18n._(command.displayText)}
+            onChange={handleCommandChoose}
+            openOnFocus
+            renderInput={params => (
+              <TextField
+                {...params}
+                placeholder="Start typing a command..."
+                variant="outlined"
+                autoFocus
+              />
+            )}
+            renderOption={command => (
+              <>
+                <ListItemIcon>
+                  <ChevronRightIcon />
+                </ListItemIcon>
+                <ListItemText primary={i18n._(command.displayText)} />
+              </>
+            )}
+          />
         </Dialog>
       )}
     </I18n>

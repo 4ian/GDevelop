@@ -85,6 +85,15 @@ export class CodeEditor extends React.Component<Props, State> {
     this.setState({
       error: null,
     });
+
+    // Define the global variable used by Monaco Editor to find its worker
+    // (used, at least, for auto-completions).
+    window.MonacoEnvironment = {
+      getWorkerUrl: function(workerId, label) {
+        return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
+      },
+    };
+
     import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
       .then(module =>
         this.setState({

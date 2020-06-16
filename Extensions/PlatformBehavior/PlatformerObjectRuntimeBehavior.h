@@ -40,6 +40,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
   double GetJumpSpeed() const { return jumpSpeed; };
   double GetCurrentFallSpeed() const { return currentFallSpeed; };
   double GetCurrentSpeed() const { return currentSpeed; };
+  double GetCurrentJumpSpeed() const { return currentJumpSpeed; };
   double GetSlopeMaxAngle() const { return slopeMaxAngle; };
 
   void SetGravity(double gravity_) { gravity = gravity_; };

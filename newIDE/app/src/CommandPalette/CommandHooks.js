@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type Command } from './CommandManager';
 import CommandsContext from './CommandsContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 export const useCommand = (commandName: string, command: Command) => {
   const commandManager = React.useContext(CommandsContext);
@@ -17,9 +18,11 @@ export const useCommand = (commandName: string, command: Command) => {
 };
 
 export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
+  const { values } = React.useContext(PreferencesContext);
   React.useEffect(
     () => {
       const handler = (e: KeyboardEvent) => {
+        if (!values.useCommandPalette) return;
         const body = document.body;
         const activeEl = document.activeElement;
         const mainFrame = document.querySelector('div.main-frame');
@@ -32,6 +35,6 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
       document.addEventListener('keyup', handler);
       return () => document.removeEventListener('keyup', handler);
     },
-    [onOpen]
+    [onOpen, values.useCommandPalette]
   );
 };

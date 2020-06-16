@@ -38,6 +38,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
     setAutoOpenMostRecentProject,
+    setUseCommandPalette,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -253,6 +254,17 @@ const PreferencesDialog = ({ onClose }: Props) => {
               />
             </Line>
           )}
+          <Text size="title">
+            <Trans>Command Palette</Trans>
+          </Text>
+          <Line>
+            <Toggle
+              onToggle={(e, check) => setUseCommandPalette(check)}
+              toggled={values.useCommandPalette}
+              labelPosition="right"
+              label={<Trans>Enable command palette (Experimental)</Trans>}
+            />
+          </Line>
         </Column>
       )}
       {currentTab === 'hints' && (

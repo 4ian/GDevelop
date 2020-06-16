@@ -24,6 +24,7 @@ type Props = {|
 |};
 
 const CommandPalette = (props: Props) => {
+  const [autocompleteOpen, openAutocomplete] = React.useState(true);
   const classes = useStyles();
   const { onClose, open } = props;
   const commandManager = React.useContext(CommandsContext);
@@ -33,7 +34,6 @@ const CommandPalette = (props: Props) => {
   };
 
   const handleCommandChoose = (e, command: NamedCommand) => {
-    console.warn(command);
     command && command.handler();
     props.onClose();
   };
@@ -52,6 +52,12 @@ const CommandPalette = (props: Props) => {
         >
           <DialogTitle>
             <Autocomplete
+              open={autocompleteOpen}
+              onClose={() => {
+                openAutocomplete(false);
+                handleClose();
+              }}
+              onOpen={() => openAutocomplete(true)}
               options={commandManager.getAllNamedCommands()}
               getOptionLabel={command => i18n._(command.displayText)}
               onChange={handleCommandChoose}

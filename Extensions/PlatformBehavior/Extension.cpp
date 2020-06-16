@@ -389,7 +389,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
-        .SetFunctionName("GetCanJump")
+        .SetFunctionName("canJump")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateLeftKey",
@@ -515,18 +515,16 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("CanGrabPlatforms",
-                  _("Can Grab Platform"),
-                  _("De/activate when the platformer object can grab the platform."),
-                  _("_PARAM0_ can grab the platforms: _PARAM2_"),
+                  _("Platform grabbing"),
+                  _("Enable (or disable) the ability of the object to grab platforms when falling near to one."),
+                  _("Allow _PARAM0_ to grab platforms: _PARAM2_"),
                   _("Controls"),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("yesorno", _("Can grab the platfroms"))
-        .MarkAsAdvanced()
-        .SetFunctionName("SetCanGrabPlatforms")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+        .AddParameter("yesorno", _("Can grab platfroms"))
+        .MarkAsAdvanced();
 
     aut.AddCondition("CanGrabPlatforms",
                      _("Can grab platforms"),
@@ -538,7 +536,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
-        .SetFunctionName("GetCanGrabPlatforms")
+        .SetFunctionName("canGrabPlatforms")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddCondition(

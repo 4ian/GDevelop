@@ -934,8 +934,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSustainTime = function() {
 };
 
 /**
- * Get the current speed during a fall of the Platformer Object.
- * @returns {number} The current speed during a fall.
+ * Get the speed at which the object is falling. It is 0 when the object is on a floor, and non 0 as soon as the object leaves the floor.
+ * @returns {number} The current fall speed.
  */
 gdjs.PlatformerObjectRuntimeBehavior.prototype.getCurrentFallSpeed = function() {
   return this._currentFallSpeed;
@@ -958,18 +958,18 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getCurrentJumpSpeed = function() 
 };
 
 /**
- * Get if the Platformer Object can grab the platforms.
- * @returns {boolean} Platformer Object can grab the platforms.
+ * Check if the Platformer Object can grab the platforms.
+ * @returns {boolean} Returns true if the object can grab the platforms.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getCanGrabPlatforms = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.canGrabPlatforms = function() {
   return this._canGrabPlatforms;
 };
 
 /**
- * Get if the Platformer Object can jump.
- * @returns {boolean} Platformer Object can jump.
+ * Check if the Platformer Object can jump.
+ * @returns {boolean} Returns true if the object can jump.
  */
-gdjs.PlatformerObjectRuntimeBehavior.prototype.getCanJump = function() {
+gdjs.PlatformerObjectRuntimeBehavior.prototype.canJump = function() {
   return this._canJump;
 };
 

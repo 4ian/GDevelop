@@ -48,13 +48,16 @@ describe('EnumerateExpressions', () => {
     );
 
     expect(
-      filterExpressions(platformerObjectBehaviorExpressions, 'JumpSpeed')
+      filterExpressions(platformerObjectBehaviorExpressions, 'CurrentJumpSpeed')
     ).toHaveLength(1);
     expect(
       filterExpressions(platformerObjectBehaviorExpressions, 'JumpSpeed')
     ).toContainEqual(
       expect.objectContaining({
         type: 'JumpSpeed',
+      }),
+      expect.objectContaining({
+        type: 'CurrentJumpSpeed',
       })
     );
   });

@@ -29,11 +29,13 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
         const isBody = activeEl === body;
         const isInMainframe = mainFrame && mainFrame.contains(activeEl);
         if (!isBody && !isInMainframe) return;
-        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.code === 'KeyP')
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.code === 'KeyP') {
+          e.preventDefault();
           onOpen();
+        }
       };
-      document.addEventListener('keyup', handler);
-      return () => document.removeEventListener('keyup', handler);
+      document.addEventListener('keydown', handler);
+      return () => document.removeEventListener('keydown', handler);
     },
     [onOpen, values.useCommandPalette]
   );

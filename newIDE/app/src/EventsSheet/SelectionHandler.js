@@ -24,7 +24,6 @@ export type ParameterContext = {|
 |};
 
 export type EventContext = {|
-  isCondition: boolean,
   eventsList: gdEventsList,
   event: gdBaseEvent,
   indexInList: number,

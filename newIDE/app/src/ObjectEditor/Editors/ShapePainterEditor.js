@@ -32,6 +32,14 @@ export default class PanelSpriteEditor extends React.Component<
             this.forceUpdate();
           }}
         />
+        <Checkbox
+          label={<Trans>Clear the rendered image between each frame</Trans>}
+          checked={shapePainterObject.isClearedBetweenFrames()}
+          onCheck={(e, checked) => {
+            shapePainterObject.setClearBetweenFrames(checked);
+            this.forceUpdate();
+          }}
+        />
         <ResponsiveLineStackLayout noMargin>
           <ColorField
             floatingLabelText={<Trans>Outline color</Trans>}

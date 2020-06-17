@@ -1,6 +1,7 @@
 // @flow
 import DarkTheme from './DarkTheme';
 import DefaultTheme from './DefaultTheme';
+import NordTheme from './NordTheme';
 import { type Theme } from './DefaultTheme';
 import './Global.css';
 
@@ -11,6 +12,7 @@ import './Global.css';
 export const themes = {
   'GDevelop default': DefaultTheme,
   Dark: DarkTheme,
+  Nord: NordTheme,
 };
 
 export const getTheme = (themeName: string): Theme =>

@@ -1,6 +1,6 @@
 // @flow
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Tool function to save a serializable object to a JS object.
@@ -36,8 +36,10 @@ export function serializeToJSON(
 ): string {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
+  const json = gd.Serializer.toJSON(serializedElement);
+  serializedElement.delete();
 
-  return gd.Serializer.toJSON(serializedElement);
+  return json;
 }
 
 /**

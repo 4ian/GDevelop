@@ -53,7 +53,12 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
-    if (!project || !project.hasLayoutNamed(projectItemName)) return null;
+    if (
+      !project ||
+      !projectItemName ||
+      !project.hasLayoutNamed(projectItemName)
+    )
+      return null;
 
     return project.getLayout(projectItemName);
   }

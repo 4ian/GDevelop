@@ -76,7 +76,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     ) => cb(true),
   };
 
-  sortableList: ?SortableVirtualizedItemList<gdEventsFunction>;
+  sortableList: ?SortableVirtualizedItemList<gdEventsBasedBehavior>;
   state: State = {
     renamedEventsBasedBehavior: null,
     searchText: '',

@@ -23,7 +23,7 @@ const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 const shell = electron ? electron.shell : null;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type ExportState = {
   archiveOutputFilename: string,

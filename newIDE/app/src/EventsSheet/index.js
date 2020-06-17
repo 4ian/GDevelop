@@ -42,7 +42,6 @@ import {
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
 } from './SelectionHandler';
-import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
   type EventsContextResult,
@@ -80,7 +79,7 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -142,6 +141,11 @@ type State = {|
   searchFocusOffset: ?number,
 
   allEventsMetadata: Array<EventMetadata>,
+|};
+
+type EventInsertionContext = {|
+  eventsList: gdEventsList,
+  indexInList: number,
 |};
 
 const styles = {
@@ -311,15 +315,15 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  addNewEvent = (type: string, context: ?EventContext): Array<gdBaseEvent> => {
+  addNewEvent = (
+    type: string,
+    context: ?EventInsertionContext
+  ): Array<gdBaseEvent> => {
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
     let insertTopOfSelection = false;
 
-    let insertions: Array<{
-      eventsList: gdEventsList,
-      indexInList: number,
-    }> = [];
+    let insertions: Array<EventInsertionContext> = [];
     if (context) {
       insertions = [context];
     } else if (hasEventsSelected) {
@@ -464,7 +468,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   ) => {
     const selectedInstructions = getSelectedInstructions(this.state.selection);
     const destinationIndex =
-      indexInList === undefined
+      indexInList === undefined || indexInList === null
         ? destinationContext.instrsList.size()
         : indexInList;
 
@@ -809,10 +813,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
-    const newEvents = this.addNewEvent(
-      'BuiltinCommonInstructions::Standard',
-      contexts[0]
-    );
+    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Standard', {
+      eventsList: contexts[0].eventsList,
+      indexInList: contexts[0].indexInList,
+    });
     if (!newEvents.length) {
       console.error('A new event should have been created');
       return;
@@ -833,10 +837,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
-    const newEvents = this.addNewEvent(
-      'BuiltinCommonInstructions::Group',
-      contexts[0]
-    );
+    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Group', {
+      eventsList: contexts[0].eventsList,
+      indexInList: contexts[0].indexInList,
+    });
     if (!newEvents.length) {
       console.error('A new event should have been created');
       return;
@@ -923,9 +927,9 @@ export default class EventsSheet extends React.Component<Props, State> {
             instruction,
             indexInList,
           } = this.state.editedInstruction;
-          if (!instrsList) return;
+          if (!instrsList || !instruction) return;
 
-          if (indexInList !== undefined) {
+          if (indexInList !== undefined && indexInList !== null) {
             // Replace an existing instruction
             instrsList.set(indexInList, instruction);
           } else {
@@ -1051,11 +1055,14 @@ export default class EventsSheet extends React.Component<Props, State> {
                           onParameterClick={this.openParameterEditor}
                           onEventClick={this.selectEvent}
                           onEventContextMenu={this.openEventContextMenu}
-                          onAddNewEvent={context => {
-                            this.addNewEvent(
-                              'BuiltinCommonInstructions::Standard',
-                              context
-                            );
+                          onAddNewEvent={(
+                            eventType: string,
+                            eventsList: gdEventsList
+                          ) => {
+                            this.addNewEvent(eventType, {
+                              eventsList,
+                              indexInList: eventsList.getEventsCount(),
+                            });
                           }}
                           onOpenExternalEvents={onOpenExternalEvents}
                           onOpenLayout={onOpenLayout}
@@ -1096,9 +1103,6 @@ export default class EventsSheet extends React.Component<Props, State> {
                               this._ensureEventUnfolded(goToNextSearchResult)
                             }
                           />
-                        )}
-                        {events && events.getEventsCount() === 0 && (
-                          <EmptyEventsPlaceholder />
                         )}
                         <InlineParameterEditor
                           open={this.state.inlineEditing}

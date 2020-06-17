@@ -21,7 +21,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsFunction: gdEventsFunction,
@@ -176,6 +176,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   fullWidth
                   disabled={!!freezeEventsFunctionType}
                   onChange={(e, i, value: string) => {
+                    // $FlowFixMe
                     eventsFunction.setFunctionType(value);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     this.forceUpdate();

@@ -8,7 +8,7 @@ import {
 } from 'react-virtualized';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import SearchBar from '../../UI/SearchBar';
-const gd = global.gd;
+const gd /*TODO: add flow in this file */ = global.gd;
 
 type State = {|
   searchText: string,
@@ -113,6 +113,8 @@ export default class InstancesList extends Component<Props, State> {
   render() {
     const { searchText } = this.state;
     const { instances } = this.props;
+
+    if (!this.instanceRowRenderer) return null;
 
     this.renderedRows.length = 0;
     instances.iterateOverInstances(this.instanceRowRenderer);

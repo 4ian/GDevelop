@@ -6,7 +6,7 @@ import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
-const gd = global.gd;
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * A service returning editor components for each object type.

@@ -5,7 +5,9 @@
  */
 
 #include "GDCore/Project/Variable.h"
+
 #include <sstream>
+
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/TinyXml/tinyxml.h"
@@ -19,9 +21,7 @@ namespace gd {
  */
 double Variable::GetValue() const {
   if (!isNumber) {
-    stringstream ss;
-    ss << str;
-    ss >> value;
+    value = str.To<double>();
     isNumber = true;
   }
 
@@ -30,9 +30,7 @@ double Variable::GetValue() const {
 
 const gd::String& Variable::GetString() const {
   if (isNumber) {
-    stringstream s;
-    s << (value);
-    str = s.str();
+    str = gd::String::From(value);
     isNumber = false;
   }
 

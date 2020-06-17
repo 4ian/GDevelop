@@ -39,7 +39,10 @@ bool Exporter::ExportLayoutForPixiPreview(gd::Project& project,
                                           gd::Layout& layout,
                                           gd::String exportDir) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportLayoutForPixiPreview(project, layout, exportDir, "");
+  gd::SerializerElement options;
+  options.AddChild("isPreview").SetBoolValue(true);
+
+  return helper.ExportLayoutForPixiPreview(project, layout, exportDir, gd::Serializer::ToJSON(options));
 }
 
 bool Exporter::ExportExternalLayoutForPixiPreview(
@@ -49,6 +52,7 @@ bool Exporter::ExportExternalLayoutForPixiPreview(
     gd::String exportDir) {
   gd::SerializerElement options;
   options.AddChild("injectExternalLayout").SetValue(externalLayout.GetName());
+  options.AddChild("isPreview").SetBoolValue(true);
 
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   return helper.ExportLayoutForPixiPreview(

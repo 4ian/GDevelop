@@ -13,7 +13,7 @@ import {
   declareBehaviorPropertiesInstructionAndExpressions,
 } from './MetadataDeclarationHelpers';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type EventsFunctionCodeWriter = {|
   getIncludeFileFor: (functionName: string) => string,
@@ -139,7 +139,7 @@ const generateEventsFunctionExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   options: Options
-): Promise<gdEventsFunctionsExtension> => {
+): Promise<gdPlatformExtension> => {
   const extension = new gd.PlatformExtension();
   declareExtension(extension, eventsFunctionsExtension);
 
@@ -196,17 +196,15 @@ const generateEventsFunctionExtension = (
 
 const generateFreeFunction = (
   project: gdProject,
-  extensionOrBehaviorMetadata: gdPlatformExtension | gdBehaviorMetadata,
-  eventsFunctionsExtensionOrEventsBasedBehavior:
-    | gdEventsFunctionsExtension
-    | gdEventsBasedBehavior,
+  extension: gdPlatformExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunction: gdEventsFunction,
   options: Options,
   codeGenerationContext: CodeGenerationContext
 ): Promise<void> => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
-    extensionOrBehaviorMetadata,
-    eventsFunctionsExtensionOrEventsBasedBehavior,
+    extension,
+    eventsFunctionsExtension,
     eventsFunction
   );
   // By convention, first parameter is always the Runtime Scene.

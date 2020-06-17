@@ -59,10 +59,16 @@ gdjs.RuntimeGame = function(data, options) {
   this._injectExternalLayout = options.injectExternalLayout || '';
   this._options = options;
 
-  //Optional client to connect to a debugger:
+  /** 
+   * Optional client to connect to a debugger
+   * @type {?gdjs.IDebuggerClient} 
+   */
   this._debuggerClient = gdjs.DebuggerClient
     ? new gdjs.DebuggerClient(this)
     : null;
+
+  /** @type {boolean} */
+  this._isPreview = options.isPreview || false;
 };
 
 /**
@@ -547,4 +553,12 @@ gdjs.RuntimeGame.prototype.wasFirstSceneLoaded = function() {
  */
 gdjs.RuntimeGame.prototype.getSceneStack = function() {
   return this._sceneStack;
+}
+
+/**
+ * Check if the game is running as a preview, launched from an editor.
+ * @returns {boolean} true if the current game is a preview.
+ */
+gdjs.RuntimeGame.prototype.isPreview = function() {
+  return this._isPreview;
 }

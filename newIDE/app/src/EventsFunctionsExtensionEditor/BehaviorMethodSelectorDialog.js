@@ -14,7 +14,7 @@ import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
 import Function from '../UI/CustomSvgIcons/Behaviors/Function';
 import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
 import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsBasedBehavior: gdEventsBasedBehavior,

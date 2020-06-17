@@ -13,7 +13,7 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import { type EventRendererProps } from './EventRenderer';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
 

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { type SelectionState } from './SelectionHandler';
 import { mapFor } from '../Utils/MapFor';
 import uniqBy from 'lodash/uniqBy';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type SearchInEventsInputs = {|
   searchInSelection: boolean,
@@ -30,8 +30,8 @@ type State = {|
 |};
 
 type Props = {|
-  globalObjectsContainer: gdProject,
-  objectsContainer: gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   selection: SelectionState,
   children: (props: {|
@@ -89,6 +89,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       // function to be done in C++.
       console.error('Replace in selection is not implemented yet');
     }
+    if (!replaceText) return;
 
     gd.EventsRefactorer.replaceStringInEvents(
       globalObjectsContainer,
@@ -98,8 +99,9 @@ export default class EventsSearcher extends React.Component<Props, State> {
       replaceText,
       matchCase,
       searchInConditions,
-      searchInActions,
-      searchInEventStrings
+      searchInActions
+      // TODO: add capability to replace in event strings
+      // searchInEventStrings
     );
   };
 

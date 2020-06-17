@@ -2,7 +2,7 @@
 
 import flatten from 'lodash/flatten';
 import { mapFor } from '../Utils/MapFor';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type EventMetadata = {|
   type: string,
@@ -17,7 +17,7 @@ export const enumerateEventsMetadata = (): Array<EventMetadata> => {
 
   return flatten(
     mapFor(0, allExtensions.size(), i => {
-      const extension = allExtensions.get(i);
+      const extension = allExtensions.at(i);
       const extensionEvents = extension.getAllEvents();
 
       return extensionEvents

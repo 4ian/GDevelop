@@ -46,7 +46,7 @@ import ForceMultiplierField, {
 } from './ParameterFields/ForceMultiplierField';
 import SceneNameField from './ParameterFields/SceneNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const components = {
   default: DefaultField,

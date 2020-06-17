@@ -181,6 +181,39 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetGetter("GetMaxFallingSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+     aut.AddCondition(
+           "LadderClimbingSpeed",
+           _("Ladder climbing speed"),
+           _("Compare the ladder climbing speed (in pixels per "
+             "second)."),
+           _("the ladder climbing speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("GetLadderClimbingSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddAction(
+           "LadderClimbingSpeed",
+           _("Ladder climbing speed"),
+           _("Change the ladder climbing speed (in pixels per "
+             "second)."),
+           _("the ladder climbing speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("SetLadderClimbingSpeed")
+        .SetGetter("GetLadderClimbingSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddCondition("Acceleration",
                      _("Acceleration"),
                      _("Compare the acceleration of the object (in pixels per "
@@ -330,7 +363,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction(
            "SetCanJump",
-           _("Allow again jumping"),
+           _("Allow jumping again"),
            _("When this action is executed, the object is able to jump again, "
              "even if it is in the air: this can be useful to allow a double "
              "jump for example. This is not a permanent effect: you must call "
@@ -486,6 +519,16 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetMaxFallingSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddExpression("LadderClimbingSpeed",
+                      _("Ladder climbing speed"),
+                      _("Get the ladder climbing speed"),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetFunctionName("GetLadderClimbingSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("Acceleration",

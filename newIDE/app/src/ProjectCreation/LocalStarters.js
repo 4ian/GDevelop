@@ -21,7 +21,7 @@ const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   onOpen: (

@@ -1,10 +1,11 @@
+// @flow
 let testExtensionsAdded = false;
 
 /**
  * Create dummy extensions into gd.JsPlatform
  * @param gd The GD instance to use to create the extensions and find the platform.
  */
-export const makeTestExtensions = gd => {
+export const makeTestExtensions = (gd: libGDevelop) => {
   // Be sure to only add test extensions once, as gd.JsPlatform is a singleton.
   if (testExtensionsAdded) return;
   testExtensionsAdded = true;
@@ -97,6 +98,34 @@ export const makeTestExtensions = gd => {
         .setType('boolean')
         .setDescription('And some *optional* description.')
     );
+
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'FakeTextBehavior',
+      'Fake extension with a fake behavior for text objects only',
+      'A fake extension with a fake behavior for text objects only.',
+      '',
+      'MIT'
+    );
+    const fakeBehavior = new gd.BehaviorJsImplementation();
+
+    const sepiaEffect = extension
+      .addBehavior(
+        'FakeTextBehavior',
+        'Fake behavior for text objects only',
+        'FakeTextBehavior', // Default name is the name
+        'A fake behavior for text objects only.',
+        '',
+        'res/function24.png',
+        'FakeTextBehavior', // Class name is the name, actually unused
+        fakeBehavior,
+        new gd.BehaviorsSharedData()
+      )
+      .setObjectType('TextObject::Text');
 
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

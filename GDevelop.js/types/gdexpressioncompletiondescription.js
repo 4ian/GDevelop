@@ -4,12 +4,12 @@ declare class gdExpressionCompletionDescription {
   static Behavior: 1;
   static Expression: 2;
   static Variable: 3;
-  getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
-  getType(): string;
-  getPrefix(): string;
-  getObjectName(): string;
-  getBehaviorName(): string;
-  isExact(): boolean;
-  delete(): void;
+  getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
+  getType(): string;
+  getPrefix(): string;
+  getObjectName(): string;
+  getBehaviorName(): string;
+  isExact(): boolean;
+  delete(): void;
   ptr: number;
-};
+};

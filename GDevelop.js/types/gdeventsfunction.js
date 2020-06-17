@@ -4,22 +4,22 @@ declare class gdEventsFunction {
   static Condition: 1;
   static Expression: 2;
   static StringExpression: 3;
-  constructor(): void;
-  setDescription(description: string): gdEventsFunction;
-  getDescription(): string;
-  setName(name: string): gdEventsFunction;
-  getName(): string;
-  setFullName(fullName: string): gdEventsFunction;
-  getFullName(): string;
-  setSentence(sentence: string): gdEventsFunction;
-  getSentence(): string;
-  setFunctionType(type: EventsFunction_FunctionType): gdEventsFunction;
-  getFunctionType(): EventsFunction_FunctionType;
-  getEvents(): gdEventsList;
-  getParameters(): gdVectorParameterMetadata;
-  getObjectGroups(): gdObjectGroupsContainer;
-  serializeTo(element: gdSerializerElement): void;
-  unserializeFrom(project: gdProject, element: gdSerializerElement): void;
-  delete(): void;
+  constructor(): void;
+  setDescription(description: string): gdEventsFunction;
+  getDescription(): string;
+  setName(name: string): gdEventsFunction;
+  getName(): string;
+  setFullName(fullName: string): gdEventsFunction;
+  getFullName(): string;
+  setSentence(sentence: string): gdEventsFunction;
+  getSentence(): string;
+  setFunctionType(type: EventsFunction_FunctionType): gdEventsFunction;
+  getFunctionType(): EventsFunction_FunctionType;
+  getEvents(): gdEventsList;
+  getParameters(): gdVectorParameterMetadata;
+  getObjectGroups(): gdObjectGroupsContainer;
+  serializeTo(element: gdSerializerElement): void;
+  unserializeFrom(project: gdProject, element: gdSerializerElement): void;
+  delete(): void;
   ptr: number;
-};
+};

@@ -77,55 +77,61 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
-  // var vertices = [this._object.x + this._radius, this._object.y + this._radius];
+  var vertices = [this._object.x, this._object.y];
   this._light.shader.uniforms.center = new Float32Array([
     this._object.x,
     this._object.y,
   ]);
 
-  // console.log(this.raycastTest());
-  // if (raycast.length !== 0) {
-  //   vertices.push.apply(vertices, raycast.flat(1));
-  //   this._light.geometry
-  //   .getBuffer('aVertexPosition')
-  //   .update(new Float32Array(vertices));
+  var raycast = this.raycastTest().flat(1);
+  if (raycast.length !== 0) {
+    vertices.push.apply(vertices, raycast);
+    this._light.geometry
+      .getBuffer('aVertexPosition')
+      .update(new Float32Array(vertices));
 
-  //   var indices = [0,1,2];
+    var indices = [0, 1, 2];
 
-  //   for(var i = 3; i < vertices.length; i+=3) {
-  //     indices[i] = 0;
-  //     indices[i + 1] = indices[i - 1];
-  //     indices[i + 2] = indices[i + 1] + 1;
-  //   }
+    for (var i = 3; i < 3 * vertices.length; i += 3) {
+      indices[i] = 0;
+      indices[i + 1] = indices[i - 1];
+      if (i + 2 === 3 * vertices.length - 1) {
+        indices[i + 2] = 1;
+      } else {
+        indices[i + 2] = indices[i + 1] + 1;
+      }
+    }
 
-  //   this._light.geometry
-  //   .getIndex().update(new Uint16Array(indices));
-  // } else {
-  this._light.geometry
-    .getBuffer('aVertexPosition')
-    .update(
-      new Float32Array([
-        this._object.x - this._radius,
-        this._object.y + this._radius,
-        this._object.x + this._radius,
-        this._object.y + this._radius,
-        this._object.x + this._radius,
-        this._object.y - this._radius,
-        this._object.x - this._radius,
-        this._object.y - this._radius,
-      ])
-    );
-  //  }
+    console.log(indices, vertices.length);
+
+    this._light.geometry.getIndex().update(new Uint16Array(indices));
+  } else {
+    this._light.geometry
+      .getBuffer('aVertexPosition')
+      .update(
+        new Float32Array([
+          this._object.x - this._radius,
+          this._object.y + this._radius,
+          this._object.x + this._radius,
+          this._object.y + this._radius,
+          this._object.x + this._radius,
+          this._object.y - this._radius,
+          this._object.x - this._radius,
+          this._object.y - this._radius,
+        ])
+      );
+  }
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
   var result = [];
-  var center = [this._object.x + this._radius, this._object.y + this._radius];
+  var centerX = this._object.x;
+  var centerY = this._object.y;
   var halfOfDiag = Math.sqrt(2) * this._radius;
 
   this._manager.getAllObstaclesAround(this._object, this._radius, result);
   var hitBoxes = result.map(function (item) {
-    return item.owner.hitBoxes;
+    return item.owner.getHitBoxes();
   });
   hitBoxes.push(this._object.getHitBoxes());
 
@@ -137,22 +143,23 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
     .flat(1);
 
   function _calculatePOI(angle) {
-    var minDist = halfOfDiag;
-    var minPOI = [];
+    var targetX = centerX + halfOfDiag * Math.cos(angle);
+    var targetY = centerY + halfOfDiag * Math.sin(angle);
+    var minSqDist = halfOfDiag * halfOfDiag;
+    var minPOI = [targetX, targetY];
     for (var poly of polygons) {
       var poi = gdjs.Polygon.raycastTest(
         poly,
-        center[0],
-        center[1],
-        center[0] + halfOfDiag * Math.cos(angle),
-        center[1] + halfOfDiag * Math.sin(angle)
+        centerX,
+        centerY,
+        targetX,
+        targetY
       );
 
-      if (poi.closeSqDist !== 0 && poi.closeSqDist <= minDist) {
-        console.log(poi.closeX, poi.closeY);
-        minDist = poi.closeSqDist;
-        minPOI.length = 0;
-        minPOI.push.apply(minPOI, [poi.closeX, poi.closeY]);
+      if (poi.collision && poi.closeSqDist <= minSqDist) {
+        minSqDist = poi.closeSqDist;
+        minPOI[0] = poi.closeX;
+        minPOI[1] = poi.closeY;
       }
     }
 
@@ -162,12 +169,9 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
   var _raycastResult = [];
 
   for (var vertex of vertices) {
-    var xdiff = vertex[0] - center[0];
-    var ydiff = vertex[1] - center[1];
-    var angle = Math.atan(ydiff / xdiff);
-
-    if (xdiff < 0) angle += Math.PI;
-    if (xdiff >= 0 && ydiff < 0) angle += 2 * Math.PI;
+    var xdiff = vertex[0] - centerX;
+    var ydiff = vertex[1] - centerY;
+    var angle = Math.atan2(ydiff, xdiff);
 
     _raycastResult.push({
       vertex: _calculatePOI(angle),
@@ -176,18 +180,19 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
 
     // TODO: Check whether we need to raycast these two extra rays or not.
     _raycastResult.push({
-      vertex: _calculatePOI(angle + 0.01),
-      angle: angle + 0.01,
+      vertex: _calculatePOI(angle + 0.0001),
+      angle: angle + 0.0001,
     });
     _raycastResult.push({
-      vertex: _calculatePOI(angle - 0.01),
-      angle: angle - 0.01,
+      vertex: _calculatePOI(angle - 0.0001),
+      angle: angle - 0.0001,
     });
   }
 
   return _raycastResult
     .sort(function (a, b) {
       if (a.angle < b.angle) return -1;
+      if (a.angle === b.angle) return 0;
       if (a.angle > b.angle) return 1;
     })
     .map(function (item) {

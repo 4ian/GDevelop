@@ -881,7 +881,7 @@ module.exports = {
 		extension
           .addAction(
             'FirestoreWriteDocument',
-            _('Write a documnet to firestore'),
+            _('Write a document to firestore'),
 			_('Writes a document (variable) to cloud firestore.'),
 			_('Write _PARAM2_ to firestore in document _PARAM1_ of collection _PARAM0_ (Store result state in _PARAM3_)'),
             _('Firebase/Cloud Firestore'),
@@ -1039,7 +1039,7 @@ module.exports = {
 		  )
 		  .addParameter("string", _("Collection"), "", false)
 		  .addParameter("string", _("Document"), "", false)
-		  .addParameter("string", _("Field to update"), "", false)
+		  .addParameter("string", _("Field to get"), "", false)
 		  .addParameter("scenevar", _("Variable where to store the field's value"), "", false)
 		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
 		  .getCodeExtraInformation()
@@ -1140,6 +1140,211 @@ module.exports = {
       	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
 		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_storagetools.js')
 		  .setFunctionName('gdjs.evtTools.firebase.storage.getDownloadURL');
+
+		/* ====== REALTIME DATABASE ====== */
+
+		extension
+          .addAction(
+            'DatabaseWriteVariable',
+            _('Write a variable to Database'),
+			_('Writes a variable to Database.'),
+			_('Write _PARAM1_ to Database in _PARAM0_ (Store result state in _PARAM2_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("scenevar", _("Variable to write"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.writeVariable');
+
+		extension
+          .addAction(
+            'DatabaseWriteField',
+            _('Write a field in Database'),
+			_('Writes a field of a Database document.'),
+			_('Write _PARAM2_ in field _PARAM1_ of _PARAM0_ (Store result state in _PARAM3_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("string", _("Field to write"), "", false)
+		  .addParameter("string", _("Value to write"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.writeField');
+
+		extension
+          .addAction(
+            'DatabaseUpdateVariable',
+            _('Update a document in Database'),
+			_('Updates a variable on the database.'),
+			_('Update varable _PARAM0_ with _PARAM1_ (Store result state in _PARAM2_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("scenevar", _("Variable to update with"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.updateVariable');
+
+		extension
+          .addAction(
+            'DatabaseUpdateField',
+            _('Update a field of a document'),
+			_('Updates a field of a Database document.'),
+			_('Update field _PARAM1_ of _PARAM0_ with _PARAM2_ (Store result state in _PARAM3_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("string", _("Field to update"), "", false)
+		  .addParameter("string", _("Value to write"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.updateField');
+
+		extension
+          .addAction(
+            'DatabaseDeleteVariable',
+            _('Delete a database variable'),
+			_('Deletes a variable from the database.'),
+			_('Delete variable _PARAM0_ from database (Store result state in _PARAM1_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.deleteVariable');
+
+		extension
+          .addAction(
+            'DatabaseDeleteField',
+            _('Delete a field of a variable'),
+			_('Deletes a field of a variable on the database.'),
+			_('Delete field _PARAM1_ of variable _PARAM0_ on the database (Store result state in _PARAM2_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("string", _("Field to delete"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.deleteField');
+
+		extension
+          .addAction(
+            'DatabaseGetVariable',
+            _('Get a variable from the database'),
+			_('Gets a variable from the database and store it in a Scene variable.'),
+			_('Load database variable _PARAM0_ into _PARAM1_ (Store result state in _PARAM2_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("scenevar", _("Variable where to store the data"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.getVariable');
+
+		extension
+          .addAction(
+            'DatabaseGetField',
+            _('Get a field of a variable'),
+			_('Gets the value of a field in a variable from the database and store it in a scene variable.'),
+			_('Load field _PARAM1_ of database variable _PARAM0_ into _PARAM2_ (Store result state in _PARAM3_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("string", _("Field to get"), "", false)
+		  .addParameter("scenevar", _("Variable where to store the field's value"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.getField');
+
+		extension
+          .addAction(
+            'DatabaseHasVariable',
+            _('Check for a variable\'s existence'),
+			_('Checks for the existence of a variable. Sets the result variable to 1 if it exists else to 2.'),
+			_('Check for existence of _PARAM0_ and store result in _PARAM1_ (Store result state in _PARAM2_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("scenevar", _("Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.hasVariable');
+
+		extension
+          .addAction(
+            'DatabaseHasField',
+            _('Check for existence of a variable\'s field'),
+			_('Checks for the existence of a field in a variable. Sets the result variable to 1 if it exists else to 2.'),
+			_('Check for existence of _PARAM1_ in database variable _PARAM0_ and store result in _PARAM2_ (Store result state in _PARAM3_)'),
+            _('Firebase/Realtime Database'),
+			'JsPlatform/Extensions/firebase.png',
+			'JsPlatform/Extensions/firebase.png'
+		  )
+		  .addParameter("string", _("Path"), "", false)
+		  .addParameter("string", _("Field to check"), "", false)
+		  .addParameter("scenevar", _("Callback Variable where to store the result"), "", false)
+		  .addParameter("scenevar", _("Callback Variable with state (ok or error)"), "", false)
+		  .getCodeExtraInformation()
+          .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+		  .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-database.js')
+      	  .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+		  .addIncludeFile('Extensions/Firebase/C_firebasetools/D_databasetools.js')
+		  .setFunctionName('gdjs.evtTools.firebase.database.hasField');
 
         return extension;
     },

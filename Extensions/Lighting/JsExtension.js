@@ -10,22 +10,19 @@ module.exports = {
     );
 
     var lightObstacleBehavior = new gd.BehaviorJsImplementation();
-    lightObstacleBehavior.updateProperty = function(
+    lightObstacleBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
       newValue
     ) {
-
       return false;
     };
-    lightObstacleBehavior.getProperties = function(behaviorContent) {
+    lightObstacleBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       return behaviorProperties;
     };
-    lightObstacleBehavior.initializeContent = function(behaviorContent) {
-      
-    };
+    lightObstacleBehavior.initializeContent = function (behaviorContent) {};
     extension
       .addBehavior(
         'LightObstacleBehavior',
@@ -38,7 +35,7 @@ module.exports = {
         lightObstacleBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
+      .setIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js');
 
     var lightObject = new gd.ObjectJsImplementation();
 
@@ -47,12 +44,12 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === 'Radius') {
-        objectContent.radius = newValue;
+      if (propertyName === 'radius') {
+        objectContent.radius = parseFloat(newValue);
         return true;
       }
 
-      if (propertyName === 'Color') {
+      if (propertyName === 'color') {
         objectContent.color = newValue;
         return true;
       }
@@ -64,15 +61,15 @@ module.exports = {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
-        'Radius',
-        new gd.PropertyDescriptor(objectContent.radius.toString()).setType(
-          'number'
-        )
+        'radius',
+        new gd.PropertyDescriptor(objectContent.radius.toString())
+          .setType('number')
+          .setLabel(_('Radius'))
       );
 
       objectProperties.set(
-        'Color',
-        new gd.PropertyDescriptor(objectContent.color)
+        'color',
+        new gd.PropertyDescriptor(objectContent.color).setLabel(_('Color'))
       );
 
       return objectProperties;
@@ -169,12 +166,12 @@ module.exports = {
       this._radius = parseFloat(
         this._associatedObject
           .getProperties(this.project)
-          .get('Radius')
+          .get('radius')
           .getValue()
       );
       this._color = this._associatedObject
         .getProperties(this.project)
-        .get('Color')
+        .get('color')
         .getValue()
         .split(',')
         .map((item) => parseFloat(item) / 255);
@@ -211,10 +208,7 @@ module.exports = {
     }
     `,
         {
-          center: [
-            this._instance.getX() + this._radius,
-            this._instance.getY() + this._radius,
-          ],
+          center: [this._instance.getX(), this._instance.getY()],
           radius: this._radius,
           color: this._color,
         }
@@ -222,7 +216,16 @@ module.exports = {
       this._geometry
         .addAttribute(
           'aVertexPosition',
-          [50, 150, 150, 150, 150, 50, 50, 50],
+          [
+            this._instance.getX() - this._radius,
+            this._instance.getY() + this._radius,
+            this._instance.getX() + this._radius,
+            this._instance.getY() + this._radius,
+            this._instance.getX() + this._radius,
+            this._instance.getY() - this._radius,
+            this._instance.getX() - this._radius,
+            this._instance.getY() - this._radius,
+          ],
           2
         )
         .addIndex([0, 1, 2, 2, 3, 0]);
@@ -252,21 +255,21 @@ module.exports = {
      */
     RenderedLightObjectInstance.prototype.update = function () {
       this._pixiObject.shader.uniforms.center = new Float32Array([
-        this._instance.getX() + this._radius,
-        this._instance.getY() + this._radius,
+        this._instance.getX(),
+        this._instance.getY(),
       ]);
       this._pixiObject.geometry
         .getBuffer('aVertexPosition')
         .update(
           new Float32Array([
-            this._instance.getX(),
-            this._instance.getY() + this._radius * 2,
-            this._instance.getX() + this._radius * 2,
-            this._instance.getY() + this._radius * 2,
-            this._instance.getX() + this._radius * 2,
-            this._instance.getY(),
-            this._instance.getX(),
-            this._instance.getY(),
+            this._instance.getX() - this._radius,
+            this._instance.getY() + this._radius,
+            this._instance.getX() + this._radius,
+            this._instance.getY() + this._radius,
+            this._instance.getX() + this._radius,
+            this._instance.getY() - this._radius,
+            this._instance.getX() - this._radius,
+            this._instance.getY() - this._radius,
           ])
         );
     };
@@ -283,6 +286,14 @@ module.exports = {
      */
     RenderedLightObjectInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height;
+    };
+
+    RenderedLightObjectInstance.prototype.getOriginX = function () {
+      return this._radius;
+    };
+
+    RenderedLightObjectInstance.prototype.getOriginY = function () {
+      return this._radius;
     };
 
     objectsRenderingService.registerInstanceRenderer(

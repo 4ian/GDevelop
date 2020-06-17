@@ -52,6 +52,13 @@ export class VariablesEditorDialog extends Component {
         title={title}
       >
         <VariablesList
+          commitVariableValueOnBlur={
+            // Reduce the number of re-renders by saving the variable value only when the field is blurred.
+            // We don't do that by default because the VariablesList can be used in a component like
+            // InstancePropertiesEditor, that can be unmounted at any time, before the text fields get a
+            // chance to be blurred.
+            true
+          }
           variablesContainer={variablesContainer}
           emptyExplanationMessage={emptyExplanationMessage}
           emptyExplanationSecondMessage={emptyExplanationSecondMessage}

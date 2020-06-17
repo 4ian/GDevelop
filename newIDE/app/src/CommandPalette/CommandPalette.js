@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Dialog from '@material-ui/core/Dialog';
@@ -64,7 +65,7 @@ const CommandPalette = (props: Props) => {
             renderInput={params => (
               <TextField
                 {...params}
-                placeholder="Start typing a command..."
+                placeholder={i18n._(t`Start typing a command...`)}
                 variant="outlined"
                 autoFocus
               />

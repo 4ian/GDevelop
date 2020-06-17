@@ -21,7 +21,7 @@ const styles = {
     // When displayed in an events sheet that has Mosaic windows (see `EditorMosaic`) next to it,
     // it could be displayed behind them, because they have a z-index of 1 :/ Use a z-index of 2
     // then. Only one InlinePopover should be shown at a time anyway.
-    zIndex: 2,
+    zIndex: 5,
   },
 };
 
